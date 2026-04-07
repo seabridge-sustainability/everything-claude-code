@@ -1,0 +1,43 @@
+# Everything Claude Code Context Index
+
+> Generated from ECC canonical English docs by `npm run context-hub:sync`.
+> Prefer local repo files first, then ECC Context Hub content, then public Context Hub entries, then Context7 for external APIs. Use this `llms.txt` file as a fallback index when `chub` is unavailable.
+
+## Retrieval Order
+
+1. Local repo file if the answer is already in the checked-out workspace.
+2. Local ECC Context Hub content via `chub` for ECC-specific guides, commands, policies, and workflows.
+3. Public Context Hub entries for non-ECC skills or curated playbooks.
+4. Context7 for third-party vendor, framework, and API documentation.
+5. `llms.txt` or general browsing only as a fallback path.
+
+## Local Workflow
+
+- `npm run context-hub:sync` refreshes the generated Context Hub content and this `llms.txt` file.
+- `npm run context-hub:validate` validates the local Context Hub content with `@aisuite/chub`.
+- `npm run context-hub:build` builds `context-hub/dist` so `chub search` and `chub get` can consume ECC locally.
+
+## Core
+
+- [ecc/core-overview](context-hub/ecc/docs/core-overview/DOC.md): Repository overview, quick start, installation, and documentation retrieval policy for ECC.
+- [ecc/core-agents](context-hub/ecc/docs/core-agents/DOC.md): Canonical agent instructions, routing rules, testing standards, and development workflow for ECC agents.
+- [ecc/core-claude](context-hub/ecc/docs/core-claude/DOC.md): Claude Code specific guidance for working in the ECC repository.
+- [ecc/core-codex](context-hub/ecc/docs/core-codex/DOC.md): Codex-specific guidance for ECC, including skills discovery and source-aware documentation routing.
+- [ecc/core-soul](context-hub/ecc/docs/core-soul/DOC.md): Core identity, principles, and cross-harness philosophy for Everything Claude Code.
+
+## Guides
+
+- [ecc/guides-shortform](context-hub/ecc/docs/guides-shortform/DOC.md): The shorthand guide covering setup, foundations, philosophy, and practical ECC workflows.
+- [ecc/guides-longform](context-hub/ecc/docs/guides-longform/DOC.md): The longform guide covering token optimization, memory, evals, research, and advanced agent workflows.
+- [ecc/guides-security](context-hub/ecc/docs/guides-security/DOC.md): Agentic security guidance for ECC, including prompt-injection, supply-chain, and sandboxing concerns.
+
+## Policies
+
+- [ecc/policy-contributing](context-hub/ecc/docs/policy-contributing/DOC.md): Contribution rules for agents, skills, commands, docs, and documentation routing within ECC.
+- [ecc/commands-docs](context-hub/ecc/docs/commands-docs/DOC.md): The source-aware `/docs` command contract for routing ECC-internal docs to Context Hub and external docs to Context7.
+- [ecc/agents-docs-lookup](context-hub/ecc/docs/agents-docs-lookup/DOC.md): Agent instructions for routing ECC-internal documentation to Context Hub and external APIs to Context7.
+
+## Skills
+
+- [ecc/documentation-lookup](context-hub/ecc/skills/documentation-lookup/SKILL.md): Documentation routing skill for ECC internal docs via Context Hub and third-party APIs via Context7.
+

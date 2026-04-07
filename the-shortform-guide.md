@@ -10,6 +10,20 @@ Here's my complete setup after 10 months of daily use: skills, hooks, subagents,
 
 ---
 
+## Documentation Retrieval Order
+
+For docs work, stop treating every question like a web search problem.
+
+Use this order:
+
+1. Local repo files if the answer is already in your workspace.
+2. Local ECC Context Hub content via `chub` for ECC's own guides, commands, and playbooks.
+3. Public Context Hub entries for non-ECC reusable skills and recipes.
+4. Context7 for external libraries, frameworks, SDKs, and APIs.
+5. `llms.txt` or browsing only as fallback paths.
+
+---
+
 ## Skills and Commands
 
 Skills operate like rules, constricted to certain scopes and workflows. They're shorthand to prompts when you need to execute a particular workflow.
@@ -126,6 +140,8 @@ Your `.rules` folder holds `.md` files with best practices Claude should ALWAYS 
 ## MCPs (Model Context Protocol)
 
 MCPs connect Claude to external services directly. Not a replacement for APIs - it's a prompt-driven wrapper around them, allowing more flexibility in navigating information.
+
+For ECC specifically, treat Context7 as the external-docs lane. ECC's own docs should come from local files or the local Context Hub bundle, not from Context7 first.
 
 **Example:** Supabase MCP lets Claude pull specific data, run SQL directly upstream without copy-paste. Same for databases, deployment platforms, etc.
 

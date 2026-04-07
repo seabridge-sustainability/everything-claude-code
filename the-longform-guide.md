@@ -232,9 +232,17 @@ For my own workflow management, I like to start an empty repo with 2 open Claude
 - Creates architecture mermaid diagrams
 - Compiles the references with actual documentation clips
 
-**llms.txt Pattern:**
+**Docs Retrieval Pattern:**
 
-If available, you can find an `llms.txt` on many documentation references by doing `/llms.txt` on them once you reach their docs page. This gives you a clean, LLM-optimized version of the documentation.
+For your own system, make internal docs fetchable through Context Hub before reaching for browsing.
+
+- local repo files first
+- local `chub` content for your own guides and playbooks
+- public Context Hub entries for shared skills
+- Context7 for third-party libraries and APIs
+- `llms.txt` only as a fallback index when `chub` is unavailable
+
+You can still use `llms.txt` on external docs sites when it exists, but it should not be the first stop for your own harness documentation anymore.
 
 **Philosophy: Build Reusable Patterns**
 

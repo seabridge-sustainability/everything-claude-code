@@ -178,7 +178,7 @@ function runTests() {
   // ── Round 28: config file parsing ──
   console.log('\nConfig file parsing:');
 
-  if (test('uses custom min_session_length from config file', () => {
+  if (test('uses default min_session_length when custom config is not at __dirname path', () => {
     const testDir = createTestDir();
     // Create a config that sets min_session_length to 3
     const configDir = path.join(testDir, 'skills', 'continuous-learning');

@@ -142,6 +142,10 @@ function getSessionMetadata() {
   };
 }
 
+function escapeRegExp(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 function extractHeaderField(header, label) {
   const match = header.match(new RegExp(`\\*\\*${escapeRegExp(label)}:\\*\\*\\s*(.+)$`, 'm'));
   return match ? match[1].trim() : null;
@@ -236,7 +240,7 @@ async function main() {
       } else {
         // Migration path for files created before summary markers existed.
         updatedContent = updatedContent.replace(
-          /## (?:Session Summary|Current State)[\s\S]*?$/,
+          /## (?:Session Summary|Current State)[\s\S]*?$/m,
           `${summaryBlock}\n\n### Notes for Next Session\n-\n\n### Context to Load\n\`\`\`\n[relevant files]\n\`\`\`\n`
         );
       }
@@ -294,8 +298,4 @@ function buildSummarySection(summary) {
 
 function buildSummaryBlock(summary) {
   return `${SUMMARY_START_MARKER}\n${buildSummarySection(summary).trim()}\n${SUMMARY_END_MARKER}`;
-}
-
-function escapeRegExp(value) {
-  return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }

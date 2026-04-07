@@ -1,6 +1,6 @@
 # Everything Claude Code (ECC) — Agent Instructions
 
-This is a **production-ready AI coding plugin** providing 30 specialized agents, 136 skills, 60 commands, and automated hook workflows for software development.
+This is a **production-ready AI coding plugin** providing 30 specialized agents, ~74 skills, 60 commands, and automated hook workflows for software development.
 
 **Version:** 1.9.0
 
@@ -11,6 +11,16 @@ This is a **production-ready AI coding plugin** providing 30 specialized agents,
 3. **Security-First** — Never compromise on security; validate all inputs
 4. **Immutability** — Always create new objects, never mutate existing ones
 5. **Plan Before Execute** — Plan complex features before writing code
+
+## Documentation Retrieval Order
+
+When documentation is needed, follow this order:
+
+1. Local repo file if the answer is already in the checked-out workspace.
+2. ECC's local Context Hub bundle via `chub` for ECC-specific guides, commands, playbooks, and policies.
+3. Public Context Hub entries for non-ECC skills or shared playbooks.
+4. Context7 only for third-party libraries, frameworks, SDKs, and APIs.
+5. `llms.txt` or web browsing only as fallback paths.
 
 ## Available Agents
 
@@ -25,7 +35,7 @@ This is a **production-ready AI coding plugin** providing 30 specialized agents,
 | e2e-runner | End-to-end Playwright testing | Critical user flows |
 | refactor-cleaner | Dead code cleanup | Code maintenance |
 | doc-updater | Documentation and codemaps | Updating docs |
-| docs-lookup | Documentation and API reference research | Library/API documentation questions |
+| docs-lookup | Source-aware documentation routing | ECC workflow docs and library/API documentation questions |
 | cpp-reviewer | C++ code review | C++ projects |
 | cpp-build-resolver | C++ build errors | C++ build failures |
 | go-reviewer | Go code review | Go projects |
@@ -142,7 +152,7 @@ Troubleshoot failures: check test isolation → verify mocks → fix implementat
 
 ```
 agents/          — 30 specialized subagents
-skills/          — 136 workflow skills and domain knowledge
+skills/          — ~74 workflow skills and domain knowledge
 commands/        — 60 slash commands
 hooks/           — Trigger-based automations
 rules/           — Always-follow guidelines (common + per-language)

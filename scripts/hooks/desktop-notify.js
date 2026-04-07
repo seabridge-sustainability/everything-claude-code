@@ -140,6 +140,21 @@ function run(raw) {
         // No PowerShell found
         log('[DesktopNotify] Tip: Install BurntToast module in PowerShell for notifications');
       }
+    } else if (process.platform === 'win32') {
+      // Native Windows (not WSL): try PowerShell directly
+      const candidates = ['pwsh.exe', 'powershell.exe'];
+      let sent = false;
+      for (const ps of candidates) {
+        const { success, reason } = notifyWindows(ps, TITLE, summary);
+        if (success) { sent = true; break; }
+        if (reason && reason.toLowerCase().includes('burnttoast')) {
+          log('[DesktopNotify] Tip: Install BurntToast module in PowerShell for notifications');
+          break;
+        }
+      }
+      if (!sent) {
+        log('[DesktopNotify] Tip: Install BurntToast module in PowerShell for notifications');
+      }
     }
   } catch (err) {
     log(`[DesktopNotify] Error: ${err.message}`);

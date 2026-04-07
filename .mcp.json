@@ -1,28 +1,68 @@
 {
   "mcpServers": {
+    "berry": {
+      "command": "C:/Users/adelm/AppData/Roaming/Python/Python314/Scripts/berry.exe",
+      "args": [
+        "mcp",
+        "--server",
+        "classic"
+      ],
+      "env": {
+        "BERRY_SERVICE_URL": "http://52.191.234.157:8000",
+        "OPENAI_API_KEY": "sk-K3GE1DIcXaAbBUGxVAAGvg",
+        "OPENAI_BASE_URL": "http://20.232.57.156/v1",
+        "STRAWBERRY_SERVICE_URL": "http://52.191.234.157:8000"
+      }
+    },
     "github": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-github"]
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ]
     },
     "context7": {
-      "command": "npx",
-      "args": ["-y", "@upstash/context7-mcp@2.1.4"]
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@upstash/context7-mcp@2.1.4"
+      ]
     },
     "exa": {
       "type": "http",
       "url": "https://mcp.exa.ai/mcp"
     },
     "memory": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-memory"]
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@modelcontextprotocol/server-memory"
+      ]
     },
     "playwright": {
-      "command": "npx",
-      "args": ["-y", "@playwright/mcp@0.0.68", "--extension"]
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@playwright/mcp@0.0.68",
+        "--extension"
+      ]
     },
     "sequential-thinking": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ]
     }
   }
 }

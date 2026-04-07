@@ -40,6 +40,36 @@ Works across **Claude Code**, **Codex**, **Cowork**, and other AI agent harnesse
 
 ---
 
+## Documentation Retrieval Order
+
+ECC now treats its own documentation as first-class agent context.
+
+Use this order whenever an agent needs docs:
+
+1. **Local repo files** if the answer is already in the checked-out workspace.
+2. **ECC Context Hub** via `chub` for ECC-specific guides, commands, rules, and playbooks.
+3. **Public Context Hub** entries for non-ECC skills or shared playbooks.
+4. **Context7** only for third-party libraries, frameworks, SDKs, and APIs.
+5. **`llms.txt` or web browsing** only as fallback paths.
+
+### Context Hub Commands
+
+```bash
+npm run context-hub:sync
+npm run context-hub:validate
+npm run context-hub:build
+```
+
+- `context-hub:sync` refreshes `context-hub/ecc/...` and regenerates the repo root `llms.txt`.
+- `context-hub:validate` runs `npx -y @aisuite/chub build context-hub --validate-only`.
+- `context-hub:build` builds `context-hub/dist` so local `chub search` and `chub get` can use ECC's docs.
+- CI enforces that `context-hub/ecc/...` and `llms.txt` stay in sync with the canonical English docs.
+- Global `chub` install is optional: `npm install -g @aisuite/chub`
+
+See [context-hub/README.md](context-hub/README.md) for local source setup with `~/.chub/config.yaml`.
+
+---
+
 ## The Guides
 
 This repo is the raw code only. The guides explain everything.
@@ -1208,7 +1238,7 @@ For the full ECC OpenCode setup, either:
 - **Migration Guide**: `.opencode/MIGRATION.md`
 - **OpenCode Plugin README**: `.opencode/README.md`
 - **Consolidated Rules**: `.opencode/instructions/INSTRUCTIONS.md`
-- **LLM Documentation**: `llms.txt` (complete OpenCode docs for LLMs)
+- **LLM Documentation Index**: `llms.txt` (generated ECC context index and fallback sitemap)
 
 ---
 

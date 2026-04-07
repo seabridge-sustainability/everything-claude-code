@@ -16,6 +16,7 @@ node tests/run-all.js
 node tests/lib/utils.test.js
 node tests/lib/package-manager.test.js
 node tests/hooks/hooks.test.js
+node tests/scripts/context-hub.test.js
 ```
 
 ## Architecture
@@ -28,8 +29,31 @@ The project is organized into several core components:
 - **hooks/** - Trigger-based automations (session persistence, pre/post-tool hooks)
 - **rules/** - Always-follow guidelines (security, coding style, testing requirements)
 - **mcp-configs/** - MCP server configurations for external integrations
-- **scripts/** - Cross-platform Node.js utilities for hooks and setup
+- **scripts/** - Cross-platform Node.js utilities for hooks, setup, and Context Hub sync/build tasks
+- **context-hub/** - Repo-local Context Hub content derived from the canonical English docs
 - **tests/** - Test suite for scripts and utilities
+
+## Documentation Retrieval Order
+
+When working inside ECC, use this order:
+
+1. Read the local repo file directly if the answer is already in the workspace.
+2. Use ECC's local Context Hub bundle for ECC-specific guides, commands, policies, and workflows.
+3. Use public Context Hub entries for non-ECC skills or shared playbooks.
+4. Use Context7 only for third-party libraries, frameworks, SDKs, and APIs.
+5. Use `llms.txt` or general browsing only as fallback paths.
+
+## Context Hub Commands
+
+```bash
+npm run context-hub:sync
+npm run context-hub:validate
+npm run context-hub:build
+```
+
+- `context-hub:sync` refreshes `context-hub/ecc/...` plus the repo root `llms.txt`.
+- `context-hub:validate` runs `npx -y @aisuite/chub build context-hub --validate-only`.
+- `context-hub:build` builds `context-hub/dist` for local `chub search` and `chub get` usage.
 
 ## Key Commands
 
@@ -40,6 +64,7 @@ The project is organized into several core components:
 - `/build-fix` - Fix build errors
 - `/learn` - Extract patterns from sessions
 - `/skill-create` - Generate skills from git history
+- `/docs` - Route ECC internal docs to Context Hub and external API docs to Context7
 
 ## Development Notes
 
@@ -49,6 +74,8 @@ The project is organized into several core components:
 - Skill format: Markdown with clear sections for when to use, how it works, examples
 - Skill placement: Curated in skills/; generated/imported under ~/.claude/skills/. See docs/SKILL-PLACEMENT-POLICY.md
 - Hook format: JSON with matcher conditions and command/notification hooks
+- Context Hub content is generated from the canonical English docs; update the source docs first, then run `npm run context-hub:sync`
+- Optional convenience install for humans and agents: `npm install -g @aisuite/chub`
 
 ## Contributing
 
@@ -58,7 +85,47 @@ Follow the formats in CONTRIBUTING.md:
 - Commands: Markdown with description frontmatter
 - Hooks: JSON with matcher and hooks array
 
-File naming: lowercase with hyphens (e.g., `python-reviewer.md`, `tdd-workflow.md`)
+File naming: lowercase with hyphens (e.g. `python-reviewer.md`, `tdd-workflow.md`)
+
+## gstack
+
+gstack is installed at `~/.claude/skills/gstack/` and provides 35 specialist skills. Use `/browse` for **all web browsing** — never use `mcp__claude-in-chrome__*` tools.
+
+| Skill | When to Use |
+|-------|-------------|
+| `/office-hours` | Start here before any new feature or product idea |
+| `/autoplan` | Auto-run CEO + design + eng + DX reviews before implementation |
+| `/plan-ceo-review` | Challenge scope, rethink the problem from first principles |
+| `/plan-eng-review` | Architecture, data flow, state machines, test matrix |
+| `/plan-design-review` | Visual/UX review of plans |
+| `/plan-devex-review` | Developer experience review of plans |
+| `/review` | Pre-PR review — SQL safety, secrets, architecture, logic |
+| `/cso` | Security audit: OWASP + STRIDE, secrets archaeology, deps |
+| `/qa` | Test a live URL in a headless browser, find + fix bugs |
+| `/qa-only` | Report-only QA pass (no auto-fix) |
+| `/browse` | All web browsing — replaces Chrome MCP tools |
+| `/investigate` | Systematic root-cause debugging |
+| `/ship` | Full ship workflow: tests → review → version bump → PR |
+| `/land-and-deploy` | Merge PR, wait for CI/deploy, verify production |
+| `/canary` | Post-deploy monitoring for errors/regressions |
+| `/design-review` | Visual QA — spacing, hierarchy, AI slop detection |
+| `/design-html` | Generate production-quality HTML/CSS |
+| `/design-consultation` | Product + landscape research, propose design direction |
+| `/design-shotgun` | Generate multiple design variants for comparison |
+| `/retro` | Weekly engineering retrospective from git history |
+| `/document-release` | Post-ship docs update |
+| `/health` | Code quality dashboard (type checker, linter, tests) |
+| `/checkpoint` | Save/resume working state across sessions |
+| `/careful` | Safety guardrails for destructive commands |
+| `/freeze` / `/unfreeze` | Lock edits to a specific directory |
+| `/guard` | Full safety mode (careful + freeze combined) |
+| `/benchmark` | Performance regression detection |
+| `/gstack-upgrade` | Upgrade gstack to latest version |
+| `/learn` | Manage project learnings across sessions |
+
+**Note:** `/browse`, `/qa`, `/benchmark`, `/canary`, and `/devex-review` require the browse daemon (Bun). Install Bun (`bun --version`) and run `cd ~/.claude/skills/gstack && ./setup` to enable browser-based skills.
+
+---
 
 ## Skills
 
@@ -68,5 +135,6 @@ Use the following skills when working on related files:
 |---------|-------|
 | `README.md` | `/readme` |
 | `.github/workflows/*.yml` | `/ci-workflow` |
+| `commands/docs.md`, `agents/docs-lookup.md`, `skills/documentation-lookup/SKILL.md` | `documentation-lookup` |
 
 When spawning subagents, always pass conventions from the respective skill into the agent's prompt.

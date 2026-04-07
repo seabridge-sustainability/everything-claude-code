@@ -233,6 +233,8 @@ That separation matters. One agent can parse a document in a restricted environm
 
 Skills and rules that point at external docs are supply chain liabilities. If a link can change without your approval, it can become an injection source later.
 
+For ECC, this is why internal docs should come from local repo files or a locally built Context Hub bundle first. Keep Context7 and external links for third-party APIs, and never send secrets into those lookups.
+
 If you can inline the content, inline it. If you cannot, add a guardrail next to the link:
 
 ```markdown

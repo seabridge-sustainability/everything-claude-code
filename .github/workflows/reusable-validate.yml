@@ -27,6 +27,21 @@ jobs:
       - name: Install validation dependencies
         run: npm ci --ignore-scripts
 
+      - name: Sync Context Hub artifacts
+        run: npm run context-hub:sync
+
+      - name: Check Context Hub generated files are committed
+        shell: bash
+        run: |
+          if [ -n "$(git status --short --untracked-files=all -- context-hub llms.txt)" ]; then
+            echo "::error::Context Hub artifacts are out of date. Run npm run context-hub:sync and commit the results."
+            git status --short --untracked-files=all -- context-hub llms.txt
+            exit 1
+          fi
+
+      - name: Validate Context Hub bundle
+        run: npm run context-hub:validate
+
       - name: Validate agents
         run: node scripts/ci/validate-agents.js
 

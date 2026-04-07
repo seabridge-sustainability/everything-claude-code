@@ -124,7 +124,8 @@ async function main() {
   // which would interfere with the parent process or cause double execution.
   let hookModule;
   const src = fs.readFileSync(scriptPath, 'utf8');
-  const hasRunExport = /\bmodule\.exports\b/.test(src) && /\brun\b/.test(src);
+  const hasRunExport = /module\.exports\s*=\s*\{[^}]*\brun\b/.test(src) ||
+                       /module\.exports\.run\s*=/.test(src);
 
   if (hasRunExport) {
     try {

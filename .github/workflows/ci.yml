@@ -170,6 +170,24 @@ jobs:
       - name: Install validation dependencies
         run: npm ci --ignore-scripts
 
+      - name: Sync Context Hub artifacts
+        run: npm run context-hub:sync
+        continue-on-error: false
+
+      - name: Check Context Hub generated files are committed
+        shell: bash
+        run: |
+          if [ -n "$(git status --short --untracked-files=all -- context-hub llms.txt)" ]; then
+            echo "::error::Context Hub artifacts are out of date. Run npm run context-hub:sync and commit the results."
+            git status --short --untracked-files=all -- context-hub llms.txt
+            exit 1
+          fi
+        continue-on-error: false
+
+      - name: Validate Context Hub bundle
+        run: npm run context-hub:validate
+        continue-on-error: false
+
       - name: Validate agents
         run: node scripts/ci/validate-agents.js
         continue-on-error: false
@@ -218,7 +236,6 @@ jobs:
 
       - name: Run npm audit
         run: npm audit --audit-level=high
-        continue-on-error: true  # Allows PR to proceed, but marks job as failed if vulnerabilities found
 
   lint:
     name: Lint

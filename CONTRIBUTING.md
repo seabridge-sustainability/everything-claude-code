@@ -10,7 +10,7 @@ Thanks for wanting to contribute! This repo is a community resource for Claude C
 - [Contributing Agents](#contributing-agents)
 - [Contributing Hooks](#contributing-hooks)
 - [Contributing Commands](#contributing-commands)
-- [MCP and documentation (e.g. Context7)](#mcp-and-documentation-eg-context7)
+- [Documentation routing (Context Hub + Context7)](#documentation-routing-context-hub--context7)
 - [Cross-Harness and Translations](#cross-harness-and-translations)
 - [Pull Request Process](#pull-request-process)
 
@@ -382,14 +382,17 @@ What the user receives.
 
 ---
 
-## MCP and documentation (e.g. Context7)
+## Documentation routing (Context Hub + Context7)
 
-Skills and agents can use **MCP (Model Context Protocol)** tools to pull in up-to-date data instead of relying only on training data. This is especially useful for documentation.
+ECC uses a source-aware documentation policy instead of sending every docs question to the same place.
 
-- **Context7** is an MCP server that exposes `resolve-library-id` and `query-docs`. Use it when the user asks about libraries, frameworks, or APIs so answers reflect current docs and code examples.
-- When contributing **skills** that depend on live docs (e.g. setup, API usage), describe how to use the relevant MCP tools (e.g. resolve the library ID, then query docs) and point to the `documentation-lookup` skill or Context7 as the pattern.
-- When contributing **agents** that answer docs/API questions, include the Context7 MCP tool names (e.g. `mcp__context7__resolve-library-id`, `mcp__context7__query-docs`) in the agent's tools and document the resolve → query workflow.
-- **mcp-configs/mcp-servers.json** includes a Context7 entry; users enable it in their harness (e.g. Claude Code, Cursor) to use the documentation-lookup skill (in `skills/documentation-lookup/`) and the `/docs` command.
+- **Local repo files** come first when the answer already exists in the checked-out workspace.
+- **ECC Context Hub** is the default for ECC-specific docs, guides, commands, policies, and playbooks. Run `npm run context-hub:sync` after editing canonical English docs, then `npm run context-hub:build` if you need a fresh local registry.
+- **Public Context Hub** entries are appropriate for non-ECC shared skills or playbooks.
+- **Context7** is for third-party libraries, frameworks, SDKs, and APIs. Use it when the user asks about external tools and current docs matter.
+- If a contribution changes ECC's canonical English docs, regenerate derived artifacts with `npm run context-hub:sync` so `context-hub/ecc/...` and `llms.txt` stay in sync. CI now checks this drift automatically.
+- When contributing **skills** or **agents** that answer docs/API questions, document the routing rule explicitly: ECC internals -> local files or Context Hub; external libraries/APIs -> Context7 resolve -> query.
+`mcp-configs/mcp-servers.json` still includes a Context7 entry for external docs. Context Hub integration in this pass is CLI-based through `chub`, not a new MCP layer.
 
 ---
 

@@ -101,6 +101,34 @@ approval_policy = "never"
 sandbox_mode = "workspace-write"
 web_search = "live"
 
+# Local inference profile — routes to llama.cpp server (Gemma-4 31B)
+# Prerequisites:
+#   1. llama-server running on localhost:8080  (see ~/.claude/skills/local-inference/SKILL.md)
+#   2. Set env: OPENAI_BASE_URL=http://localhost:8080/v1  OPENAI_API_KEY=local
+# Usage: codex -p local "your task"
+[profiles.local]
+model = "gemma-4-31b-it"
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+web_search = "live"
+
+# DeepSeek-R1 profile — reasoning-optimized (debugging, architecture)
+# Prerequisites: llama-server running DeepSeek-R1 on localhost:8080
+# Usage: codex -p reason "explain why this test fails"
+[profiles.reason]
+model = "DeepSeek-R1-Distill-Qwen-14B"
+approval_policy = "on-request"
+sandbox_mode = "read-only"
+web_search = "cached"
+
+# Llama-4 Scout profile — lower VRAM alternative to Gemma-4 31B
+# Usage: codex -p llama "write unit tests"
+[profiles.llama]
+model = "Llama-4-Scout-17B-16E-Instruct"
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+web_search = "live"
+
 [agents]
 [agents]
 # Multi-agent role limits and local role definitions.

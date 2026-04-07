@@ -24,7 +24,7 @@ const MAX_STDIN = 1024 * 1024;
 
 // Patterns that indicate potential hardcoded secrets
 const SECRET_PATTERNS = [
-  { name: 'aws_key', pattern: /(?:AKIA|ASIA)[A-Z0-9]{16}/i },
+  { name: 'aws_key', pattern: /(?:AKIA|ASIA)[A-Z0-9]{16}/ },
   { name: 'generic_secret', pattern: /(?:secret|password|token|api[_-]?key)\s*[:=]\s*["'][^"']{8,}/i },
   { name: 'private_key', pattern: /-----BEGIN (?:RSA |EC |DSA )?PRIVATE KEY-----/ },
   { name: 'jwt', pattern: /eyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}/ },

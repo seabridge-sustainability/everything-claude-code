@@ -139,10 +139,10 @@ function findFileIssues(filePath) {
  */
 function validateCommitMessage(command) {
   // Extract commit message from command
-  const messageMatch = command.match(/(?:-m|--message)[=\s]+["']?([^"']+)["']?/);
+  const messageMatch = command.match(/(?:-m|--message)[=\s]+"([^"]+)"|(?:-m|--message)[=\s]+'([^']+)'|(?:-m|--message)[=\s]+([^\s"'][^\s]*(?:\s+[^\s"'][^\s]*)*)/);
   if (!messageMatch) return null;
-  
-  const message = messageMatch[1];
+
+  const message = messageMatch[1] ?? messageMatch[2] ?? messageMatch[3];
   const issues = [];
   
   // Check conventional commit format
@@ -380,7 +380,7 @@ function evaluate(rawInput) {
 }
 
 function run(rawInput) {
-  return evaluate(rawInput).output;
+  return evaluate(rawInput);
 }
 
 // ── stdin entry point ────────────────────────────────────────────

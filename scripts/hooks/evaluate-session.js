@@ -83,8 +83,12 @@ async function main() {
     process.exit(0);
   }
 
-  // Count user messages in session (allow optional whitespace around colon)
-  const messageCount = countInFile(transcriptPath, /"type"\s*:\s*"user"/g);
+  // Count user messages in session by parsing each JSONL line
+  const rawTranscript = fs.readFileSync(transcriptPath, 'utf8');
+  const messageCount = rawTranscript.split('\n').filter(line => {
+    if (!line.trim()) return false;
+    try { return JSON.parse(line).type === 'user'; } catch { return false; }
+  }).length;
 
   // Skip short sessions
   if (messageCount < minSessionLength) {

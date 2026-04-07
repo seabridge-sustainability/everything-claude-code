@@ -95,7 +95,7 @@ for (const testFile of testFiles) {
 
   if (result.error) {
     console.log(`✗ ${displayPath} failed to start: ${result.error.message}`);
-    totalFailed += failedMatch ? 0 : 1;
+    totalFailed += 1;
     continue;
   }
 
