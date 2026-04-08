@@ -1,29 +1,42 @@
 # Test Gereksinimleri
 
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
 ## Minimum Test Coverage: %80
 
-Test Tipleri (HEPSİ gerekli):
+Test Tipleri (HEPSÃ„Â° gerekli):
 1. **Unit Tests** - Bireysel fonksiyonlar, utility'ler, component'ler
-2. **Integration Tests** - API endpoint'leri, database işlemleri
-3. **E2E Tests** - Kritik kullanıcı akışları (framework dile göre seçilir)
+2. **Integration Tests** - API endpoint'leri, database iÃ…Å¸lemleri
+3. **E2E Tests** - Kritik kullanÃ„Â±cÃ„Â± akÃ„Â±Ã…Å¸larÃ„Â± (framework dile gÃƒÂ¶re seÃƒÂ§ilir)
 
-## Test Odaklı Geliştirme
+## Test OdaklÃ„Â± GeliÃ…Å¸tirme
 
-ZORUNLU iş akışı:
-1. Önce test yaz (RED)
-2. Testi çalıştır - BAŞARISIZ olmalı
+ZORUNLU iÃ…Å¸ akÃ„Â±Ã…Å¸Ã„Â±:
+1. Ãƒâ€“nce test yaz (RED)
+2. Testi ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r - BAÃ…Å¾ARISIZ olmalÃ„Â±
 3. Minimum implementasyon yaz (GREEN)
-4. Testi çalıştır - BAŞARILI olmalı
+4. Testi ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r - BAÃ…Å¾ARILI olmalÃ„Â±
 5. Refactor et (IMPROVE)
-6. Coverage'ı doğrula (%80+)
+6. Coverage'Ã„Â± doÃ„Å¸rula (%80+)
 
-## Test Hatalarında Sorun Giderme
+## Test HatalarÃ„Â±nda Sorun Giderme
 
 1. **tdd-guide** agent kullan
 2. Test izolasyonunu kontrol et
-3. Mock'ların doğru olduğunu doğrula
-4. Testleri değil implementasyonu düzelt (testler yanlış olmadıkça)
+3. Mock'larÃ„Â±n doÃ„Å¸ru olduÃ„Å¸unu doÃ„Å¸rula
+4. Testleri deÃ„Å¸il implementasyonu dÃƒÂ¼zelt (testler yanlÃ„Â±Ã…Å¸ olmadÃ„Â±kÃƒÂ§a)
 
-## Agent Desteği
+## Agent DesteÃ„Å¸i
 
-- **tdd-guide** - Yeni özellikler için PROAKTİF olarak kullan, test-önce-yaz'ı zorlar
+- **tdd-guide** - Yeni ÃƒÂ¶zellikler iÃƒÂ§in PROAKTÃ„Â°F olarak kullan, test-ÃƒÂ¶nce-yaz'Ã„Â± zorlar

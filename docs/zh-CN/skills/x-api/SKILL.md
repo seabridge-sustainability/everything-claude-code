@@ -1,27 +1,40 @@
 ---
 name: x-api
-description: X/Twitter API集成，用于发布推文、线程、读取时间线、搜索和分析。涵盖OAuth认证模式、速率限制和平台原生内容发布。当用户希望以编程方式与X交互时使用。
+description: X/Twitter APIÃ©â€ºâ€ Ã¦Ë†ÂÃ¯Â¼Å’Ã§â€Â¨Ã¤ÂºÅ½Ã¥Ââ€˜Ã¥Â¸Æ’Ã¦Å½Â¨Ã¦â€“â€¡Ã£â‚¬ÂÃ§ÂºÂ¿Ã§Â¨â€¹Ã£â‚¬ÂÃ¨Â¯Â»Ã¥Ââ€“Ã¦â€”Â¶Ã©â€”Â´Ã§ÂºÂ¿Ã£â‚¬ÂÃ¦ÂÅ“Ã§Â´Â¢Ã¥â€™Å’Ã¥Ë†â€ Ã¦Å¾ÂÃ£â‚¬â€šÃ¦Â¶ÂµÃ§â€ºâ€“OAuthÃ¨Â®Â¤Ã¨Â¯ÂÃ¦Â¨Â¡Ã¥Â¼ÂÃ£â‚¬ÂÃ©â‚¬Å¸Ã§Å½â€¡Ã©â„¢ÂÃ¥Ë†Â¶Ã¥â€™Å’Ã¥Â¹Â³Ã¥ÂÂ°Ã¥Å½Å¸Ã§â€Å¸Ã¥â€ â€¦Ã¥Â®Â¹Ã¥Ââ€˜Ã¥Â¸Æ’Ã£â‚¬â€šÃ¥Â½â€œÃ§â€Â¨Ã¦Ë†Â·Ã¥Â¸Å’Ã¦Å“â€ºÃ¤Â»Â¥Ã§Â¼â€“Ã§Â¨â€¹Ã¦â€“Â¹Ã¥Â¼ÂÃ¤Â¸Å½XÃ¤ÂºÂ¤Ã¤Âºâ€™Ã¦â€”Â¶Ã¤Â½Â¿Ã§â€Â¨Ã£â‚¬â€š
 origin: ECC
 ---
 
 # X API
 
-以编程方式与 X（Twitter）交互，用于发布、读取、搜索和分析。
+## Safety And Authorization Rule
 
-## 何时激活
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-* 用户希望以编程方式发布推文或帖子串
-* 从 X 读取时间线、提及或用户数据
-* 在 X 上搜索内容、趋势或对话
-* 构建 X 集成或机器人
-* 分析和参与度跟踪
-* 用户提及"发布到 X"、"发推"、"X API"或"Twitter API"
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-## 认证
 
-### OAuth 2.0 Bearer 令牌（仅应用）
+Ã¤Â»Â¥Ã§Â¼â€“Ã§Â¨â€¹Ã¦â€“Â¹Ã¥Â¼ÂÃ¤Â¸Å½ XÃ¯Â¼Ë†TwitterÃ¯Â¼â€°Ã¤ÂºÂ¤Ã¤Âºâ€™Ã¯Â¼Å’Ã§â€Â¨Ã¤ÂºÅ½Ã¥Ââ€˜Ã¥Â¸Æ’Ã£â‚¬ÂÃ¨Â¯Â»Ã¥Ââ€“Ã£â‚¬ÂÃ¦ÂÅ“Ã§Â´Â¢Ã¥â€™Å’Ã¥Ë†â€ Ã¦Å¾ÂÃ£â‚¬â€š
 
-最佳适用场景：读取密集型操作、搜索、公开数据。
+## Ã¤Â½â€¢Ã¦â€”Â¶Ã¦Â¿â‚¬Ã¦Â´Â»
+
+* Ã§â€Â¨Ã¦Ë†Â·Ã¥Â¸Å’Ã¦Å“â€ºÃ¤Â»Â¥Ã§Â¼â€“Ã§Â¨â€¹Ã¦â€“Â¹Ã¥Â¼ÂÃ¥Ââ€˜Ã¥Â¸Æ’Ã¦Å½Â¨Ã¦â€“â€¡Ã¦Ë†â€“Ã¥Â¸â€“Ã¥Â­ÂÃ¤Â¸Â²
+* Ã¤Â»Å½ X Ã¨Â¯Â»Ã¥Ââ€“Ã¦â€”Â¶Ã©â€”Â´Ã§ÂºÂ¿Ã£â‚¬ÂÃ¦ÂÂÃ¥ÂÅ Ã¦Ë†â€“Ã§â€Â¨Ã¦Ë†Â·Ã¦â€¢Â°Ã¦ÂÂ®
+* Ã¥Å“Â¨ X Ã¤Â¸Å Ã¦ÂÅ“Ã§Â´Â¢Ã¥â€ â€¦Ã¥Â®Â¹Ã£â‚¬ÂÃ¨Â¶â€¹Ã¥Å Â¿Ã¦Ë†â€“Ã¥Â¯Â¹Ã¨Â¯Â
+* Ã¦Å¾â€žÃ¥Â»Âº X Ã©â€ºâ€ Ã¦Ë†ÂÃ¦Ë†â€“Ã¦Å“ÂºÃ¥â„¢Â¨Ã¤ÂºÂº
+* Ã¥Ë†â€ Ã¦Å¾ÂÃ¥â€™Å’Ã¥Ââ€šÃ¤Â¸Å½Ã¥ÂºÂ¦Ã¨Â·Å¸Ã¨Â¸Âª
+* Ã§â€Â¨Ã¦Ë†Â·Ã¦ÂÂÃ¥ÂÅ "Ã¥Ââ€˜Ã¥Â¸Æ’Ã¥Ë†Â° X"Ã£â‚¬Â"Ã¥Ââ€˜Ã¦Å½Â¨"Ã£â‚¬Â"X API"Ã¦Ë†â€“"Twitter API"
+
+## Ã¨Â®Â¤Ã¨Â¯Â
+
+### OAuth 2.0 Bearer Ã¤Â»Â¤Ã§â€°Å’Ã¯Â¼Ë†Ã¤Â»â€¦Ã¥Âºâ€Ã§â€Â¨Ã¯Â¼â€°
+
+Ã¦Å“â‚¬Ã¤Â½Â³Ã©â‚¬â€šÃ§â€Â¨Ã¥Å“ÂºÃ¦â„¢Â¯Ã¯Â¼Å¡Ã¨Â¯Â»Ã¥Ââ€“Ã¥Â¯â€ Ã©â€ºâ€ Ã¥Å¾â€¹Ã¦â€œÂÃ¤Â½Å“Ã£â‚¬ÂÃ¦ÂÅ“Ã§Â´Â¢Ã£â‚¬ÂÃ¥â€¦Â¬Ã¥Â¼â‚¬Ã¦â€¢Â°Ã¦ÂÂ®Ã£â‚¬â€š
 
 ```bash
 # Environment setup
@@ -44,12 +57,12 @@ resp = requests.get(
 tweets = resp.json()
 ```
 
-### OAuth 1.0a（用户上下文）
+### OAuth 1.0aÃ¯Â¼Ë†Ã§â€Â¨Ã¦Ë†Â·Ã¤Â¸Å Ã¤Â¸â€¹Ã¦â€“â€¡Ã¯Â¼â€°
 
-必需用于：发布推文、管理账户、私信。
+Ã¥Â¿â€¦Ã©Å“â‚¬Ã§â€Â¨Ã¤ÂºÅ½Ã¯Â¼Å¡Ã¥Ââ€˜Ã¥Â¸Æ’Ã¦Å½Â¨Ã¦â€“â€¡Ã£â‚¬ÂÃ§Â®Â¡Ã§Ââ€ Ã¨Â´Â¦Ã¦Ë†Â·Ã£â‚¬ÂÃ§Â§ÂÃ¤Â¿Â¡Ã£â‚¬â€š
 
 ```bash
-# Environment setup — source before use
+# Environment setup Ã¢â‚¬â€ source before use
 export X_API_KEY="your-api-key"
 export X_API_SECRET="your-api-secret"
 export X_ACCESS_TOKEN="your-access-token"
@@ -68,9 +81,9 @@ oauth = OAuth1Session(
 )
 ```
 
-## 核心操作
+## Ã¦Â Â¸Ã¥Â¿Æ’Ã¦â€œÂÃ¤Â½Å“
 
-### 发布一条推文
+### Ã¥Ââ€˜Ã¥Â¸Æ’Ã¤Â¸â‚¬Ã¦ÂÂ¡Ã¦Å½Â¨Ã¦â€“â€¡
 
 ```python
 resp = oauth.post(
@@ -81,7 +94,7 @@ resp.raise_for_status()
 tweet_id = resp.json()["data"]["id"]
 ```
 
-### 发布一个帖子串
+### Ã¥Ââ€˜Ã¥Â¸Æ’Ã¤Â¸â‚¬Ã¤Â¸ÂªÃ¥Â¸â€“Ã¥Â­ÂÃ¤Â¸Â²
 
 ```python
 def post_thread(oauth, tweets: list[str]) -> list[str]:
@@ -98,7 +111,7 @@ def post_thread(oauth, tweets: list[str]) -> list[str]:
     return ids
 ```
 
-### 读取用户时间线
+### Ã¨Â¯Â»Ã¥Ââ€“Ã§â€Â¨Ã¦Ë†Â·Ã¦â€”Â¶Ã©â€”Â´Ã§ÂºÂ¿
 
 ```python
 resp = requests.get(
@@ -111,7 +124,7 @@ resp = requests.get(
 )
 ```
 
-### 搜索推文
+### Ã¦ÂÅ“Ã§Â´Â¢Ã¦Å½Â¨Ã¦â€“â€¡
 
 ```python
 resp = requests.get(
@@ -125,7 +138,7 @@ resp = requests.get(
 )
 ```
 
-### 通过用户名获取用户
+### Ã©â‚¬Å¡Ã¨Â¿â€¡Ã§â€Â¨Ã¦Ë†Â·Ã¥ÂÂÃ¨Å½Â·Ã¥Ââ€“Ã§â€Â¨Ã¦Ë†Â·
 
 ```python
 resp = requests.get(
@@ -135,7 +148,7 @@ resp = requests.get(
 )
 ```
 
-### 上传媒体并发布
+### Ã¤Â¸Å Ã¤Â¼Â Ã¥Âªâ€™Ã¤Â½â€œÃ¥Â¹Â¶Ã¥Ââ€˜Ã¥Â¸Æ’
 
 ```python
 # Media upload uses v1.1 endpoint
@@ -154,13 +167,13 @@ resp = oauth.post(
 )
 ```
 
-## 速率限制
+## Ã©â‚¬Å¸Ã§Å½â€¡Ã©â„¢ÂÃ¥Ë†Â¶
 
-X API 的速率限制因端点、认证方法和账户等级而异，并且会随时间变化。请始终：
+X API Ã§Å¡â€žÃ©â‚¬Å¸Ã§Å½â€¡Ã©â„¢ÂÃ¥Ë†Â¶Ã¥â€ºÂ Ã§Â«Â¯Ã§â€šÂ¹Ã£â‚¬ÂÃ¨Â®Â¤Ã¨Â¯ÂÃ¦â€“Â¹Ã¦Â³â€¢Ã¥â€™Å’Ã¨Â´Â¦Ã¦Ë†Â·Ã§Â­â€°Ã§ÂºÂ§Ã¨â‚¬Å’Ã¥Â¼â€šÃ¯Â¼Å’Ã¥Â¹Â¶Ã¤Â¸â€Ã¤Â¼Å¡Ã©Å¡ÂÃ¦â€”Â¶Ã©â€”Â´Ã¥ÂËœÃ¥Å’â€“Ã£â‚¬â€šÃ¨Â¯Â·Ã¥Â§â€¹Ã§Â»Ë†Ã¯Â¼Å¡
 
-* 在硬编码假设之前，查看当前的 X 开发者文档
-* 在运行时读取 `x-rate-limit-remaining` 和 `x-rate-limit-reset` 头部信息
-* 自动退避，而不是依赖代码中的静态表格
+* Ã¥Å“Â¨Ã§Â¡Â¬Ã§Â¼â€“Ã§Â ÂÃ¥Ââ€¡Ã¨Â®Â¾Ã¤Â¹â€¹Ã¥â€°ÂÃ¯Â¼Å’Ã¦Å¸Â¥Ã§Å“â€¹Ã¥Â½â€œÃ¥â€°ÂÃ§Å¡â€ž X Ã¥Â¼â‚¬Ã¥Ââ€˜Ã¨â‚¬â€¦Ã¦â€“â€¡Ã¦Â¡Â£
+* Ã¥Å“Â¨Ã¨Â¿ÂÃ¨Â¡Å’Ã¦â€”Â¶Ã¨Â¯Â»Ã¥Ââ€“ `x-rate-limit-remaining` Ã¥â€™Å’ `x-rate-limit-reset` Ã¥Â¤Â´Ã©Æ’Â¨Ã¤Â¿Â¡Ã¦ÂÂ¯
+* Ã¨â€¡ÂªÃ¥Å Â¨Ã©â‚¬â‚¬Ã©ÂÂ¿Ã¯Â¼Å’Ã¨â‚¬Å’Ã¤Â¸ÂÃ¦ËœÂ¯Ã¤Â¾ÂÃ¨Âµâ€“Ã¤Â»Â£Ã§Â ÂÃ¤Â¸Â­Ã§Å¡â€žÃ©Ââ„¢Ã¦â‚¬ÂÃ¨Â¡Â¨Ã¦Â Â¼
 
 ```python
 import time
@@ -172,7 +185,7 @@ if remaining < 5:
     print(f"Rate limit approaching. Resets in {wait}s")
 ```
 
-## 错误处理
+## Ã©â€â„¢Ã¨Â¯Â¯Ã¥Â¤â€žÃ§Ââ€ 
 
 ```python
 resp = oauth.post("https://api.x.com/2/tweets", json={"text": content})
@@ -187,24 +200,24 @@ else:
     raise Exception(f"X API error {resp.status_code}: {resp.text}")
 ```
 
-## 安全性
+## Ã¥Â®â€°Ã¥â€¦Â¨Ã¦â‚¬Â§
 
-* **切勿硬编码令牌。** 使用环境变量或 `.env` 文件。
-* **切勿提交 `.env` 文件。** 将其添加到 `.gitignore`。
-* **如果令牌暴露，请轮换令牌。** 在 developer.x.com 重新生成。
-* **当不需要写权限时，使用只读令牌。**
-* **安全存储 OAuth 密钥** — 不要存储在源代码或日志中。
+* **Ã¥Ë†â€¡Ã¥â€¹Â¿Ã§Â¡Â¬Ã§Â¼â€“Ã§Â ÂÃ¤Â»Â¤Ã§â€°Å’Ã£â‚¬â€š** Ã¤Â½Â¿Ã§â€Â¨Ã§Å½Â¯Ã¥Â¢Æ’Ã¥ÂËœÃ©â€¡ÂÃ¦Ë†â€“ `.env` Ã¦â€“â€¡Ã¤Â»Â¶Ã£â‚¬â€š
+* **Ã¥Ë†â€¡Ã¥â€¹Â¿Ã¦ÂÂÃ¤ÂºÂ¤ `.env` Ã¦â€“â€¡Ã¤Â»Â¶Ã£â‚¬â€š** Ã¥Â°â€ Ã¥â€¦Â¶Ã¦Â·Â»Ã¥Å Â Ã¥Ë†Â° `.gitignore`Ã£â‚¬â€š
+* **Ã¥Â¦â€šÃ¦Å¾Å“Ã¤Â»Â¤Ã§â€°Å’Ã¦Å¡Â´Ã©Å“Â²Ã¯Â¼Å’Ã¨Â¯Â·Ã¨Â½Â®Ã¦ÂÂ¢Ã¤Â»Â¤Ã§â€°Å’Ã£â‚¬â€š** Ã¥Å“Â¨ developer.x.com Ã©â€¡ÂÃ¦â€“Â°Ã§â€Å¸Ã¦Ë†ÂÃ£â‚¬â€š
+* **Ã¥Â½â€œÃ¤Â¸ÂÃ©Å“â‚¬Ã¨Â¦ÂÃ¥â€ â„¢Ã¦ÂÆ’Ã©â„¢ÂÃ¦â€”Â¶Ã¯Â¼Å’Ã¤Â½Â¿Ã§â€Â¨Ã¥ÂÂªÃ¨Â¯Â»Ã¤Â»Â¤Ã§â€°Å’Ã£â‚¬â€š**
+* **Ã¥Â®â€°Ã¥â€¦Â¨Ã¥Â­ËœÃ¥â€šÂ¨ OAuth Ã¥Â¯â€ Ã©â€™Â¥** Ã¢â‚¬â€ Ã¤Â¸ÂÃ¨Â¦ÂÃ¥Â­ËœÃ¥â€šÂ¨Ã¥Å“Â¨Ã¦ÂºÂÃ¤Â»Â£Ã§Â ÂÃ¦Ë†â€“Ã¦â€”Â¥Ã¥Â¿â€”Ã¤Â¸Â­Ã£â‚¬â€š
 
-## 与内容引擎集成
+## Ã¤Â¸Å½Ã¥â€ â€¦Ã¥Â®Â¹Ã¥Â¼â€¢Ã¦â€œÅ½Ã©â€ºâ€ Ã¦Ë†Â
 
-使用 `content-engine` 技能生成平台原生内容，然后通过 X API 发布：
+Ã¤Â½Â¿Ã§â€Â¨ `content-engine` Ã¦Å â‚¬Ã¨Æ’Â½Ã§â€Å¸Ã¦Ë†ÂÃ¥Â¹Â³Ã¥ÂÂ°Ã¥Å½Å¸Ã§â€Å¸Ã¥â€ â€¦Ã¥Â®Â¹Ã¯Â¼Å’Ã§â€žÂ¶Ã¥ÂÅ½Ã©â‚¬Å¡Ã¨Â¿â€¡ X API Ã¥Ââ€˜Ã¥Â¸Æ’Ã¯Â¼Å¡
 
-1. 使用内容引擎生成内容（X 平台格式）
-2. 验证长度（单条推文 280 字符）
-3. 使用上述模式通过 X API 发布
-4. 通过 public\_metrics 跟踪参与度
+1. Ã¤Â½Â¿Ã§â€Â¨Ã¥â€ â€¦Ã¥Â®Â¹Ã¥Â¼â€¢Ã¦â€œÅ½Ã§â€Å¸Ã¦Ë†ÂÃ¥â€ â€¦Ã¥Â®Â¹Ã¯Â¼Ë†X Ã¥Â¹Â³Ã¥ÂÂ°Ã¦Â Â¼Ã¥Â¼ÂÃ¯Â¼â€°
+2. Ã©ÂªÅ’Ã¨Â¯ÂÃ©â€¢Â¿Ã¥ÂºÂ¦Ã¯Â¼Ë†Ã¥Ââ€¢Ã¦ÂÂ¡Ã¦Å½Â¨Ã¦â€“â€¡ 280 Ã¥Â­â€”Ã§Â¬Â¦Ã¯Â¼â€°
+3. Ã¤Â½Â¿Ã§â€Â¨Ã¤Â¸Å Ã¨Â¿Â°Ã¦Â¨Â¡Ã¥Â¼ÂÃ©â‚¬Å¡Ã¨Â¿â€¡ X API Ã¥Ââ€˜Ã¥Â¸Æ’
+4. Ã©â‚¬Å¡Ã¨Â¿â€¡ public\_metrics Ã¨Â·Å¸Ã¨Â¸ÂªÃ¥Ââ€šÃ¤Â¸Å½Ã¥ÂºÂ¦
 
-## 相关技能
+## Ã§â€ºÂ¸Ã¥â€¦Â³Ã¦Å â‚¬Ã¨Æ’Â½
 
-* `content-engine` — 为 X 生成平台原生内容
-* `crosspost` — 在 X、LinkedIn 和其他平台分发内容
+* `content-engine` Ã¢â‚¬â€ Ã¤Â¸Âº X Ã§â€Å¸Ã¦Ë†ÂÃ¥Â¹Â³Ã¥ÂÂ°Ã¥Å½Å¸Ã§â€Å¸Ã¥â€ â€¦Ã¥Â®Â¹
+* `crosspost` Ã¢â‚¬â€ Ã¥Å“Â¨ XÃ£â‚¬ÂLinkedIn Ã¥â€™Å’Ã¥â€¦Â¶Ã¤Â»â€“Ã¥Â¹Â³Ã¥ÂÂ°Ã¥Ë†â€ Ã¥Ââ€˜Ã¥â€ â€¦Ã¥Â®Â¹

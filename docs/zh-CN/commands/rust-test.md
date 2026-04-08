@@ -1,40 +1,53 @@
 ---
-description: 为Rust强制执行TDD工作流。先写测试，然后实现。使用cargo-llvm-cov验证80%以上的覆盖率。
+description: Ã¤Â¸ÂºRustÃ¥Â¼ÂºÃ¥Ë†Â¶Ã¦â€°Â§Ã¨Â¡Å’TDDÃ¥Â·Â¥Ã¤Â½Å“Ã¦ÂµÂÃ£â‚¬â€šÃ¥â€¦Ë†Ã¥â€ â„¢Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¯Â¼Å’Ã§â€žÂ¶Ã¥ÂÅ½Ã¥Â®Å¾Ã§Å½Â°Ã£â‚¬â€šÃ¤Â½Â¿Ã§â€Â¨cargo-llvm-covÃ©ÂªÅ’Ã¨Â¯Â80%Ã¤Â»Â¥Ã¤Â¸Å Ã§Å¡â€žÃ¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡Ã£â‚¬â€š
 ---
 
-# Rust TDD 命令
+# Rust TDD Ã¥â€˜Â½Ã¤Â»Â¤
 
-该命令使用 `#[test]`、rstest、proptest 和 mockall 来强制执行 Rust 代码的测试驱动开发方法。
+## Safety And Authorization Rule
 
-## 该命令的作用
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-1. **定义类型/特征**：使用 `todo!()` 搭建函数签名
-2. **编写测试**：创建全面的测试模块（RED）
-3. **运行测试**：验证测试因正确的原因而失败
-4. **实现代码**：编写通过测试所需的最少代码（GREEN）
-5. **重构**：在保持测试通过的前提下进行改进
-6. **检查覆盖率**：使用 cargo-llvm-cov 确保 80%+ 的覆盖率
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-## 何时使用
 
-在以下情况使用 `/rust-test`：
+Ã¨Â¯Â¥Ã¥â€˜Â½Ã¤Â»Â¤Ã¤Â½Â¿Ã§â€Â¨ `#[test]`Ã£â‚¬ÂrstestÃ£â‚¬Âproptest Ã¥â€™Å’ mockall Ã¦ÂÂ¥Ã¥Â¼ÂºÃ¥Ë†Â¶Ã¦â€°Â§Ã¨Â¡Å’ Rust Ã¤Â»Â£Ã§Â ÂÃ§Å¡â€žÃ¦Âµâ€¹Ã¨Â¯â€¢Ã©Â©Â±Ã¥Å Â¨Ã¥Â¼â‚¬Ã¥Ââ€˜Ã¦â€“Â¹Ã¦Â³â€¢Ã£â‚¬â€š
 
-* 实现新的 Rust 函数、方法或特征时
-* 为现有 Rust 代码添加测试覆盖时
-* 修复错误时（首先编写失败的测试）
-* 构建关键业务逻辑时
-* 学习 Rust 中的 TDD 工作流程时
+## Ã¨Â¯Â¥Ã¥â€˜Â½Ã¤Â»Â¤Ã§Å¡â€žÃ¤Â½Å“Ã§â€Â¨
 
-## TDD 循环
+1. **Ã¥Â®Å¡Ã¤Â¹â€°Ã§Â±Â»Ã¥Å¾â€¹/Ã§â€°Â¹Ã¥Â¾Â**Ã¯Â¼Å¡Ã¤Â½Â¿Ã§â€Â¨ `todo!()` Ã¦ÂÂ­Ã¥Â»ÂºÃ¥â€¡Â½Ã¦â€¢Â°Ã§Â­Â¾Ã¥ÂÂ
+2. **Ã§Â¼â€“Ã¥â€ â„¢Ã¦Âµâ€¹Ã¨Â¯â€¢**Ã¯Â¼Å¡Ã¥Ë†â€ºÃ¥Â»ÂºÃ¥â€¦Â¨Ã©ÂÂ¢Ã§Å¡â€žÃ¦Âµâ€¹Ã¨Â¯â€¢Ã¦Â¨Â¡Ã¥Ââ€”Ã¯Â¼Ë†REDÃ¯Â¼â€°
+3. **Ã¨Â¿ÂÃ¨Â¡Å’Ã¦Âµâ€¹Ã¨Â¯â€¢**Ã¯Â¼Å¡Ã©ÂªÅ’Ã¨Â¯ÂÃ¦Âµâ€¹Ã¨Â¯â€¢Ã¥â€ºÂ Ã¦Â­Â£Ã§Â¡Â®Ã§Å¡â€žÃ¥Å½Å¸Ã¥â€ºÂ Ã¨â‚¬Å’Ã¥Â¤Â±Ã¨Â´Â¥
+4. **Ã¥Â®Å¾Ã§Å½Â°Ã¤Â»Â£Ã§Â Â**Ã¯Â¼Å¡Ã§Â¼â€“Ã¥â€ â„¢Ã©â‚¬Å¡Ã¨Â¿â€¡Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¦â€°â‚¬Ã©Å“â‚¬Ã§Å¡â€žÃ¦Å“â‚¬Ã¥Â°â€˜Ã¤Â»Â£Ã§Â ÂÃ¯Â¼Ë†GREENÃ¯Â¼â€°
+5. **Ã©â€¡ÂÃ¦Å¾â€ž**Ã¯Â¼Å¡Ã¥Å“Â¨Ã¤Â¿ÂÃ¦Å’ÂÃ¦Âµâ€¹Ã¨Â¯â€¢Ã©â‚¬Å¡Ã¨Â¿â€¡Ã§Å¡â€žÃ¥â€°ÂÃ¦ÂÂÃ¤Â¸â€¹Ã¨Â¿â€ºÃ¨Â¡Å’Ã¦â€Â¹Ã¨Â¿â€º
+6. **Ã¦Â£â‚¬Ã¦Å¸Â¥Ã¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡**Ã¯Â¼Å¡Ã¤Â½Â¿Ã§â€Â¨ cargo-llvm-cov Ã§Â¡Â®Ã¤Â¿Â 80%+ Ã§Å¡â€žÃ¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡
+
+## Ã¤Â½â€¢Ã¦â€”Â¶Ã¤Â½Â¿Ã§â€Â¨
+
+Ã¥Å“Â¨Ã¤Â»Â¥Ã¤Â¸â€¹Ã¦Æ’â€¦Ã¥â€ ÂµÃ¤Â½Â¿Ã§â€Â¨ `/rust-test`Ã¯Â¼Å¡
+
+* Ã¥Â®Å¾Ã§Å½Â°Ã¦â€“Â°Ã§Å¡â€ž Rust Ã¥â€¡Â½Ã¦â€¢Â°Ã£â‚¬ÂÃ¦â€“Â¹Ã¦Â³â€¢Ã¦Ë†â€“Ã§â€°Â¹Ã¥Â¾ÂÃ¦â€”Â¶
+* Ã¤Â¸ÂºÃ§Å½Â°Ã¦Å“â€° Rust Ã¤Â»Â£Ã§Â ÂÃ¦Â·Â»Ã¥Å Â Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¨Â¦â€ Ã§â€ºâ€“Ã¦â€”Â¶
+* Ã¤Â¿Â®Ã¥Â¤ÂÃ©â€â„¢Ã¨Â¯Â¯Ã¦â€”Â¶Ã¯Â¼Ë†Ã©Â¦â€“Ã¥â€¦Ë†Ã§Â¼â€“Ã¥â€ â„¢Ã¥Â¤Â±Ã¨Â´Â¥Ã§Å¡â€žÃ¦Âµâ€¹Ã¨Â¯â€¢Ã¯Â¼â€°
+* Ã¦Å¾â€žÃ¥Â»ÂºÃ¥â€¦Â³Ã©â€Â®Ã¤Â¸Å¡Ã¥Å Â¡Ã©â‚¬Â»Ã¨Â¾â€˜Ã¦â€”Â¶
+* Ã¥Â­Â¦Ã¤Â¹Â  Rust Ã¤Â¸Â­Ã§Å¡â€ž TDD Ã¥Â·Â¥Ã¤Â½Å“Ã¦ÂµÂÃ§Â¨â€¹Ã¦â€”Â¶
+
+## TDD Ã¥Â¾ÂªÃ§Å½Â¯
 
 ```
-RED     -> 先编写失败的测试
-GREEN   -> 实现最小化代码以通过测试
-REFACTOR -> 改进代码，保持测试通过
-REPEAT  -> 下一个测试用例
+RED     -> Ã¥â€¦Ë†Ã§Â¼â€“Ã¥â€ â„¢Ã¥Â¤Â±Ã¨Â´Â¥Ã§Å¡â€žÃ¦Âµâ€¹Ã¨Â¯â€¢
+GREEN   -> Ã¥Â®Å¾Ã§Å½Â°Ã¦Å“â‚¬Ã¥Â°ÂÃ¥Å’â€“Ã¤Â»Â£Ã§Â ÂÃ¤Â»Â¥Ã©â‚¬Å¡Ã¨Â¿â€¡Ã¦Âµâ€¹Ã¨Â¯â€¢
+REFACTOR -> Ã¦â€Â¹Ã¨Â¿â€ºÃ¤Â»Â£Ã§Â ÂÃ¯Â¼Å’Ã¤Â¿ÂÃ¦Å’ÂÃ¦Âµâ€¹Ã¨Â¯â€¢Ã©â‚¬Å¡Ã¨Â¿â€¡
+REPEAT  -> Ã¤Â¸â€¹Ã¤Â¸â‚¬Ã¤Â¸ÂªÃ¦Âµâ€¹Ã¨Â¯â€¢Ã§â€Â¨Ã¤Â¾â€¹
 ```
 
-## 示例会话
+## Ã§Â¤ÂºÃ¤Â¾â€¹Ã¤Â¼Å¡Ã¨Â¯Â
 
 ````text
 User: /rust-test I need a function to validate user registration
@@ -122,7 +135,7 @@ mod tests {
 }
 ```
 
-## Step 3: Run Tests — Verify FAIL
+## Step 3: Run Tests Ã¢â‚¬â€ Verify FAIL
 
 ```bash
 $ cargo test
@@ -159,7 +172,7 @@ pub fn validate_registration(request: &RegistrationRequest) -> ValidationResult 
 }
 ```
 
-## Step 5: Run Tests — Verify PASS
+## Step 5: Run Tests Ã¢â‚¬â€ Verify PASS
 
 ```bash
 $ cargo test
@@ -186,9 +199,9 @@ Coverage: 100%
 ## TDD Complete!
 ````
 
-## 测试模式
+## Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¦Â¨Â¡Ã¥Â¼Â
 
-### 单元测试
+### Ã¥Ââ€¢Ã¥â€¦Æ’Ã¦Âµâ€¹Ã¨Â¯â€¢
 
 ```rust
 #[cfg(test)]
@@ -209,7 +222,7 @@ mod tests {
 }
 ```
 
-### 使用 rstest 进行参数化测试
+### Ã¤Â½Â¿Ã§â€Â¨ rstest Ã¨Â¿â€ºÃ¨Â¡Å’Ã¥Ââ€šÃ¦â€¢Â°Ã¥Å’â€“Ã¦Âµâ€¹Ã¨Â¯â€¢
 
 ```rust
 use rstest::{rstest, fixture};
@@ -223,7 +236,7 @@ fn test_string_length(#[case] input: &str, #[case] expected: usize) {
 }
 ```
 
-### 异步测试
+### Ã¥Â¼â€šÃ¦Â­Â¥Ã¦Âµâ€¹Ã¨Â¯â€¢
 
 ```rust
 #[tokio::test]
@@ -234,7 +247,7 @@ async fn fetches_data_successfully() {
 }
 ```
 
-### 基于属性的测试
+### Ã¥Å¸ÂºÃ¤ÂºÅ½Ã¥Â±Å¾Ã¦â‚¬Â§Ã§Å¡â€žÃ¦Âµâ€¹Ã¨Â¯â€¢
 
 ```rust
 use proptest::prelude::*;
@@ -249,7 +262,7 @@ proptest! {
 }
 ```
 
-## 覆盖率命令
+## Ã¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡Ã¥â€˜Â½Ã¤Â»Â¤
 
 ```bash
 # Summary report
@@ -271,41 +284,41 @@ cargo test -- --nocapture
 cargo test --no-fail-fast
 ```
 
-## 覆盖率目标
+## Ã¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡Ã§â€ºÂ®Ã¦Â â€¡
 
-| 代码类型 | 目标 |
+| Ã¤Â»Â£Ã§Â ÂÃ§Â±Â»Ã¥Å¾â€¹ | Ã§â€ºÂ®Ã¦Â â€¡ |
 |-----------|--------|
-| 关键业务逻辑 | 100% |
-| 公共 API | 90%+ |
-| 通用代码 | 80%+ |
-| 生成的 / FFI 绑定 | 排除 |
+| Ã¥â€¦Â³Ã©â€Â®Ã¤Â¸Å¡Ã¥Å Â¡Ã©â‚¬Â»Ã¨Â¾â€˜ | 100% |
+| Ã¥â€¦Â¬Ã¥â€¦Â± API | 90%+ |
+| Ã©â‚¬Å¡Ã§â€Â¨Ã¤Â»Â£Ã§Â Â | 80%+ |
+| Ã§â€Å¸Ã¦Ë†ÂÃ§Å¡â€ž / FFI Ã§Â»â€˜Ã¥Â®Å¡ | Ã¦Å½â€™Ã©â„¢Â¤ |
 
-## TDD 最佳实践
+## TDD Ã¦Å“â‚¬Ã¤Â½Â³Ã¥Â®Å¾Ã¨Â·Âµ
 
-**应做：**
+**Ã¥Âºâ€Ã¥ÂÅ¡Ã¯Â¼Å¡**
 
-* **首先**编写测试，在任何实现之前
-* 每次更改后运行测试
-* 使用 `assert_eq!` 而非 `assert!` 以获得更好的错误信息
-* 在返回 `Result` 的测试中使用 `?` 以获得更清晰的输出
-* 测试行为，而非实现
-* 包含边界情况（空值、边界值、错误路径）
+* **Ã©Â¦â€“Ã¥â€¦Ë†**Ã§Â¼â€“Ã¥â€ â„¢Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¯Â¼Å’Ã¥Å“Â¨Ã¤Â»Â»Ã¤Â½â€¢Ã¥Â®Å¾Ã§Å½Â°Ã¤Â¹â€¹Ã¥â€°Â
+* Ã¦Â¯ÂÃ¦Â¬Â¡Ã¦â€ºÂ´Ã¦â€Â¹Ã¥ÂÅ½Ã¨Â¿ÂÃ¨Â¡Å’Ã¦Âµâ€¹Ã¨Â¯â€¢
+* Ã¤Â½Â¿Ã§â€Â¨ `assert_eq!` Ã¨â‚¬Å’Ã©ÂÅ¾ `assert!` Ã¤Â»Â¥Ã¨Å½Â·Ã¥Â¾â€”Ã¦â€ºÂ´Ã¥Â¥Â½Ã§Å¡â€žÃ©â€â„¢Ã¨Â¯Â¯Ã¤Â¿Â¡Ã¦ÂÂ¯
+* Ã¥Å“Â¨Ã¨Â¿â€Ã¥â€ºÅ¾ `Result` Ã§Å¡â€žÃ¦Âµâ€¹Ã¨Â¯â€¢Ã¤Â¸Â­Ã¤Â½Â¿Ã§â€Â¨ `?` Ã¤Â»Â¥Ã¨Å½Â·Ã¥Â¾â€”Ã¦â€ºÂ´Ã¦Â¸â€¦Ã¦â„¢Â°Ã§Å¡â€žÃ¨Â¾â€œÃ¥â€¡Âº
+* Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¨Â¡Å’Ã¤Â¸ÂºÃ¯Â¼Å’Ã¨â‚¬Å’Ã©ÂÅ¾Ã¥Â®Å¾Ã§Å½Â°
+* Ã¥Å’â€¦Ã¥ÂÂ«Ã¨Â¾Â¹Ã§â€¢Å’Ã¦Æ’â€¦Ã¥â€ ÂµÃ¯Â¼Ë†Ã§Â©ÂºÃ¥â‚¬Â¼Ã£â‚¬ÂÃ¨Â¾Â¹Ã§â€¢Å’Ã¥â‚¬Â¼Ã£â‚¬ÂÃ©â€â„¢Ã¨Â¯Â¯Ã¨Â·Â¯Ã¥Â¾â€žÃ¯Â¼â€°
 
-**不应做：**
+**Ã¤Â¸ÂÃ¥Âºâ€Ã¥ÂÅ¡Ã¯Â¼Å¡**
 
-* 在测试之前编写实现
-* 跳过 RED 阶段
-* 在 `Result::is_err()` 可用时使用 `#[should_panic]`
-* 在测试中使用 `sleep()` — 应使用通道或 `tokio::time::pause()`
-* 模拟一切 — 在可行时优先使用集成测试
+* Ã¥Å“Â¨Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¤Â¹â€¹Ã¥â€°ÂÃ§Â¼â€“Ã¥â€ â„¢Ã¥Â®Å¾Ã§Å½Â°
+* Ã¨Â·Â³Ã¨Â¿â€¡ RED Ã©ËœÂ¶Ã¦Â®Âµ
+* Ã¥Å“Â¨ `Result::is_err()` Ã¥ÂÂ¯Ã§â€Â¨Ã¦â€”Â¶Ã¤Â½Â¿Ã§â€Â¨ `#[should_panic]`
+* Ã¥Å“Â¨Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¤Â¸Â­Ã¤Â½Â¿Ã§â€Â¨ `sleep()` Ã¢â‚¬â€ Ã¥Âºâ€Ã¤Â½Â¿Ã§â€Â¨Ã©â‚¬Å¡Ã©Ââ€œÃ¦Ë†â€“ `tokio::time::pause()`
+* Ã¦Â¨Â¡Ã¦â€¹Å¸Ã¤Â¸â‚¬Ã¥Ë†â€¡ Ã¢â‚¬â€ Ã¥Å“Â¨Ã¥ÂÂ¯Ã¨Â¡Å’Ã¦â€”Â¶Ã¤Â¼ËœÃ¥â€¦Ë†Ã¤Â½Â¿Ã§â€Â¨Ã©â€ºâ€ Ã¦Ë†ÂÃ¦Âµâ€¹Ã¨Â¯â€¢
 
-## 相关命令
+## Ã§â€ºÂ¸Ã¥â€¦Â³Ã¥â€˜Â½Ã¤Â»Â¤
 
-* `/rust-build` - 修复构建错误
-* `/rust-review` - 在实现后审查代码
-* `/verify` - 运行完整的验证循环
+* `/rust-build` - Ã¤Â¿Â®Ã¥Â¤ÂÃ¦Å¾â€žÃ¥Â»ÂºÃ©â€â„¢Ã¨Â¯Â¯
+* `/rust-review` - Ã¥Å“Â¨Ã¥Â®Å¾Ã§Å½Â°Ã¥ÂÅ½Ã¥Â®Â¡Ã¦Å¸Â¥Ã¤Â»Â£Ã§Â Â
+* `/verify` - Ã¨Â¿ÂÃ¨Â¡Å’Ã¥Â®Å’Ã¦â€¢Â´Ã§Å¡â€žÃ©ÂªÅ’Ã¨Â¯ÂÃ¥Â¾ÂªÃ§Å½Â¯
 
-## 相关
+## Ã§â€ºÂ¸Ã¥â€¦Â³
 
-* 技能：`skills/rust-testing/`
-* 技能：`skills/rust-patterns/`
+* Ã¦Å â‚¬Ã¨Æ’Â½Ã¯Â¼Å¡`skills/rust-testing/`
+* Ã¦Å â‚¬Ã¨Æ’Â½Ã¯Â¼Å¡`skills/rust-patterns/`

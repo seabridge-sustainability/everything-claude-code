@@ -1,4 +1,17 @@
-# SaaS Application — Project CLAUDE.md
+# SaaS Application Ã¢â‚¬â€ Project CLAUDE.md
+
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
 
 > Real-world example for a Next.js + Supabase + Stripe SaaS application.
 > Copy this to your project root and customize for your stack.
@@ -13,8 +26,8 @@
 
 ### Database
 
-- All queries use Supabase client with RLS enabled — never bypass RLS
-- Migrations in `supabase/migrations/` — never modify the database directly
+- All queries use Supabase client with RLS enabled Ã¢â‚¬â€ never bypass RLS
+- Migrations in `supabase/migrations/` Ã¢â‚¬â€ never modify the database directly
 - Use `select()` with explicit column lists, not `select('*')`
 - All user-facing queries must include `.limit()` to prevent unbounded results
 
@@ -22,22 +35,22 @@
 
 - Use `createServerClient()` from `@supabase/ssr` in Server Components
 - Use `createBrowserClient()` from `@supabase/ssr` in Client Components
-- Protected routes check `getUser()` — never trust `getSession()` alone for auth
+- Protected routes check `getUser()` Ã¢â‚¬â€ never trust `getSession()` alone for auth
 - Middleware in `middleware.ts` refreshes auth tokens on every request
 
 ### Billing
 
 - Stripe webhook handler in `app/api/webhooks/stripe/route.ts`
-- Never trust client-side price data — always fetch from Stripe server-side
+- Never trust client-side price data Ã¢â‚¬â€ always fetch from Stripe server-side
 - Subscription status checked via `subscription_status` column, synced by webhook
 - Free tier users: 3 projects, 100 API calls/day
 
 ### Code Style
 
 - No emojis in code or comments
-- Immutable patterns only — spread operator, never mutate
+- Immutable patterns only Ã¢â‚¬â€ spread operator, never mutate
 - Server Components: no `'use client'` directive, no `useState`/`useEffect`
-- Client Components: `'use client'` at top, minimal — extract logic to hooks
+- Client Components: `'use client'` at top, minimal Ã¢â‚¬â€ extract logic to hooks
 - Prefer Zod schemas for all input validation (API routes, forms, env vars)
 
 ## File Structure
@@ -135,10 +148,10 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 ### Critical E2E Flows
 
-1. Sign up → email verification → first project creation
-2. Login → dashboard → CRUD operations
-3. Upgrade plan → Stripe checkout → subscription active
-4. Webhook: subscription canceled → downgrade to free tier
+1. Sign up Ã¢â€ â€™ email verification Ã¢â€ â€™ first project creation
+2. Login Ã¢â€ â€™ dashboard Ã¢â€ â€™ CRUD operations
+3. Upgrade plan Ã¢â€ â€™ Stripe checkout Ã¢â€ â€™ subscription active
+4. Webhook: subscription canceled Ã¢â€ â€™ downgrade to free tier
 
 ## ECC Workflow
 

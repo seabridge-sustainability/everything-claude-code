@@ -1,17 +1,30 @@
-# 程式碼風格
+# Ã§Â¨â€¹Ã¥Â¼ÂÃ§Â¢Â¼Ã©Â¢Â¨Ã¦Â Â¼
 
-## 不可變性（關鍵）
+## Safety And Authorization Rule
 
-總是建立新物件，絕不變異：
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+## Ã¤Â¸ÂÃ¥ÂÂ¯Ã¨Â®Å Ã¦â‚¬Â§Ã¯Â¼Ë†Ã©â€”Å“Ã©ÂÂµÃ¯Â¼â€°
+
+Ã§Â¸Â½Ã¦ËœÂ¯Ã¥Â»ÂºÃ§Â«â€¹Ã¦â€“Â°Ã§â€°Â©Ã¤Â»Â¶Ã¯Â¼Å’Ã§Âµâ€¢Ã¤Â¸ÂÃ¨Â®Å Ã§â€¢Â°Ã¯Â¼Å¡
 
 ```javascript
-// 錯誤：變異
+// Ã©Å’Â¯Ã¨ÂªÂ¤Ã¯Â¼Å¡Ã¨Â®Å Ã§â€¢Â°
 function updateUser(user, name) {
-  user.name = name  // 變異！
+  user.name = name  // Ã¨Â®Å Ã§â€¢Â°Ã¯Â¼Â
   return user
 }
 
-// 正確：不可變性
+// Ã¦Â­Â£Ã§Â¢ÂºÃ¯Â¼Å¡Ã¤Â¸ÂÃ¥ÂÂ¯Ã¨Â®Å Ã¦â‚¬Â§
 function updateUser(user, name) {
   return {
     ...user,
@@ -20,17 +33,17 @@ function updateUser(user, name) {
 }
 ```
 
-## 檔案組織
+## Ã¦Âªâ€Ã¦Â¡Ë†Ã§Âµâ€žÃ§Â¹â€
 
-多小檔案 > 少大檔案：
-- 高內聚、低耦合
-- 通常 200-400 行，最多 800 行
-- 從大型元件中抽取工具
-- 依功能/領域組織，而非依類型
+Ã¥Â¤Å¡Ã¥Â°ÂÃ¦Âªâ€Ã¦Â¡Ë† > Ã¥Â°â€˜Ã¥Â¤Â§Ã¦Âªâ€Ã¦Â¡Ë†Ã¯Â¼Å¡
+- Ã©Â«ËœÃ¥â€¦Â§Ã¨ÂÅ¡Ã£â‚¬ÂÃ¤Â½Å½Ã¨â‚¬Â¦Ã¥ÂË†
+- Ã©â‚¬Å¡Ã¥Â¸Â¸ 200-400 Ã¨Â¡Å’Ã¯Â¼Å’Ã¦Å“â‚¬Ã¥Â¤Å¡ 800 Ã¨Â¡Å’
+- Ã¥Â¾Å¾Ã¥Â¤Â§Ã¥Å¾â€¹Ã¥â€¦Æ’Ã¤Â»Â¶Ã¤Â¸Â­Ã¦Å Â½Ã¥Ââ€“Ã¥Â·Â¥Ã¥â€¦Â·
+- Ã¤Â¾ÂÃ¥Å Å¸Ã¨Æ’Â½/Ã©Â ËœÃ¥Å¸Å¸Ã§Âµâ€žÃ§Â¹â€Ã¯Â¼Å’Ã¨â‚¬Å’Ã©ÂÅ¾Ã¤Â¾ÂÃ©Â¡Å¾Ã¥Å¾â€¹
 
-## 錯誤處理
+## Ã©Å’Â¯Ã¨ÂªÂ¤Ã¨â„¢â€¢Ã§Ââ€ 
 
-總是全面處理錯誤：
+Ã§Â¸Â½Ã¦ËœÂ¯Ã¥â€¦Â¨Ã©ÂÂ¢Ã¨â„¢â€¢Ã§Ââ€ Ã©Å’Â¯Ã¨ÂªÂ¤Ã¯Â¼Å¡
 
 ```typescript
 try {
@@ -42,9 +55,9 @@ try {
 }
 ```
 
-## 輸入驗證
+## Ã¨Â¼Â¸Ã¥â€¦Â¥Ã©Â©â€”Ã¨Â­â€°
 
-總是驗證使用者輸入：
+Ã§Â¸Â½Ã¦ËœÂ¯Ã©Â©â€”Ã¨Â­â€°Ã¤Â½Â¿Ã§â€Â¨Ã¨â‚¬â€¦Ã¨Â¼Â¸Ã¥â€¦Â¥Ã¯Â¼Å¡
 
 ```typescript
 import { z } from 'zod'
@@ -57,14 +70,14 @@ const schema = z.object({
 const validated = schema.parse(input)
 ```
 
-## 程式碼品質檢查清單
+## Ã§Â¨â€¹Ã¥Â¼ÂÃ§Â¢Â¼Ã¥â€œÂÃ¨Â³ÂªÃ¦ÂªÂ¢Ã¦Å¸Â¥Ã¦Â¸â€¦Ã¥â€“Â®
 
-在標記工作完成前：
-- [ ] 程式碼可讀且命名良好
-- [ ] 函式小（<50 行）
-- [ ] 檔案專注（<800 行）
-- [ ] 沒有深層巢狀（>4 層）
-- [ ] 適當的錯誤處理
-- [ ] 沒有 console.log 陳述式
-- [ ] 沒有寫死的值
-- [ ] 沒有變異（使用不可變模式）
+Ã¥Å“Â¨Ã¦Â¨â„¢Ã¨Â¨ËœÃ¥Â·Â¥Ã¤Â½Å“Ã¥Â®Å’Ã¦Ë†ÂÃ¥â€°ÂÃ¯Â¼Å¡
+- [ ] Ã§Â¨â€¹Ã¥Â¼ÂÃ§Â¢Â¼Ã¥ÂÂ¯Ã¨Â®â‚¬Ã¤Â¸â€Ã¥â€˜Â½Ã¥ÂÂÃ¨â€°Â¯Ã¥Â¥Â½
+- [ ] Ã¥â€¡Â½Ã¥Â¼ÂÃ¥Â°ÂÃ¯Â¼Ë†<50 Ã¨Â¡Å’Ã¯Â¼â€°
+- [ ] Ã¦Âªâ€Ã¦Â¡Ë†Ã¥Â°Ë†Ã¦Â³Â¨Ã¯Â¼Ë†<800 Ã¨Â¡Å’Ã¯Â¼â€°
+- [ ] Ã¦Â²â€™Ã¦Å“â€°Ã¦Â·Â±Ã¥Â±Â¤Ã¥Â·Â¢Ã§â€¹â‚¬Ã¯Â¼Ë†>4 Ã¥Â±Â¤Ã¯Â¼â€°
+- [ ] Ã©ÂÂ©Ã§â€¢Â¶Ã§Å¡â€žÃ©Å’Â¯Ã¨ÂªÂ¤Ã¨â„¢â€¢Ã§Ââ€ 
+- [ ] Ã¦Â²â€™Ã¦Å“â€° console.log Ã©â„¢Â³Ã¨Â¿Â°Ã¥Â¼Â
+- [ ] Ã¦Â²â€™Ã¦Å“â€°Ã¥Â¯Â«Ã¦Â­Â»Ã§Å¡â€žÃ¥â‚¬Â¼
+- [ ] Ã¦Â²â€™Ã¦Å“â€°Ã¨Â®Å Ã§â€¢Â°Ã¯Â¼Ë†Ã¤Â½Â¿Ã§â€Â¨Ã¤Â¸ÂÃ¥ÂÂ¯Ã¨Â®Å Ã¦Â¨Â¡Ã¥Â¼ÂÃ¯Â¼â€°

@@ -1,60 +1,73 @@
-# 检查点命令
+# Ã¦Â£â‚¬Ã¦Å¸Â¥Ã§â€šÂ¹Ã¥â€˜Â½Ã¤Â»Â¤
 
-在你的工作流中创建或验证一个检查点。
+## Safety And Authorization Rule
 
-## 用法
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+Ã¥Å“Â¨Ã¤Â½Â Ã§Å¡â€žÃ¥Â·Â¥Ã¤Â½Å“Ã¦ÂµÂÃ¤Â¸Â­Ã¥Ë†â€ºÃ¥Â»ÂºÃ¦Ë†â€“Ã©ÂªÅ’Ã¨Â¯ÂÃ¤Â¸â‚¬Ã¤Â¸ÂªÃ¦Â£â‚¬Ã¦Å¸Â¥Ã§â€šÂ¹Ã£â‚¬â€š
+
+## Ã§â€Â¨Ã¦Â³â€¢
 
 `/checkpoint [create|verify|list] [name]`
 
-## 创建检查点
+## Ã¥Ë†â€ºÃ¥Â»ÂºÃ¦Â£â‚¬Ã¦Å¸Â¥Ã§â€šÂ¹
 
-创建检查点时：
+Ã¥Ë†â€ºÃ¥Â»ÂºÃ¦Â£â‚¬Ã¦Å¸Â¥Ã§â€šÂ¹Ã¦â€”Â¶Ã¯Â¼Å¡
 
-1. 运行 `/verify quick` 以确保当前状态是干净的
-2. 使用检查点名称创建一个 git stash 或提交
-3. 将检查点记录到 `.claude/checkpoints.log`：
+1. Ã¨Â¿ÂÃ¨Â¡Å’ `/verify quick` Ã¤Â»Â¥Ã§Â¡Â®Ã¤Â¿ÂÃ¥Â½â€œÃ¥â€°ÂÃ§Å Â¶Ã¦â‚¬ÂÃ¦ËœÂ¯Ã¥Â¹Â²Ã¥â€¡â‚¬Ã§Å¡â€ž
+2. Ã¤Â½Â¿Ã§â€Â¨Ã¦Â£â‚¬Ã¦Å¸Â¥Ã§â€šÂ¹Ã¥ÂÂÃ§Â§Â°Ã¥Ë†â€ºÃ¥Â»ÂºÃ¤Â¸â‚¬Ã¤Â¸Âª git stash Ã¦Ë†â€“Ã¦ÂÂÃ¤ÂºÂ¤
+3. Ã¥Â°â€ Ã¦Â£â‚¬Ã¦Å¸Â¥Ã§â€šÂ¹Ã¨Â®Â°Ã¥Â½â€¢Ã¥Ë†Â° `.claude/checkpoints.log`Ã¯Â¼Å¡
 
 ```bash
 echo "$(date +%Y-%m-%d-%H:%M) | $CHECKPOINT_NAME | $(git rev-parse --short HEAD)" >> .claude/checkpoints.log
 ```
 
-4. 报告检查点已创建
+4. Ã¦Å Â¥Ã¥â€˜Å Ã¦Â£â‚¬Ã¦Å¸Â¥Ã§â€šÂ¹Ã¥Â·Â²Ã¥Ë†â€ºÃ¥Â»Âº
 
-## 验证检查点
+## Ã©ÂªÅ’Ã¨Â¯ÂÃ¦Â£â‚¬Ã¦Å¸Â¥Ã§â€šÂ¹
 
-根据检查点进行验证时：
+Ã¦Â Â¹Ã¦ÂÂ®Ã¦Â£â‚¬Ã¦Å¸Â¥Ã§â€šÂ¹Ã¨Â¿â€ºÃ¨Â¡Å’Ã©ÂªÅ’Ã¨Â¯ÂÃ¦â€”Â¶Ã¯Â¼Å¡
 
-1. 从日志中读取检查点
+1. Ã¤Â»Å½Ã¦â€”Â¥Ã¥Â¿â€”Ã¤Â¸Â­Ã¨Â¯Â»Ã¥Ââ€“Ã¦Â£â‚¬Ã¦Å¸Â¥Ã§â€šÂ¹
 
-2. 将当前状态与检查点进行比较：
-   * 自检查点以来新增的文件
-   * 自检查点以来修改的文件
-   * 现在的测试通过率与当时对比
-   * 现在的覆盖率与当时对比
+2. Ã¥Â°â€ Ã¥Â½â€œÃ¥â€°ÂÃ§Å Â¶Ã¦â‚¬ÂÃ¤Â¸Å½Ã¦Â£â‚¬Ã¦Å¸Â¥Ã§â€šÂ¹Ã¨Â¿â€ºÃ¨Â¡Å’Ã¦Â¯â€Ã¨Â¾Æ’Ã¯Â¼Å¡
+   * Ã¨â€¡ÂªÃ¦Â£â‚¬Ã¦Å¸Â¥Ã§â€šÂ¹Ã¤Â»Â¥Ã¦ÂÂ¥Ã¦â€“Â°Ã¥Â¢Å¾Ã§Å¡â€žÃ¦â€“â€¡Ã¤Â»Â¶
+   * Ã¨â€¡ÂªÃ¦Â£â‚¬Ã¦Å¸Â¥Ã§â€šÂ¹Ã¤Â»Â¥Ã¦ÂÂ¥Ã¤Â¿Â®Ã¦â€Â¹Ã§Å¡â€žÃ¦â€“â€¡Ã¤Â»Â¶
+   * Ã§Å½Â°Ã¥Å“Â¨Ã§Å¡â€žÃ¦Âµâ€¹Ã¨Â¯â€¢Ã©â‚¬Å¡Ã¨Â¿â€¡Ã§Å½â€¡Ã¤Â¸Å½Ã¥Â½â€œÃ¦â€”Â¶Ã¥Â¯Â¹Ã¦Â¯â€
+   * Ã§Å½Â°Ã¥Å“Â¨Ã§Å¡â€žÃ¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡Ã¤Â¸Å½Ã¥Â½â€œÃ¦â€”Â¶Ã¥Â¯Â¹Ã¦Â¯â€
 
-3. 报告：
+3. Ã¦Å Â¥Ã¥â€˜Å Ã¯Â¼Å¡
 
 ```
-检查点对比：$NAME
+Ã¦Â£â‚¬Ã¦Å¸Â¥Ã§â€šÂ¹Ã¥Â¯Â¹Ã¦Â¯â€Ã¯Â¼Å¡$NAME
 ============================
-文件更改数：X
-测试结果：通过数 +Y / 失败数 -Z
-覆盖率：+X% / -Y%
-构建状态：[通过/失败]
+Ã¦â€“â€¡Ã¤Â»Â¶Ã¦â€ºÂ´Ã¦â€Â¹Ã¦â€¢Â°Ã¯Â¼Å¡X
+Ã¦Âµâ€¹Ã¨Â¯â€¢Ã§Â»â€œÃ¦Å¾Å“Ã¯Â¼Å¡Ã©â‚¬Å¡Ã¨Â¿â€¡Ã¦â€¢Â° +Y / Ã¥Â¤Â±Ã¨Â´Â¥Ã¦â€¢Â° -Z
+Ã¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡Ã¯Â¼Å¡+X% / -Y%
+Ã¦Å¾â€žÃ¥Â»ÂºÃ§Å Â¶Ã¦â‚¬ÂÃ¯Â¼Å¡[Ã©â‚¬Å¡Ã¨Â¿â€¡/Ã¥Â¤Â±Ã¨Â´Â¥]
 ```
 
-## 列出检查点
+## Ã¥Ë†â€”Ã¥â€¡ÂºÃ¦Â£â‚¬Ã¦Å¸Â¥Ã§â€šÂ¹
 
-显示所有检查点，包含：
+Ã¦ËœÂ¾Ã§Â¤ÂºÃ¦â€°â‚¬Ã¦Å“â€°Ã¦Â£â‚¬Ã¦Å¸Â¥Ã§â€šÂ¹Ã¯Â¼Å’Ã¥Å’â€¦Ã¥ÂÂ«Ã¯Â¼Å¡
 
-* 名称
-* 时间戳
+* Ã¥ÂÂÃ§Â§Â°
+* Ã¦â€”Â¶Ã©â€”Â´Ã¦Ë†Â³
 * Git SHA
-* 状态（当前、落后、超前）
+* Ã§Å Â¶Ã¦â‚¬ÂÃ¯Â¼Ë†Ã¥Â½â€œÃ¥â€°ÂÃ£â‚¬ÂÃ¨ÂÂ½Ã¥ÂÅ½Ã£â‚¬ÂÃ¨Â¶â€¦Ã¥â€°ÂÃ¯Â¼â€°
 
-## 工作流
+## Ã¥Â·Â¥Ã¤Â½Å“Ã¦ÂµÂ
 
-典型的检查点流程：
+Ã¥â€¦Â¸Ã¥Å¾â€¹Ã§Å¡â€žÃ¦Â£â‚¬Ã¦Å¸Â¥Ã§â€šÂ¹Ã¦ÂµÂÃ§Â¨â€¹Ã¯Â¼Å¡
 
 ```
 [Start] --> /checkpoint create "feature-start"
@@ -68,11 +81,11 @@ echo "$(date +%Y-%m-%d-%H:%M) | $CHECKPOINT_NAME | $(git rev-parse --short HEAD)
 [PR] --> /checkpoint verify "feature-start"
 ```
 
-## 参数
+## Ã¥Ââ€šÃ¦â€¢Â°
 
 $ARGUMENTS:
 
-* `create <name>` - 创建指定名称的检查点
-* `verify <name>` - 根据指定名称的检查点进行验证
-* `list` - 显示所有检查点
-* `clear` - 删除旧的检查点（保留最后5个）
+* `create <name>` - Ã¥Ë†â€ºÃ¥Â»ÂºÃ¦Å’â€¡Ã¥Â®Å¡Ã¥ÂÂÃ§Â§Â°Ã§Å¡â€žÃ¦Â£â‚¬Ã¦Å¸Â¥Ã§â€šÂ¹
+* `verify <name>` - Ã¦Â Â¹Ã¦ÂÂ®Ã¦Å’â€¡Ã¥Â®Å¡Ã¥ÂÂÃ§Â§Â°Ã§Å¡â€žÃ¦Â£â‚¬Ã¦Å¸Â¥Ã§â€šÂ¹Ã¨Â¿â€ºÃ¨Â¡Å’Ã©ÂªÅ’Ã¨Â¯Â
+* `list` - Ã¦ËœÂ¾Ã§Â¤ÂºÃ¦â€°â‚¬Ã¦Å“â€°Ã¦Â£â‚¬Ã¦Å¸Â¥Ã§â€šÂ¹
+* `clear` - Ã¥Ë†Â Ã©â„¢Â¤Ã¦â€”Â§Ã§Å¡â€žÃ¦Â£â‚¬Ã¦Å¸Â¥Ã§â€šÂ¹Ã¯Â¼Ë†Ã¤Â¿ÂÃ§â€¢â„¢Ã¦Å“â‚¬Ã¥ÂÅ½5Ã¤Â¸ÂªÃ¯Â¼â€°

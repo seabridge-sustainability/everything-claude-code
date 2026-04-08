@@ -6,6 +6,19 @@ origin: ECC
 
 # Context Budget
 
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
 Analyze token overhead across every loaded component in a Claude Code session and surface actionable optimizations to reclaim context space.
 
 ## When to Use
@@ -23,14 +36,14 @@ Analyze token overhead across every loaded component in a Claude Code session an
 Scan all component directories and estimate token consumption:
 
 **Agents** (`agents/*.md`)
-- Count lines and tokens per file (words × 1.3)
+- Count lines and tokens per file (words Ãƒâ€” 1.3)
 - Extract `description` frontmatter length
 - Flag: files >200 lines (heavy), description >30 words (bloated frontmatter)
 
 **Skills** (`skills/*/SKILL.md`)
 - Count tokens per SKILL.md
 - Flag: files >400 lines
-- Check for duplicate copies in `.agents/skills/` — skip identical copies to avoid double-counting
+- Check for duplicate copies in `.agents/skills/` Ã¢â‚¬â€ skip identical copies to avoid double-counting
 
 **Rules** (`rules/**/*.md`)
 - Count tokens per file
@@ -60,11 +73,11 @@ Sort every component into a bucket:
 
 Identify the following problem patterns:
 
-- **Bloated agent descriptions** — description >30 words in frontmatter loads into every Task tool invocation
-- **Heavy agents** — files >200 lines inflate Task tool context on every spawn
-- **Redundant components** — skills that duplicate agent logic, rules that duplicate CLAUDE.md
-- **MCP over-subscription** — >10 servers, or servers wrapping CLI tools available for free
-- **CLAUDE.md bloat** — verbose explanations, outdated sections, instructions that should be rules
+- **Bloated agent descriptions** Ã¢â‚¬â€ description >30 words in frontmatter loads into every Task tool invocation
+- **Heavy agents** Ã¢â‚¬â€ files >200 lines inflate Task tool context on every spawn
+- **Redundant components** Ã¢â‚¬â€ skills that duplicate agent logic, rules that duplicate CLAUDE.md
+- **MCP over-subscription** Ã¢â‚¬â€ >10 servers, or servers wrapping CLI tools available for free
+- **CLAUDE.md bloat** Ã¢â‚¬â€ verbose explanations, outdated sections, instructions that should be rules
 
 ### Phase 4: Report
 
@@ -72,30 +85,30 @@ Produce the context budget report:
 
 ```
 Context Budget Report
-═══════════════════════════════════════
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
 
 Total estimated overhead: ~XX,XXX tokens
 Context model: Claude Sonnet (200K window)
 Effective available context: ~XXX,XXX tokens (XX%)
 
 Component Breakdown:
-┌─────────────────┬────────┬───────────┐
-│ Component       │ Count  │ Tokens    │
-├─────────────────┼────────┼───────────┤
-│ Agents          │ N      │ ~X,XXX    │
-│ Skills          │ N      │ ~X,XXX    │
-│ Rules           │ N      │ ~X,XXX    │
-│ MCP tools       │ N      │ ~XX,XXX   │
-│ CLAUDE.md       │ N      │ ~X,XXX    │
-└─────────────────┴────────┴───────────┘
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š Component       Ã¢â€â€š Count  Ã¢â€â€š Tokens    Ã¢â€â€š
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¼Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¼Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¤
+Ã¢â€â€š Agents          Ã¢â€â€š N      Ã¢â€â€š ~X,XXX    Ã¢â€â€š
+Ã¢â€â€š Skills          Ã¢â€â€š N      Ã¢â€â€š ~X,XXX    Ã¢â€â€š
+Ã¢â€â€š Rules           Ã¢â€â€š N      Ã¢â€â€š ~X,XXX    Ã¢â€â€š
+Ã¢â€â€š MCP tools       Ã¢â€â€š N      Ã¢â€â€š ~XX,XXX   Ã¢â€â€š
+Ã¢â€â€š CLAUDE.md       Ã¢â€â€š N      Ã¢â€â€š ~X,XXX    Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â´Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â´Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
 
 WARNING: Issues Found (N):
 [ranked by token savings]
 
 Top 3 Optimizations:
-1. [action] → save ~X,XXX tokens
-2. [action] → save ~X,XXX tokens
-3. [action] → save ~X,XXX tokens
+1. [action] Ã¢â€ â€™ save ~X,XXX tokens
+2. [action] Ã¢â€ â€™ save ~X,XXX tokens
+3. [action] Ã¢â€ â€™ save ~X,XXX tokens
 
 Potential savings: ~XX,XXX tokens (XX% of current overhead)
 ```
@@ -107,9 +120,9 @@ In verbose mode, additionally output per-file token counts, line-by-line breakdo
 **Basic audit**
 ```
 User: /context-budget
-Skill: Scans setup → 16 agents (12,400 tokens), 28 skills (6,200), 87 MCP tools (43,500), 2 CLAUDE.md (1,200)
+Skill: Scans setup Ã¢â€ â€™ 16 agents (12,400 tokens), 28 skills (6,200), 87 MCP tools (43,500), 2 CLAUDE.md (1,200)
        Flags: 3 heavy agents, 14 MCP servers (3 CLI-replaceable)
-       Top saving: remove 3 MCP servers → -27,500 tokens (47% overhead reduction)
+       Top saving: remove 3 MCP servers Ã¢â€ â€™ -27,500 tokens (47% overhead reduction)
 ```
 
 **Verbose mode**
@@ -122,13 +135,13 @@ Skill: Full report + per-file breakdown showing planner.md (213 lines, 1,840 tok
 **Pre-expansion check**
 ```
 User: I want to add 5 more MCP servers, do I have room?
-Skill: Current overhead 33% → adding 5 servers (~50 tools) would add ~25,000 tokens → pushes to 45% overhead
+Skill: Current overhead 33% Ã¢â€ â€™ adding 5 servers (~50 tools) would add ~25,000 tokens Ã¢â€ â€™ pushes to 45% overhead
        Recommendation: remove 2 CLI-replaceable servers first to stay under 40%
 ```
 
 ## Best Practices
 
-- **Token estimation**: use `words × 1.3` for prose, `chars / 4` for code-heavy files
+- **Token estimation**: use `words Ãƒâ€” 1.3` for prose, `chars / 4` for code-heavy files
 - **MCP is the biggest lever**: each tool schema costs ~500 tokens; a 30-tool server costs more than all your skills combined
 - **Agent descriptions are loaded always**: even if the agent is never invoked, its description field is present in every Task tool context
 - **Verbose mode for debugging**: use when you need to pinpoint the exact files driving overhead, not for regular audits

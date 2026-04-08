@@ -1,12 +1,23 @@
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 ---
 name: session-mobility
-description: Move Claude Code sessions across devices using --teleport (cloud→local) and Remote Control (local←phone/web). Covers setup, enabling remote control by default, and cross-device workflow patterns.
+description: Move Claude Code sessions across devices using --teleport (cloudÃ¢â€ â€™local) and Remote Control (localÃ¢â€ Âphone/web). Covers setup, enabling remote control by default, and cross-device workflow patterns.
 origin: ECC
 ---
 
 # Session Mobility
 
-Move active Claude Code sessions between devices — pull a cloud session to your machine or drive a local session from your phone or browser.
+Move active Claude Code sessions between devices Ã¢â‚¬â€ pull a cloud session to your machine or drive a local session from your phone or browser.
 
 ## When to Activate
 
@@ -16,7 +27,7 @@ Move active Claude Code sessions between devices — pull a cloud session to you
 
 ---
 
-## Feature 1: `--teleport` — Cloud → Local
+## Feature 1: `--teleport` Ã¢â‚¬â€ Cloud Ã¢â€ â€™ Local
 
 Moves a running cloud (claude.ai) session to your local machine, giving it access to your local tools, files, and MCP servers.
 
@@ -37,20 +48,20 @@ Claude will print a URL. Open that URL on the device where the cloud session is 
 ### Workflow
 
 ```
-[Phone/claude.ai] → start session → get teleport URL
-[Local machine]   → claude --teleport → session moves here with all tools
+[Phone/claude.ai] Ã¢â€ â€™ start session Ã¢â€ â€™ get teleport URL
+[Local machine]   Ã¢â€ â€™ claude --teleport Ã¢â€ â€™ session moves here with all tools
 ```
 
 ---
 
-## Feature 2: Remote Control — Local ← Phone/Web
+## Feature 2: Remote Control Ã¢â‚¬â€ Local Ã¢â€ Â Phone/Web
 
 Lets you drive a local Claude Code session from your phone or any browser without teleporting.
 
 ### Enable for a single session
 
 ```bash
-claude  # start normally — Remote Control is offered in session settings
+claude  # start normally Ã¢â‚¬â€ Remote Control is offered in session settings
 # or use /remote-control inside a running session
 ```
 
@@ -81,10 +92,10 @@ Then ask it to set `remoteControlEnabled: true`.
 
 ## Best Practices
 
-- Enable `remoteControlEnabled: true` globally (Boris does this) — zero friction when you need it
+- Enable `remoteControlEnabled: true` globally (Boris does this) Ã¢â‚¬â€ zero friction when you need it
 - Use `--teleport` when you need full local tool access; use remote control when you just want to observe or steer
 - Remote control sessions auto-expire when the local session ends
-- Do not share remote-control URLs — they grant full session input access
+- Do not share remote-control URLs Ã¢â‚¬â€ they grant full session input access
 
 ---
 

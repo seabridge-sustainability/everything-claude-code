@@ -1,35 +1,48 @@
 ---
 name: e2e-testing
-description: Playwright E2E 测试模式、页面对象模型、配置、CI/CD 集成、工件管理和不稳定测试策略。
+description: Playwright E2E Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¦Â¨Â¡Ã¥Â¼ÂÃ£â‚¬ÂÃ©Â¡ÂµÃ©ÂÂ¢Ã¥Â¯Â¹Ã¨Â±Â¡Ã¦Â¨Â¡Ã¥Å¾â€¹Ã£â‚¬ÂÃ©â€¦ÂÃ§Â½Â®Ã£â‚¬ÂCI/CD Ã©â€ºâ€ Ã¦Ë†ÂÃ£â‚¬ÂÃ¥Â·Â¥Ã¤Â»Â¶Ã§Â®Â¡Ã§Ââ€ Ã¥â€™Å’Ã¤Â¸ÂÃ§Â¨Â³Ã¥Â®Å¡Ã¦Âµâ€¹Ã¨Â¯â€¢Ã§Â­â€“Ã§â€¢Â¥Ã£â‚¬â€š
 origin: ECC
 ---
 
-# E2E 测试模式
+# E2E Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¦Â¨Â¡Ã¥Â¼Â
 
-用于构建稳定、快速且可维护的 E2E 测试套件的全面 Playwright 模式。
+## Safety And Authorization Rule
 
-## 测试文件组织
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+Ã§â€Â¨Ã¤ÂºÅ½Ã¦Å¾â€žÃ¥Â»ÂºÃ§Â¨Â³Ã¥Â®Å¡Ã£â‚¬ÂÃ¥Â¿Â«Ã©â‚¬Å¸Ã¤Â¸â€Ã¥ÂÂ¯Ã§Â»Â´Ã¦Å Â¤Ã§Å¡â€ž E2E Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¥Â¥â€”Ã¤Â»Â¶Ã§Å¡â€žÃ¥â€¦Â¨Ã©ÂÂ¢ Playwright Ã¦Â¨Â¡Ã¥Â¼ÂÃ£â‚¬â€š
+
+## Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¦â€“â€¡Ã¤Â»Â¶Ã§Â»â€žÃ§Â»â€¡
 
 ```
 tests/
-├── e2e/
-│   ├── auth/
-│   │   ├── login.spec.ts
-│   │   ├── logout.spec.ts
-│   │   └── register.spec.ts
-│   ├── features/
-│   │   ├── browse.spec.ts
-│   │   ├── search.spec.ts
-│   │   └── create.spec.ts
-│   └── api/
-│       └── endpoints.spec.ts
-├── fixtures/
-│   ├── auth.ts
-│   └── data.ts
-└── playwright.config.ts
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ e2e/
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ auth/
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ login.spec.ts
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ logout.spec.ts
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ register.spec.ts
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ features/
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ browse.spec.ts
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ search.spec.ts
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ create.spec.ts
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ api/
+Ã¢â€â€š       Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ endpoints.spec.ts
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ fixtures/
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ auth.ts
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ data.ts
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ playwright.config.ts
 ```
 
-## 页面对象模型 (POM)
+## Ã©Â¡ÂµÃ©ÂÂ¢Ã¥Â¯Â¹Ã¨Â±Â¡Ã¦Â¨Â¡Ã¥Å¾â€¹ (POM)
 
 ```typescript
 import { Page, Locator } from '@playwright/test'
@@ -64,7 +77,7 @@ export class ItemsPage {
 }
 ```
 
-## 测试结构
+## Ã¦Âµâ€¹Ã¨Â¯â€¢Ã§Â»â€œÃ¦Å¾â€ž
 
 ```typescript
 import { test, expect } from '@playwright/test'
@@ -97,7 +110,7 @@ test.describe('Item Search', () => {
 })
 ```
 
-## Playwright 配置
+## Playwright Ã©â€¦ÂÃ§Â½Â®
 
 ```typescript
 import { defineConfig, devices } from '@playwright/test'
@@ -136,9 +149,9 @@ export default defineConfig({
 })
 ```
 
-## 不稳定测试模式
+## Ã¤Â¸ÂÃ§Â¨Â³Ã¥Â®Å¡Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¦Â¨Â¡Ã¥Â¼Â
 
-### 隔离
+### Ã©Å¡â€Ã§Â¦Â»
 
 ```typescript
 test('flaky: complex search', async ({ page }) => {
@@ -152,16 +165,16 @@ test('conditional skip', async ({ page }) => {
 })
 ```
 
-### 识别不稳定性
+### Ã¨Â¯â€ Ã¥Ë†Â«Ã¤Â¸ÂÃ§Â¨Â³Ã¥Â®Å¡Ã¦â‚¬Â§
 
 ```bash
 npx playwright test tests/search.spec.ts --repeat-each=10
 npx playwright test tests/search.spec.ts --retries=3
 ```
 
-### 常见原因与修复
+### Ã¥Â¸Â¸Ã¨Â§ÂÃ¥Å½Å¸Ã¥â€ºÂ Ã¤Â¸Å½Ã¤Â¿Â®Ã¥Â¤Â
 
-**竞态条件：**
+**Ã§Â«Å¾Ã¦â‚¬ÂÃ¦ÂÂ¡Ã¤Â»Â¶Ã¯Â¼Å¡**
 
 ```typescript
 // Bad: assumes element is ready
@@ -171,7 +184,7 @@ await page.click('[data-testid="button"]')
 await page.locator('[data-testid="button"]').click()
 ```
 
-**网络时序：**
+**Ã§Â½â€˜Ã§Â»Å“Ã¦â€”Â¶Ã¥ÂºÂÃ¯Â¼Å¡**
 
 ```typescript
 // Bad: arbitrary timeout
@@ -181,7 +194,7 @@ await page.waitForTimeout(5000)
 await page.waitForResponse(resp => resp.url().includes('/api/data'))
 ```
 
-**动画时序：**
+**Ã¥Å Â¨Ã§â€Â»Ã¦â€”Â¶Ã¥ÂºÂÃ¯Â¼Å¡**
 
 ```typescript
 // Bad: click during animation
@@ -193,9 +206,9 @@ await page.waitForLoadState('networkidle')
 await page.locator('[data-testid="menu-item"]').click()
 ```
 
-## 产物管理
+## Ã¤ÂºÂ§Ã§â€°Â©Ã§Â®Â¡Ã§Ââ€ 
 
-### 截图
+### Ã¦Ë†ÂªÃ¥â€ºÂ¾
 
 ```typescript
 await page.screenshot({ path: 'artifacts/after-login.png' })
@@ -203,7 +216,7 @@ await page.screenshot({ path: 'artifacts/full-page.png', fullPage: true })
 await page.locator('[data-testid="chart"]').screenshot({ path: 'artifacts/chart.png' })
 ```
 
-### 跟踪记录
+### Ã¨Â·Å¸Ã¨Â¸ÂªÃ¨Â®Â°Ã¥Â½â€¢
 
 ```typescript
 await browser.startTracing(page, {
@@ -215,7 +228,7 @@ await browser.startTracing(page, {
 await browser.stopTracing()
 ```
 
-### 视频
+### Ã¨Â§â€ Ã©Â¢â€˜
 
 ```typescript
 // In playwright.config.ts
@@ -225,7 +238,7 @@ use: {
 }
 ```
 
-## CI/CD 集成
+## CI/CD Ã©â€ºâ€ Ã¦Ë†Â
 
 ```yaml
 # .github/workflows/e2e.yml
@@ -253,34 +266,34 @@ jobs:
           retention-days: 30
 ```
 
-## 测试报告模板
+## Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¦Å Â¥Ã¥â€˜Å Ã¦Â¨Â¡Ã¦ÂÂ¿
 
 ```markdown
-# E2E 测试报告
+# E2E Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¦Å Â¥Ã¥â€˜Å 
 
-**日期：** YYYY-MM-DD HH:MM
-**持续时间：** Xm Ys
-**状态：** 通过 / 失败
+**Ã¦â€”Â¥Ã¦Å“Å¸Ã¯Â¼Å¡** YYYY-MM-DD HH:MM
+**Ã¦Å’ÂÃ§Â»Â­Ã¦â€”Â¶Ã©â€”Â´Ã¯Â¼Å¡** Xm Ys
+**Ã§Å Â¶Ã¦â‚¬ÂÃ¯Â¼Å¡** Ã©â‚¬Å¡Ã¨Â¿â€¡ / Ã¥Â¤Â±Ã¨Â´Â¥
 
-## 概要
-- 总计：X | 通过：Y (Z%) | 失败：A | 不稳定：B | 跳过：C
+## Ã¦Â¦â€šÃ¨Â¦Â
+- Ã¦â‚¬Â»Ã¨Â®Â¡Ã¯Â¼Å¡X | Ã©â‚¬Å¡Ã¨Â¿â€¡Ã¯Â¼Å¡Y (Z%) | Ã¥Â¤Â±Ã¨Â´Â¥Ã¯Â¼Å¡A | Ã¤Â¸ÂÃ§Â¨Â³Ã¥Â®Å¡Ã¯Â¼Å¡B | Ã¨Â·Â³Ã¨Â¿â€¡Ã¯Â¼Å¡C
 
-## 失败的测试
+## Ã¥Â¤Â±Ã¨Â´Â¥Ã§Å¡â€žÃ¦Âµâ€¹Ã¨Â¯â€¢
 
 ### test-name
-**文件：** `tests/e2e/feature.spec.ts:45`
-**错误：** 期望元素可见
-**截图：** artifacts/failed.png
-**建议修复：** [description]
+**Ã¦â€“â€¡Ã¤Â»Â¶Ã¯Â¼Å¡** `tests/e2e/feature.spec.ts:45`
+**Ã©â€â„¢Ã¨Â¯Â¯Ã¯Â¼Å¡** Ã¦Å“Å¸Ã¦Å“â€ºÃ¥â€¦Æ’Ã§Â´Â Ã¥ÂÂ¯Ã¨Â§Â
+**Ã¦Ë†ÂªÃ¥â€ºÂ¾Ã¯Â¼Å¡** artifacts/failed.png
+**Ã¥Â»ÂºÃ¨Â®Â®Ã¤Â¿Â®Ã¥Â¤ÂÃ¯Â¼Å¡** [description]
 
-## 产物
-- HTML 报告：playwright-report/index.html
-- 截图：artifacts/*.png
-- 视频：artifacts/videos/*.webm
-- 追踪文件：artifacts/*.zip
+## Ã¤ÂºÂ§Ã§â€°Â©
+- HTML Ã¦Å Â¥Ã¥â€˜Å Ã¯Â¼Å¡playwright-report/index.html
+- Ã¦Ë†ÂªÃ¥â€ºÂ¾Ã¯Â¼Å¡artifacts/*.png
+- Ã¨Â§â€ Ã©Â¢â€˜Ã¯Â¼Å¡artifacts/videos/*.webm
+- Ã¨Â¿Â½Ã¨Â¸ÂªÃ¦â€“â€¡Ã¤Â»Â¶Ã¯Â¼Å¡artifacts/*.zip
 ```
 
-## 钱包 / Web3 测试
+## Ã©â€™Â±Ã¥Å’â€¦ / Web3 Ã¦Âµâ€¹Ã¨Â¯â€¢
 
 ```typescript
 test('wallet connection', async ({ page, context }) => {
@@ -302,11 +315,11 @@ test('wallet connection', async ({ page, context }) => {
 })
 ```
 
-## 金融 / 关键流程测试
+## Ã©â€¡â€˜Ã¨Å¾Â / Ã¥â€¦Â³Ã©â€Â®Ã¦ÂµÂÃ§Â¨â€¹Ã¦Âµâ€¹Ã¨Â¯â€¢
 
 ```typescript
 test('trade execution', async ({ page }) => {
-  // Skip on production — real money
+  // Skip on production Ã¢â‚¬â€ real money
   test.skip(process.env.NODE_ENV === 'production', 'Skip on production')
 
   await page.goto('/markets/test-market')

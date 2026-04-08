@@ -1,80 +1,93 @@
 # Refactor Clean
 
-Her adımda test doğrulaması ile ölü kodu güvenle tanımla ve kaldır.
+## Safety And Authorization Rule
 
-## Adım 1: Ölü Kodu Tespit Et
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-Proje türüne göre analiz araçlarını çalıştır:
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-| Araç | Ne Bulur | Komut |
+
+Her adÃ„Â±mda test doÃ„Å¸rulamasÃ„Â± ile ÃƒÂ¶lÃƒÂ¼ kodu gÃƒÂ¼venle tanÃ„Â±mla ve kaldÃ„Â±r.
+
+## AdÃ„Â±m 1: Ãƒâ€“lÃƒÂ¼ Kodu Tespit Et
+
+Proje tÃƒÂ¼rÃƒÂ¼ne gÃƒÂ¶re analiz araÃƒÂ§larÃ„Â±nÃ„Â± ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r:
+
+| AraÃƒÂ§ | Ne Bulur | Komut |
 |------|--------------|---------|
-| knip | Kullanılmayan export'lar, dosyalar, bağımlılıklar | `npx knip` |
-| depcheck | Kullanılmayan npm bağımlılıkları | `npx depcheck` |
-| ts-prune | Kullanılmayan TypeScript export'ları | `npx ts-prune` |
-| vulture | Kullanılmayan Python kodu | `vulture src/` |
-| deadcode | Kullanılmayan Go kodu | `deadcode ./...` |
-| cargo-udeps | Kullanılmayan Rust bağımlılıkları | `cargo +nightly udeps` |
+| knip | KullanÃ„Â±lmayan export'lar, dosyalar, baÃ„Å¸Ã„Â±mlÃ„Â±lÃ„Â±klar | `npx knip` |
+| depcheck | KullanÃ„Â±lmayan npm baÃ„Å¸Ã„Â±mlÃ„Â±lÃ„Â±klarÃ„Â± | `npx depcheck` |
+| ts-prune | KullanÃ„Â±lmayan TypeScript export'larÃ„Â± | `npx ts-prune` |
+| vulture | KullanÃ„Â±lmayan Python kodu | `vulture src/` |
+| deadcode | KullanÃ„Â±lmayan Go kodu | `deadcode ./...` |
+| cargo-udeps | KullanÃ„Â±lmayan Rust baÃ„Å¸Ã„Â±mlÃ„Â±lÃ„Â±klarÃ„Â± | `cargo +nightly udeps` |
 
-Hiçbir araç yoksa, sıfır import'lu export'ları bulmak için Grep kullanın:
+HiÃƒÂ§bir araÃƒÂ§ yoksa, sÃ„Â±fÃ„Â±r import'lu export'larÃ„Â± bulmak iÃƒÂ§in Grep kullanÃ„Â±n:
 ```
-# Export'ları bul, sonra herhangi bir yerde import edilip edilmediklerini kontrol et
+# Export'larÃ„Â± bul, sonra herhangi bir yerde import edilip edilmediklerini kontrol et
 ```
 
-## Adım 2: Bulguları Kategorize Et
+## AdÃ„Â±m 2: BulgularÃ„Â± Kategorize Et
 
-Bulguları güvenlik katmanlarına göre sırala:
+BulgularÃ„Â± gÃƒÂ¼venlik katmanlarÃ„Â±na gÃƒÂ¶re sÃ„Â±rala:
 
-| Katman | Örnekler | Aksiyon |
+| Katman | Ãƒâ€“rnekler | Aksiyon |
 |------|----------|--------|
-| **GÜVENLİ** | Kullanılmayan yardımcılar, test yardımcıları, dahili fonksiyonlar | Güvenle sil |
-| **DİKKAT** | Component'ler, API route'ları, middleware | Dinamik import'ları veya harici tüketicileri olmadığını doğrula |
-| **TEHLİKE** | Config dosyaları, giriş noktaları, tip tanımları | Dokunmadan önce araştır |
+| **GÃƒÅ“VENLÃ„Â°** | KullanÃ„Â±lmayan yardÃ„Â±mcÃ„Â±lar, test yardÃ„Â±mcÃ„Â±larÃ„Â±, dahili fonksiyonlar | GÃƒÂ¼venle sil |
+| **DÃ„Â°KKAT** | Component'ler, API route'larÃ„Â±, middleware | Dinamik import'larÃ„Â± veya harici tÃƒÂ¼keticileri olmadÃ„Â±Ã„Å¸Ã„Â±nÃ„Â± doÃ„Å¸rula |
+| **TEHLÃ„Â°KE** | Config dosyalarÃ„Â±, giriÃ…Å¸ noktalarÃ„Â±, tip tanÃ„Â±mlarÃ„Â± | Dokunmadan ÃƒÂ¶nce araÃ…Å¸tÃ„Â±r |
 
-## Adım 3: Güvenli Silme Döngüsü
+## AdÃ„Â±m 3: GÃƒÂ¼venli Silme DÃƒÂ¶ngÃƒÂ¼sÃƒÂ¼
 
-Her GÜVENLİ öğe için:
+Her GÃƒÅ“VENLÃ„Â° ÃƒÂ¶Ã„Å¸e iÃƒÂ§in:
 
-1. **Tam test paketini çalıştır** — Baseline oluştur (tümü yeşil)
-2. **Ölü kodu sil** — Cerrahi kaldırma için Edit aracını kullan
-3. **Test paketini yeniden çalıştır** — Hiçbir şeyin bozulmadığını doğrula
-4. **Testler başarısız olursa** — Hemen `git checkout -- <file>` ile geri al ve bu öğeyi atla
-5. **Testler geçerse** — Sonraki öğeye geç
+1. **Tam test paketini ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r** Ã¢â‚¬â€ Baseline oluÃ…Å¸tur (tÃƒÂ¼mÃƒÂ¼ yeÃ…Å¸il)
+2. **Ãƒâ€“lÃƒÂ¼ kodu sil** Ã¢â‚¬â€ Cerrahi kaldÃ„Â±rma iÃƒÂ§in Edit aracÃ„Â±nÃ„Â± kullan
+3. **Test paketini yeniden ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r** Ã¢â‚¬â€ HiÃƒÂ§bir Ã…Å¸eyin bozulmadÃ„Â±Ã„Å¸Ã„Â±nÃ„Â± doÃ„Å¸rula
+4. **Testler baÃ…Å¸arÃ„Â±sÃ„Â±z olursa** Ã¢â‚¬â€ Hemen `git checkout -- <file>` ile geri al ve bu ÃƒÂ¶Ã„Å¸eyi atla
+5. **Testler geÃƒÂ§erse** Ã¢â‚¬â€ Sonraki ÃƒÂ¶Ã„Å¸eye geÃƒÂ§
 
-## Adım 4: DİKKAT Öğelerini İdare Et
+## AdÃ„Â±m 4: DÃ„Â°KKAT Ãƒâ€“Ã„Å¸elerini Ã„Â°dare Et
 
-DİKKAT öğelerini silmeden önce:
-- Dinamik import'ları ara: `import()`, `require()`, `__import__`
-- String referansları ara: route isimleri, config'lerdeki component isimleri
-- Public paket API'sinden export edilip edilmediğini kontrol et
-- Harici tüketici olmadığını doğrula (yayınlanmışsa bağımlıları kontrol et)
+DÃ„Â°KKAT ÃƒÂ¶Ã„Å¸elerini silmeden ÃƒÂ¶nce:
+- Dinamik import'larÃ„Â± ara: `import()`, `require()`, `__import__`
+- String referanslarÃ„Â± ara: route isimleri, config'lerdeki component isimleri
+- Public paket API'sinden export edilip edilmediÃ„Å¸ini kontrol et
+- Harici tÃƒÂ¼ketici olmadÃ„Â±Ã„Å¸Ã„Â±nÃ„Â± doÃ„Å¸rula (yayÃ„Â±nlanmÃ„Â±Ã…Å¸sa baÃ„Å¸Ã„Â±mlÃ„Â±larÃ„Â± kontrol et)
 
-## Adım 5: Duplikatları Birleştir
+## AdÃ„Â±m 5: DuplikatlarÃ„Â± BirleÃ…Å¸tir
 
-Ölü kodu kaldırdıktan sonra şunları ara:
-- Neredeyse aynı fonksiyonlar (%80'den fazla benzer) — birinde birleştir
-- Gereksiz tip tanımları — birleştir
-- Değer eklemeyen wrapper fonksiyonlar — inline yap
-- Amacı olmayan re-export'lar — yönlendirmeyi kaldır
+Ãƒâ€“lÃƒÂ¼ kodu kaldÃ„Â±rdÃ„Â±ktan sonra Ã…Å¸unlarÃ„Â± ara:
+- Neredeyse aynÃ„Â± fonksiyonlar (%80'den fazla benzer) Ã¢â‚¬â€ birinde birleÃ…Å¸tir
+- Gereksiz tip tanÃ„Â±mlarÃ„Â± Ã¢â‚¬â€ birleÃ…Å¸tir
+- DeÃ„Å¸er eklemeyen wrapper fonksiyonlar Ã¢â‚¬â€ inline yap
+- AmacÃ„Â± olmayan re-export'lar Ã¢â‚¬â€ yÃƒÂ¶nlendirmeyi kaldÃ„Â±r
 
-## Adım 6: Özet
+## AdÃ„Â±m 6: Ãƒâ€“zet
 
-Sonuçları raporla:
+SonuÃƒÂ§larÃ„Â± raporla:
 
 ```
-Ölü Kod Temizliği
-──────────────────────────────
-Silindi:   12 kullanılmayan fonksiyon
-           3 kullanılmayan dosya
-           5 kullanılmayan bağımlılık
-Atlandı:   2 öğe (testler başarısız)
-Kazanç:    ~450 satır kaldırıldı
-──────────────────────────────
-Tüm testler geçiyor PASS:
+Ãƒâ€“lÃƒÂ¼ Kod TemizliÃ„Å¸i
+Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+Silindi:   12 kullanÃ„Â±lmayan fonksiyon
+           3 kullanÃ„Â±lmayan dosya
+           5 kullanÃ„Â±lmayan baÃ„Å¸Ã„Â±mlÃ„Â±lÃ„Â±k
+AtlandÃ„Â±:   2 ÃƒÂ¶Ã„Å¸e (testler baÃ…Å¸arÃ„Â±sÃ„Â±z)
+KazanÃƒÂ§:    ~450 satÃ„Â±r kaldÃ„Â±rÃ„Â±ldÃ„Â±
+Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+TÃƒÂ¼m testler geÃƒÂ§iyor PASS:
 ```
 
 ## Kurallar
 
-- **Önce testleri çalıştırmadan asla silmeyin**
-- **Bir seferde bir silme** — Atomik değişiklikler geri almayı kolaylaştırır
-- **Emin değilseniz atlayın** — Üretimi bozmaktansa ölü kodu tutmak daha iyidir
-- **Temizlerken refactor etmeyin** — Endişeleri ayırın (önce temizle, sonra refactor et)
+- **Ãƒâ€“nce testleri ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±rmadan asla silmeyin**
+- **Bir seferde bir silme** Ã¢â‚¬â€ Atomik deÃ„Å¸iÃ…Å¸iklikler geri almayÃ„Â± kolaylaÃ…Å¸tÃ„Â±rÃ„Â±r
+- **Emin deÃ„Å¸ilseniz atlayÃ„Â±n** Ã¢â‚¬â€ ÃƒÅ“retimi bozmaktansa ÃƒÂ¶lÃƒÂ¼ kodu tutmak daha iyidir
+- **Temizlerken refactor etmeyin** Ã¢â‚¬â€ EndiÃ…Å¸eleri ayÃ„Â±rÃ„Â±n (ÃƒÂ¶nce temizle, sonra refactor et)

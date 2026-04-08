@@ -6,6 +6,19 @@ origin: ECC
 
 # Git Workflow Patterns
 
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
 Best practices for Git version control, branching strategies, and collaborative development.
 
 ## When to Activate
@@ -25,10 +38,10 @@ Best for continuous deployment and small-to-medium teams.
 
 ```
 main (protected, always deployable)
-  │
-  ├── feature/user-auth      → PR → merge to main
-  ├── feature/payment-flow   → PR → merge to main
-  └── fix/login-bug          → PR → merge to main
+  Ã¢â€â€š
+  Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ feature/user-auth      Ã¢â€ â€™ PR Ã¢â€ â€™ merge to main
+  Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ feature/payment-flow   Ã¢â€ â€™ PR Ã¢â€ â€™ merge to main
+  Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ fix/login-bug          Ã¢â€ â€™ PR Ã¢â€ â€™ merge to main
 ```
 
 **Rules:**
@@ -44,10 +57,10 @@ Best for teams with strong CI/CD and feature flags.
 
 ```
 main (trunk)
-  │
-  ├── short-lived feature (1-2 days max)
-  ├── short-lived feature
-  └── short-lived feature
+  Ã¢â€â€š
+  Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ short-lived feature (1-2 days max)
+  Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ short-lived feature
+  Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ short-lived feature
 ```
 
 **Rules:**
@@ -62,15 +75,15 @@ Best for scheduled releases and enterprise projects.
 
 ```
 main (production releases)
-  │
-  └── develop (integration branch)
-        │
-        ├── feature/user-auth
-        ├── feature/payment
-        │
-        ├── release/1.0.0    → merge to main and develop
-        │
-        └── hotfix/critical  → merge to main and develop
+  Ã¢â€â€š
+  Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ develop (integration branch)
+        Ã¢â€â€š
+        Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ feature/user-auth
+        Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ feature/payment
+        Ã¢â€â€š
+        Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ release/1.0.0    Ã¢â€ â€™ merge to main and develop
+        Ã¢â€â€š
+        Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ hotfix/critical  Ã¢â€ â€™ merge to main and develop
 ```
 
 **Rules:**
@@ -416,9 +429,9 @@ MINOR: New features, backward compatible
 PATCH: Bug fixes, backward compatible
 
 Examples:
-1.0.0 → 1.0.1 (patch: bug fix)
-1.0.1 → 1.1.0 (minor: new feature)
-1.1.0 → 2.0.0 (major: breaking change)
+1.0.0 Ã¢â€ â€™ 1.0.1 (patch: bug fix)
+1.0.1 Ã¢â€ â€™ 1.1.0 (minor: new feature)
+1.1.0 Ã¢â€ â€™ 2.0.0 (major: breaking change)
 ```
 
 ### Creating Releases

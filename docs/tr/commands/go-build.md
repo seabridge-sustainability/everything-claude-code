@@ -1,55 +1,68 @@
 ---
-description: Go build hatalarını, go vet uyarılarını ve linter sorunlarını aşamalı olarak düzelt. Minimal, cerrahi düzeltmeler için go-build-resolver agent'ını çağırır.
+description: Go build hatalarÃ„Â±nÃ„Â±, go vet uyarÃ„Â±larÃ„Â±nÃ„Â± ve linter sorunlarÃ„Â±nÃ„Â± aÃ…Å¸amalÃ„Â± olarak dÃƒÂ¼zelt. Minimal, cerrahi dÃƒÂ¼zeltmeler iÃƒÂ§in go-build-resolver agent'Ã„Â±nÃ„Â± ÃƒÂ§aÃ„Å¸Ã„Â±rÃ„Â±r.
 ---
 
 # Go Build and Fix
 
-Bu komut, minimal değişikliklerle Go build hatalarını aşamalı olarak düzeltmek için **go-build-resolver** agent'ını çağırır.
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+Bu komut, minimal deÃ„Å¸iÃ…Å¸ikliklerle Go build hatalarÃ„Â±nÃ„Â± aÃ…Å¸amalÃ„Â± olarak dÃƒÂ¼zeltmek iÃƒÂ§in **go-build-resolver** agent'Ã„Â±nÃ„Â± ÃƒÂ§aÃ„Å¸Ã„Â±rÃ„Â±r.
 
 ## Bu Komut Ne Yapar
 
-1. **Diagnostics Çalıştır**: `go build`, `go vet`, `staticcheck` yürüt
-2. **Hataları Parse Et**: Dosyaya göre grupla ve önem derecesine göre sırala
-3. **Aşamalı Düzelt**: Bir seferde bir hata
-4. **Her Düzeltmeyi Doğrula**: Her değişiklikten sonra build'i yeniden çalıştır
-5. **Özet Raporla**: Neyin düzeltildiğini ve neyin kaldığını göster
+1. **Diagnostics Ãƒâ€¡alÃ„Â±Ã…Å¸tÃ„Â±r**: `go build`, `go vet`, `staticcheck` yÃƒÂ¼rÃƒÂ¼t
+2. **HatalarÃ„Â± Parse Et**: Dosyaya gÃƒÂ¶re grupla ve ÃƒÂ¶nem derecesine gÃƒÂ¶re sÃ„Â±rala
+3. **AÃ…Å¸amalÃ„Â± DÃƒÂ¼zelt**: Bir seferde bir hata
+4. **Her DÃƒÂ¼zeltmeyi DoÃ„Å¸rula**: Her deÃ„Å¸iÃ…Å¸iklikten sonra build'i yeniden ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
+5. **Ãƒâ€“zet Raporla**: Neyin dÃƒÂ¼zeltildiÃ„Å¸ini ve neyin kaldÃ„Â±Ã„Å¸Ã„Â±nÃ„Â± gÃƒÂ¶ster
 
-## Ne Zaman Kullanılır
+## Ne Zaman KullanÃ„Â±lÃ„Â±r
 
-`/go-build` komutunu şu durumlarda kullanın:
-- `go build ./...` hatalarla başarısız olduğunda
-- `go vet ./...` sorunlar raporladığında
-- `golangci-lint run` uyarılar gösterdiğinde
-- Modül bağımlılıkları bozulduğunda
-- Build'i bozan değişiklikleri pull ettikten sonra
+`/go-build` komutunu Ã…Å¸u durumlarda kullanÃ„Â±n:
+- `go build ./...` hatalarla baÃ…Å¸arÃ„Â±sÃ„Â±z olduÃ„Å¸unda
+- `go vet ./...` sorunlar raporladÃ„Â±Ã„Å¸Ã„Â±nda
+- `golangci-lint run` uyarÃ„Â±lar gÃƒÂ¶sterdiÃ„Å¸inde
+- ModÃƒÂ¼l baÃ„Å¸Ã„Â±mlÃ„Â±lÃ„Â±klarÃ„Â± bozulduÃ„Å¸unda
+- Build'i bozan deÃ„Å¸iÃ…Å¸iklikleri pull ettikten sonra
 
-## Çalıştırılan Diagnostic Komutları
+## Ãƒâ€¡alÃ„Â±Ã…Å¸tÃ„Â±rÃ„Â±lan Diagnostic KomutlarÃ„Â±
 
 ```bash
-# Birincil build kontrolü
+# Birincil build kontrolÃƒÂ¼
 go build ./...
 
 # Static analiz
 go vet ./...
 
-# Genişletilmiş linting (mevcutsa)
+# GeniÃ…Å¸letilmiÃ…Å¸ linting (mevcutsa)
 staticcheck ./...
 golangci-lint run
 
-# Modül sorunları
+# ModÃƒÂ¼l sorunlarÃ„Â±
 go mod verify
 go mod tidy -v
 ```
 
-## Örnek Oturum
+## Ãƒâ€“rnek Oturum
 
 ```text
-Kullanıcı: /go-build
+KullanÃ„Â±cÃ„Â±: /go-build
 
 Agent:
-# Go Build Çözümü
+# Go Build Ãƒâ€¡ÃƒÂ¶zÃƒÂ¼mÃƒÂ¼
 
-## İlk Diagnostics
+## Ã„Â°lk Diagnostics
 
 ```bash
 $ go build ./...
@@ -60,7 +73,7 @@ internal/handler/api.go:58:2: missing return at end of function
 
 Bulunan hatalar: 3
 
-## Düzeltme 1: Tanımsız Tanımlayıcı
+## DÃƒÂ¼zeltme 1: TanÃ„Â±msÃ„Â±z TanÃ„Â±mlayÃ„Â±cÃ„Â±
 
 Dosya: internal/service/user.go:25
 Hata: undefined: UserRepository
@@ -70,36 +83,36 @@ Neden: Eksik import
 // Import eklendi
 import "project/internal/repository"
 
-// Değiştirildi
+// DeÃ„Å¸iÃ…Å¸tirildi
 var repo UserRepository
-// Şuna
+// Ã…Å¾una
 var repo repository.UserRepository
 ```
 
 ```bash
 $ go build ./...
-# 2 hata kaldı
+# 2 hata kaldÃ„Â±
 ```
 
-## Düzeltme 2: Tip Uyuşmazlığı
+## DÃƒÂ¼zeltme 2: Tip UyuÃ…Å¸mazlÃ„Â±Ã„Å¸Ã„Â±
 
 Dosya: internal/handler/api.go:42
 Hata: cannot use x (type string) as type int
 
 ```go
-// Değiştirildi
+// DeÃ„Å¸iÃ…Å¸tirildi
 count := params.Get("count")
-// Şuna
+// Ã…Å¾una
 countStr := params.Get("count")
 count, _ := strconv.Atoi(countStr)
 ```
 
 ```bash
 $ go build ./...
-# 1 hata kaldı
+# 1 hata kaldÃ„Â±
 ```
 
-## Düzeltme 3: Eksik Return
+## DÃƒÂ¼zeltme 3: Eksik Return
 
 Dosya: internal/handler/api.go:58
 Hata: missing return at end of function
@@ -117,10 +130,10 @@ func GetUser(id string) (*User, error) {
 
 ```bash
 $ go build ./...
-# Build başarılı!
+# Build baÃ…Å¸arÃ„Â±lÃ„Â±!
 ```
 
-## Son Doğrulama
+## Son DoÃ„Å¸rulama
 
 ```bash
 $ go vet ./...
@@ -131,53 +144,53 @@ ok      project/internal/service   0.015s
 ok      project/internal/handler   0.023s
 ```
 
-## Özet
+## Ãƒâ€“zet
 
-| Metrik | Sayı |
+| Metrik | SayÃ„Â± |
 |--------|-------|
-| Düzeltilen build hataları | 3 |
-| Düzeltilen vet uyarıları | 0 |
-| Değiştirilen dosyalar | 2 |
+| DÃƒÂ¼zeltilen build hatalarÃ„Â± | 3 |
+| DÃƒÂ¼zeltilen vet uyarÃ„Â±larÃ„Â± | 0 |
+| DeÃ„Å¸iÃ…Å¸tirilen dosyalar | 2 |
 | Kalan sorunlar | 0 |
 
-Build Durumu: PASS: BAŞARILI
+Build Durumu: PASS: BAÃ…Å¾ARILI
 ```
 
-## Düzeltilen Yaygın Hatalar
+## DÃƒÂ¼zeltilen YaygÃ„Â±n Hatalar
 
-| Hata | Tipik Düzeltme |
+| Hata | Tipik DÃƒÂ¼zeltme |
 |-------|-------------|
-| `undefined: X` | Import ekle veya yazım hatasını düzelt |
-| `cannot use X as Y` | Tip dönüşümü veya atamayı düzelt |
+| `undefined: X` | Import ekle veya yazÃ„Â±m hatasÃ„Â±nÃ„Â± dÃƒÂ¼zelt |
+| `cannot use X as Y` | Tip dÃƒÂ¶nÃƒÂ¼Ã…Å¸ÃƒÂ¼mÃƒÂ¼ veya atamayÃ„Â± dÃƒÂ¼zelt |
 | `missing return` | Return ifadesi ekle |
 | `X does not implement Y` | Eksik metod ekle |
-| `import cycle` | Paketleri yeniden yapılandır |
-| `declared but not used` | Değişkeni kaldır veya kullan |
+| `import cycle` | Paketleri yeniden yapÃ„Â±landÃ„Â±r |
+| `declared but not used` | DeÃ„Å¸iÃ…Å¸keni kaldÃ„Â±r veya kullan |
 | `cannot find package` | `go get` veya `go mod tidy` |
 
-## Düzeltme Stratejisi
+## DÃƒÂ¼zeltme Stratejisi
 
-1. **Önce build hataları** - Kodun compile edilmesi gerekli
-2. **İkinci olarak vet uyarıları** - Şüpheli yapıları düzelt
-3. **Üçüncü olarak lint uyarıları** - Stil ve en iyi uygulamalar
-4. **Bir seferde bir düzeltme** - Her değişikliği doğrula
-5. **Minimal değişiklikler** - Refactor etme, sadece düzelt
+1. **Ãƒâ€“nce build hatalarÃ„Â±** - Kodun compile edilmesi gerekli
+2. **Ã„Â°kinci olarak vet uyarÃ„Â±larÃ„Â±** - Ã…Å¾ÃƒÂ¼pheli yapÃ„Â±larÃ„Â± dÃƒÂ¼zelt
+3. **ÃƒÅ“ÃƒÂ§ÃƒÂ¼ncÃƒÂ¼ olarak lint uyarÃ„Â±larÃ„Â±** - Stil ve en iyi uygulamalar
+4. **Bir seferde bir dÃƒÂ¼zeltme** - Her deÃ„Å¸iÃ…Å¸ikliÃ„Å¸i doÃ„Å¸rula
+5. **Minimal deÃ„Å¸iÃ…Å¸iklikler** - Refactor etme, sadece dÃƒÂ¼zelt
 
-## Durdurma Koşulları
+## Durdurma KoÃ…Å¸ullarÃ„Â±
 
-Agent şu durumlarda durur ve raporlar:
-- Aynı hata 3 denemeden sonra devam ederse
-- Düzeltme daha fazla hata oluşturursa
-- Mimari değişiklikler gerektirirse
-- Harici bağımlılıklar eksikse
+Agent Ã…Å¸u durumlarda durur ve raporlar:
+- AynÃ„Â± hata 3 denemeden sonra devam ederse
+- DÃƒÂ¼zeltme daha fazla hata oluÃ…Å¸turursa
+- Mimari deÃ„Å¸iÃ…Å¸iklikler gerektirirse
+- Harici baÃ„Å¸Ã„Â±mlÃ„Â±lÃ„Â±klar eksikse
 
-## İlgili Komutlar
+## Ã„Â°lgili Komutlar
 
-- `/go-test` - Build başarılı olduktan sonra testleri çalıştır
+- `/go-test` - Build baÃ…Å¸arÃ„Â±lÃ„Â± olduktan sonra testleri ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
 - `/go-review` - Kod kalitesini incele
-- `/verify` - Tam doğrulama döngüsü
+- `/verify` - Tam doÃ„Å¸rulama dÃƒÂ¶ngÃƒÂ¼sÃƒÂ¼
 
-## İlgili
+## Ã„Â°lgili
 
 - Agent: `agents/go-build-resolver.md`
 - Skill: `skills/golang-patterns/`

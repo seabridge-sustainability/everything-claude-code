@@ -1,47 +1,60 @@
-# Rust API Service — 프로젝트 CLAUDE.md
+# Rust API Service Ã¢â‚¬â€ Ã­â€â€žÃ«Â¡Å“Ã¬Â ÂÃ­Å Â¸ CLAUDE.md
 
-> Axum, PostgreSQL, Docker를 사용하는 Rust API 서비스의 실전 예시입니다.
-> 프로젝트 루트에 복사하여 서비스에 맞게 커스터마이즈하세요.
+## Safety And Authorization Rule
 
-## 프로젝트 개요
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-**기술 스택:** Rust 1.78+, Axum (웹 프레임워크), SQLx (비동기 데이터베이스), PostgreSQL, Tokio (비동기 런타임), Docker
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-**아키텍처:** handler -> service -> repository로 분리된 레이어드 아키텍처. HTTP에 Axum, 컴파일 타임에 타입이 검증되는 SQL에 SQLx, 횡단 관심사에 Tower 미들웨어 사용.
 
-## 필수 규칙
+> Axum, PostgreSQL, DockerÃ«Â¥Â¼ Ã¬â€šÂ¬Ã¬Å¡Â©Ã­â€¢ËœÃ«Å â€ Rust API Ã¬â€žÅ“Ã«Â¹â€žÃ¬Å Â¤Ã¬ÂËœ Ã¬â€¹Â¤Ã¬Â â€ž Ã¬ËœË†Ã¬â€¹Å“Ã¬Å¾â€¦Ã«â€¹Ë†Ã«â€¹Â¤.
+> Ã­â€â€žÃ«Â¡Å“Ã¬Â ÂÃ­Å Â¸ Ã«Â£Â¨Ã­Å Â¸Ã¬â€”Â Ã«Â³ÂµÃ¬â€šÂ¬Ã­â€¢ËœÃ¬â€”Â¬ Ã¬â€žÅ“Ã«Â¹â€žÃ¬Å Â¤Ã¬â€”Â Ã«Â§Å¾ÃªÂ²Å’ Ã¬Â»Â¤Ã¬Å Â¤Ã­â€žÂ°Ã«Â§Ë†Ã¬ÂÂ´Ã¬Â¦Ë†Ã­â€¢ËœÃ¬â€žÂ¸Ã¬Å¡â€.
 
-### Rust 규칙
+## Ã­â€â€žÃ«Â¡Å“Ã¬Â ÂÃ­Å Â¸ ÃªÂ°Å“Ã¬Å¡â€
 
-- 라이브러리 오류에 `thiserror`, 바이너리 크레이트나 테스트에서만 `anyhow` 사용
-- 프로덕션 코드에서 `.unwrap()`이나 `.expect()` 사용 금지 — `?`로 오류 전파
-- 함수 매개변수에 `String`보다 `&str` 선호; 소유권 이전 시 `String` 반환
-- `#![deny(clippy::all, clippy::pedantic)]`과 함께 `clippy` 사용 — 모든 경고 수정
-- 모든 공개 타입에 `Debug` derive; `Clone`, `PartialEq`는 필요할 때만 derive
-- `// SAFETY:` 주석으로 정당화하지 않는 한 `unsafe` 블록 사용 금지
+**ÃªÂ¸Â°Ã¬Ë†Â  Ã¬Å Â¤Ã­Æ’Â:** Rust 1.78+, Axum (Ã¬â€ºÂ¹ Ã­â€â€žÃ«Â Ë†Ã¬Å¾â€žÃ¬â€ºÅ’Ã­ÂÂ¬), SQLx (Ã«Â¹â€žÃ«Ââ„¢ÃªÂ¸Â° Ã«ÂÂ°Ã¬ÂÂ´Ã­â€žÂ°Ã«Â²Â Ã¬ÂÂ´Ã¬Å Â¤), PostgreSQL, Tokio (Ã«Â¹â€žÃ«Ââ„¢ÃªÂ¸Â° Ã«Å¸Â°Ã­Æ’â‚¬Ã¬Å¾â€ž), Docker
 
-### 데이터베이스
+**Ã¬â€¢â€žÃ­â€šÂ¤Ã­â€¦ÂÃ¬Â²Ëœ:** handler -> service -> repositoryÃ«Â¡Å“ Ã«Â¶â€žÃ«Â¦Â¬Ã«ÂÅ“ Ã«Â Ë†Ã¬ÂÂ´Ã¬â€“Â´Ã«â€œÅ“ Ã¬â€¢â€žÃ­â€šÂ¤Ã­â€¦ÂÃ¬Â²Ëœ. HTTPÃ¬â€”Â Axum, Ã¬Â»Â´Ã­Å’Å’Ã¬ÂÂ¼ Ã­Æ’â‚¬Ã¬Å¾â€žÃ¬â€”Â Ã­Æ’â‚¬Ã¬Å¾â€¦Ã¬ÂÂ´ ÃªÂ²â‚¬Ã¬Â¦ÂÃ«ÂËœÃ«Å â€ SQLÃ¬â€”Â SQLx, Ã­Å¡Â¡Ã«â€¹Â¨ ÃªÂ´â‚¬Ã¬â€¹Â¬Ã¬â€šÂ¬Ã¬â€”Â Tower Ã«Â¯Â¸Ã«â€œÂ¤Ã¬â€ºÂ¨Ã¬â€“Â´ Ã¬â€šÂ¬Ã¬Å¡Â©.
 
-- 모든 쿼리에 SQLx `query!` 또는 `query_as!` 매크로 사용 — 스키마에 대해 컴파일 타임에 검증
-- 마이그레이션은 `migrations/`에 `sqlx migrate` 사용 — 데이터베이스를 직접 변경하지 않기
-- 공유 상태로 `sqlx::Pool<Postgres>` 사용 — 요청마다 커넥션을 생성하지 않기
-- 모든 쿼리에 parameterized placeholder (`$1`, `$2`) 사용 — 문자열 포매팅 사용 금지
+## Ã­â€¢â€žÃ¬Ë†Ëœ ÃªÂ·Å“Ã¬Â¹â„¢
+
+### Rust ÃªÂ·Å“Ã¬Â¹â„¢
+
+- Ã«ÂÂ¼Ã¬ÂÂ´Ã«Â¸Å’Ã«Å¸Â¬Ã«Â¦Â¬ Ã¬ËœÂ¤Ã«Â¥ËœÃ¬â€”Â `thiserror`, Ã«Â°â€Ã¬ÂÂ´Ã«â€žË†Ã«Â¦Â¬ Ã­ÂÂ¬Ã«Â Ë†Ã¬ÂÂ´Ã­Å Â¸Ã«â€šËœ Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸Ã¬â€”ÂÃ¬â€žÅ“Ã«Â§Å’ `anyhow` Ã¬â€šÂ¬Ã¬Å¡Â©
+- Ã­â€â€žÃ«Â¡Å“Ã«Ââ€¢Ã¬â€¦Ëœ Ã¬Â½â€Ã«â€œÅ“Ã¬â€”ÂÃ¬â€žÅ“ `.unwrap()`Ã¬ÂÂ´Ã«â€šËœ `.expect()` Ã¬â€šÂ¬Ã¬Å¡Â© ÃªÂ¸Ë†Ã¬Â§â‚¬ Ã¢â‚¬â€ `?`Ã«Â¡Å“ Ã¬ËœÂ¤Ã«Â¥Ëœ Ã¬Â â€žÃ­Å’Å’
+- Ã­â€¢Â¨Ã¬Ë†Ëœ Ã«Â§Â¤ÃªÂ°Å“Ã«Â³â‚¬Ã¬Ë†ËœÃ¬â€”Â `String`Ã«Â³Â´Ã«â€¹Â¤ `&str` Ã¬â€žÂ Ã­ËœÂ¸; Ã¬â€ Å’Ã¬Å“Â ÃªÂ¶Å’ Ã¬ÂÂ´Ã¬Â â€ž Ã¬â€¹Å“ `String` Ã«Â°ËœÃ­â„¢Ëœ
+- `#![deny(clippy::all, clippy::pedantic)]`ÃªÂ³Â¼ Ã­â€¢Â¨ÃªÂ»Ëœ `clippy` Ã¬â€šÂ¬Ã¬Å¡Â© Ã¢â‚¬â€ Ã«ÂªÂ¨Ã«â€œÂ  ÃªÂ²Â½ÃªÂ³Â  Ã¬Ë†ËœÃ¬Â â€¢
+- Ã«ÂªÂ¨Ã«â€œÂ  ÃªÂ³ÂµÃªÂ°Å“ Ã­Æ’â‚¬Ã¬Å¾â€¦Ã¬â€”Â `Debug` derive; `Clone`, `PartialEq`Ã«Å â€ Ã­â€¢â€žÃ¬Å¡â€Ã­â€¢Â  Ã«â€¢Å’Ã«Â§Å’ derive
+- `// SAFETY:` Ã¬Â£Â¼Ã¬â€žÂÃ¬Å“Â¼Ã«Â¡Å“ Ã¬Â â€¢Ã«â€¹Â¹Ã­â„¢â€Ã­â€¢ËœÃ¬Â§â‚¬ Ã¬â€¢Å Ã«Å â€ Ã­â€¢Å“ `unsafe` Ã«Â¸â€Ã«Â¡Â Ã¬â€šÂ¬Ã¬Å¡Â© ÃªÂ¸Ë†Ã¬Â§â‚¬
+
+### Ã«ÂÂ°Ã¬ÂÂ´Ã­â€žÂ°Ã«Â²Â Ã¬ÂÂ´Ã¬Å Â¤
+
+- Ã«ÂªÂ¨Ã«â€œÂ  Ã¬Â¿Â¼Ã«Â¦Â¬Ã¬â€”Â SQLx `query!` Ã«ËœÂÃ«Å â€ `query_as!` Ã«Â§Â¤Ã­ÂÂ¬Ã«Â¡Å“ Ã¬â€šÂ¬Ã¬Å¡Â© Ã¢â‚¬â€ Ã¬Å Â¤Ã­â€šÂ¤Ã«Â§Ë†Ã¬â€”Â Ã«Å’â‚¬Ã­â€¢Â´ Ã¬Â»Â´Ã­Å’Å’Ã¬ÂÂ¼ Ã­Æ’â‚¬Ã¬Å¾â€žÃ¬â€”Â ÃªÂ²â‚¬Ã¬Â¦Â
+- Ã«Â§Ë†Ã¬ÂÂ´ÃªÂ·Â¸Ã«Â Ë†Ã¬ÂÂ´Ã¬â€¦ËœÃ¬Ââ‚¬ `migrations/`Ã¬â€”Â `sqlx migrate` Ã¬â€šÂ¬Ã¬Å¡Â© Ã¢â‚¬â€ Ã«ÂÂ°Ã¬ÂÂ´Ã­â€žÂ°Ã«Â²Â Ã¬ÂÂ´Ã¬Å Â¤Ã«Â¥Â¼ Ã¬Â§ÂÃ¬Â â€˜ Ã«Â³â‚¬ÃªÂ²Â½Ã­â€¢ËœÃ¬Â§â‚¬ Ã¬â€¢Å ÃªÂ¸Â°
+- ÃªÂ³ÂµÃ¬Å“Â  Ã¬Æ’ÂÃ­Æ’Å“Ã«Â¡Å“ `sqlx::Pool<Postgres>` Ã¬â€šÂ¬Ã¬Å¡Â© Ã¢â‚¬â€ Ã¬Å¡â€Ã¬Â²Â­Ã«Â§Ë†Ã«â€¹Â¤ Ã¬Â»Â¤Ã«â€žÂ¥Ã¬â€¦ËœÃ¬Ââ€ž Ã¬Æ’ÂÃ¬â€žÂ±Ã­â€¢ËœÃ¬Â§â‚¬ Ã¬â€¢Å ÃªÂ¸Â°
+- Ã«ÂªÂ¨Ã«â€œÂ  Ã¬Â¿Â¼Ã«Â¦Â¬Ã¬â€”Â parameterized placeholder (`$1`, `$2`) Ã¬â€šÂ¬Ã¬Å¡Â© Ã¢â‚¬â€ Ã«Â¬Â¸Ã¬Å¾ÂÃ¬â€”Â´ Ã­ÂÂ¬Ã«Â§Â¤Ã­Å’â€¦ Ã¬â€šÂ¬Ã¬Å¡Â© ÃªÂ¸Ë†Ã¬Â§â‚¬
 
 ```rust
-// 나쁜 예: 문자열 보간 (SQL injection 위험)
+// Ã«â€šËœÃ¬ÂÅ“ Ã¬ËœË†: Ã«Â¬Â¸Ã¬Å¾ÂÃ¬â€”Â´ Ã«Â³Â´ÃªÂ°â€ž (SQL injection Ã¬Å“â€žÃ­â€”Ëœ)
 let q = format!("SELECT * FROM users WHERE id = '{}'", id);
 
-// 좋은 예: parameterized 쿼리, 컴파일 타임에 검증
+// Ã¬Â¢â€¹Ã¬Ââ‚¬ Ã¬ËœË†: parameterized Ã¬Â¿Â¼Ã«Â¦Â¬, Ã¬Â»Â´Ã­Å’Å’Ã¬ÂÂ¼ Ã­Æ’â‚¬Ã¬Å¾â€žÃ¬â€”Â ÃªÂ²â‚¬Ã¬Â¦Â
 let user = sqlx::query_as!(User, "SELECT * FROM users WHERE id = $1", id)
     .fetch_optional(&pool)
     .await?;
 ```
 
-### 오류 처리
+### Ã¬ËœÂ¤Ã«Â¥Ëœ Ã¬Â²ËœÃ«Â¦Â¬
 
-- 모듈별로 `thiserror`를 사용한 도메인 오류 enum 정의
-- `IntoResponse`를 통해 오류를 HTTP 응답으로 매핑 — 내부 세부 정보를 노출하지 않기
-- 구조화된 로깅에 `tracing` 사용 — `println!`이나 `eprintln!` 사용 금지
+- Ã«ÂªÂ¨Ã«â€œË†Ã«Â³â€žÃ«Â¡Å“ `thiserror`Ã«Â¥Â¼ Ã¬â€šÂ¬Ã¬Å¡Â©Ã­â€¢Å“ Ã«Ââ€žÃ«Â©â€Ã¬ÂÂ¸ Ã¬ËœÂ¤Ã«Â¥Ëœ enum Ã¬Â â€¢Ã¬ÂËœ
+- `IntoResponse`Ã«Â¥Â¼ Ã­â€ ÂµÃ­â€¢Â´ Ã¬ËœÂ¤Ã«Â¥ËœÃ«Â¥Â¼ HTTP Ã¬Ââ€˜Ã«â€¹ÂµÃ¬Å“Â¼Ã«Â¡Å“ Ã«Â§Â¤Ã­â€¢â€˜ Ã¢â‚¬â€ Ã«â€šÂ´Ã«Â¶â‚¬ Ã¬â€žÂ¸Ã«Â¶â‚¬ Ã¬Â â€¢Ã«Â³Â´Ã«Â¥Â¼ Ã«â€¦Â¸Ã¬Â¶Å“Ã­â€¢ËœÃ¬Â§â‚¬ Ã¬â€¢Å ÃªÂ¸Â°
+- ÃªÂµÂ¬Ã¬Â¡Â°Ã­â„¢â€Ã«ÂÅ“ Ã«Â¡Å“ÃªÂ¹â€¦Ã¬â€”Â `tracing` Ã¬â€šÂ¬Ã¬Å¡Â© Ã¢â‚¬â€ `println!`Ã¬ÂÂ´Ã«â€šËœ `eprintln!` Ã¬â€šÂ¬Ã¬Å¡Â© ÃªÂ¸Ë†Ã¬Â§â‚¬
 
 ```rust
 use thiserror::Error;
@@ -80,59 +93,59 @@ impl IntoResponse for AppError {
 }
 ```
 
-### 테스트
+### Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸
 
-- 각 소스 파일 내의 `#[cfg(test)]` 모듈에서 단위 테스트
-- `tests/` 디렉토리에서 실제 PostgreSQL을 사용한 통합 테스트 (Testcontainers 또는 Docker)
-- 자동 마이그레이션과 롤백이 포함된 데이터베이스 테스트에 `#[sqlx::test]` 사용
-- 외부 서비스 모킹에 `mockall` 또는 `wiremock` 사용
+- ÃªÂ°Â Ã¬â€ Å’Ã¬Å Â¤ Ã­Å’Å’Ã¬ÂÂ¼ Ã«â€šÂ´Ã¬ÂËœ `#[cfg(test)]` Ã«ÂªÂ¨Ã«â€œË†Ã¬â€”ÂÃ¬â€žÅ“ Ã«â€¹Â¨Ã¬Å“â€ž Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸
+- `tests/` Ã«â€â€Ã«Â â€°Ã­â€ Â Ã«Â¦Â¬Ã¬â€”ÂÃ¬â€žÅ“ Ã¬â€¹Â¤Ã¬Â Å“ PostgreSQLÃ¬Ââ€ž Ã¬â€šÂ¬Ã¬Å¡Â©Ã­â€¢Å“ Ã­â€ ÂµÃ­â€¢Â© Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸ (Testcontainers Ã«ËœÂÃ«Å â€ Docker)
+- Ã¬Å¾ÂÃ«Ââ„¢ Ã«Â§Ë†Ã¬ÂÂ´ÃªÂ·Â¸Ã«Â Ë†Ã¬ÂÂ´Ã¬â€¦ËœÃªÂ³Â¼ Ã«Â¡Â¤Ã«Â°Â±Ã¬ÂÂ´ Ã­ÂÂ¬Ã­â€¢Â¨Ã«ÂÅ“ Ã«ÂÂ°Ã¬ÂÂ´Ã­â€žÂ°Ã«Â²Â Ã¬ÂÂ´Ã¬Å Â¤ Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸Ã¬â€”Â `#[sqlx::test]` Ã¬â€šÂ¬Ã¬Å¡Â©
+- Ã¬â„¢Â¸Ã«Â¶â‚¬ Ã¬â€žÅ“Ã«Â¹â€žÃ¬Å Â¤ Ã«ÂªÂ¨Ã­â€šÂ¹Ã¬â€”Â `mockall` Ã«ËœÂÃ«Å â€ `wiremock` Ã¬â€šÂ¬Ã¬Å¡Â©
 
-### 코드 스타일
+### Ã¬Â½â€Ã«â€œÅ“ Ã¬Å Â¤Ã­Æ’â‚¬Ã¬ÂÂ¼
 
-- 최대 줄 길이: 100자 (rustfmt에 의해 강제)
-- import 그룹화: `std`, 외부 크레이트, `crate`/`super` — 빈 줄로 구분
-- 모듈: 모듈당 파일 하나, `mod.rs`는 re-export용으로만 사용
-- 타입: PascalCase, 함수/변수: snake_case, 상수: UPPER_SNAKE_CASE
+- Ã¬ÂµÅ“Ã«Å’â‚¬ Ã¬Â¤â€ž ÃªÂ¸Â¸Ã¬ÂÂ´: 100Ã¬Å¾Â (rustfmtÃ¬â€”Â Ã¬ÂËœÃ­â€¢Â´ ÃªÂ°â€¢Ã¬Â Å“)
+- import ÃªÂ·Â¸Ã«Â£Â¹Ã­â„¢â€: `std`, Ã¬â„¢Â¸Ã«Â¶â‚¬ Ã­ÂÂ¬Ã«Â Ë†Ã¬ÂÂ´Ã­Å Â¸, `crate`/`super` Ã¢â‚¬â€ Ã«Â¹Ë† Ã¬Â¤â€žÃ«Â¡Å“ ÃªÂµÂ¬Ã«Â¶â€ž
+- Ã«ÂªÂ¨Ã«â€œË†: Ã«ÂªÂ¨Ã«â€œË†Ã«â€¹Â¹ Ã­Å’Å’Ã¬ÂÂ¼ Ã­â€¢ËœÃ«â€šËœ, `mod.rs`Ã«Å â€ re-exportÃ¬Å¡Â©Ã¬Å“Â¼Ã«Â¡Å“Ã«Â§Å’ Ã¬â€šÂ¬Ã¬Å¡Â©
+- Ã­Æ’â‚¬Ã¬Å¾â€¦: PascalCase, Ã­â€¢Â¨Ã¬Ë†Ëœ/Ã«Â³â‚¬Ã¬Ë†Ëœ: snake_case, Ã¬Æ’ÂÃ¬Ë†Ëœ: UPPER_SNAKE_CASE
 
-## 파일 구조
+## Ã­Å’Å’Ã¬ÂÂ¼ ÃªÂµÂ¬Ã¬Â¡Â°
 
 ```
 src/
-  main.rs              # 진입점, 서버 설정, 우아한 종료
-  lib.rs               # 통합 테스트를 위한 re-export
-  config.rs            # envy 또는 figment을 사용한 환경 설정
-  router.rs            # 모든 라우트가 포함된 Axum 라우터
+  main.rs              # Ã¬Â§â€žÃ¬Å¾â€¦Ã¬Â Â, Ã¬â€žÅ“Ã«Â²â€ž Ã¬â€žÂ¤Ã¬Â â€¢, Ã¬Å¡Â°Ã¬â€¢â€žÃ­â€¢Å“ Ã¬Â¢â€¦Ã«Â£Å’
+  lib.rs               # Ã­â€ ÂµÃ­â€¢Â© Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸Ã«Â¥Â¼ Ã¬Å“â€žÃ­â€¢Å“ re-export
+  config.rs            # envy Ã«ËœÂÃ«Å â€ figmentÃ¬Ââ€ž Ã¬â€šÂ¬Ã¬Å¡Â©Ã­â€¢Å“ Ã­â„¢ËœÃªÂ²Â½ Ã¬â€žÂ¤Ã¬Â â€¢
+  router.rs            # Ã«ÂªÂ¨Ã«â€œÂ  Ã«ÂÂ¼Ã¬Å¡Â°Ã­Å Â¸ÃªÂ°â‚¬ Ã­ÂÂ¬Ã­â€¢Â¨Ã«ÂÅ“ Axum Ã«ÂÂ¼Ã¬Å¡Â°Ã­â€žÂ°
   middleware/
-    auth.rs            # JWT 추출 및 검증
-    logging.rs         # 요청/응답 트레이싱
+    auth.rs            # JWT Ã¬Â¶â€Ã¬Â¶Å“ Ã«Â°Â ÃªÂ²â‚¬Ã¬Â¦Â
+    logging.rs         # Ã¬Å¡â€Ã¬Â²Â­/Ã¬Ââ€˜Ã«â€¹Âµ Ã­Å Â¸Ã«Â Ë†Ã¬ÂÂ´Ã¬â€¹Â±
   handlers/
-    mod.rs             # 라우트 핸들러 (얇게 — 서비스에 위임)
+    mod.rs             # Ã«ÂÂ¼Ã¬Å¡Â°Ã­Å Â¸ Ã­â€¢Â¸Ã«â€œÂ¤Ã«Å¸Â¬ (Ã¬â€“â€¡ÃªÂ²Å’ Ã¢â‚¬â€ Ã¬â€žÅ“Ã«Â¹â€žÃ¬Å Â¤Ã¬â€”Â Ã¬Å“â€žÃ¬Å¾â€ž)
     users.rs
     orders.rs
   services/
-    mod.rs             # 비즈니스 로직
+    mod.rs             # Ã«Â¹â€žÃ¬Â¦Ë†Ã«â€¹Ë†Ã¬Å Â¤ Ã«Â¡Å“Ã¬Â§Â
     users.rs
     orders.rs
   repositories/
-    mod.rs             # 데이터베이스 접근 (SQLx 쿼리)
+    mod.rs             # Ã«ÂÂ°Ã¬ÂÂ´Ã­â€žÂ°Ã«Â²Â Ã¬ÂÂ´Ã¬Å Â¤ Ã¬Â â€˜ÃªÂ·Â¼ (SQLx Ã¬Â¿Â¼Ã«Â¦Â¬)
     users.rs
     orders.rs
   domain/
-    mod.rs             # 도메인 타입, 오류 enum
+    mod.rs             # Ã«Ââ€žÃ«Â©â€Ã¬ÂÂ¸ Ã­Æ’â‚¬Ã¬Å¾â€¦, Ã¬ËœÂ¤Ã«Â¥Ëœ enum
     user.rs
     order.rs
 migrations/
   001_create_users.sql
   002_create_orders.sql
 tests/
-  common/mod.rs        # 공유 테스트 헬퍼, 테스트 서버 설정
-  api_users.rs         # 사용자 엔드포인트 통합 테스트
-  api_orders.rs        # 주문 엔드포인트 통합 테스트
+  common/mod.rs        # ÃªÂ³ÂµÃ¬Å“Â  Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸ Ã­â€”Â¬Ã­ÂÂ¼, Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸ Ã¬â€žÅ“Ã«Â²â€ž Ã¬â€žÂ¤Ã¬Â â€¢
+  api_users.rs         # Ã¬â€šÂ¬Ã¬Å¡Â©Ã¬Å¾Â Ã¬â€”â€Ã«â€œÅ“Ã­ÂÂ¬Ã¬ÂÂ¸Ã­Å Â¸ Ã­â€ ÂµÃ­â€¢Â© Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸
+  api_orders.rs        # Ã¬Â£Â¼Ã«Â¬Â¸ Ã¬â€”â€Ã«â€œÅ“Ã­ÂÂ¬Ã¬ÂÂ¸Ã­Å Â¸ Ã­â€ ÂµÃ­â€¢Â© Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸
 ```
 
-## 주요 패턴
+## Ã¬Â£Â¼Ã¬Å¡â€ Ã­Å’Â¨Ã­â€žÂ´
 
-### Handler (얇은 레이어)
+### Handler (Ã¬â€“â€¡Ã¬Ââ‚¬ Ã«Â Ë†Ã¬ÂÂ´Ã¬â€“Â´)
 
 ```rust
 async fn create_user(
@@ -144,7 +157,7 @@ async fn create_user(
 }
 ```
 
-### Service (비즈니스 로직)
+### Service (Ã«Â¹â€žÃ¬Â¦Ë†Ã«â€¹Ë†Ã¬Å Â¤ Ã«Â¡Å“Ã¬Â§Â)
 
 ```rust
 impl UserService {
@@ -161,7 +174,7 @@ impl UserService {
 }
 ```
 
-### Repository (데이터 접근)
+### Repository (Ã«ÂÂ°Ã¬ÂÂ´Ã­â€žÂ° Ã¬Â â€˜ÃªÂ·Â¼)
 
 ```rust
 impl UserRepository {
@@ -189,7 +202,7 @@ impl UserRepository {
 }
 ```
 
-### 통합 테스트
+### Ã­â€ ÂµÃ­â€¢Â© Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸
 
 ```rust
 #[tokio::test]
@@ -216,76 +229,76 @@ async fn test_create_user() {
 #[tokio::test]
 async fn test_create_user_duplicate_email() {
     let app = spawn_test_app().await;
-    // 첫 번째 사용자 생성
+    // Ã¬Â²Â« Ã«Â²Ë†Ã¬Â§Â¸ Ã¬â€šÂ¬Ã¬Å¡Â©Ã¬Å¾Â Ã¬Æ’ÂÃ¬â€žÂ±
     create_test_user(&app, "alice@example.com").await;
-    // 중복 시도
+    // Ã¬Â¤â€˜Ã«Â³Âµ Ã¬â€¹Å“Ã«Ââ€ž
     let response = create_user_request(&app, "alice@example.com").await;
     assert_eq!(response.status(), StatusCode::BAD_REQUEST);
 }
 ```
 
-## 환경 변수
+## Ã­â„¢ËœÃªÂ²Â½ Ã«Â³â‚¬Ã¬Ë†Ëœ
 
 ```bash
-# 서버
+# Ã¬â€žÅ“Ã«Â²â€ž
 HOST=0.0.0.0
 PORT=8080
 RUST_LOG=info,tower_http=debug
 
-# 데이터베이스
+# Ã«ÂÂ°Ã¬ÂÂ´Ã­â€žÂ°Ã«Â²Â Ã¬ÂÂ´Ã¬Å Â¤
 DATABASE_URL=postgres://user:pass@localhost:5432/myapp
 
-# 인증
+# Ã¬ÂÂ¸Ã¬Â¦Â
 JWT_SECRET=your-secret-key-min-32-chars
 JWT_EXPIRY_HOURS=24
 
-# 선택 사항
+# Ã¬â€žÂ Ã­Æ’Â Ã¬â€šÂ¬Ã­â€¢Â­
 CORS_ALLOWED_ORIGINS=http://localhost:3000
 ```
 
-## 테스트 전략
+## Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸ Ã¬Â â€žÃ«Å¾Âµ
 
 ```bash
-# 전체 테스트 실행
+# Ã¬Â â€žÃ¬Â²Â´ Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸ Ã¬â€¹Â¤Ã­â€“â€°
 cargo test
 
-# 출력과 함께 실행
+# Ã¬Â¶Å“Ã«Â Â¥ÃªÂ³Â¼ Ã­â€¢Â¨ÃªÂ»Ëœ Ã¬â€¹Â¤Ã­â€“â€°
 cargo test -- --nocapture
 
-# 특정 테스트 모듈 실행
+# Ã­Å Â¹Ã¬Â â€¢ Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸ Ã«ÂªÂ¨Ã«â€œË† Ã¬â€¹Â¤Ã­â€“â€°
 cargo test api_users
 
-# 커버리지 확인 (cargo-llvm-cov 필요)
+# Ã¬Â»Â¤Ã«Â²â€žÃ«Â¦Â¬Ã¬Â§â‚¬ Ã­â„¢â€¢Ã¬ÂÂ¸ (cargo-llvm-cov Ã­â€¢â€žÃ¬Å¡â€)
 cargo llvm-cov --html
 open target/llvm-cov/html/index.html
 
-# 린트
+# Ã«Â¦Â°Ã­Å Â¸
 cargo clippy -- -D warnings
 
-# 포맷 검사
+# Ã­ÂÂ¬Ã«Â§Â· ÃªÂ²â‚¬Ã¬â€šÂ¬
 cargo fmt -- --check
 ```
 
-## ECC 워크플로우
+## ECC Ã¬â€ºÅ’Ã­ÂÂ¬Ã­â€Å’Ã«Â¡Å“Ã¬Å¡Â°
 
 ```bash
-# 계획 수립
+# ÃªÂ³â€žÃ­Å¡Â Ã¬Ë†ËœÃ«Â¦Â½
 /plan "Add order fulfillment with Stripe payment"
 
-# TDD로 개발
-/tdd                    # cargo test 기반 TDD 워크플로우
+# TDDÃ«Â¡Å“ ÃªÂ°Å“Ã«Â°Å“
+/tdd                    # cargo test ÃªÂ¸Â°Ã«Â°Ëœ TDD Ã¬â€ºÅ’Ã­ÂÂ¬Ã­â€Å’Ã«Â¡Å“Ã¬Å¡Â°
 
-# 리뷰
-/code-review            # Rust 전용 코드 리뷰
-/security-scan          # 의존성 감사 + unsafe 스캔
+# Ã«Â¦Â¬Ã«Â·Â°
+/code-review            # Rust Ã¬Â â€žÃ¬Å¡Â© Ã¬Â½â€Ã«â€œÅ“ Ã«Â¦Â¬Ã«Â·Â°
+/security-scan          # Ã¬ÂËœÃ¬Â¡Â´Ã¬â€žÂ± ÃªÂ°ÂÃ¬â€šÂ¬ + unsafe Ã¬Å Â¤Ã¬Âºâ€
 
-# 검증
-/verify                 # 빌드, clippy, 테스트, 보안 스캔
+# ÃªÂ²â‚¬Ã¬Â¦Â
+/verify                 # Ã«Â¹Å’Ã«â€œÅ“, clippy, Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸, Ã«Â³Â´Ã¬â€¢Ë† Ã¬Å Â¤Ã¬Âºâ€
 ```
 
-## Git 워크플로우
+## Git Ã¬â€ºÅ’Ã­ÂÂ¬Ã­â€Å’Ã«Â¡Å“Ã¬Å¡Â°
 
-- `feat:` 새 기능, `fix:` 버그 수정, `refactor:` 코드 변경
-- `main`에서 feature 브랜치 생성, PR 필수
+- `feat:` Ã¬Æ’Ë† ÃªÂ¸Â°Ã«Å Â¥, `fix:` Ã«Â²â€žÃªÂ·Â¸ Ã¬Ë†ËœÃ¬Â â€¢, `refactor:` Ã¬Â½â€Ã«â€œÅ“ Ã«Â³â‚¬ÃªÂ²Â½
+- `main`Ã¬â€”ÂÃ¬â€žÅ“ feature Ã«Â¸Å’Ã«Å¾Å“Ã¬Â¹Ëœ Ã¬Æ’ÂÃ¬â€žÂ±, PR Ã­â€¢â€žÃ¬Ë†Ëœ
 - CI: `cargo fmt --check`, `cargo clippy`, `cargo test`, `cargo audit`
-- 배포: `scratch` 또는 `distroless` 베이스를 사용한 Docker 멀티스테이지 빌드
+- Ã«Â°Â°Ã­ÂÂ¬: `scratch` Ã«ËœÂÃ«Å â€ `distroless` Ã«Â²Â Ã¬ÂÂ´Ã¬Å Â¤Ã«Â¥Â¼ Ã¬â€šÂ¬Ã¬Å¡Â©Ã­â€¢Å“ Docker Ã«Â©â‚¬Ã­â€¹Â°Ã¬Å Â¤Ã­â€¦Å’Ã¬ÂÂ´Ã¬Â§â‚¬ Ã«Â¹Å’Ã«â€œÅ“

@@ -6,6 +6,19 @@ origin: "Ronald Skelton - Founder, RapportScore.ai"
 
 # Santa Method
 
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
 Multi-agent adversarial verification framework. Make a list, check it twice. If it's naughty, fix it until it's nice.
 
 The core insight: a single agent reviewing its own output shares the same biases, knowledge gaps, and systematic errors that produced the output. Two independent reviewers with no shared context break this failure mode.
@@ -25,41 +38,41 @@ Do NOT use for internal drafts, exploratory research, or tasks with deterministi
 ## Architecture
 
 ```
-┌─────────────┐
-│  GENERATOR   │  Phase 1: Make a List
-│  (Agent A)   │  Produce the deliverable
-└──────┬───────┘
-       │ output
-       ▼
-┌──────────────────────────────┐
-│     DUAL INDEPENDENT REVIEW   │  Phase 2: Check It Twice
-│                                │
-│  ┌───────────┐ ┌───────────┐  │  Two agents, same rubric,
-│  │ Reviewer B │ │ Reviewer C │  │  no shared context
-│  └─────┬─────┘ └─────┬─────┘  │
-│        │              │        │
-└────────┼──────────────┼────────┘
-         │              │
-         ▼              ▼
-┌──────────────────────────────┐
-│        VERDICT GATE           │  Phase 3: Naughty or Nice
-│                                │
-│  B passes AND C passes → NICE  │  Both must pass.
-│  Otherwise → NAUGHTY           │  No exceptions.
-└──────┬──────────────┬─────────┘
-       │              │
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š  GENERATOR   Ã¢â€â€š  Phase 1: Make a List
+Ã¢â€â€š  (Agent A)   Ã¢â€â€š  Produce the deliverable
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+       Ã¢â€â€š output
+       Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š     DUAL INDEPENDENT REVIEW   Ã¢â€â€š  Phase 2: Check It Twice
+Ã¢â€â€š                                Ã¢â€â€š
+Ã¢â€â€š  Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â  Ã¢â€â€š  Two agents, same rubric,
+Ã¢â€â€š  Ã¢â€â€š Reviewer B Ã¢â€â€š Ã¢â€â€š Reviewer C Ã¢â€â€š  Ã¢â€â€š  no shared context
+Ã¢â€â€š  Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ  Ã¢â€â€š
+Ã¢â€â€š        Ã¢â€â€š              Ã¢â€â€š        Ã¢â€â€š
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¼Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¼Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+         Ã¢â€â€š              Ã¢â€â€š
+         Ã¢â€“Â¼              Ã¢â€“Â¼
+Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+Ã¢â€â€š        VERDICT GATE           Ã¢â€â€š  Phase 3: Naughty or Nice
+Ã¢â€â€š                                Ã¢â€â€š
+Ã¢â€â€š  B passes AND C passes Ã¢â€ â€™ NICE  Ã¢â€â€š  Both must pass.
+Ã¢â€â€š  Otherwise Ã¢â€ â€™ NAUGHTY           Ã¢â€â€š  No exceptions.
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+       Ã¢â€â€š              Ã¢â€â€š
     NICE           NAUGHTY
-       │              │
-       ▼              ▼
-   [ SHIP ]    ┌─────────────┐
-               │  FIX CYCLE   │  Phase 4: Fix Until Nice
-               │              │
-               │ iteration++  │  Collect all flags.
-               │ if i > MAX:  │  Fix all issues.
-               │   escalate   │  Re-run both reviewers.
-               │ else:        │  Loop until convergence.
-               │   goto Ph.2  │
-               └──────────────┘
+       Ã¢â€â€š              Ã¢â€â€š
+       Ã¢â€“Â¼              Ã¢â€“Â¼
+   [ SHIP ]    Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+               Ã¢â€â€š  FIX CYCLE   Ã¢â€â€š  Phase 4: Fix Until Nice
+               Ã¢â€â€š              Ã¢â€â€š
+               Ã¢â€â€š iteration++  Ã¢â€â€š  Collect all flags.
+               Ã¢â€â€š if i > MAX:  Ã¢â€â€š  Fix all issues.
+               Ã¢â€â€š   escalate   Ã¢â€â€š  Re-run both reviewers.
+               Ã¢â€â€š else:        Ã¢â€â€š  Loop until convergence.
+               Ã¢â€â€š   goto Ph.2  Ã¢â€â€š
+               Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
 ```
 
 ## Phase Details
@@ -77,10 +90,10 @@ output = generate(task_spec)
 
 Spawn two review agents in parallel. Critical invariants:
 
-1. **Context isolation** — neither reviewer sees the other's assessment
-2. **Identical rubric** — both receive the same evaluation criteria
-3. **Same inputs** — both receive the original spec AND the generated output
-4. **Structured output** — each returns a typed verdict, not prose
+1. **Context isolation** Ã¢â‚¬â€ neither reviewer sees the other's assessment
+2. **Identical rubric** Ã¢â‚¬â€ both receive the same evaluation criteria
+3. **Same inputs** Ã¢â‚¬â€ both receive the original spec AND the generated output
+4. **Structured output** Ã¢â‚¬â€ each returns a typed verdict, not prose
 
 ```python
 REVIEWER_PROMPT = """
@@ -119,7 +132,7 @@ Be rigorous. Your job is to find problems, not to approve.
 review_b = Agent(prompt=REVIEWER_PROMPT.format(...), description="Santa Reviewer B")
 review_c = Agent(prompt=REVIEWER_PROMPT.format(...), description="Santa Reviewer C")
 
-# Both run concurrently — neither sees the other
+# Both run concurrently Ã¢â‚¬â€ neither sees the other
 ```
 
 ### Rubric Design
@@ -195,7 +208,7 @@ for iteration in range(MAX_ITERATIONS):
     review_b = Agent(prompt=REVIEWER_PROMPT.format(output=output, ...))
     review_c = Agent(prompt=REVIEWER_PROMPT.format(output=output, ...))
 
-# Exhausted iterations — escalate
+# Exhausted iterations Ã¢â‚¬â€ escalate
 log_santa_result(output, MAX_ITERATIONS, "escalated")
 escalate_to_human(output, issues)
 ```
@@ -236,7 +249,7 @@ When subagents aren't available, simulate isolation with explicit context resets
 5. New context: "You are Reviewer 2. Evaluate ONLY against this rubric. Find problems."
 6. Compare both reviews, fix, repeat
 
-The subagent pattern is strictly superior — inline simulation risks context bleed between reviewers.
+The subagent pattern is strictly superior Ã¢â‚¬â€ inline simulation risks context bleed between reviewers.
 
 ### Pattern C: Batch Sampling
 
@@ -261,7 +274,7 @@ def santa_batch(items, rubric, sample_rate=0.15):
             items = batch_fix(items, pattern)  # Fix all items matching pattern
             return santa_batch(items, rubric)   # Re-sample
 
-    return items  # Clean sample → ship batch
+    return items  # Clean sample Ã¢â€ â€™ ship batch
 ```
 
 ## Failure Modes and Mitigations
@@ -281,7 +294,7 @@ def santa_batch(items, rubric, sample_rate=0.15):
 |-------|-------------|
 | Verification Loop | Use for deterministic checks (build, lint, test). Santa for semantic checks (accuracy, hallucinations). Run verification-loop first, Santa second. |
 | Eval Harness | Santa Method results feed eval metrics. Track pass@k across Santa runs to measure generator quality over time. |
-| Continuous Learning v2 | Santa findings become instincts. Repeated failures on the same criterion → learned behavior to avoid the pattern. |
+| Continuous Learning v2 | Santa findings become instincts. Repeated failures on the same criterion Ã¢â€ â€™ learned behavior to avoid the pattern. |
 | Strategic Compact | Run Santa BEFORE compacting. Don't lose review context mid-verification. |
 
 ## Metrics
@@ -299,7 +312,7 @@ Track these to measure Santa Method effectiveness:
 Santa Method costs approximately 2-3x the token cost of generation alone per verification cycle. For most high-stakes output, this is a bargain:
 
 ```
-Cost of Santa = (generation tokens) + 2×(review tokens per round) × (avg rounds)
+Cost of Santa = (generation tokens) + 2Ãƒâ€”(review tokens per round) Ãƒâ€” (avg rounds)
 Cost of NOT Santa = (reputation damage) + (correction effort) + (trust erosion)
 ```
 

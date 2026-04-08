@@ -1,5 +1,18 @@
 # Update Codemaps
 
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
 Analyze the codebase structure and generate token-lean architecture documentation.
 
 ## Step 1: Scan Project Structure
@@ -15,21 +28,21 @@ Create or update codemaps in `docs/CODEMAPS/` (or `.reports/codemaps/`):
 | File | Contents |
 |------|----------|
 | `architecture.md` | High-level system diagram, service boundaries, data flow |
-| `backend.md` | API routes, middleware chain, service → repository mapping |
+| `backend.md` | API routes, middleware chain, service Ã¢â€ â€™ repository mapping |
 | `frontend.md` | Page tree, component hierarchy, state management flow |
 | `data.md` | Database tables, relationships, migration history |
 | `dependencies.md` | External services, third-party integrations, shared libraries |
 
 ### Codemap Format
 
-Each codemap should be token-lean — optimized for AI context consumption:
+Each codemap should be token-lean Ã¢â‚¬â€ optimized for AI context consumption:
 
 ```markdown
 # Backend Architecture
 
 ## Routes
-POST /api/users → UserController.create → UserService.create → UserRepo.insert
-GET  /api/users/:id → UserController.get → UserService.findById → UserRepo.findById
+POST /api/users Ã¢â€ â€™ UserController.create Ã¢â€ â€™ UserService.create Ã¢â€ â€™ UserRepo.insert
+GET  /api/users/:id Ã¢â€ â€™ UserController.get Ã¢â€ â€™ UserService.findById Ã¢â€ â€™ UserRepo.findById
 
 ## Key Files
 src/services/user.ts (business logic, 120 lines)

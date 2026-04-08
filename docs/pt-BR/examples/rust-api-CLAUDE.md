@@ -1,31 +1,44 @@
-# Serviço de API Rust — CLAUDE.md de Projeto
+# ServiÃƒÂ§o de API Rust Ã¢â‚¬â€ CLAUDE.md de Projeto
 
-> Exemplo real para um serviço de API Rust com Axum, PostgreSQL e Docker.
-> Copie para a raiz do seu projeto e customize para seu serviço.
+## Safety And Authorization Rule
 
-## Visão Geral do Projeto
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-**Stack:** Rust 1.78+, Axum (web framework), SQLx (banco assíncrono), PostgreSQL, Tokio (runtime assíncrono), Docker
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-**Arquitetura:** Arquitetura em camadas com separação handler → service → repository. Axum para HTTP, SQLx para SQL verificado em tempo de compilação, middleware Tower para preocupações transversais.
 
-## Regras Críticas
+> Exemplo real para um serviÃƒÂ§o de API Rust com Axum, PostgreSQL e Docker.
+> Copie para a raiz do seu projeto e customize para seu serviÃƒÂ§o.
 
-### Convenções Rust
+## VisÃƒÂ£o Geral do Projeto
 
-- Use `thiserror` para erros de library, `anyhow` apenas em crates binários ou testes
-- Sem `.unwrap()` ou `.expect()` em código de produção — propague erros com `?`
-- Prefira `&str` a `String` em parâmetros de função; retorne `String` quando houver transferência de ownership
-- Use `clippy` com `#![deny(clippy::all, clippy::pedantic)]` — corrija todos os warnings
-- Derive `Debug` em todos os tipos públicos; derive `Clone`, `PartialEq` só quando necessário
-- Sem blocos `unsafe` sem justificativa com comentário `// SAFETY:`
+**Stack:** Rust 1.78+, Axum (web framework), SQLx (banco assÃƒÂ­ncrono), PostgreSQL, Tokio (runtime assÃƒÂ­ncrono), Docker
+
+**Arquitetura:** Arquitetura em camadas com separaÃƒÂ§ÃƒÂ£o handler Ã¢â€ â€™ service Ã¢â€ â€™ repository. Axum para HTTP, SQLx para SQL verificado em tempo de compilaÃƒÂ§ÃƒÂ£o, middleware Tower para preocupaÃƒÂ§ÃƒÂµes transversais.
+
+## Regras CrÃƒÂ­ticas
+
+### ConvenÃƒÂ§ÃƒÂµes Rust
+
+- Use `thiserror` para erros de library, `anyhow` apenas em crates binÃƒÂ¡rios ou testes
+- Sem `.unwrap()` ou `.expect()` em cÃƒÂ³digo de produÃƒÂ§ÃƒÂ£o Ã¢â‚¬â€ propague erros com `?`
+- Prefira `&str` a `String` em parÃƒÂ¢metros de funÃƒÂ§ÃƒÂ£o; retorne `String` quando houver transferÃƒÂªncia de ownership
+- Use `clippy` com `#![deny(clippy::all, clippy::pedantic)]` Ã¢â‚¬â€ corrija todos os warnings
+- Derive `Debug` em todos os tipos pÃƒÂºblicos; derive `Clone`, `PartialEq` sÃƒÂ³ quando necessÃƒÂ¡rio
+- Sem blocos `unsafe` sem justificativa com comentÃƒÂ¡rio `// SAFETY:`
 
 ### Banco de Dados
 
-- Todas as queries usam macros SQLx `query!` ou `query_as!` — verificadas em compile time contra o schema
-- Migrations em `migrations/` com `sqlx migrate` — nunca alterar banco diretamente
-- Use `sqlx::Pool<Postgres>` como estado compartilhado — nunca criar conexão por requisição
-- Todas as queries usam placeholders parametrizados (`$1`, `$2`) — nunca string formatting
+- Todas as queries usam macros SQLx `query!` ou `query_as!` Ã¢â‚¬â€ verificadas em compile time contra o schema
+- Migrations em `migrations/` com `sqlx migrate` Ã¢â‚¬â€ nunca alterar banco diretamente
+- Use `sqlx::Pool<Postgres>` como estado compartilhado Ã¢â‚¬â€ nunca criar conexÃƒÂ£o por requisiÃƒÂ§ÃƒÂ£o
+- Todas as queries usam placeholders parametrizados (`$1`, `$2`) Ã¢â‚¬â€ nunca string formatting
 
 ```rust
 // BAD: String interpolation (SQL injection risk)
@@ -39,9 +52,9 @@ let user = sqlx::query_as!(User, "SELECT * FROM users WHERE id = $1", id)
 
 ### Tratamento de Erro
 
-- Defina enum de erro de domínio por módulo com `thiserror`
-- Mapeie erros para respostas HTTP via `IntoResponse` — nunca exponha detalhes internos
-- Use `tracing` para logs estruturados — nunca `println!` ou `eprintln!`
+- Defina enum de erro de domÃƒÂ­nio por mÃƒÂ³dulo com `thiserror`
+- Mapeie erros para respostas HTTP via `IntoResponse` Ã¢â‚¬â€ nunca exponha detalhes internos
+- Use `tracing` para logs estruturados Ã¢â‚¬â€ nunca `println!` ou `eprintln!`
 
 ```rust
 use thiserror::Error;
@@ -76,17 +89,17 @@ impl IntoResponse for AppError {
 
 ### Testes
 
-- Testes unitários em módulos `#[cfg(test)]` dentro de cada arquivo fonte
-- Testes de integração no diretório `tests/` usando PostgreSQL real (Testcontainers ou Docker)
-- Use `#[sqlx::test]` para testes de banco com migration e rollback automáticos
-- Faça mock de serviços externos com `mockall` ou `wiremock`
+- Testes unitÃƒÂ¡rios em mÃƒÂ³dulos `#[cfg(test)]` dentro de cada arquivo fonte
+- Testes de integraÃƒÂ§ÃƒÂ£o no diretÃƒÂ³rio `tests/` usando PostgreSQL real (Testcontainers ou Docker)
+- Use `#[sqlx::test]` para testes de banco com migration e rollback automÃƒÂ¡ticos
+- FaÃƒÂ§a mock de serviÃƒÂ§os externos com `mockall` ou `wiremock`
 
-### Estilo de Código
+### Estilo de CÃƒÂ³digo
 
-- Tamanho máximo de linha: 100 caracteres (enforced by rustfmt)
-- Agrupe imports: `std`, crates externas, `crate`/`super` — separados por linha em branco
-- Módulos: um arquivo por módulo, `mod.rs` só para re-exports
-- Tipos: PascalCase, funções/variáveis: snake_case, constantes: UPPER_SNAKE_CASE
+- Tamanho mÃƒÂ¡ximo de linha: 100 caracteres (enforced by rustfmt)
+- Agrupe imports: `std`, crates externas, `crate`/`super` Ã¢â‚¬â€ separados por linha em branco
+- MÃƒÂ³dulos: um arquivo por mÃƒÂ³dulo, `mod.rs` sÃƒÂ³ para re-exports
+- Tipos: PascalCase, funÃƒÂ§ÃƒÂµes/variÃƒÂ¡veis: snake_case, constantes: UPPER_SNAKE_CASE
 
 ## Estrutura de Arquivos
 
@@ -100,7 +113,7 @@ src/
     auth.rs            # JWT extraction and validation
     logging.rs         # Request/response tracing
   handlers/
-    mod.rs             # Route handlers (thin — delegate to services)
+    mod.rs             # Route handlers (thin Ã¢â‚¬â€ delegate to services)
     users.rs
     orders.rs
   services/
@@ -124,7 +137,7 @@ tests/
   api_orders.rs        # Integration tests for order endpoints
 ```
 
-## Padrões-Chave
+## PadrÃƒÂµes-Chave
 
 ### Handler (Enxuto)
 
@@ -138,7 +151,7 @@ async fn create_user(
 }
 ```
 
-### Service (Lógica de Negócio)
+### Service (LÃƒÂ³gica de NegÃƒÂ³cio)
 
 ```rust
 impl UserService {
@@ -183,7 +196,7 @@ impl UserRepository {
 }
 ```
 
-### Teste de Integração
+### Teste de IntegraÃƒÂ§ÃƒÂ£o
 
 ```rust
 #[tokio::test]
@@ -218,7 +231,7 @@ async fn test_create_user_duplicate_email() {
 }
 ```
 
-## Variáveis de Ambiente
+## VariÃƒÂ¡veis de Ambiente
 
 ```bash
 # Server
@@ -237,7 +250,7 @@ JWT_EXPIRY_HOURS=24
 CORS_ALLOWED_ORIGINS=http://localhost:3000
 ```
 
-## Estratégia de Teste
+## EstratÃƒÂ©gia de Teste
 
 ```bash
 # Run all tests
@@ -279,7 +292,7 @@ cargo fmt -- --check
 
 ## Fluxo Git
 
-- `feat:` novas features, `fix:` correções de bug, `refactor:` mudanças de código
-- Branches de feature a partir da `main`, PRs obrigatórios
+- `feat:` novas features, `fix:` correÃƒÂ§ÃƒÂµes de bug, `refactor:` mudanÃƒÂ§as de cÃƒÂ³digo
+- Branches de feature a partir da `main`, PRs obrigatÃƒÂ³rios
 - CI: `cargo fmt --check`, `cargo clippy`, `cargo test`, `cargo audit`
 - Deploy: Docker multi-stage build com base `scratch` ou `distroless`

@@ -3,16 +3,29 @@ name: frontend-patterns
 description: Frontend development patterns for React, Next.js, state management, performance optimization, and UI best practices.
 ---
 
-# 前端開發模式
+# Ã¥â€°ÂÃ§Â«Â¯Ã©â€“â€¹Ã§â„¢Â¼Ã¦Â¨Â¡Ã¥Â¼Â
 
-用於 React、Next.js 和高效能使用者介面的現代前端模式。
+## Safety And Authorization Rule
 
-## 元件模式
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-### 組合優於繼承
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+Ã§â€Â¨Ã¦â€“Â¼ ReactÃ£â‚¬ÂNext.js Ã¥â€™Å’Ã©Â«ËœÃ¦â€¢Ë†Ã¨Æ’Â½Ã¤Â½Â¿Ã§â€Â¨Ã¨â‚¬â€¦Ã¤Â»â€¹Ã©ÂÂ¢Ã§Å¡â€žÃ§ÂÂ¾Ã¤Â»Â£Ã¥â€°ÂÃ§Â«Â¯Ã¦Â¨Â¡Ã¥Â¼ÂÃ£â‚¬â€š
+
+## Ã¥â€¦Æ’Ã¤Â»Â¶Ã¦Â¨Â¡Ã¥Â¼Â
+
+### Ã§Âµâ€žÃ¥ÂË†Ã¥â€žÂªÃ¦â€“Â¼Ã§Â¹Â¼Ã¦â€°Â¿
 
 ```typescript
-// PASS: 良好：元件組合
+// PASS: Ã¨â€°Â¯Ã¥Â¥Â½Ã¯Â¼Å¡Ã¥â€¦Æ’Ã¤Â»Â¶Ã§Âµâ€žÃ¥ÂË†
 interface CardProps {
   children: React.ReactNode
   variant?: 'default' | 'outlined'
@@ -30,14 +43,14 @@ export function CardBody({ children }: { children: React.ReactNode }) {
   return <div className="card-body">{children}</div>
 }
 
-// 使用方式
+// Ã¤Â½Â¿Ã§â€Â¨Ã¦â€“Â¹Ã¥Â¼Â
 <Card>
-  <CardHeader>標題</CardHeader>
-  <CardBody>內容</CardBody>
+  <CardHeader>Ã¦Â¨â„¢Ã©Â¡Å’</CardHeader>
+  <CardBody>Ã¥â€¦Â§Ã¥Â®Â¹</CardBody>
 </Card>
 ```
 
-### 複合元件
+### Ã¨Â¤â€¡Ã¥ÂË†Ã¥â€¦Æ’Ã¤Â»Â¶
 
 ```typescript
 interface TabsContextValue {
@@ -78,16 +91,16 @@ export function Tab({ id, children }: { id: string, children: React.ReactNode })
   )
 }
 
-// 使用方式
+// Ã¤Â½Â¿Ã§â€Â¨Ã¦â€“Â¹Ã¥Â¼Â
 <Tabs defaultTab="overview">
   <TabList>
-    <Tab id="overview">概覽</Tab>
-    <Tab id="details">詳情</Tab>
+    <Tab id="overview">Ã¦Â¦â€šÃ¨Â¦Â½</Tab>
+    <Tab id="details">Ã¨Â©Â³Ã¦Æ’â€¦</Tab>
   </TabList>
 </Tabs>
 ```
 
-### Render Props 模式
+### Render Props Ã¦Â¨Â¡Ã¥Â¼Â
 
 ```typescript
 interface DataLoaderProps<T> {
@@ -111,7 +124,7 @@ export function DataLoader<T>({ url, children }: DataLoaderProps<T>) {
   return <>{children(data, loading, error)}</>
 }
 
-// 使用方式
+// Ã¤Â½Â¿Ã§â€Â¨Ã¦â€“Â¹Ã¥Â¼Â
 <DataLoader<Market[]> url="/api/markets">
   {(markets, loading, error) => {
     if (loading) return <Spinner />
@@ -121,9 +134,9 @@ export function DataLoader<T>({ url, children }: DataLoaderProps<T>) {
 </DataLoader>
 ```
 
-## 自訂 Hooks 模式
+## Ã¨â€¡ÂªÃ¨Â¨â€š Hooks Ã¦Â¨Â¡Ã¥Â¼Â
 
-### 狀態管理 Hook
+### Ã§â€¹â‚¬Ã¦â€¦â€¹Ã§Â®Â¡Ã§Ââ€  Hook
 
 ```typescript
 export function useToggle(initialValue = false): [boolean, () => void] {
@@ -136,11 +149,11 @@ export function useToggle(initialValue = false): [boolean, () => void] {
   return [value, toggle]
 }
 
-// 使用方式
+// Ã¤Â½Â¿Ã§â€Â¨Ã¦â€“Â¹Ã¥Â¼Â
 const [isOpen, toggleOpen] = useToggle()
 ```
 
-### 非同步資料取得 Hook
+### Ã©ÂÅ¾Ã¥ÂÅ’Ã¦Â­Â¥Ã¨Â³â€¡Ã¦â€“â„¢Ã¥Ââ€“Ã¥Â¾â€” Hook
 
 ```typescript
 interface UseQueryOptions<T> {
@@ -184,7 +197,7 @@ export function useQuery<T>(
   return { data, error, loading, refetch }
 }
 
-// 使用方式
+// Ã¤Â½Â¿Ã§â€Â¨Ã¦â€“Â¹Ã¥Â¼Â
 const { data: markets, loading, error, refetch } = useQuery(
   'markets',
   () => fetch('/api/markets').then(r => r.json()),
@@ -212,7 +225,7 @@ export function useDebounce<T>(value: T, delay: number): T {
   return debouncedValue
 }
 
-// 使用方式
+// Ã¤Â½Â¿Ã§â€Â¨Ã¦â€“Â¹Ã¥Â¼Â
 const [searchQuery, setSearchQuery] = useState('')
 const debouncedQuery = useDebounce(searchQuery, 500)
 
@@ -223,9 +236,9 @@ useEffect(() => {
 }, [debouncedQuery])
 ```
 
-## 狀態管理模式
+## Ã§â€¹â‚¬Ã¦â€¦â€¹Ã§Â®Â¡Ã§Ââ€ Ã¦Â¨Â¡Ã¥Â¼Â
 
-### Context + Reducer 模式
+### Context + Reducer Ã¦Â¨Â¡Ã¥Â¼Â
 
 ```typescript
 interface State {
@@ -278,22 +291,22 @@ export function useMarkets() {
 }
 ```
 
-## 效能優化
+## Ã¦â€¢Ë†Ã¨Æ’Â½Ã¥â€žÂªÃ¥Å’â€“
 
-### 記憶化
+### Ã¨Â¨ËœÃ¦â€ Â¶Ã¥Å’â€“
 
 ```typescript
-// PASS: useMemo 用於昂貴計算
+// PASS: useMemo Ã§â€Â¨Ã¦â€“Â¼Ã¦Ëœâ€šÃ¨Â²Â´Ã¨Â¨Ë†Ã§Â®â€”
 const sortedMarkets = useMemo(() => {
   return markets.sort((a, b) => b.volume - a.volume)
 }, [markets])
 
-// PASS: useCallback 用於傳遞給子元件的函式
+// PASS: useCallback Ã§â€Â¨Ã¦â€“Â¼Ã¥â€šÂ³Ã©ÂÅ¾Ã§ÂµÂ¦Ã¥Â­ÂÃ¥â€¦Æ’Ã¤Â»Â¶Ã§Å¡â€žÃ¥â€¡Â½Ã¥Â¼Â
 const handleSearch = useCallback((query: string) => {
   setSearchQuery(query)
 }, [])
 
-// PASS: React.memo 用於純元件
+// PASS: React.memo Ã§â€Â¨Ã¦â€“Â¼Ã§Â´â€Ã¥â€¦Æ’Ã¤Â»Â¶
 export const MarketCard = React.memo<MarketCardProps>(({ market }) => {
   return (
     <div className="market-card">
@@ -304,12 +317,12 @@ export const MarketCard = React.memo<MarketCardProps>(({ market }) => {
 })
 ```
 
-### 程式碼分割與延遲載入
+### Ã§Â¨â€¹Ã¥Â¼ÂÃ§Â¢Â¼Ã¥Ë†â€ Ã¥â€°Â²Ã¨Ë†â€¡Ã¥Â»Â¶Ã©ÂÂ²Ã¨Â¼â€°Ã¥â€¦Â¥
 
 ```typescript
 import { lazy, Suspense } from 'react'
 
-// PASS: 延遲載入重型元件
+// PASS: Ã¥Â»Â¶Ã©ÂÂ²Ã¨Â¼â€°Ã¥â€¦Â¥Ã©â€¡ÂÃ¥Å¾â€¹Ã¥â€¦Æ’Ã¤Â»Â¶
 const HeavyChart = lazy(() => import('./HeavyChart'))
 const ThreeJsBackground = lazy(() => import('./ThreeJsBackground'))
 
@@ -328,7 +341,7 @@ export function Dashboard() {
 }
 ```
 
-### 長列表虛擬化
+### Ã©â€¢Â·Ã¥Ë†â€”Ã¨Â¡Â¨Ã¨â„¢â€ºÃ¦â€œÂ¬Ã¥Å’â€“
 
 ```typescript
 import { useVirtualizer } from '@tanstack/react-virtual'
@@ -339,8 +352,8 @@ export function VirtualMarketList({ markets }: { markets: Market[] }) {
   const virtualizer = useVirtualizer({
     count: markets.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 100,  // 預估行高
-    overscan: 5  // 額外渲染的項目數
+    estimateSize: () => 100,  // Ã©Â ÂÃ¤Â¼Â°Ã¨Â¡Å’Ã©Â«Ëœ
+    overscan: 5  // Ã©Â¡ÂÃ¥Â¤â€“Ã¦Â¸Â²Ã¦Å¸â€œÃ§Å¡â€žÃ©Â â€¦Ã§â€ºÂ®Ã¦â€¢Â¸
   })
 
   return (
@@ -372,9 +385,9 @@ export function VirtualMarketList({ markets }: { markets: Market[] }) {
 }
 ```
 
-## 表單處理模式
+## Ã¨Â¡Â¨Ã¥â€“Â®Ã¨â„¢â€¢Ã§Ââ€ Ã¦Â¨Â¡Ã¥Â¼Â
 
-### 帶驗證的受控表單
+### Ã¥Â¸Â¶Ã©Â©â€”Ã¨Â­â€°Ã§Å¡â€žÃ¥Ââ€”Ã¦Å½Â§Ã¨Â¡Â¨Ã¥â€“Â®
 
 ```typescript
 interface FormData {
@@ -402,17 +415,17 @@ export function CreateMarketForm() {
     const newErrors: FormErrors = {}
 
     if (!formData.name.trim()) {
-      newErrors.name = '名稱為必填'
+      newErrors.name = 'Ã¥ÂÂÃ§Â¨Â±Ã§â€šÂºÃ¥Â¿â€¦Ã¥Â¡Â«'
     } else if (formData.name.length > 200) {
-      newErrors.name = '名稱必須少於 200 個字元'
+      newErrors.name = 'Ã¥ÂÂÃ§Â¨Â±Ã¥Â¿â€¦Ã©Â Ë†Ã¥Â°â€˜Ã¦â€“Â¼ 200 Ã¥â‚¬â€¹Ã¥Â­â€”Ã¥â€¦Æ’'
     }
 
     if (!formData.description.trim()) {
-      newErrors.description = '描述為必填'
+      newErrors.description = 'Ã¦ÂÂÃ¨Â¿Â°Ã§â€šÂºÃ¥Â¿â€¦Ã¥Â¡Â«'
     }
 
     if (!formData.endDate) {
-      newErrors.endDate = '結束日期為必填'
+      newErrors.endDate = 'Ã§ÂµÂÃ¦ÂÅ¸Ã¦â€”Â¥Ã¦Å“Å¸Ã§â€šÂºÃ¥Â¿â€¦Ã¥Â¡Â«'
     }
 
     setErrors(newErrors)
@@ -426,9 +439,9 @@ export function CreateMarketForm() {
 
     try {
       await createMarket(formData)
-      // 成功處理
+      // Ã¦Ë†ÂÃ¥Å Å¸Ã¨â„¢â€¢Ã§Ââ€ 
     } catch (error) {
-      // 錯誤處理
+      // Ã©Å’Â¯Ã¨ÂªÂ¤Ã¨â„¢â€¢Ã§Ââ€ 
     }
   }
 
@@ -437,19 +450,19 @@ export function CreateMarketForm() {
       <input
         value={formData.name}
         onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
-        placeholder="市場名稱"
+        placeholder="Ã¥Â¸â€šÃ¥Â Â´Ã¥ÂÂÃ§Â¨Â±"
       />
       {errors.name && <span className="error">{errors.name}</span>}
 
-      {/* 其他欄位 */}
+      {/* Ã¥â€¦Â¶Ã¤Â»â€“Ã¦Â¬â€žÃ¤Â½Â */}
 
-      <button type="submit">建立市場</button>
+      <button type="submit">Ã¥Â»ÂºÃ§Â«â€¹Ã¥Â¸â€šÃ¥Â Â´</button>
     </form>
   )
 }
 ```
 
-## Error Boundary 模式
+## Error Boundary Ã¦Â¨Â¡Ã¥Â¼Â
 
 ```typescript
 interface ErrorBoundaryState {
@@ -478,10 +491,10 @@ export class ErrorBoundary extends React.Component<
     if (this.state.hasError) {
       return (
         <div className="error-fallback">
-          <h2>發生錯誤</h2>
+          <h2>Ã§â„¢Â¼Ã§â€Å¸Ã©Å’Â¯Ã¨ÂªÂ¤</h2>
           <p>{this.state.error?.message}</p>
           <button onClick={() => this.setState({ hasError: false })}>
-            重試
+            Ã©â€¡ÂÃ¨Â©Â¦
           </button>
         </div>
       )
@@ -491,20 +504,20 @@ export class ErrorBoundary extends React.Component<
   }
 }
 
-// 使用方式
+// Ã¤Â½Â¿Ã§â€Â¨Ã¦â€“Â¹Ã¥Â¼Â
 <ErrorBoundary>
   <App />
 </ErrorBoundary>
 ```
 
-## 動畫模式
+## Ã¥â€¹â€¢Ã§â€¢Â«Ã¦Â¨Â¡Ã¥Â¼Â
 
-### Framer Motion 動畫
+### Framer Motion Ã¥â€¹â€¢Ã§â€¢Â«
 
 ```typescript
 import { motion, AnimatePresence } from 'framer-motion'
 
-// PASS: 列表動畫
+// PASS: Ã¥Ë†â€”Ã¨Â¡Â¨Ã¥â€¹â€¢Ã§â€¢Â«
 export function AnimatedMarketList({ markets }: { markets: Market[] }) {
   return (
     <AnimatePresence>
@@ -523,7 +536,7 @@ export function AnimatedMarketList({ markets }: { markets: Market[] }) {
   )
 }
 
-// PASS: Modal 動畫
+// PASS: Modal Ã¥â€¹â€¢Ã§â€¢Â«
 export function Modal({ isOpen, onClose, children }: ModalProps) {
   return (
     <AnimatePresence>
@@ -551,9 +564,9 @@ export function Modal({ isOpen, onClose, children }: ModalProps) {
 }
 ```
 
-## 無障礙模式
+## Ã§â€žÂ¡Ã©Å¡Å“Ã§Â¤â„¢Ã¦Â¨Â¡Ã¥Â¼Â
 
-### 鍵盤導航
+### Ã©ÂÂµÃ§â€ºÂ¤Ã¥Â°Å½Ã¨Ë†Âª
 
 ```typescript
 export function Dropdown({ options, onSelect }: DropdownProps) {
@@ -588,13 +601,13 @@ export function Dropdown({ options, onSelect }: DropdownProps) {
       aria-haspopup="listbox"
       onKeyDown={handleKeyDown}
     >
-      {/* 下拉選單實作 */}
+      {/* Ã¤Â¸â€¹Ã¦â€¹â€°Ã©ÂÂ¸Ã¥â€“Â®Ã¥Â¯Â¦Ã¤Â½Å“ */}
     </div>
   )
 }
 ```
 
-### 焦點管理
+### Ã§â€žÂ¦Ã©Â»Å¾Ã§Â®Â¡Ã§Ââ€ 
 
 ```typescript
 export function Modal({ isOpen, onClose, children }: ModalProps) {
@@ -603,13 +616,13 @@ export function Modal({ isOpen, onClose, children }: ModalProps) {
 
   useEffect(() => {
     if (isOpen) {
-      // 儲存目前聚焦的元素
+      // Ã¥â€žÂ²Ã¥Â­ËœÃ§â€ºÂ®Ã¥â€°ÂÃ¨ÂÅ¡Ã§â€žÂ¦Ã§Å¡â€žÃ¥â€¦Æ’Ã§Â´Â 
       previousFocusRef.current = document.activeElement as HTMLElement
 
-      // 聚焦 modal
+      // Ã¨ÂÅ¡Ã§â€žÂ¦ modal
       modalRef.current?.focus()
     } else {
-      // 關閉時恢復焦點
+      // Ã©â€”Å“Ã©â€“â€°Ã¦â„¢â€šÃ¦ÂÂ¢Ã¥Â¾Â©Ã§â€žÂ¦Ã©Â»Å¾
       previousFocusRef.current?.focus()
     }
   }, [isOpen])
@@ -628,4 +641,4 @@ export function Modal({ isOpen, onClose, children }: ModalProps) {
 }
 ```
 
-**記住**：現代前端模式能實現可維護、高效能的使用者介面。選擇符合你專案複雜度的模式。
+**Ã¨Â¨ËœÃ¤Â½Â**Ã¯Â¼Å¡Ã§ÂÂ¾Ã¤Â»Â£Ã¥â€°ÂÃ§Â«Â¯Ã¦Â¨Â¡Ã¥Â¼ÂÃ¨Æ’Â½Ã¥Â¯Â¦Ã§ÂÂ¾Ã¥ÂÂ¯Ã§Â¶Â­Ã¨Â­Â·Ã£â‚¬ÂÃ©Â«ËœÃ¦â€¢Ë†Ã¨Æ’Â½Ã§Å¡â€žÃ¤Â½Â¿Ã§â€Â¨Ã¨â‚¬â€¦Ã¤Â»â€¹Ã©ÂÂ¢Ã£â‚¬â€šÃ©ÂÂ¸Ã¦â€œâ€¡Ã§Â¬Â¦Ã¥ÂË†Ã¤Â½Â Ã¥Â°Ë†Ã¦Â¡Ë†Ã¨Â¤â€¡Ã©â€ºÅ“Ã¥ÂºÂ¦Ã§Å¡â€žÃ¦Â¨Â¡Ã¥Â¼ÂÃ£â‚¬â€š

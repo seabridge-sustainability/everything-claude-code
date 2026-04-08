@@ -1,52 +1,65 @@
-# SeaBridgeAI Coding Agent System — Verification & Test Protocol
+# SeaBridgeAI Coding Agent System Ã¢â‚¬â€ Verification & Test Protocol
+
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
 
 > Last verified: 2026-04-04
 > Canonical location: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\CODING_AGENTS.md`
-> Referenced from: `manageesg-backend/CLAUDE.md` · `manageesg-frontend/CLAUDE.md`
+> Referenced from: `manageesg-backend/CLAUDE.md` Ã‚Â· `manageesg-frontend/CLAUDE.md`
 
-This document is the **onboarding and verification protocol** for the SeaBridgeAI multi-agent coding system. Every check below must pass before any new feature work begins. All coding agents — Claude Code, Codex, Gemini CLI, Deep Agents sub-agents, and LangGraph nodes — must treat this as the system baseline, not vanilla AI tooling.
+This document is the **onboarding and verification protocol** for the SeaBridgeAI multi-agent coding system. Every check below must pass before any new feature work begins. All coding agents Ã¢â‚¬â€ Claude Code, Codex, Gemini CLI, Deep Agents sub-agents, and LangGraph nodes Ã¢â‚¬â€ must treat this as the system baseline, not vanilla AI tooling.
 
 Run these checks at the start of any new session where agent configuration has changed, or before onboarding a new contributor.
 
 ---
 
-## System Summary — What Is Actually Installed
+## System Summary Ã¢â‚¬â€ What Is Actually Installed
 
 | Component | Status | Version / Count |
 |---|---|---|
-| gstack (garrytan/gstack) | ✅ Installed | 35 skills at `~/.claude/skills/gstack/` |
-| deepagents (langchain-ai/deepagents) | ✅ Installed | CLI 0.0.34 · SDK 0.4.11 |
-| ECC Claude Code skills | ✅ Active | 35 gstack skills at `~/.claude/skills/gstack/` + 1 ECC-specific skill |
-| ECC Codex/Gemini skills | ✅ Active | 38 skill directories in `ECC/.agents/skills/` |
-| Claude Code agents | ✅ Active | 30 agents in `agents/` |
-| Hooks | ✅ Active | 10 hooks (7 core + 3 supplementary) |
-| Berry MCP | ✅ Registered | in `manageesg-backend/.mcp.json` |
-| Boris Cherney settings | ✅ Active | `acceptEdits` + autocompact 50% + ECC plugin root |
+| gstack (garrytan/gstack) | Ã¢Å“â€¦ Installed | 35 skills at `~/.claude/skills/gstack/` |
+| deepagents (langchain-ai/deepagents) | Ã¢Å“â€¦ Installed | CLI 0.0.34 Ã‚Â· SDK 0.4.11 |
+| ECC Claude Code skills | Ã¢Å“â€¦ Active | 35 gstack skills at `~/.claude/skills/gstack/` + 1 ECC-specific skill |
+| ECC Codex/Gemini skills | Ã¢Å“â€¦ Active | 38 skill directories in `ECC/.agents/skills/` |
+| Claude Code agents | Ã¢Å“â€¦ Active | 30 agents in `agents/` |
+| Hooks | Ã¢Å“â€¦ Active | 10 hooks (7 core + 3 supplementary) |
+| Berry MCP | Ã¢Å“â€¦ Registered | in `manageesg-backend/.mcp.json` |
+| Boris Cherney settings | Ã¢Å“â€¦ Active | `acceptEdits` + autocompact 50% + ECC plugin root |
 
 ---
 
 ## Architecture Overview
 
 ```
-Tier 1 — Shared Intelligence (read-only to application repos)
-├── everything-claude-code/   ← ECC: skills, agents, rules, hooks for Claude Code
-└── autoresearch/             ← ML research sandbox (separate, self-contained)
+Tier 1 Ã¢â‚¬â€ Shared Intelligence (read-only to application repos)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ everything-claude-code/   Ã¢â€ Â ECC: skills, agents, rules, hooks for Claude Code
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ autoresearch/             Ã¢â€ Â ML research sandbox (separate, self-contained)
 
-Tier 2 — Application Repositories (consume Tier 1, never copy it)
-├── manageesg-backend/        ← FastAPI + LangGraph agents + AI package
-└── manageesg-frontend/       ← Next.js ESG dashboard
+Tier 2 Ã¢â‚¬â€ Application Repositories (consume Tier 1, never copy it)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ manageesg-backend/        Ã¢â€ Â FastAPI + LangGraph agents + AI package
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ manageesg-frontend/       Ã¢â€ Â Next.js ESG dashboard
 
-Tier 3 — Integration Adapter (thin bridge only, inside backend)
-└── seabridge_ai/src/sustainability_ai/ai_agents/autoresearch/
-    ├── handoff.py            ← receives research artifacts from autoresearch sandbox
-    ├── runner.py             ← orchestrates autoresearch runs from backend pipeline
-    ├── overnight_audit.py    ← production overnight audit using research findings
-    └── regression_harness.py ← regression checks against autoresearch baselines
+Tier 3 Ã¢â‚¬â€ Integration Adapter (thin bridge only, inside backend)
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ seabridge_ai/src/sustainability_ai/ai_agents/autoresearch/
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ handoff.py            Ã¢â€ Â receives research artifacts from autoresearch sandbox
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ runner.py             Ã¢â€ Â orchestrates autoresearch runs from backend pipeline
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ overnight_audit.py    Ã¢â€ Â production overnight audit using research findings
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ regression_harness.py Ã¢â€ Â regression checks against autoresearch baselines
 ```
 
 ---
 
-## CHECK 1 — Four-Repository Tier Structure
+## CHECK 1 Ã¢â‚¬â€ Four-Repository Tier Structure
 
 Confirm no files have crossed tier boundaries:
 
@@ -55,25 +68,25 @@ Confirm no files have crossed tier boundaries:
 | ECC exists as standalone repo | `everything-claude-code/.git` present | `ls C:/Users/adelm/SeaBridgeAI/everything-claude-code/.git` |
 | autoresearch is standalone | `autoresearch/.git` present, not embedded | `ls C:/Users/adelm/SeaBridgeAI/autoresearch/.git` |
 | Tier 3 adapter is thin | Only 4 files in `ai_agents/autoresearch/` | `ls seabridge_ai/src/sustainability_ai/ai_agents/autoresearch/*.py` |
-| No ECC source in Tier 2 | No `everything-claude-code/` inside backend or frontend | `ls manageesg-backend/everything-claude-code 2>/dev/null` → error |
-| `train.py` not in adapter | autoresearch's `train.py` not copied to backend | `ls seabridge_ai/.../autoresearch/train.py 2>/dev/null` → error |
+| No ECC source in Tier 2 | No `everything-claude-code/` inside backend or frontend | `ls manageesg-backend/everything-claude-code 2>/dev/null` Ã¢â€ â€™ error |
+| `train.py` not in adapter | autoresearch's `train.py` not copied to backend | `ls seabridge_ai/.../autoresearch/train.py 2>/dev/null` Ã¢â€ â€™ error |
 
 **Rule:** Tier 2 repos reference Tier 1 via absolute paths in config files. They never embed or copy Tier 1 source code.
 
 ---
 
-## CHECK 2 — Auto-Loading Files (Session Intelligence)
+## CHECK 2 Ã¢â‚¬â€ Auto-Loading Files (Session Intelligence)
 
-These files must exist and load automatically at session start — no manual prompt needed.
+These files must exist and load automatically at session start Ã¢â‚¬â€ no manual prompt needed.
 
 ### Claude Code
 
 | File | Purpose | Must Exist At |
 |---|---|---|
-| `~/.claude/CLAUDE.md` | Global config — loads for every project, every session | `C:/Users/adelm/.claude/CLAUDE.md` |
+| `~/.claude/CLAUDE.md` | Global config Ã¢â‚¬â€ loads for every project, every session | `C:/Users/adelm/.claude/CLAUDE.md` |
 | `~/.claude/rules/common/*.md` | Always-injected rules: agents, code-review, security, git-workflow, coding-style, testing, hooks, performance, patterns | `C:/Users/adelm/.claude/rules/common/` |
 | `project/CLAUDE.md` | Project-level: SeaBridgeAI stack, AI docs refs, gstack section | Both backend and frontend roots |
-| `project/.claude/rules/berry.md` | Berry state machine — injected every session | `manageesg-backend/.claude/rules/berry.md` |
+| `project/.claude/rules/berry.md` | Berry state machine Ã¢â‚¬â€ injected every session | `manageesg-backend/.claude/rules/berry.md` |
 | `project/.claude/skills/berry-plan-verification.md` | Berry `/plan` workflow skill | `manageesg-backend/.claude/skills/` |
 
 ### Codex
@@ -88,16 +101,16 @@ These files must exist and load automatically at session start — no manual pro
 
 | File | Purpose | Must Exist At |
 |---|---|---|
-| `project/AGENTS.md` | Same file as Codex — tool-agnostic | Both backend and frontend roots |
+| `project/AGENTS.md` | Same file as Codex Ã¢â‚¬â€ tool-agnostic | Both backend and frontend roots |
 | `project/.gemini/settings.json` | Berry registered as MCP server | backend root |
 
 ---
 
-## CHECK 3 — Skills Libraries
+## CHECK 3 Ã¢â‚¬â€ Skills Libraries
 
-Two skill registries — both active.
+Two skill registries Ã¢â‚¬â€ both active.
 
-### Claude Code Global Skills (`~/.claude/skills/`) — 35 gstack + 1 ECC-specific
+### Claude Code Global Skills (`~/.claude/skills/`) Ã¢â‚¬â€ 35 gstack + 1 ECC-specific
 
 **35 gstack skills** (individually discoverable as `~/.claude/skills/<name>/SKILL.md`):
 ```
@@ -117,7 +130,7 @@ setup-deploy      ship              unfreeze
 everything-claude-code
 ```
 
-### Codex / Gemini Skills (`ECC/.agents/skills/`) — 38 total
+### Codex / Gemini Skills (`ECC/.agents/skills/`) Ã¢â‚¬â€ 38 total
 
 ```
 api-design         article-writing    backend-patterns   batch-workflow
@@ -135,21 +148,21 @@ session-mobility   strategic-compact  tdd-workflow       verification-loop
 
 ---
 
-## CHECK 4 — gstack Skills (garrytan/gstack) ✅
+## CHECK 4 Ã¢â‚¬â€ gstack Skills (garrytan/gstack) Ã¢Å“â€¦
 
-**Install location (global):** `~/.claude/skills/gstack/` — 35 skills with SKILL.md on disk
-**ECC reference copy:** `ECC/.claude/skills/gstack/` — no .git, version-tracked in ECC
-**Individual skill links:** `~/.claude/skills/<name>/SKILL.md` — all 35 accessible
+**Install location (global):** `~/.claude/skills/gstack/` Ã¢â‚¬â€ 35 skills with SKILL.md on disk
+**ECC reference copy:** `ECC/.claude/skills/gstack/` Ã¢â‚¬â€ no .git, version-tracked in ECC
+**Individual skill links:** `~/.claude/skills/<name>/SKILL.md` Ã¢â‚¬â€ all 35 accessible
 
 **Sprint order (enforce, do not skip steps):**
 ```
-Think        → /office-hours     (forcing questions, design doc)
-Plan         → /autoplan         (or /plan-ceo-review + /plan-eng-review + /plan-design-review)
-Build        → implementation    (planner + tdd-guide + code-reviewer agents)
-Review       → /review           (pre-PR: SQL injection, secrets, logic, architecture)
-Test         → /qa               (browser QA against running endpoint)
-Ship         → /ship             (tests → review → version bump → PR)
-Reflect      → /retro            (git history retrospective)
+Think        Ã¢â€ â€™ /office-hours     (forcing questions, design doc)
+Plan         Ã¢â€ â€™ /autoplan         (or /plan-ceo-review + /plan-eng-review + /plan-design-review)
+Build        Ã¢â€ â€™ implementation    (planner + tdd-guide + code-reviewer agents)
+Review       Ã¢â€ â€™ /review           (pre-PR: SQL injection, secrets, logic, architecture)
+Test         Ã¢â€ â€™ /qa               (browser QA against running endpoint)
+Ship         Ã¢â€ â€™ /ship             (tests Ã¢â€ â€™ review Ã¢â€ â€™ version bump Ã¢â€ â€™ PR)
+Reflect      Ã¢â€ â€™ /retro            (git history retrospective)
 ```
 
 **If skills need rebuilding:**
@@ -161,24 +174,24 @@ cd ~/.claude/skills/gstack && ./setup
 
 ---
 
-## CHECK 5 — Boris Cherney's Recommended Claude Code Features ✅
+## CHECK 5 Ã¢â‚¬â€ Boris Cherney's Recommended Claude Code Features Ã¢Å“â€¦
 
 All verified active in `~/.claude/settings.json`:
 
 | Feature | Setting | Current Value |
 |---|---|---|
-| Permission mode | `permissions.defaultMode` | `"acceptEdits"` ✅ |
-| Auto-compact threshold | `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE` | `"50"` (compact at 50% context) ✅ |
-| Hook profile | `ECC_HOOK_PROFILE` | `"standard"` ✅ |
-| Plugin root | `CLAUDE_PLUGIN_ROOT` | `ECC` directory ✅ |
+| Permission mode | `permissions.defaultMode` | `"acceptEdits"` Ã¢Å“â€¦ |
+| Auto-compact threshold | `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE` | `"50"` (compact at 50% context) Ã¢Å“â€¦ |
+| Hook profile | `ECC_HOOK_PROFILE` | `"standard"` Ã¢Å“â€¦ |
+| Plugin root | `CLAUDE_PLUGIN_ROOT` | `ECC` directory Ã¢Å“â€¦ |
 
 These settings are in `~/.claude/settings.json` and apply globally to all Claude Code sessions.
 
 ---
 
-## CHECK 6 — Deep Agents Coding Harness (langchain-ai/deepagents) ✅
+## CHECK 6 Ã¢â‚¬â€ Deep Agents Coding Harness (langchain-ai/deepagents) Ã¢Å“â€¦
 
-**Installed:** deepagents-cli 0.0.34 · deepagents SDK 0.4.11
+**Installed:** deepagents-cli 0.0.34 Ã‚Â· deepagents SDK 0.4.11
 **SKILL.md (Claude Code):** `~/.claude/skills/deepagents/SKILL.md`
 **SKILL.md (Codex/Gemini):** `ECC/.agents/skills/deepagents/SKILL.md`
 
@@ -199,13 +212,13 @@ deepagents is a LangGraph-based coding agent CLI. Use it for parallel workstream
 
 **Verify:**
 ```bash
-deepagents --version        # → deepagents-cli 0.0.34
-deepagents-cli --version    # → 0.0.34
+deepagents --version        # Ã¢â€ â€™ deepagents-cli 0.0.34
+deepagents-cli --version    # Ã¢â€ â€™ 0.0.34
 ```
 
 ---
 
-## CHECK 7 — Berry Hallucination Detection ✅
+## CHECK 7 Ã¢â‚¬â€ Berry Hallucination Detection Ã¢Å“â€¦
 
 Berry MCP is registered in `manageesg-backend/.mcp.json` (along with context7, sequential-thinking, voicemode).
 
@@ -222,7 +235,7 @@ Berry MCP is registered in `manageesg-backend/.mcp.json` (along with context7, s
 | `cannot` | Switch approach or surface the missing artifact to the user. |
 
 **Mandatory Berry flow before any `/plan`:**
-1. `berry_change("<task description>")` — submit the plan
+1. `berry_change("<task description>")` Ã¢â‚¬â€ submit the plan
 2. Berry gathers evidence from git spans (actual file content)
 3. Every plan step must cite evidence from the actual codebase
 4. State must reach `done` before implementation begins
@@ -231,11 +244,11 @@ No plan proceeds to implementation if any step lacks file evidence.
 
 ---
 
-## CHECK 8 — Automatic Hooks (Claude Code Only) ✅
+## CHECK 8 Ã¢â‚¬â€ Automatic Hooks (Claude Code Only) Ã¢Å“â€¦
 
 10 hooks active in `~/.claude/settings.json`. All run without any manual prompt.
 
-### Core Hooks (7) — defined in ECC/scripts/hooks/
+### Core Hooks (7) Ã¢â‚¬â€ defined in ECC/scripts/hooks/
 
 | Hook script | Lifecycle | Trigger | Purpose |
 |---|---|---|---|
@@ -259,7 +272,7 @@ No plan proceeds to implementation if any step lacks file evidence.
 
 ---
 
-## CHECK 9 — Mandatory MD File Reference on Every Agent Call
+## CHECK 9 Ã¢â‚¬â€ Mandatory MD File Reference on Every Agent Call
 
 Every agent invocation must read these files before taking any action in the backend repo:
 
@@ -274,86 +287,86 @@ Every agent invocation must read these files before taking any action in the bac
 **Reference agent structure** (use `nature_agent/` as the canonical pattern):
 ```
 seabridge_ai/src/sustainability_ai/ai_agents/nature_agent/
-├── __init__.py
-├── state.py           ← LangGraph state schema
-├── workflow.py        ← LangGraph graph definition
-├── prompts/           ← prompt templates
-├── cecil_client.py    ← external data client
-└── streamlit_nature_risk.py
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ __init__.py
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ state.py           Ã¢â€ Â LangGraph state schema
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ workflow.py        Ã¢â€ Â LangGraph graph definition
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ prompts/           Ã¢â€ Â prompt templates
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ cecil_client.py    Ã¢â€ Â external data client
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ streamlit_nature_risk.py
 ```
 
 **No agent may assume folder structure, import paths, or dependency patterns without reading `AI_agents.md` first.**
 
 ---
 
-## CHECK 10 — File Distribution Audit
+## CHECK 10 Ã¢â‚¬â€ File Distribution Audit
 
 Zero cross-contamination between tiers.
 
 | Rule | Verify With |
 |---|---|
-| gstack lives at `~/.claude/skills/gstack/` and `ECC/.claude/skills/gstack/` only | `ls manageesg-backend/.claude/skills/ 2>/dev/null` → empty |
-| Global rules at `~/.claude/rules/common/` only | `ls manageesg-backend/.claude/rules/` → only `berry.md` |
-| No autoresearch source in adapter | `ls seabridge_ai/.../ai_agents/autoresearch/` → only 4 .py files + `__init__.py` |
-| No frontend assets in backend | `ls manageesg-backend/src/ 2>/dev/null` → error |
-| No backend AI agents in frontend | `ls manageesg-frontend/seabridge_ai/ 2>/dev/null` → error |
-| No `.env` committed | `git -C manageesg-backend ls-files .env` → empty |
+| gstack lives at `~/.claude/skills/gstack/` and `ECC/.claude/skills/gstack/` only | `ls manageesg-backend/.claude/skills/ 2>/dev/null` Ã¢â€ â€™ empty |
+| Global rules at `~/.claude/rules/common/` only | `ls manageesg-backend/.claude/rules/` Ã¢â€ â€™ only `berry.md` |
+| No autoresearch source in adapter | `ls seabridge_ai/.../ai_agents/autoresearch/` Ã¢â€ â€™ only 4 .py files + `__init__.py` |
+| No frontend assets in backend | `ls manageesg-backend/src/ 2>/dev/null` Ã¢â€ â€™ error |
+| No backend AI agents in frontend | `ls manageesg-frontend/seabridge_ai/ 2>/dev/null` Ã¢â€ â€™ error |
+| No `.env` committed | `git -C manageesg-backend ls-files .env` Ã¢â€ â€™ empty |
 
 ---
 
-## WORKFLOW TEST — End-to-End Execution
+## WORKFLOW TEST Ã¢â‚¬â€ End-to-End Execution
 
 **Test task:** "Add a new LangGraph agent for nature risk monitoring."
-*(Note: `nature_agent/` already exists — use it as the reference. For a real test, substitute `water_stress_agent/`.)*
+*(Note: `nature_agent/` already exists Ã¢â‚¬â€ use it as the reference. For a real test, substitute `water_stress_agent/`.)*
 
 **Required execution sequence (no manual intervention between steps):**
 
 ```
 1  Session opens
-   → CLAUDE.md + rules/common/*.md auto-load
-   → berry.md injected
-   → Agent reads seabridge_ai/docs/AI_agents.md BEFORE writing any code
+   Ã¢â€ â€™ CLAUDE.md + rules/common/*.md auto-load
+   Ã¢â€ â€™ berry.md injected
+   Ã¢â€ â€™ Agent reads seabridge_ai/docs/AI_agents.md BEFORE writing any code
 
 2  /plan invoked
-   → berry_change("<task>") called
-   → Berry gathers git spans as evidence
-   → audit_trace_budget: all steps cite real files
-   → state=done before implementation
+   Ã¢â€ â€™ berry_change("<task>") called
+   Ã¢â€ â€™ Berry gathers git spans as evidence
+   Ã¢â€ â€™ audit_trace_budget: all steps cite real files
+   Ã¢â€ â€™ state=done before implementation
 
 3  planner agent triggered (mandatory: complex feature)
-   → Phases defined, risks surfaced, user confirms
+   Ã¢â€ â€™ Phases defined, risks surfaced, user confirms
 
 4  gstack /autoplan runs
-   → CEO review: is this the right scope?
-   → Eng review: data flow, test matrix, error paths, diagram
+   Ã¢â€ â€™ CEO review: is this the right scope?
+   Ã¢â€ â€™ Eng review: data flow, test matrix, error paths, diagram
 
 5  Code written (state.py, workflow.py, prompts/, __init__.py)
-   → Follows nature_agent/ structure exactly
-   → code-reviewer agent runs after each file
+   Ã¢â€ â€™ Follows nature_agent/ structure exactly
+   Ã¢â€ â€™ code-reviewer agent runs after each file
 
 6  security-reviewer agent runs
-   → Triggered: agent touches external data source (ENCORE/Axion MCP)
-   → OWASP checks, secrets scan, API key handling verified
+   Ã¢â€ â€™ Triggered: agent touches external data source (ENCORE/Axion MCP)
+   Ã¢â€ â€™ OWASP checks, secrets scan, API key handling verified
 
 7  quality-gate hook fires (PostToolUse | Edit/Write/MultiEdit)
-   → Runs after every file write
-   → Blocks on CRITICAL issues, warns on HIGH
+   Ã¢â€ â€™ Runs after every file write
+   Ã¢â€ â€™ Blocks on CRITICAL issues, warns on HIGH
 
 8  gstack /review runs (pre-PR)
-   → SQL/injection checks, secrets scan, logic review
+   Ã¢â€ â€™ SQL/injection checks, secrets scan, logic review
 
 9  gstack /qa runs
-   → Browser QA against FastAPI endpoint
-   → Bugs found and fixed
+   Ã¢â€ â€™ Browser QA against FastAPI endpoint
+   Ã¢â€ â€™ Bugs found and fixed
 
 10 commit-quality hook fires before git commit
-   → Validates conventional commit format
-   → Blocks malformed messages
+   Ã¢â€ â€™ Validates conventional commit format
+   Ã¢â€ â€™ Blocks malformed messages
 
 11 gstack /ship runs
-   → Tests verified, PR opened with coverage audit
-   → session-end + evaluate-session hooks fire
-   → Learnings logged
+   Ã¢â€ â€™ Tests verified, PR opened with coverage audit
+   Ã¢â€ â€™ session-end + evaluate-session hooks fire
+   Ã¢â€ â€™ Learnings logged
 ```
 
 **Blockers to report:**
@@ -364,7 +377,7 @@ Zero cross-contamination between tiers.
 
 ---
 
-## Quick Reference — All Paths
+## Quick Reference Ã¢â‚¬â€ All Paths
 
 | Resource | Absolute Path |
 |---|---|

@@ -1,28 +1,41 @@
 ---
 name: kotlin-patterns
-description: 惯用的Kotlin模式、最佳实践和约定，用于构建健壮、高效且可维护的Kotlin应用程序，包括协程、空安全和DSL构建器。
+description: Ã¦Æ’Â¯Ã§â€Â¨Ã§Å¡â€žKotlinÃ¦Â¨Â¡Ã¥Â¼ÂÃ£â‚¬ÂÃ¦Å“â‚¬Ã¤Â½Â³Ã¥Â®Å¾Ã¨Â·ÂµÃ¥â€™Å’Ã§ÂºÂ¦Ã¥Â®Å¡Ã¯Â¼Å’Ã§â€Â¨Ã¤ÂºÅ½Ã¦Å¾â€žÃ¥Â»ÂºÃ¥ÂÂ¥Ã¥Â£Â®Ã£â‚¬ÂÃ©Â«ËœÃ¦â€¢Ë†Ã¤Â¸â€Ã¥ÂÂ¯Ã§Â»Â´Ã¦Å Â¤Ã§Å¡â€žKotlinÃ¥Âºâ€Ã§â€Â¨Ã§Â¨â€¹Ã¥ÂºÂÃ¯Â¼Å’Ã¥Å’â€¦Ã¦â€¹Â¬Ã¥ÂÂÃ§Â¨â€¹Ã£â‚¬ÂÃ§Â©ÂºÃ¥Â®â€°Ã¥â€¦Â¨Ã¥â€™Å’DSLÃ¦Å¾â€žÃ¥Â»ÂºÃ¥â„¢Â¨Ã£â‚¬â€š
 origin: ECC
 ---
 
-# Kotlin 开发模式
+# Kotlin Ã¥Â¼â‚¬Ã¥Ââ€˜Ã¦Â¨Â¡Ã¥Â¼Â
 
-适用于构建健壮、高效、可维护应用程序的惯用 Kotlin 模式与最佳实践。
+## Safety And Authorization Rule
 
-## 使用时机
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-* 编写新的 Kotlin 代码
-* 审查 Kotlin 代码
-* 重构现有的 Kotlin 代码
-* 设计 Kotlin 模块或库
-* 配置 Gradle Kotlin DSL 构建
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-## 工作原理
 
-本技能在七个关键领域强制执行惯用的 Kotlin 约定：使用类型系统和安全调用运算符实现空安全；通过数据类的 `val` 和 `copy()` 实现不可变性；使用密封类和接口实现穷举类型层次结构；使用协程和 `Flow` 实现结构化并发；使用扩展函数在不使用继承的情况下添加行为；使用 `@DslMarker` 和 lambda 接收器构建类型安全的 DSL；以及使用 Gradle Kotlin DSL 进行构建配置。
+Ã©â‚¬â€šÃ§â€Â¨Ã¤ÂºÅ½Ã¦Å¾â€žÃ¥Â»ÂºÃ¥ÂÂ¥Ã¥Â£Â®Ã£â‚¬ÂÃ©Â«ËœÃ¦â€¢Ë†Ã£â‚¬ÂÃ¥ÂÂ¯Ã§Â»Â´Ã¦Å Â¤Ã¥Âºâ€Ã§â€Â¨Ã§Â¨â€¹Ã¥ÂºÂÃ§Å¡â€žÃ¦Æ’Â¯Ã§â€Â¨ Kotlin Ã¦Â¨Â¡Ã¥Â¼ÂÃ¤Â¸Å½Ã¦Å“â‚¬Ã¤Â½Â³Ã¥Â®Å¾Ã¨Â·ÂµÃ£â‚¬â€š
 
-## 示例
+## Ã¤Â½Â¿Ã§â€Â¨Ã¦â€”Â¶Ã¦Å“Âº
 
-**使用 Elvis 运算符实现空安全：**
+* Ã§Â¼â€“Ã¥â€ â„¢Ã¦â€“Â°Ã§Å¡â€ž Kotlin Ã¤Â»Â£Ã§Â Â
+* Ã¥Â®Â¡Ã¦Å¸Â¥ Kotlin Ã¤Â»Â£Ã§Â Â
+* Ã©â€¡ÂÃ¦Å¾â€žÃ§Å½Â°Ã¦Å“â€°Ã§Å¡â€ž Kotlin Ã¤Â»Â£Ã§Â Â
+* Ã¨Â®Â¾Ã¨Â®Â¡ Kotlin Ã¦Â¨Â¡Ã¥Ââ€”Ã¦Ë†â€“Ã¥Âºâ€œ
+* Ã©â€¦ÂÃ§Â½Â® Gradle Kotlin DSL Ã¦Å¾â€žÃ¥Â»Âº
+
+## Ã¥Â·Â¥Ã¤Â½Å“Ã¥Å½Å¸Ã§Ââ€ 
+
+Ã¦Å“Â¬Ã¦Å â‚¬Ã¨Æ’Â½Ã¥Å“Â¨Ã¤Â¸Æ’Ã¤Â¸ÂªÃ¥â€¦Â³Ã©â€Â®Ã©Â¢â€ Ã¥Å¸Å¸Ã¥Â¼ÂºÃ¥Ë†Â¶Ã¦â€°Â§Ã¨Â¡Å’Ã¦Æ’Â¯Ã§â€Â¨Ã§Å¡â€ž Kotlin Ã§ÂºÂ¦Ã¥Â®Å¡Ã¯Â¼Å¡Ã¤Â½Â¿Ã§â€Â¨Ã§Â±Â»Ã¥Å¾â€¹Ã§Â³Â»Ã§Â»Å¸Ã¥â€™Å’Ã¥Â®â€°Ã¥â€¦Â¨Ã¨Â°Æ’Ã§â€Â¨Ã¨Â¿ÂÃ§Â®â€”Ã§Â¬Â¦Ã¥Â®Å¾Ã§Å½Â°Ã§Â©ÂºÃ¥Â®â€°Ã¥â€¦Â¨Ã¯Â¼â€ºÃ©â‚¬Å¡Ã¨Â¿â€¡Ã¦â€¢Â°Ã¦ÂÂ®Ã§Â±Â»Ã§Å¡â€ž `val` Ã¥â€™Å’ `copy()` Ã¥Â®Å¾Ã§Å½Â°Ã¤Â¸ÂÃ¥ÂÂ¯Ã¥ÂËœÃ¦â‚¬Â§Ã¯Â¼â€ºÃ¤Â½Â¿Ã§â€Â¨Ã¥Â¯â€ Ã¥Â°ÂÃ§Â±Â»Ã¥â€™Å’Ã¦Å½Â¥Ã¥ÂÂ£Ã¥Â®Å¾Ã§Å½Â°Ã§Â©Â·Ã¤Â¸Â¾Ã§Â±Â»Ã¥Å¾â€¹Ã¥Â±â€šÃ¦Â¬Â¡Ã§Â»â€œÃ¦Å¾â€žÃ¯Â¼â€ºÃ¤Â½Â¿Ã§â€Â¨Ã¥ÂÂÃ§Â¨â€¹Ã¥â€™Å’ `Flow` Ã¥Â®Å¾Ã§Å½Â°Ã§Â»â€œÃ¦Å¾â€žÃ¥Å’â€“Ã¥Â¹Â¶Ã¥Ââ€˜Ã¯Â¼â€ºÃ¤Â½Â¿Ã§â€Â¨Ã¦â€°Â©Ã¥Â±â€¢Ã¥â€¡Â½Ã¦â€¢Â°Ã¥Å“Â¨Ã¤Â¸ÂÃ¤Â½Â¿Ã§â€Â¨Ã§Â»Â§Ã¦â€°Â¿Ã§Å¡â€žÃ¦Æ’â€¦Ã¥â€ ÂµÃ¤Â¸â€¹Ã¦Â·Â»Ã¥Å Â Ã¨Â¡Å’Ã¤Â¸ÂºÃ¯Â¼â€ºÃ¤Â½Â¿Ã§â€Â¨ `@DslMarker` Ã¥â€™Å’ lambda Ã¦Å½Â¥Ã¦â€Â¶Ã¥â„¢Â¨Ã¦Å¾â€žÃ¥Â»ÂºÃ§Â±Â»Ã¥Å¾â€¹Ã¥Â®â€°Ã¥â€¦Â¨Ã§Å¡â€ž DSLÃ¯Â¼â€ºÃ¤Â»Â¥Ã¥ÂÅ Ã¤Â½Â¿Ã§â€Â¨ Gradle Kotlin DSL Ã¨Â¿â€ºÃ¨Â¡Å’Ã¦Å¾â€žÃ¥Â»ÂºÃ©â€¦ÂÃ§Â½Â®Ã£â‚¬â€š
+
+## Ã§Â¤ÂºÃ¤Â¾â€¹
+
+**Ã¤Â½Â¿Ã§â€Â¨ Elvis Ã¨Â¿ÂÃ§Â®â€”Ã§Â¬Â¦Ã¥Â®Å¾Ã§Å½Â°Ã§Â©ÂºÃ¥Â®â€°Ã¥â€¦Â¨Ã¯Â¼Å¡**
 
 ```kotlin
 fun getUserEmail(userId: String): String {
@@ -31,7 +44,7 @@ fun getUserEmail(userId: String): String {
 }
 ```
 
-**使用密封类处理穷举结果：**
+**Ã¤Â½Â¿Ã§â€Â¨Ã¥Â¯â€ Ã¥Â°ÂÃ§Â±Â»Ã¥Â¤â€žÃ§Ââ€ Ã§Â©Â·Ã¤Â¸Â¾Ã§Â»â€œÃ¦Å¾Å“Ã¯Â¼Å¡**
 
 ```kotlin
 sealed class Result<out T> {
@@ -41,7 +54,7 @@ sealed class Result<out T> {
 }
 ```
 
-**使用 async/await 实现结构化并发：**
+**Ã¤Â½Â¿Ã§â€Â¨ async/await Ã¥Â®Å¾Ã§Å½Â°Ã§Â»â€œÃ¦Å¾â€žÃ¥Å’â€“Ã¥Â¹Â¶Ã¥Ââ€˜Ã¯Â¼Å¡**
 
 ```kotlin
 suspend fun fetchUserWithPosts(userId: String): UserProfile =
@@ -52,11 +65,11 @@ suspend fun fetchUserWithPosts(userId: String): UserProfile =
     }
 ```
 
-## 核心原则
+## Ã¦Â Â¸Ã¥Â¿Æ’Ã¥Å½Å¸Ã¥Ë†â„¢
 
-### 1. 空安全
+### 1. Ã§Â©ÂºÃ¥Â®â€°Ã¥â€¦Â¨
 
-Kotlin 的类型系统区分可空和不可空类型。充分利用它。
+Kotlin Ã§Å¡â€žÃ§Â±Â»Ã¥Å¾â€¹Ã§Â³Â»Ã§Â»Å¸Ã¥Å’ÂºÃ¥Ë†â€ Ã¥ÂÂ¯Ã§Â©ÂºÃ¥â€™Å’Ã¤Â¸ÂÃ¥ÂÂ¯Ã§Â©ÂºÃ§Â±Â»Ã¥Å¾â€¹Ã£â‚¬â€šÃ¥â€¦â€¦Ã¥Ë†â€ Ã¥Ë†Â©Ã§â€Â¨Ã¥Â®Æ’Ã£â‚¬â€š
 
 ```kotlin
 // Good: Use non-nullable types by default
@@ -78,9 +91,9 @@ fun getUserEmail(userId: String): String {
 }
 ```
 
-### 2. 默认不可变性
+### 2. Ã©Â»ËœÃ¨Â®Â¤Ã¤Â¸ÂÃ¥ÂÂ¯Ã¥ÂËœÃ¦â‚¬Â§
 
-优先使用 `val` 而非 `var`，优先使用不可变集合而非可变集合。
+Ã¤Â¼ËœÃ¥â€¦Ë†Ã¤Â½Â¿Ã§â€Â¨ `val` Ã¨â‚¬Å’Ã©ÂÅ¾ `var`Ã¯Â¼Å’Ã¤Â¼ËœÃ¥â€¦Ë†Ã¤Â½Â¿Ã§â€Â¨Ã¤Â¸ÂÃ¥ÂÂ¯Ã¥ÂËœÃ©â€ºâ€ Ã¥ÂË†Ã¨â‚¬Å’Ã©ÂÅ¾Ã¥ÂÂ¯Ã¥ÂËœÃ©â€ºâ€ Ã¥ÂË†Ã£â‚¬â€š
 
 ```kotlin
 // Good: Immutable data
@@ -103,9 +116,9 @@ var currentUser: User? = null // Avoid mutable global state
 val mutableUsers = mutableListOf<User>() // Avoid unless truly needed
 ```
 
-### 3. 表达式体和单表达式函数
+### 3. Ã¨Â¡Â¨Ã¨Â¾Â¾Ã¥Â¼ÂÃ¤Â½â€œÃ¥â€™Å’Ã¥Ââ€¢Ã¨Â¡Â¨Ã¨Â¾Â¾Ã¥Â¼ÂÃ¥â€¡Â½Ã¦â€¢Â°
 
-使用表达式体编写简洁、可读的函数。
+Ã¤Â½Â¿Ã§â€Â¨Ã¨Â¡Â¨Ã¨Â¾Â¾Ã¥Â¼ÂÃ¤Â½â€œÃ§Â¼â€“Ã¥â€ â„¢Ã§Â®â‚¬Ã¦Â´ÂÃ£â‚¬ÂÃ¥ÂÂ¯Ã¨Â¯Â»Ã§Å¡â€žÃ¥â€¡Â½Ã¦â€¢Â°Ã£â‚¬â€š
 
 ```kotlin
 // Good: Expression body
@@ -131,9 +144,9 @@ fun isAdult(age: Int): Boolean {
 }
 ```
 
-### 4. 数据类用于值对象
+### 4. Ã¦â€¢Â°Ã¦ÂÂ®Ã§Â±Â»Ã§â€Â¨Ã¤ÂºÅ½Ã¥â‚¬Â¼Ã¥Â¯Â¹Ã¨Â±Â¡
 
-使用数据类表示主要包含数据的类型。
+Ã¤Â½Â¿Ã§â€Â¨Ã¦â€¢Â°Ã¦ÂÂ®Ã§Â±Â»Ã¨Â¡Â¨Ã§Â¤ÂºÃ¤Â¸Â»Ã¨Â¦ÂÃ¥Å’â€¦Ã¥ÂÂ«Ã¦â€¢Â°Ã¦ÂÂ®Ã§Å¡â€žÃ§Â±Â»Ã¥Å¾â€¹Ã£â‚¬â€š
 
 ```kotlin
 // Good: Data class with copy, equals, hashCode, toString
@@ -161,9 +174,9 @@ value class Email(val value: String) {
 fun getUser(id: UserId): User = userRepository.findById(id)
 ```
 
-## 密封类和接口
+## Ã¥Â¯â€ Ã¥Â°ÂÃ§Â±Â»Ã¥â€™Å’Ã¦Å½Â¥Ã¥ÂÂ£
 
-### 建模受限的层次结构
+### Ã¥Â»ÂºÃ¦Â¨Â¡Ã¥Ââ€”Ã©â„¢ÂÃ§Å¡â€žÃ¥Â±â€šÃ¦Â¬Â¡Ã§Â»â€œÃ¦Å¾â€ž
 
 ```kotlin
 // Good: Sealed class for exhaustive when
@@ -186,7 +199,7 @@ fun <T> Result<T>.getOrThrow(): T = when (this) {
 }
 ```
 
-### 用于 API 响应的密封接口
+### Ã§â€Â¨Ã¤ÂºÅ½ API Ã¥â€œÂÃ¥Âºâ€Ã§Å¡â€žÃ¥Â¯â€ Ã¥Â°ÂÃ¦Å½Â¥Ã¥ÂÂ£
 
 ```kotlin
 sealed interface ApiError {
@@ -212,9 +225,9 @@ fun ApiError.toStatusCode(): Int = when (this) {
 }
 ```
 
-## 作用域函数
+## Ã¤Â½Å“Ã§â€Â¨Ã¥Å¸Å¸Ã¥â€¡Â½Ã¦â€¢Â°
 
-### 何时使用各个函数
+### Ã¤Â½â€¢Ã¦â€”Â¶Ã¤Â½Â¿Ã§â€Â¨Ã¥Ââ€žÃ¤Â¸ÂªÃ¥â€¡Â½Ã¦â€¢Â°
 
 ```kotlin
 // let: Transform nullable or scoped result
@@ -243,7 +256,7 @@ val csv = with(StringBuilder()) {
 }
 ```
 
-### 反模式
+### Ã¥ÂÂÃ¦Â¨Â¡Ã¥Â¼Â
 
 ```kotlin
 // Bad: Nesting scope functions
@@ -260,9 +273,9 @@ val city = user?.address?.city
 city?.let { println(it) }
 ```
 
-## 扩展函数
+## Ã¦â€°Â©Ã¥Â±â€¢Ã¥â€¡Â½Ã¦â€¢Â°
 
-### 在不使用继承的情况下添加功能
+### Ã¥Å“Â¨Ã¤Â¸ÂÃ¤Â½Â¿Ã§â€Â¨Ã§Â»Â§Ã¦â€°Â¿Ã§Å¡â€žÃ¦Æ’â€¦Ã¥â€ ÂµÃ¤Â¸â€¹Ã¦Â·Â»Ã¥Å Â Ã¥Å Å¸Ã¨Æ’Â½
 
 ```kotlin
 // Good: Domain-specific extensions
@@ -289,9 +302,9 @@ class UserService {
 }
 ```
 
-## 协程
+## Ã¥ÂÂÃ§Â¨â€¹
 
-### 结构化并发
+### Ã§Â»â€œÃ¦Å¾â€žÃ¥Å’â€“Ã¥Â¹Â¶Ã¥Ââ€˜
 
 ```kotlin
 // Good: Structured concurrency with coroutineScope
@@ -333,7 +346,7 @@ suspend fun fetchDashboard(userId: String): Dashboard =
     }
 ```
 
-### Flow 用于响应式流
+### Flow Ã§â€Â¨Ã¤ÂºÅ½Ã¥â€œÂÃ¥Âºâ€Ã¥Â¼ÂÃ¦ÂµÂ
 
 ```kotlin
 // Good: Cold flow with proper error handling
@@ -358,7 +371,7 @@ fun searchUsers(query: Flow<String>): Flow<List<User>> =
         .catch { emit(emptyList()) }
 ```
 
-### 取消与清理
+### Ã¥Ââ€“Ã¦Â¶Ë†Ã¤Â¸Å½Ã¦Â¸â€¦Ã§Ââ€ 
 
 ```kotlin
 // Good: Respect cancellation
@@ -382,9 +395,9 @@ suspend fun acquireAndProcess() {
 }
 ```
 
-## 委托
+## Ã¥Â§â€Ã¦â€°Ëœ
 
-### 属性委托
+### Ã¥Â±Å¾Ã¦â‚¬Â§Ã¥Â§â€Ã¦â€°Ëœ
 
 ```kotlin
 // Lazy initialization
@@ -407,7 +420,7 @@ class Config(private val map: Map<String, Any?>) {
 val config = Config(mapOf("host" to "localhost", "port" to 8080, "debug" to true))
 ```
 
-### 接口委托
+### Ã¦Å½Â¥Ã¥ÂÂ£Ã¥Â§â€Ã¦â€°Ëœ
 
 ```kotlin
 // Good: Delegate interface implementation
@@ -425,9 +438,9 @@ class LoggingUserRepository(
 }
 ```
 
-## DSL 构建器
+## DSL Ã¦Å¾â€žÃ¥Â»ÂºÃ¥â„¢Â¨
 
-### 类型安全构建器
+### Ã§Â±Â»Ã¥Å¾â€¹Ã¥Â®â€°Ã¥â€¦Â¨Ã¦Å¾â€žÃ¥Â»ÂºÃ¥â„¢Â¨
 
 ```kotlin
 // Good: DSL with @DslMarker
@@ -461,7 +474,7 @@ val page = html {
 }
 ```
 
-### 配置 DSL
+### Ã©â€¦ÂÃ§Â½Â® DSL
 
 ```kotlin
 data class ServerConfig(
@@ -503,7 +516,7 @@ val config = serverConfig {
 }
 ```
 
-## 用于惰性求值的序列
+## Ã§â€Â¨Ã¤ÂºÅ½Ã¦Æ’Â°Ã¦â‚¬Â§Ã¦Â±â€šÃ¥â‚¬Â¼Ã§Å¡â€žÃ¥ÂºÂÃ¥Ë†â€”
 
 ```kotlin
 // Good: Use sequences for large collections with multiple operations
@@ -531,7 +544,7 @@ val first20 = fibonacci.take(20).toList()
 
 ## Gradle Kotlin DSL
 
-### build.gradle.kts 配置
+### build.gradle.kts Ã©â€¦ÂÃ§Â½Â®
 
 ```kotlin
 // Check for latest versions: https://kotlinlang.org/docs/releases.html
@@ -588,9 +601,9 @@ detekt {
 }
 ```
 
-## 错误处理模式
+## Ã©â€â„¢Ã¨Â¯Â¯Ã¥Â¤â€žÃ§Ââ€ Ã¦Â¨Â¡Ã¥Â¼Â
 
-### 用于领域操作的 Result 类型
+### Ã§â€Â¨Ã¤ÂºÅ½Ã©Â¢â€ Ã¥Å¸Å¸Ã¦â€œÂÃ¤Â½Å“Ã§Å¡â€ž Result Ã§Â±Â»Ã¥Å¾â€¹
 
 ```kotlin
 // Good: Use Kotlin's Result or a custom sealed class
@@ -625,9 +638,9 @@ fun withdraw(account: Account, amount: Money): Account {
 }
 ```
 
-## 集合操作
+## Ã©â€ºâ€ Ã¥ÂË†Ã¦â€œÂÃ¤Â½Å“
 
-### 惯用的集合处理
+### Ã¦Æ’Â¯Ã§â€Â¨Ã§Å¡â€žÃ©â€ºâ€ Ã¥ÂË†Ã¥Â¤â€žÃ§Ââ€ 
 
 ```kotlin
 // Good: Chained operations
@@ -649,27 +662,27 @@ val usersById: Map<UserId, User> = users.associateBy { it.id }
 val (active, inactive) = users.partition { it.isActive }
 ```
 
-## 快速参考：Kotlin 惯用法
+## Ã¥Â¿Â«Ã©â‚¬Å¸Ã¥Ââ€šÃ¨â‚¬Æ’Ã¯Â¼Å¡Kotlin Ã¦Æ’Â¯Ã§â€Â¨Ã¦Â³â€¢
 
-| 惯用法 | 描述 |
+| Ã¦Æ’Â¯Ã§â€Â¨Ã¦Â³â€¢ | Ã¦ÂÂÃ¨Â¿Â° |
 |-------|-------------|
-| `val` 优于 `var` | 优先使用不可变变量 |
-| `data class` | 用于具有 equals/hashCode/copy 的值对象 |
-| `sealed class/interface` | 用于受限的类型层次结构 |
-| `value class` | 用于零开销的类型安全包装器 |
-| 表达式 `when` | 穷举模式匹配 |
-| 安全调用 `?.` | 空安全的成员访问 |
-| Elvis `?:` | 为可空类型提供默认值 |
-| `let`/`apply`/`also`/`run`/`with` | 用于编写简洁代码的作用域函数 |
-| 扩展函数 | 在不使用继承的情况下添加行为 |
-| `copy()` | 数据类上的不可变更新 |
-| `require`/`check` | 前置条件断言 |
-| 协程 `async`/`await` | 结构化并发执行 |
-| `Flow` | 冷响应式流 |
-| `sequence` | 惰性求值 |
-| 委托 `by` | 在不使用继承的情况下重用实现 |
+| `val` Ã¤Â¼ËœÃ¤ÂºÅ½ `var` | Ã¤Â¼ËœÃ¥â€¦Ë†Ã¤Â½Â¿Ã§â€Â¨Ã¤Â¸ÂÃ¥ÂÂ¯Ã¥ÂËœÃ¥ÂËœÃ©â€¡Â |
+| `data class` | Ã§â€Â¨Ã¤ÂºÅ½Ã¥â€¦Â·Ã¦Å“â€° equals/hashCode/copy Ã§Å¡â€žÃ¥â‚¬Â¼Ã¥Â¯Â¹Ã¨Â±Â¡ |
+| `sealed class/interface` | Ã§â€Â¨Ã¤ÂºÅ½Ã¥Ââ€”Ã©â„¢ÂÃ§Å¡â€žÃ§Â±Â»Ã¥Å¾â€¹Ã¥Â±â€šÃ¦Â¬Â¡Ã§Â»â€œÃ¦Å¾â€ž |
+| `value class` | Ã§â€Â¨Ã¤ÂºÅ½Ã©â€ºÂ¶Ã¥Â¼â‚¬Ã©â€â‚¬Ã§Å¡â€žÃ§Â±Â»Ã¥Å¾â€¹Ã¥Â®â€°Ã¥â€¦Â¨Ã¥Å’â€¦Ã¨Â£â€¦Ã¥â„¢Â¨ |
+| Ã¨Â¡Â¨Ã¨Â¾Â¾Ã¥Â¼Â `when` | Ã§Â©Â·Ã¤Â¸Â¾Ã¦Â¨Â¡Ã¥Â¼ÂÃ¥Å’Â¹Ã©â€¦Â |
+| Ã¥Â®â€°Ã¥â€¦Â¨Ã¨Â°Æ’Ã§â€Â¨ `?.` | Ã§Â©ÂºÃ¥Â®â€°Ã¥â€¦Â¨Ã§Å¡â€žÃ¦Ë†ÂÃ¥â€˜ËœÃ¨Â®Â¿Ã©â€”Â® |
+| Elvis `?:` | Ã¤Â¸ÂºÃ¥ÂÂ¯Ã§Â©ÂºÃ§Â±Â»Ã¥Å¾â€¹Ã¦ÂÂÃ¤Â¾â€ºÃ©Â»ËœÃ¨Â®Â¤Ã¥â‚¬Â¼ |
+| `let`/`apply`/`also`/`run`/`with` | Ã§â€Â¨Ã¤ÂºÅ½Ã§Â¼â€“Ã¥â€ â„¢Ã§Â®â‚¬Ã¦Â´ÂÃ¤Â»Â£Ã§Â ÂÃ§Å¡â€žÃ¤Â½Å“Ã§â€Â¨Ã¥Å¸Å¸Ã¥â€¡Â½Ã¦â€¢Â° |
+| Ã¦â€°Â©Ã¥Â±â€¢Ã¥â€¡Â½Ã¦â€¢Â° | Ã¥Å“Â¨Ã¤Â¸ÂÃ¤Â½Â¿Ã§â€Â¨Ã§Â»Â§Ã¦â€°Â¿Ã§Å¡â€žÃ¦Æ’â€¦Ã¥â€ ÂµÃ¤Â¸â€¹Ã¦Â·Â»Ã¥Å Â Ã¨Â¡Å’Ã¤Â¸Âº |
+| `copy()` | Ã¦â€¢Â°Ã¦ÂÂ®Ã§Â±Â»Ã¤Â¸Å Ã§Å¡â€žÃ¤Â¸ÂÃ¥ÂÂ¯Ã¥ÂËœÃ¦â€ºÂ´Ã¦â€“Â° |
+| `require`/`check` | Ã¥â€°ÂÃ§Â½Â®Ã¦ÂÂ¡Ã¤Â»Â¶Ã¦â€“Â­Ã¨Â¨â‚¬ |
+| Ã¥ÂÂÃ§Â¨â€¹ `async`/`await` | Ã§Â»â€œÃ¦Å¾â€žÃ¥Å’â€“Ã¥Â¹Â¶Ã¥Ââ€˜Ã¦â€°Â§Ã¨Â¡Å’ |
+| `Flow` | Ã¥â€ Â·Ã¥â€œÂÃ¥Âºâ€Ã¥Â¼ÂÃ¦ÂµÂ |
+| `sequence` | Ã¦Æ’Â°Ã¦â‚¬Â§Ã¦Â±â€šÃ¥â‚¬Â¼ |
+| Ã¥Â§â€Ã¦â€°Ëœ `by` | Ã¥Å“Â¨Ã¤Â¸ÂÃ¤Â½Â¿Ã§â€Â¨Ã§Â»Â§Ã¦â€°Â¿Ã§Å¡â€žÃ¦Æ’â€¦Ã¥â€ ÂµÃ¤Â¸â€¹Ã©â€¡ÂÃ§â€Â¨Ã¥Â®Å¾Ã§Å½Â° |
 
-## 应避免的反模式
+## Ã¥Âºâ€Ã©ÂÂ¿Ã¥â€¦ÂÃ§Å¡â€žÃ¥ÂÂÃ¦Â¨Â¡Ã¥Â¼Â
 
 ```kotlin
 // Bad: Force-unwrapping nullable types
@@ -711,4 +724,4 @@ user?.let { u ->
 user?.address?.city?.let { process(it) }
 ```
 
-**请记住**：Kotlin 代码应简洁但可读。利用类型系统确保安全，优先使用不可变性，并使用协程处理并发。如有疑问，让编译器帮助你。
+**Ã¨Â¯Â·Ã¨Â®Â°Ã¤Â½Â**Ã¯Â¼Å¡Kotlin Ã¤Â»Â£Ã§Â ÂÃ¥Âºâ€Ã§Â®â‚¬Ã¦Â´ÂÃ¤Â½â€ Ã¥ÂÂ¯Ã¨Â¯Â»Ã£â‚¬â€šÃ¥Ë†Â©Ã§â€Â¨Ã§Â±Â»Ã¥Å¾â€¹Ã§Â³Â»Ã§Â»Å¸Ã§Â¡Â®Ã¤Â¿ÂÃ¥Â®â€°Ã¥â€¦Â¨Ã¯Â¼Å’Ã¤Â¼ËœÃ¥â€¦Ë†Ã¤Â½Â¿Ã§â€Â¨Ã¤Â¸ÂÃ¥ÂÂ¯Ã¥ÂËœÃ¦â‚¬Â§Ã¯Â¼Å’Ã¥Â¹Â¶Ã¤Â½Â¿Ã§â€Â¨Ã¥ÂÂÃ§Â¨â€¹Ã¥Â¤â€žÃ§Ââ€ Ã¥Â¹Â¶Ã¥Ââ€˜Ã£â‚¬â€šÃ¥Â¦â€šÃ¦Å“â€°Ã§â€“â€˜Ã©â€”Â®Ã¯Â¼Å’Ã¨Â®Â©Ã§Â¼â€“Ã¨Â¯â€˜Ã¥â„¢Â¨Ã¥Â¸Â®Ã¥Å Â©Ã¤Â½Â Ã£â‚¬â€š

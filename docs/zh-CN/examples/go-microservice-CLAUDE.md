@@ -1,46 +1,59 @@
-# Go 微服务 — 项目 CLAUDE.md
+# Go Ã¥Â¾Â®Ã¦Å“ÂÃ¥Å Â¡ Ã¢â‚¬â€ Ã©Â¡Â¹Ã§â€ºÂ® CLAUDE.md
 
-> 一个使用 PostgreSQL、gRPC 和 Docker 的 Go 微服务真实示例。
-> 将此文件复制到您的项目根目录，并根据您的服务进行自定义。
+## Safety And Authorization Rule
 
-## 项目概述
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-**技术栈:** Go 1.22+, PostgreSQL, gRPC + REST (grpc-gateway), Docker, sqlc (类型安全的 SQL), Wire (依赖注入)
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-**架构:** 采用领域、仓库、服务和处理器层的清晰架构。gRPC 作为主要传输方式，REST 网关用于外部客户端。
 
-## 关键规则
+> Ã¤Â¸â‚¬Ã¤Â¸ÂªÃ¤Â½Â¿Ã§â€Â¨ PostgreSQLÃ£â‚¬ÂgRPC Ã¥â€™Å’ Docker Ã§Å¡â€ž Go Ã¥Â¾Â®Ã¦Å“ÂÃ¥Å Â¡Ã§Å“Å¸Ã¥Â®Å¾Ã§Â¤ÂºÃ¤Â¾â€¹Ã£â‚¬â€š
+> Ã¥Â°â€ Ã¦Â­Â¤Ã¦â€“â€¡Ã¤Â»Â¶Ã¥Â¤ÂÃ¥Ë†Â¶Ã¥Ë†Â°Ã¦â€šÂ¨Ã§Å¡â€žÃ©Â¡Â¹Ã§â€ºÂ®Ã¦Â Â¹Ã§â€ºÂ®Ã¥Â½â€¢Ã¯Â¼Å’Ã¥Â¹Â¶Ã¦Â Â¹Ã¦ÂÂ®Ã¦â€šÂ¨Ã§Å¡â€žÃ¦Å“ÂÃ¥Å Â¡Ã¨Â¿â€ºÃ¨Â¡Å’Ã¨â€¡ÂªÃ¥Â®Å¡Ã¤Â¹â€°Ã£â‚¬â€š
 
-### Go 规范
+## Ã©Â¡Â¹Ã§â€ºÂ®Ã¦Â¦â€šÃ¨Â¿Â°
 
-* 遵循 Effective Go 和 Go Code Review Comments 指南
-* 使用 `errors.New` / `fmt.Errorf` 配合 `%w` 进行包装 — 绝不对错误进行字符串匹配
-* 不使用 `init()` 函数 — 在 `main()` 或构造函数中进行显式初始化
-* 没有全局可变状态 — 通过构造函数传递依赖项
-* Context 必须是第一个参数，并在所有层中传播
+**Ã¦Å â‚¬Ã¦Å“Â¯Ã¦Â Ë†:** Go 1.22+, PostgreSQL, gRPC + REST (grpc-gateway), Docker, sqlc (Ã§Â±Â»Ã¥Å¾â€¹Ã¥Â®â€°Ã¥â€¦Â¨Ã§Å¡â€ž SQL), Wire (Ã¤Â¾ÂÃ¨Âµâ€“Ã¦Â³Â¨Ã¥â€¦Â¥)
 
-### 数据库
+**Ã¦Å¾Â¶Ã¦Å¾â€ž:** Ã©â€¡â€¡Ã§â€Â¨Ã©Â¢â€ Ã¥Å¸Å¸Ã£â‚¬ÂÃ¤Â»â€œÃ¥Âºâ€œÃ£â‚¬ÂÃ¦Å“ÂÃ¥Å Â¡Ã¥â€™Å’Ã¥Â¤â€žÃ§Ââ€ Ã¥â„¢Â¨Ã¥Â±â€šÃ§Å¡â€žÃ¦Â¸â€¦Ã¦â„¢Â°Ã¦Å¾Â¶Ã¦Å¾â€žÃ£â‚¬â€šgRPC Ã¤Â½Å“Ã¤Â¸ÂºÃ¤Â¸Â»Ã¨Â¦ÂÃ¤Â¼Â Ã¨Â¾â€œÃ¦â€“Â¹Ã¥Â¼ÂÃ¯Â¼Å’REST Ã§Â½â€˜Ã¥â€¦Â³Ã§â€Â¨Ã¤ÂºÅ½Ã¥Â¤â€“Ã©Æ’Â¨Ã¥Â®Â¢Ã¦Ë†Â·Ã§Â«Â¯Ã£â‚¬â€š
 
-* `queries/` 中的所有查询都使用纯 SQL — sqlc 生成类型安全的 Go 代码
-* 在 `migrations/` 中使用 golang-migrate 进行迁移 — 绝不直接更改数据库
-* 通过 `pgx.Tx` 为多步骤操作使用事务
-* 所有查询必须使用参数化占位符 (`$1`, `$2`) — 绝不使用字符串格式化
+## Ã¥â€¦Â³Ã©â€Â®Ã¨Â§â€žÃ¥Ë†â„¢
 
-### 错误处理
+### Go Ã¨Â§â€žÃ¨Å’Æ’
 
-* 返回错误，不要 panic — panic 仅用于真正无法恢复的情况
-* 使用上下文包装错误：`fmt.Errorf("creating user: %w", err)`
-* 在 `domain/errors.go` 中定义业务逻辑的哨兵错误
-* 在处理器层将领域错误映射到 gRPC 状态码
+* Ã©ÂÂµÃ¥Â¾Âª Effective Go Ã¥â€™Å’ Go Code Review Comments Ã¦Å’â€¡Ã¥Ââ€”
+* Ã¤Â½Â¿Ã§â€Â¨ `errors.New` / `fmt.Errorf` Ã©â€¦ÂÃ¥ÂË† `%w` Ã¨Â¿â€ºÃ¨Â¡Å’Ã¥Å’â€¦Ã¨Â£â€¦ Ã¢â‚¬â€ Ã§Â»ÂÃ¤Â¸ÂÃ¥Â¯Â¹Ã©â€â„¢Ã¨Â¯Â¯Ã¨Â¿â€ºÃ¨Â¡Å’Ã¥Â­â€”Ã§Â¬Â¦Ã¤Â¸Â²Ã¥Å’Â¹Ã©â€¦Â
+* Ã¤Â¸ÂÃ¤Â½Â¿Ã§â€Â¨ `init()` Ã¥â€¡Â½Ã¦â€¢Â° Ã¢â‚¬â€ Ã¥Å“Â¨ `main()` Ã¦Ë†â€“Ã¦Å¾â€žÃ©â‚¬Â Ã¥â€¡Â½Ã¦â€¢Â°Ã¤Â¸Â­Ã¨Â¿â€ºÃ¨Â¡Å’Ã¦ËœÂ¾Ã¥Â¼ÂÃ¥Ë†ÂÃ¥Â§â€¹Ã¥Å’â€“
+* Ã¦Â²Â¡Ã¦Å“â€°Ã¥â€¦Â¨Ã¥Â±â‚¬Ã¥ÂÂ¯Ã¥ÂËœÃ§Å Â¶Ã¦â‚¬Â Ã¢â‚¬â€ Ã©â‚¬Å¡Ã¨Â¿â€¡Ã¦Å¾â€žÃ©â‚¬Â Ã¥â€¡Â½Ã¦â€¢Â°Ã¤Â¼Â Ã©â‚¬â€™Ã¤Â¾ÂÃ¨Âµâ€“Ã©Â¡Â¹
+* Context Ã¥Â¿â€¦Ã©Â¡Â»Ã¦ËœÂ¯Ã§Â¬Â¬Ã¤Â¸â‚¬Ã¤Â¸ÂªÃ¥Ââ€šÃ¦â€¢Â°Ã¯Â¼Å’Ã¥Â¹Â¶Ã¥Å“Â¨Ã¦â€°â‚¬Ã¦Å“â€°Ã¥Â±â€šÃ¤Â¸Â­Ã¤Â¼Â Ã¦â€™Â­
+
+### Ã¦â€¢Â°Ã¦ÂÂ®Ã¥Âºâ€œ
+
+* `queries/` Ã¤Â¸Â­Ã§Å¡â€žÃ¦â€°â‚¬Ã¦Å“â€°Ã¦Å¸Â¥Ã¨Â¯Â¢Ã©Æ’Â½Ã¤Â½Â¿Ã§â€Â¨Ã§ÂºÂ¯ SQL Ã¢â‚¬â€ sqlc Ã§â€Å¸Ã¦Ë†ÂÃ§Â±Â»Ã¥Å¾â€¹Ã¥Â®â€°Ã¥â€¦Â¨Ã§Å¡â€ž Go Ã¤Â»Â£Ã§Â Â
+* Ã¥Å“Â¨ `migrations/` Ã¤Â¸Â­Ã¤Â½Â¿Ã§â€Â¨ golang-migrate Ã¨Â¿â€ºÃ¨Â¡Å’Ã¨Â¿ÂÃ§Â§Â» Ã¢â‚¬â€ Ã§Â»ÂÃ¤Â¸ÂÃ§â€ºÂ´Ã¦Å½Â¥Ã¦â€ºÂ´Ã¦â€Â¹Ã¦â€¢Â°Ã¦ÂÂ®Ã¥Âºâ€œ
+* Ã©â‚¬Å¡Ã¨Â¿â€¡ `pgx.Tx` Ã¤Â¸ÂºÃ¥Â¤Å¡Ã¦Â­Â¥Ã©ÂªÂ¤Ã¦â€œÂÃ¤Â½Å“Ã¤Â½Â¿Ã§â€Â¨Ã¤Âºâ€¹Ã¥Å Â¡
+* Ã¦â€°â‚¬Ã¦Å“â€°Ã¦Å¸Â¥Ã¨Â¯Â¢Ã¥Â¿â€¦Ã©Â¡Â»Ã¤Â½Â¿Ã§â€Â¨Ã¥Ââ€šÃ¦â€¢Â°Ã¥Å’â€“Ã¥ÂÂ Ã¤Â½ÂÃ§Â¬Â¦ (`$1`, `$2`) Ã¢â‚¬â€ Ã§Â»ÂÃ¤Â¸ÂÃ¤Â½Â¿Ã§â€Â¨Ã¥Â­â€”Ã§Â¬Â¦Ã¤Â¸Â²Ã¦Â Â¼Ã¥Â¼ÂÃ¥Å’â€“
+
+### Ã©â€â„¢Ã¨Â¯Â¯Ã¥Â¤â€žÃ§Ââ€ 
+
+* Ã¨Â¿â€Ã¥â€ºÅ¾Ã©â€â„¢Ã¨Â¯Â¯Ã¯Â¼Å’Ã¤Â¸ÂÃ¨Â¦Â panic Ã¢â‚¬â€ panic Ã¤Â»â€¦Ã§â€Â¨Ã¤ÂºÅ½Ã§Å“Å¸Ã¦Â­Â£Ã¦â€”Â Ã¦Â³â€¢Ã¦ÂÂ¢Ã¥Â¤ÂÃ§Å¡â€žÃ¦Æ’â€¦Ã¥â€ Âµ
+* Ã¤Â½Â¿Ã§â€Â¨Ã¤Â¸Å Ã¤Â¸â€¹Ã¦â€“â€¡Ã¥Å’â€¦Ã¨Â£â€¦Ã©â€â„¢Ã¨Â¯Â¯Ã¯Â¼Å¡`fmt.Errorf("creating user: %w", err)`
+* Ã¥Å“Â¨ `domain/errors.go` Ã¤Â¸Â­Ã¥Â®Å¡Ã¤Â¹â€°Ã¤Â¸Å¡Ã¥Å Â¡Ã©â‚¬Â»Ã¨Â¾â€˜Ã§Å¡â€žÃ¥â€œÂ¨Ã¥â€¦ÂµÃ©â€â„¢Ã¨Â¯Â¯
+* Ã¥Å“Â¨Ã¥Â¤â€žÃ§Ââ€ Ã¥â„¢Â¨Ã¥Â±â€šÃ¥Â°â€ Ã©Â¢â€ Ã¥Å¸Å¸Ã©â€â„¢Ã¨Â¯Â¯Ã¦ËœÂ Ã¥Â°â€žÃ¥Ë†Â° gRPC Ã§Å Â¶Ã¦â‚¬ÂÃ§Â Â
 
 ```go
-// Domain layer — sentinel errors
+// Domain layer Ã¢â‚¬â€ sentinel errors
 var (
     ErrUserNotFound  = errors.New("user not found")
     ErrEmailTaken    = errors.New("email already registered")
 )
 
-// Handler layer — map to gRPC status
+// Handler layer Ã¢â‚¬â€ map to gRPC status
 func toGRPCError(err error) error {
     switch {
     case errors.Is(err, domain.ErrUserNotFound):
@@ -53,51 +66,51 @@ func toGRPCError(err error) error {
 }
 ```
 
-### 代码风格
+### Ã¤Â»Â£Ã§Â ÂÃ©Â£Å½Ã¦Â Â¼
 
-* 代码或注释中不使用表情符号
-* 导出的类型和函数必须有文档注释
-* 函数保持在 50 行以内 — 提取辅助函数
-* 对所有具有多个用例的逻辑使用表格驱动测试
-* 对于信号通道，优先使用 `struct{}`，而不是 `bool`
+* Ã¤Â»Â£Ã§Â ÂÃ¦Ë†â€“Ã¦Â³Â¨Ã©â€¡Å Ã¤Â¸Â­Ã¤Â¸ÂÃ¤Â½Â¿Ã§â€Â¨Ã¨Â¡Â¨Ã¦Æ’â€¦Ã§Â¬Â¦Ã¥ÂÂ·
+* Ã¥Â¯Â¼Ã¥â€¡ÂºÃ§Å¡â€žÃ§Â±Â»Ã¥Å¾â€¹Ã¥â€™Å’Ã¥â€¡Â½Ã¦â€¢Â°Ã¥Â¿â€¦Ã©Â¡Â»Ã¦Å“â€°Ã¦â€“â€¡Ã¦Â¡Â£Ã¦Â³Â¨Ã©â€¡Å 
+* Ã¥â€¡Â½Ã¦â€¢Â°Ã¤Â¿ÂÃ¦Å’ÂÃ¥Å“Â¨ 50 Ã¨Â¡Å’Ã¤Â»Â¥Ã¥â€ â€¦ Ã¢â‚¬â€ Ã¦ÂÂÃ¥Ââ€“Ã¨Â¾â€¦Ã¥Å Â©Ã¥â€¡Â½Ã¦â€¢Â°
+* Ã¥Â¯Â¹Ã¦â€°â‚¬Ã¦Å“â€°Ã¥â€¦Â·Ã¦Å“â€°Ã¥Â¤Å¡Ã¤Â¸ÂªÃ§â€Â¨Ã¤Â¾â€¹Ã§Å¡â€žÃ©â‚¬Â»Ã¨Â¾â€˜Ã¤Â½Â¿Ã§â€Â¨Ã¨Â¡Â¨Ã¦Â Â¼Ã©Â©Â±Ã¥Å Â¨Ã¦Âµâ€¹Ã¨Â¯â€¢
+* Ã¥Â¯Â¹Ã¤ÂºÅ½Ã¤Â¿Â¡Ã¥ÂÂ·Ã©â‚¬Å¡Ã©Ââ€œÃ¯Â¼Å’Ã¤Â¼ËœÃ¥â€¦Ë†Ã¤Â½Â¿Ã§â€Â¨ `struct{}`Ã¯Â¼Å’Ã¨â‚¬Å’Ã¤Â¸ÂÃ¦ËœÂ¯ `bool`
 
-## 文件结构
+## Ã¦â€“â€¡Ã¤Â»Â¶Ã§Â»â€œÃ¦Å¾â€ž
 
 ```
 cmd/
   server/
-    main.go              # 入口点，Wire注入，优雅关闭
+    main.go              # Ã¥â€¦Â¥Ã¥ÂÂ£Ã§â€šÂ¹Ã¯Â¼Å’WireÃ¦Â³Â¨Ã¥â€¦Â¥Ã¯Â¼Å’Ã¤Â¼ËœÃ©â€ºâ€¦Ã¥â€¦Â³Ã©â€”Â­
 internal/
-  domain/                # 业务类型和接口
-    user.go              # 用户实体和仓库接口
-    errors.go            # 哨兵错误
-  service/               # 业务逻辑
+  domain/                # Ã¤Â¸Å¡Ã¥Å Â¡Ã§Â±Â»Ã¥Å¾â€¹Ã¥â€™Å’Ã¦Å½Â¥Ã¥ÂÂ£
+    user.go              # Ã§â€Â¨Ã¦Ë†Â·Ã¥Â®Å¾Ã¤Â½â€œÃ¥â€™Å’Ã¤Â»â€œÃ¥Âºâ€œÃ¦Å½Â¥Ã¥ÂÂ£
+    errors.go            # Ã¥â€œÂ¨Ã¥â€¦ÂµÃ©â€â„¢Ã¨Â¯Â¯
+  service/               # Ã¤Â¸Å¡Ã¥Å Â¡Ã©â‚¬Â»Ã¨Â¾â€˜
     user_service.go
     user_service_test.go
-  repository/            # 数据访问（sqlc生成 + 自定义）
+  repository/            # Ã¦â€¢Â°Ã¦ÂÂ®Ã¨Â®Â¿Ã©â€”Â®Ã¯Â¼Ë†sqlcÃ§â€Å¸Ã¦Ë†Â + Ã¨â€¡ÂªÃ¥Â®Å¡Ã¤Â¹â€°Ã¯Â¼â€°
     postgres/
       user_repo.go
-      user_repo_test.go  # 使用testcontainers的集成测试
-  handler/               # gRPC + REST处理程序
+      user_repo_test.go  # Ã¤Â½Â¿Ã§â€Â¨testcontainersÃ§Å¡â€žÃ©â€ºâ€ Ã¦Ë†ÂÃ¦Âµâ€¹Ã¨Â¯â€¢
+  handler/               # gRPC + RESTÃ¥Â¤â€žÃ§Ââ€ Ã§Â¨â€¹Ã¥ÂºÂ
     grpc/
       user_handler.go
     rest/
       user_handler.go
-  config/                # 配置加载
+  config/                # Ã©â€¦ÂÃ§Â½Â®Ã¥Å Â Ã¨Â½Â½
     config.go
-proto/                   # Protobuf定义
+proto/                   # ProtobufÃ¥Â®Å¡Ã¤Â¹â€°
   user/v1/
     user.proto
-queries/                 # sqlc的SQL查询
+queries/                 # sqlcÃ§Å¡â€žSQLÃ¦Å¸Â¥Ã¨Â¯Â¢
   user.sql
-migrations/              # 数据库迁移
+migrations/              # Ã¦â€¢Â°Ã¦ÂÂ®Ã¥Âºâ€œÃ¨Â¿ÂÃ§Â§Â»
   001_create_users.up.sql
   001_create_users.down.sql
 ```
 
-## 关键模式
+## Ã¥â€¦Â³Ã©â€Â®Ã¦Â¨Â¡Ã¥Â¼Â
 
-### 仓库接口
+### Ã¤Â»â€œÃ¥Âºâ€œÃ¦Å½Â¥Ã¥ÂÂ£
 
 ```go
 type UserRepository interface {
@@ -109,7 +122,7 @@ type UserRepository interface {
 }
 ```
 
-### 使用依赖注入的服务
+### Ã¤Â½Â¿Ã§â€Â¨Ã¤Â¾ÂÃ¨Âµâ€“Ã¦Â³Â¨Ã¥â€¦Â¥Ã§Å¡â€žÃ¦Å“ÂÃ¥Å Â¡
 
 ```go
 type UserService struct {
@@ -149,7 +162,7 @@ func (s *UserService) Create(ctx context.Context, req CreateUserRequest) (*domai
 }
 ```
 
-### 表格驱动测试
+### Ã¨Â¡Â¨Ã¦Â Â¼Ã©Â©Â±Ã¥Å Â¨Ã¦Âµâ€¹Ã¨Â¯â€¢
 
 ```go
 func TestUserService_Create(t *testing.T) {
@@ -196,7 +209,7 @@ func TestUserService_Create(t *testing.T) {
 }
 ```
 
-## 环境变量
+## Ã§Å½Â¯Ã¥Â¢Æ’Ã¥ÂËœÃ©â€¡Â
 
 ```bash
 # Database
@@ -215,7 +228,7 @@ LOG_LEVEL=info        # debug, info, warn, error
 OTEL_ENDPOINT=        # OpenTelemetry collector
 ```
 
-## 测试策略
+## Ã¦Âµâ€¹Ã¨Â¯â€¢Ã§Â­â€“Ã§â€¢Â¥
 
 ```bash
 /go-test             # TDD workflow for Go
@@ -223,7 +236,7 @@ OTEL_ENDPOINT=        # OpenTelemetry collector
 /go-build            # Fix build errors
 ```
 
-### 测试命令
+### Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¥â€˜Â½Ã¤Â»Â¤
 
 ```bash
 # Unit tests (fast, no external deps)
@@ -241,7 +254,7 @@ go tool cover -html=coverage.out  # browser
 go test ./... -race -count=1
 ```
 
-## ECC 工作流
+## ECC Ã¥Â·Â¥Ã¤Â½Å“Ã¦ÂµÂ
 
 ```bash
 # Planning
@@ -259,9 +272,9 @@ go vet ./...
 staticcheck ./...
 ```
 
-## Git 工作流
+## Git Ã¥Â·Â¥Ã¤Â½Å“Ã¦ÂµÂ
 
-* `feat:` 新功能，`fix:` 错误修复，`refactor:` 代码更改
-* 从 `main` 创建功能分支，需要 PR
+* `feat:` Ã¦â€“Â°Ã¥Å Å¸Ã¨Æ’Â½Ã¯Â¼Å’`fix:` Ã©â€â„¢Ã¨Â¯Â¯Ã¤Â¿Â®Ã¥Â¤ÂÃ¯Â¼Å’`refactor:` Ã¤Â»Â£Ã§Â ÂÃ¦â€ºÂ´Ã¦â€Â¹
+* Ã¤Â»Å½ `main` Ã¥Ë†â€ºÃ¥Â»ÂºÃ¥Å Å¸Ã¨Æ’Â½Ã¥Ë†â€ Ã¦â€Â¯Ã¯Â¼Å’Ã©Å“â‚¬Ã¨Â¦Â PR
 * CI: `go vet`, `staticcheck`, `go test -race`, `golangci-lint`
-* 部署: 在 CI 中构建 Docker 镜像，部署到 Kubernetes
+* Ã©Æ’Â¨Ã§Â½Â²: Ã¥Å“Â¨ CI Ã¤Â¸Â­Ã¦Å¾â€žÃ¥Â»Âº Docker Ã©â€¢Å“Ã¥Æ’ÂÃ¯Â¼Å’Ã©Æ’Â¨Ã§Â½Â²Ã¥Ë†Â° Kubernetes

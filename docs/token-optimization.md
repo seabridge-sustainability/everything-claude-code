@@ -1,5 +1,18 @@
 # Token Optimization Guide
 
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
 Practical settings and habits to reduce token consumption, extend session quality, and get more work done within daily limits.
 
 > See also: `rules/common/performance.md` for model selection strategy, `skills/strategic-compact/` for automated compaction suggestions.
@@ -8,7 +21,7 @@ Practical settings and habits to reduce token consumption, extend session qualit
 
 ## Recommended Settings
 
-These are recommended defaults for most users. Power users can tune values further based on their workload — for example, setting `MAX_THINKING_TOKENS` lower for simple tasks or higher for complex architectural work.
+These are recommended defaults for most users. Power users can tune values further based on their workload Ã¢â‚¬â€ for example, setting `MAX_THINKING_TOKENS` lower for simple tasks or higher for complex architectural work.
 
 Add to your `~/.claude/settings.json`:
 
@@ -29,13 +42,13 @@ Add to your `~/.claude/settings.json`:
 |---------|---------|-------------|--------|
 | `model` | opus | **sonnet** | Sonnet handles ~80% of coding tasks well. Switch to Opus with `/model opus` for complex reasoning. ~60% cost reduction. |
 | `MAX_THINKING_TOKENS` | 31,999 | **10,000** | Extended thinking reserves up to 31,999 output tokens per request for internal reasoning. Reducing this cuts hidden cost by ~70%. Set to `0` to disable for trivial tasks. |
-| `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE` | 95 | **50** | Auto-compaction triggers when context reaches this % of capacity. Default 95% is too late — quality degrades before that. Compacting at 50% keeps sessions healthier. |
+| `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE` | 95 | **50** | Auto-compaction triggers when context reaches this % of capacity. Default 95% is too late Ã¢â‚¬â€ quality degrades before that. Compacting at 50% keeps sessions healthier. |
 | `CLAUDE_CODE_SUBAGENT_MODEL` | _(inherits main)_ | **haiku** | Subagents (Task tool) run on this model. Haiku is ~80% cheaper and sufficient for exploration, file reading, and test running. |
 
 ### Toggling extended thinking
 
-- **Alt+T** (Windows/Linux) or **Option+T** (macOS) — toggle on/off
-- **Ctrl+O** — see thinking output (verbose mode)
+- **Alt+T** (Windows/Linux) or **Option+T** (macOS) Ã¢â‚¬â€ toggle on/off
+- **Ctrl+O** Ã¢â‚¬â€ see thinking output (verbose mode)
 
 ---
 
@@ -86,7 +99,7 @@ The `strategic-compact` skill (in `skills/strategic-compact/`) suggests `/compac
 
 ### Subagents protect your context
 
-Use subagents (Task tool) for exploration instead of reading many files in your main session. The subagent reads 20 files but only returns a summary — your main context stays clean.
+Use subagents (Task tool) for exploration instead of reading many files in your main session. The subagent reads 20 files but only returns a summary Ã¢â‚¬â€ your main context stays clean.
 
 ---
 
@@ -98,7 +111,7 @@ Tips:
 - Run `/mcp` to see active servers and their context cost
 - Prefer CLI tools when available (`gh` instead of GitHub MCP, `aws` instead of AWS MCP)
 - Use `disabledMcpServers` in project config to disable servers per-project
-- The `memory` MCP server is configured by default but not used by any skill, agent, or hook — consider disabling it
+- The `memory` MCP server is configured by default but not used by any skill, agent, or hook Ã¢â‚¬â€ consider disabling it
 
 ---
 

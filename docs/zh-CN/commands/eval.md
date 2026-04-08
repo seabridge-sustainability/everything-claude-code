@@ -1,122 +1,135 @@
-# Eval 命令
+# Eval Ã¥â€˜Â½Ã¤Â»Â¤
 
-管理基于评估的开发工作流。
+## Safety And Authorization Rule
 
-## 用法
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+Ã§Â®Â¡Ã§Ââ€ Ã¥Å¸ÂºÃ¤ÂºÅ½Ã¨Â¯â€žÃ¤Â¼Â°Ã§Å¡â€žÃ¥Â¼â‚¬Ã¥Ââ€˜Ã¥Â·Â¥Ã¤Â½Å“Ã¦ÂµÂÃ£â‚¬â€š
+
+## Ã§â€Â¨Ã¦Â³â€¢
 
 `/eval [define|check|report|list] [feature-name]`
 
-## 定义评估
+## Ã¥Â®Å¡Ã¤Â¹â€°Ã¨Â¯â€žÃ¤Â¼Â°
 
 `/eval define feature-name`
 
-创建新的评估定义：
+Ã¥Ë†â€ºÃ¥Â»ÂºÃ¦â€“Â°Ã§Å¡â€žÃ¨Â¯â€žÃ¤Â¼Â°Ã¥Â®Å¡Ã¤Â¹â€°Ã¯Â¼Å¡
 
-1. 使用模板创建 `.claude/evals/feature-name.md`：
+1. Ã¤Â½Â¿Ã§â€Â¨Ã¦Â¨Â¡Ã¦ÂÂ¿Ã¥Ë†â€ºÃ¥Â»Âº `.claude/evals/feature-name.md`Ã¯Â¼Å¡
 
 ```markdown
-## EVAL: 功能名称
-创建于: $(date)
+## EVAL: Ã¥Å Å¸Ã¨Æ’Â½Ã¥ÂÂÃ§Â§Â°
+Ã¥Ë†â€ºÃ¥Â»ÂºÃ¤ÂºÅ½: $(date)
 
-### 能力评估
-- [ ] [能力 1 的描述]
-- [ ] [能力 2 的描述]
+### Ã¨Æ’Â½Ã¥Å â€ºÃ¨Â¯â€žÃ¤Â¼Â°
+- [ ] [Ã¨Æ’Â½Ã¥Å â€º 1 Ã§Å¡â€žÃ¦ÂÂÃ¨Â¿Â°]
+- [ ] [Ã¨Æ’Â½Ã¥Å â€º 2 Ã§Å¡â€žÃ¦ÂÂÃ¨Â¿Â°]
 
-### 回归评估
-- [ ] [现有行为 1 仍然有效]
-- [ ] [现有行为 2 仍然有效]
+### Ã¥â€ºÅ¾Ã¥Â½â€™Ã¨Â¯â€žÃ¤Â¼Â°
+- [ ] [Ã§Å½Â°Ã¦Å“â€°Ã¨Â¡Å’Ã¤Â¸Âº 1 Ã¤Â»ÂÃ§â€žÂ¶Ã¦Å“â€°Ã¦â€¢Ë†]
+- [ ] [Ã§Å½Â°Ã¦Å“â€°Ã¨Â¡Å’Ã¤Â¸Âº 2 Ã¤Â»ÂÃ§â€žÂ¶Ã¦Å“â€°Ã¦â€¢Ë†]
 
-### 成功标准
-- 能力评估的 pass@3 > 90%
-- 回归评估的 pass^3 = 100%
+### Ã¦Ë†ÂÃ¥Å Å¸Ã¦Â â€¡Ã¥â€¡â€ 
+- Ã¨Æ’Â½Ã¥Å â€ºÃ¨Â¯â€žÃ¤Â¼Â°Ã§Å¡â€ž pass@3 > 90%
+- Ã¥â€ºÅ¾Ã¥Â½â€™Ã¨Â¯â€žÃ¤Â¼Â°Ã§Å¡â€ž pass^3 = 100%
 
 ```
 
-2. 提示用户填写具体标准
+2. Ã¦ÂÂÃ§Â¤ÂºÃ§â€Â¨Ã¦Ë†Â·Ã¥Â¡Â«Ã¥â€ â„¢Ã¥â€¦Â·Ã¤Â½â€œÃ¦Â â€¡Ã¥â€¡â€ 
 
-## 检查评估
+## Ã¦Â£â‚¬Ã¦Å¸Â¥Ã¨Â¯â€žÃ¤Â¼Â°
 
 `/eval check feature-name`
 
-为功能运行评估：
+Ã¤Â¸ÂºÃ¥Å Å¸Ã¨Æ’Â½Ã¨Â¿ÂÃ¨Â¡Å’Ã¨Â¯â€žÃ¤Â¼Â°Ã¯Â¼Å¡
 
-1. 从 `.claude/evals/feature-name.md` 读取评估定义
-2. 对于每个能力评估：
-   * 尝试验证标准
-   * 记录 通过/失败
-   * 在 `.claude/evals/feature-name.log` 中记录尝试
-3. 对于每个回归评估：
-   * 运行相关测试
-   * 与基线比较
-   * 记录 通过/失败
-4. 报告当前状态：
+1. Ã¤Â»Å½ `.claude/evals/feature-name.md` Ã¨Â¯Â»Ã¥Ââ€“Ã¨Â¯â€žÃ¤Â¼Â°Ã¥Â®Å¡Ã¤Â¹â€°
+2. Ã¥Â¯Â¹Ã¤ÂºÅ½Ã¦Â¯ÂÃ¤Â¸ÂªÃ¨Æ’Â½Ã¥Å â€ºÃ¨Â¯â€žÃ¤Â¼Â°Ã¯Â¼Å¡
+   * Ã¥Â°ÂÃ¨Â¯â€¢Ã©ÂªÅ’Ã¨Â¯ÂÃ¦Â â€¡Ã¥â€¡â€ 
+   * Ã¨Â®Â°Ã¥Â½â€¢ Ã©â‚¬Å¡Ã¨Â¿â€¡/Ã¥Â¤Â±Ã¨Â´Â¥
+   * Ã¥Å“Â¨ `.claude/evals/feature-name.log` Ã¤Â¸Â­Ã¨Â®Â°Ã¥Â½â€¢Ã¥Â°ÂÃ¨Â¯â€¢
+3. Ã¥Â¯Â¹Ã¤ÂºÅ½Ã¦Â¯ÂÃ¤Â¸ÂªÃ¥â€ºÅ¾Ã¥Â½â€™Ã¨Â¯â€žÃ¤Â¼Â°Ã¯Â¼Å¡
+   * Ã¨Â¿ÂÃ¨Â¡Å’Ã§â€ºÂ¸Ã¥â€¦Â³Ã¦Âµâ€¹Ã¨Â¯â€¢
+   * Ã¤Â¸Å½Ã¥Å¸ÂºÃ§ÂºÂ¿Ã¦Â¯â€Ã¨Â¾Æ’
+   * Ã¨Â®Â°Ã¥Â½â€¢ Ã©â‚¬Å¡Ã¨Â¿â€¡/Ã¥Â¤Â±Ã¨Â´Â¥
+4. Ã¦Å Â¥Ã¥â€˜Å Ã¥Â½â€œÃ¥â€°ÂÃ§Å Â¶Ã¦â‚¬ÂÃ¯Â¼Å¡
 
 ```
 EVAL CHECK: feature-name
 ========================
-功能：X/Y 通过
-回归测试：X/Y 通过
-状态：进行中 / 就绪
+Ã¥Å Å¸Ã¨Æ’Â½Ã¯Â¼Å¡X/Y Ã©â‚¬Å¡Ã¨Â¿â€¡
+Ã¥â€ºÅ¾Ã¥Â½â€™Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¯Â¼Å¡X/Y Ã©â‚¬Å¡Ã¨Â¿â€¡
+Ã§Å Â¶Ã¦â‚¬ÂÃ¯Â¼Å¡Ã¨Â¿â€ºÃ¨Â¡Å’Ã¤Â¸Â­ / Ã¥Â°Â±Ã§Â»Âª
 ```
 
-## 报告评估
+## Ã¦Å Â¥Ã¥â€˜Å Ã¨Â¯â€žÃ¤Â¼Â°
 
 `/eval report feature-name`
 
-生成全面的评估报告：
+Ã§â€Å¸Ã¦Ë†ÂÃ¥â€¦Â¨Ã©ÂÂ¢Ã§Å¡â€žÃ¨Â¯â€žÃ¤Â¼Â°Ã¦Å Â¥Ã¥â€˜Å Ã¯Â¼Å¡
 
 ```
 EVAL REPORT: feature-name
 =========================
-生成时间: $(date)
+Ã§â€Å¸Ã¦Ë†ÂÃ¦â€”Â¶Ã©â€”Â´: $(date)
 
-能力评估
+Ã¨Æ’Â½Ã¥Å â€ºÃ¨Â¯â€žÃ¤Â¼Â°
 ----------------
-[eval-1]: 通过 (pass@1)
-[eval-2]: 通过 (pass@2) - 需要重试
-[eval-3]: 失败 - 参见备注
+[eval-1]: Ã©â‚¬Å¡Ã¨Â¿â€¡ (pass@1)
+[eval-2]: Ã©â‚¬Å¡Ã¨Â¿â€¡ (pass@2) - Ã©Å“â‚¬Ã¨Â¦ÂÃ©â€¡ÂÃ¨Â¯â€¢
+[eval-3]: Ã¥Â¤Â±Ã¨Â´Â¥ - Ã¥Ââ€šÃ¨Â§ÂÃ¥Â¤â€¡Ã¦Â³Â¨
 
-回归测试
+Ã¥â€ºÅ¾Ã¥Â½â€™Ã¦Âµâ€¹Ã¨Â¯â€¢
 ----------------
-[test-1]: 通过
-[test-2]: 通过
-[test-3]: 通过
+[test-1]: Ã©â‚¬Å¡Ã¨Â¿â€¡
+[test-2]: Ã©â‚¬Å¡Ã¨Â¿â€¡
+[test-3]: Ã©â‚¬Å¡Ã¨Â¿â€¡
 
-指标
+Ã¦Å’â€¡Ã¦Â â€¡
 -------
-能力 pass@1: 67%
-能力 pass@3: 100%
-回归 pass^3: 100%
+Ã¨Æ’Â½Ã¥Å â€º pass@1: 67%
+Ã¨Æ’Â½Ã¥Å â€º pass@3: 100%
+Ã¥â€ºÅ¾Ã¥Â½â€™ pass^3: 100%
 
-备注
+Ã¥Â¤â€¡Ã¦Â³Â¨
 -----
-[任何问题、边界情况或观察结果]
+[Ã¤Â»Â»Ã¤Â½â€¢Ã©â€”Â®Ã©Â¢ËœÃ£â‚¬ÂÃ¨Â¾Â¹Ã§â€¢Å’Ã¦Æ’â€¦Ã¥â€ ÂµÃ¦Ë†â€“Ã¨Â§â€šÃ¥Â¯Å¸Ã§Â»â€œÃ¦Å¾Å“]
 
-建议
+Ã¥Â»ÂºÃ¨Â®Â®
 --------------
 [SHIP / NEEDS WORK / BLOCKED]
 ```
 
-## 列出评估
+## Ã¥Ë†â€”Ã¥â€¡ÂºÃ¨Â¯â€žÃ¤Â¼Â°
 
 `/eval list`
 
-显示所有评估定义：
+Ã¦ËœÂ¾Ã§Â¤ÂºÃ¦â€°â‚¬Ã¦Å“â€°Ã¨Â¯â€žÃ¤Â¼Â°Ã¥Â®Å¡Ã¤Â¹â€°Ã¯Â¼Å¡
 
 ```
-功能模块定义
+Ã¥Å Å¸Ã¨Æ’Â½Ã¦Â¨Â¡Ã¥Ââ€”Ã¥Â®Å¡Ã¤Â¹â€°
 ================
-feature-auth      [3/5 通过] 进行中
-feature-search    [5/5 通过] 就绪
-feature-export    [0/4 通过] 未开始
+feature-auth      [3/5 Ã©â‚¬Å¡Ã¨Â¿â€¡] Ã¨Â¿â€ºÃ¨Â¡Å’Ã¤Â¸Â­
+feature-search    [5/5 Ã©â‚¬Å¡Ã¨Â¿â€¡] Ã¥Â°Â±Ã§Â»Âª
+feature-export    [0/4 Ã©â‚¬Å¡Ã¨Â¿â€¡] Ã¦Å“ÂªÃ¥Â¼â‚¬Ã¥Â§â€¹
 ```
 
-## 参数
+## Ã¥Ââ€šÃ¦â€¢Â°
 
 $ARGUMENTS:
 
-* `define <name>` - 创建新的评估定义
-* `check <name>` - 运行并检查评估
-* `report <name>` - 生成完整报告
-* `list` - 显示所有评估
-* `clean` - 删除旧的评估日志（保留最近 10 次运行）
+* `define <name>` - Ã¥Ë†â€ºÃ¥Â»ÂºÃ¦â€“Â°Ã§Å¡â€žÃ¨Â¯â€žÃ¤Â¼Â°Ã¥Â®Å¡Ã¤Â¹â€°
+* `check <name>` - Ã¨Â¿ÂÃ¨Â¡Å’Ã¥Â¹Â¶Ã¦Â£â‚¬Ã¦Å¸Â¥Ã¨Â¯â€žÃ¤Â¼Â°
+* `report <name>` - Ã§â€Å¸Ã¦Ë†ÂÃ¥Â®Å’Ã¦â€¢Â´Ã¦Å Â¥Ã¥â€˜Å 
+* `list` - Ã¦ËœÂ¾Ã§Â¤ÂºÃ¦â€°â‚¬Ã¦Å“â€°Ã¨Â¯â€žÃ¤Â¼Â°
+* `clean` - Ã¥Ë†Â Ã©â„¢Â¤Ã¦â€”Â§Ã§Å¡â€žÃ¨Â¯â€žÃ¤Â¼Â°Ã¦â€”Â¥Ã¥Â¿â€”Ã¯Â¼Ë†Ã¤Â¿ÂÃ§â€¢â„¢Ã¦Å“â‚¬Ã¨Â¿â€˜ 10 Ã¦Â¬Â¡Ã¨Â¿ÂÃ¨Â¡Å’Ã¯Â¼â€°

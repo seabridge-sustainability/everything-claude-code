@@ -1,28 +1,41 @@
 ---
 name: perl-testing
-description: 使用Test2::V0、Test::More、prove runner、模拟、Devel::Cover覆盖率和TDD方法的Perl测试模式。
+description: Ã¤Â½Â¿Ã§â€Â¨Test2::V0Ã£â‚¬ÂTest::MoreÃ£â‚¬Âprove runnerÃ£â‚¬ÂÃ¦Â¨Â¡Ã¦â€¹Å¸Ã£â‚¬ÂDevel::CoverÃ¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡Ã¥â€™Å’TDDÃ¦â€“Â¹Ã¦Â³â€¢Ã§Å¡â€žPerlÃ¦Âµâ€¹Ã¨Â¯â€¢Ã¦Â¨Â¡Ã¥Â¼ÂÃ£â‚¬â€š
 origin: ECC
 ---
 
-# Perl 测试模式
+# Perl Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¦Â¨Â¡Ã¥Â¼Â
 
-使用 Test2::V0、Test::More、prove 和 TDD 方法论为 Perl 应用程序提供全面的测试策略。
+## Safety And Authorization Rule
 
-## 何时激活
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-* 编写新的 Perl 代码（遵循 TDD：红、绿、重构）
-* 为 Perl 模块或应用程序设计测试套件
-* 审查 Perl 测试覆盖率
-* 设置 Perl 测试基础设施
-* 将测试从 Test::More 迁移到 Test2::V0
-* 调试失败的 Perl 测试
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-## TDD 工作流程
 
-始终遵循 RED-GREEN-REFACTOR 循环。
+Ã¤Â½Â¿Ã§â€Â¨ Test2::V0Ã£â‚¬ÂTest::MoreÃ£â‚¬Âprove Ã¥â€™Å’ TDD Ã¦â€“Â¹Ã¦Â³â€¢Ã¨Â®ÂºÃ¤Â¸Âº Perl Ã¥Âºâ€Ã§â€Â¨Ã§Â¨â€¹Ã¥ÂºÂÃ¦ÂÂÃ¤Â¾â€ºÃ¥â€¦Â¨Ã©ÂÂ¢Ã§Å¡â€žÃ¦Âµâ€¹Ã¨Â¯â€¢Ã§Â­â€“Ã§â€¢Â¥Ã£â‚¬â€š
+
+## Ã¤Â½â€¢Ã¦â€”Â¶Ã¦Â¿â‚¬Ã¦Â´Â»
+
+* Ã§Â¼â€“Ã¥â€ â„¢Ã¦â€“Â°Ã§Å¡â€ž Perl Ã¤Â»Â£Ã§Â ÂÃ¯Â¼Ë†Ã©ÂÂµÃ¥Â¾Âª TDDÃ¯Â¼Å¡Ã§ÂºÂ¢Ã£â‚¬ÂÃ§Â»Â¿Ã£â‚¬ÂÃ©â€¡ÂÃ¦Å¾â€žÃ¯Â¼â€°
+* Ã¤Â¸Âº Perl Ã¦Â¨Â¡Ã¥Ââ€”Ã¦Ë†â€“Ã¥Âºâ€Ã§â€Â¨Ã§Â¨â€¹Ã¥ÂºÂÃ¨Â®Â¾Ã¨Â®Â¡Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¥Â¥â€”Ã¤Â»Â¶
+* Ã¥Â®Â¡Ã¦Å¸Â¥ Perl Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡
+* Ã¨Â®Â¾Ã§Â½Â® Perl Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¥Å¸ÂºÃ§Â¡â‚¬Ã¨Â®Â¾Ã¦â€“Â½
+* Ã¥Â°â€ Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¤Â»Å½ Test::More Ã¨Â¿ÂÃ§Â§Â»Ã¥Ë†Â° Test2::V0
+* Ã¨Â°Æ’Ã¨Â¯â€¢Ã¥Â¤Â±Ã¨Â´Â¥Ã§Å¡â€ž Perl Ã¦Âµâ€¹Ã¨Â¯â€¢
+
+## TDD Ã¥Â·Â¥Ã¤Â½Å“Ã¦ÂµÂÃ§Â¨â€¹
+
+Ã¥Â§â€¹Ã§Â»Ë†Ã©ÂÂµÃ¥Â¾Âª RED-GREEN-REFACTOR Ã¥Â¾ÂªÃ§Å½Â¯Ã£â‚¬â€š
 
 ```perl
-# Step 1: RED — Write a failing test
+# Step 1: RED Ã¢â‚¬â€ Write a failing test
 # t/unit/calculator.t
 use v5.36;
 use Test2::V0;
@@ -38,7 +51,7 @@ subtest 'addition' => sub {
 
 done_testing;
 
-# Step 2: GREEN — Write minimal implementation
+# Step 2: GREEN Ã¢â‚¬â€ Write minimal implementation
 # lib/Calculator.pm
 package Calculator;
 use v5.36;
@@ -50,15 +63,15 @@ sub add($self, $a, $b) {
 
 1;
 
-# Step 3: REFACTOR — Improve while tests stay green
+# Step 3: REFACTOR Ã¢â‚¬â€ Improve while tests stay green
 # Run: prove -lv t/unit/calculator.t
 ```
 
-## Test::More 基础
+## Test::More Ã¥Å¸ÂºÃ§Â¡â‚¬
 
-标准的 Perl 测试模块 —— 广泛使用，随核心发行。
+Ã¦Â â€¡Ã¥â€¡â€ Ã§Å¡â€ž Perl Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¦Â¨Â¡Ã¥Ââ€” Ã¢â‚¬â€Ã¢â‚¬â€ Ã¥Â¹Â¿Ã¦Â³â€ºÃ¤Â½Â¿Ã§â€Â¨Ã¯Â¼Å’Ã©Å¡ÂÃ¦Â Â¸Ã¥Â¿Æ’Ã¥Ââ€˜Ã¨Â¡Å’Ã£â‚¬â€š
 
-### 基本断言
+### Ã¥Å¸ÂºÃ¦Å“Â¬Ã¦â€“Â­Ã¨Â¨â‚¬
 
 ```perl
 use v5.36;
@@ -93,7 +106,7 @@ can_ok($obj, 'save', 'delete');
 done_testing;
 ```
 
-### SKIP 和 TODO
+### SKIP Ã¥â€™Å’ TODO
 
 ```perl
 use v5.36;
@@ -117,25 +130,25 @@ TODO: {
 done_testing;
 ```
 
-## Test2::V0 现代框架
+## Test2::V0 Ã§Å½Â°Ã¤Â»Â£Ã¦Â¡â€ Ã¦Å¾Â¶
 
-Test2::V0 是 Test::More 的现代替代品 —— 更丰富的断言、更好的诊断和可扩展性。
+Test2::V0 Ã¦ËœÂ¯ Test::More Ã§Å¡â€žÃ§Å½Â°Ã¤Â»Â£Ã¦â€ºÂ¿Ã¤Â»Â£Ã¥â€œÂ Ã¢â‚¬â€Ã¢â‚¬â€ Ã¦â€ºÂ´Ã¤Â¸Â°Ã¥Â¯Å’Ã§Å¡â€žÃ¦â€“Â­Ã¨Â¨â‚¬Ã£â‚¬ÂÃ¦â€ºÂ´Ã¥Â¥Â½Ã§Å¡â€žÃ¨Â¯Å Ã¦â€“Â­Ã¥â€™Å’Ã¥ÂÂ¯Ã¦â€°Â©Ã¥Â±â€¢Ã¦â‚¬Â§Ã£â‚¬â€š
 
-### 为什么选择 Test2？
+### Ã¤Â¸ÂºÃ¤Â»â‚¬Ã¤Â¹Ë†Ã©â‚¬â€°Ã¦â€¹Â© Test2Ã¯Â¼Å¸
 
-* 使用哈希/数组构建器进行卓越的深层比较
-* 失败时提供更好的诊断输出
-* 具有更清晰作用域的子测试
-* 可通过 Test2::Tools::\* 插件扩展
-* 与 Test::More 测试向后兼容
+* Ã¤Â½Â¿Ã§â€Â¨Ã¥â€œË†Ã¥Â¸Å’/Ã¦â€¢Â°Ã§Â»â€žÃ¦Å¾â€žÃ¥Â»ÂºÃ¥â„¢Â¨Ã¨Â¿â€ºÃ¨Â¡Å’Ã¥Ââ€œÃ¨Â¶Å Ã§Å¡â€žÃ¦Â·Â±Ã¥Â±â€šÃ¦Â¯â€Ã¨Â¾Æ’
+* Ã¥Â¤Â±Ã¨Â´Â¥Ã¦â€”Â¶Ã¦ÂÂÃ¤Â¾â€ºÃ¦â€ºÂ´Ã¥Â¥Â½Ã§Å¡â€žÃ¨Â¯Å Ã¦â€“Â­Ã¨Â¾â€œÃ¥â€¡Âº
+* Ã¥â€¦Â·Ã¦Å“â€°Ã¦â€ºÂ´Ã¦Â¸â€¦Ã¦â„¢Â°Ã¤Â½Å“Ã§â€Â¨Ã¥Å¸Å¸Ã§Å¡â€žÃ¥Â­ÂÃ¦Âµâ€¹Ã¨Â¯â€¢
+* Ã¥ÂÂ¯Ã©â‚¬Å¡Ã¨Â¿â€¡ Test2::Tools::\* Ã¦Ââ€™Ã¤Â»Â¶Ã¦â€°Â©Ã¥Â±â€¢
+* Ã¤Â¸Å½ Test::More Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¥Ââ€˜Ã¥ÂÅ½Ã¥â€¦Â¼Ã¥Â®Â¹
 
-### 使用构建器进行深层比较
+### Ã¤Â½Â¿Ã§â€Â¨Ã¦Å¾â€žÃ¥Â»ÂºÃ¥â„¢Â¨Ã¨Â¿â€ºÃ¨Â¡Å’Ã¦Â·Â±Ã¥Â±â€šÃ¦Â¯â€Ã¨Â¾Æ’
 
 ```perl
 use v5.36;
 use Test2::V0;
 
-# Hash builder — check partial structure
+# Hash builder Ã¢â‚¬â€ check partial structure
 is(
     $user->to_hash,
     hash {
@@ -154,12 +167,12 @@ is(
     array {
         item 'first';
         item match(qr/^second/);
-        item DNE();  # Does Not Exist — verify no extra items
+        item DNE();  # Does Not Exist Ã¢â‚¬â€ verify no extra items
     },
     'result matches expected list'
 );
 
-# Bag — order-independent comparison
+# Bag Ã¢â‚¬â€ order-independent comparison
 is(
     $tags,
     bag {
@@ -171,7 +184,7 @@ is(
 );
 ```
 
-### 子测试
+### Ã¥Â­ÂÃ¦Âµâ€¹Ã¨Â¯â€¢
 
 ```perl
 use v5.36;
@@ -194,7 +207,7 @@ subtest 'User validation' => sub {
 done_testing;
 ```
 
-### 使用 Test2 进行异常测试
+### Ã¤Â½Â¿Ã§â€Â¨ Test2 Ã¨Â¿â€ºÃ¨Â¡Å’Ã¥Â¼â€šÃ¥Â¸Â¸Ã¦Âµâ€¹Ã¨Â¯â€¢
 
 ```perl
 use v5.36;
@@ -223,29 +236,29 @@ subtest 'error handling' => sub {
 done_testing;
 ```
 
-## 测试组织与 prove
+## Ã¦Âµâ€¹Ã¨Â¯â€¢Ã§Â»â€žÃ§Â»â€¡Ã¤Â¸Å½ prove
 
-### 目录结构
+### Ã§â€ºÂ®Ã¥Â½â€¢Ã§Â»â€œÃ¦Å¾â€ž
 
 ```text
 t/
-├── 00-load.t              # 验证模块编译
-├── 01-basic.t             # 核心功能
-├── unit/
-│   ├── config.t           # 按模块划分的单元测试
-│   ├── user.t
-│   └── util.t
-├── integration/
-│   ├── database.t
-│   └── api.t
-├── lib/
-│   └── TestHelper.pm      # 共享测试工具
-└── fixtures/
-    ├── config.json        # 测试数据文件
-    └── users.csv
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ 00-load.t              # Ã©ÂªÅ’Ã¨Â¯ÂÃ¦Â¨Â¡Ã¥Ââ€”Ã§Â¼â€“Ã¨Â¯â€˜
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ 01-basic.t             # Ã¦Â Â¸Ã¥Â¿Æ’Ã¥Å Å¸Ã¨Æ’Â½
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ unit/
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ config.t           # Ã¦Å’â€°Ã¦Â¨Â¡Ã¥Ââ€”Ã¥Ë†â€™Ã¥Ë†â€ Ã§Å¡â€žÃ¥Ââ€¢Ã¥â€¦Æ’Ã¦Âµâ€¹Ã¨Â¯â€¢
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ user.t
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ util.t
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ integration/
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ database.t
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ api.t
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ lib/
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ TestHelper.pm      # Ã¥â€¦Â±Ã¤ÂºÂ«Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¥Â·Â¥Ã¥â€¦Â·
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ fixtures/
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ config.json        # Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¦â€¢Â°Ã¦ÂÂ®Ã¦â€“â€¡Ã¤Â»Â¶
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ users.csv
 ```
 
-### prove 命令
+### prove Ã¥â€˜Â½Ã¤Â»Â¤
 
 ```bash
 # Run all tests
@@ -273,7 +286,7 @@ prove -l --color --timer t/
 prove -l --formatter TAP::Formatter::JUnit t/ > results.xml
 ```
 
-### .proverc 配置
+### .proverc Ã©â€¦ÂÃ§Â½Â®
 
 ```text
 -l
@@ -284,9 +297,9 @@ prove -l --formatter TAP::Formatter::JUnit t/ > results.xml
 --state=save
 ```
 
-## 夹具与设置/拆卸
+## Ã¥Â¤Â¹Ã¥â€¦Â·Ã¤Â¸Å½Ã¨Â®Â¾Ã§Â½Â®/Ã¦â€¹â€ Ã¥ÂÂ¸
 
-### 子测试隔离
+### Ã¥Â­ÂÃ¦Âµâ€¹Ã¨Â¯â€¢Ã©Å¡â€Ã§Â¦Â»
 
 ```perl
 use v5.36;
@@ -308,11 +321,11 @@ subtest 'file processing' => sub {
 };
 ```
 
-### 共享测试助手
+### Ã¥â€¦Â±Ã¤ÂºÂ«Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¥Å Â©Ã¦â€°â€¹
 
-将可重用的助手放在 `t/lib/TestHelper.pm` 中，并通过 `use lib 't/lib'` 加载。通过 `Exporter` 导出工厂函数，例如 `create_test_db()`、`create_temp_dir()` 和 `fixture_path()`。
+Ã¥Â°â€ Ã¥ÂÂ¯Ã©â€¡ÂÃ§â€Â¨Ã§Å¡â€žÃ¥Å Â©Ã¦â€°â€¹Ã¦â€Â¾Ã¥Å“Â¨ `t/lib/TestHelper.pm` Ã¤Â¸Â­Ã¯Â¼Å’Ã¥Â¹Â¶Ã©â‚¬Å¡Ã¨Â¿â€¡ `use lib 't/lib'` Ã¥Å Â Ã¨Â½Â½Ã£â‚¬â€šÃ©â‚¬Å¡Ã¨Â¿â€¡ `Exporter` Ã¥Â¯Â¼Ã¥â€¡ÂºÃ¥Â·Â¥Ã¥Å½â€šÃ¥â€¡Â½Ã¦â€¢Â°Ã¯Â¼Å’Ã¤Â¾â€¹Ã¥Â¦â€š `create_test_db()`Ã£â‚¬Â`create_temp_dir()` Ã¥â€™Å’ `fixture_path()`Ã£â‚¬â€š
 
-## 模拟
+## Ã¦Â¨Â¡Ã¦â€¹Å¸
 
 ### Test::MockModule
 
@@ -344,14 +357,14 @@ subtest 'mock external API' => sub {
 };
 
 # Bad: Monkey-patching without restoration
-# *MyApp::API::fetch_user = sub { ... };  # NEVER — leaks across tests
+# *MyApp::API::fetch_user = sub { ... };  # NEVER Ã¢â‚¬â€ leaks across tests
 ```
 
-对于轻量级的模拟对象，使用 `Test::MockObject` 创建可注入的测试替身，使用 `->mock()` 并验证调用 `->called_ok()`。
+Ã¥Â¯Â¹Ã¤ÂºÅ½Ã¨Â½Â»Ã©â€¡ÂÃ§ÂºÂ§Ã§Å¡â€žÃ¦Â¨Â¡Ã¦â€¹Å¸Ã¥Â¯Â¹Ã¨Â±Â¡Ã¯Â¼Å’Ã¤Â½Â¿Ã§â€Â¨ `Test::MockObject` Ã¥Ë†â€ºÃ¥Â»ÂºÃ¥ÂÂ¯Ã¦Â³Â¨Ã¥â€¦Â¥Ã§Å¡â€žÃ¦Âµâ€¹Ã¨Â¯â€¢Ã¦â€ºÂ¿Ã¨ÂºÂ«Ã¯Â¼Å’Ã¤Â½Â¿Ã§â€Â¨ `->mock()` Ã¥Â¹Â¶Ã©ÂªÅ’Ã¨Â¯ÂÃ¨Â°Æ’Ã§â€Â¨ `->called_ok()`Ã£â‚¬â€š
 
-## 使用 Devel::Cover 进行覆盖率分析
+## Ã¤Â½Â¿Ã§â€Â¨ Devel::Cover Ã¨Â¿â€ºÃ¨Â¡Å’Ã¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡Ã¥Ë†â€ Ã¦Å¾Â
 
-### 运行覆盖率分析
+### Ã¨Â¿ÂÃ¨Â¡Å’Ã¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡Ã¥Ë†â€ Ã¦Å¾Â
 
 ```bash
 # Basic coverage report
@@ -373,9 +386,9 @@ cover -test && cover -report text -select '^lib/' \
   | perl -ne 'if (/Total.*?(\d+\.\d+)/) { exit 1 if $1 < 80 }'
 ```
 
-### 集成测试
+### Ã©â€ºâ€ Ã¦Ë†ÂÃ¦Âµâ€¹Ã¨Â¯â€¢
 
-对数据库测试使用内存中的 SQLite，对 API 测试模拟 HTTP::Tiny。
+Ã¥Â¯Â¹Ã¦â€¢Â°Ã¦ÂÂ®Ã¥Âºâ€œÃ¦Âµâ€¹Ã¨Â¯â€¢Ã¤Â½Â¿Ã§â€Â¨Ã¥â€ â€¦Ã¥Â­ËœÃ¤Â¸Â­Ã§Å¡â€ž SQLiteÃ¯Â¼Å’Ã¥Â¯Â¹ API Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¦Â¨Â¡Ã¦â€¹Å¸ HTTP::TinyÃ£â‚¬â€š
 
 ```perl
 use v5.36;
@@ -396,56 +409,56 @@ subtest 'database integration' => sub {
 done_testing;
 ```
 
-## 最佳实践
+## Ã¦Å“â‚¬Ã¤Â½Â³Ã¥Â®Å¾Ã¨Â·Âµ
 
-### 应做事项
+### Ã¥Âºâ€Ã¥ÂÅ¡Ã¤Âºâ€¹Ã©Â¡Â¹
 
-* **遵循 TDD**：在实现之前编写测试（红-绿-重构）
-* **使用 Test2::V0**：现代断言，更好的诊断
-* **使用子测试**：分组相关断言，隔离状态
-* **模拟外部依赖**：网络、数据库、文件系统
-* **使用 `prove -l`**：始终将 lib/ 包含在 `@INC` 中
-* **清晰命名测试**：`'user login with invalid password fails'`
-* **测试边界情况**：空字符串、undef、零、边界值
-* **目标 80%+ 覆盖率**：专注于业务逻辑路径
-* **保持测试快速**：模拟 I/O，使用内存数据库
+* **Ã©ÂÂµÃ¥Â¾Âª TDD**Ã¯Â¼Å¡Ã¥Å“Â¨Ã¥Â®Å¾Ã§Å½Â°Ã¤Â¹â€¹Ã¥â€°ÂÃ§Â¼â€“Ã¥â€ â„¢Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¯Â¼Ë†Ã§ÂºÂ¢-Ã§Â»Â¿-Ã©â€¡ÂÃ¦Å¾â€žÃ¯Â¼â€°
+* **Ã¤Â½Â¿Ã§â€Â¨ Test2::V0**Ã¯Â¼Å¡Ã§Å½Â°Ã¤Â»Â£Ã¦â€“Â­Ã¨Â¨â‚¬Ã¯Â¼Å’Ã¦â€ºÂ´Ã¥Â¥Â½Ã§Å¡â€žÃ¨Â¯Å Ã¦â€“Â­
+* **Ã¤Â½Â¿Ã§â€Â¨Ã¥Â­ÂÃ¦Âµâ€¹Ã¨Â¯â€¢**Ã¯Â¼Å¡Ã¥Ë†â€ Ã§Â»â€žÃ§â€ºÂ¸Ã¥â€¦Â³Ã¦â€“Â­Ã¨Â¨â‚¬Ã¯Â¼Å’Ã©Å¡â€Ã§Â¦Â»Ã§Å Â¶Ã¦â‚¬Â
+* **Ã¦Â¨Â¡Ã¦â€¹Å¸Ã¥Â¤â€“Ã©Æ’Â¨Ã¤Â¾ÂÃ¨Âµâ€“**Ã¯Â¼Å¡Ã§Â½â€˜Ã§Â»Å“Ã£â‚¬ÂÃ¦â€¢Â°Ã¦ÂÂ®Ã¥Âºâ€œÃ£â‚¬ÂÃ¦â€“â€¡Ã¤Â»Â¶Ã§Â³Â»Ã§Â»Å¸
+* **Ã¤Â½Â¿Ã§â€Â¨ `prove -l`**Ã¯Â¼Å¡Ã¥Â§â€¹Ã§Â»Ë†Ã¥Â°â€  lib/ Ã¥Å’â€¦Ã¥ÂÂ«Ã¥Å“Â¨ `@INC` Ã¤Â¸Â­
+* **Ã¦Â¸â€¦Ã¦â„¢Â°Ã¥â€˜Â½Ã¥ÂÂÃ¦Âµâ€¹Ã¨Â¯â€¢**Ã¯Â¼Å¡`'user login with invalid password fails'`
+* **Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¨Â¾Â¹Ã§â€¢Å’Ã¦Æ’â€¦Ã¥â€ Âµ**Ã¯Â¼Å¡Ã§Â©ÂºÃ¥Â­â€”Ã§Â¬Â¦Ã¤Â¸Â²Ã£â‚¬ÂundefÃ£â‚¬ÂÃ©â€ºÂ¶Ã£â‚¬ÂÃ¨Â¾Â¹Ã§â€¢Å’Ã¥â‚¬Â¼
+* **Ã§â€ºÂ®Ã¦Â â€¡ 80%+ Ã¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡**Ã¯Â¼Å¡Ã¤Â¸â€œÃ¦Â³Â¨Ã¤ÂºÅ½Ã¤Â¸Å¡Ã¥Å Â¡Ã©â‚¬Â»Ã¨Â¾â€˜Ã¨Â·Â¯Ã¥Â¾â€ž
+* **Ã¤Â¿ÂÃ¦Å’ÂÃ¦Âµâ€¹Ã¨Â¯â€¢Ã¥Â¿Â«Ã©â‚¬Å¸**Ã¯Â¼Å¡Ã¦Â¨Â¡Ã¦â€¹Å¸ I/OÃ¯Â¼Å’Ã¤Â½Â¿Ã§â€Â¨Ã¥â€ â€¦Ã¥Â­ËœÃ¦â€¢Â°Ã¦ÂÂ®Ã¥Âºâ€œ
 
-### 禁止事项
+### Ã§Â¦ÂÃ¦Â­Â¢Ã¤Âºâ€¹Ã©Â¡Â¹
 
-* **不要测试实现**：测试行为和输出，而非内部细节
-* **不要在子测试之间共享状态**：每个子测试都应是独立的
-* **不要跳过 `done_testing`**：确保所有计划的测试都已运行
-* **不要过度模拟**：仅模拟边界，而非被测试的代码
-* **不要在新项目中使用 `Test::More`**：首选 Test2::V0
-* **不要忽略测试失败**：所有测试必须在合并前通过
-* **不要测试 CPAN 模块**：相信库能正常工作
-* **不要编写脆弱的测试**：避免过度具体的字符串匹配
+* **Ã¤Â¸ÂÃ¨Â¦ÂÃ¦Âµâ€¹Ã¨Â¯â€¢Ã¥Â®Å¾Ã§Å½Â°**Ã¯Â¼Å¡Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¨Â¡Å’Ã¤Â¸ÂºÃ¥â€™Å’Ã¨Â¾â€œÃ¥â€¡ÂºÃ¯Â¼Å’Ã¨â‚¬Å’Ã©ÂÅ¾Ã¥â€ â€¦Ã©Æ’Â¨Ã§Â»â€ Ã¨Å â€š
+* **Ã¤Â¸ÂÃ¨Â¦ÂÃ¥Å“Â¨Ã¥Â­ÂÃ¦Âµâ€¹Ã¨Â¯â€¢Ã¤Â¹â€¹Ã©â€”Â´Ã¥â€¦Â±Ã¤ÂºÂ«Ã§Å Â¶Ã¦â‚¬Â**Ã¯Â¼Å¡Ã¦Â¯ÂÃ¤Â¸ÂªÃ¥Â­ÂÃ¦Âµâ€¹Ã¨Â¯â€¢Ã©Æ’Â½Ã¥Âºâ€Ã¦ËœÂ¯Ã§â€¹Â¬Ã§Â«â€¹Ã§Å¡â€ž
+* **Ã¤Â¸ÂÃ¨Â¦ÂÃ¨Â·Â³Ã¨Â¿â€¡ `done_testing`**Ã¯Â¼Å¡Ã§Â¡Â®Ã¤Â¿ÂÃ¦â€°â‚¬Ã¦Å“â€°Ã¨Â®Â¡Ã¥Ë†â€™Ã§Å¡â€žÃ¦Âµâ€¹Ã¨Â¯â€¢Ã©Æ’Â½Ã¥Â·Â²Ã¨Â¿ÂÃ¨Â¡Å’
+* **Ã¤Â¸ÂÃ¨Â¦ÂÃ¨Â¿â€¡Ã¥ÂºÂ¦Ã¦Â¨Â¡Ã¦â€¹Å¸**Ã¯Â¼Å¡Ã¤Â»â€¦Ã¦Â¨Â¡Ã¦â€¹Å¸Ã¨Â¾Â¹Ã§â€¢Å’Ã¯Â¼Å’Ã¨â‚¬Å’Ã©ÂÅ¾Ã¨Â¢Â«Ã¦Âµâ€¹Ã¨Â¯â€¢Ã§Å¡â€žÃ¤Â»Â£Ã§Â Â
+* **Ã¤Â¸ÂÃ¨Â¦ÂÃ¥Å“Â¨Ã¦â€“Â°Ã©Â¡Â¹Ã§â€ºÂ®Ã¤Â¸Â­Ã¤Â½Â¿Ã§â€Â¨ `Test::More`**Ã¯Â¼Å¡Ã©Â¦â€“Ã©â‚¬â€° Test2::V0
+* **Ã¤Â¸ÂÃ¨Â¦ÂÃ¥Â¿Â½Ã§â€¢Â¥Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¥Â¤Â±Ã¨Â´Â¥**Ã¯Â¼Å¡Ã¦â€°â‚¬Ã¦Å“â€°Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¥Â¿â€¦Ã©Â¡Â»Ã¥Å“Â¨Ã¥ÂË†Ã¥Â¹Â¶Ã¥â€°ÂÃ©â‚¬Å¡Ã¨Â¿â€¡
+* **Ã¤Â¸ÂÃ¨Â¦ÂÃ¦Âµâ€¹Ã¨Â¯â€¢ CPAN Ã¦Â¨Â¡Ã¥Ââ€”**Ã¯Â¼Å¡Ã§â€ºÂ¸Ã¤Â¿Â¡Ã¥Âºâ€œÃ¨Æ’Â½Ã¦Â­Â£Ã¥Â¸Â¸Ã¥Â·Â¥Ã¤Â½Å“
+* **Ã¤Â¸ÂÃ¨Â¦ÂÃ§Â¼â€“Ã¥â€ â„¢Ã¨â€žâ€ Ã¥Â¼Â±Ã§Å¡â€žÃ¦Âµâ€¹Ã¨Â¯â€¢**Ã¯Â¼Å¡Ã©ÂÂ¿Ã¥â€¦ÂÃ¨Â¿â€¡Ã¥ÂºÂ¦Ã¥â€¦Â·Ã¤Â½â€œÃ§Å¡â€žÃ¥Â­â€”Ã§Â¬Â¦Ã¤Â¸Â²Ã¥Å’Â¹Ã©â€¦Â
 
-## 快速参考
+## Ã¥Â¿Â«Ã©â‚¬Å¸Ã¥Ââ€šÃ¨â‚¬Æ’
 
-| 任务 | 命令 / 模式 |
+| Ã¤Â»Â»Ã¥Å Â¡ | Ã¥â€˜Â½Ã¤Â»Â¤ / Ã¦Â¨Â¡Ã¥Â¼Â |
 |---|---|
-| 运行所有测试 | `prove -lr t/` |
-| 详细运行单个测试 | `prove -lv t/unit/user.t` |
-| 并行测试运行 | `prove -lr -j8 t/` |
-| 覆盖率报告 | `cover -test && cover -report html` |
-| 测试相等性 | `is($got, $expected, 'label')` |
-| 深层比较 | `is($got, hash { field k => 'v'; etc() }, 'label')` |
-| 测试异常 | `like(dies { ... }, qr/msg/, 'label')` |
-| 测试无异常 | `ok(lives { ... }, 'label')` |
-| 模拟一个方法 | `Test::MockModule->new('Pkg')->mock(m => sub { ... })` |
-| 跳过测试 | `SKIP: { skip 'reason', $count unless $cond; ... }` |
-| TODO 测试 | `TODO: { local $TODO = 'reason'; ... }` |
+| Ã¨Â¿ÂÃ¨Â¡Å’Ã¦â€°â‚¬Ã¦Å“â€°Ã¦Âµâ€¹Ã¨Â¯â€¢ | `prove -lr t/` |
+| Ã¨Â¯Â¦Ã§Â»â€ Ã¨Â¿ÂÃ¨Â¡Å’Ã¥Ââ€¢Ã¤Â¸ÂªÃ¦Âµâ€¹Ã¨Â¯â€¢ | `prove -lv t/unit/user.t` |
+| Ã¥Â¹Â¶Ã¨Â¡Å’Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¨Â¿ÂÃ¨Â¡Å’ | `prove -lr -j8 t/` |
+| Ã¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡Ã¦Å Â¥Ã¥â€˜Å  | `cover -test && cover -report html` |
+| Ã¦Âµâ€¹Ã¨Â¯â€¢Ã§â€ºÂ¸Ã§Â­â€°Ã¦â‚¬Â§ | `is($got, $expected, 'label')` |
+| Ã¦Â·Â±Ã¥Â±â€šÃ¦Â¯â€Ã¨Â¾Æ’ | `is($got, hash { field k => 'v'; etc() }, 'label')` |
+| Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¥Â¼â€šÃ¥Â¸Â¸ | `like(dies { ... }, qr/msg/, 'label')` |
+| Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¦â€”Â Ã¥Â¼â€šÃ¥Â¸Â¸ | `ok(lives { ... }, 'label')` |
+| Ã¦Â¨Â¡Ã¦â€¹Å¸Ã¤Â¸â‚¬Ã¤Â¸ÂªÃ¦â€“Â¹Ã¦Â³â€¢ | `Test::MockModule->new('Pkg')->mock(m => sub { ... })` |
+| Ã¨Â·Â³Ã¨Â¿â€¡Ã¦Âµâ€¹Ã¨Â¯â€¢ | `SKIP: { skip 'reason', $count unless $cond; ... }` |
+| TODO Ã¦Âµâ€¹Ã¨Â¯â€¢ | `TODO: { local $TODO = 'reason'; ... }` |
 
-## 常见陷阱
+## Ã¥Â¸Â¸Ã¨Â§ÂÃ©â„¢Â·Ã©ËœÂ±
 
-### 忘记 `done_testing`
+### Ã¥Â¿ËœÃ¨Â®Â° `done_testing`
 
 ```perl
 # Bad: Test file runs but doesn't verify all tests executed
 use Test2::V0;
 is(1, 1, 'works');
-# Missing done_testing — silent bugs if test code is skipped
+# Missing done_testing Ã¢â‚¬â€ silent bugs if test code is skipped
 
 # Good: Always end with done_testing
 use Test2::V0;
@@ -453,7 +466,7 @@ is(1, 1, 'works');
 done_testing;
 ```
 
-### 缺少 `-l` 标志
+### Ã§Â¼ÂºÃ¥Â°â€˜ `-l` Ã¦Â â€¡Ã¥Â¿â€”
 
 ```bash
 # Bad: Modules in lib/ not found
@@ -464,12 +477,12 @@ prove t/unit/user.t
 prove -l t/unit/user.t
 ```
 
-### 过度模拟
+### Ã¨Â¿â€¡Ã¥ÂºÂ¦Ã¦Â¨Â¡Ã¦â€¹Å¸
 
-模拟*依赖项*，而非被测试的代码。如果你的测试只验证模拟返回了你告诉它的内容，那么它什么也没测试。
+Ã¦Â¨Â¡Ã¦â€¹Å¸*Ã¤Â¾ÂÃ¨Âµâ€“Ã©Â¡Â¹*Ã¯Â¼Å’Ã¨â‚¬Å’Ã©ÂÅ¾Ã¨Â¢Â«Ã¦Âµâ€¹Ã¨Â¯â€¢Ã§Å¡â€žÃ¤Â»Â£Ã§Â ÂÃ£â‚¬â€šÃ¥Â¦â€šÃ¦Å¾Å“Ã¤Â½Â Ã§Å¡â€žÃ¦Âµâ€¹Ã¨Â¯â€¢Ã¥ÂÂªÃ©ÂªÅ’Ã¨Â¯ÂÃ¦Â¨Â¡Ã¦â€¹Å¸Ã¨Â¿â€Ã¥â€ºÅ¾Ã¤Âºâ€ Ã¤Â½Â Ã¥â€˜Å Ã¨Â¯â€°Ã¥Â®Æ’Ã§Å¡â€žÃ¥â€ â€¦Ã¥Â®Â¹Ã¯Â¼Å’Ã©â€šÂ£Ã¤Â¹Ë†Ã¥Â®Æ’Ã¤Â»â‚¬Ã¤Â¹Ë†Ã¤Â¹Å¸Ã¦Â²Â¡Ã¦Âµâ€¹Ã¨Â¯â€¢Ã£â‚¬â€š
 
-### 测试污染
+### Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¦Â±Â¡Ã¦Å¸â€œ
 
-在子测试内部使用 `my` 变量 —— 永远不要用 `our` —— 以防止状态在测试之间泄漏。
+Ã¥Å“Â¨Ã¥Â­ÂÃ¦Âµâ€¹Ã¨Â¯â€¢Ã¥â€ â€¦Ã©Æ’Â¨Ã¤Â½Â¿Ã§â€Â¨ `my` Ã¥ÂËœÃ©â€¡Â Ã¢â‚¬â€Ã¢â‚¬â€ Ã¦Â°Â¸Ã¨Â¿Å“Ã¤Â¸ÂÃ¨Â¦ÂÃ§â€Â¨ `our` Ã¢â‚¬â€Ã¢â‚¬â€ Ã¤Â»Â¥Ã©ËœÂ²Ã¦Â­Â¢Ã§Å Â¶Ã¦â‚¬ÂÃ¥Å“Â¨Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¤Â¹â€¹Ã©â€”Â´Ã¦Â³â€žÃ¦Â¼ÂÃ£â‚¬â€š
 
-**记住**：测试是你的安全网。保持它们快速、专注和独立。新项目使用 Test2::V0，运行使用 prove，问责使用 Devel::Cover。
+**Ã¨Â®Â°Ã¤Â½Â**Ã¯Â¼Å¡Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¦ËœÂ¯Ã¤Â½Â Ã§Å¡â€žÃ¥Â®â€°Ã¥â€¦Â¨Ã§Â½â€˜Ã£â‚¬â€šÃ¤Â¿ÂÃ¦Å’ÂÃ¥Â®Æ’Ã¤Â»Â¬Ã¥Â¿Â«Ã©â‚¬Å¸Ã£â‚¬ÂÃ¤Â¸â€œÃ¦Â³Â¨Ã¥â€™Å’Ã§â€¹Â¬Ã§Â«â€¹Ã£â‚¬â€šÃ¦â€“Â°Ã©Â¡Â¹Ã§â€ºÂ®Ã¤Â½Â¿Ã§â€Â¨ Test2::V0Ã¯Â¼Å’Ã¨Â¿ÂÃ¨Â¡Å’Ã¤Â½Â¿Ã§â€Â¨ proveÃ¯Â¼Å’Ã©â€”Â®Ã¨Â´Â£Ã¤Â½Â¿Ã§â€Â¨ Devel::CoverÃ£â‚¬â€š

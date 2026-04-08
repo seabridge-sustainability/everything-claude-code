@@ -1,58 +1,71 @@
-# Örnek Proje CLAUDE.md
+# Ãƒâ€“rnek Proje CLAUDE.md
 
-Bu, örnek bir proje seviyesi CLAUDE.md dosyasıdır. Bunu proje kök dizininize yerleştirin.
+## Safety And Authorization Rule
 
-## Proje Genel Bakış
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-[Projenizin kısa açıklaması - ne yaptığı, teknoloji yığını]
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+Bu, ÃƒÂ¶rnek bir proje seviyesi CLAUDE.md dosyasÃ„Â±dÃ„Â±r. Bunu proje kÃƒÂ¶k dizininize yerleÃ…Å¸tirin.
+
+## Proje Genel BakÃ„Â±Ã…Å¸
+
+[Projenizin kÃ„Â±sa aÃƒÂ§Ã„Â±klamasÃ„Â± - ne yaptÃ„Â±Ã„Å¸Ã„Â±, teknoloji yÃ„Â±Ã„Å¸Ã„Â±nÃ„Â±]
 
 ## Kritik Kurallar
 
 ### 1. Kod Organizasyonu
 
-- Birkaç büyük dosya yerine çok sayıda küçük dosya
-- Yüksek bağlılık, düşük bağımlılık
-- Tipik olarak 200-400 satır, dosya başına maksimum 800 satır
-- Tipe göre değil, özellik/domain'e göre organize edin
+- BirkaÃƒÂ§ bÃƒÂ¼yÃƒÂ¼k dosya yerine ÃƒÂ§ok sayÃ„Â±da kÃƒÂ¼ÃƒÂ§ÃƒÂ¼k dosya
+- YÃƒÂ¼ksek baÃ„Å¸lÃ„Â±lÃ„Â±k, dÃƒÂ¼Ã…Å¸ÃƒÂ¼k baÃ„Å¸Ã„Â±mlÃ„Â±lÃ„Â±k
+- Tipik olarak 200-400 satÃ„Â±r, dosya baÃ…Å¸Ã„Â±na maksimum 800 satÃ„Â±r
+- Tipe gÃƒÂ¶re deÃ„Å¸il, ÃƒÂ¶zellik/domain'e gÃƒÂ¶re organize edin
 
 ### 2. Kod Stili
 
-- Kod, yorum veya dokümantasyonda emoji kullanmayın
-- Her zaman değişmezlik - asla obje veya array'leri mutate etmeyin
-- Production kodunda console.log kullanmayın
-- try/catch ile uygun hata yönetimi
+- Kod, yorum veya dokÃƒÂ¼mantasyonda emoji kullanmayÃ„Â±n
+- Her zaman deÃ„Å¸iÃ…Å¸mezlik - asla obje veya array'leri mutate etmeyin
+- Production kodunda console.log kullanmayÃ„Â±n
+- try/catch ile uygun hata yÃƒÂ¶netimi
 - Zod veya benzeri ile input validasyonu
 
 ### 3. Test
 
-- TDD: Önce testleri yazın
+- TDD: Ãƒâ€“nce testleri yazÃ„Â±n
 - Minimum %80 kapsama
-- Utility'ler için unit testler
-- API'ler için integration testler
-- Kritik akışlar için E2E testler
+- Utility'ler iÃƒÂ§in unit testler
+- API'ler iÃƒÂ§in integration testler
+- Kritik akÃ„Â±Ã…Å¸lar iÃƒÂ§in E2E testler
 
-### 4. Güvenlik
+### 4. GÃƒÂ¼venlik
 
-- Hardcoded secret kullanmayın
-- Hassas veriler için environment variable'lar
-- Tüm kullanıcı girdilerini validate edin
+- Hardcoded secret kullanmayÃ„Â±n
+- Hassas veriler iÃƒÂ§in environment variable'lar
+- TÃƒÂ¼m kullanÃ„Â±cÃ„Â± girdilerini validate edin
 - Sadece parametreli sorgular
-- CSRF koruması aktif
+- CSRF korumasÃ„Â± aktif
 
-## Dosya Yapısı
+## Dosya YapÃ„Â±sÃ„Â±
 
 ```
 src/
 |-- app/              # Next.js app router
-|-- components/       # Tekrar kullanılabilir UI bileşenleri
+|-- components/       # Tekrar kullanÃ„Â±labilir UI bileÃ…Å¸enleri
 |-- hooks/            # Custom React hooks
-|-- lib/              # Utility kütüphaneleri
-|-- types/            # TypeScript tanımlamaları
+|-- lib/              # Utility kÃƒÂ¼tÃƒÂ¼phaneleri
+|-- types/            # TypeScript tanÃ„Â±mlamalarÃ„Â±
 ```
 
 ## Temel Desenler
 
-### API Response Formatı
+### API Response FormatÃ„Â±
 
 ```typescript
 interface ApiResponse<T> {
@@ -62,7 +75,7 @@ interface ApiResponse<T> {
 }
 ```
 
-### Hata Yönetimi
+### Hata YÃƒÂ¶netimi
 
 ```typescript
 try {
@@ -70,7 +83,7 @@ try {
   return { success: true, data: result }
 } catch (error) {
   console.error('Operation failed:', error)
-  return { success: false, error: 'Kullanıcı dostu mesaj' }
+  return { success: false, error: 'KullanÃ„Â±cÃ„Â± dostu mesaj' }
 }
 ```
 
@@ -85,16 +98,16 @@ API_KEY=
 DEBUG=false
 ```
 
-## Kullanılabilir Komutlar
+## KullanÃ„Â±labilir Komutlar
 
-- `/tdd` - Test-driven development iş akışı
-- `/plan` - Uygulama planı oluştur
-- `/code-review` - Kod kalitesini gözden geçir
-- `/build-fix` - Build hatalarını düzelt
+- `/tdd` - Test-driven development iÃ…Å¸ akÃ„Â±Ã…Å¸Ã„Â±
+- `/plan` - Uygulama planÃ„Â± oluÃ…Å¸tur
+- `/code-review` - Kod kalitesini gÃƒÂ¶zden geÃƒÂ§ir
+- `/build-fix` - Build hatalarÃ„Â±nÃ„Â± dÃƒÂ¼zelt
 
-## Git İş Akışı
+## Git Ã„Â°Ã…Å¸ AkÃ„Â±Ã…Å¸Ã„Â±
 
 - Conventional commit'ler: `feat:`, `fix:`, `refactor:`, `docs:`, `test:`
-- Asla doğrudan main'e commit yapmayın
+- Asla doÃ„Å¸rudan main'e commit yapmayÃ„Â±n
 - PR'lar review gerektirir
-- Merge'den önce tüm testler geçmeli
+- Merge'den ÃƒÂ¶nce tÃƒÂ¼m testler geÃƒÂ§meli

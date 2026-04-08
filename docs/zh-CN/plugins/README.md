@@ -1,14 +1,27 @@
-# 插件与市场
+# Ã¦Ââ€™Ã¤Â»Â¶Ã¤Â¸Å½Ã¥Â¸â€šÃ¥Å“Âº
 
-插件扩展了 Claude Code 的功能，为其添加新工具和能力。本指南仅涵盖安装部分 - 关于何时以及为何使用插件，请参阅[完整文章](https://x.com/affaanmustafa/status/2012378465664745795)。
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+Ã¦Ââ€™Ã¤Â»Â¶Ã¦â€°Â©Ã¥Â±â€¢Ã¤Âºâ€  Claude Code Ã§Å¡â€žÃ¥Å Å¸Ã¨Æ’Â½Ã¯Â¼Å’Ã¤Â¸ÂºÃ¥â€¦Â¶Ã¦Â·Â»Ã¥Å Â Ã¦â€“Â°Ã¥Â·Â¥Ã¥â€¦Â·Ã¥â€™Å’Ã¨Æ’Â½Ã¥Å â€ºÃ£â‚¬â€šÃ¦Å“Â¬Ã¦Å’â€¡Ã¥Ââ€”Ã¤Â»â€¦Ã¦Â¶ÂµÃ§â€ºâ€“Ã¥Â®â€°Ã¨Â£â€¦Ã©Æ’Â¨Ã¥Ë†â€  - Ã¥â€¦Â³Ã¤ÂºÅ½Ã¤Â½â€¢Ã¦â€”Â¶Ã¤Â»Â¥Ã¥ÂÅ Ã¤Â¸ÂºÃ¤Â½â€¢Ã¤Â½Â¿Ã§â€Â¨Ã¦Ââ€™Ã¤Â»Â¶Ã¯Â¼Å’Ã¨Â¯Â·Ã¥Ââ€šÃ©Ëœâ€¦[Ã¥Â®Å’Ã¦â€¢Â´Ã¦â€“â€¡Ã§Â«Â ](https://x.com/affaanmustafa/status/2012378465664745795)Ã£â‚¬â€š
 
 ***
 
-## 市场
+## Ã¥Â¸â€šÃ¥Å“Âº
 
-市场是可安装插件的存储库。
+Ã¥Â¸â€šÃ¥Å“ÂºÃ¦ËœÂ¯Ã¥ÂÂ¯Ã¥Â®â€°Ã¨Â£â€¦Ã¦Ââ€™Ã¤Â»Â¶Ã§Å¡â€žÃ¥Â­ËœÃ¥â€šÂ¨Ã¥Âºâ€œÃ£â‚¬â€š
 
-### 添加市场
+### Ã¦Â·Â»Ã¥Å Â Ã¥Â¸â€šÃ¥Å“Âº
 
 ```bash
 # Add official Anthropic marketplace
@@ -18,9 +31,9 @@ claude plugin marketplace add https://github.com/anthropics/claude-plugins-offic
 claude plugin marketplace add https://github.com/mixedbread-ai/mgrep
 ```
 
-### 推荐市场
+### Ã¦Å½Â¨Ã¨ÂÂÃ¥Â¸â€šÃ¥Å“Âº
 
-| 市场 | 来源 |
+| Ã¥Â¸â€šÃ¥Å“Âº | Ã¦ÂÂ¥Ã¦ÂºÂ |
 |-------------|--------|
 | claude-plugins-official | `anthropics/claude-plugins-official` |
 | claude-code-plugins | `anthropics/claude-code` |
@@ -28,7 +41,7 @@ claude plugin marketplace add https://github.com/mixedbread-ai/mgrep
 
 ***
 
-## 安装插件
+## Ã¥Â®â€°Ã¨Â£â€¦Ã¦Ââ€™Ã¤Â»Â¶
 
 ```bash
 # Open plugins browser
@@ -38,35 +51,35 @@ claude plugin marketplace add https://github.com/mixedbread-ai/mgrep
 claude plugin install typescript-lsp@claude-plugins-official
 ```
 
-### 推荐插件
+### Ã¦Å½Â¨Ã¨ÂÂÃ¦Ââ€™Ã¤Â»Â¶
 
-**开发：**
+**Ã¥Â¼â‚¬Ã¥Ââ€˜Ã¯Â¼Å¡**
 
-* `typescript-lsp` - TypeScript 智能支持
-* `pyright-lsp` - Python 类型检查
-* `hookify` - 通过对话创建钩子
-* `code-simplifier` - 代码重构
+* `typescript-lsp` - TypeScript Ã¦â„¢ÂºÃ¨Æ’Â½Ã¦â€Â¯Ã¦Å’Â
+* `pyright-lsp` - Python Ã§Â±Â»Ã¥Å¾â€¹Ã¦Â£â‚¬Ã¦Å¸Â¥
+* `hookify` - Ã©â‚¬Å¡Ã¨Â¿â€¡Ã¥Â¯Â¹Ã¨Â¯ÂÃ¥Ë†â€ºÃ¥Â»ÂºÃ©â€™Â©Ã¥Â­Â
+* `code-simplifier` - Ã¤Â»Â£Ã§Â ÂÃ©â€¡ÂÃ¦Å¾â€ž
 
-**代码质量：**
+**Ã¤Â»Â£Ã§Â ÂÃ¨Â´Â¨Ã©â€¡ÂÃ¯Â¼Å¡**
 
-* `code-review` - 代码审查
-* `pr-review-toolkit` - PR 自动化
-* `security-guidance` - 安全检查
+* `code-review` - Ã¤Â»Â£Ã§Â ÂÃ¥Â®Â¡Ã¦Å¸Â¥
+* `pr-review-toolkit` - PR Ã¨â€¡ÂªÃ¥Å Â¨Ã¥Å’â€“
+* `security-guidance` - Ã¥Â®â€°Ã¥â€¦Â¨Ã¦Â£â‚¬Ã¦Å¸Â¥
 
-**搜索：**
+**Ã¦ÂÅ“Ã§Â´Â¢Ã¯Â¼Å¡**
 
-* `mgrep` - 增强搜索（优于 ripgrep）
-* `context7` - 实时文档查找
+* `mgrep` - Ã¥Â¢Å¾Ã¥Â¼ÂºÃ¦ÂÅ“Ã§Â´Â¢Ã¯Â¼Ë†Ã¤Â¼ËœÃ¤ÂºÅ½ ripgrepÃ¯Â¼â€°
+* `context7` - Ã¥Â®Å¾Ã¦â€”Â¶Ã¦â€“â€¡Ã¦Â¡Â£Ã¦Å¸Â¥Ã¦â€°Â¾
 
-**工作流：**
+**Ã¥Â·Â¥Ã¤Â½Å“Ã¦ÂµÂÃ¯Â¼Å¡**
 
-* `commit-commands` - Git 工作流
-* `frontend-design` - UI 模式
-* `feature-dev` - 功能开发
+* `commit-commands` - Git Ã¥Â·Â¥Ã¤Â½Å“Ã¦ÂµÂ
+* `frontend-design` - UI Ã¦Â¨Â¡Ã¥Â¼Â
+* `feature-dev` - Ã¥Å Å¸Ã¨Æ’Â½Ã¥Â¼â‚¬Ã¥Ââ€˜
 
 ***
 
-## 快速设置
+## Ã¥Â¿Â«Ã©â‚¬Å¸Ã¨Â®Â¾Ã§Â½Â®
 
 ```bash
 # Add marketplaces
@@ -78,12 +91,12 @@ claude plugin marketplace add https://github.com/mixedbread-ai/mgrep
 
 ***
 
-## 插件文件位置
+## Ã¦Ââ€™Ã¤Â»Â¶Ã¦â€“â€¡Ã¤Â»Â¶Ã¤Â½ÂÃ§Â½Â®
 
 ```
 ~/.claude/plugins/
-|-- cache/                    # 已下载的插件
-|-- installed_plugins.json    # 已安装列表
-|-- known_marketplaces.json   # 已添加的市场
-|-- marketplaces/             # 市场数据
+|-- cache/                    # Ã¥Â·Â²Ã¤Â¸â€¹Ã¨Â½Â½Ã§Å¡â€žÃ¦Ââ€™Ã¤Â»Â¶
+|-- installed_plugins.json    # Ã¥Â·Â²Ã¥Â®â€°Ã¨Â£â€¦Ã¥Ë†â€”Ã¨Â¡Â¨
+|-- known_marketplaces.json   # Ã¥Â·Â²Ã¦Â·Â»Ã¥Å Â Ã§Å¡â€žÃ¥Â¸â€šÃ¥Å“Âº
+|-- marketplaces/             # Ã¥Â¸â€šÃ¥Å“ÂºÃ¦â€¢Â°Ã¦ÂÂ®
 ```

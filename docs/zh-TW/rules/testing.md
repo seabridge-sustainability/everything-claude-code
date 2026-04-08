@@ -1,30 +1,43 @@
-# 測試需求
+# Ã¦Â¸Â¬Ã¨Â©Â¦Ã©Å“â‚¬Ã¦Â±â€š
 
-## 最低測試覆蓋率：80%
+## Safety And Authorization Rule
 
-測試類型（全部必要）：
-1. **單元測試** - 個別函式、工具、元件
-2. **整合測試** - API 端點、資料庫操作
-3. **E2E 測試** - 關鍵使用者流程（Playwright）
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-## 測試驅動開發
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-強制工作流程：
-1. 先撰寫測試（RED）
-2. 執行測試 - 應該失敗
-3. 撰寫最小實作（GREEN）
-4. 執行測試 - 應該通過
-5. 重構（IMPROVE）
-6. 驗證覆蓋率（80%+）
 
-## 測試失敗疑難排解
+## Ã¦Å“â‚¬Ã¤Â½Å½Ã¦Â¸Â¬Ã¨Â©Â¦Ã¨Â¦â€ Ã¨â€œâ€¹Ã§Å½â€¡Ã¯Â¼Å¡80%
 
-1. 使用 **tdd-guide** Agent
-2. 檢查測試隔離
-3. 驗證 mock 是否正確
-4. 修復實作，而非測試（除非測試是錯的）
+Ã¦Â¸Â¬Ã¨Â©Â¦Ã©Â¡Å¾Ã¥Å¾â€¹Ã¯Â¼Ë†Ã¥â€¦Â¨Ã©Æ’Â¨Ã¥Â¿â€¦Ã¨Â¦ÂÃ¯Â¼â€°Ã¯Â¼Å¡
+1. **Ã¥â€“Â®Ã¥â€¦Æ’Ã¦Â¸Â¬Ã¨Â©Â¦** - Ã¥â‚¬â€¹Ã¥Ë†Â¥Ã¥â€¡Â½Ã¥Â¼ÂÃ£â‚¬ÂÃ¥Â·Â¥Ã¥â€¦Â·Ã£â‚¬ÂÃ¥â€¦Æ’Ã¤Â»Â¶
+2. **Ã¦â€¢Â´Ã¥ÂË†Ã¦Â¸Â¬Ã¨Â©Â¦** - API Ã§Â«Â¯Ã©Â»Å¾Ã£â‚¬ÂÃ¨Â³â€¡Ã¦â€“â„¢Ã¥ÂºÂ«Ã¦â€œÂÃ¤Â½Å“
+3. **E2E Ã¦Â¸Â¬Ã¨Â©Â¦** - Ã©â€”Å“Ã©ÂÂµÃ¤Â½Â¿Ã§â€Â¨Ã¨â‚¬â€¦Ã¦ÂµÂÃ§Â¨â€¹Ã¯Â¼Ë†PlaywrightÃ¯Â¼â€°
 
-## Agent 支援
+## Ã¦Â¸Â¬Ã¨Â©Â¦Ã©Â©â€¦Ã¥â€¹â€¢Ã©â€“â€¹Ã§â„¢Â¼
 
-- **tdd-guide** - 主動用於新功能，強制先撰寫測試
-- **e2e-runner** - Playwright E2E 測試專家
+Ã¥Â¼Â·Ã¥Ë†Â¶Ã¥Â·Â¥Ã¤Â½Å“Ã¦ÂµÂÃ§Â¨â€¹Ã¯Â¼Å¡
+1. Ã¥â€¦Ë†Ã¦â€™Â°Ã¥Â¯Â«Ã¦Â¸Â¬Ã¨Â©Â¦Ã¯Â¼Ë†REDÃ¯Â¼â€°
+2. Ã¥Å¸Â·Ã¨Â¡Å’Ã¦Â¸Â¬Ã¨Â©Â¦ - Ã¦â€¡â€°Ã¨Â©Â²Ã¥Â¤Â±Ã¦â€¢â€”
+3. Ã¦â€™Â°Ã¥Â¯Â«Ã¦Å“â‚¬Ã¥Â°ÂÃ¥Â¯Â¦Ã¤Â½Å“Ã¯Â¼Ë†GREENÃ¯Â¼â€°
+4. Ã¥Å¸Â·Ã¨Â¡Å’Ã¦Â¸Â¬Ã¨Â©Â¦ - Ã¦â€¡â€°Ã¨Â©Â²Ã©â‚¬Å¡Ã©ÂÅ½
+5. Ã©â€¡ÂÃ¦Â§â€¹Ã¯Â¼Ë†IMPROVEÃ¯Â¼â€°
+6. Ã©Â©â€”Ã¨Â­â€°Ã¨Â¦â€ Ã¨â€œâ€¹Ã§Å½â€¡Ã¯Â¼Ë†80%+Ã¯Â¼â€°
+
+## Ã¦Â¸Â¬Ã¨Â©Â¦Ã¥Â¤Â±Ã¦â€¢â€”Ã§â€“â€˜Ã©â€ºÂ£Ã¦Å½â€™Ã¨Â§Â£
+
+1. Ã¤Â½Â¿Ã§â€Â¨ **tdd-guide** Agent
+2. Ã¦ÂªÂ¢Ã¦Å¸Â¥Ã¦Â¸Â¬Ã¨Â©Â¦Ã©Å¡â€Ã©â€ºÂ¢
+3. Ã©Â©â€”Ã¨Â­â€° mock Ã¦ËœÂ¯Ã¥ÂÂ¦Ã¦Â­Â£Ã§Â¢Âº
+4. Ã¤Â¿Â®Ã¥Â¾Â©Ã¥Â¯Â¦Ã¤Â½Å“Ã¯Â¼Å’Ã¨â‚¬Å’Ã©ÂÅ¾Ã¦Â¸Â¬Ã¨Â©Â¦Ã¯Â¼Ë†Ã©â„¢Â¤Ã©ÂÅ¾Ã¦Â¸Â¬Ã¨Â©Â¦Ã¦ËœÂ¯Ã©Å’Â¯Ã§Å¡â€žÃ¯Â¼â€°
+
+## Agent Ã¦â€Â¯Ã¦ÂÂ´
+
+- **tdd-guide** - Ã¤Â¸Â»Ã¥â€¹â€¢Ã§â€Â¨Ã¦â€“Â¼Ã¦â€“Â°Ã¥Å Å¸Ã¨Æ’Â½Ã¯Â¼Å’Ã¥Â¼Â·Ã¥Ë†Â¶Ã¥â€¦Ë†Ã¦â€™Â°Ã¥Â¯Â«Ã¦Â¸Â¬Ã¨Â©Â¦
+- **e2e-runner** - Playwright E2E Ã¦Â¸Â¬Ã¨Â©Â¦Ã¥Â°Ë†Ã¥Â®Â¶

@@ -1,27 +1,40 @@
 # Rules
+
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
 ## Structure
 
 Rules are organized into a **common** layer plus **language-specific** directories:
 
 ```
 rules/
-├── common/          # Language-agnostic principles (always install)
-│   ├── coding-style.md
-│   ├── git-workflow.md
-│   ├── testing.md
-│   ├── performance.md
-│   ├── patterns.md
-│   ├── hooks.md
-│   ├── agents.md
-│   └── security.md
-├── typescript/      # TypeScript/JavaScript specific
-├── python/          # Python specific
-├── golang/          # Go specific
-├── swift/           # Swift specific
-└── php/             # PHP specific
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ common/          # Language-agnostic principles (always install)
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ coding-style.md
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ git-workflow.md
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ testing.md
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ performance.md
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ patterns.md
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ hooks.md
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ agents.md
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ security.md
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ typescript/      # TypeScript/JavaScript specific
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ python/          # Python specific
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ golang/          # Go specific
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ swift/           # Swift specific
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ php/             # PHP specific
 ```
 
-- **common/** contains universal principles — no language-specific code examples.
+- **common/** contains universal principles Ã¢â‚¬â€ no language-specific code examples.
 - **Language directories** extend the common rules with framework-specific patterns, tools, and code examples. Each file references its common counterpart.
 
 ## Installation
@@ -42,7 +55,7 @@ rules/
 
 ### Option 2: Manual Installation
 
-> **Important:** Copy entire directories — do NOT flatten with `/*`.
+> **Important:** Copy entire directories Ã¢â‚¬â€ do NOT flatten with `/*`.
 > Common and language-specific directories contain files with the same names.
 > Flattening them into one directory causes language-specific files to overwrite
 > common rules, and breaks the relative `../common/` references used by
@@ -75,11 +88,11 @@ To add support for a new language (e.g., `rust/`):
 
 1. Create a `rules/rust/` directory
 2. Add files that extend the common rules:
-   - `coding-style.md` — formatting tools, idioms, error handling patterns
-   - `testing.md` — test framework, coverage tools, test organization
-   - `patterns.md` — language-specific design patterns
-   - `hooks.md` — PostToolUse hooks for formatters, linters, type checkers
-   - `security.md` — secret management, security scanning tools
+   - `coding-style.md` Ã¢â‚¬â€ formatting tools, idioms, error handling patterns
+   - `testing.md` Ã¢â‚¬â€ test framework, coverage tools, test organization
+   - `patterns.md` Ã¢â‚¬â€ language-specific design patterns
+   - `hooks.md` Ã¢â‚¬â€ PostToolUse hooks for formatters, linters, type checkers
+   - `security.md` Ã¢â‚¬â€ secret management, security scanning tools
 3. Each file should start with:
    ```
    > This file extends [common/xxx.md](../common/xxx.md) with <Language> specific content.
@@ -97,7 +110,7 @@ When language-specific rules and common rules conflict, **language-specific rule
 
 `common/coding-style.md` recommends immutability as a default principle. A language-specific `golang/coding-style.md` can override this:
 
-> Idiomatic Go uses pointer receivers for struct mutation — see [common/coding-style.md](../common/coding-style.md) for the general principle, but Go-idiomatic mutation is preferred here.
+> Idiomatic Go uses pointer receivers for struct mutation Ã¢â‚¬â€ see [common/coding-style.md](../common/coding-style.md) for the general principle, but Go-idiomatic mutation is preferred here.
 
 ### Common rules with override notes
 

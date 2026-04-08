@@ -1,37 +1,50 @@
 ---
 name: clickhouse-io
-description: ClickHouse数据库模式、查询优化、分析以及高性能分析工作负载的数据工程最佳实践。
+description: ClickHouseÃ¦â€¢Â°Ã¦ÂÂ®Ã¥Âºâ€œÃ¦Â¨Â¡Ã¥Â¼ÂÃ£â‚¬ÂÃ¦Å¸Â¥Ã¨Â¯Â¢Ã¤Â¼ËœÃ¥Å’â€“Ã£â‚¬ÂÃ¥Ë†â€ Ã¦Å¾ÂÃ¤Â»Â¥Ã¥ÂÅ Ã©Â«ËœÃ¦â‚¬Â§Ã¨Æ’Â½Ã¥Ë†â€ Ã¦Å¾ÂÃ¥Â·Â¥Ã¤Â½Å“Ã¨Â´Å¸Ã¨Â½Â½Ã§Å¡â€žÃ¦â€¢Â°Ã¦ÂÂ®Ã¥Â·Â¥Ã§Â¨â€¹Ã¦Å“â‚¬Ã¤Â½Â³Ã¥Â®Å¾Ã¨Â·ÂµÃ£â‚¬â€š
 origin: ECC
 ---
 
-# ClickHouse 分析模式
+# ClickHouse Ã¥Ë†â€ Ã¦Å¾ÂÃ¦Â¨Â¡Ã¥Â¼Â
 
-用于高性能分析和数据工程的 ClickHouse 特定模式。
+## Safety And Authorization Rule
 
-## 何时激活
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-* 设计 ClickHouse 表架构（MergeTree 引擎选择）
-* 编写分析查询（聚合、窗口函数、连接）
-* 优化查询性能（分区裁剪、投影、物化视图）
-* 摄取大量数据（批量插入、Kafka 集成）
-* 为分析目的从 PostgreSQL/MySQL 迁移到 ClickHouse
-* 实现实时仪表板或时间序列分析
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-## 概述
 
-ClickHouse 是一个用于在线分析处理 (OLAP) 的列式数据库管理系统 (DBMS)。它针对大型数据集上的快速分析查询进行了优化。
+Ã§â€Â¨Ã¤ÂºÅ½Ã©Â«ËœÃ¦â‚¬Â§Ã¨Æ’Â½Ã¥Ë†â€ Ã¦Å¾ÂÃ¥â€™Å’Ã¦â€¢Â°Ã¦ÂÂ®Ã¥Â·Â¥Ã§Â¨â€¹Ã§Å¡â€ž ClickHouse Ã§â€°Â¹Ã¥Â®Å¡Ã¦Â¨Â¡Ã¥Â¼ÂÃ£â‚¬â€š
 
-**关键特性:**
+## Ã¤Â½â€¢Ã¦â€”Â¶Ã¦Â¿â‚¬Ã¦Â´Â»
 
-* 列式存储
-* 数据压缩
-* 并行查询执行
-* 分布式查询
-* 实时分析
+* Ã¨Â®Â¾Ã¨Â®Â¡ ClickHouse Ã¨Â¡Â¨Ã¦Å¾Â¶Ã¦Å¾â€žÃ¯Â¼Ë†MergeTree Ã¥Â¼â€¢Ã¦â€œÅ½Ã©â‚¬â€°Ã¦â€¹Â©Ã¯Â¼â€°
+* Ã§Â¼â€“Ã¥â€ â„¢Ã¥Ë†â€ Ã¦Å¾ÂÃ¦Å¸Â¥Ã¨Â¯Â¢Ã¯Â¼Ë†Ã¨ÂÅ¡Ã¥ÂË†Ã£â‚¬ÂÃ§Âªâ€”Ã¥ÂÂ£Ã¥â€¡Â½Ã¦â€¢Â°Ã£â‚¬ÂÃ¨Â¿Å¾Ã¦Å½Â¥Ã¯Â¼â€°
+* Ã¤Â¼ËœÃ¥Å’â€“Ã¦Å¸Â¥Ã¨Â¯Â¢Ã¦â‚¬Â§Ã¨Æ’Â½Ã¯Â¼Ë†Ã¥Ë†â€ Ã¥Å’ÂºÃ¨Â£ÂÃ¥â€°ÂªÃ£â‚¬ÂÃ¦Å â€¢Ã¥Â½Â±Ã£â‚¬ÂÃ§â€°Â©Ã¥Å’â€“Ã¨Â§â€ Ã¥â€ºÂ¾Ã¯Â¼â€°
+* Ã¦â€˜â€žÃ¥Ââ€“Ã¥Â¤Â§Ã©â€¡ÂÃ¦â€¢Â°Ã¦ÂÂ®Ã¯Â¼Ë†Ã¦â€°Â¹Ã©â€¡ÂÃ¦Ââ€™Ã¥â€¦Â¥Ã£â‚¬ÂKafka Ã©â€ºâ€ Ã¦Ë†ÂÃ¯Â¼â€°
+* Ã¤Â¸ÂºÃ¥Ë†â€ Ã¦Å¾ÂÃ§â€ºÂ®Ã§Å¡â€žÃ¤Â»Å½ PostgreSQL/MySQL Ã¨Â¿ÂÃ§Â§Â»Ã¥Ë†Â° ClickHouse
+* Ã¥Â®Å¾Ã§Å½Â°Ã¥Â®Å¾Ã¦â€”Â¶Ã¤Â»ÂªÃ¨Â¡Â¨Ã¦ÂÂ¿Ã¦Ë†â€“Ã¦â€”Â¶Ã©â€”Â´Ã¥ÂºÂÃ¥Ë†â€”Ã¥Ë†â€ Ã¦Å¾Â
 
-## 表设计模式
+## Ã¦Â¦â€šÃ¨Â¿Â°
 
-### MergeTree 引擎 (最常用)
+ClickHouse Ã¦ËœÂ¯Ã¤Â¸â‚¬Ã¤Â¸ÂªÃ§â€Â¨Ã¤ÂºÅ½Ã¥Å“Â¨Ã§ÂºÂ¿Ã¥Ë†â€ Ã¦Å¾ÂÃ¥Â¤â€žÃ§Ââ€  (OLAP) Ã§Å¡â€žÃ¥Ë†â€”Ã¥Â¼ÂÃ¦â€¢Â°Ã¦ÂÂ®Ã¥Âºâ€œÃ§Â®Â¡Ã§Ââ€ Ã§Â³Â»Ã§Â»Å¸ (DBMS)Ã£â‚¬â€šÃ¥Â®Æ’Ã©â€™Ë†Ã¥Â¯Â¹Ã¥Â¤Â§Ã¥Å¾â€¹Ã¦â€¢Â°Ã¦ÂÂ®Ã©â€ºâ€ Ã¤Â¸Å Ã§Å¡â€žÃ¥Â¿Â«Ã©â‚¬Å¸Ã¥Ë†â€ Ã¦Å¾ÂÃ¦Å¸Â¥Ã¨Â¯Â¢Ã¨Â¿â€ºÃ¨Â¡Å’Ã¤Âºâ€ Ã¤Â¼ËœÃ¥Å’â€“Ã£â‚¬â€š
+
+**Ã¥â€¦Â³Ã©â€Â®Ã§â€°Â¹Ã¦â‚¬Â§:**
+
+* Ã¥Ë†â€”Ã¥Â¼ÂÃ¥Â­ËœÃ¥â€šÂ¨
+* Ã¦â€¢Â°Ã¦ÂÂ®Ã¥Å½â€¹Ã§Â¼Â©
+* Ã¥Â¹Â¶Ã¨Â¡Å’Ã¦Å¸Â¥Ã¨Â¯Â¢Ã¦â€°Â§Ã¨Â¡Å’
+* Ã¥Ë†â€ Ã¥Â¸Æ’Ã¥Â¼ÂÃ¦Å¸Â¥Ã¨Â¯Â¢
+* Ã¥Â®Å¾Ã¦â€”Â¶Ã¥Ë†â€ Ã¦Å¾Â
+
+## Ã¨Â¡Â¨Ã¨Â®Â¾Ã¨Â®Â¡Ã¦Â¨Â¡Ã¥Â¼Â
+
+### MergeTree Ã¥Â¼â€¢Ã¦â€œÅ½ (Ã¦Å“â‚¬Ã¥Â¸Â¸Ã§â€Â¨)
 
 ```sql
 CREATE TABLE markets_analytics (
@@ -49,7 +62,7 @@ ORDER BY (date, market_id)
 SETTINGS index_granularity = 8192;
 ```
 
-### ReplacingMergeTree (去重)
+### ReplacingMergeTree (Ã¥Å½Â»Ã©â€¡Â)
 
 ```sql
 -- For data that may have duplicates (e.g., from multiple sources)
@@ -65,7 +78,7 @@ ORDER BY (user_id, event_id, timestamp)
 PRIMARY KEY (user_id, event_id);
 ```
 
-### AggregatingMergeTree (预聚合)
+### AggregatingMergeTree (Ã©Â¢â€žÃ¨ÂÅ¡Ã¥ÂË†)
 
 ```sql
 -- For maintaining aggregated metrics
@@ -92,9 +105,9 @@ GROUP BY hour, market_id
 ORDER BY hour DESC;
 ```
 
-## 查询优化模式
+## Ã¦Å¸Â¥Ã¨Â¯Â¢Ã¤Â¼ËœÃ¥Å’â€“Ã¦Â¨Â¡Ã¥Â¼Â
 
-### 高效过滤
+### Ã©Â«ËœÃ¦â€¢Ë†Ã¨Â¿â€¡Ã¦Â»Â¤
 
 ```sql
 -- PASS: GOOD: Use indexed columns first
@@ -114,7 +127,7 @@ WHERE volume > 1000
   AND date >= '2025-01-01';
 ```
 
-### 聚合
+### Ã¨ÂÅ¡Ã¥ÂË†
 
 ```sql
 -- PASS: GOOD: Use ClickHouse-specific aggregation functions
@@ -139,7 +152,7 @@ FROM trades
 WHERE created_at >= now() - INTERVAL 1 HOUR;
 ```
 
-### 窗口函数
+### Ã§Âªâ€”Ã¥ÂÂ£Ã¥â€¡Â½Ã¦â€¢Â°
 
 ```sql
 -- Calculate running totals
@@ -157,9 +170,9 @@ WHERE date >= today() - INTERVAL 30 DAY
 ORDER BY market_id, date;
 ```
 
-## 数据插入模式
+## Ã¦â€¢Â°Ã¦ÂÂ®Ã¦Ââ€™Ã¥â€¦Â¥Ã¦Â¨Â¡Ã¥Â¼Â
 
-### 批量插入 (推荐)
+### Ã¦â€°Â¹Ã©â€¡ÂÃ¦Ââ€™Ã¥â€¦Â¥ (Ã¦Å½Â¨Ã¨ÂÂ)
 
 ```typescript
 import { ClickHouse } from 'clickhouse'
@@ -198,7 +211,7 @@ async function insertTrade(trade: Trade) {
 }
 ```
 
-### 流式插入
+### Ã¦ÂµÂÃ¥Â¼ÂÃ¦Ââ€™Ã¥â€¦Â¥
 
 ```typescript
 // For continuous data ingestion
@@ -216,9 +229,9 @@ async function streamInserts() {
 }
 ```
 
-## 物化视图
+## Ã§â€°Â©Ã¥Å’â€“Ã¨Â§â€ Ã¥â€ºÂ¾
 
-### 实时聚合
+### Ã¥Â®Å¾Ã¦â€”Â¶Ã¨ÂÅ¡Ã¥ÂË†
 
 ```sql
 -- Create materialized view for hourly stats
@@ -245,9 +258,9 @@ WHERE hour >= now() - INTERVAL 24 HOUR
 GROUP BY hour, market_id;
 ```
 
-## 性能监控
+## Ã¦â‚¬Â§Ã¨Æ’Â½Ã§â€ºâ€˜Ã¦Å½Â§
 
-### 查询性能
+### Ã¦Å¸Â¥Ã¨Â¯Â¢Ã¦â‚¬Â§Ã¨Æ’Â½
 
 ```sql
 -- Check slow queries
@@ -267,7 +280,7 @@ ORDER BY query_duration_ms DESC
 LIMIT 10;
 ```
 
-### 表统计信息
+### Ã¨Â¡Â¨Ã§Â»Å¸Ã¨Â®Â¡Ã¤Â¿Â¡Ã¦ÂÂ¯
 
 ```sql
 -- Check table sizes
@@ -283,9 +296,9 @@ GROUP BY database, table
 ORDER BY sum(bytes) DESC;
 ```
 
-## 常见分析查询
+## Ã¥Â¸Â¸Ã¨Â§ÂÃ¥Ë†â€ Ã¦Å¾ÂÃ¦Å¸Â¥Ã¨Â¯Â¢
 
-### 时间序列分析
+### Ã¦â€”Â¶Ã©â€”Â´Ã¥ÂºÂÃ¥Ë†â€”Ã¥Ë†â€ Ã¦Å¾Â
 
 ```sql
 -- Daily active users
@@ -317,7 +330,7 @@ GROUP BY signup_date
 ORDER BY signup_date DESC;
 ```
 
-### 漏斗分析
+### Ã¦Â¼ÂÃ¦â€“â€”Ã¥Ë†â€ Ã¦Å¾Â
 
 ```sql
 -- Conversion funnel
@@ -338,7 +351,7 @@ FROM (
 GROUP BY session_id;
 ```
 
-### 队列分析
+### Ã©ËœÅ¸Ã¥Ë†â€”Ã¥Ë†â€ Ã¦Å¾Â
 
 ```sql
 -- User cohorts by signup month
@@ -358,9 +371,9 @@ GROUP BY cohort, month, months_since_signup
 ORDER BY cohort, months_since_signup;
 ```
 
-## 数据流水线模式
+## Ã¦â€¢Â°Ã¦ÂÂ®Ã¦ÂµÂÃ¦Â°Â´Ã§ÂºÂ¿Ã¦Â¨Â¡Ã¥Â¼Â
 
-### ETL 模式
+### ETL Ã¦Â¨Â¡Ã¥Â¼Â
 
 ```typescript
 // Extract, Transform, Load
@@ -384,7 +397,7 @@ async function etlPipeline() {
 setInterval(etlPipeline, 60 * 60 * 1000)  // Every hour
 ```
 
-### 变更数据捕获 (CDC)
+### Ã¥ÂËœÃ¦â€ºÂ´Ã¦â€¢Â°Ã¦ÂÂ®Ã¦Ââ€¢Ã¨Å½Â· (CDC)
 
 ```typescript
 // Listen to PostgreSQL changes and sync to ClickHouse
@@ -408,38 +421,38 @@ pgClient.on('notification', async (msg) => {
 })
 ```
 
-## 最佳实践
+## Ã¦Å“â‚¬Ã¤Â½Â³Ã¥Â®Å¾Ã¨Â·Âµ
 
-### 1. 分区策略
+### 1. Ã¥Ë†â€ Ã¥Å’ÂºÃ§Â­â€“Ã§â€¢Â¥
 
-* 按时间分区 (通常是月或日)
-* 避免过多分区 (影响性能)
-* 对分区键使用 DATE 类型
+* Ã¦Å’â€°Ã¦â€”Â¶Ã©â€”Â´Ã¥Ë†â€ Ã¥Å’Âº (Ã©â‚¬Å¡Ã¥Â¸Â¸Ã¦ËœÂ¯Ã¦Å“Ë†Ã¦Ë†â€“Ã¦â€”Â¥)
+* Ã©ÂÂ¿Ã¥â€¦ÂÃ¨Â¿â€¡Ã¥Â¤Å¡Ã¥Ë†â€ Ã¥Å’Âº (Ã¥Â½Â±Ã¥â€œÂÃ¦â‚¬Â§Ã¨Æ’Â½)
+* Ã¥Â¯Â¹Ã¥Ë†â€ Ã¥Å’ÂºÃ©â€Â®Ã¤Â½Â¿Ã§â€Â¨ DATE Ã§Â±Â»Ã¥Å¾â€¹
 
-### 2. 排序键
+### 2. Ã¦Å½â€™Ã¥ÂºÂÃ©â€Â®
 
-* 将最常过滤的列放在前面
-* 考虑基数 (高基数优先)
-* 排序影响压缩
+* Ã¥Â°â€ Ã¦Å“â‚¬Ã¥Â¸Â¸Ã¨Â¿â€¡Ã¦Â»Â¤Ã§Å¡â€žÃ¥Ë†â€”Ã¦â€Â¾Ã¥Å“Â¨Ã¥â€°ÂÃ©ÂÂ¢
+* Ã¨â‚¬Æ’Ã¨â„¢â€˜Ã¥Å¸ÂºÃ¦â€¢Â° (Ã©Â«ËœÃ¥Å¸ÂºÃ¦â€¢Â°Ã¤Â¼ËœÃ¥â€¦Ë†)
+* Ã¦Å½â€™Ã¥ÂºÂÃ¥Â½Â±Ã¥â€œÂÃ¥Å½â€¹Ã§Â¼Â©
 
-### 3. 数据类型
+### 3. Ã¦â€¢Â°Ã¦ÂÂ®Ã§Â±Â»Ã¥Å¾â€¹
 
-* 使用最合适的较小类型 (UInt32 对比 UInt64)
-* 对重复字符串使用 LowCardinality
-* 对分类数据使用 Enum
+* Ã¤Â½Â¿Ã§â€Â¨Ã¦Å“â‚¬Ã¥ÂË†Ã©â‚¬â€šÃ§Å¡â€žÃ¨Â¾Æ’Ã¥Â°ÂÃ§Â±Â»Ã¥Å¾â€¹ (UInt32 Ã¥Â¯Â¹Ã¦Â¯â€ UInt64)
+* Ã¥Â¯Â¹Ã©â€¡ÂÃ¥Â¤ÂÃ¥Â­â€”Ã§Â¬Â¦Ã¤Â¸Â²Ã¤Â½Â¿Ã§â€Â¨ LowCardinality
+* Ã¥Â¯Â¹Ã¥Ë†â€ Ã§Â±Â»Ã¦â€¢Â°Ã¦ÂÂ®Ã¤Â½Â¿Ã§â€Â¨ Enum
 
-### 4. 避免
+### 4. Ã©ÂÂ¿Ã¥â€¦Â
 
-* SELECT \* (指定列)
-* FINAL (改为在查询前合并数据)
-* 过多的 JOIN (分析场景下进行反规范化)
-* 频繁的小批量插入 (改为批量)
+* SELECT \* (Ã¦Å’â€¡Ã¥Â®Å¡Ã¥Ë†â€”)
+* FINAL (Ã¦â€Â¹Ã¤Â¸ÂºÃ¥Å“Â¨Ã¦Å¸Â¥Ã¨Â¯Â¢Ã¥â€°ÂÃ¥ÂË†Ã¥Â¹Â¶Ã¦â€¢Â°Ã¦ÂÂ®)
+* Ã¨Â¿â€¡Ã¥Â¤Å¡Ã§Å¡â€ž JOIN (Ã¥Ë†â€ Ã¦Å¾ÂÃ¥Å“ÂºÃ¦â„¢Â¯Ã¤Â¸â€¹Ã¨Â¿â€ºÃ¨Â¡Å’Ã¥ÂÂÃ¨Â§â€žÃ¨Å’Æ’Ã¥Å’â€“)
+* Ã©Â¢â€˜Ã§Â¹ÂÃ§Å¡â€žÃ¥Â°ÂÃ¦â€°Â¹Ã©â€¡ÂÃ¦Ââ€™Ã¥â€¦Â¥ (Ã¦â€Â¹Ã¤Â¸ÂºÃ¦â€°Â¹Ã©â€¡Â)
 
-### 5. 监控
+### 5. Ã§â€ºâ€˜Ã¦Å½Â§
 
-* 跟踪查询性能
-* 监控磁盘使用情况
-* 检查合并操作
-* 查看慢查询日志
+* Ã¨Â·Å¸Ã¨Â¸ÂªÃ¦Å¸Â¥Ã¨Â¯Â¢Ã¦â‚¬Â§Ã¨Æ’Â½
+* Ã§â€ºâ€˜Ã¦Å½Â§Ã§Â£ÂÃ§â€ºËœÃ¤Â½Â¿Ã§â€Â¨Ã¦Æ’â€¦Ã¥â€ Âµ
+* Ã¦Â£â‚¬Ã¦Å¸Â¥Ã¥ÂË†Ã¥Â¹Â¶Ã¦â€œÂÃ¤Â½Å“
+* Ã¦Å¸Â¥Ã§Å“â€¹Ã¦â€¦Â¢Ã¦Å¸Â¥Ã¨Â¯Â¢Ã¦â€”Â¥Ã¥Â¿â€”
 
-**记住**: ClickHouse 擅长分析工作负载。根据查询模式设计表，批量插入，并利用物化视图进行实时聚合。
+**Ã¨Â®Â°Ã¤Â½Â**: ClickHouse Ã¦â€œâ€¦Ã©â€¢Â¿Ã¥Ë†â€ Ã¦Å¾ÂÃ¥Â·Â¥Ã¤Â½Å“Ã¨Â´Å¸Ã¨Â½Â½Ã£â‚¬â€šÃ¦Â Â¹Ã¦ÂÂ®Ã¦Å¸Â¥Ã¨Â¯Â¢Ã¦Â¨Â¡Ã¥Â¼ÂÃ¨Â®Â¾Ã¨Â®Â¡Ã¨Â¡Â¨Ã¯Â¼Å’Ã¦â€°Â¹Ã©â€¡ÂÃ¦Ââ€™Ã¥â€¦Â¥Ã¯Â¼Å’Ã¥Â¹Â¶Ã¥Ë†Â©Ã§â€Â¨Ã§â€°Â©Ã¥Å’â€“Ã¨Â§â€ Ã¥â€ºÂ¾Ã¨Â¿â€ºÃ¨Â¡Å’Ã¥Â®Å¾Ã¦â€”Â¶Ã¨ÂÅ¡Ã¥ÂË†Ã£â‚¬â€š

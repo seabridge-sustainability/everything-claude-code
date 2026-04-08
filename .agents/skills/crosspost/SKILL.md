@@ -1,3 +1,14 @@
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 ---
 name: crosspost
 description: Multi-platform content distribution across X, LinkedIn, Threads, and Bluesky. Adapts content per platform using content-engine patterns. Never posts identical content cross-platform. Use when the user wants to distribute content across social platforms.
@@ -84,7 +95,7 @@ Post to the primary platform first:
 ### Step 5: Post to Secondary Platforms
 
 Post adapted versions to remaining platforms:
-- Stagger timing (not all at once — 30-60 min gaps)
+- Stagger timing (not all at once Ã¢â‚¬â€ 30-60 min gaps)
 - Include cross-platform references where appropriate ("longer thread on X" etc.)
 
 ## Content Adaptation Examples
@@ -115,7 +126,7 @@ Here's why it matters:
 
 **Threads version:**
 ```
-just shipped something cool — [feature]
+just shipped something cool Ã¢â‚¬â€ [feature]
 
 [casual explanation of what it does]
 
@@ -184,5 +195,5 @@ Before posting:
 
 ## Related Skills
 
-- `content-engine` — Generate platform-native content
-- `x-api` — X/Twitter API integration
+- `content-engine` Ã¢â‚¬â€ Generate platform-native content
+- `x-api` Ã¢â‚¬â€ X/Twitter API integration

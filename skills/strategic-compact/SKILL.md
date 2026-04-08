@@ -6,12 +6,25 @@ origin: ECC
 
 # Strategic Compact Skill
 
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
 Suggests manual `/compact` at strategic points in your workflow rather than relying on arbitrary auto-compaction.
 
 ## When to Activate
 
 - Running long sessions that approach context limits (200K+ tokens)
-- Working on multi-phase tasks (research → plan → implement → test)
+- Working on multi-phase tasks (research Ã¢â€ â€™ plan Ã¢â€ â€™ implement Ã¢â€ â€™ test)
 - Switching between unrelated tasks within the same session
 - After completing a major milestone and starting new work
 - When responses slow down or become less coherent (context pressure)
@@ -24,17 +37,17 @@ Auto-compaction triggers at arbitrary points:
 - Can interrupt complex multi-step operations
 
 Strategic compaction at logical boundaries:
-- **After exploration, before execution** — Compact research context, keep implementation plan
-- **After completing a milestone** — Fresh start for next phase
-- **Before major context shifts** — Clear exploration context before different task
+- **After exploration, before execution** Ã¢â‚¬â€ Compact research context, keep implementation plan
+- **After completing a milestone** Ã¢â‚¬â€ Fresh start for next phase
+- **Before major context shifts** Ã¢â‚¬â€ Clear exploration context before different task
 
 ## How It Works
 
 The `suggest-compact.js` script runs on PreToolUse (Edit/Write) and:
 
-1. **Tracks tool calls** — Counts tool invocations in session
-2. **Threshold detection** — Suggests at configurable threshold (default: 50 calls)
-3. **Periodic reminders** — Reminds every 25 calls after threshold
+1. **Tracks tool calls** Ã¢â‚¬â€ Counts tool invocations in session
+2. **Threshold detection** Ã¢â‚¬â€ Suggests at configurable threshold (default: 50 calls)
+3. **Periodic reminders** Ã¢â‚¬â€ Reminds every 25 calls after threshold
 
 ## Hook Setup
 
@@ -60,7 +73,7 @@ Add to your `~/.claude/settings.json`:
 ## Configuration
 
 Environment variables:
-- `COMPACT_THRESHOLD` — Tool calls before first suggestion (default: 50)
+- `COMPACT_THRESHOLD` Ã¢â‚¬â€ Tool calls before first suggestion (default: 50)
 
 ## Compaction Decision Guide
 
@@ -68,10 +81,10 @@ Use this table to decide when to compact:
 
 | Phase Transition | Compact? | Why |
 |-----------------|----------|-----|
-| Research → Planning | Yes | Research context is bulky; plan is the distilled output |
-| Planning → Implementation | Yes | Plan is in TodoWrite or a file; free up context for code |
-| Implementation → Testing | Maybe | Keep if tests reference recent code; compact if switching focus |
-| Debugging → Next feature | Yes | Debug traces pollute context for unrelated work |
+| Research Ã¢â€ â€™ Planning | Yes | Research context is bulky; plan is the distilled output |
+| Planning Ã¢â€ â€™ Implementation | Yes | Plan is in TodoWrite or a file; free up context for code |
+| Implementation Ã¢â€ â€™ Testing | Maybe | Keep if tests reference recent code; compact if switching focus |
+| Debugging Ã¢â€ â€™ Next feature | Yes | Debug traces pollute context for unrelated work |
 | Mid-implementation | No | Losing variable names, file paths, and partial state is costly |
 | After a failed approach | Yes | Clear the dead-end reasoning before trying a new approach |
 
@@ -89,12 +102,12 @@ Understanding what persists helps you compact with confidence:
 
 ## Best Practices
 
-1. **Compact after planning** — Once plan is finalized in TodoWrite, compact to start fresh
-2. **Compact after debugging** — Clear error-resolution context before continuing
-3. **Don't compact mid-implementation** — Preserve context for related changes
-4. **Read the suggestion** — The hook tells you *when*, you decide *if*
-5. **Write before compacting** — Save important context to files or memory before compacting
-6. **Use `/compact` with a summary** — Add a custom message: `/compact Focus on implementing auth middleware next`
+1. **Compact after planning** Ã¢â‚¬â€ Once plan is finalized in TodoWrite, compact to start fresh
+2. **Compact after debugging** Ã¢â‚¬â€ Clear error-resolution context before continuing
+3. **Don't compact mid-implementation** Ã¢â‚¬â€ Preserve context for related changes
+4. **Read the suggestion** Ã¢â‚¬â€ The hook tells you *when*, you decide *if*
+5. **Write before compacting** Ã¢â‚¬â€ Save important context to files or memory before compacting
+6. **Use `/compact` with a summary** Ã¢â‚¬â€ Add a custom message: `/compact Focus on implementing auth middleware next`
 
 ## Token Optimization Patterns
 
@@ -109,10 +122,10 @@ Instead of loading full skill content at session start, use a trigger table that
 
 ### Context Composition Awareness
 Monitor what's consuming your context window:
-- **CLAUDE.md files** — Always loaded, keep lean
-- **Loaded skills** — Each skill adds 1-5K tokens
-- **Conversation history** — Grows with each exchange
-- **Tool results** — File reads, search results add bulk
+- **CLAUDE.md files** Ã¢â‚¬â€ Always loaded, keep lean
+- **Loaded skills** Ã¢â‚¬â€ Each skill adds 1-5K tokens
+- **Conversation history** Ã¢â‚¬â€ Grows with each exchange
+- **Tool results** Ã¢â‚¬â€ File reads, search results add bulk
 
 ### Duplicate Instruction Detection
 Common sources of duplicate context:
@@ -121,11 +134,11 @@ Common sources of duplicate context:
 - Multiple skills covering overlapping domains
 
 ### Context Optimization Tools
-- `token-optimizer` MCP — Automated 95%+ token reduction via content deduplication
-- `context-mode` — Context virtualization (315KB to 5.4KB demonstrated)
+- `token-optimizer` MCP Ã¢â‚¬â€ Automated 95%+ token reduction via content deduplication
+- `context-mode` Ã¢â‚¬â€ Context virtualization (315KB to 5.4KB demonstrated)
 
 ## Related
 
-- [The Longform Guide](https://x.com/affaanmustafa/status/2014040193557471352) — Token optimization section
-- Memory persistence hooks — For state that survives compaction
-- `continuous-learning` skill — Extracts patterns before session ends
+- [The Longform Guide](https://x.com/affaanmustafa/status/2014040193557471352) Ã¢â‚¬â€ Token optimization section
+- Memory persistence hooks Ã¢â‚¬â€ For state that survives compaction
+- `continuous-learning` skill Ã¢â‚¬â€ Extracts patterns before session ends

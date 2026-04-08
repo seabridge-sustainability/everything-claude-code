@@ -1,6 +1,19 @@
 # Execute - Multi-Model Collaborative Execution
 
-Multi-model collaborative execution - Get prototype from plan → Claude refactors and implements → Multi-model audit and delivery.
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+Multi-model collaborative execution - Get prototype from plan Ã¢â€ â€™ Claude refactors and implements Ã¢â€ â€™ Multi-model audit and delivery.
 
 $ARGUMENTS
 
@@ -128,7 +141,7 @@ TaskOutput({ task_id: "<task_id>", block: true, timeout: 600000 })
    |-----------|-----------|-------|
    | **Frontend** | Pages, components, UI, styles, layout | Gemini |
    | **Backend** | API, interfaces, database, logic, algorithms | Codex |
-   | **Fullstack** | Contains both frontend and backend | Codex ∥ Gemini parallel |
+   | **Fullstack** | Contains both frontend and backend | Codex Ã¢Ë†Â¥ Gemini parallel |
 
 ---
 
@@ -171,7 +184,7 @@ mcp__ace-tool__search_context({
 
 **Route Based on Task Type**:
 
-#### Route A: Frontend/UI/Styles → Gemini
+#### Route A: Frontend/UI/Styles Ã¢â€ â€™ Gemini
 
 **Limit**: Context < 32k tokens
 
@@ -182,7 +195,7 @@ mcp__ace-tool__search_context({
 5. **WARNING**: Ignore Gemini's backend logic suggestions
 6. If plan contains `GEMINI_SESSION`: prefer `resume <GEMINI_SESSION>`
 
-#### Route B: Backend/Logic/Algorithms → Codex
+#### Route B: Backend/Logic/Algorithms Ã¢â€ â€™ Codex
 
 1. Call Codex (use `~/.claude/.ccg/prompts/codex/architect.md`)
 2. Input: Plan content + retrieved context + target files
@@ -190,7 +203,7 @@ mcp__ace-tool__search_context({
 4. **Codex is backend logic authority, leverage its logical reasoning and debug capabilities**
 5. If plan contains `CODEX_SESSION`: prefer `resume <CODEX_SESSION>`
 
-#### Route C: Fullstack → Parallel Calls
+#### Route C: Fullstack Ã¢â€ â€™ Parallel Calls
 
 1. **Parallel Calls** (`run_in_background: true`):
    - Gemini: Handle frontend part
@@ -288,11 +301,11 @@ After audit passes, report to user:
 
 ## Key Rules
 
-1. **Code Sovereignty** – All file modifications by Claude, external models have zero write access
-2. **Dirty Prototype Refactoring** – Codex/Gemini output treated as draft, must refactor
-3. **Trust Rules** – Backend follows Codex, Frontend follows Gemini
-4. **Minimal Changes** – Only modify necessary code, no side effects
-5. **Mandatory Audit** – Must perform multi-model Code Review after changes
+1. **Code Sovereignty** Ã¢â‚¬â€œ All file modifications by Claude, external models have zero write access
+2. **Dirty Prototype Refactoring** Ã¢â‚¬â€œ Codex/Gemini output treated as draft, must refactor
+3. **Trust Rules** Ã¢â‚¬â€œ Backend follows Codex, Frontend follows Gemini
+4. **Minimal Changes** Ã¢â‚¬â€œ Only modify necessary code, no side effects
+5. **Mandatory Audit** Ã¢â‚¬â€œ Must perform multi-model Code Review after changes
 
 ---
 

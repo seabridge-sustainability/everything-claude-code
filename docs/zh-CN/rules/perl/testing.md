@@ -7,13 +7,26 @@ paths:
   - "**/*.cgi"
 ---
 
-# Perl 测试
+# Perl Ã¦Âµâ€¹Ã¨Â¯â€¢
 
-> 本文档在 [common/testing.md](../common/testing.md) 的基础上扩展了针对 Perl 的内容。
+## Safety And Authorization Rule
 
-## 框架
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-在新项目中使用 **Test2::V0**（而非 Test::More）：
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+> Ã¦Å“Â¬Ã¦â€“â€¡Ã¦Â¡Â£Ã¥Å“Â¨ [common/testing.md](../common/testing.md) Ã§Å¡â€žÃ¥Å¸ÂºÃ§Â¡â‚¬Ã¤Â¸Å Ã¦â€°Â©Ã¥Â±â€¢Ã¤Âºâ€ Ã©â€™Ë†Ã¥Â¯Â¹ Perl Ã§Å¡â€žÃ¥â€ â€¦Ã¥Â®Â¹Ã£â‚¬â€š
+
+## Ã¦Â¡â€ Ã¦Å¾Â¶
+
+Ã¥Å“Â¨Ã¦â€“Â°Ã©Â¡Â¹Ã§â€ºÂ®Ã¤Â¸Â­Ã¤Â½Â¿Ã§â€Â¨ **Test2::V0**Ã¯Â¼Ë†Ã¨â‚¬Å’Ã©ÂÅ¾ Test::MoreÃ¯Â¼â€°Ã¯Â¼Å¡
 
 ```perl
 use Test2::V0;
@@ -23,33 +36,33 @@ is($result, 42, 'answer is correct');
 done_testing;
 ```
 
-## 测试运行器
+## Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¨Â¿ÂÃ¨Â¡Å’Ã¥â„¢Â¨
 
 ```bash
 prove -l t/              # adds lib/ to @INC
 prove -lr -j8 t/         # recursive, 8 parallel jobs
 ```
 
-始终使用 `-l` 以确保 `lib/` 位于 `@INC` 上。
+Ã¥Â§â€¹Ã§Â»Ë†Ã¤Â½Â¿Ã§â€Â¨ `-l` Ã¤Â»Â¥Ã§Â¡Â®Ã¤Â¿Â `lib/` Ã¤Â½ÂÃ¤ÂºÅ½ `@INC` Ã¤Â¸Å Ã£â‚¬â€š
 
-## 覆盖率
+## Ã¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡
 
-使用 **Devel::Cover** —— 目标覆盖率 80%+：
+Ã¤Â½Â¿Ã§â€Â¨ **Devel::Cover** Ã¢â‚¬â€Ã¢â‚¬â€ Ã§â€ºÂ®Ã¦Â â€¡Ã¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡ 80%+Ã¯Â¼Å¡
 
 ```bash
 cover -test
 ```
 
-## 模拟
+## Ã¦Â¨Â¡Ã¦â€¹Å¸
 
-* **Test::MockModule** —— 模拟现有模块上的方法
-* **Test::MockObject** —— 从头创建测试替身
+* **Test::MockModule** Ã¢â‚¬â€Ã¢â‚¬â€ Ã¦Â¨Â¡Ã¦â€¹Å¸Ã§Å½Â°Ã¦Å“â€°Ã¦Â¨Â¡Ã¥Ââ€”Ã¤Â¸Å Ã§Å¡â€žÃ¦â€“Â¹Ã¦Â³â€¢
+* **Test::MockObject** Ã¢â‚¬â€Ã¢â‚¬â€ Ã¤Â»Å½Ã¥Â¤Â´Ã¥Ë†â€ºÃ¥Â»ÂºÃ¦Âµâ€¹Ã¨Â¯â€¢Ã¦â€ºÂ¿Ã¨ÂºÂ«
 
-## 常见陷阱
+## Ã¥Â¸Â¸Ã¨Â§ÂÃ©â„¢Â·Ã©ËœÂ±
 
-* 测试文件末尾始终使用 `done_testing`
-* 使用 `prove` 时切勿忘记 `-l` 标志
+* Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¦â€“â€¡Ã¤Â»Â¶Ã¦Å“Â«Ã¥Â°Â¾Ã¥Â§â€¹Ã§Â»Ë†Ã¤Â½Â¿Ã§â€Â¨ `done_testing`
+* Ã¤Â½Â¿Ã§â€Â¨ `prove` Ã¦â€”Â¶Ã¥Ë†â€¡Ã¥â€¹Â¿Ã¥Â¿ËœÃ¨Â®Â° `-l` Ã¦Â â€¡Ã¥Â¿â€”
 
-## 参考
+## Ã¥Ââ€šÃ¨â‚¬Æ’
 
-有关使用 Test2::V0、prove 和 Devel::Cover 的详细 Perl TDD 模式，请参阅技能：`perl-testing`。
+Ã¦Å“â€°Ã¥â€¦Â³Ã¤Â½Â¿Ã§â€Â¨ Test2::V0Ã£â‚¬Âprove Ã¥â€™Å’ Devel::Cover Ã§Å¡â€žÃ¨Â¯Â¦Ã§Â»â€  Perl TDD Ã¦Â¨Â¡Ã¥Â¼ÂÃ¯Â¼Å’Ã¨Â¯Â·Ã¥Ââ€šÃ©Ëœâ€¦Ã¦Å â‚¬Ã¨Æ’Â½Ã¯Â¼Å¡`perl-testing`Ã£â‚¬â€š

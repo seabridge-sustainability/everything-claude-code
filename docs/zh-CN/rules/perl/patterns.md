@@ -7,13 +7,26 @@ paths:
   - "**/*.cgi"
 ---
 
-# Perl 模式
+# Perl Ã¦Â¨Â¡Ã¥Â¼Â
 
-> 本文档在 [common/patterns.md](../common/patterns.md) 的基础上扩展了 Perl 特定的内容。
+## Safety And Authorization Rule
 
-## 仓储模式
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-在接口背后使用 **DBI** 或 **DBIx::Class**：
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+> Ã¦Å“Â¬Ã¦â€“â€¡Ã¦Â¡Â£Ã¥Å“Â¨ [common/patterns.md](../common/patterns.md) Ã§Å¡â€žÃ¥Å¸ÂºÃ§Â¡â‚¬Ã¤Â¸Å Ã¦â€°Â©Ã¥Â±â€¢Ã¤Âºâ€  Perl Ã§â€°Â¹Ã¥Â®Å¡Ã§Å¡â€žÃ¥â€ â€¦Ã¥Â®Â¹Ã£â‚¬â€š
+
+## Ã¤Â»â€œÃ¥â€šÂ¨Ã¦Â¨Â¡Ã¥Â¼Â
+
+Ã¥Å“Â¨Ã¦Å½Â¥Ã¥ÂÂ£Ã¨Æ’Å’Ã¥ÂÅ½Ã¤Â½Â¿Ã§â€Â¨ **DBI** Ã¦Ë†â€“ **DBIx::Class**Ã¯Â¼Å¡
 
 ```perl
 package MyApp::Repo::User;
@@ -28,9 +41,9 @@ sub find_by_id ($self, $id) {
 }
 ```
 
-## DTOs / 值对象
+## DTOs / Ã¥â‚¬Â¼Ã¥Â¯Â¹Ã¨Â±Â¡
 
-使用带有 **Types::Standard** 的 **Moo** 类（相当于 Python 的 dataclasses）：
+Ã¤Â½Â¿Ã§â€Â¨Ã¥Â¸Â¦Ã¦Å“â€° **Types::Standard** Ã§Å¡â€ž **Moo** Ã§Â±Â»Ã¯Â¼Ë†Ã§â€ºÂ¸Ã¥Â½â€œÃ¤ÂºÅ½ Python Ã§Å¡â€ž dataclassesÃ¯Â¼â€°Ã¯Â¼Å¡
 
 ```perl
 package MyApp::DTO::User;
@@ -42,10 +55,10 @@ has email => (is => 'ro', isa => Str, required => 1);
 has age   => (is => 'ro', isa => Int);
 ```
 
-## 资源管理
+## Ã¨Âµâ€žÃ¦ÂºÂÃ§Â®Â¡Ã§Ââ€ 
 
-* 始终使用 **三参数 open** 配合 `autodie`
-* 使用 **Path::Tiny** 进行文件操作
+* Ã¥Â§â€¹Ã§Â»Ë†Ã¤Â½Â¿Ã§â€Â¨ **Ã¤Â¸â€°Ã¥Ââ€šÃ¦â€¢Â° open** Ã©â€¦ÂÃ¥ÂË† `autodie`
+* Ã¤Â½Â¿Ã§â€Â¨ **Path::Tiny** Ã¨Â¿â€ºÃ¨Â¡Å’Ã¦â€“â€¡Ã¤Â»Â¶Ã¦â€œÂÃ¤Â½Å“
 
 ```perl
 use autodie;
@@ -54,24 +67,24 @@ use Path::Tiny;
 my $content = path('config.json')->slurp_utf8;
 ```
 
-## 模块接口
+## Ã¦Â¨Â¡Ã¥Ââ€”Ã¦Å½Â¥Ã¥ÂÂ£
 
-使用 `Exporter 'import'` 配合 `@EXPORT_OK` — 绝不使用 `@EXPORT`：
+Ã¤Â½Â¿Ã§â€Â¨ `Exporter 'import'` Ã©â€¦ÂÃ¥ÂË† `@EXPORT_OK` Ã¢â‚¬â€ Ã§Â»ÂÃ¤Â¸ÂÃ¤Â½Â¿Ã§â€Â¨ `@EXPORT`Ã¯Â¼Å¡
 
 ```perl
 use Exporter 'import';
 our @EXPORT_OK = qw(parse_config validate_input);
 ```
 
-## 依赖管理
+## Ã¤Â¾ÂÃ¨Âµâ€“Ã§Â®Â¡Ã§Ââ€ 
 
-使用 **cpanfile** + **carton** 以实现可复现的安装：
+Ã¤Â½Â¿Ã§â€Â¨ **cpanfile** + **carton** Ã¤Â»Â¥Ã¥Â®Å¾Ã§Å½Â°Ã¥ÂÂ¯Ã¥Â¤ÂÃ§Å½Â°Ã§Å¡â€žÃ¥Â®â€°Ã¨Â£â€¦Ã¯Â¼Å¡
 
 ```bash
 carton install
 carton exec prove -lr t/
 ```
 
-## 参考
+## Ã¥Ââ€šÃ¨â‚¬Æ’
 
-查看技能：`perl-patterns` 以获取全面的现代 Perl 模式和惯用法。
+Ã¦Å¸Â¥Ã§Å“â€¹Ã¦Å â‚¬Ã¨Æ’Â½Ã¯Â¼Å¡`perl-patterns` Ã¤Â»Â¥Ã¨Å½Â·Ã¥Ââ€“Ã¥â€¦Â¨Ã©ÂÂ¢Ã§Å¡â€žÃ§Å½Â°Ã¤Â»Â£ Perl Ã¦Â¨Â¡Ã¥Â¼ÂÃ¥â€™Å’Ã¦Æ’Â¯Ã§â€Â¨Ã¦Â³â€¢Ã£â‚¬â€š

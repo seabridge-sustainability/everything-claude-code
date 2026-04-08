@@ -1,84 +1,97 @@
 # Update Documentation
 
-Dokümanları codebase ile senkronize et, truth-of-source dosyalarından oluştur.
+## Safety And Authorization Rule
 
-## Adım 1: Truth Kaynaklarını Tanımla
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-| Kaynak | Oluşturur |
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+DokÃƒÂ¼manlarÃ„Â± codebase ile senkronize et, truth-of-source dosyalarÃ„Â±ndan oluÃ…Å¸tur.
+
+## AdÃ„Â±m 1: Truth KaynaklarÃ„Â±nÃ„Â± TanÃ„Â±mla
+
+| Kaynak | OluÃ…Å¸turur |
 |--------|-----------|
-| `package.json` scripts | Mevcut komutlar referansı |
-| `.env.example` | Environment variable dokümanı |
-| `openapi.yaml` / route dosyaları | API endpoint referansı |
-| Kaynak kod export'ları | Public API dokümanı |
-| `Dockerfile` / `docker-compose.yml` | Altyapı kurulum dokümanları |
+| `package.json` scripts | Mevcut komutlar referansÃ„Â± |
+| `.env.example` | Environment variable dokÃƒÂ¼manÃ„Â± |
+| `openapi.yaml` / route dosyalarÃ„Â± | API endpoint referansÃ„Â± |
+| Kaynak kod export'larÃ„Â± | Public API dokÃƒÂ¼manÃ„Â± |
+| `Dockerfile` / `docker-compose.yml` | AltyapÃ„Â± kurulum dokÃƒÂ¼manlarÃ„Â± |
 
-## Adım 2: Script Referansı Oluştur
+## AdÃ„Â±m 2: Script ReferansÃ„Â± OluÃ…Å¸tur
 
-1. `package.json`'ı oku (veya `Makefile`, `Cargo.toml`, `pyproject.toml`)
-2. Tüm script'leri/komutları açıklamalarıyla birlikte çıkar
-3. Bir referans tablosu oluştur:
+1. `package.json`'Ã„Â± oku (veya `Makefile`, `Cargo.toml`, `pyproject.toml`)
+2. TÃƒÂ¼m script'leri/komutlarÃ„Â± aÃƒÂ§Ã„Â±klamalarÃ„Â±yla birlikte ÃƒÂ§Ã„Â±kar
+3. Bir referans tablosu oluÃ…Å¸tur:
 
 ```markdown
 | Command | Description |
 |---------|-------------|
-| `npm run dev` | Hot reload ile development server'ı başlat |
+| `npm run dev` | Hot reload ile development server'Ã„Â± baÃ…Å¸lat |
 | `npm run build` | Type checking ile production build |
-| `npm test` | Coverage ile test suite'ini çalıştır |
+| `npm test` | Coverage ile test suite'ini ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r |
 ```
 
-## Adım 3: Environment Dokümanı Oluştur
+## AdÃ„Â±m 3: Environment DokÃƒÂ¼manÃ„Â± OluÃ…Å¸tur
 
-1. `.env.example`'ı oku (veya `.env.template`, `.env.sample`)
-2. Tüm değişkenleri amaçlarıyla birlikte çıkar
-3. Zorunlu vs isteğe bağlı olarak kategorize et
-4. Beklenen format ve geçerli değerleri dokümante et
+1. `.env.example`'Ã„Â± oku (veya `.env.template`, `.env.sample`)
+2. TÃƒÂ¼m deÃ„Å¸iÃ…Å¸kenleri amaÃƒÂ§larÃ„Â±yla birlikte ÃƒÂ§Ã„Â±kar
+3. Zorunlu vs isteÃ„Å¸e baÃ„Å¸lÃ„Â± olarak kategorize et
+4. Beklenen format ve geÃƒÂ§erli deÃ„Å¸erleri dokÃƒÂ¼mante et
 
 ```markdown
 | Variable | Required | Description | Example |
 |----------|----------|-------------|---------|
-| `DATABASE_URL` | Yes | PostgreSQL bağlantı string'i | `postgres://user:pass@host:5432/db` |
-| `LOG_LEVEL` | No | Log detay seviyesi (varsayılan: info) | `debug`, `info`, `warn`, `error` |
+| `DATABASE_URL` | Yes | PostgreSQL baÃ„Å¸lantÃ„Â± string'i | `postgres://user:pass@host:5432/db` |
+| `LOG_LEVEL` | No | Log detay seviyesi (varsayÃ„Â±lan: info) | `debug`, `info`, `warn`, `error` |
 ```
 
-## Adım 4: Contributing Guide'ı Güncelle
+## AdÃ„Â±m 4: Contributing Guide'Ã„Â± GÃƒÂ¼ncelle
 
-`docs/CONTRIBUTING.md`'yi şunlarla oluştur veya güncelle:
-- Development environment kurulumu (ön koşullar, kurulum adımları)
-- Mevcut script'ler ve amaçları
-- Test prosedürleri (nasıl çalıştırılır, nasıl yeni test yazılır)
-- Kod stili zorlama (linter, formatter, pre-commit hook'ları)
-- PR gönderim kontrol listesi
+`docs/CONTRIBUTING.md`'yi Ã…Å¸unlarla oluÃ…Å¸tur veya gÃƒÂ¼ncelle:
+- Development environment kurulumu (ÃƒÂ¶n koÃ…Å¸ullar, kurulum adÃ„Â±mlarÃ„Â±)
+- Mevcut script'ler ve amaÃƒÂ§larÃ„Â±
+- Test prosedÃƒÂ¼rleri (nasÃ„Â±l ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±rÃ„Â±lÃ„Â±r, nasÃ„Â±l yeni test yazÃ„Â±lÃ„Â±r)
+- Kod stili zorlama (linter, formatter, pre-commit hook'larÃ„Â±)
+- PR gÃƒÂ¶nderim kontrol listesi
 
-## Adım 5: Runbook'u Güncelle
+## AdÃ„Â±m 5: Runbook'u GÃƒÂ¼ncelle
 
-`docs/RUNBOOK.md`'yi şunlarla oluştur veya güncelle:
-- Deployment prosedürleri (adım adım)
+`docs/RUNBOOK.md`'yi Ã…Å¸unlarla oluÃ…Å¸tur veya gÃƒÂ¼ncelle:
+- Deployment prosedÃƒÂ¼rleri (adÃ„Â±m adÃ„Â±m)
 - Health check endpoint'leri ve izleme
-- Yaygın sorunlar ve düzeltmeleri
-- Rollback prosedürleri
-- Uyarı ve eskalasyon yolları
+- YaygÃ„Â±n sorunlar ve dÃƒÂ¼zeltmeleri
+- Rollback prosedÃƒÂ¼rleri
+- UyarÃ„Â± ve eskalasyon yollarÃ„Â±
 
-## Adım 6: Güncellik Kontrolü
+## AdÃ„Â±m 6: GÃƒÂ¼ncellik KontrolÃƒÂ¼
 
-1. 90+ gün değiştirilmemiş doküman dosyalarını bul
-2. Son kaynak kod değişiklikleriyle çapraz referans yap
-3. Manuel gözden geçirme için potansiyel güncel olmayan dokümanları işaretle
+1. 90+ gÃƒÂ¼n deÃ„Å¸iÃ…Å¸tirilmemiÃ…Å¸ dokÃƒÂ¼man dosyalarÃ„Â±nÃ„Â± bul
+2. Son kaynak kod deÃ„Å¸iÃ…Å¸iklikleriyle ÃƒÂ§apraz referans yap
+3. Manuel gÃƒÂ¶zden geÃƒÂ§irme iÃƒÂ§in potansiyel gÃƒÂ¼ncel olmayan dokÃƒÂ¼manlarÃ„Â± iÃ…Å¸aretle
 
-## Adım 7: Özeti Göster
+## AdÃ„Â±m 7: Ãƒâ€“zeti GÃƒÂ¶ster
 
 ```
 Documentation Update
-──────────────────────────────
+Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 Updated:  docs/CONTRIBUTING.md (scripts table)
 Updated:  docs/ENV.md (3 new variables)
 Flagged:  docs/DEPLOY.md (142 days stale)
 Skipped:  docs/API.md (no changes detected)
-──────────────────────────────
+Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 ```
 
 ## Kurallar
 
-- **Tek truth kaynağı**: Her zaman koddan oluştur, oluşturulan bölümleri asla manuel düzenleme
-- **Manuel bölümleri koru**: Sadece oluşturulan bölümleri güncelle; elle yazılmış prose'u bozulmamış bırak
-- **Oluşturulan içeriği işaretle**: Oluşturulan bölümlerin etrafında `<!-- AUTO-GENERATED -->` marker'ları kullan
-- **İstenmeyen doküman oluşturma**: Sadece komut açıkça talep ederse yeni doküman dosyaları oluştur
+- **Tek truth kaynaÃ„Å¸Ã„Â±**: Her zaman koddan oluÃ…Å¸tur, oluÃ…Å¸turulan bÃƒÂ¶lÃƒÂ¼mleri asla manuel dÃƒÂ¼zenleme
+- **Manuel bÃƒÂ¶lÃƒÂ¼mleri koru**: Sadece oluÃ…Å¸turulan bÃƒÂ¶lÃƒÂ¼mleri gÃƒÂ¼ncelle; elle yazÃ„Â±lmÃ„Â±Ã…Å¸ prose'u bozulmamÃ„Â±Ã…Å¸ bÃ„Â±rak
+- **OluÃ…Å¸turulan iÃƒÂ§eriÃ„Å¸i iÃ…Å¸aretle**: OluÃ…Å¸turulan bÃƒÂ¶lÃƒÂ¼mlerin etrafÃ„Â±nda `<!-- AUTO-GENERATED -->` marker'larÃ„Â± kullan
+- **Ã„Â°stenmeyen dokÃƒÂ¼man oluÃ…Å¸turma**: Sadece komut aÃƒÂ§Ã„Â±kÃƒÂ§a talep ederse yeni dokÃƒÂ¼man dosyalarÃ„Â± oluÃ…Å¸tur

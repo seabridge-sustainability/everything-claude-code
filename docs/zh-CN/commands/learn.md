@@ -1,39 +1,52 @@
-# /learn - 提取可重用模式
+# /learn - Ã¦ÂÂÃ¥Ââ€“Ã¥ÂÂ¯Ã©â€¡ÂÃ§â€Â¨Ã¦Â¨Â¡Ã¥Â¼Â
 
-分析当前会话，提取值得保存为技能的任何模式。
+## Safety And Authorization Rule
 
-## 触发时机
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-在会话期间的任何时刻，当你解决了一个非平凡问题时，运行 `/learn`。
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-## 提取内容
 
-寻找：
+Ã¥Ë†â€ Ã¦Å¾ÂÃ¥Â½â€œÃ¥â€°ÂÃ¤Â¼Å¡Ã¨Â¯ÂÃ¯Â¼Å’Ã¦ÂÂÃ¥Ââ€“Ã¥â‚¬Â¼Ã¥Â¾â€”Ã¤Â¿ÂÃ¥Â­ËœÃ¤Â¸ÂºÃ¦Å â‚¬Ã¨Æ’Â½Ã§Å¡â€žÃ¤Â»Â»Ã¤Â½â€¢Ã¦Â¨Â¡Ã¥Â¼ÂÃ£â‚¬â€š
 
-1. **错误解决模式**
-   * 出现了什么错误？
-   * 根本原因是什么？
-   * 什么方法修复了它？
-   * 这对解决类似错误是否可重用？
+## Ã¨Â§Â¦Ã¥Ââ€˜Ã¦â€”Â¶Ã¦Å“Âº
 
-2. **调试技术**
-   * 不明显的调试步骤
-   * 有效的工具组合
-   * 诊断模式
+Ã¥Å“Â¨Ã¤Â¼Å¡Ã¨Â¯ÂÃ¦Å“Å¸Ã©â€”Â´Ã§Å¡â€žÃ¤Â»Â»Ã¤Â½â€¢Ã¦â€”Â¶Ã¥Ë†Â»Ã¯Â¼Å’Ã¥Â½â€œÃ¤Â½Â Ã¨Â§Â£Ã¥â€ Â³Ã¤Âºâ€ Ã¤Â¸â‚¬Ã¤Â¸ÂªÃ©ÂÅ¾Ã¥Â¹Â³Ã¥â€¡Â¡Ã©â€”Â®Ã©Â¢ËœÃ¦â€”Â¶Ã¯Â¼Å’Ã¨Â¿ÂÃ¨Â¡Å’ `/learn`Ã£â‚¬â€š
 
-3. **变通方法**
-   * 库的怪癖
-   * API 限制
-   * 特定版本的修复
+## Ã¦ÂÂÃ¥Ââ€“Ã¥â€ â€¦Ã¥Â®Â¹
 
-4. **项目特定模式**
-   * 发现的代码库约定
-   * 做出的架构决策
-   * 集成模式
+Ã¥Â¯Â»Ã¦â€°Â¾Ã¯Â¼Å¡
 
-## 输出格式
+1. **Ã©â€â„¢Ã¨Â¯Â¯Ã¨Â§Â£Ã¥â€ Â³Ã¦Â¨Â¡Ã¥Â¼Â**
+   * Ã¥â€¡ÂºÃ§Å½Â°Ã¤Âºâ€ Ã¤Â»â‚¬Ã¤Â¹Ë†Ã©â€â„¢Ã¨Â¯Â¯Ã¯Â¼Å¸
+   * Ã¦Â Â¹Ã¦Å“Â¬Ã¥Å½Å¸Ã¥â€ºÂ Ã¦ËœÂ¯Ã¤Â»â‚¬Ã¤Â¹Ë†Ã¯Â¼Å¸
+   * Ã¤Â»â‚¬Ã¤Â¹Ë†Ã¦â€“Â¹Ã¦Â³â€¢Ã¤Â¿Â®Ã¥Â¤ÂÃ¤Âºâ€ Ã¥Â®Æ’Ã¯Â¼Å¸
+   * Ã¨Â¿â„¢Ã¥Â¯Â¹Ã¨Â§Â£Ã¥â€ Â³Ã§Â±Â»Ã¤Â¼Â¼Ã©â€â„¢Ã¨Â¯Â¯Ã¦ËœÂ¯Ã¥ÂÂ¦Ã¥ÂÂ¯Ã©â€¡ÂÃ§â€Â¨Ã¯Â¼Å¸
 
-在 `~/.claude/skills/learned/[pattern-name].md` 创建一个技能文件：
+2. **Ã¨Â°Æ’Ã¨Â¯â€¢Ã¦Å â‚¬Ã¦Å“Â¯**
+   * Ã¤Â¸ÂÃ¦ËœÅ½Ã¦ËœÂ¾Ã§Å¡â€žÃ¨Â°Æ’Ã¨Â¯â€¢Ã¦Â­Â¥Ã©ÂªÂ¤
+   * Ã¦Å“â€°Ã¦â€¢Ë†Ã§Å¡â€žÃ¥Â·Â¥Ã¥â€¦Â·Ã§Â»â€žÃ¥ÂË†
+   * Ã¨Â¯Å Ã¦â€“Â­Ã¦Â¨Â¡Ã¥Â¼Â
+
+3. **Ã¥ÂËœÃ©â‚¬Å¡Ã¦â€“Â¹Ã¦Â³â€¢**
+   * Ã¥Âºâ€œÃ§Å¡â€žÃ¦â‚¬ÂªÃ§â„¢â€“
+   * API Ã©â„¢ÂÃ¥Ë†Â¶
+   * Ã§â€°Â¹Ã¥Â®Å¡Ã§â€°Ë†Ã¦Å“Â¬Ã§Å¡â€žÃ¤Â¿Â®Ã¥Â¤Â
+
+4. **Ã©Â¡Â¹Ã§â€ºÂ®Ã§â€°Â¹Ã¥Â®Å¡Ã¦Â¨Â¡Ã¥Â¼Â**
+   * Ã¥Ââ€˜Ã§Å½Â°Ã§Å¡â€žÃ¤Â»Â£Ã§Â ÂÃ¥Âºâ€œÃ§ÂºÂ¦Ã¥Â®Å¡
+   * Ã¥ÂÅ¡Ã¥â€¡ÂºÃ§Å¡â€žÃ¦Å¾Â¶Ã¦Å¾â€žÃ¥â€ Â³Ã§Â­â€“
+   * Ã©â€ºâ€ Ã¦Ë†ÂÃ¦Â¨Â¡Ã¥Â¼Â
+
+## Ã¨Â¾â€œÃ¥â€¡ÂºÃ¦Â Â¼Ã¥Â¼Â
+
+Ã¥Å“Â¨ `~/.claude/skills/learned/[pattern-name].md` Ã¥Ë†â€ºÃ¥Â»ÂºÃ¤Â¸â‚¬Ã¤Â¸ÂªÃ¦Å â‚¬Ã¨Æ’Â½Ã¦â€“â€¡Ã¤Â»Â¶Ã¯Â¼Å¡
 
 ```markdown
 # [Descriptive Pattern Name]
@@ -54,17 +67,17 @@
 [Trigger conditions - what should activate this skill]
 ```
 
-## 流程
+## Ã¦ÂµÂÃ§Â¨â€¹
 
-1. 回顾会话，寻找可提取的模式
-2. 识别最有价值/可重用的见解
-3. 起草技能文件
-4. 在保存前请用户确认
-5. 保存到 `~/.claude/skills/learned/`
+1. Ã¥â€ºÅ¾Ã©Â¡Â¾Ã¤Â¼Å¡Ã¨Â¯ÂÃ¯Â¼Å’Ã¥Â¯Â»Ã¦â€°Â¾Ã¥ÂÂ¯Ã¦ÂÂÃ¥Ââ€“Ã§Å¡â€žÃ¦Â¨Â¡Ã¥Â¼Â
+2. Ã¨Â¯â€ Ã¥Ë†Â«Ã¦Å“â‚¬Ã¦Å“â€°Ã¤Â»Â·Ã¥â‚¬Â¼/Ã¥ÂÂ¯Ã©â€¡ÂÃ§â€Â¨Ã§Å¡â€žÃ¨Â§ÂÃ¨Â§Â£
+3. Ã¨ÂµÂ·Ã¨Ââ€°Ã¦Å â‚¬Ã¨Æ’Â½Ã¦â€“â€¡Ã¤Â»Â¶
+4. Ã¥Å“Â¨Ã¤Â¿ÂÃ¥Â­ËœÃ¥â€°ÂÃ¨Â¯Â·Ã§â€Â¨Ã¦Ë†Â·Ã§Â¡Â®Ã¨Â®Â¤
+5. Ã¤Â¿ÂÃ¥Â­ËœÃ¥Ë†Â° `~/.claude/skills/learned/`
 
-## 注意事项
+## Ã¦Â³Â¨Ã¦â€žÂÃ¤Âºâ€¹Ã©Â¡Â¹
 
-* 不要提取琐碎的修复（拼写错误、简单的语法错误）
-* 不要提取一次性问题（特定的 API 中断等）
-* 专注于那些将在未来会话中节省时间的模式
-* 保持技能的专注性 - 一个技能对应一个模式
+* Ã¤Â¸ÂÃ¨Â¦ÂÃ¦ÂÂÃ¥Ââ€“Ã§ÂÂÃ§Â¢Å½Ã§Å¡â€žÃ¤Â¿Â®Ã¥Â¤ÂÃ¯Â¼Ë†Ã¦â€¹Â¼Ã¥â€ â„¢Ã©â€â„¢Ã¨Â¯Â¯Ã£â‚¬ÂÃ§Â®â‚¬Ã¥Ââ€¢Ã§Å¡â€žÃ¨Â¯Â­Ã¦Â³â€¢Ã©â€â„¢Ã¨Â¯Â¯Ã¯Â¼â€°
+* Ã¤Â¸ÂÃ¨Â¦ÂÃ¦ÂÂÃ¥Ââ€“Ã¤Â¸â‚¬Ã¦Â¬Â¡Ã¦â‚¬Â§Ã©â€”Â®Ã©Â¢ËœÃ¯Â¼Ë†Ã§â€°Â¹Ã¥Â®Å¡Ã§Å¡â€ž API Ã¤Â¸Â­Ã¦â€“Â­Ã§Â­â€°Ã¯Â¼â€°
+* Ã¤Â¸â€œÃ¦Â³Â¨Ã¤ÂºÅ½Ã©â€šÂ£Ã¤Âºâ€ºÃ¥Â°â€ Ã¥Å“Â¨Ã¦Å“ÂªÃ¦ÂÂ¥Ã¤Â¼Å¡Ã¨Â¯ÂÃ¤Â¸Â­Ã¨Å â€šÃ§Å“ÂÃ¦â€”Â¶Ã©â€”Â´Ã§Å¡â€žÃ¦Â¨Â¡Ã¥Â¼Â
+* Ã¤Â¿ÂÃ¦Å’ÂÃ¦Å â‚¬Ã¨Æ’Â½Ã§Å¡â€žÃ¤Â¸â€œÃ¦Â³Â¨Ã¦â‚¬Â§ - Ã¤Â¸â‚¬Ã¤Â¸ÂªÃ¦Å â‚¬Ã¨Æ’Â½Ã¥Â¯Â¹Ã¥Âºâ€Ã¤Â¸â‚¬Ã¤Â¸ÂªÃ¦Â¨Â¡Ã¥Â¼Â

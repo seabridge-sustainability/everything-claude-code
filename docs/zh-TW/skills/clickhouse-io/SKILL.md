@@ -3,24 +3,37 @@ name: clickhouse-io
 description: ClickHouse database patterns, query optimization, analytics, and data engineering best practices for high-performance analytical workloads.
 ---
 
-# ClickHouse 分析模式
+# ClickHouse Ã¥Ë†â€ Ã¦Å¾ÂÃ¦Â¨Â¡Ã¥Â¼Â
 
-用於高效能分析和資料工程的 ClickHouse 特定模式。
+## Safety And Authorization Rule
 
-## 概述
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-ClickHouse 是一個列式資料庫管理系統（DBMS），用於線上分析處理（OLAP）。它針對大型資料集的快速分析查詢進行了優化。
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-**關鍵特性：**
-- 列式儲存
-- 資料壓縮
-- 平行查詢執行
-- 分散式查詢
-- 即時分析
 
-## 表格設計模式
+Ã§â€Â¨Ã¦â€“Â¼Ã©Â«ËœÃ¦â€¢Ë†Ã¨Æ’Â½Ã¥Ë†â€ Ã¦Å¾ÂÃ¥â€™Å’Ã¨Â³â€¡Ã¦â€“â„¢Ã¥Â·Â¥Ã§Â¨â€¹Ã§Å¡â€ž ClickHouse Ã§â€°Â¹Ã¥Â®Å¡Ã¦Â¨Â¡Ã¥Â¼ÂÃ£â‚¬â€š
 
-### MergeTree 引擎（最常見）
+## Ã¦Â¦â€šÃ¨Â¿Â°
+
+ClickHouse Ã¦ËœÂ¯Ã¤Â¸â‚¬Ã¥â‚¬â€¹Ã¥Ë†â€”Ã¥Â¼ÂÃ¨Â³â€¡Ã¦â€“â„¢Ã¥ÂºÂ«Ã§Â®Â¡Ã§Ââ€ Ã§Â³Â»Ã§ÂµÂ±Ã¯Â¼Ë†DBMSÃ¯Â¼â€°Ã¯Â¼Å’Ã§â€Â¨Ã¦â€“Â¼Ã§Â·Å¡Ã¤Â¸Å Ã¥Ë†â€ Ã¦Å¾ÂÃ¨â„¢â€¢Ã§Ââ€ Ã¯Â¼Ë†OLAPÃ¯Â¼â€°Ã£â‚¬â€šÃ¥Â®Æ’Ã©â€¡ÂÃ¥Â°ÂÃ¥Â¤Â§Ã¥Å¾â€¹Ã¨Â³â€¡Ã¦â€“â„¢Ã©â€ºâ€ Ã§Å¡â€žÃ¥Â¿Â«Ã©â‚¬Å¸Ã¥Ë†â€ Ã¦Å¾ÂÃ¦Å¸Â¥Ã¨Â©Â¢Ã©â‚¬Â²Ã¨Â¡Å’Ã¤Âºâ€ Ã¥â€žÂªÃ¥Å’â€“Ã£â‚¬â€š
+
+**Ã©â€”Å“Ã©ÂÂµÃ§â€°Â¹Ã¦â‚¬Â§Ã¯Â¼Å¡**
+- Ã¥Ë†â€”Ã¥Â¼ÂÃ¥â€žÂ²Ã¥Â­Ëœ
+- Ã¨Â³â€¡Ã¦â€“â„¢Ã¥Â£â€œÃ§Â¸Â®
+- Ã¥Â¹Â³Ã¨Â¡Å’Ã¦Å¸Â¥Ã¨Â©Â¢Ã¥Å¸Â·Ã¨Â¡Å’
+- Ã¥Ë†â€ Ã¦â€¢Â£Ã¥Â¼ÂÃ¦Å¸Â¥Ã¨Â©Â¢
+- Ã¥ÂÂ³Ã¦â„¢â€šÃ¥Ë†â€ Ã¦Å¾Â
+
+## Ã¨Â¡Â¨Ã¦Â Â¼Ã¨Â¨Â­Ã¨Â¨Ë†Ã¦Â¨Â¡Ã¥Â¼Â
+
+### MergeTree Ã¥Â¼â€¢Ã¦â€œÅ½Ã¯Â¼Ë†Ã¦Å“â‚¬Ã¥Â¸Â¸Ã¨Â¦â€¹Ã¯Â¼â€°
 
 ```sql
 CREATE TABLE markets_analytics (
@@ -38,10 +51,10 @@ ORDER BY (date, market_id)
 SETTINGS index_granularity = 8192;
 ```
 
-### ReplacingMergeTree（去重）
+### ReplacingMergeTreeÃ¯Â¼Ë†Ã¥Å½Â»Ã©â€¡ÂÃ¯Â¼â€°
 
 ```sql
--- 用於可能有重複的資料（例如來自多個來源）
+-- Ã§â€Â¨Ã¦â€“Â¼Ã¥ÂÂ¯Ã¨Æ’Â½Ã¦Å“â€°Ã©â€¡ÂÃ¨Â¤â€¡Ã§Å¡â€žÃ¨Â³â€¡Ã¦â€“â„¢Ã¯Â¼Ë†Ã¤Â¾â€¹Ã¥Â¦â€šÃ¤Â¾â€ Ã¨â€¡ÂªÃ¥Â¤Å¡Ã¥â‚¬â€¹Ã¤Â¾â€ Ã¦ÂºÂÃ¯Â¼â€°
 CREATE TABLE user_events (
     event_id String,
     user_id String,
@@ -54,10 +67,10 @@ ORDER BY (user_id, event_id, timestamp)
 PRIMARY KEY (user_id, event_id);
 ```
 
-### AggregatingMergeTree（預聚合）
+### AggregatingMergeTreeÃ¯Â¼Ë†Ã©Â ÂÃ¨ÂÅ¡Ã¥ÂË†Ã¯Â¼â€°
 
 ```sql
--- 用於維護聚合指標
+-- Ã§â€Â¨Ã¦â€“Â¼Ã§Â¶Â­Ã¨Â­Â·Ã¨ÂÅ¡Ã¥ÂË†Ã¦Å’â€¡Ã¦Â¨â„¢
 CREATE TABLE market_stats_hourly (
     hour DateTime,
     market_id String,
@@ -68,7 +81,7 @@ CREATE TABLE market_stats_hourly (
 PARTITION BY toYYYYMM(hour)
 ORDER BY (hour, market_id);
 
--- 查詢聚合資料
+-- Ã¦Å¸Â¥Ã¨Â©Â¢Ã¨ÂÅ¡Ã¥ÂË†Ã¨Â³â€¡Ã¦â€“â„¢
 SELECT
     hour,
     market_id,
@@ -81,12 +94,12 @@ GROUP BY hour, market_id
 ORDER BY hour DESC;
 ```
 
-## 查詢優化模式
+## Ã¦Å¸Â¥Ã¨Â©Â¢Ã¥â€žÂªÃ¥Å’â€“Ã¦Â¨Â¡Ã¥Â¼Â
 
-### 高效過濾
+### Ã©Â«ËœÃ¦â€¢Ë†Ã©ÂÅ½Ã¦Â¿Â¾
 
 ```sql
--- PASS: 良好：先使用索引欄位
+-- PASS: Ã¨â€°Â¯Ã¥Â¥Â½Ã¯Â¼Å¡Ã¥â€¦Ë†Ã¤Â½Â¿Ã§â€Â¨Ã§Â´Â¢Ã¥Â¼â€¢Ã¦Â¬â€žÃ¤Â½Â
 SELECT *
 FROM markets_analytics
 WHERE date >= '2025-01-01'
@@ -95,7 +108,7 @@ WHERE date >= '2025-01-01'
 ORDER BY date DESC
 LIMIT 100;
 
--- FAIL: 不良：先過濾非索引欄位
+-- FAIL: Ã¤Â¸ÂÃ¨â€°Â¯Ã¯Â¼Å¡Ã¥â€¦Ë†Ã©ÂÅ½Ã¦Â¿Â¾Ã©ÂÅ¾Ã§Â´Â¢Ã¥Â¼â€¢Ã¦Â¬â€žÃ¤Â½Â
 SELECT *
 FROM markets_analytics
 WHERE volume > 1000
@@ -103,10 +116,10 @@ WHERE volume > 1000
   AND date >= '2025-01-01';
 ```
 
-### 聚合
+### Ã¨ÂÅ¡Ã¥ÂË†
 
 ```sql
--- PASS: 良好：使用 ClickHouse 特定聚合函式
+-- PASS: Ã¨â€°Â¯Ã¥Â¥Â½Ã¯Â¼Å¡Ã¤Â½Â¿Ã§â€Â¨ ClickHouse Ã§â€°Â¹Ã¥Â®Å¡Ã¨ÂÅ¡Ã¥ÂË†Ã¥â€¡Â½Ã¥Â¼Â
 SELECT
     toStartOfDay(created_at) AS day,
     market_id,
@@ -119,7 +132,7 @@ WHERE created_at >= today() - INTERVAL 7 DAY
 GROUP BY day, market_id
 ORDER BY day DESC, total_volume DESC;
 
--- PASS: 使用 quantile 計算百分位數（比 percentile 更高效）
+-- PASS: Ã¤Â½Â¿Ã§â€Â¨ quantile Ã¨Â¨Ë†Ã§Â®â€”Ã§â„¢Â¾Ã¥Ë†â€ Ã¤Â½ÂÃ¦â€¢Â¸Ã¯Â¼Ë†Ã¦Â¯â€ percentile Ã¦â€ºÂ´Ã©Â«ËœÃ¦â€¢Ë†Ã¯Â¼â€°
 SELECT
     quantile(0.50)(trade_size) AS median,
     quantile(0.95)(trade_size) AS p95,
@@ -128,10 +141,10 @@ FROM trades
 WHERE created_at >= now() - INTERVAL 1 HOUR;
 ```
 
-### 視窗函式
+### Ã¨Â¦â€“Ã§Âªâ€”Ã¥â€¡Â½Ã¥Â¼Â
 
 ```sql
--- 計算累計總和
+-- Ã¨Â¨Ë†Ã§Â®â€”Ã§Â´Â¯Ã¨Â¨Ë†Ã§Â¸Â½Ã¥â€™Å’
 SELECT
     date,
     market_id,
@@ -146,9 +159,9 @@ WHERE date >= today() - INTERVAL 30 DAY
 ORDER BY market_id, date;
 ```
 
-## 資料插入模式
+## Ã¨Â³â€¡Ã¦â€“â„¢Ã¦Ââ€™Ã¥â€¦Â¥Ã¦Â¨Â¡Ã¥Â¼Â
 
-### 批量插入（推薦）
+### Ã¦â€°Â¹Ã©â€¡ÂÃ¦Ââ€™Ã¥â€¦Â¥Ã¯Â¼Ë†Ã¦Å½Â¨Ã¨â€“Â¦Ã¯Â¼â€°
 
 ```typescript
 import { ClickHouse } from 'clickhouse'
@@ -162,7 +175,7 @@ const clickhouse = new ClickHouse({
   }
 })
 
-// PASS: 批量插入（高效）
+// PASS: Ã¦â€°Â¹Ã©â€¡ÂÃ¦Ââ€™Ã¥â€¦Â¥Ã¯Â¼Ë†Ã©Â«ËœÃ¦â€¢Ë†Ã¯Â¼â€°
 async function bulkInsertTrades(trades: Trade[]) {
   const values = trades.map(trade => `(
     '${trade.id}',
@@ -178,19 +191,19 @@ async function bulkInsertTrades(trades: Trade[]) {
   `).toPromise()
 }
 
-// FAIL: 個別插入（慢）
+// FAIL: Ã¥â‚¬â€¹Ã¥Ë†Â¥Ã¦Ââ€™Ã¥â€¦Â¥Ã¯Â¼Ë†Ã¦â€¦Â¢Ã¯Â¼â€°
 async function insertTrade(trade: Trade) {
-  // 不要在迴圈中這樣做！
+  // Ã¤Â¸ÂÃ¨Â¦ÂÃ¥Å“Â¨Ã¨Â¿Â´Ã¥Å“Ë†Ã¤Â¸Â­Ã©â‚¬â„¢Ã¦Â¨Â£Ã¥ÂÅ¡Ã¯Â¼Â
   await clickhouse.query(`
     INSERT INTO trades VALUES ('${trade.id}', ...)
   `).toPromise()
 }
 ```
 
-### 串流插入
+### Ã¤Â¸Â²Ã¦ÂµÂÃ¦Ââ€™Ã¥â€¦Â¥
 
 ```typescript
-// 用於持續資料攝取
+// Ã§â€Â¨Ã¦â€“Â¼Ã¦Å’ÂÃ§ÂºÅ’Ã¨Â³â€¡Ã¦â€“â„¢Ã¦â€ÂÃ¥Ââ€“
 import { createWriteStream } from 'fs'
 import { pipeline } from 'stream/promises'
 
@@ -205,12 +218,12 @@ async function streamInserts() {
 }
 ```
 
-## 物化視圖
+## Ã§â€°Â©Ã¥Å’â€“Ã¨Â¦â€“Ã¥Å“â€“
 
-### 即時聚合
+### Ã¥ÂÂ³Ã¦â„¢â€šÃ¨ÂÅ¡Ã¥ÂË†
 
 ```sql
--- 建立每小時統計的物化視圖
+-- Ã¥Â»ÂºÃ§Â«â€¹Ã¦Â¯ÂÃ¥Â°ÂÃ¦â„¢â€šÃ§ÂµÂ±Ã¨Â¨Ë†Ã§Å¡â€žÃ§â€°Â©Ã¥Å’â€“Ã¨Â¦â€“Ã¥Å“â€“
 CREATE MATERIALIZED VIEW market_stats_hourly_mv
 TO market_stats_hourly
 AS SELECT
@@ -222,7 +235,7 @@ AS SELECT
 FROM trades
 GROUP BY hour, market_id;
 
--- 查詢物化視圖
+-- Ã¦Å¸Â¥Ã¨Â©Â¢Ã§â€°Â©Ã¥Å’â€“Ã¨Â¦â€“Ã¥Å“â€“
 SELECT
     hour,
     market_id,
@@ -234,12 +247,12 @@ WHERE hour >= now() - INTERVAL 24 HOUR
 GROUP BY hour, market_id;
 ```
 
-## 效能監控
+## Ã¦â€¢Ë†Ã¨Æ’Â½Ã§â€ºÂ£Ã¦Å½Â§
 
-### 查詢效能
+### Ã¦Å¸Â¥Ã¨Â©Â¢Ã¦â€¢Ë†Ã¨Æ’Â½
 
 ```sql
--- 檢查慢查詢
+-- Ã¦ÂªÂ¢Ã¦Å¸Â¥Ã¦â€¦Â¢Ã¦Å¸Â¥Ã¨Â©Â¢
 SELECT
     query_id,
     user,
@@ -256,10 +269,10 @@ ORDER BY query_duration_ms DESC
 LIMIT 10;
 ```
 
-### 表格統計
+### Ã¨Â¡Â¨Ã¦Â Â¼Ã§ÂµÂ±Ã¨Â¨Ë†
 
 ```sql
--- 檢查表格大小
+-- Ã¦ÂªÂ¢Ã¦Å¸Â¥Ã¨Â¡Â¨Ã¦Â Â¼Ã¥Â¤Â§Ã¥Â°Â
 SELECT
     database,
     table,
@@ -272,12 +285,12 @@ GROUP BY database, table
 ORDER BY sum(bytes) DESC;
 ```
 
-## 常見分析查詢
+## Ã¥Â¸Â¸Ã¨Â¦â€¹Ã¥Ë†â€ Ã¦Å¾ÂÃ¦Å¸Â¥Ã¨Â©Â¢
 
-### 時間序列分析
+### Ã¦â„¢â€šÃ©â€“â€œÃ¥ÂºÂÃ¥Ë†â€”Ã¥Ë†â€ Ã¦Å¾Â
 
 ```sql
--- 每日活躍使用者
+-- Ã¦Â¯ÂÃ¦â€”Â¥Ã¦Â´Â»Ã¨ÂºÂÃ¤Â½Â¿Ã§â€Â¨Ã¨â‚¬â€¦
 SELECT
     toDate(timestamp) AS date,
     uniq(user_id) AS daily_active_users
@@ -286,7 +299,7 @@ WHERE timestamp >= today() - INTERVAL 30 DAY
 GROUP BY date
 ORDER BY date;
 
--- 留存分析
+-- Ã§â€¢â„¢Ã¥Â­ËœÃ¥Ë†â€ Ã¦Å¾Â
 SELECT
     signup_date,
     countIf(days_since_signup = 0) AS day_0,
@@ -306,10 +319,10 @@ GROUP BY signup_date
 ORDER BY signup_date DESC;
 ```
 
-### 漏斗分析
+### Ã¦Â¼ÂÃ¦â€“â€”Ã¥Ë†â€ Ã¦Å¾Â
 
 ```sql
--- 轉換漏斗
+-- Ã¨Â½â€°Ã¦Ââ€ºÃ¦Â¼ÂÃ¦â€“â€”
 SELECT
     countIf(step = 'viewed_market') AS viewed,
     countIf(step = 'clicked_trade') AS clicked,
@@ -327,10 +340,10 @@ FROM (
 GROUP BY session_id;
 ```
 
-### 世代分析
+### Ã¤Â¸â€“Ã¤Â»Â£Ã¥Ë†â€ Ã¦Å¾Â
 
 ```sql
--- 按註冊月份的使用者世代
+-- Ã¦Å’â€°Ã¨Â¨Â»Ã¥â€ Å Ã¦Å“Ë†Ã¤Â»Â½Ã§Å¡â€žÃ¤Â½Â¿Ã§â€Â¨Ã¨â‚¬â€¦Ã¤Â¸â€“Ã¤Â»Â£
 SELECT
     toStartOfMonth(signup_date) AS cohort,
     toStartOfMonth(activity_date) AS month,
@@ -347,17 +360,17 @@ GROUP BY cohort, month, months_since_signup
 ORDER BY cohort, months_since_signup;
 ```
 
-## 資料管線模式
+## Ã¨Â³â€¡Ã¦â€“â„¢Ã§Â®Â¡Ã§Â·Å¡Ã¦Â¨Â¡Ã¥Â¼Â
 
-### ETL 模式
+### ETL Ã¦Â¨Â¡Ã¥Â¼Â
 
 ```typescript
-// 提取、轉換、載入
+// Ã¦ÂÂÃ¥Ââ€“Ã£â‚¬ÂÃ¨Â½â€°Ã¦Ââ€ºÃ£â‚¬ÂÃ¨Â¼â€°Ã¥â€¦Â¥
 async function etlPipeline() {
-  // 1. 從來源提取
+  // 1. Ã¥Â¾Å¾Ã¤Â¾â€ Ã¦ÂºÂÃ¦ÂÂÃ¥Ââ€“
   const rawData = await extractFromPostgres()
 
-  // 2. 轉換
+  // 2. Ã¨Â½â€°Ã¦Ââ€º
   const transformed = rawData.map(row => ({
     date: new Date(row.created_at).toISOString().split('T')[0],
     market_id: row.market_slug,
@@ -365,18 +378,18 @@ async function etlPipeline() {
     trades: parseInt(row.trade_count)
   }))
 
-  // 3. 載入到 ClickHouse
+  // 3. Ã¨Â¼â€°Ã¥â€¦Â¥Ã¥Ë†Â° ClickHouse
   await bulkInsertToClickHouse(transformed)
 }
 
-// 定期執行
-setInterval(etlPipeline, 60 * 60 * 1000)  // 每小時
+// Ã¥Â®Å¡Ã¦Å“Å¸Ã¥Å¸Â·Ã¨Â¡Å’
+setInterval(etlPipeline, 60 * 60 * 1000)  // Ã¦Â¯ÂÃ¥Â°ÂÃ¦â„¢â€š
 ```
 
-### 變更資料捕獲（CDC）
+### Ã¨Â®Å Ã¦â€ºÂ´Ã¨Â³â€¡Ã¦â€“â„¢Ã¦Ââ€¢Ã§ÂÂ²Ã¯Â¼Ë†CDCÃ¯Â¼â€°
 
 ```typescript
-// 監聽 PostgreSQL 變更並同步到 ClickHouse
+// Ã§â€ºÂ£Ã¨ÂÂ½ PostgreSQL Ã¨Â®Å Ã¦â€ºÂ´Ã¤Â¸Â¦Ã¥ÂÅ’Ã¦Â­Â¥Ã¥Ë†Â° ClickHouse
 import { Client } from 'pg'
 
 const pgClient = new Client({ connectionString: process.env.DATABASE_URL })
@@ -397,33 +410,33 @@ pgClient.on('notification', async (msg) => {
 })
 ```
 
-## 最佳實務
+## Ã¦Å“â‚¬Ã¤Â½Â³Ã¥Â¯Â¦Ã¥â€¹â„¢
 
-### 1. 分區策略
-- 按時間分區（通常按月或日）
-- 避免太多分區（效能影響）
-- 分區鍵使用 DATE 類型
+### 1. Ã¥Ë†â€ Ã¥Ââ‚¬Ã§Â­â€“Ã§â€¢Â¥
+- Ã¦Å’â€°Ã¦â„¢â€šÃ©â€“â€œÃ¥Ë†â€ Ã¥Ââ‚¬Ã¯Â¼Ë†Ã©â‚¬Å¡Ã¥Â¸Â¸Ã¦Å’â€°Ã¦Å“Ë†Ã¦Ë†â€“Ã¦â€”Â¥Ã¯Â¼â€°
+- Ã©ÂÂ¿Ã¥â€¦ÂÃ¥Â¤ÂªÃ¥Â¤Å¡Ã¥Ë†â€ Ã¥Ââ‚¬Ã¯Â¼Ë†Ã¦â€¢Ë†Ã¨Æ’Â½Ã¥Â½Â±Ã©Å¸Â¿Ã¯Â¼â€°
+- Ã¥Ë†â€ Ã¥Ââ‚¬Ã©ÂÂµÃ¤Â½Â¿Ã§â€Â¨ DATE Ã©Â¡Å¾Ã¥Å¾â€¹
 
-### 2. 排序鍵
-- 最常過濾的欄位放在最前面
-- 考慮基數（高基數優先）
-- 排序影響壓縮
+### 2. Ã¦Å½â€™Ã¥ÂºÂÃ©ÂÂµ
+- Ã¦Å“â‚¬Ã¥Â¸Â¸Ã©ÂÅ½Ã¦Â¿Â¾Ã§Å¡â€žÃ¦Â¬â€žÃ¤Â½ÂÃ¦â€Â¾Ã¥Å“Â¨Ã¦Å“â‚¬Ã¥â€°ÂÃ©ÂÂ¢
+- Ã¨â‚¬Æ’Ã¦â€¦Â®Ã¥Å¸ÂºÃ¦â€¢Â¸Ã¯Â¼Ë†Ã©Â«ËœÃ¥Å¸ÂºÃ¦â€¢Â¸Ã¥â€žÂªÃ¥â€¦Ë†Ã¯Â¼â€°
+- Ã¦Å½â€™Ã¥ÂºÂÃ¥Â½Â±Ã©Å¸Â¿Ã¥Â£â€œÃ§Â¸Â®
 
-### 3. 資料類型
-- 使用最小的適當類型（UInt32 vs UInt64）
-- 重複字串使用 LowCardinality
-- 分類資料使用 Enum
+### 3. Ã¨Â³â€¡Ã¦â€“â„¢Ã©Â¡Å¾Ã¥Å¾â€¹
+- Ã¤Â½Â¿Ã§â€Â¨Ã¦Å“â‚¬Ã¥Â°ÂÃ§Å¡â€žÃ©ÂÂ©Ã§â€¢Â¶Ã©Â¡Å¾Ã¥Å¾â€¹Ã¯Â¼Ë†UInt32 vs UInt64Ã¯Â¼â€°
+- Ã©â€¡ÂÃ¨Â¤â€¡Ã¥Â­â€”Ã¤Â¸Â²Ã¤Â½Â¿Ã§â€Â¨ LowCardinality
+- Ã¥Ë†â€ Ã©Â¡Å¾Ã¨Â³â€¡Ã¦â€“â„¢Ã¤Â½Â¿Ã§â€Â¨ Enum
 
-### 4. 避免
-- SELECT *（指定欄位）
-- FINAL（改為在查詢前合併資料）
-- 太多 JOINs（為分析反正規化）
-- 小量頻繁插入（改用批量）
+### 4. Ã©ÂÂ¿Ã¥â€¦Â
+- SELECT *Ã¯Â¼Ë†Ã¦Å’â€¡Ã¥Â®Å¡Ã¦Â¬â€žÃ¤Â½ÂÃ¯Â¼â€°
+- FINALÃ¯Â¼Ë†Ã¦â€Â¹Ã§â€šÂºÃ¥Å“Â¨Ã¦Å¸Â¥Ã¨Â©Â¢Ã¥â€°ÂÃ¥ÂË†Ã¤Â½ÂµÃ¨Â³â€¡Ã¦â€“â„¢Ã¯Â¼â€°
+- Ã¥Â¤ÂªÃ¥Â¤Å¡ JOINsÃ¯Â¼Ë†Ã§â€šÂºÃ¥Ë†â€ Ã¦Å¾ÂÃ¥ÂÂÃ¦Â­Â£Ã¨Â¦ÂÃ¥Å’â€“Ã¯Â¼â€°
+- Ã¥Â°ÂÃ©â€¡ÂÃ©Â Â»Ã§Â¹ÂÃ¦Ââ€™Ã¥â€¦Â¥Ã¯Â¼Ë†Ã¦â€Â¹Ã§â€Â¨Ã¦â€°Â¹Ã©â€¡ÂÃ¯Â¼â€°
 
-### 5. 監控
-- 追蹤查詢效能
-- 監控磁碟使用
-- 檢查合併操作
-- 審查慢查詢日誌
+### 5. Ã§â€ºÂ£Ã¦Å½Â§
+- Ã¨Â¿Â½Ã¨Â¹Â¤Ã¦Å¸Â¥Ã¨Â©Â¢Ã¦â€¢Ë†Ã¨Æ’Â½
+- Ã§â€ºÂ£Ã¦Å½Â§Ã§Â£ÂÃ§Â¢Å¸Ã¤Â½Â¿Ã§â€Â¨
+- Ã¦ÂªÂ¢Ã¦Å¸Â¥Ã¥ÂË†Ã¤Â½ÂµÃ¦â€œÂÃ¤Â½Å“
+- Ã¥Â¯Â©Ã¦Å¸Â¥Ã¦â€¦Â¢Ã¦Å¸Â¥Ã¨Â©Â¢Ã¦â€”Â¥Ã¨ÂªÅ’
 
-**記住**：ClickHouse 擅長分析工作負載。為你的查詢模式設計表格，批量插入，並利用物化視圖進行即時聚合。
+**Ã¨Â¨ËœÃ¤Â½Â**Ã¯Â¼Å¡ClickHouse Ã¦â€œâ€¦Ã©â€¢Â·Ã¥Ë†â€ Ã¦Å¾ÂÃ¥Â·Â¥Ã¤Â½Å“Ã¨Â²Â Ã¨Â¼â€°Ã£â‚¬â€šÃ§â€šÂºÃ¤Â½Â Ã§Å¡â€žÃ¦Å¸Â¥Ã¨Â©Â¢Ã¦Â¨Â¡Ã¥Â¼ÂÃ¨Â¨Â­Ã¨Â¨Ë†Ã¨Â¡Â¨Ã¦Â Â¼Ã¯Â¼Å’Ã¦â€°Â¹Ã©â€¡ÂÃ¦Ââ€™Ã¥â€¦Â¥Ã¯Â¼Å’Ã¤Â¸Â¦Ã¥Ë†Â©Ã§â€Â¨Ã§â€°Â©Ã¥Å’â€“Ã¨Â¦â€“Ã¥Å“â€“Ã©â‚¬Â²Ã¨Â¡Å’Ã¥ÂÂ³Ã¦â„¢â€šÃ¨ÂÅ¡Ã¥ÂË†Ã£â‚¬â€š

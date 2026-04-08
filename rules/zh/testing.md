@@ -1,29 +1,42 @@
-# 测试要求
+# Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¨Â¦ÂÃ¦Â±â€š
 
-## 最低测试覆盖率：80%
+## Safety And Authorization Rule
 
-测试类型（全部必需）：
-1. **单元测试** - 单个函数、工具、组件
-2. **集成测试** - API 端点、数据库操作
-3. **E2E 测试** - 关键用户流程（框架根据语言选择）
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-## 测试驱动开发
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-强制工作流：
-1. 先写测试（RED）
-2. 运行测试 - 应该失败
-3. 编写最小实现（GREEN）
-4. 运行测试 - 应该通过
-5. 重构（IMPROVE）
-6. 验证覆盖率（80%+）
 
-## 测试失败排查
+## Ã¦Å“â‚¬Ã¤Â½Å½Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡Ã¯Â¼Å¡80%
 
-1. 使用 **tdd-guide** 代理
-2. 检查测试隔离
-3. 验证模拟是否正确
-4. 修复实现，而非测试（除非测试有误）
+Ã¦Âµâ€¹Ã¨Â¯â€¢Ã§Â±Â»Ã¥Å¾â€¹Ã¯Â¼Ë†Ã¥â€¦Â¨Ã©Æ’Â¨Ã¥Â¿â€¦Ã©Å“â‚¬Ã¯Â¼â€°Ã¯Â¼Å¡
+1. **Ã¥Ââ€¢Ã¥â€¦Æ’Ã¦Âµâ€¹Ã¨Â¯â€¢** - Ã¥Ââ€¢Ã¤Â¸ÂªÃ¥â€¡Â½Ã¦â€¢Â°Ã£â‚¬ÂÃ¥Â·Â¥Ã¥â€¦Â·Ã£â‚¬ÂÃ§Â»â€žÃ¤Â»Â¶
+2. **Ã©â€ºâ€ Ã¦Ë†ÂÃ¦Âµâ€¹Ã¨Â¯â€¢** - API Ã§Â«Â¯Ã§â€šÂ¹Ã£â‚¬ÂÃ¦â€¢Â°Ã¦ÂÂ®Ã¥Âºâ€œÃ¦â€œÂÃ¤Â½Å“
+3. **E2E Ã¦Âµâ€¹Ã¨Â¯â€¢** - Ã¥â€¦Â³Ã©â€Â®Ã§â€Â¨Ã¦Ë†Â·Ã¦ÂµÂÃ§Â¨â€¹Ã¯Â¼Ë†Ã¦Â¡â€ Ã¦Å¾Â¶Ã¦Â Â¹Ã¦ÂÂ®Ã¨Â¯Â­Ã¨Â¨â‚¬Ã©â‚¬â€°Ã¦â€¹Â©Ã¯Â¼â€°
 
-## 代理支持
+## Ã¦Âµâ€¹Ã¨Â¯â€¢Ã©Â©Â±Ã¥Å Â¨Ã¥Â¼â‚¬Ã¥Ââ€˜
 
-- **tdd-guide** - 主动用于新功能，强制先写测试
+Ã¥Â¼ÂºÃ¥Ë†Â¶Ã¥Â·Â¥Ã¤Â½Å“Ã¦ÂµÂÃ¯Â¼Å¡
+1. Ã¥â€¦Ë†Ã¥â€ â„¢Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¯Â¼Ë†REDÃ¯Â¼â€°
+2. Ã¨Â¿ÂÃ¨Â¡Å’Ã¦Âµâ€¹Ã¨Â¯â€¢ - Ã¥Âºâ€Ã¨Â¯Â¥Ã¥Â¤Â±Ã¨Â´Â¥
+3. Ã§Â¼â€“Ã¥â€ â„¢Ã¦Å“â‚¬Ã¥Â°ÂÃ¥Â®Å¾Ã§Å½Â°Ã¯Â¼Ë†GREENÃ¯Â¼â€°
+4. Ã¨Â¿ÂÃ¨Â¡Å’Ã¦Âµâ€¹Ã¨Â¯â€¢ - Ã¥Âºâ€Ã¨Â¯Â¥Ã©â‚¬Å¡Ã¨Â¿â€¡
+5. Ã©â€¡ÂÃ¦Å¾â€žÃ¯Â¼Ë†IMPROVEÃ¯Â¼â€°
+6. Ã©ÂªÅ’Ã¨Â¯ÂÃ¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡Ã¯Â¼Ë†80%+Ã¯Â¼â€°
+
+## Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¥Â¤Â±Ã¨Â´Â¥Ã¦Å½â€™Ã¦Å¸Â¥
+
+1. Ã¤Â½Â¿Ã§â€Â¨ **tdd-guide** Ã¤Â»Â£Ã§Ââ€ 
+2. Ã¦Â£â‚¬Ã¦Å¸Â¥Ã¦Âµâ€¹Ã¨Â¯â€¢Ã©Å¡â€Ã§Â¦Â»
+3. Ã©ÂªÅ’Ã¨Â¯ÂÃ¦Â¨Â¡Ã¦â€¹Å¸Ã¦ËœÂ¯Ã¥ÂÂ¦Ã¦Â­Â£Ã§Â¡Â®
+4. Ã¤Â¿Â®Ã¥Â¤ÂÃ¥Â®Å¾Ã§Å½Â°Ã¯Â¼Å’Ã¨â‚¬Å’Ã©ÂÅ¾Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¯Â¼Ë†Ã©â„¢Â¤Ã©ÂÅ¾Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¦Å“â€°Ã¨Â¯Â¯Ã¯Â¼â€°
+
+## Ã¤Â»Â£Ã§Ââ€ Ã¦â€Â¯Ã¦Å’Â
+
+- **tdd-guide** - Ã¤Â¸Â»Ã¥Å Â¨Ã§â€Â¨Ã¤ÂºÅ½Ã¦â€“Â°Ã¥Å Å¸Ã¨Æ’Â½Ã¯Â¼Å’Ã¥Â¼ÂºÃ¥Ë†Â¶Ã¥â€¦Ë†Ã¥â€ â„¢Ã¦Âµâ€¹Ã¨Â¯â€¢

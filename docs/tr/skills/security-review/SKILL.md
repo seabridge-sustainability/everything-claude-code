@@ -1,65 +1,78 @@
 ---
 name: security-review
-description: Kimlik doğrulama eklerken, kullanıcı girdisi işlerken, secret'larla çalışırken, API endpoint'leri oluştururken veya ödeme/hassas özellikler uygularken bu skill'i kullanın. Kapsamlı güvenlik kontrol listesi ve kalıplar sağlar.
+description: Kimlik doÃ„Å¸rulama eklerken, kullanÃ„Â±cÃ„Â± girdisi iÃ…Å¸lerken, secret'larla ÃƒÂ§alÃ„Â±Ã…Å¸Ã„Â±rken, API endpoint'leri oluÃ…Å¸tururken veya ÃƒÂ¶deme/hassas ÃƒÂ¶zellikler uygularken bu skill'i kullanÃ„Â±n. KapsamlÃ„Â± gÃƒÂ¼venlik kontrol listesi ve kalÃ„Â±plar saÃ„Å¸lar.
 origin: ECC
 ---
 
-# Güvenlik İnceleme Skill'i
+# GÃƒÂ¼venlik Ã„Â°nceleme Skill'i
 
-Bu skill tüm kodun güvenlik en iyi uygulamalarını takip etmesini sağlar ve potansiyel güvenlik açıklarını tanımlar.
+## Safety And Authorization Rule
 
-## Ne Zaman Aktifleştirmelisiniz
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-- Kimlik doğrulama veya yetkilendirme uygularken
-- Kullanıcı girdisi veya dosya yüklemeleri işlerken
-- Yeni API endpoint'leri oluştururken
-- Secret'lar veya kimlik bilgileriyle çalışırken
-- Ödeme özellikleri uygularken
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+Bu skill tÃƒÂ¼m kodun gÃƒÂ¼venlik en iyi uygulamalarÃ„Â±nÃ„Â± takip etmesini saÃ„Å¸lar ve potansiyel gÃƒÂ¼venlik aÃƒÂ§Ã„Â±klarÃ„Â±nÃ„Â± tanÃ„Â±mlar.
+
+## Ne Zaman AktifleÃ…Å¸tirmelisiniz
+
+- Kimlik doÃ„Å¸rulama veya yetkilendirme uygularken
+- KullanÃ„Â±cÃ„Â± girdisi veya dosya yÃƒÂ¼klemeleri iÃ…Å¸lerken
+- Yeni API endpoint'leri oluÃ…Å¸tururken
+- Secret'lar veya kimlik bilgileriyle ÃƒÂ§alÃ„Â±Ã…Å¸Ã„Â±rken
+- Ãƒâ€“deme ÃƒÂ¶zellikleri uygularken
 - Hassas veri saklarken veya iletirken
-- Üçüncü taraf API'leri entegre ederken
+- ÃƒÅ“ÃƒÂ§ÃƒÂ¼ncÃƒÂ¼ taraf API'leri entegre ederken
 
-## Güvenlik Kontrol Listesi
+## GÃƒÂ¼venlik Kontrol Listesi
 
-### 1. Secret Yönetimi
+### 1. Secret YÃƒÂ¶netimi
 
-#### FAIL: ASLA Bunu Yapmayın
+#### FAIL: ASLA Bunu YapmayÃ„Â±n
 ```typescript
 const apiKey = "sk-proj-xxxxx"  // Hardcoded secret
 const dbPassword = "password123" // Kaynak kodda
 ```
 
-#### PASS: HER ZAMAN Bunu Yapın
+#### PASS: HER ZAMAN Bunu YapÃ„Â±n
 ```typescript
 const apiKey = process.env.OPENAI_API_KEY
 const dbUrl = process.env.DATABASE_URL
 
-// Secret'ların var olduğunu doğrula
+// Secret'larÃ„Â±n var olduÃ„Å¸unu doÃ„Å¸rula
 if (!apiKey) {
   throw new Error('OPENAI_API_KEY not configured')
 }
 ```
 
-#### Doğrulama Adımları
-- [ ] Hardcoded API key, token veya şifre yok
-- [ ] Tüm secret'lar environment variable'larda
+#### DoÃ„Å¸rulama AdÃ„Â±mlarÃ„Â±
+- [ ] Hardcoded API key, token veya Ã…Å¸ifre yok
+- [ ] TÃƒÂ¼m secret'lar environment variable'larda
 - [ ] `.env.local` .gitignore'da
 - [ ] Git history'de secret yok
-- [ ] Production secret'ları hosting platformunda (Vercel, Railway)
+- [ ] Production secret'larÃ„Â± hosting platformunda (Vercel, Railway)
 
-### 2. Input Doğrulama
+### 2. Input DoÃ„Å¸rulama
 
-#### Her Zaman Kullanıcı Girdisini Doğrulayın
+#### Her Zaman KullanÃ„Â±cÃ„Â± Girdisini DoÃ„Å¸rulayÃ„Â±n
 ```typescript
 import { z } from 'zod'
 
-// Doğrulama şeması tanımla
+// DoÃ„Å¸rulama Ã…Å¸emasÃ„Â± tanÃ„Â±mla
 const CreateUserSchema = z.object({
   email: z.string().email(),
   name: z.string().min(1).max(100),
   age: z.number().int().min(0).max(150)
 })
 
-// İşlemeden önce doğrula
+// Ã„Â°Ã…Å¸lemeden ÃƒÂ¶nce doÃ„Å¸rula
 export async function createUser(input: unknown) {
   try {
     const validated = CreateUserSchema.parse(input)
@@ -73,51 +86,51 @@ export async function createUser(input: unknown) {
 }
 ```
 
-#### Dosya Yükleme Doğrulama
+#### Dosya YÃƒÂ¼kleme DoÃ„Å¸rulama
 ```typescript
 function validateFileUpload(file: File) {
-  // Boyut kontrolü (5MB max)
+  // Boyut kontrolÃƒÂ¼ (5MB max)
   const maxSize = 5 * 1024 * 1024
   if (file.size > maxSize) {
-    throw new Error('Dosya çok büyük (max 5MB)')
+    throw new Error('Dosya ÃƒÂ§ok bÃƒÂ¼yÃƒÂ¼k (max 5MB)')
   }
 
-  // Tip kontrolü
+  // Tip kontrolÃƒÂ¼
   const allowedTypes = ['image/jpeg', 'image/png', 'image/gif']
   if (!allowedTypes.includes(file.type)) {
-    throw new Error('Geçersiz dosya tipi')
+    throw new Error('GeÃƒÂ§ersiz dosya tipi')
   }
 
-  // Uzantı kontrolü
+  // UzantÃ„Â± kontrolÃƒÂ¼
   const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif']
   const extension = file.name.toLowerCase().match(/\.[^.]+$/)?.[0]
   if (!extension || !allowedExtensions.includes(extension)) {
-    throw new Error('Geçersiz dosya uzantısı')
+    throw new Error('GeÃƒÂ§ersiz dosya uzantÃ„Â±sÃ„Â±')
   }
 
   return true
 }
 ```
 
-#### Doğrulama Adımları
-- [ ] Tüm kullanıcı girdileri şema ile doğrulanmış
-- [ ] Dosya yüklemeleri kısıtlanmış (boyut, tip, uzantı)
-- [ ] Kullanıcı girdisi doğrudan sorgularda kullanılmıyor
-- [ ] Whitelist doğrulama (blacklist değil)
-- [ ] Hata mesajları hassas bilgi sızdırmıyor
+#### DoÃ„Å¸rulama AdÃ„Â±mlarÃ„Â±
+- [ ] TÃƒÂ¼m kullanÃ„Â±cÃ„Â± girdileri Ã…Å¸ema ile doÃ„Å¸rulanmÃ„Â±Ã…Å¸
+- [ ] Dosya yÃƒÂ¼klemeleri kÃ„Â±sÃ„Â±tlanmÃ„Â±Ã…Å¸ (boyut, tip, uzantÃ„Â±)
+- [ ] KullanÃ„Â±cÃ„Â± girdisi doÃ„Å¸rudan sorgularda kullanÃ„Â±lmÃ„Â±yor
+- [ ] Whitelist doÃ„Å¸rulama (blacklist deÃ„Å¸il)
+- [ ] Hata mesajlarÃ„Â± hassas bilgi sÃ„Â±zdÃ„Â±rmÃ„Â±yor
 
-### 3. SQL Injection Önleme
+### 3. SQL Injection Ãƒâ€“nleme
 
-#### FAIL: ASLA SQL Concatenation Yapmayın
+#### FAIL: ASLA SQL Concatenation YapmayÃ„Â±n
 ```typescript
-// TEHLİKELİ - SQL Injection açığı
+// TEHLÃ„Â°KELÃ„Â° - SQL Injection aÃƒÂ§Ã„Â±Ã„Å¸Ã„Â±
 const query = `SELECT * FROM users WHERE email = '${userEmail}'`
 await db.query(query)
 ```
 
-#### PASS: HER ZAMAN Parametreli Sorgular Kullanın
+#### PASS: HER ZAMAN Parametreli Sorgular KullanÃ„Â±n
 ```typescript
-// Güvenli - parametreli sorgu
+// GÃƒÂ¼venli - parametreli sorgu
 const { data } = await supabase
   .from('users')
   .select('*')
@@ -130,20 +143,20 @@ await db.query(
 )
 ```
 
-#### Doğrulama Adımları
-- [ ] Tüm veritabanı sorguları parametreli
+#### DoÃ„Å¸rulama AdÃ„Â±mlarÃ„Â±
+- [ ] TÃƒÂ¼m veritabanÃ„Â± sorgularÃ„Â± parametreli
 - [ ] SQL'de string concatenation yok
-- [ ] ORM/query builder doğru kullanılıyor
-- [ ] Supabase sorguları düzgün sanitize edilmiş
+- [ ] ORM/query builder doÃ„Å¸ru kullanÃ„Â±lÃ„Â±yor
+- [ ] Supabase sorgularÃ„Â± dÃƒÂ¼zgÃƒÂ¼n sanitize edilmiÃ…Å¸
 
-### 4. Kimlik Doğrulama ve Yetkilendirme
+### 4. Kimlik DoÃ„Å¸rulama ve Yetkilendirme
 
-#### JWT Token İşleme
+#### JWT Token Ã„Â°Ã…Å¸leme
 ```typescript
-// FAIL: YANLIŞ: localStorage (XSS'e karşı savunmasız)
+// FAIL: YANLIÃ…Å¾: localStorage (XSS'e karÃ…Å¸Ã„Â± savunmasÃ„Â±z)
 localStorage.setItem('token', token)
 
-// PASS: DOĞRU: httpOnly cookies
+// PASS: DOÃ„Å¾RU: httpOnly cookies
 res.setHeader('Set-Cookie',
   `token=${token}; HttpOnly; Secure; SameSite=Strict; Max-Age=3600`)
 ```
@@ -151,7 +164,7 @@ res.setHeader('Set-Cookie',
 #### Yetkilendirme Kontrolleri
 ```typescript
 export async function deleteUser(userId: string, requesterId: string) {
-  // HER ZAMAN önce yetkilendirmeyi doğrula
+  // HER ZAMAN ÃƒÂ¶nce yetkilendirmeyi doÃ„Å¸rula
   const requester = await db.users.findUnique({
     where: { id: requesterId }
   })
@@ -163,41 +176,41 @@ export async function deleteUser(userId: string, requesterId: string) {
     )
   }
 
-  // Silme işlemine devam et
+  // Silme iÃ…Å¸lemine devam et
   await db.users.delete({ where: { id: userId } })
 }
 ```
 
 #### Row Level Security (Supabase)
 ```sql
--- Tüm tablolarda RLS'yi aktifleştir
+-- TÃƒÂ¼m tablolarda RLS'yi aktifleÃ…Å¸tir
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 
--- Kullanıcılar sadece kendi verilerini görebilir
+-- KullanÃ„Â±cÃ„Â±lar sadece kendi verilerini gÃƒÂ¶rebilir
 CREATE POLICY "Users view own data"
   ON users FOR SELECT
   USING (auth.uid() = id);
 
--- Kullanıcılar sadece kendi verilerini güncelleyebilir
+-- KullanÃ„Â±cÃ„Â±lar sadece kendi verilerini gÃƒÂ¼ncelleyebilir
 CREATE POLICY "Users update own data"
   ON users FOR UPDATE
   USING (auth.uid() = id);
 ```
 
-#### Doğrulama Adımları
-- [ ] Token'lar httpOnly cookie'lerde (localStorage'da değil)
-- [ ] Hassas operasyonlardan önce yetkilendirme kontrolleri
+#### DoÃ„Å¸rulama AdÃ„Â±mlarÃ„Â±
+- [ ] Token'lar httpOnly cookie'lerde (localStorage'da deÃ„Å¸il)
+- [ ] Hassas operasyonlardan ÃƒÂ¶nce yetkilendirme kontrolleri
 - [ ] Supabase'de Row Level Security aktif
-- [ ] Rol tabanlı erişim kontrolü uygulanmış
-- [ ] Session yönetimi güvenli
+- [ ] Rol tabanlÃ„Â± eriÃ…Å¸im kontrolÃƒÂ¼ uygulanmÃ„Â±Ã…Å¸
+- [ ] Session yÃƒÂ¶netimi gÃƒÂ¼venli
 
-### 5. XSS Önleme
+### 5. XSS Ãƒâ€“nleme
 
 #### HTML'i Sanitize Et
 ```typescript
 import DOMPurify from 'isomorphic-dompurify'
 
-// HER ZAMAN kullanıcı tarafından sağlanan HTML'i sanitize et
+// HER ZAMAN kullanÃ„Â±cÃ„Â± tarafÃ„Â±ndan saÃ„Å¸lanan HTML'i sanitize et
 function renderUserContent(html: string) {
   const clean = DOMPurify.sanitize(html, {
     ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'p'],
@@ -225,15 +238,15 @@ const securityHeaders = [
 ]
 ```
 
-#### Doğrulama Adımları
-- [ ] Kullanıcı tarafından sağlanan HTML sanitize edilmiş
-- [ ] CSP başlıkları yapılandırılmış
-- [ ] Doğrulanmamış dinamik içerik render'ı yok
-- [ ] React'in yerleşik XSS koruması kullanılıyor
+#### DoÃ„Å¸rulama AdÃ„Â±mlarÃ„Â±
+- [ ] KullanÃ„Â±cÃ„Â± tarafÃ„Â±ndan saÃ„Å¸lanan HTML sanitize edilmiÃ…Å¸
+- [ ] CSP baÃ…Å¸lÃ„Â±klarÃ„Â± yapÃ„Â±landÃ„Â±rÃ„Â±lmÃ„Â±Ã…Å¸
+- [ ] DoÃ„Å¸rulanmamÃ„Â±Ã…Å¸ dinamik iÃƒÂ§erik render'Ã„Â± yok
+- [ ] React'in yerleÃ…Å¸ik XSS korumasÃ„Â± kullanÃ„Â±lÃ„Â±yor
 
-### 6. CSRF Koruması
+### 6. CSRF KorumasÃ„Â±
 
-#### CSRF Token'ları
+#### CSRF Token'larÃ„Â±
 ```typescript
 import { csrf } from '@/lib/csrf'
 
@@ -247,7 +260,7 @@ export async function POST(request: Request) {
     )
   }
 
-  // İsteği işle
+  // Ã„Â°steÃ„Å¸i iÃ…Å¸le
 }
 ```
 
@@ -257,10 +270,10 @@ res.setHeader('Set-Cookie',
   `session=${sessionId}; HttpOnly; Secure; SameSite=Strict`)
 ```
 
-#### Doğrulama Adımları
-- [ ] State değiştiren operasyonlarda CSRF token'ları
-- [ ] Tüm cookie'lerde SameSite=Strict
-- [ ] Double-submit cookie pattern uygulanmış
+#### DoÃ„Å¸rulama AdÃ„Â±mlarÃ„Â±
+- [ ] State deÃ„Å¸iÃ…Å¸tiren operasyonlarda CSRF token'larÃ„Â±
+- [ ] TÃƒÂ¼m cookie'lerde SameSite=Strict
+- [ ] Double-submit cookie pattern uygulanmÃ„Â±Ã…Å¸
 
 ### 7. Rate Limiting
 
@@ -270,48 +283,48 @@ import rateLimit from 'express-rate-limit'
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 dakika
-  max: 100, // Pencere başına 100 istek
-  message: 'Çok fazla istek'
+  max: 100, // Pencere baÃ…Å¸Ã„Â±na 100 istek
+  message: 'Ãƒâ€¡ok fazla istek'
 })
 
 // Route'lara uygula
 app.use('/api/', limiter)
 ```
 
-#### Pahalı Operasyonlar
+#### PahalÃ„Â± Operasyonlar
 ```typescript
-// Aramalar için agresif rate limiting
+// Aramalar iÃƒÂ§in agresif rate limiting
 const searchLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 dakika
   max: 10, // Dakikada 10 istek
-  message: 'Çok fazla arama isteği'
+  message: 'Ãƒâ€¡ok fazla arama isteÃ„Å¸i'
 })
 
 app.use('/api/search', searchLimiter)
 ```
 
-#### Doğrulama Adımları
-- [ ] Tüm API endpoint'lerinde rate limiting
-- [ ] Pahalı operasyonlarda daha sıkı limitler
-- [ ] IP tabanlı rate limiting
-- [ ] Kullanıcı tabanlı rate limiting (authenticated)
+#### DoÃ„Å¸rulama AdÃ„Â±mlarÃ„Â±
+- [ ] TÃƒÂ¼m API endpoint'lerinde rate limiting
+- [ ] PahalÃ„Â± operasyonlarda daha sÃ„Â±kÃ„Â± limitler
+- [ ] IP tabanlÃ„Â± rate limiting
+- [ ] KullanÃ„Â±cÃ„Â± tabanlÃ„Â± rate limiting (authenticated)
 
-### 8. Hassas Veri İfşası
+### 8. Hassas Veri Ã„Â°fÃ…Å¸asÃ„Â±
 
 #### Loglama
 ```typescript
-// FAIL: YANLIŞ: Hassas veri loglama
+// FAIL: YANLIÃ…Å¾: Hassas veri loglama
 console.log('User login:', { email, password })
 console.log('Payment:', { cardNumber, cvv })
 
-// PASS: DOĞRU: Hassas veriyi gizle
+// PASS: DOÃ„Å¾RU: Hassas veriyi gizle
 console.log('User login:', { email, userId })
 console.log('Payment:', { last4: card.last4, userId })
 ```
 
-#### Hata Mesajları
+#### Hata MesajlarÃ„Â±
 ```typescript
-// FAIL: YANLIŞ: İç detayları açığa çıkarma
+// FAIL: YANLIÃ…Å¾: Ã„Â°ÃƒÂ§ detaylarÃ„Â± aÃƒÂ§Ã„Â±Ã„Å¸a ÃƒÂ§Ã„Â±karma
 catch (error) {
   return NextResponse.json(
     { error: error.message, stack: error.stack },
@@ -319,25 +332,25 @@ catch (error) {
   )
 }
 
-// PASS: DOĞRU: Genel hata mesajları
+// PASS: DOÃ„Å¾RU: Genel hata mesajlarÃ„Â±
 catch (error) {
   console.error('Internal error:', error)
   return NextResponse.json(
-    { error: 'Bir hata oluştu. Lütfen tekrar deneyin.' },
+    { error: 'Bir hata oluÃ…Å¸tu. LÃƒÂ¼tfen tekrar deneyin.' },
     { status: 500 }
   )
 }
 ```
 
-#### Doğrulama Adımları
-- [ ] Loglarda şifre, token veya secret yok
-- [ ] Kullanıcılar için genel hata mesajları
-- [ ] Detaylı hatalar sadece sunucu loglarında
-- [ ] Kullanıcılara stack trace gösterilmiyor
+#### DoÃ„Å¸rulama AdÃ„Â±mlarÃ„Â±
+- [ ] Loglarda Ã…Å¸ifre, token veya secret yok
+- [ ] KullanÃ„Â±cÃ„Â±lar iÃƒÂ§in genel hata mesajlarÃ„Â±
+- [ ] DetaylÃ„Â± hatalar sadece sunucu loglarÃ„Â±nda
+- [ ] KullanÃ„Â±cÃ„Â±lara stack trace gÃƒÂ¶sterilmiyor
 
-### 9. Blockchain Güvenliği (Solana)
+### 9. Blockchain GÃƒÂ¼venliÃ„Å¸i (Solana)
 
-#### Wallet Doğrulama
+#### Wallet DoÃ„Å¸rulama
 ```typescript
 import { verify } from '@solana/web3.js'
 
@@ -359,20 +372,20 @@ async function verifyWalletOwnership(
 }
 ```
 
-#### Transaction Doğrulama
+#### Transaction DoÃ„Å¸rulama
 ```typescript
 async function verifyTransaction(transaction: Transaction) {
-  // Alıcıyı doğrula
+  // AlÃ„Â±cÃ„Â±yÃ„Â± doÃ„Å¸rula
   if (transaction.to !== expectedRecipient) {
-    throw new Error('Geçersiz alıcı')
+    throw new Error('GeÃƒÂ§ersiz alÃ„Â±cÃ„Â±')
   }
 
-  // Miktarı doğrula
+  // MiktarÃ„Â± doÃ„Å¸rula
   if (transaction.amount > maxAmount) {
-    throw new Error('Miktar limiti aşıyor')
+    throw new Error('Miktar limiti aÃ…Å¸Ã„Â±yor')
   }
 
-  // Kullanıcının yeterli bakiyesi olduğunu doğrula
+  // KullanÃ„Â±cÃ„Â±nÃ„Â±n yeterli bakiyesi olduÃ„Å¸unu doÃ„Å¸rula
   const balance = await getBalance(transaction.from)
   if (balance < transaction.amount) {
     throw new Error('Yetersiz bakiye')
@@ -382,65 +395,65 @@ async function verifyTransaction(transaction: Transaction) {
 }
 ```
 
-#### Doğrulama Adımları
-- [ ] Wallet imzaları doğrulanmış
-- [ ] Transaction detayları validate edilmiş
-- [ ] Transaction'lardan önce bakiye kontrolleri
-- [ ] Kör transaction imzalama yok
+#### DoÃ„Å¸rulama AdÃ„Â±mlarÃ„Â±
+- [ ] Wallet imzalarÃ„Â± doÃ„Å¸rulanmÃ„Â±Ã…Å¸
+- [ ] Transaction detaylarÃ„Â± validate edilmiÃ…Å¸
+- [ ] Transaction'lardan ÃƒÂ¶nce bakiye kontrolleri
+- [ ] KÃƒÂ¶r transaction imzalama yok
 
-### 10. Bağımlılık Güvenliği
+### 10. BaÃ„Å¸Ã„Â±mlÃ„Â±lÃ„Â±k GÃƒÂ¼venliÃ„Å¸i
 
-#### Düzenli Güncellemeler
+#### DÃƒÂ¼zenli GÃƒÂ¼ncellemeler
 ```bash
-# Güvenlik açıklarını kontrol et
+# GÃƒÂ¼venlik aÃƒÂ§Ã„Â±klarÃ„Â±nÃ„Â± kontrol et
 npm audit
 
-# Otomatik düzeltilebilir sorunları düzelt
+# Otomatik dÃƒÂ¼zeltilebilir sorunlarÃ„Â± dÃƒÂ¼zelt
 npm audit fix
 
-# Bağımlılıkları güncelle
+# BaÃ„Å¸Ã„Â±mlÃ„Â±lÃ„Â±klarÃ„Â± gÃƒÂ¼ncelle
 npm update
 
 # Eski paketleri kontrol et
 npm outdated
 ```
 
-#### Lock Dosyaları
+#### Lock DosyalarÃ„Â±
 ```bash
-# HER ZAMAN lock dosyalarını commit et
+# HER ZAMAN lock dosyalarÃ„Â±nÃ„Â± commit et
 git add package-lock.json
 
-# CI/CD'de tekrarlanabilir build'ler için kullan
+# CI/CD'de tekrarlanabilir build'ler iÃƒÂ§in kullan
 npm ci  # npm install yerine
 ```
 
-#### Doğrulama Adımları
-- [ ] Bağımlılıklar güncel
-- [ ] Bilinen güvenlik açığı yok (npm audit clean)
-- [ ] Lock dosyaları commit edilmiş
+#### DoÃ„Å¸rulama AdÃ„Â±mlarÃ„Â±
+- [ ] BaÃ„Å¸Ã„Â±mlÃ„Â±lÃ„Â±klar gÃƒÂ¼ncel
+- [ ] Bilinen gÃƒÂ¼venlik aÃƒÂ§Ã„Â±Ã„Å¸Ã„Â± yok (npm audit clean)
+- [ ] Lock dosyalarÃ„Â± commit edilmiÃ…Å¸
 - [ ] GitHub'da Dependabot aktif
-- [ ] Düzenli güvenlik güncellemeleri
+- [ ] DÃƒÂ¼zenli gÃƒÂ¼venlik gÃƒÂ¼ncellemeleri
 
-## Güvenlik Testi
+## GÃƒÂ¼venlik Testi
 
-### Otomatik Güvenlik Testleri
+### Otomatik GÃƒÂ¼venlik Testleri
 ```typescript
-// Kimlik doğrulama testi
-test('kimlik doğrulama gerektirir', async () => {
+// Kimlik doÃ„Å¸rulama testi
+test('kimlik doÃ„Å¸rulama gerektirir', async () => {
   const response = await fetch('/api/protected')
   expect(response.status).toBe(401)
 })
 
 // Yetkilendirme testi
-test('admin rolü gerektirir', async () => {
+test('admin rolÃƒÂ¼ gerektirir', async () => {
   const response = await fetch('/api/admin', {
     headers: { Authorization: `Bearer ${userToken}` }
   })
   expect(response.status).toBe(403)
 })
 
-// Input doğrulama testi
-test('geçersiz input'u reddeder', async () => {
+// Input doÃ„Å¸rulama testi
+test('geÃƒÂ§ersiz input'u reddeder', async () => {
   const response = await fetch('/api/users', {
     method: 'POST',
     body: JSON.stringify({ email: 'not-an-email' })
@@ -461,27 +474,27 @@ test('rate limit'leri zorlar', async () => {
 })
 ```
 
-## Deployment Öncesi Güvenlik Kontrol Listesi
+## Deployment Ãƒâ€“ncesi GÃƒÂ¼venlik Kontrol Listesi
 
-HERHANGİ bir production deployment'ından önce:
+HERHANGÃ„Â° bir production deployment'Ã„Â±ndan ÃƒÂ¶nce:
 
 - [ ] **Secret'lar**: Hardcoded secret yok, hepsi env var'larda
-- [ ] **Input Doğrulama**: Tüm kullanıcı girdileri validate edilmiş
-- [ ] **SQL Injection**: Tüm sorgular parametreli
-- [ ] **XSS**: Kullanıcı içeriği sanitize edilmiş
+- [ ] **Input DoÃ„Å¸rulama**: TÃƒÂ¼m kullanÃ„Â±cÃ„Â± girdileri validate edilmiÃ…Å¸
+- [ ] **SQL Injection**: TÃƒÂ¼m sorgular parametreli
+- [ ] **XSS**: KullanÃ„Â±cÃ„Â± iÃƒÂ§eriÃ„Å¸i sanitize edilmiÃ…Å¸
 - [ ] **CSRF**: Koruma aktif
-- [ ] **Kimlik Doğrulama**: Doğru token işleme
+- [ ] **Kimlik DoÃ„Å¸rulama**: DoÃ„Å¸ru token iÃ…Å¸leme
 - [ ] **Yetkilendirme**: Rol kontrolleri yerinde
-- [ ] **Rate Limiting**: Tüm endpoint'lerde aktif
+- [ ] **Rate Limiting**: TÃƒÂ¼m endpoint'lerde aktif
 - [ ] **HTTPS**: Production'da zorunlu
-- [ ] **Güvenlik Başlıkları**: CSP, X-Frame-Options yapılandırılmış
-- [ ] **Hata İşleme**: Hatalarda hassas veri yok
-- [ ] **Loglama**: Hassas veri loglanmıyor
-- [ ] **Bağımlılıklar**: Güncel, güvenlik açığı yok
+- [ ] **GÃƒÂ¼venlik BaÃ…Å¸lÃ„Â±klarÃ„Â±**: CSP, X-Frame-Options yapÃ„Â±landÃ„Â±rÃ„Â±lmÃ„Â±Ã…Å¸
+- [ ] **Hata Ã„Â°Ã…Å¸leme**: Hatalarda hassas veri yok
+- [ ] **Loglama**: Hassas veri loglanmÃ„Â±yor
+- [ ] **BaÃ„Å¸Ã„Â±mlÃ„Â±lÃ„Â±klar**: GÃƒÂ¼ncel, gÃƒÂ¼venlik aÃƒÂ§Ã„Â±Ã„Å¸Ã„Â± yok
 - [ ] **Row Level Security**: Supabase'de aktif
-- [ ] **CORS**: Düzgün yapılandırılmış
-- [ ] **Dosya Yüklemeleri**: Validate edilmiş (boyut, tip)
-- [ ] **Wallet İmzaları**: Doğrulanmış (blockchain varsa)
+- [ ] **CORS**: DÃƒÂ¼zgÃƒÂ¼n yapÃ„Â±landÃ„Â±rÃ„Â±lmÃ„Â±Ã…Å¸
+- [ ] **Dosya YÃƒÂ¼klemeleri**: Validate edilmiÃ…Å¸ (boyut, tip)
+- [ ] **Wallet Ã„Â°mzalarÃ„Â±**: DoÃ„Å¸rulanmÃ„Â±Ã…Å¸ (blockchain varsa)
 
 ## Kaynaklar
 
@@ -492,4 +505,4 @@ HERHANGİ bir production deployment'ından önce:
 
 ---
 
-**Unutmayın**: Güvenlik opsiyonel değildir. Bir güvenlik açığı tüm platformu tehlikeye atabilir. Şüphe duyduğunuzda ihtiyatlı olun.
+**UnutmayÃ„Â±n**: GÃƒÂ¼venlik opsiyonel deÃ„Å¸ildir. Bir gÃƒÂ¼venlik aÃƒÂ§Ã„Â±Ã„Å¸Ã„Â± tÃƒÂ¼m platformu tehlikeye atabilir. Ã…Å¾ÃƒÂ¼phe duyduÃ„Å¸unuzda ihtiyatlÃ„Â± olun.

@@ -1,4 +1,17 @@
-# PR Review And Queue Triage — March 13, 2026
+# PR Review And Queue Triage Ã¢â‚¬â€ March 13, 2026
+
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
 
 ## Snapshot
 
@@ -20,7 +33,7 @@ Stale threshold used for this pass:
 
 PR:
 
-- `#399` — `fix(observe): 5-layer automated session guard to prevent self-loop observations`
+- `#399` Ã¢â‚¬â€ `fix(observe): 5-layer automated session guard to prevent self-loop observations`
 - state: `MERGED`
 - merged at: `2026-03-13T06:40:03Z`
 - merge commit: `c52a28ace9e7e84c00309fc7b629955dfc46ecf9`
@@ -86,7 +99,7 @@ No currently open PR is stale by the `>30 days since last update` rule.
 
 ## Per-PR Assessment
 
-### `#292` — Governance / Config Foundation
+### `#292` Ã¢â‚¬â€ Governance / Config Foundation
 
 Live state:
 
@@ -123,7 +136,7 @@ Current recommendation:
 - If you want a conservative path, do one quick human review of the remaining
   `.env.example`, PR-template, and `.tool-versions` nitpicks before merge.
 
-### `#298` — Large Multi-Domain Content Expansion
+### `#298` Ã¢â‚¬â€ Large Multi-Domain Content Expansion
 
 Live state:
 
@@ -134,7 +147,7 @@ Live state:
 - visible checks:
   - `CodeRabbit` passed
   - `GitGuardian Security Checks` passed
-  - `cubic · AI code reviewer` passed
+  - `cubic Ã‚Â· AI code reviewer` passed
 
 Scope:
 
@@ -159,7 +172,7 @@ Current recommendation:
 - Rebase or restack first, then resolve the substantive example-quality issues.
 - If momentum matters, split by domain rather than carrying one very large PR.
 
-### `#336` — Codex CLI Customization
+### `#336` Ã¢â‚¬â€ Codex CLI Customization
 
 Live state:
 
@@ -198,7 +211,7 @@ Current recommendation:
   - run or confirm validation on the global-state scripts
   - take it out of draft only after that review is complete
 
-### `#420` — Laravel Skills
+### `#420` Ã¢â‚¬â€ Laravel Skills
 
 Live state:
 
@@ -287,7 +300,7 @@ Refreshed at `2026-03-13T22:11:40Z`.
 
 ### Updated Queue Read
 
-#### `#292` — Governance / Config Foundation
+#### `#292` Ã¢â‚¬â€ Governance / Config Foundation
 
 - open
 - non-draft
@@ -304,7 +317,7 @@ Current recommendation:
 - Either patch the remaining doc/config correctness issues, or do one final
   owner pass and merge if you accept the current tradeoffs.
 
-#### `#420` — Laravel Skills
+#### `#420` Ã¢â‚¬â€ Laravel Skills
 
 - open
 - draft
@@ -320,7 +333,7 @@ Current recommendation:
 - Low implementation risk, but not merge-ready while still draft and
   under-reviewed.
 
-#### `#336` — Codex CLI Customization
+#### `#336` Ã¢â‚¬â€ Codex CLI Customization
 
 - open
 - draft
@@ -335,7 +348,7 @@ Current recommendation:
 
 - `Manual-review lane, not immediate merge lane.`
 
-#### `#298` — Large Content Expansion
+#### `#298` Ã¢â‚¬â€ Large Content Expansion
 
 - open
 - non-draft

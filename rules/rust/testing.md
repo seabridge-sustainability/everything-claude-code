@@ -4,6 +4,19 @@ paths:
 ---
 # Rust Testing
 
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
 > This file extends [common/testing.md](../common/testing.md) with Rust-specific content.
 
 ## Test Framework
@@ -18,19 +31,19 @@ paths:
 
 ```text
 my_crate/
-├── src/
-│   ├── lib.rs           # Unit tests in #[cfg(test)] modules
-│   ├── auth/
-│   │   └── mod.rs       # #[cfg(test)] mod tests { ... }
-│   └── orders/
-│       └── service.rs   # #[cfg(test)] mod tests { ... }
-├── tests/               # Integration tests (each file = separate binary)
-│   ├── api_test.rs
-│   ├── db_test.rs
-│   └── common/          # Shared test utilities
-│       └── mod.rs
-└── benches/             # Criterion benchmarks
-    └── benchmark.rs
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ src/
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ lib.rs           # Unit tests in #[cfg(test)] modules
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ auth/
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ mod.rs       # #[cfg(test)] mod tests { ... }
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ orders/
+Ã¢â€â€š       Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ service.rs   # #[cfg(test)] mod tests { ... }
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ tests/               # Integration tests (each file = separate binary)
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ api_test.rs
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ db_test.rs
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ common/          # Shared test utilities
+Ã¢â€â€š       Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ mod.rs
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ benches/             # Criterion benchmarks
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ benchmark.rs
 ```
 
 Unit tests go inside `#[cfg(test)]` modules in the same file. Integration tests go in `tests/`.
@@ -87,7 +100,7 @@ async fn fetches_data_successfully() {
 Define traits in production code; generate mocks in test modules:
 
 ```rust
-// Production trait — pub so integration tests can import it
+// Production trait Ã¢â‚¬â€ pub so integration tests can import it
 pub trait UserRepository {
     fn find_by_id(&self, id: u64) -> Option<User>;
 }
@@ -130,7 +143,7 @@ Use descriptive names that explain the scenario:
 
 - Target 80%+ line coverage
 - Use **cargo-llvm-cov** for coverage reporting
-- Focus on business logic — exclude generated code and FFI bindings
+- Focus on business logic Ã¢â‚¬â€ exclude generated code and FFI bindings
 
 ```bash
 cargo llvm-cov                       # Summary

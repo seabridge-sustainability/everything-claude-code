@@ -1,28 +1,41 @@
 ---
 name: golang-testing
-description: テスト駆動開発とGoコードの高品質を保証するための包括的なテスト戦略。
+description: Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã©Â§â€ Ã¥â€¹â€¢Ã©â€“â€¹Ã§â„¢ÂºÃ£ÂÂ¨GoÃ£â€šÂ³Ã£Æ’Â¼Ã£Æ’â€°Ã£ÂÂ®Ã©Â«ËœÃ¥â€œÂÃ¨Â³ÂªÃ£â€šâ€™Ã¤Â¿ÂÃ¨Â¨Â¼Ã£Ââ„¢Ã£â€šâ€¹Ã£ÂÅ¸Ã£â€šÂÃ£ÂÂ®Ã¥Å’â€¦Ã¦â€¹Â¬Ã§Å¡â€žÃ£ÂÂªÃ£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã¦Ë†Â¦Ã§â€¢Â¥Ã£â‚¬â€š
 ---
 
-# Go テスト
+# Go Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†
 
-テスト駆動開発(TDD)とGoコードの高品質を保証するための包括的なテスト戦略。
+## Safety And Authorization Rule
 
-## いつ有効化するか
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-- 新しいGoコードを書くとき
-- Goコードをレビューするとき
-- 既存のテストを改善するとき
-- テストカバレッジを向上させるとき
-- デバッグとバグ修正時
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-## 核となる原則
 
-### 1. テスト駆動開発(TDD)ワークフロー
+Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã©Â§â€ Ã¥â€¹â€¢Ã©â€“â€¹Ã§â„¢Âº(TDD)Ã£ÂÂ¨GoÃ£â€šÂ³Ã£Æ’Â¼Ã£Æ’â€°Ã£ÂÂ®Ã©Â«ËœÃ¥â€œÂÃ¨Â³ÂªÃ£â€šâ€™Ã¤Â¿ÂÃ¨Â¨Â¼Ã£Ââ„¢Ã£â€šâ€¹Ã£ÂÅ¸Ã£â€šÂÃ£ÂÂ®Ã¥Å’â€¦Ã¦â€¹Â¬Ã§Å¡â€žÃ£ÂÂªÃ£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã¦Ë†Â¦Ã§â€¢Â¥Ã£â‚¬â€š
 
-失敗するテストを書き、実装し、リファクタリングするサイクルに従います。
+## Ã£Ââ€žÃ£ÂÂ¤Ã¦Å“â€°Ã¥Å Â¹Ã¥Å’â€“Ã£Ââ„¢Ã£â€šâ€¹Ã£Ââ€¹
+
+- Ã¦â€“Â°Ã£Ââ€”Ã£Ââ€žGoÃ£â€šÂ³Ã£Æ’Â¼Ã£Æ’â€°Ã£â€šâ€™Ã¦â€ºÂ¸Ã£ÂÂÃ£ÂÂ¨Ã£ÂÂ
+- GoÃ£â€šÂ³Ã£Æ’Â¼Ã£Æ’â€°Ã£â€šâ€™Ã£Æ’Â¬Ã£Æ’â€œÃ£Æ’Â¥Ã£Æ’Â¼Ã£Ââ„¢Ã£â€šâ€¹Ã£ÂÂ¨Ã£ÂÂ
+- Ã¦â€”Â¢Ã¥Â­ËœÃ£ÂÂ®Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â€šâ€™Ã¦â€Â¹Ã¥â€“â€žÃ£Ââ„¢Ã£â€šâ€¹Ã£ÂÂ¨Ã£ÂÂ
+- Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â€šÂ«Ã£Æ’ÂÃ£Æ’Â¬Ã£Æ’Æ’Ã£â€šÂ¸Ã£â€šâ€™Ã¥Ââ€˜Ã¤Â¸Å Ã£Ââ€¢Ã£Ââ€ºÃ£â€šâ€¹Ã£ÂÂ¨Ã£ÂÂ
+- Ã£Æ’â€¡Ã£Æ’ÂÃ£Æ’Æ’Ã£â€šÂ°Ã£ÂÂ¨Ã£Æ’ÂÃ£â€šÂ°Ã¤Â¿Â®Ã¦Â­Â£Ã¦â„¢â€š
+
+## Ã¦Â Â¸Ã£ÂÂ¨Ã£ÂÂªÃ£â€šâ€¹Ã¥Å½Å¸Ã¥â€°â€¡
+
+### 1. Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã©Â§â€ Ã¥â€¹â€¢Ã©â€“â€¹Ã§â„¢Âº(TDD)Ã£Æ’Â¯Ã£Æ’Â¼Ã£â€šÂ¯Ã£Æ’â€¢Ã£Æ’Â­Ã£Æ’Â¼
+
+Ã¥Â¤Â±Ã¦â€¢â€”Ã£Ââ„¢Ã£â€šâ€¹Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â€šâ€™Ã¦â€ºÂ¸Ã£ÂÂÃ£â‚¬ÂÃ¥Â®Å¸Ã¨Â£â€¦Ã£Ââ€”Ã£â‚¬ÂÃ£Æ’ÂªÃ£Æ’â€¢Ã£â€šÂ¡Ã£â€šÂ¯Ã£â€šÂ¿Ã£Æ’ÂªÃ£Æ’Â³Ã£â€šÂ°Ã£Ââ„¢Ã£â€šâ€¹Ã£â€šÂµÃ£â€šÂ¤Ã£â€šÂ¯Ã£Æ’Â«Ã£ÂÂ«Ã¥Â¾â€œÃ£Ââ€žÃ£ÂÂ¾Ã£Ââ„¢Ã£â‚¬â€š
 
 ```go
-// 1. テストを書く（失敗）
+// 1. Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â€šâ€™Ã¦â€ºÂ¸Ã£ÂÂÃ¯Â¼Ë†Ã¥Â¤Â±Ã¦â€¢â€”Ã¯Â¼â€°
 func TestCalculateTotal(t *testing.T) {
     total := CalculateTotal([]float64{10.0, 20.0, 30.0})
     want := 60.0
@@ -31,7 +44,7 @@ func TestCalculateTotal(t *testing.T) {
     }
 }
 
-// 2. 実装する（テストを通す）
+// 2. Ã¥Â®Å¸Ã¨Â£â€¦Ã£Ââ„¢Ã£â€šâ€¹Ã¯Â¼Ë†Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â€šâ€™Ã©â‚¬Å¡Ã£Ââ„¢Ã¯Â¼â€°
 func CalculateTotal(prices []float64) float64 {
     var total float64
     for _, price := range prices {
@@ -40,13 +53,13 @@ func CalculateTotal(prices []float64) float64 {
     return total
 }
 
-// 3. リファクタリング
-// テストを壊さずにコードを改善
+// 3. Ã£Æ’ÂªÃ£Æ’â€¢Ã£â€šÂ¡Ã£â€šÂ¯Ã£â€šÂ¿Ã£Æ’ÂªÃ£Æ’Â³Ã£â€šÂ°
+// Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â€šâ€™Ã¥Â£Å Ã£Ââ€¢Ã£ÂÅ¡Ã£ÂÂ«Ã£â€šÂ³Ã£Æ’Â¼Ã£Æ’â€°Ã£â€šâ€™Ã¦â€Â¹Ã¥â€“â€ž
 ```
 
-### 2. テーブル駆動テスト
+### 2. Ã£Æ’â€ Ã£Æ’Â¼Ã£Æ’â€“Ã£Æ’Â«Ã©Â§â€ Ã¥â€¹â€¢Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†
 
-複数のケースを体系的にテストします。
+Ã¨Â¤â€¡Ã¦â€¢Â°Ã£ÂÂ®Ã£â€šÂ±Ã£Æ’Â¼Ã£â€šÂ¹Ã£â€šâ€™Ã¤Â½â€œÃ§Â³Â»Ã§Å¡â€žÃ£ÂÂ«Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£Ââ€”Ã£ÂÂ¾Ã£Ââ„¢Ã£â‚¬â€š
 
 ```go
 func TestAdd(t *testing.T) {
@@ -73,9 +86,9 @@ func TestAdd(t *testing.T) {
 }
 ```
 
-### 3. サブテスト
+### 3. Ã£â€šÂµÃ£Æ’â€“Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†
 
-サブテストを使用した論理的なテストの構成。
+Ã£â€šÂµÃ£Æ’â€“Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â€šâ€™Ã¤Â½Â¿Ã§â€Â¨Ã£Ââ€”Ã£ÂÅ¸Ã¨Â«â€“Ã§Ââ€ Ã§Å¡â€žÃ£ÂÂªÃ£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£ÂÂ®Ã¦Â§â€¹Ã¦Ë†ÂÃ£â‚¬â€š
 
 ```go
 func TestUser(t *testing.T) {
@@ -96,66 +109,66 @@ func TestUser(t *testing.T) {
     })
 
     t.Run("serialization", func(t *testing.T) {
-        // 別のテストグループ
+        // Ã¥Ë†Â¥Ã£ÂÂ®Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â€šÂ°Ã£Æ’Â«Ã£Æ’Â¼Ã£Æ’â€”
     })
 }
 ```
 
-## テスト構成
+## Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã¦Â§â€¹Ã¦Ë†Â
 
-### ファイル構成
+### Ã£Æ’â€¢Ã£â€šÂ¡Ã£â€šÂ¤Ã£Æ’Â«Ã¦Â§â€¹Ã¦Ë†Â
 
 ```text
 mypackage/
-├── user.go
-├── user_test.go          # ユニットテスト
-├── integration_test.go   # 統合テスト
-├── testdata/             # テストフィクスチャ
-│   ├── valid_user.json
-│   └── invalid_user.json
-└── export_test.go        # 内部テスト用の非公開エクスポート
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ user.go
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ user_test.go          # Ã£Æ’Â¦Ã£Æ’â€¹Ã£Æ’Æ’Ã£Æ’Ë†Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ integration_test.go   # Ã§ÂµÂ±Ã¥ÂË†Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ testdata/             # Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£Æ’â€¢Ã£â€šÂ£Ã£â€šÂ¯Ã£â€šÂ¹Ã£Æ’ÂÃ£Æ’Â£
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ valid_user.json
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ invalid_user.json
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ export_test.go        # Ã¥â€ â€¦Ã©Æ’Â¨Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã§â€Â¨Ã£ÂÂ®Ã©ÂÅ¾Ã¥â€¦Â¬Ã©â€“â€¹Ã£â€šÂ¨Ã£â€šÂ¯Ã£â€šÂ¹Ã£Æ’ÂÃ£Æ’Â¼Ã£Æ’Ë†
 ```
 
-### テストパッケージ
+### Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£Æ’â€˜Ã£Æ’Æ’Ã£â€šÂ±Ã£Æ’Â¼Ã£â€šÂ¸
 
 ```go
-// user_test.go - 同じパッケージ（ホワイトボックステスト）
+// user_test.go - Ã¥ÂÅ’Ã£ÂËœÃ£Æ’â€˜Ã£Æ’Æ’Ã£â€šÂ±Ã£Æ’Â¼Ã£â€šÂ¸Ã¯Â¼Ë†Ã£Æ’â€ºÃ£Æ’Â¯Ã£â€šÂ¤Ã£Æ’Ë†Ã£Æ’Å“Ã£Æ’Æ’Ã£â€šÂ¯Ã£â€šÂ¹Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã¯Â¼â€°
 package user
 
 func TestInternalFunction(t *testing.T) {
-    // 内部をテストできる
+    // Ã¥â€ â€¦Ã©Æ’Â¨Ã£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£ÂÂ§Ã£ÂÂÃ£â€šâ€¹
 }
 
-// user_external_test.go - 外部パッケージ（ブラックボックステスト）
+// user_external_test.go - Ã¥Â¤â€“Ã©Æ’Â¨Ã£Æ’â€˜Ã£Æ’Æ’Ã£â€šÂ±Ã£Æ’Â¼Ã£â€šÂ¸Ã¯Â¼Ë†Ã£Æ’â€“Ã£Æ’Â©Ã£Æ’Æ’Ã£â€šÂ¯Ã£Æ’Å“Ã£Æ’Æ’Ã£â€šÂ¯Ã£â€šÂ¹Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã¯Â¼â€°
 package user_test
 
 import "myapp/user"
 
 func TestPublicAPI(t *testing.T) {
-    // 公開APIのみをテスト
+    // Ã¥â€¦Â¬Ã©â€“â€¹APIÃ£ÂÂ®Ã£ÂÂ¿Ã£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†
 }
 ```
 
-## アサーションとヘルパー
+## Ã£â€šÂ¢Ã£â€šÂµÃ£Æ’Â¼Ã£â€šÂ·Ã£Æ’Â§Ã£Æ’Â³Ã£ÂÂ¨Ã£Æ’ËœÃ£Æ’Â«Ã£Æ’â€˜Ã£Æ’Â¼
 
-### 基本的なアサーション
+### Ã¥Å¸ÂºÃ¦Å“Â¬Ã§Å¡â€žÃ£ÂÂªÃ£â€šÂ¢Ã£â€šÂµÃ£Æ’Â¼Ã£â€šÂ·Ã£Æ’Â§Ã£Æ’Â³
 
 ```go
 func TestBasicAssertions(t *testing.T) {
-    // 等価性
+    // Ã§Â­â€°Ã¤Â¾Â¡Ã¦â‚¬Â§
     got := Calculate()
     want := 42
     if got != want {
         t.Errorf("got %d, want %d", got, want)
     }
 
-    // エラーチェック
+    // Ã£â€šÂ¨Ã£Æ’Â©Ã£Æ’Â¼Ã£Æ’ÂÃ£â€šÂ§Ã£Æ’Æ’Ã£â€šÂ¯
     _, err := Process()
     if err != nil {
         t.Fatalf("unexpected error: %v", err)
     }
 
-    // nil チェック
+    // nil Ã£Æ’ÂÃ£â€šÂ§Ã£Æ’Æ’Ã£â€šÂ¯
     result := GetResult()
     if result == nil {
         t.Fatal("expected non-nil result")
@@ -163,10 +176,10 @@ func TestBasicAssertions(t *testing.T) {
 }
 ```
 
-### カスタムヘルパー関数
+### Ã£â€šÂ«Ã£â€šÂ¹Ã£â€šÂ¿Ã£Æ’Â Ã£Æ’ËœÃ£Æ’Â«Ã£Æ’â€˜Ã£Æ’Â¼Ã©â€“Â¢Ã¦â€¢Â°
 
 ```go
-// ヘルパーとしてマーク（スタックトレースに表示されない）
+// Ã£Æ’ËœÃ£Æ’Â«Ã£Æ’â€˜Ã£Æ’Â¼Ã£ÂÂ¨Ã£Ââ€”Ã£ÂÂ¦Ã£Æ’Å¾Ã£Æ’Â¼Ã£â€šÂ¯Ã¯Â¼Ë†Ã£â€šÂ¹Ã£â€šÂ¿Ã£Æ’Æ’Ã£â€šÂ¯Ã£Æ’Ë†Ã£Æ’Â¬Ã£Æ’Â¼Ã£â€šÂ¹Ã£ÂÂ«Ã¨Â¡Â¨Ã§Â¤ÂºÃ£Ââ€¢Ã£â€šÅ’Ã£ÂÂªÃ£Ââ€žÃ¯Â¼â€°
 func assertEqual(t *testing.T, got, want interface{}) {
     t.Helper()
     if got != want {
@@ -181,7 +194,7 @@ func assertNoError(t *testing.T, err error) {
     }
 }
 
-// 使用例
+// Ã¤Â½Â¿Ã§â€Â¨Ã¤Â¾â€¹
 func TestWithHelpers(t *testing.T) {
     result, err := Process()
     assertNoError(t, err)
@@ -189,7 +202,7 @@ func TestWithHelpers(t *testing.T) {
 }
 ```
 
-### ディープ等価性チェック
+### Ã£Æ’â€¡Ã£â€šÂ£Ã£Æ’Â¼Ã£Æ’â€”Ã§Â­â€°Ã¤Â¾Â¡Ã¦â‚¬Â§Ã£Æ’ÂÃ£â€šÂ§Ã£Æ’Æ’Ã£â€šÂ¯
 
 ```go
 import "reflect"
@@ -208,12 +221,12 @@ func TestStructEquality(t *testing.T) {
 }
 ```
 
-## モッキングとスタブ
+## Ã£Æ’Â¢Ã£Æ’Æ’Ã£â€šÂ­Ã£Æ’Â³Ã£â€šÂ°Ã£ÂÂ¨Ã£â€šÂ¹Ã£â€šÂ¿Ã£Æ’â€“
 
-### インターフェースベースのモック
+### Ã£â€šÂ¤Ã£Æ’Â³Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’â€¢Ã£â€šÂ§Ã£Æ’Â¼Ã£â€šÂ¹Ã£Æ’â„¢Ã£Æ’Â¼Ã£â€šÂ¹Ã£ÂÂ®Ã£Æ’Â¢Ã£Æ’Æ’Ã£â€šÂ¯
 
 ```go
-// 本番コード
+// Ã¦Å“Â¬Ã§â€¢ÂªÃ£â€šÂ³Ã£Æ’Â¼Ã£Æ’â€°
 type UserStore interface {
     GetUser(id string) (*User, error)
     SaveUser(user *User) error
@@ -223,7 +236,7 @@ type UserService struct {
     store UserStore
 }
 
-// テストコード
+// Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â€šÂ³Ã£Æ’Â¼Ã£Æ’â€°
 type MockUserStore struct {
     users map[string]*User
     err   error
@@ -244,21 +257,21 @@ func (m *MockUserStore) SaveUser(user *User) error {
     return nil
 }
 
-// テスト
+// Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†
 func TestUserService(t *testing.T) {
     mock := &MockUserStore{
         users: make(map[string]*User),
     }
     service := &UserService{store: mock}
 
-    // サービスをテスト...
+    // Ã£â€šÂµÃ£Æ’Â¼Ã£Æ’â€œÃ£â€šÂ¹Ã£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†...
 }
 ```
 
-### 時間のモック
+### Ã¦â„¢â€šÃ©â€“â€œÃ£ÂÂ®Ã£Æ’Â¢Ã£Æ’Æ’Ã£â€šÂ¯
 
 ```go
-// プロダクションコード - 時間を注入可能にする
+// Ã£Æ’â€”Ã£Æ’Â­Ã£Æ’â‚¬Ã£â€šÂ¯Ã£â€šÂ·Ã£Æ’Â§Ã£Æ’Â³Ã£â€šÂ³Ã£Æ’Â¼Ã£Æ’â€° - Ã¦â„¢â€šÃ©â€“â€œÃ£â€šâ€™Ã¦Â³Â¨Ã¥â€¦Â¥Ã¥ÂÂ¯Ã¨Æ’Â½Ã£ÂÂ«Ã£Ââ„¢Ã£â€šâ€¹
 type TimeProvider interface {
     Now() time.Time
 }
@@ -273,7 +286,7 @@ type Service struct {
     time TimeProvider
 }
 
-// テストコード
+// Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â€šÂ³Ã£Æ’Â¼Ã£Æ’â€°
 type MockTime struct {
     current time.Time
 }
@@ -288,11 +301,11 @@ func TestTimeDependent(t *testing.T) {
     }
     service := &Service{time: mockTime}
 
-    // 固定時間でテスト...
+    // Ã¥â€ºÂºÃ¥Â®Å¡Ã¦â„¢â€šÃ©â€“â€œÃ£ÂÂ§Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†...
 }
 ```
 
-### HTTP クライアントのモック
+### HTTP Ã£â€šÂ¯Ã£Æ’Â©Ã£â€šÂ¤Ã£â€šÂ¢Ã£Æ’Â³Ã£Æ’Ë†Ã£ÂÂ®Ã£Æ’Â¢Ã£Æ’Æ’Ã£â€šÂ¯
 
 ```go
 type HTTPClient interface {
@@ -317,13 +330,13 @@ func TestAPICall(t *testing.T) {
     }
 
     api := &APIClient{client: mockClient}
-    // APIクライアントをテスト...
+    // APIÃ£â€šÂ¯Ã£Æ’Â©Ã£â€šÂ¤Ã£â€šÂ¢Ã£Æ’Â³Ã£Æ’Ë†Ã£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†...
 }
 ```
 
-## HTTPハンドラーのテスト
+## HTTPÃ£Æ’ÂÃ£Æ’Â³Ã£Æ’â€°Ã£Æ’Â©Ã£Æ’Â¼Ã£ÂÂ®Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†
 
-### httptest の使用
+### httptest Ã£ÂÂ®Ã¤Â½Â¿Ã§â€Â¨
 
 ```go
 func TestHandler(t *testing.T) {
@@ -334,12 +347,12 @@ func TestHandler(t *testing.T) {
 
     handler.ServeHTTP(rec, req)
 
-    // ステータスコードをチェック
+    // Ã£â€šÂ¹Ã£Æ’â€ Ã£Æ’Â¼Ã£â€šÂ¿Ã£â€šÂ¹Ã£â€šÂ³Ã£Æ’Â¼Ã£Æ’â€°Ã£â€šâ€™Ã£Æ’ÂÃ£â€šÂ§Ã£Æ’Æ’Ã£â€šÂ¯
     if rec.Code != http.StatusOK {
         t.Errorf("got status %d, want %d", rec.Code, http.StatusOK)
     }
 
-    // レスポンスボディをチェック
+    // Ã£Æ’Â¬Ã£â€šÂ¹Ã£Æ’ÂÃ£Æ’Â³Ã£â€šÂ¹Ã£Æ’Å“Ã£Æ’â€¡Ã£â€šÂ£Ã£â€šâ€™Ã£Æ’ÂÃ£â€šÂ§Ã£Æ’Æ’Ã£â€šÂ¯
     var response map[string]interface{}
     if err := json.NewDecoder(rec.Body).Decode(&response); err != nil {
         t.Fatalf("failed to decode response: %v", err)
@@ -351,16 +364,16 @@ func TestHandler(t *testing.T) {
 }
 ```
 
-### ミドルウェアのテスト
+### Ã£Æ’Å¸Ã£Æ’â€°Ã£Æ’Â«Ã£â€šÂ¦Ã£â€šÂ§Ã£â€šÂ¢Ã£ÂÂ®Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†
 
 ```go
 func TestAuthMiddleware(t *testing.T) {
-    // ダミーハンドラー
+    // Ã£Æ’â‚¬Ã£Æ’Å¸Ã£Æ’Â¼Ã£Æ’ÂÃ£Æ’Â³Ã£Æ’â€°Ã£Æ’Â©Ã£Æ’Â¼
     nextHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
         w.WriteHeader(http.StatusOK)
     })
 
-    // ミドルウェアでラップ
+    // Ã£Æ’Å¸Ã£Æ’â€°Ã£Æ’Â«Ã£â€šÂ¦Ã£â€šÂ§Ã£â€šÂ¢Ã£ÂÂ§Ã£Æ’Â©Ã£Æ’Æ’Ã£Æ’â€”
     handler := AuthMiddleware(nextHandler)
 
     tests := []struct {
@@ -391,11 +404,11 @@ func TestAuthMiddleware(t *testing.T) {
 }
 ```
 
-### テストサーバー
+### Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â€šÂµÃ£Æ’Â¼Ã£Æ’ÂÃ£Æ’Â¼
 
 ```go
 func TestAPIIntegration(t *testing.T) {
-    // テストサーバーを作成
+    // Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â€šÂµÃ£Æ’Â¼Ã£Æ’ÂÃ£Æ’Â¼Ã£â€šâ€™Ã¤Â½Å“Ã¦Ë†Â
     server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
         json.NewEncoder(w).Encode(map[string]string{
             "message": "hello",
@@ -403,14 +416,14 @@ func TestAPIIntegration(t *testing.T) {
     }))
     defer server.Close()
 
-    // 実際のHTTPリクエストを行う
+    // Ã¥Â®Å¸Ã©Å¡â€ºÃ£ÂÂ®HTTPÃ£Æ’ÂªÃ£â€šÂ¯Ã£â€šÂ¨Ã£â€šÂ¹Ã£Æ’Ë†Ã£â€šâ€™Ã¨Â¡Å’Ã£Ââ€ 
     resp, err := http.Get(server.URL)
     if err != nil {
         t.Fatalf("request failed: %v", err)
     }
     defer resp.Body.Close()
 
-    // レスポンスを検証
+    // Ã£Æ’Â¬Ã£â€šÂ¹Ã£Æ’ÂÃ£Æ’Â³Ã£â€šÂ¹Ã£â€šâ€™Ã¦Â¤Å“Ã¨Â¨Â¼
     var result map[string]string
     json.NewDecoder(resp.Body).Decode(&result)
 
@@ -420,9 +433,9 @@ func TestAPIIntegration(t *testing.T) {
 }
 ```
 
-## データベーステスト
+## Ã£Æ’â€¡Ã£Æ’Â¼Ã£â€šÂ¿Ã£Æ’â„¢Ã£Æ’Â¼Ã£â€šÂ¹Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†
 
-### トランザクションを使用したテストの分離
+### Ã£Æ’Ë†Ã£Æ’Â©Ã£Æ’Â³Ã£â€šÂ¶Ã£â€šÂ¯Ã£â€šÂ·Ã£Æ’Â§Ã£Æ’Â³Ã£â€šâ€™Ã¤Â½Â¿Ã§â€Â¨Ã£Ââ€”Ã£ÂÅ¸Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£ÂÂ®Ã¥Ë†â€ Ã©â€ºÂ¢
 
 ```go
 func TestUserRepository(t *testing.T) {
@@ -444,7 +457,7 @@ func TestUserRepository(t *testing.T) {
             if err != nil {
                 t.Fatal(err)
             }
-            defer tx.Rollback() // テスト後にロールバック
+            defer tx.Rollback() // Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã¥Â¾Å’Ã£ÂÂ«Ã£Æ’Â­Ã£Æ’Â¼Ã£Æ’Â«Ã£Æ’ÂÃ£Æ’Æ’Ã£â€šÂ¯
 
             tt.fn(t, tx)
         })
@@ -452,7 +465,7 @@ func TestUserRepository(t *testing.T) {
 }
 ```
 
-### テストフィクスチャ
+### Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£Æ’â€¢Ã£â€šÂ£Ã£â€šÂ¯Ã£â€šÂ¹Ã£Æ’ÂÃ£Æ’Â£
 
 ```go
 func setupTestDB(t *testing.T) *sql.DB {
@@ -463,7 +476,7 @@ func setupTestDB(t *testing.T) *sql.DB {
         t.Fatalf("failed to connect: %v", err)
     }
 
-    // スキーマを移行
+    // Ã£â€šÂ¹Ã£â€šÂ­Ã£Æ’Â¼Ã£Æ’Å¾Ã£â€šâ€™Ã§Â§Â»Ã¨Â¡Å’
     if err := runMigrations(db); err != nil {
         t.Fatalf("migrations failed: %v", err)
     }
@@ -487,9 +500,9 @@ func seedTestData(t *testing.T, db *sql.DB) {
 }
 ```
 
-## ベンチマーク
+## Ã£Æ’â„¢Ã£Æ’Â³Ã£Æ’ÂÃ£Æ’Å¾Ã£Æ’Â¼Ã£â€šÂ¯
 
-### 基本的なベンチマーク
+### Ã¥Å¸ÂºÃ¦Å“Â¬Ã§Å¡â€žÃ£ÂÂªÃ£Æ’â„¢Ã£Æ’Â³Ã£Æ’ÂÃ£Æ’Å¾Ã£Æ’Â¼Ã£â€šÂ¯
 
 ```go
 func BenchmarkCalculation(b *testing.B) {
@@ -498,7 +511,7 @@ func BenchmarkCalculation(b *testing.B) {
     }
 }
 
-// メモリ割り当てを報告
+// Ã£Æ’Â¡Ã£Æ’Â¢Ã£Æ’ÂªÃ¥â€°Â²Ã£â€šÅ Ã¥Â½â€œÃ£ÂÂ¦Ã£â€šâ€™Ã¥Â Â±Ã¥â€˜Å 
 func BenchmarkWithAllocs(b *testing.B) {
     b.ReportAllocs()
     for i := 0; i < b.N; i++ {
@@ -507,7 +520,7 @@ func BenchmarkWithAllocs(b *testing.B) {
 }
 ```
 
-### サブベンチマーク
+### Ã£â€šÂµÃ£Æ’â€“Ã£Æ’â„¢Ã£Æ’Â³Ã£Æ’ÂÃ£Æ’Å¾Ã£Æ’Â¼Ã£â€šÂ¯
 
 ```go
 func BenchmarkEncoding(b *testing.B) {
@@ -533,10 +546,10 @@ func BenchmarkEncoding(b *testing.B) {
 }
 ```
 
-### ベンチマーク比較
+### Ã£Æ’â„¢Ã£Æ’Â³Ã£Æ’ÂÃ£Æ’Å¾Ã£Æ’Â¼Ã£â€šÂ¯Ã¦Â¯â€Ã¨Â¼Æ’
 
 ```go
-// 実行: go test -bench=. -benchmem
+// Ã¥Â®Å¸Ã¨Â¡Å’: go test -bench=. -benchmem
 func BenchmarkStringConcat(b *testing.B) {
     b.Run("operator", func(b *testing.B) {
         for i := 0; i < b.N; i++ {
@@ -562,22 +575,22 @@ func BenchmarkStringConcat(b *testing.B) {
 }
 ```
 
-## ファジングテスト
+## Ã£Æ’â€¢Ã£â€šÂ¡Ã£â€šÂ¸Ã£Æ’Â³Ã£â€šÂ°Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†
 
-### 基本的なファズテスト（Go 1.18+）
+### Ã¥Å¸ÂºÃ¦Å“Â¬Ã§Å¡â€žÃ£ÂÂªÃ£Æ’â€¢Ã£â€šÂ¡Ã£â€šÂºÃ£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã¯Â¼Ë†Go 1.18+Ã¯Â¼â€°
 
 ```go
 func FuzzParseInput(f *testing.F) {
-    // シードコーパス
+    // Ã£â€šÂ·Ã£Æ’Â¼Ã£Æ’â€°Ã£â€šÂ³Ã£Æ’Â¼Ã£Æ’â€˜Ã£â€šÂ¹
     f.Add("hello")
     f.Add("world")
     f.Add("123")
 
     f.Fuzz(func(t *testing.T, input string) {
-        // パースがパニックしないことを確認
+        // Ã£Æ’â€˜Ã£Æ’Â¼Ã£â€šÂ¹Ã£ÂÅ’Ã£Æ’â€˜Ã£Æ’â€¹Ã£Æ’Æ’Ã£â€šÂ¯Ã£Ââ€”Ã£ÂÂªÃ£Ââ€žÃ£Ââ€œÃ£ÂÂ¨Ã£â€šâ€™Ã§Â¢ÂºÃ¨ÂªÂ
         result, err := ParseInput(input)
 
-        // エラーがあっても、nilでないか一貫性があることを確認
+        // Ã£â€šÂ¨Ã£Æ’Â©Ã£Æ’Â¼Ã£ÂÅ’Ã£Ââ€šÃ£ÂÂ£Ã£ÂÂ¦Ã£â€šâ€šÃ£â‚¬ÂnilÃ£ÂÂ§Ã£ÂÂªÃ£Ââ€žÃ£Ââ€¹Ã¤Â¸â‚¬Ã¨Â²Â«Ã¦â‚¬Â§Ã£ÂÅ’Ã£Ââ€šÃ£â€šâ€¹Ã£Ââ€œÃ£ÂÂ¨Ã£â€šâ€™Ã§Â¢ÂºÃ¨ÂªÂ
         if err == nil && result == nil {
             t.Error("got nil result with no error")
         }
@@ -585,7 +598,7 @@ func FuzzParseInput(f *testing.F) {
 }
 ```
 
-### より複雑なファジング
+### Ã£â€šË†Ã£â€šÅ Ã¨Â¤â€¡Ã©â€ºâ€˜Ã£ÂÂªÃ£Æ’â€¢Ã£â€šÂ¡Ã£â€šÂ¸Ã£Æ’Â³Ã£â€šÂ°
 
 ```go
 func FuzzJSONParsing(f *testing.F) {
@@ -596,7 +609,7 @@ func FuzzJSONParsing(f *testing.F) {
         var user User
         err := json.Unmarshal(data, &user)
 
-        // JSONがデコードされる場合、再度エンコードできるべき
+        // JSONÃ£ÂÅ’Ã£Æ’â€¡Ã£â€šÂ³Ã£Æ’Â¼Ã£Æ’â€°Ã£Ââ€¢Ã£â€šÅ’Ã£â€šâ€¹Ã¥Â Â´Ã¥ÂË†Ã£â‚¬ÂÃ¥â€ ÂÃ¥ÂºÂ¦Ã£â€šÂ¨Ã£Æ’Â³Ã£â€šÂ³Ã£Æ’Â¼Ã£Æ’â€°Ã£ÂÂ§Ã£ÂÂÃ£â€šâ€¹Ã£ÂÂ¹Ã£ÂÂ
         if err == nil {
             _, err := json.Marshal(user)
             if err != nil {
@@ -607,39 +620,39 @@ func FuzzJSONParsing(f *testing.F) {
 }
 ```
 
-## テストカバレッジ
+## Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â€šÂ«Ã£Æ’ÂÃ£Æ’Â¬Ã£Æ’Æ’Ã£â€šÂ¸
 
-### カバレッジの実行と表示
+### Ã£â€šÂ«Ã£Æ’ÂÃ£Æ’Â¬Ã£Æ’Æ’Ã£â€šÂ¸Ã£ÂÂ®Ã¥Â®Å¸Ã¨Â¡Å’Ã£ÂÂ¨Ã¨Â¡Â¨Ã§Â¤Âº
 
 ```bash
-# カバレッジを実行してHTMLレポートを生成
+# Ã£â€šÂ«Ã£Æ’ÂÃ£Æ’Â¬Ã£Æ’Æ’Ã£â€šÂ¸Ã£â€šâ€™Ã¥Â®Å¸Ã¨Â¡Å’Ã£Ââ€”Ã£ÂÂ¦HTMLÃ£Æ’Â¬Ã£Æ’ÂÃ£Æ’Â¼Ã£Æ’Ë†Ã£â€šâ€™Ã§â€Å¸Ã¦Ë†Â
 go test -coverprofile=coverage.out ./...
 go tool cover -html=coverage.out -o coverage.html
 
-# パッケージごとのカバレッジを表示
+# Ã£Æ’â€˜Ã£Æ’Æ’Ã£â€šÂ±Ã£Æ’Â¼Ã£â€šÂ¸Ã£Ââ€Ã£ÂÂ¨Ã£ÂÂ®Ã£â€šÂ«Ã£Æ’ÂÃ£Æ’Â¬Ã£Æ’Æ’Ã£â€šÂ¸Ã£â€šâ€™Ã¨Â¡Â¨Ã§Â¤Âº
 go test -cover ./...
 
-# 詳細なカバレッジ
+# Ã¨Â©Â³Ã§Â´Â°Ã£ÂÂªÃ£â€šÂ«Ã£Æ’ÂÃ£Æ’Â¬Ã£Æ’Æ’Ã£â€šÂ¸
 go test -coverprofile=coverage.out -covermode=atomic ./...
 ```
 
-### カバレッジのベストプラクティス
+### Ã£â€šÂ«Ã£Æ’ÂÃ£Æ’Â¬Ã£Æ’Æ’Ã£â€šÂ¸Ã£ÂÂ®Ã£Æ’â„¢Ã£â€šÂ¹Ã£Æ’Ë†Ã£Æ’â€”Ã£Æ’Â©Ã£â€šÂ¯Ã£Æ’â€ Ã£â€šÂ£Ã£â€šÂ¹
 
 ```go
-// Good: テスタブルなコード
+// Good: Ã£Æ’â€ Ã£â€šÂ¹Ã£â€šÂ¿Ã£Æ’â€“Ã£Æ’Â«Ã£ÂÂªÃ£â€šÂ³Ã£Æ’Â¼Ã£Æ’â€°
 func ProcessData(data []byte) (Result, error) {
     if len(data) == 0 {
         return Result{}, ErrEmptyData
     }
 
-    // 各分岐をテスト可能
+    // Ã¥Ââ€žÃ¥Ë†â€ Ã¥Â²ÂÃ£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã¥ÂÂ¯Ã¨Æ’Â½
     if isValid(data) {
         return parseValid(data)
     }
     return parseInvalid(data)
 }
 
-// 対応するテストが全分岐をカバー
+// Ã¥Â¯Â¾Ã¥Â¿Å“Ã£Ââ„¢Ã£â€šâ€¹Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£ÂÅ’Ã¥â€¦Â¨Ã¥Ë†â€ Ã¥Â²ÂÃ£â€šâ€™Ã£â€šÂ«Ã£Æ’ÂÃ£Æ’Â¼
 func TestProcessData(t *testing.T) {
     tests := []struct {
         name    string
@@ -654,9 +667,9 @@ func TestProcessData(t *testing.T) {
 }
 ```
 
-## 統合テスト
+## Ã§ÂµÂ±Ã¥ÂË†Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†
 
-### ビルドタグの使用
+### Ã£Æ’â€œÃ£Æ’Â«Ã£Æ’â€°Ã£â€šÂ¿Ã£â€šÂ°Ã£ÂÂ®Ã¤Â½Â¿Ã§â€Â¨
 
 ```go
 //go:build integration
@@ -667,19 +680,19 @@ package myapp_test
 import "testing"
 
 func TestDatabaseIntegration(t *testing.T) {
-    // 実際のDBを必要とするテスト
+    // Ã¥Â®Å¸Ã©Å¡â€ºÃ£ÂÂ®DBÃ£â€šâ€™Ã¥Â¿â€¦Ã¨Â¦ÂÃ£ÂÂ¨Ã£Ââ„¢Ã£â€šâ€¹Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†
 }
 ```
 
 ```bash
-# 統合テストを実行
+# Ã§ÂµÂ±Ã¥ÂË†Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â€šâ€™Ã¥Â®Å¸Ã¨Â¡Å’
 go test -tags=integration ./...
 
-# 統合テストを除外
+# Ã§ÂµÂ±Ã¥ÂË†Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â€šâ€™Ã©â„¢Â¤Ã¥Â¤â€“
 go test ./...
 ```
 
-### テストコンテナの使用
+### Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â€šÂ³Ã£Æ’Â³Ã£Æ’â€ Ã£Æ’Å Ã£ÂÂ®Ã¤Â½Â¿Ã§â€Â¨
 
 ```go
 import "github.com/testcontainers/testcontainers-go"
@@ -708,15 +721,15 @@ func setupPostgres(t *testing.T) *sql.DB {
         container.Terminate(ctx)
     })
 
-    // コンテナに接続
+    // Ã£â€šÂ³Ã£Æ’Â³Ã£Æ’â€ Ã£Æ’Å Ã£ÂÂ«Ã¦Å½Â¥Ã§Â¶Å¡
     // ...
     return db
 }
 ```
 
-## テストの並列化
+## Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£ÂÂ®Ã¤Â¸Â¦Ã¥Ë†â€”Ã¥Å’â€“
 
-### 並列テスト
+### Ã¤Â¸Â¦Ã¥Ë†â€”Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†
 
 ```go
 func TestParallel(t *testing.T) {
@@ -730,20 +743,20 @@ func TestParallel(t *testing.T) {
     }
 
     for _, tt := range tests {
-        tt := tt // ループ変数をキャプチャ
+        tt := tt // Ã£Æ’Â«Ã£Æ’Â¼Ã£Æ’â€”Ã¥Â¤â€°Ã¦â€¢Â°Ã£â€šâ€™Ã£â€šÂ­Ã£Æ’Â£Ã£Æ’â€”Ã£Æ’ÂÃ£Æ’Â£
         t.Run(tt.name, func(t *testing.T) {
-            t.Parallel() // このテストを並列実行
+            t.Parallel() // Ã£Ââ€œÃ£ÂÂ®Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â€šâ€™Ã¤Â¸Â¦Ã¥Ë†â€”Ã¥Â®Å¸Ã¨Â¡Å’
             tt.fn(t)
         })
     }
 }
 ```
 
-### 並列実行の制御
+### Ã¤Â¸Â¦Ã¥Ë†â€”Ã¥Â®Å¸Ã¨Â¡Å’Ã£ÂÂ®Ã¥Ë†Â¶Ã¥Â¾Â¡
 
 ```go
 func TestWithResourceLimit(t *testing.T) {
-    // 同時に5つのテストのみ
+    // Ã¥ÂÅ’Ã¦â„¢â€šÃ£ÂÂ«5Ã£ÂÂ¤Ã£ÂÂ®Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£ÂÂ®Ã£ÂÂ¿
     sem := make(chan struct{}, 5)
 
     tests := generateManyTests()
@@ -753,8 +766,8 @@ func TestWithResourceLimit(t *testing.T) {
         t.Run(tt.name, func(t *testing.T) {
             t.Parallel()
 
-            sem <- struct{}{}        // 獲得
-            defer func() { <-sem }() // 解放
+            sem <- struct{}{}        // Ã§ÂÂ²Ã¥Â¾â€”
+            defer func() { <-sem }() // Ã¨Â§Â£Ã¦â€Â¾
 
             tt.fn(t)
         })
@@ -762,58 +775,58 @@ func TestWithResourceLimit(t *testing.T) {
 }
 ```
 
-## Goツール統合
+## GoÃ£Æ’â€žÃ£Æ’Â¼Ã£Æ’Â«Ã§ÂµÂ±Ã¥ÂË†
 
-### テストコマンド
+### Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â€šÂ³Ã£Æ’Å¾Ã£Æ’Â³Ã£Æ’â€°
 
 ```bash
-# 基本テスト
+# Ã¥Å¸ÂºÃ¦Å“Â¬Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†
 go test ./...
-go test -v ./...                    # 詳細出力
-go test -run TestSpecific ./...     # 特定のテストを実行
+go test -v ./...                    # Ã¨Â©Â³Ã§Â´Â°Ã¥â€¡ÂºÃ¥Å â€º
+go test -run TestSpecific ./...     # Ã§â€°Â¹Ã¥Â®Å¡Ã£ÂÂ®Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â€šâ€™Ã¥Â®Å¸Ã¨Â¡Å’
 
-# カバレッジ
+# Ã£â€šÂ«Ã£Æ’ÂÃ£Æ’Â¬Ã£Æ’Æ’Ã£â€šÂ¸
 go test -cover ./...
 go test -coverprofile=coverage.out ./...
 
-# レースコンディション
+# Ã£Æ’Â¬Ã£Æ’Â¼Ã£â€šÂ¹Ã£â€šÂ³Ã£Æ’Â³Ã£Æ’â€¡Ã£â€šÂ£Ã£â€šÂ·Ã£Æ’Â§Ã£Æ’Â³
 go test -race ./...
 
-# ベンチマーク
+# Ã£Æ’â„¢Ã£Æ’Â³Ã£Æ’ÂÃ£Æ’Å¾Ã£Æ’Â¼Ã£â€šÂ¯
 go test -bench=. ./...
 go test -bench=. -benchmem ./...
 go test -bench=. -cpuprofile=cpu.prof ./...
 
-# ファジング
+# Ã£Æ’â€¢Ã£â€šÂ¡Ã£â€šÂ¸Ã£Æ’Â³Ã£â€šÂ°
 go test -fuzz=FuzzTest
 
-# 統合テスト
+# Ã§ÂµÂ±Ã¥ÂË†Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†
 go test -tags=integration ./...
 
-# JSONフォーマット（CI統合用）
+# JSONÃ£Æ’â€¢Ã£â€šÂ©Ã£Æ’Â¼Ã£Æ’Å¾Ã£Æ’Æ’Ã£Æ’Ë†Ã¯Â¼Ë†CIÃ§ÂµÂ±Ã¥ÂË†Ã§â€Â¨Ã¯Â¼â€°
 go test -json ./...
 ```
 
-### テスト設定
+### Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã¨Â¨Â­Ã¥Â®Å¡
 
 ```bash
-# テストタイムアウト
+# Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â€šÂ¿Ã£â€šÂ¤Ã£Æ’Â Ã£â€šÂ¢Ã£â€šÂ¦Ã£Æ’Ë†
 go test -timeout 30s ./...
 
-# 短時間テスト（長時間テストをスキップ）
+# Ã§Å¸Â­Ã¦â„¢â€šÃ©â€“â€œÃ£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã¯Â¼Ë†Ã©â€¢Â·Ã¦â„¢â€šÃ©â€“â€œÃ£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â€šâ€™Ã£â€šÂ¹Ã£â€šÂ­Ã£Æ’Æ’Ã£Æ’â€”Ã¯Â¼â€°
 go test -short ./...
 
-# ビルドキャッシュのクリア
+# Ã£Æ’â€œÃ£Æ’Â«Ã£Æ’â€°Ã£â€šÂ­Ã£Æ’Â£Ã£Æ’Æ’Ã£â€šÂ·Ã£Æ’Â¥Ã£ÂÂ®Ã£â€šÂ¯Ã£Æ’ÂªÃ£â€šÂ¢
 go clean -testcache
 go test ./...
 ```
 
-## ベストプラクティス
+## Ã£Æ’â„¢Ã£â€šÂ¹Ã£Æ’Ë†Ã£Æ’â€”Ã£Æ’Â©Ã£â€šÂ¯Ã£Æ’â€ Ã£â€šÂ£Ã£â€šÂ¹
 
-### DRY（Don't Repeat Yourself）原則
+### DRYÃ¯Â¼Ë†Don't Repeat YourselfÃ¯Â¼â€°Ã¥Å½Å¸Ã¥â€°â€¡
 
 ```go
-// Good: テーブル駆動テストで繰り返しを削減
+// Good: Ã£Æ’â€ Ã£Æ’Â¼Ã£Æ’â€“Ã£Æ’Â«Ã©Â§â€ Ã¥â€¹â€¢Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£ÂÂ§Ã§Â¹Â°Ã£â€šÅ Ã¨Â¿â€Ã£Ââ€”Ã£â€šâ€™Ã¥â€°Å Ã¦Â¸â€º
 func TestValidation(t *testing.T) {
     tests := []struct {
         input string
@@ -836,10 +849,10 @@ func TestValidation(t *testing.T) {
 }
 ```
 
-### テストデータの分離
+### Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£Æ’â€¡Ã£Æ’Â¼Ã£â€šÂ¿Ã£ÂÂ®Ã¥Ë†â€ Ã©â€ºÂ¢
 
 ```go
-// Good: テストデータを testdata/ ディレクトリに配置
+// Good: Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£Æ’â€¡Ã£Æ’Â¼Ã£â€šÂ¿Ã£â€šâ€™ testdata/ Ã£Æ’â€¡Ã£â€šÂ£Ã£Æ’Â¬Ã£â€šÂ¯Ã£Æ’Ë†Ã£Æ’ÂªÃ£ÂÂ«Ã©â€¦ÂÃ§Â½Â®
 func TestLoadConfig(t *testing.T) {
     data, err := os.ReadFile("testdata/config.json")
     if err != nil {
@@ -851,52 +864,52 @@ func TestLoadConfig(t *testing.T) {
 }
 ```
 
-### クリーンアップの使用
+### Ã£â€šÂ¯Ã£Æ’ÂªÃ£Æ’Â¼Ã£Æ’Â³Ã£â€šÂ¢Ã£Æ’Æ’Ã£Æ’â€”Ã£ÂÂ®Ã¤Â½Â¿Ã§â€Â¨
 
 ```go
 func TestWithCleanup(t *testing.T) {
-    // リソースを設定
+    // Ã£Æ’ÂªÃ£â€šÂ½Ã£Æ’Â¼Ã£â€šÂ¹Ã£â€šâ€™Ã¨Â¨Â­Ã¥Â®Å¡
     file, err := os.CreateTemp("", "test")
     if err != nil {
         t.Fatal(err)
     }
 
-    // クリーンアップを登録（deferに似ているが、サブテストで動作）
+    // Ã£â€šÂ¯Ã£Æ’ÂªÃ£Æ’Â¼Ã£Æ’Â³Ã£â€šÂ¢Ã£Æ’Æ’Ã£Æ’â€”Ã£â€šâ€™Ã§â„¢Â»Ã©Å’Â²Ã¯Â¼Ë†deferÃ£ÂÂ«Ã¤Â¼Â¼Ã£ÂÂ¦Ã£Ââ€žÃ£â€šâ€¹Ã£ÂÅ’Ã£â‚¬ÂÃ£â€šÂµÃ£Æ’â€“Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£ÂÂ§Ã¥â€¹â€¢Ã¤Â½Å“Ã¯Â¼â€°
     t.Cleanup(func() {
         os.Remove(file.Name())
     })
 
-    // テストを続ける...
+    // Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â€šâ€™Ã§Â¶Å¡Ã£Ââ€˜Ã£â€šâ€¹...
 }
 ```
 
-### エラーメッセージの明確化
+### Ã£â€šÂ¨Ã£Æ’Â©Ã£Æ’Â¼Ã£Æ’Â¡Ã£Æ’Æ’Ã£â€šÂ»Ã£Æ’Â¼Ã£â€šÂ¸Ã£ÂÂ®Ã¦ËœÅ½Ã§Â¢ÂºÃ¥Å’â€“
 
 ```go
-// Bad: 不明確なエラー
+// Bad: Ã¤Â¸ÂÃ¦ËœÅ½Ã§Â¢ÂºÃ£ÂÂªÃ£â€šÂ¨Ã£Æ’Â©Ã£Æ’Â¼
 if result != expected {
     t.Error("wrong result")
 }
 
-// Good: コンテキスト付きエラー
+// Good: Ã£â€šÂ³Ã£Æ’Â³Ã£Æ’â€ Ã£â€šÂ­Ã£â€šÂ¹Ã£Æ’Ë†Ã¤Â»ËœÃ£ÂÂÃ£â€šÂ¨Ã£Æ’Â©Ã£Æ’Â¼
 if result != expected {
     t.Errorf("Calculate(%d) = %d; want %d", input, result, expected)
 }
 
-// Better: ヘルパー関数の使用
+// Better: Ã£Æ’ËœÃ£Æ’Â«Ã£Æ’â€˜Ã£Æ’Â¼Ã©â€“Â¢Ã¦â€¢Â°Ã£ÂÂ®Ã¤Â½Â¿Ã§â€Â¨
 assertEqual(t, result, expected, "Calculate(%d)", input)
 ```
 
-## 避けるべきアンチパターン
+## Ã©ÂÂ¿Ã£Ââ€˜Ã£â€šâ€¹Ã£ÂÂ¹Ã£ÂÂÃ£â€šÂ¢Ã£Æ’Â³Ã£Æ’ÂÃ£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³
 
 ```go
-// Bad: 外部状態に依存
+// Bad: Ã¥Â¤â€“Ã©Æ’Â¨Ã§Å Â¶Ã¦â€¦â€¹Ã£ÂÂ«Ã¤Â¾ÂÃ¥Â­Ëœ
 func TestBadDependency(t *testing.T) {
-    result := GetUserFromDatabase("123") // 実際のDBを使用
-    // テストが壊れやすく遅い
+    result := GetUserFromDatabase("123") // Ã¥Â®Å¸Ã©Å¡â€ºÃ£ÂÂ®DBÃ£â€šâ€™Ã¤Â½Â¿Ã§â€Â¨
+    // Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£ÂÅ’Ã¥Â£Å Ã£â€šÅ’Ã£â€šâ€žÃ£Ââ„¢Ã£ÂÂÃ©Ââ€¦Ã£Ââ€ž
 }
 
-// Good: 依存を注入
+// Good: Ã¤Â¾ÂÃ¥Â­ËœÃ£â€šâ€™Ã¦Â³Â¨Ã¥â€¦Â¥
 func TestGoodDependency(t *testing.T) {
     mockDB := &MockDatabase{
         users: map[string]User{"123": {ID: "123"}},
@@ -904,22 +917,22 @@ func TestGoodDependency(t *testing.T) {
     result := GetUser(mockDB, "123")
 }
 
-// Bad: テスト間で状態を共有
+// Bad: Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã©â€“â€œÃ£ÂÂ§Ã§Å Â¶Ã¦â€¦â€¹Ã£â€šâ€™Ã¥â€¦Â±Ã¦Å“â€°
 var sharedCounter int
 
 func TestShared1(t *testing.T) {
     sharedCounter++
-    // テストの順序に依存
+    // Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£ÂÂ®Ã©Â â€ Ã¥ÂºÂÃ£ÂÂ«Ã¤Â¾ÂÃ¥Â­Ëœ
 }
 
-// Good: 各テストを独立させる
+// Good: Ã¥Ââ€žÃ£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â€šâ€™Ã§â€¹Â¬Ã§Â«â€¹Ã£Ââ€¢Ã£Ââ€ºÃ£â€šâ€¹
 func TestIndependent(t *testing.T) {
     counter := 0
     counter++
-    // 他のテストに影響しない
+    // Ã¤Â»â€“Ã£ÂÂ®Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£ÂÂ«Ã¥Â½Â±Ã©Å¸Â¿Ã£Ââ€”Ã£ÂÂªÃ£Ââ€ž
 }
 
-// Bad: エラーを無視
+// Bad: Ã£â€šÂ¨Ã£Æ’Â©Ã£Æ’Â¼Ã£â€šâ€™Ã§â€žÂ¡Ã¨Â¦â€“
 func TestIgnoreError(t *testing.T) {
     result, _ := Process()
     if result != expected {
@@ -927,7 +940,7 @@ func TestIgnoreError(t *testing.T) {
     }
 }
 
-// Good: エラーをチェック
+// Good: Ã£â€šÂ¨Ã£Æ’Â©Ã£Æ’Â¼Ã£â€šâ€™Ã£Æ’ÂÃ£â€šÂ§Ã£Æ’Æ’Ã£â€šÂ¯
 func TestCheckError(t *testing.T) {
     result, err := Process()
     if err != nil {
@@ -939,21 +952,21 @@ func TestCheckError(t *testing.T) {
 }
 ```
 
-## クイックリファレンス
+## Ã£â€šÂ¯Ã£â€šÂ¤Ã£Æ’Æ’Ã£â€šÂ¯Ã£Æ’ÂªÃ£Æ’â€¢Ã£â€šÂ¡Ã£Æ’Â¬Ã£Æ’Â³Ã£â€šÂ¹
 
-| コマンド/パターン | 目的 |
+| Ã£â€šÂ³Ã£Æ’Å¾Ã£Æ’Â³Ã£Æ’â€°/Ã£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³ | Ã§â€ºÂ®Ã§Å¡â€ž |
 |--------------|---------|
-| `go test ./...` | すべてのテストを実行 |
-| `go test -v` | 詳細出力 |
-| `go test -cover` | カバレッジレポート |
-| `go test -race` | レースコンディション検出 |
-| `go test -bench=.` | ベンチマークを実行 |
-| `t.Run()` | サブテスト |
-| `t.Helper()` | テストヘルパー関数 |
-| `t.Parallel()` | テストを並列実行 |
-| `t.Cleanup()` | クリーンアップを登録 |
-| `testdata/` | テストフィクスチャ用ディレクトリ |
-| `-short` | 長時間テストをスキップ |
-| `-tags=integration` | ビルドタグでテストを実行 |
+| `go test ./...` | Ã£Ââ„¢Ã£ÂÂ¹Ã£ÂÂ¦Ã£ÂÂ®Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â€šâ€™Ã¥Â®Å¸Ã¨Â¡Å’ |
+| `go test -v` | Ã¨Â©Â³Ã§Â´Â°Ã¥â€¡ÂºÃ¥Å â€º |
+| `go test -cover` | Ã£â€šÂ«Ã£Æ’ÂÃ£Æ’Â¬Ã£Æ’Æ’Ã£â€šÂ¸Ã£Æ’Â¬Ã£Æ’ÂÃ£Æ’Â¼Ã£Æ’Ë† |
+| `go test -race` | Ã£Æ’Â¬Ã£Æ’Â¼Ã£â€šÂ¹Ã£â€šÂ³Ã£Æ’Â³Ã£Æ’â€¡Ã£â€šÂ£Ã£â€šÂ·Ã£Æ’Â§Ã£Æ’Â³Ã¦Â¤Å“Ã¥â€¡Âº |
+| `go test -bench=.` | Ã£Æ’â„¢Ã£Æ’Â³Ã£Æ’ÂÃ£Æ’Å¾Ã£Æ’Â¼Ã£â€šÂ¯Ã£â€šâ€™Ã¥Â®Å¸Ã¨Â¡Å’ |
+| `t.Run()` | Ã£â€šÂµÃ£Æ’â€“Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë† |
+| `t.Helper()` | Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£Æ’ËœÃ£Æ’Â«Ã£Æ’â€˜Ã£Æ’Â¼Ã©â€“Â¢Ã¦â€¢Â° |
+| `t.Parallel()` | Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â€šâ€™Ã¤Â¸Â¦Ã¥Ë†â€”Ã¥Â®Å¸Ã¨Â¡Å’ |
+| `t.Cleanup()` | Ã£â€šÂ¯Ã£Æ’ÂªÃ£Æ’Â¼Ã£Æ’Â³Ã£â€šÂ¢Ã£Æ’Æ’Ã£Æ’â€”Ã£â€šâ€™Ã§â„¢Â»Ã©Å’Â² |
+| `testdata/` | Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£Æ’â€¢Ã£â€šÂ£Ã£â€šÂ¯Ã£â€šÂ¹Ã£Æ’ÂÃ£Æ’Â£Ã§â€Â¨Ã£Æ’â€¡Ã£â€šÂ£Ã£Æ’Â¬Ã£â€šÂ¯Ã£Æ’Ë†Ã£Æ’Âª |
+| `-short` | Ã©â€¢Â·Ã¦â„¢â€šÃ©â€“â€œÃ£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â€šâ€™Ã£â€šÂ¹Ã£â€šÂ­Ã£Æ’Æ’Ã£Æ’â€” |
+| `-tags=integration` | Ã£Æ’â€œÃ£Æ’Â«Ã£Æ’â€°Ã£â€šÂ¿Ã£â€šÂ°Ã£ÂÂ§Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â€šâ€™Ã¥Â®Å¸Ã¨Â¡Å’ |
 
-**覚えておいてください**: 良いテストは高速で、信頼性があり、保守可能で、明確です。複雑さより明確さを目指してください。
+**Ã¨Â¦Å¡Ã£ÂË†Ã£ÂÂ¦Ã£ÂÅ Ã£Ââ€žÃ£ÂÂ¦Ã£ÂÂÃ£ÂÂ Ã£Ââ€¢Ã£Ââ€ž**: Ã¨â€°Â¯Ã£Ââ€žÃ£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£ÂÂ¯Ã©Â«ËœÃ©â‚¬Å¸Ã£ÂÂ§Ã£â‚¬ÂÃ¤Â¿Â¡Ã©Â Â¼Ã¦â‚¬Â§Ã£ÂÅ’Ã£Ââ€šÃ£â€šÅ Ã£â‚¬ÂÃ¤Â¿ÂÃ¥Â®Ë†Ã¥ÂÂ¯Ã¨Æ’Â½Ã£ÂÂ§Ã£â‚¬ÂÃ¦ËœÅ½Ã§Â¢ÂºÃ£ÂÂ§Ã£Ââ„¢Ã£â‚¬â€šÃ¨Â¤â€¡Ã©â€ºâ€˜Ã£Ââ€¢Ã£â€šË†Ã£â€šÅ Ã¦ËœÅ½Ã§Â¢ÂºÃ£Ââ€¢Ã£â€šâ€™Ã§â€ºÂ®Ã¦Å’â€¡Ã£Ââ€”Ã£ÂÂ¦Ã£ÂÂÃ£ÂÂ Ã£Ââ€¢Ã£Ââ€žÃ£â‚¬â€š

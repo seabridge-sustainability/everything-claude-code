@@ -1,59 +1,72 @@
 ---
 name: instinct-status
-description: 展示已学习的本能（项目+全局）并充满信心
+description: Ã¥Â±â€¢Ã§Â¤ÂºÃ¥Â·Â²Ã¥Â­Â¦Ã¤Â¹Â Ã§Å¡â€žÃ¦Å“Â¬Ã¨Æ’Â½Ã¯Â¼Ë†Ã©Â¡Â¹Ã§â€ºÂ®+Ã¥â€¦Â¨Ã¥Â±â‚¬Ã¯Â¼â€°Ã¥Â¹Â¶Ã¥â€¦â€¦Ã¦Â»Â¡Ã¤Â¿Â¡Ã¥Â¿Æ’
 command: true
 ---
 
-# 本能状态命令
+# Ã¦Å“Â¬Ã¨Æ’Â½Ã§Å Â¶Ã¦â‚¬ÂÃ¥â€˜Â½Ã¤Â»Â¤
 
-显示当前项目学习到的本能以及全局本能，按领域分组。
+## Safety And Authorization Rule
 
-## 实现
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-使用插件根路径运行本能 CLI：
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+Ã¦ËœÂ¾Ã§Â¤ÂºÃ¥Â½â€œÃ¥â€°ÂÃ©Â¡Â¹Ã§â€ºÂ®Ã¥Â­Â¦Ã¤Â¹Â Ã¥Ë†Â°Ã§Å¡â€žÃ¦Å“Â¬Ã¨Æ’Â½Ã¤Â»Â¥Ã¥ÂÅ Ã¥â€¦Â¨Ã¥Â±â‚¬Ã¦Å“Â¬Ã¨Æ’Â½Ã¯Â¼Å’Ã¦Å’â€°Ã©Â¢â€ Ã¥Å¸Å¸Ã¥Ë†â€ Ã§Â»â€žÃ£â‚¬â€š
+
+## Ã¥Â®Å¾Ã§Å½Â°
+
+Ã¤Â½Â¿Ã§â€Â¨Ã¦Ââ€™Ã¤Â»Â¶Ã¦Â Â¹Ã¨Â·Â¯Ã¥Â¾â€žÃ¨Â¿ÂÃ¨Â¡Å’Ã¦Å“Â¬Ã¨Æ’Â½ CLIÃ¯Â¼Å¡
 
 ```bash
 python3 "${CLAUDE_PLUGIN_ROOT}/skills/continuous-learning-v2/scripts/instinct-cli.py" status
 ```
 
-或者，如果未设置 `CLAUDE_PLUGIN_ROOT`（手动安装），则使用：
+Ã¦Ë†â€“Ã¨â‚¬â€¦Ã¯Â¼Å’Ã¥Â¦â€šÃ¦Å¾Å“Ã¦Å“ÂªÃ¨Â®Â¾Ã§Â½Â® `CLAUDE_PLUGIN_ROOT`Ã¯Â¼Ë†Ã¦â€°â€¹Ã¥Å Â¨Ã¥Â®â€°Ã¨Â£â€¦Ã¯Â¼â€°Ã¯Â¼Å’Ã¥Ë†â„¢Ã¤Â½Â¿Ã§â€Â¨Ã¯Â¼Å¡
 
 ```bash
 python3 ~/.claude/skills/continuous-learning-v2/scripts/instinct-cli.py status
 ```
 
-## 用法
+## Ã§â€Â¨Ã¦Â³â€¢
 
 ```
 /instinct-status
 ```
 
-## 操作步骤
+## Ã¦â€œÂÃ¤Â½Å“Ã¦Â­Â¥Ã©ÂªÂ¤
 
-1. 检测当前项目上下文（git remote/路径哈希）
-2. 从 `~/.claude/homunculus/projects/<project-id>/instincts/` 读取项目本能
-3. 从 `~/.claude/homunculus/instincts/` 读取全局本能
-4. 合并并应用优先级规则（当ID冲突时，项目本能覆盖全局本能）
-5. 按领域分组显示，包含置信度条和观察统计数据
+1. Ã¦Â£â‚¬Ã¦Âµâ€¹Ã¥Â½â€œÃ¥â€°ÂÃ©Â¡Â¹Ã§â€ºÂ®Ã¤Â¸Å Ã¤Â¸â€¹Ã¦â€“â€¡Ã¯Â¼Ë†git remote/Ã¨Â·Â¯Ã¥Â¾â€žÃ¥â€œË†Ã¥Â¸Å’Ã¯Â¼â€°
+2. Ã¤Â»Å½ `~/.claude/homunculus/projects/<project-id>/instincts/` Ã¨Â¯Â»Ã¥Ââ€“Ã©Â¡Â¹Ã§â€ºÂ®Ã¦Å“Â¬Ã¨Æ’Â½
+3. Ã¤Â»Å½ `~/.claude/homunculus/instincts/` Ã¨Â¯Â»Ã¥Ââ€“Ã¥â€¦Â¨Ã¥Â±â‚¬Ã¦Å“Â¬Ã¨Æ’Â½
+4. Ã¥ÂË†Ã¥Â¹Â¶Ã¥Â¹Â¶Ã¥Âºâ€Ã§â€Â¨Ã¤Â¼ËœÃ¥â€¦Ë†Ã§ÂºÂ§Ã¨Â§â€žÃ¥Ë†â„¢Ã¯Â¼Ë†Ã¥Â½â€œIDÃ¥â€ Â²Ã§ÂªÂÃ¦â€”Â¶Ã¯Â¼Å’Ã©Â¡Â¹Ã§â€ºÂ®Ã¦Å“Â¬Ã¨Æ’Â½Ã¨Â¦â€ Ã§â€ºâ€“Ã¥â€¦Â¨Ã¥Â±â‚¬Ã¦Å“Â¬Ã¨Æ’Â½Ã¯Â¼â€°
+5. Ã¦Å’â€°Ã©Â¢â€ Ã¥Å¸Å¸Ã¥Ë†â€ Ã§Â»â€žÃ¦ËœÂ¾Ã§Â¤ÂºÃ¯Â¼Å’Ã¥Å’â€¦Ã¥ÂÂ«Ã§Â½Â®Ã¤Â¿Â¡Ã¥ÂºÂ¦Ã¦ÂÂ¡Ã¥â€™Å’Ã¨Â§â€šÃ¥Â¯Å¸Ã§Â»Å¸Ã¨Â®Â¡Ã¦â€¢Â°Ã¦ÂÂ®
 
-## 输出格式
+## Ã¨Â¾â€œÃ¥â€¡ÂºÃ¦Â Â¼Ã¥Â¼Â
 
 ```
 ============================================================
-  INSTINCT 状态 - 总计 12
+  INSTINCT Ã§Å Â¶Ã¦â‚¬Â - Ã¦â‚¬Â»Ã¨Â®Â¡ 12
 ============================================================
 
-  项目: my-app (a1b2c3d4e5f6)
-  项目 instincts: 8
-  全局 instincts:  4
+  Ã©Â¡Â¹Ã§â€ºÂ®: my-app (a1b2c3d4e5f6)
+  Ã©Â¡Â¹Ã§â€ºÂ® instincts: 8
+  Ã¥â€¦Â¨Ã¥Â±â‚¬ instincts:  4
 
-## 项目范围内 (my-app)
-  ### 工作流 (3)
-    ███████░░░  70%  grep-before-edit [project]
-              触发条件: 当修改代码时
+## Ã©Â¡Â¹Ã§â€ºÂ®Ã¨Å’Æ’Ã¥â€ºÂ´Ã¥â€ â€¦ (my-app)
+  ### Ã¥Â·Â¥Ã¤Â½Å“Ã¦ÂµÂ (3)
+    Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“â€˜Ã¢â€“â€˜Ã¢â€“â€˜  70%  grep-before-edit [project]
+              Ã¨Â§Â¦Ã¥Ââ€˜Ã¦ÂÂ¡Ã¤Â»Â¶: Ã¥Â½â€œÃ¤Â¿Â®Ã¦â€Â¹Ã¤Â»Â£Ã§Â ÂÃ¦â€”Â¶
 
-## 全局 (适用于所有项目)
-  ### 安全 (2)
-    █████████░  85%  validate-user-input [global]
-              触发条件: 当处理用户输入时
+## Ã¥â€¦Â¨Ã¥Â±â‚¬ (Ã©â‚¬â€šÃ§â€Â¨Ã¤ÂºÅ½Ã¦â€°â‚¬Ã¦Å“â€°Ã©Â¡Â¹Ã§â€ºÂ®)
+  ### Ã¥Â®â€°Ã¥â€¦Â¨ (2)
+    Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“â€˜  85%  validate-user-input [global]
+              Ã¨Â§Â¦Ã¥Ââ€˜Ã¦ÂÂ¡Ã¤Â»Â¶: Ã¥Â½â€œÃ¥Â¤â€žÃ§Ââ€ Ã§â€Â¨Ã¦Ë†Â·Ã¨Â¾â€œÃ¥â€¦Â¥Ã¦â€”Â¶
 ```

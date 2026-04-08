@@ -1,45 +1,58 @@
 ---
 name: coding-standards
-description: TypeScript、JavaScript、React、Node.js開発のための汎用コーディング標準、ベストプラクティス、パターン。
+description: TypeScriptÃ£â‚¬ÂJavaScriptÃ£â‚¬ÂReactÃ£â‚¬ÂNode.jsÃ©â€“â€¹Ã§â„¢ÂºÃ£ÂÂ®Ã£ÂÅ¸Ã£â€šÂÃ£ÂÂ®Ã¦Â±Å½Ã§â€Â¨Ã£â€šÂ³Ã£Æ’Â¼Ã£Æ’â€¡Ã£â€šÂ£Ã£Æ’Â³Ã£â€šÂ°Ã¦Â¨â„¢Ã¦Âºâ€“Ã£â‚¬ÂÃ£Æ’â„¢Ã£â€šÂ¹Ã£Æ’Ë†Ã£Æ’â€”Ã£Æ’Â©Ã£â€šÂ¯Ã£Æ’â€ Ã£â€šÂ£Ã£â€šÂ¹Ã£â‚¬ÂÃ£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³Ã£â‚¬â€š
 ---
 
-# コーディング標準とベストプラクティス
+# Ã£â€šÂ³Ã£Æ’Â¼Ã£Æ’â€¡Ã£â€šÂ£Ã£Æ’Â³Ã£â€šÂ°Ã¦Â¨â„¢Ã¦Âºâ€“Ã£ÂÂ¨Ã£Æ’â„¢Ã£â€šÂ¹Ã£Æ’Ë†Ã£Æ’â€”Ã£Æ’Â©Ã£â€šÂ¯Ã£Æ’â€ Ã£â€šÂ£Ã£â€šÂ¹
 
-すべてのプロジェクトに適用される汎用的なコーディング標準。
+## Safety And Authorization Rule
 
-## コード品質の原則
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-### 1. 可読性優先
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-* コードは書くよりも読まれることが多い
-* 明確な変数名と関数名
-* コメントよりも自己文書化コードを優先
-* 一貫したフォーマット
+
+Ã£Ââ„¢Ã£ÂÂ¹Ã£ÂÂ¦Ã£ÂÂ®Ã£Æ’â€”Ã£Æ’Â­Ã£â€šÂ¸Ã£â€šÂ§Ã£â€šÂ¯Ã£Æ’Ë†Ã£ÂÂ«Ã©ÂÂ©Ã§â€Â¨Ã£Ââ€¢Ã£â€šÅ’Ã£â€šâ€¹Ã¦Â±Å½Ã§â€Â¨Ã§Å¡â€žÃ£ÂÂªÃ£â€šÂ³Ã£Æ’Â¼Ã£Æ’â€¡Ã£â€šÂ£Ã£Æ’Â³Ã£â€šÂ°Ã¦Â¨â„¢Ã¦Âºâ€“Ã£â‚¬â€š
+
+## Ã£â€šÂ³Ã£Æ’Â¼Ã£Æ’â€°Ã¥â€œÂÃ¨Â³ÂªÃ£ÂÂ®Ã¥Å½Å¸Ã¥â€°â€¡
+
+### 1. Ã¥ÂÂ¯Ã¨ÂªÂ­Ã¦â‚¬Â§Ã¥â€žÂªÃ¥â€¦Ë†
+
+* Ã£â€šÂ³Ã£Æ’Â¼Ã£Æ’â€°Ã£ÂÂ¯Ã¦â€ºÂ¸Ã£ÂÂÃ£â€šË†Ã£â€šÅ Ã£â€šâ€šÃ¨ÂªÂ­Ã£ÂÂ¾Ã£â€šÅ’Ã£â€šâ€¹Ã£Ââ€œÃ£ÂÂ¨Ã£ÂÅ’Ã¥Â¤Å¡Ã£Ââ€ž
+* Ã¦ËœÅ½Ã§Â¢ÂºÃ£ÂÂªÃ¥Â¤â€°Ã¦â€¢Â°Ã¥ÂÂÃ£ÂÂ¨Ã©â€“Â¢Ã¦â€¢Â°Ã¥ÂÂ
+* Ã£â€šÂ³Ã£Æ’Â¡Ã£Æ’Â³Ã£Æ’Ë†Ã£â€šË†Ã£â€šÅ Ã£â€šâ€šÃ¨â€¡ÂªÃ¥Â·Â±Ã¦â€“â€¡Ã¦â€ºÂ¸Ã¥Å’â€“Ã£â€šÂ³Ã£Æ’Â¼Ã£Æ’â€°Ã£â€šâ€™Ã¥â€žÂªÃ¥â€¦Ë†
+* Ã¤Â¸â‚¬Ã¨Â²Â«Ã£Ââ€”Ã£ÂÅ¸Ã£Æ’â€¢Ã£â€šÂ©Ã£Æ’Â¼Ã£Æ’Å¾Ã£Æ’Æ’Ã£Æ’Ë†
 
 ### 2. KISS (Keep It Simple, Stupid)
 
-* 機能する最もシンプルなソリューションを採用
-* 過剰設計を避ける
-* 早すぎる最適化を避ける
-* 理解しやすさ > 巧妙なコード
+* Ã¦Â©Å¸Ã¨Æ’Â½Ã£Ââ„¢Ã£â€šâ€¹Ã¦Å“â‚¬Ã£â€šâ€šÃ£â€šÂ·Ã£Æ’Â³Ã£Æ’â€”Ã£Æ’Â«Ã£ÂÂªÃ£â€šÂ½Ã£Æ’ÂªÃ£Æ’Â¥Ã£Æ’Â¼Ã£â€šÂ·Ã£Æ’Â§Ã£Æ’Â³Ã£â€šâ€™Ã¦Å½Â¡Ã§â€Â¨
+* Ã©ÂÅ½Ã¥â€°Â°Ã¨Â¨Â­Ã¨Â¨Ë†Ã£â€šâ€™Ã©ÂÂ¿Ã£Ââ€˜Ã£â€šâ€¹
+* Ã¦â€”Â©Ã£Ââ„¢Ã£ÂÅ½Ã£â€šâ€¹Ã¦Å“â‚¬Ã©ÂÂ©Ã¥Å’â€“Ã£â€šâ€™Ã©ÂÂ¿Ã£Ââ€˜Ã£â€šâ€¹
+* Ã§Ââ€ Ã¨Â§Â£Ã£Ââ€”Ã£â€šâ€žÃ£Ââ„¢Ã£Ââ€¢ > Ã¥Â·Â§Ã¥Â¦â„¢Ã£ÂÂªÃ£â€šÂ³Ã£Æ’Â¼Ã£Æ’â€°
 
 ### 3. DRY (Don't Repeat Yourself)
 
-* 共通ロジックを関数に抽出
-* 再利用可能なコンポーネントを作成
-* ユーティリティ関数をモジュール間で共有
-* コピー&ペーストプログラミングを避ける
+* Ã¥â€¦Â±Ã©â‚¬Å¡Ã£Æ’Â­Ã£â€šÂ¸Ã£Æ’Æ’Ã£â€šÂ¯Ã£â€šâ€™Ã©â€“Â¢Ã¦â€¢Â°Ã£ÂÂ«Ã¦Å Â½Ã¥â€¡Âº
+* Ã¥â€ ÂÃ¥Ë†Â©Ã§â€Â¨Ã¥ÂÂ¯Ã¨Æ’Â½Ã£ÂÂªÃ£â€šÂ³Ã£Æ’Â³Ã£Æ’ÂÃ£Æ’Â¼Ã£Æ’ÂÃ£Æ’Â³Ã£Æ’Ë†Ã£â€šâ€™Ã¤Â½Å“Ã¦Ë†Â
+* Ã£Æ’Â¦Ã£Æ’Â¼Ã£Æ’â€ Ã£â€šÂ£Ã£Æ’ÂªÃ£Æ’â€ Ã£â€šÂ£Ã©â€“Â¢Ã¦â€¢Â°Ã£â€šâ€™Ã£Æ’Â¢Ã£â€šÂ¸Ã£Æ’Â¥Ã£Æ’Â¼Ã£Æ’Â«Ã©â€“â€œÃ£ÂÂ§Ã¥â€¦Â±Ã¦Å“â€°
+* Ã£â€šÂ³Ã£Æ’â€Ã£Æ’Â¼&Ã£Æ’Å¡Ã£Æ’Â¼Ã£â€šÂ¹Ã£Æ’Ë†Ã£Æ’â€”Ã£Æ’Â­Ã£â€šÂ°Ã£Æ’Â©Ã£Æ’Å¸Ã£Æ’Â³Ã£â€šÂ°Ã£â€šâ€™Ã©ÂÂ¿Ã£Ââ€˜Ã£â€šâ€¹
 
 ### 4. YAGNI (You Aren't Gonna Need It)
 
-* 必要ない機能を事前に構築しない
-* 推測的な一般化を避ける
-* 必要なときのみ複雑さを追加
-* シンプルに始めて、必要に応じてリファクタリング
+* Ã¥Â¿â€¦Ã¨Â¦ÂÃ£ÂÂªÃ£Ââ€žÃ¦Â©Å¸Ã¨Æ’Â½Ã£â€šâ€™Ã¤Âºâ€¹Ã¥â€°ÂÃ£ÂÂ«Ã¦Â§â€¹Ã§Â¯â€°Ã£Ââ€”Ã£ÂÂªÃ£Ââ€ž
+* Ã¦Å½Â¨Ã¦Â¸Â¬Ã§Å¡â€žÃ£ÂÂªÃ¤Â¸â‚¬Ã¨Ë†Â¬Ã¥Å’â€“Ã£â€šâ€™Ã©ÂÂ¿Ã£Ââ€˜Ã£â€šâ€¹
+* Ã¥Â¿â€¦Ã¨Â¦ÂÃ£ÂÂªÃ£ÂÂ¨Ã£ÂÂÃ£ÂÂ®Ã£ÂÂ¿Ã¨Â¤â€¡Ã©â€ºâ€˜Ã£Ââ€¢Ã£â€šâ€™Ã¨Â¿Â½Ã¥Å Â 
+* Ã£â€šÂ·Ã£Æ’Â³Ã£Æ’â€”Ã£Æ’Â«Ã£ÂÂ«Ã¥Â§â€¹Ã£â€šÂÃ£ÂÂ¦Ã£â‚¬ÂÃ¥Â¿â€¦Ã¨Â¦ÂÃ£ÂÂ«Ã¥Â¿Å“Ã£ÂËœÃ£ÂÂ¦Ã£Æ’ÂªÃ£Æ’â€¢Ã£â€šÂ¡Ã£â€šÂ¯Ã£â€šÂ¿Ã£Æ’ÂªÃ£Æ’Â³Ã£â€šÂ°
 
-## TypeScript/JavaScript標準
+## TypeScript/JavaScriptÃ¦Â¨â„¢Ã¦Âºâ€“
 
-### 変数の命名
+### Ã¥Â¤â€°Ã¦â€¢Â°Ã£ÂÂ®Ã¥â€˜Â½Ã¥ÂÂ
 
 ```typescript
 // PASS: GOOD: Descriptive names
@@ -53,7 +66,7 @@ const flag = true
 const x = 1000
 ```
 
-### 関数の命名
+### Ã©â€“Â¢Ã¦â€¢Â°Ã£ÂÂ®Ã¥â€˜Â½Ã¥ÂÂ
 
 ```typescript
 // PASS: GOOD: Verb-noun pattern
@@ -67,7 +80,7 @@ function similarity(a, b) { }
 function email(e) { }
 ```
 
-### 不変性パターン（重要）
+### Ã¤Â¸ÂÃ¥Â¤â€°Ã¦â‚¬Â§Ã£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³Ã¯Â¼Ë†Ã©â€¡ÂÃ¨Â¦ÂÃ¯Â¼â€°
 
 ```typescript
 // PASS: ALWAYS use spread operator
@@ -83,7 +96,7 @@ user.name = 'New Name'  // BAD
 items.push(newItem)     // BAD
 ```
 
-### エラーハンドリング
+### Ã£â€šÂ¨Ã£Æ’Â©Ã£Æ’Â¼Ã£Æ’ÂÃ£Æ’Â³Ã£Æ’â€°Ã£Æ’ÂªÃ£Æ’Â³Ã£â€šÂ°
 
 ```typescript
 // PASS: GOOD: Comprehensive error handling
@@ -109,7 +122,7 @@ async function fetchData(url) {
 }
 ```
 
-### Async/Awaitベストプラクティス
+### Async/AwaitÃ£Æ’â„¢Ã£â€šÂ¹Ã£Æ’Ë†Ã£Æ’â€”Ã£Æ’Â©Ã£â€šÂ¯Ã£Æ’â€ Ã£â€šÂ£Ã£â€šÂ¹
 
 ```typescript
 // PASS: GOOD: Parallel execution when possible
@@ -125,7 +138,7 @@ const markets = await fetchMarkets()
 const stats = await fetchStats()
 ```
 
-### 型安全性
+### Ã¥Å¾â€¹Ã¥Â®â€°Ã¥â€¦Â¨Ã¦â‚¬Â§
 
 ```typescript
 // PASS: GOOD: Proper types
@@ -146,9 +159,9 @@ function getMarket(id: any): Promise<any> {
 }
 ```
 
-## Reactベストプラクティス
+## ReactÃ£Æ’â„¢Ã£â€šÂ¹Ã£Æ’Ë†Ã£Æ’â€”Ã£Æ’Â©Ã£â€šÂ¯Ã£Æ’â€ Ã£â€šÂ£Ã£â€šÂ¹
 
-### コンポーネント構造
+### Ã£â€šÂ³Ã£Æ’Â³Ã£Æ’ÂÃ£Æ’Â¼Ã£Æ’ÂÃ£Æ’Â³Ã£Æ’Ë†Ã¦Â§â€¹Ã©â‚¬Â 
 
 ```typescript
 // PASS: GOOD: Functional component with types
@@ -182,7 +195,7 @@ export function Button(props) {
 }
 ```
 
-### カスタムフック
+### Ã£â€šÂ«Ã£â€šÂ¹Ã£â€šÂ¿Ã£Æ’Â Ã£Æ’â€¢Ã£Æ’Æ’Ã£â€šÂ¯
 
 ```typescript
 // PASS: GOOD: Reusable custom hook
@@ -204,7 +217,7 @@ export function useDebounce<T>(value: T, delay: number): T {
 const debouncedQuery = useDebounce(searchQuery, 500)
 ```
 
-### 状態管理
+### Ã§Å Â¶Ã¦â€¦â€¹Ã§Â®Â¡Ã§Ââ€ 
 
 ```typescript
 // PASS: GOOD: Proper state updates
@@ -217,7 +230,7 @@ setCount(prev => prev + 1)
 setCount(count + 1)  // Can be stale in async scenarios
 ```
 
-### 条件付きレンダリング
+### Ã¦ÂÂ¡Ã¤Â»Â¶Ã¤Â»ËœÃ£ÂÂÃ£Æ’Â¬Ã£Æ’Â³Ã£Æ’â‚¬Ã£Æ’ÂªÃ£Æ’Â³Ã£â€šÂ°
 
 ```typescript
 // PASS: GOOD: Clear conditional rendering
@@ -229,23 +242,23 @@ setCount(count + 1)  // Can be stale in async scenarios
 {isLoading ? <Spinner /> : error ? <ErrorMessage error={error} /> : data ? <DataDisplay data={data} /> : null}
 ```
 
-## API設計標準
+## APIÃ¨Â¨Â­Ã¨Â¨Ë†Ã¦Â¨â„¢Ã¦Âºâ€“
 
-### REST API規約
+### REST APIÃ¨Â¦ÂÃ§Â´â€ž
 
 ```
-GET    /api/markets              # すべてのマーケットを一覧
-GET    /api/markets/:id          # 特定のマーケットを取得
-POST   /api/markets              # 新しいマーケットを作成
-PUT    /api/markets/:id          # マーケットを更新（全体）
-PATCH  /api/markets/:id          # マーケットを更新（部分）
-DELETE /api/markets/:id          # マーケットを削除
+GET    /api/markets              # Ã£Ââ„¢Ã£ÂÂ¹Ã£ÂÂ¦Ã£ÂÂ®Ã£Æ’Å¾Ã£Æ’Â¼Ã£â€šÂ±Ã£Æ’Æ’Ã£Æ’Ë†Ã£â€šâ€™Ã¤Â¸â‚¬Ã¨Â¦Â§
+GET    /api/markets/:id          # Ã§â€°Â¹Ã¥Â®Å¡Ã£ÂÂ®Ã£Æ’Å¾Ã£Æ’Â¼Ã£â€šÂ±Ã£Æ’Æ’Ã£Æ’Ë†Ã£â€šâ€™Ã¥Ââ€“Ã¥Â¾â€”
+POST   /api/markets              # Ã¦â€“Â°Ã£Ââ€”Ã£Ââ€žÃ£Æ’Å¾Ã£Æ’Â¼Ã£â€šÂ±Ã£Æ’Æ’Ã£Æ’Ë†Ã£â€šâ€™Ã¤Â½Å“Ã¦Ë†Â
+PUT    /api/markets/:id          # Ã£Æ’Å¾Ã£Æ’Â¼Ã£â€šÂ±Ã£Æ’Æ’Ã£Æ’Ë†Ã£â€šâ€™Ã¦â€ºÂ´Ã¦â€“Â°Ã¯Â¼Ë†Ã¥â€¦Â¨Ã¤Â½â€œÃ¯Â¼â€°
+PATCH  /api/markets/:id          # Ã£Æ’Å¾Ã£Æ’Â¼Ã£â€šÂ±Ã£Æ’Æ’Ã£Æ’Ë†Ã£â€šâ€™Ã¦â€ºÂ´Ã¦â€“Â°Ã¯Â¼Ë†Ã©Æ’Â¨Ã¥Ë†â€ Ã¯Â¼â€°
+DELETE /api/markets/:id          # Ã£Æ’Å¾Ã£Æ’Â¼Ã£â€šÂ±Ã£Æ’Æ’Ã£Æ’Ë†Ã£â€šâ€™Ã¥â€°Å Ã©â„¢Â¤
 
-# フィルタリング用クエリパラメータ
+# Ã£Æ’â€¢Ã£â€šÂ£Ã£Æ’Â«Ã£â€šÂ¿Ã£Æ’ÂªÃ£Æ’Â³Ã£â€šÂ°Ã§â€Â¨Ã£â€šÂ¯Ã£â€šÂ¨Ã£Æ’ÂªÃ£Æ’â€˜Ã£Æ’Â©Ã£Æ’Â¡Ã£Æ’Â¼Ã£â€šÂ¿
 GET /api/markets?status=active&limit=10&offset=0
 ```
 
-### レスポンス形式
+### Ã£Æ’Â¬Ã£â€šÂ¹Ã£Æ’ÂÃ£Æ’Â³Ã£â€šÂ¹Ã¥Â½Â¢Ã¥Â¼Â
 
 ```typescript
 // PASS: GOOD: Consistent response structure
@@ -274,7 +287,7 @@ return NextResponse.json({
 }, { status: 400 })
 ```
 
-### 入力検証
+### Ã¥â€¦Â¥Ã¥Å â€ºÃ¦Â¤Å“Ã¨Â¨Â¼
 
 ```typescript
 import { z } from 'zod'
@@ -305,41 +318,41 @@ export async function POST(request: Request) {
 }
 ```
 
-## ファイル構成
+## Ã£Æ’â€¢Ã£â€šÂ¡Ã£â€šÂ¤Ã£Æ’Â«Ã¦Â§â€¹Ã¦Ë†Â
 
-### プロジェクト構造
+### Ã£Æ’â€”Ã£Æ’Â­Ã£â€šÂ¸Ã£â€šÂ§Ã£â€šÂ¯Ã£Æ’Ë†Ã¦Â§â€¹Ã©â‚¬Â 
 
 ```
 src/
-├── app/                    # Next.js App Router
-│   ├── api/               # API ルート
-│   ├── markets/           # マーケットページ
-│   └── (auth)/           # 認証ページ（ルートグループ）
-├── components/            # React コンポーネント
-│   ├── ui/               # 汎用 UI コンポーネント
-│   ├── forms/            # フォームコンポーネント
-│   └── layouts/          # レイアウトコンポーネント
-├── hooks/                # カスタム React フック
-├── lib/                  # ユーティリティと設定
-│   ├── api/             # API クライアント
-│   ├── utils/           # ヘルパー関数
-│   └── constants/       # 定数
-├── types/                # TypeScript 型定義
-└── styles/              # グローバルスタイル
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ app/                    # Next.js App Router
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ api/               # API Ã£Æ’Â«Ã£Æ’Â¼Ã£Æ’Ë†
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ markets/           # Ã£Æ’Å¾Ã£Æ’Â¼Ã£â€šÂ±Ã£Æ’Æ’Ã£Æ’Ë†Ã£Æ’Å¡Ã£Æ’Â¼Ã£â€šÂ¸
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ (auth)/           # Ã¨ÂªÂÃ¨Â¨Â¼Ã£Æ’Å¡Ã£Æ’Â¼Ã£â€šÂ¸Ã¯Â¼Ë†Ã£Æ’Â«Ã£Æ’Â¼Ã£Æ’Ë†Ã£â€šÂ°Ã£Æ’Â«Ã£Æ’Â¼Ã£Æ’â€”Ã¯Â¼â€°
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ components/            # React Ã£â€šÂ³Ã£Æ’Â³Ã£Æ’ÂÃ£Æ’Â¼Ã£Æ’ÂÃ£Æ’Â³Ã£Æ’Ë†
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ ui/               # Ã¦Â±Å½Ã§â€Â¨ UI Ã£â€šÂ³Ã£Æ’Â³Ã£Æ’ÂÃ£Æ’Â¼Ã£Æ’ÂÃ£Æ’Â³Ã£Æ’Ë†
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ forms/            # Ã£Æ’â€¢Ã£â€šÂ©Ã£Æ’Â¼Ã£Æ’Â Ã£â€šÂ³Ã£Æ’Â³Ã£Æ’ÂÃ£Æ’Â¼Ã£Æ’ÂÃ£Æ’Â³Ã£Æ’Ë†
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ layouts/          # Ã£Æ’Â¬Ã£â€šÂ¤Ã£â€šÂ¢Ã£â€šÂ¦Ã£Æ’Ë†Ã£â€šÂ³Ã£Æ’Â³Ã£Æ’ÂÃ£Æ’Â¼Ã£Æ’ÂÃ£Æ’Â³Ã£Æ’Ë†
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ hooks/                # Ã£â€šÂ«Ã£â€šÂ¹Ã£â€šÂ¿Ã£Æ’Â  React Ã£Æ’â€¢Ã£Æ’Æ’Ã£â€šÂ¯
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ lib/                  # Ã£Æ’Â¦Ã£Æ’Â¼Ã£Æ’â€ Ã£â€šÂ£Ã£Æ’ÂªÃ£Æ’â€ Ã£â€šÂ£Ã£ÂÂ¨Ã¨Â¨Â­Ã¥Â®Å¡
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ api/             # API Ã£â€šÂ¯Ã£Æ’Â©Ã£â€šÂ¤Ã£â€šÂ¢Ã£Æ’Â³Ã£Æ’Ë†
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ utils/           # Ã£Æ’ËœÃ£Æ’Â«Ã£Æ’â€˜Ã£Æ’Â¼Ã©â€“Â¢Ã¦â€¢Â°
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ constants/       # Ã¥Â®Å¡Ã¦â€¢Â°
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ types/                # TypeScript Ã¥Å¾â€¹Ã¥Â®Å¡Ã§Â¾Â©
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ styles/              # Ã£â€šÂ°Ã£Æ’Â­Ã£Æ’Â¼Ã£Æ’ÂÃ£Æ’Â«Ã£â€šÂ¹Ã£â€šÂ¿Ã£â€šÂ¤Ã£Æ’Â«
 ```
 
-### ファイル命名
+### Ã£Æ’â€¢Ã£â€šÂ¡Ã£â€šÂ¤Ã£Æ’Â«Ã¥â€˜Â½Ã¥ÂÂ
 
 ```
-components/Button.tsx          # コンポーネントは PascalCase
-hooks/useAuth.ts              # フックは 'use' プレフィックス付き camelCase
-lib/formatDate.ts             # ユーティリティは camelCase
-types/market.types.ts         # 型定義は .types サフィックス付き camelCase
+components/Button.tsx          # Ã£â€šÂ³Ã£Æ’Â³Ã£Æ’ÂÃ£Æ’Â¼Ã£Æ’ÂÃ£Æ’Â³Ã£Æ’Ë†Ã£ÂÂ¯ PascalCase
+hooks/useAuth.ts              # Ã£Æ’â€¢Ã£Æ’Æ’Ã£â€šÂ¯Ã£ÂÂ¯ 'use' Ã£Æ’â€”Ã£Æ’Â¬Ã£Æ’â€¢Ã£â€šÂ£Ã£Æ’Æ’Ã£â€šÂ¯Ã£â€šÂ¹Ã¤Â»ËœÃ£ÂÂ camelCase
+lib/formatDate.ts             # Ã£Æ’Â¦Ã£Æ’Â¼Ã£Æ’â€ Ã£â€šÂ£Ã£Æ’ÂªÃ£Æ’â€ Ã£â€šÂ£Ã£ÂÂ¯ camelCase
+types/market.types.ts         # Ã¥Å¾â€¹Ã¥Â®Å¡Ã§Â¾Â©Ã£ÂÂ¯ .types Ã£â€šÂµÃ£Æ’â€¢Ã£â€šÂ£Ã£Æ’Æ’Ã£â€šÂ¯Ã£â€šÂ¹Ã¤Â»ËœÃ£ÂÂ camelCase
 ```
 
-## コメントとドキュメント
+## Ã£â€šÂ³Ã£Æ’Â¡Ã£Æ’Â³Ã£Æ’Ë†Ã£ÂÂ¨Ã£Æ’â€°Ã£â€šÂ­Ã£Æ’Â¥Ã£Æ’Â¡Ã£Æ’Â³Ã£Æ’Ë†
 
-### コメントを追加するタイミング
+### Ã£â€šÂ³Ã£Æ’Â¡Ã£Æ’Â³Ã£Æ’Ë†Ã£â€šâ€™Ã¨Â¿Â½Ã¥Å Â Ã£Ââ„¢Ã£â€šâ€¹Ã£â€šÂ¿Ã£â€šÂ¤Ã£Æ’Å¸Ã£Æ’Â³Ã£â€šÂ°
 
 ```typescript
 // PASS: GOOD: Explain WHY, not WHAT
@@ -357,7 +370,7 @@ count++
 name = user.name
 ```
 
-### パブリックAPIのJSDoc
+### Ã£Æ’â€˜Ã£Æ’â€“Ã£Æ’ÂªÃ£Æ’Æ’Ã£â€šÂ¯APIÃ£ÂÂ®JSDoc
 
 ````typescript
 /**
@@ -382,9 +395,9 @@ export async function searchMarkets(
 }
 ````
 
-## パフォーマンスベストプラクティス
+## Ã£Æ’â€˜Ã£Æ’â€¢Ã£â€šÂ©Ã£Æ’Â¼Ã£Æ’Å¾Ã£Æ’Â³Ã£â€šÂ¹Ã£Æ’â„¢Ã£â€šÂ¹Ã£Æ’Ë†Ã£Æ’â€”Ã£Æ’Â©Ã£â€šÂ¯Ã£Æ’â€ Ã£â€šÂ£Ã£â€šÂ¹
 
-### メモ化
+### Ã£Æ’Â¡Ã£Æ’Â¢Ã¥Å’â€“
 
 ```typescript
 import { useMemo, useCallback } from 'react'
@@ -400,7 +413,7 @@ const handleSearch = useCallback((query: string) => {
 }, [])
 ```
 
-### 遅延読み込み
+### Ã©Ââ€¦Ã¥Â»Â¶Ã¨ÂªÂ­Ã£ÂÂ¿Ã¨Â¾Â¼Ã£ÂÂ¿
 
 ```typescript
 import { lazy, Suspense } from 'react'
@@ -417,7 +430,7 @@ export function Dashboard() {
 }
 ```
 
-### データベースクエリ
+### Ã£Æ’â€¡Ã£Æ’Â¼Ã£â€šÂ¿Ã£Æ’â„¢Ã£Æ’Â¼Ã£â€šÂ¹Ã£â€šÂ¯Ã£â€šÂ¨Ã£Æ’Âª
 
 ```typescript
 // PASS: GOOD: Select only needed columns
@@ -432,9 +445,9 @@ const { data } = await supabase
   .select('*')
 ```
 
-## テスト標準
+## Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã¦Â¨â„¢Ã¦Âºâ€“
 
-### テスト構造（AAAパターン）
+### Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã¦Â§â€¹Ã©â‚¬Â Ã¯Â¼Ë†AAAÃ£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³Ã¯Â¼â€°
 
 ```typescript
 test('calculates similarity correctly', () => {
@@ -450,7 +463,7 @@ test('calculates similarity correctly', () => {
 })
 ```
 
-### テストの命名
+### Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£ÂÂ®Ã¥â€˜Â½Ã¥ÂÂ
 
 ```typescript
 // PASS: GOOD: Descriptive test names
@@ -463,11 +476,11 @@ test('works', () => { })
 test('test search', () => { })
 ```
 
-## コードスメルの検出
+## Ã£â€šÂ³Ã£Æ’Â¼Ã£Æ’â€°Ã£â€šÂ¹Ã£Æ’Â¡Ã£Æ’Â«Ã£ÂÂ®Ã¦Â¤Å“Ã¥â€¡Âº
 
-以下のアンチパターンに注意してください。
+Ã¤Â»Â¥Ã¤Â¸â€¹Ã£ÂÂ®Ã£â€šÂ¢Ã£Æ’Â³Ã£Æ’ÂÃ£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³Ã£ÂÂ«Ã¦Â³Â¨Ã¦â€žÂÃ£Ââ€”Ã£ÂÂ¦Ã£ÂÂÃ£ÂÂ Ã£Ââ€¢Ã£Ââ€žÃ£â‚¬â€š
 
-### 1. 長い関数
+### 1. Ã©â€¢Â·Ã£Ââ€žÃ©â€“Â¢Ã¦â€¢Â°
 
 ```typescript
 // FAIL: BAD: Function > 50 lines
@@ -483,7 +496,7 @@ function processMarketData() {
 }
 ```
 
-### 2. 深いネスト
+### 2. Ã¦Â·Â±Ã£Ââ€žÃ£Æ’ÂÃ£â€šÂ¹Ã£Æ’Ë†
 
 ```typescript
 // FAIL: BAD: 5+ levels of nesting
@@ -509,7 +522,7 @@ if (!hasPermission) return
 // Do something
 ```
 
-### 3. マジックナンバー
+### 3. Ã£Æ’Å¾Ã£â€šÂ¸Ã£Æ’Æ’Ã£â€šÂ¯Ã£Æ’Å Ã£Æ’Â³Ã£Æ’ÂÃ£Æ’Â¼
 
 ```typescript
 // FAIL: BAD: Unexplained numbers
@@ -524,4 +537,4 @@ if (retryCount > MAX_RETRIES) { }
 setTimeout(callback, DEBOUNCE_DELAY_MS)
 ```
 
-**覚えておいてください**: コード品質は妥協できません。明確で保守可能なコードにより、迅速な開発と自信を持ったリファクタリングが可能になります。
+**Ã¨Â¦Å¡Ã£ÂË†Ã£ÂÂ¦Ã£ÂÅ Ã£Ââ€žÃ£ÂÂ¦Ã£ÂÂÃ£ÂÂ Ã£Ââ€¢Ã£Ââ€ž**: Ã£â€šÂ³Ã£Æ’Â¼Ã£Æ’â€°Ã¥â€œÂÃ¨Â³ÂªÃ£ÂÂ¯Ã¥Â¦Â¥Ã¥Ââ€Ã£ÂÂ§Ã£ÂÂÃ£ÂÂ¾Ã£Ââ€ºÃ£â€šâ€œÃ£â‚¬â€šÃ¦ËœÅ½Ã§Â¢ÂºÃ£ÂÂ§Ã¤Â¿ÂÃ¥Â®Ë†Ã¥ÂÂ¯Ã¨Æ’Â½Ã£ÂÂªÃ£â€šÂ³Ã£Æ’Â¼Ã£Æ’â€°Ã£ÂÂ«Ã£â€šË†Ã£â€šÅ Ã£â‚¬ÂÃ¨Â¿â€¦Ã©â‚¬Å¸Ã£ÂÂªÃ©â€“â€¹Ã§â„¢ÂºÃ£ÂÂ¨Ã¨â€¡ÂªÃ¤Â¿Â¡Ã£â€šâ€™Ã¦Å’ÂÃ£ÂÂ£Ã£ÂÅ¸Ã£Æ’ÂªÃ£Æ’â€¢Ã£â€šÂ¡Ã£â€šÂ¯Ã£â€šÂ¿Ã£Æ’ÂªÃ£Æ’Â³Ã£â€šÂ°Ã£ÂÅ’Ã¥ÂÂ¯Ã¨Æ’Â½Ã£ÂÂ«Ã£ÂÂªÃ£â€šÅ Ã£ÂÂ¾Ã£Ââ„¢Ã£â‚¬â€š

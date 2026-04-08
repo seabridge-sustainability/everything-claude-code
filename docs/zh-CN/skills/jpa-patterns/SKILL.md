@@ -1,23 +1,36 @@
 ---
 name: jpa-patterns
-description: Spring Boot中的JPA/Hibernate模式，用于实体设计、关系处理、查询优化、事务管理、审计、索引、分页和连接池。
+description: Spring BootÃ¤Â¸Â­Ã§Å¡â€žJPA/HibernateÃ¦Â¨Â¡Ã¥Â¼ÂÃ¯Â¼Å’Ã§â€Â¨Ã¤ÂºÅ½Ã¥Â®Å¾Ã¤Â½â€œÃ¨Â®Â¾Ã¨Â®Â¡Ã£â‚¬ÂÃ¥â€¦Â³Ã§Â³Â»Ã¥Â¤â€žÃ§Ââ€ Ã£â‚¬ÂÃ¦Å¸Â¥Ã¨Â¯Â¢Ã¤Â¼ËœÃ¥Å’â€“Ã£â‚¬ÂÃ¤Âºâ€¹Ã¥Å Â¡Ã§Â®Â¡Ã§Ââ€ Ã£â‚¬ÂÃ¥Â®Â¡Ã¨Â®Â¡Ã£â‚¬ÂÃ§Â´Â¢Ã¥Â¼â€¢Ã£â‚¬ÂÃ¥Ë†â€ Ã©Â¡ÂµÃ¥â€™Å’Ã¨Â¿Å¾Ã¦Å½Â¥Ã¦Â±Â Ã£â‚¬â€š
 origin: ECC
 ---
 
-# JPA/Hibernate 模式
+# JPA/Hibernate Ã¦Â¨Â¡Ã¥Â¼Â
 
-用于 Spring Boot 中的数据建模、存储库和性能调优。
+## Safety And Authorization Rule
 
-## 何时激活
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-* 设计 JPA 实体和表映射时
-* 定义关系时 (@OneToMany, @ManyToOne, @ManyToMany)
-* 优化查询时 (N+1 问题预防、获取策略、投影)
-* 配置事务、审计或软删除时
-* 设置分页、排序或自定义存储库方法时
-* 调整连接池 (HikariCP) 或二级缓存时
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-## 实体设计
+
+Ã§â€Â¨Ã¤ÂºÅ½ Spring Boot Ã¤Â¸Â­Ã§Å¡â€žÃ¦â€¢Â°Ã¦ÂÂ®Ã¥Â»ÂºÃ¦Â¨Â¡Ã£â‚¬ÂÃ¥Â­ËœÃ¥â€šÂ¨Ã¥Âºâ€œÃ¥â€™Å’Ã¦â‚¬Â§Ã¨Æ’Â½Ã¨Â°Æ’Ã¤Â¼ËœÃ£â‚¬â€š
+
+## Ã¤Â½â€¢Ã¦â€”Â¶Ã¦Â¿â‚¬Ã¦Â´Â»
+
+* Ã¨Â®Â¾Ã¨Â®Â¡ JPA Ã¥Â®Å¾Ã¤Â½â€œÃ¥â€™Å’Ã¨Â¡Â¨Ã¦ËœÂ Ã¥Â°â€žÃ¦â€”Â¶
+* Ã¥Â®Å¡Ã¤Â¹â€°Ã¥â€¦Â³Ã§Â³Â»Ã¦â€”Â¶ (@OneToMany, @ManyToOne, @ManyToMany)
+* Ã¤Â¼ËœÃ¥Å’â€“Ã¦Å¸Â¥Ã¨Â¯Â¢Ã¦â€”Â¶ (N+1 Ã©â€”Â®Ã©Â¢ËœÃ©Â¢â€žÃ©ËœÂ²Ã£â‚¬ÂÃ¨Å½Â·Ã¥Ââ€“Ã§Â­â€“Ã§â€¢Â¥Ã£â‚¬ÂÃ¦Å â€¢Ã¥Â½Â±)
+* Ã©â€¦ÂÃ§Â½Â®Ã¤Âºâ€¹Ã¥Å Â¡Ã£â‚¬ÂÃ¥Â®Â¡Ã¨Â®Â¡Ã¦Ë†â€“Ã¨Â½Â¯Ã¥Ë†Â Ã©â„¢Â¤Ã¦â€”Â¶
+* Ã¨Â®Â¾Ã§Â½Â®Ã¥Ë†â€ Ã©Â¡ÂµÃ£â‚¬ÂÃ¦Å½â€™Ã¥ÂºÂÃ¦Ë†â€“Ã¨â€¡ÂªÃ¥Â®Å¡Ã¤Â¹â€°Ã¥Â­ËœÃ¥â€šÂ¨Ã¥Âºâ€œÃ¦â€“Â¹Ã¦Â³â€¢Ã¦â€”Â¶
+* Ã¨Â°Æ’Ã¦â€¢Â´Ã¨Â¿Å¾Ã¦Å½Â¥Ã¦Â±Â  (HikariCP) Ã¦Ë†â€“Ã¤ÂºÅ’Ã§ÂºÂ§Ã§Â¼â€œÃ¥Â­ËœÃ¦â€”Â¶
+
+## Ã¥Â®Å¾Ã¤Â½â€œÃ¨Â®Â¾Ã¨Â®Â¡
 
 ```java
 @Entity
@@ -43,7 +56,7 @@ public class MarketEntity {
 }
 ```
 
-启用审计：
+Ã¥ÂÂ¯Ã§â€Â¨Ã¥Â®Â¡Ã¨Â®Â¡Ã¯Â¼Å¡
 
 ```java
 @Configuration
@@ -51,22 +64,22 @@ public class MarketEntity {
 class JpaConfig {}
 ```
 
-## 关联关系和 N+1 预防
+## Ã¥â€¦Â³Ã¨Ââ€Ã¥â€¦Â³Ã§Â³Â»Ã¥â€™Å’ N+1 Ã©Â¢â€žÃ©ËœÂ²
 
 ```java
 @OneToMany(mappedBy = "market", cascade = CascadeType.ALL, orphanRemoval = true)
 private List<PositionEntity> positions = new ArrayList<>();
 ```
 
-* 默认使用延迟加载；需要时在查询中使用 `JOIN FETCH`
-* 避免在集合上使用 `EAGER`；对于读取路径使用 DTO 投影
+* Ã©Â»ËœÃ¨Â®Â¤Ã¤Â½Â¿Ã§â€Â¨Ã¥Â»Â¶Ã¨Â¿Å¸Ã¥Å Â Ã¨Â½Â½Ã¯Â¼â€ºÃ©Å“â‚¬Ã¨Â¦ÂÃ¦â€”Â¶Ã¥Å“Â¨Ã¦Å¸Â¥Ã¨Â¯Â¢Ã¤Â¸Â­Ã¤Â½Â¿Ã§â€Â¨ `JOIN FETCH`
+* Ã©ÂÂ¿Ã¥â€¦ÂÃ¥Å“Â¨Ã©â€ºâ€ Ã¥ÂË†Ã¤Â¸Å Ã¤Â½Â¿Ã§â€Â¨ `EAGER`Ã¯Â¼â€ºÃ¥Â¯Â¹Ã¤ÂºÅ½Ã¨Â¯Â»Ã¥Ââ€“Ã¨Â·Â¯Ã¥Â¾â€žÃ¤Â½Â¿Ã§â€Â¨ DTO Ã¦Å â€¢Ã¥Â½Â±
 
 ```java
 @Query("select m from MarketEntity m left join fetch m.positions where m.id = :id")
 Optional<MarketEntity> findWithPositions(@Param("id") Long id);
 ```
 
-## 存储库模式
+## Ã¥Â­ËœÃ¥â€šÂ¨Ã¥Âºâ€œÃ¦Â¨Â¡Ã¥Â¼Â
 
 ```java
 public interface MarketRepository extends JpaRepository<MarketEntity, Long> {
@@ -77,7 +90,7 @@ public interface MarketRepository extends JpaRepository<MarketEntity, Long> {
 }
 ```
 
-* 使用投影进行轻量级查询：
+* Ã¤Â½Â¿Ã§â€Â¨Ã¦Å â€¢Ã¥Â½Â±Ã¨Â¿â€ºÃ¨Â¡Å’Ã¨Â½Â»Ã©â€¡ÂÃ§ÂºÂ§Ã¦Å¸Â¥Ã¨Â¯Â¢Ã¯Â¼Å¡
 
 ```java
 public interface MarketSummary {
@@ -88,11 +101,11 @@ public interface MarketSummary {
 Page<MarketSummary> findAllBy(Pageable pageable);
 ```
 
-## 事务
+## Ã¤Âºâ€¹Ã¥Å Â¡
 
-* 使用 `@Transactional` 注解服务方法
-* 对读取路径使用 `@Transactional(readOnly = true)` 以进行优化
-* 谨慎选择传播行为；避免长时间运行的事务
+* Ã¤Â½Â¿Ã§â€Â¨ `@Transactional` Ã¦Â³Â¨Ã¨Â§Â£Ã¦Å“ÂÃ¥Å Â¡Ã¦â€“Â¹Ã¦Â³â€¢
+* Ã¥Â¯Â¹Ã¨Â¯Â»Ã¥Ââ€“Ã¨Â·Â¯Ã¥Â¾â€žÃ¤Â½Â¿Ã§â€Â¨ `@Transactional(readOnly = true)` Ã¤Â»Â¥Ã¨Â¿â€ºÃ¨Â¡Å’Ã¤Â¼ËœÃ¥Å’â€“
+* Ã¨Â°Â¨Ã¦â€¦Å½Ã©â‚¬â€°Ã¦â€¹Â©Ã¤Â¼Â Ã¦â€™Â­Ã¨Â¡Å’Ã¤Â¸ÂºÃ¯Â¼â€ºÃ©ÂÂ¿Ã¥â€¦ÂÃ©â€¢Â¿Ã¦â€”Â¶Ã©â€”Â´Ã¨Â¿ÂÃ¨Â¡Å’Ã§Å¡â€žÃ¤Âºâ€¹Ã¥Å Â¡
 
 ```java
 @Transactional
@@ -104,25 +117,25 @@ public Market updateStatus(Long id, MarketStatus status) {
 }
 ```
 
-## 分页
+## Ã¥Ë†â€ Ã©Â¡Âµ
 
 ```java
 PageRequest page = PageRequest.of(pageNumber, pageSize, Sort.by("createdAt").descending());
 Page<MarketEntity> markets = repo.findByStatus(MarketStatus.ACTIVE, page);
 ```
 
-对于类似游标的分页，在 JPQL 中包含 `id > :lastId` 并配合排序。
+Ã¥Â¯Â¹Ã¤ÂºÅ½Ã§Â±Â»Ã¤Â¼Â¼Ã¦Â¸Â¸Ã¦Â â€¡Ã§Å¡â€žÃ¥Ë†â€ Ã©Â¡ÂµÃ¯Â¼Å’Ã¥Å“Â¨ JPQL Ã¤Â¸Â­Ã¥Å’â€¦Ã¥ÂÂ« `id > :lastId` Ã¥Â¹Â¶Ã©â€¦ÂÃ¥ÂË†Ã¦Å½â€™Ã¥ÂºÂÃ£â‚¬â€š
 
-## 索引和性能
+## Ã§Â´Â¢Ã¥Â¼â€¢Ã¥â€™Å’Ã¦â‚¬Â§Ã¨Æ’Â½
 
-* 为常用过滤器添加索引（`status`、`slug`、外键）
-* 使用与查询模式匹配的复合索引（`status, created_at`）
-* 避免 `select *`；仅投影需要的列
-* 使用 `saveAll` 和 `hibernate.jdbc.batch_size` 进行批量写入
+* Ã¤Â¸ÂºÃ¥Â¸Â¸Ã§â€Â¨Ã¨Â¿â€¡Ã¦Â»Â¤Ã¥â„¢Â¨Ã¦Â·Â»Ã¥Å Â Ã§Â´Â¢Ã¥Â¼â€¢Ã¯Â¼Ë†`status`Ã£â‚¬Â`slug`Ã£â‚¬ÂÃ¥Â¤â€“Ã©â€Â®Ã¯Â¼â€°
+* Ã¤Â½Â¿Ã§â€Â¨Ã¤Â¸Å½Ã¦Å¸Â¥Ã¨Â¯Â¢Ã¦Â¨Â¡Ã¥Â¼ÂÃ¥Å’Â¹Ã©â€¦ÂÃ§Å¡â€žÃ¥Â¤ÂÃ¥ÂË†Ã§Â´Â¢Ã¥Â¼â€¢Ã¯Â¼Ë†`status, created_at`Ã¯Â¼â€°
+* Ã©ÂÂ¿Ã¥â€¦Â `select *`Ã¯Â¼â€ºÃ¤Â»â€¦Ã¦Å â€¢Ã¥Â½Â±Ã©Å“â‚¬Ã¨Â¦ÂÃ§Å¡â€žÃ¥Ë†â€”
+* Ã¤Â½Â¿Ã§â€Â¨ `saveAll` Ã¥â€™Å’ `hibernate.jdbc.batch_size` Ã¨Â¿â€ºÃ¨Â¡Å’Ã¦â€°Â¹Ã©â€¡ÂÃ¥â€ â„¢Ã¥â€¦Â¥
 
-## 连接池 (HikariCP)
+## Ã¨Â¿Å¾Ã¦Å½Â¥Ã¦Â±Â  (HikariCP)
 
-推荐属性：
+Ã¦Å½Â¨Ã¨ÂÂÃ¥Â±Å¾Ã¦â‚¬Â§Ã¯Â¼Å¡
 
 ```
 spring.datasource.hikari.maximum-pool-size=20
@@ -131,25 +144,25 @@ spring.datasource.hikari.connection-timeout=30000
 spring.datasource.hikari.validation-timeout=5000
 ```
 
-对于 PostgreSQL LOB 处理，添加：
+Ã¥Â¯Â¹Ã¤ÂºÅ½ PostgreSQL LOB Ã¥Â¤â€žÃ§Ââ€ Ã¯Â¼Å’Ã¦Â·Â»Ã¥Å Â Ã¯Â¼Å¡
 
 ```
 spring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation=true
 ```
 
-## 缓存
+## Ã§Â¼â€œÃ¥Â­Ëœ
 
-* 一级缓存是每个 EntityManager 的；避免在事务之间保持实体
-* 对于读取频繁的实体，谨慎考虑二级缓存；验证驱逐策略
+* Ã¤Â¸â‚¬Ã§ÂºÂ§Ã§Â¼â€œÃ¥Â­ËœÃ¦ËœÂ¯Ã¦Â¯ÂÃ¤Â¸Âª EntityManager Ã§Å¡â€žÃ¯Â¼â€ºÃ©ÂÂ¿Ã¥â€¦ÂÃ¥Å“Â¨Ã¤Âºâ€¹Ã¥Å Â¡Ã¤Â¹â€¹Ã©â€”Â´Ã¤Â¿ÂÃ¦Å’ÂÃ¥Â®Å¾Ã¤Â½â€œ
+* Ã¥Â¯Â¹Ã¤ÂºÅ½Ã¨Â¯Â»Ã¥Ââ€“Ã©Â¢â€˜Ã§Â¹ÂÃ§Å¡â€žÃ¥Â®Å¾Ã¤Â½â€œÃ¯Â¼Å’Ã¨Â°Â¨Ã¦â€¦Å½Ã¨â‚¬Æ’Ã¨â„¢â€˜Ã¤ÂºÅ’Ã§ÂºÂ§Ã§Â¼â€œÃ¥Â­ËœÃ¯Â¼â€ºÃ©ÂªÅ’Ã¨Â¯ÂÃ©Â©Â±Ã©â‚¬ÂÃ§Â­â€“Ã§â€¢Â¥
 
-## 迁移
+## Ã¨Â¿ÂÃ§Â§Â»
 
-* 使用 Flyway 或 Liquibase；切勿在生产中依赖 Hibernate 自动 DDL
-* 保持迁移的幂等性和可添加性；避免无计划地删除列
+* Ã¤Â½Â¿Ã§â€Â¨ Flyway Ã¦Ë†â€“ LiquibaseÃ¯Â¼â€ºÃ¥Ë†â€¡Ã¥â€¹Â¿Ã¥Å“Â¨Ã§â€Å¸Ã¤ÂºÂ§Ã¤Â¸Â­Ã¤Â¾ÂÃ¨Âµâ€“ Hibernate Ã¨â€¡ÂªÃ¥Å Â¨ DDL
+* Ã¤Â¿ÂÃ¦Å’ÂÃ¨Â¿ÂÃ§Â§Â»Ã§Å¡â€žÃ¥Â¹â€šÃ§Â­â€°Ã¦â‚¬Â§Ã¥â€™Å’Ã¥ÂÂ¯Ã¦Â·Â»Ã¥Å Â Ã¦â‚¬Â§Ã¯Â¼â€ºÃ©ÂÂ¿Ã¥â€¦ÂÃ¦â€”Â Ã¨Â®Â¡Ã¥Ë†â€™Ã¥Å“Â°Ã¥Ë†Â Ã©â„¢Â¤Ã¥Ë†â€”
 
-## 测试数据访问
+## Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¦â€¢Â°Ã¦ÂÂ®Ã¨Â®Â¿Ã©â€”Â®
 
-* 首选使用 Testcontainers 的 `@DataJpaTest` 来镜像生产环境
-* 使用日志断言 SQL 效率：设置 `logging.level.org.hibernate.SQL=DEBUG` 和 `logging.level.org.hibernate.orm.jdbc.bind=TRACE` 以查看参数值
+* Ã©Â¦â€“Ã©â‚¬â€°Ã¤Â½Â¿Ã§â€Â¨ Testcontainers Ã§Å¡â€ž `@DataJpaTest` Ã¦ÂÂ¥Ã©â€¢Å“Ã¥Æ’ÂÃ§â€Å¸Ã¤ÂºÂ§Ã§Å½Â¯Ã¥Â¢Æ’
+* Ã¤Â½Â¿Ã§â€Â¨Ã¦â€”Â¥Ã¥Â¿â€”Ã¦â€“Â­Ã¨Â¨â‚¬ SQL Ã¦â€¢Ë†Ã§Å½â€¡Ã¯Â¼Å¡Ã¨Â®Â¾Ã§Â½Â® `logging.level.org.hibernate.SQL=DEBUG` Ã¥â€™Å’ `logging.level.org.hibernate.orm.jdbc.bind=TRACE` Ã¤Â»Â¥Ã¦Å¸Â¥Ã§Å“â€¹Ã¥Ââ€šÃ¦â€¢Â°Ã¥â‚¬Â¼
 
-**请记住**：保持实体精简，查询有针对性，事务简短。通过获取策略和投影来预防 N+1 问题，并根据读写路径建立索引。
+**Ã¨Â¯Â·Ã¨Â®Â°Ã¤Â½Â**Ã¯Â¼Å¡Ã¤Â¿ÂÃ¦Å’ÂÃ¥Â®Å¾Ã¤Â½â€œÃ§Â²Â¾Ã§Â®â‚¬Ã¯Â¼Å’Ã¦Å¸Â¥Ã¨Â¯Â¢Ã¦Å“â€°Ã©â€™Ë†Ã¥Â¯Â¹Ã¦â‚¬Â§Ã¯Â¼Å’Ã¤Âºâ€¹Ã¥Å Â¡Ã§Â®â‚¬Ã§Å¸Â­Ã£â‚¬â€šÃ©â‚¬Å¡Ã¨Â¿â€¡Ã¨Å½Â·Ã¥Ââ€“Ã§Â­â€“Ã§â€¢Â¥Ã¥â€™Å’Ã¦Å â€¢Ã¥Â½Â±Ã¦ÂÂ¥Ã©Â¢â€žÃ©ËœÂ² N+1 Ã©â€”Â®Ã©Â¢ËœÃ¯Â¼Å’Ã¥Â¹Â¶Ã¦Â Â¹Ã¦ÂÂ®Ã¨Â¯Â»Ã¥â€ â„¢Ã¨Â·Â¯Ã¥Â¾â€žÃ¥Â»ÂºÃ§Â«â€¹Ã§Â´Â¢Ã¥Â¼â€¢Ã£â‚¬â€š

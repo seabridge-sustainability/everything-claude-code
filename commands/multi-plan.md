@@ -1,6 +1,19 @@
 # Plan - Multi-Model Collaborative Planning
 
-Multi-model collaborative planning - Context retrieval + Dual-model analysis → Generate step-by-step implementation plan.
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+Multi-model collaborative planning - Context retrieval + Dual-model analysis Ã¢â€ â€™ Generate step-by-step implementation plan.
 
 $ARGUMENTS
 
@@ -169,9 +182,9 @@ Synthesize both analyses, generate **Step-by-step Implementation Plan**:
 ## Implementation Plan: <Task Name>
 
 ### Task Type
-- [ ] Frontend (→ Gemini)
-- [ ] Backend (→ Codex)
-- [ ] Fullstack (→ Parallel)
+- [ ] Frontend (Ã¢â€ â€™ Gemini)
+- [ ] Backend (Ã¢â€ â€™ Codex)
+- [ ] Fullstack (Ã¢â€ â€™ Parallel)
 
 ### Technical Solution
 <Optimal solution synthesized from Codex + Gemini analysis>
@@ -261,8 +274,8 @@ After user approves, **manually** execute:
 
 ## Key Rules
 
-1. **Plan only, no implementation** – This command does not execute any code changes
-2. **No Y/N prompts** – Only present plan, let user decide next steps
-3. **Trust Rules** – Backend follows Codex, Frontend follows Gemini
+1. **Plan only, no implementation** Ã¢â‚¬â€œ This command does not execute any code changes
+2. **No Y/N prompts** Ã¢â‚¬â€œ Only present plan, let user decide next steps
+3. **Trust Rules** Ã¢â‚¬â€œ Backend follows Codex, Frontend follows Gemini
 4. External models have **zero filesystem write access**
-5. **SESSION_ID Handoff** – Plan must include `CODEX_SESSION` / `GEMINI_SESSION` at end (for `/ccg:execute resume <SESSION_ID>` use)
+5. **SESSION_ID Handoff** Ã¢â‚¬â€œ Plan must include `CODEX_SESSION` / `GEMINI_SESSION` at end (for `/ccg:execute resume <SESSION_ID>` use)

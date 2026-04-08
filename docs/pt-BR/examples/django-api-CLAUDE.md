@@ -1,31 +1,44 @@
-# Django REST API — CLAUDE.md de Projeto
+# Django REST API Ã¢â‚¬â€ CLAUDE.md de Projeto
+
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
 
 > Exemplo real para uma API Django REST Framework com PostgreSQL e Celery.
-> Copie para a raiz do seu projeto e customize para seu serviço.
+> Copie para a raiz do seu projeto e customize para seu serviÃƒÂ§o.
 
-## Visão Geral do Projeto
+## VisÃƒÂ£o Geral do Projeto
 
 **Stack:** Python 3.12+, Django 5.x, Django REST Framework, PostgreSQL, Celery + Redis, pytest, Docker Compose
 
-**Arquitetura:** Design orientado a domínio com apps por domínio de negócio. DRF para camada de API, Celery para tarefas assíncronas, pytest para testes. Todos os endpoints retornam JSON — sem renderização de templates.
+**Arquitetura:** Design orientado a domÃƒÂ­nio com apps por domÃƒÂ­nio de negÃƒÂ³cio. DRF para camada de API, Celery para tarefas assÃƒÂ­ncronas, pytest para testes. Todos os endpoints retornam JSON Ã¢â‚¬â€ sem renderizaÃƒÂ§ÃƒÂ£o de templates.
 
-## Regras Críticas
+## Regras CrÃƒÂ­ticas
 
-### Convenções Python
+### ConvenÃƒÂ§ÃƒÂµes Python
 
-- Type hints em todas as assinaturas de função — use `from __future__ import annotations`
-- Sem `print()` statements — use `logging.getLogger(__name__)`
-- f-strings para formatação, nunca `%` ou `.format()`
-- Use `pathlib.Path` e não `os.path` para operações de arquivo
+- Type hints em todas as assinaturas de funÃƒÂ§ÃƒÂ£o Ã¢â‚¬â€ use `from __future__ import annotations`
+- Sem `print()` statements Ã¢â‚¬â€ use `logging.getLogger(__name__)`
+- f-strings para formataÃƒÂ§ÃƒÂ£o, nunca `%` ou `.format()`
+- Use `pathlib.Path` e nÃƒÂ£o `os.path` para operaÃƒÂ§ÃƒÂµes de arquivo
 - Imports ordenados com isort: stdlib, third-party, local (enforced by ruff)
 
 ### Banco de Dados
 
-- Todas as queries usam Django ORM — SQL bruto só com `.raw()` e queries parametrizadas
-- Migrations versionadas no git — nunca use `--fake` em produção
+- Todas as queries usam Django ORM Ã¢â‚¬â€ SQL bruto sÃƒÂ³ com `.raw()` e queries parametrizadas
+- Migrations versionadas no git Ã¢â‚¬â€ nunca use `--fake` em produÃƒÂ§ÃƒÂ£o
 - Use `select_related()` e `prefetch_related()` para prevenir queries N+1
 - Todos os models devem ter auto-fields `created_at` e `updated_at`
-- Índices em qualquer campo usado em `filter()`, `order_by()` ou cláusulas `WHERE`
+- ÃƒÂndices em qualquer campo usado em `filter()`, `order_by()` ou clÃƒÂ¡usulas `WHERE`
 
 ```python
 # BAD: N+1 query
@@ -37,18 +50,18 @@ for order in orders:
 orders = Order.objects.select_related("customer").all()
 ```
 
-### Autenticação
+### AutenticaÃƒÂ§ÃƒÂ£o
 
-- JWT via `djangorestframework-simplejwt` — access token (15 min) + refresh token (7 days)
-- Permission classes em toda view — nunca confiar no padrão
-- Use `IsAuthenticated` como base e adicione permissões customizadas para acesso por objeto
+- JWT via `djangorestframework-simplejwt` Ã¢â‚¬â€ access token (15 min) + refresh token (7 days)
+- Permission classes em toda view Ã¢â‚¬â€ nunca confiar no padrÃƒÂ£o
+- Use `IsAuthenticated` como base e adicione permissÃƒÂµes customizadas para acesso por objeto
 - Token blacklisting habilitado para logout
 
 ### Serializers
 
-- Use `ModelSerializer` para CRUD simples, `Serializer` para validação complexa
+- Use `ModelSerializer` para CRUD simples, `Serializer` para validaÃƒÂ§ÃƒÂ£o complexa
 - Separe serializers de leitura e escrita quando input/output diferirem
-- Valide no nível de serializer, não na view — views devem ser enxutas
+- Valide no nÃƒÂ­vel de serializer, nÃƒÂ£o na view Ã¢â‚¬â€ views devem ser enxutas
 
 ```python
 class CreateOrderSerializer(serializers.Serializer):
@@ -72,7 +85,7 @@ class OrderDetailSerializer(serializers.ModelSerializer):
 ### Tratamento de Erro
 
 - Use DRF exception handler para respostas de erro consistentes
-- Exceções customizadas de regra de negócio em `core/exceptions.py`
+- ExceÃƒÂ§ÃƒÂµes customizadas de regra de negÃƒÂ³cio em `core/exceptions.py`
 - Nunca exponha detalhes internos de erro para clientes
 
 ```python
@@ -85,12 +98,12 @@ class InsufficientStockError(APIException):
     default_code = "insufficient_stock"
 ```
 
-### Estilo de Código
+### Estilo de CÃƒÂ³digo
 
-- Sem emojis em código ou comentários
-- Tamanho máximo de linha: 120 caracteres (enforced by ruff)
-- Classes: PascalCase, funções/variáveis: snake_case, constantes: UPPER_SNAKE_CASE
-- Views enxutas — lógica de negócio em funções de serviço ou métodos do model
+- Sem emojis em cÃƒÂ³digo ou comentÃƒÂ¡rios
+- Tamanho mÃƒÂ¡ximo de linha: 120 caracteres (enforced by ruff)
+- Classes: PascalCase, funÃƒÂ§ÃƒÂµes/variÃƒÂ¡veis: snake_case, constantes: UPPER_SNAKE_CASE
+- Views enxutas Ã¢â‚¬â€ lÃƒÂ³gica de negÃƒÂ³cio em funÃƒÂ§ÃƒÂµes de serviÃƒÂ§o ou mÃƒÂ©todos do model
 
 ## Estrutura de Arquivos
 
@@ -132,9 +145,9 @@ core/
   tests/
 ```
 
-## Padrões-Chave
+## PadrÃƒÂµes-Chave
 
-### Camada de Serviço
+### Camada de ServiÃƒÂ§o
 
 ```python
 # apps/orders/services.py
@@ -162,7 +175,7 @@ def create_order(*, customer, product_id: uuid.UUID, quantity: int) -> Order:
     return order
 ```
 
-### Padrão de View
+### PadrÃƒÂ£o de View
 
 ```python
 # apps/orders/views.py
@@ -192,7 +205,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         serializer.instance = order
 ```
 
-### Padrão de Teste (pytest + Factory Boy)
+### PadrÃƒÂ£o de Teste (pytest + Factory Boy)
 
 ```python
 # apps/orders/tests/factories.py
@@ -243,7 +256,7 @@ class TestCreateOrder:
         assert response.status_code == 401
 ```
 
-## Variáveis de Ambiente
+## VariÃƒÂ¡veis de Ambiente
 
 ```bash
 # Django
@@ -266,7 +279,7 @@ EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
 EMAIL_HOST=smtp.example.com
 ```
 
-## Estratégia de Teste
+## EstratÃƒÂ©gia de Teste
 
 ```bash
 # Run all tests
@@ -302,7 +315,7 @@ pytest --lf
 
 ## Fluxo Git
 
-- `feat:` novas features, `fix:` correções de bug, `refactor:` mudanças de código
-- Branches de feature a partir da `main`, PRs obrigatórios
+- `feat:` novas features, `fix:` correÃƒÂ§ÃƒÂµes de bug, `refactor:` mudanÃƒÂ§as de cÃƒÂ³digo
+- Branches de feature a partir da `main`, PRs obrigatÃƒÂ³rios
 - CI: ruff (lint + format), mypy (types), pytest (tests), safety (dep check)
 - Deploy: imagem Docker, gerenciada via Kubernetes ou Railway

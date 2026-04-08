@@ -1,60 +1,73 @@
 ---
-description: Playwright ile end-to-end testler oluştur ve çalıştır. Test yolculukları oluşturur, testleri çalıştırır, ekran görüntüleri/videolar/izlemeler yakalar ve artifact'ları yükler.
+description: Playwright ile end-to-end testler oluÃ…Å¸tur ve ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r. Test yolculuklarÃ„Â± oluÃ…Å¸turur, testleri ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±rÃ„Â±r, ekran gÃƒÂ¶rÃƒÂ¼ntÃƒÂ¼leri/videolar/izlemeler yakalar ve artifact'larÃ„Â± yÃƒÂ¼kler.
 ---
 
 # E2E Komutu
 
-Bu komut, Playwright kullanarak end-to-end testleri oluşturmak, sürdürmek ve yürütmek için **e2e-runner** agent'ını çağırır.
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+Bu komut, Playwright kullanarak end-to-end testleri oluÃ…Å¸turmak, sÃƒÂ¼rdÃƒÂ¼rmek ve yÃƒÂ¼rÃƒÂ¼tmek iÃƒÂ§in **e2e-runner** agent'Ã„Â±nÃ„Â± ÃƒÂ§aÃ„Å¸Ã„Â±rÃ„Â±r.
 
 ## Bu Komut Ne Yapar
 
-1. **Test Yolculukları Oluştur** - Kullanıcı akışları için Playwright testleri oluştur
-2. **E2E Testlerini Çalıştır** - Testleri tarayıcılar arasında yürüt
-3. **Artifact'ları Yakala** - Hatalarda ekran görüntüleri, videolar, izlemeler
-4. **Sonuçları Yükle** - HTML raporları ve JUnit XML
-5. **Dengesiz Testleri Tanımla** - Kararsız testleri karantinaya al
+1. **Test YolculuklarÃ„Â± OluÃ…Å¸tur** - KullanÃ„Â±cÃ„Â± akÃ„Â±Ã…Å¸larÃ„Â± iÃƒÂ§in Playwright testleri oluÃ…Å¸tur
+2. **E2E Testlerini Ãƒâ€¡alÃ„Â±Ã…Å¸tÃ„Â±r** - Testleri tarayÃ„Â±cÃ„Â±lar arasÃ„Â±nda yÃƒÂ¼rÃƒÂ¼t
+3. **Artifact'larÃ„Â± Yakala** - Hatalarda ekran gÃƒÂ¶rÃƒÂ¼ntÃƒÂ¼leri, videolar, izlemeler
+4. **SonuÃƒÂ§larÃ„Â± YÃƒÂ¼kle** - HTML raporlarÃ„Â± ve JUnit XML
+5. **Dengesiz Testleri TanÃ„Â±mla** - KararsÃ„Â±z testleri karantinaya al
 
-## Ne Zaman Kullanılır
+## Ne Zaman KullanÃ„Â±lÃ„Â±r
 
-`/e2e` komutunu şu durumlarda kullanın:
-- Kritik kullanıcı yolculuklarını test ederken (giriş, ticaret, ödemeler)
-- Çok adımlı akışların uçtan uca çalıştığını doğrularken
-- UI etkileşimlerini ve navigasyonu test ederken
-- Frontend ve backend arasındaki entegrasyonu doğrularken
-- Üretime dağıtım için hazırlanırken
+`/e2e` komutunu Ã…Å¸u durumlarda kullanÃ„Â±n:
+- Kritik kullanÃ„Â±cÃ„Â± yolculuklarÃ„Â±nÃ„Â± test ederken (giriÃ…Å¸, ticaret, ÃƒÂ¶demeler)
+- Ãƒâ€¡ok adÃ„Â±mlÃ„Â± akÃ„Â±Ã…Å¸larÃ„Â±n uÃƒÂ§tan uca ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±Ã„Å¸Ã„Â±nÃ„Â± doÃ„Å¸rularken
+- UI etkileÃ…Å¸imlerini ve navigasyonu test ederken
+- Frontend ve backend arasÃ„Â±ndaki entegrasyonu doÃ„Å¸rularken
+- ÃƒÅ“retime daÃ„Å¸Ã„Â±tÃ„Â±m iÃƒÂ§in hazÃ„Â±rlanÃ„Â±rken
 
-## Nasıl Çalışır
+## NasÃ„Â±l Ãƒâ€¡alÃ„Â±Ã…Å¸Ã„Â±r
 
-e2e-runner agent'ı şunları yapacaktır:
+e2e-runner agent'Ã„Â± Ã…Å¸unlarÃ„Â± yapacaktÃ„Â±r:
 
-1. **Kullanıcı akışını analiz edecek** ve test senaryolarını tanımlayacak
-2. Page Object Model deseni kullanarak **Playwright testi oluşturacak**
-3. **Testleri çalıştıracak** (Chrome, Firefox, Safari)
-4. Ekran görüntüleri, videolar ve izlemelerle **hataları yakalayacak**
-5. Sonuçlar ve artifact'larla **rapor oluşturacak**
-6. **Dengesiz testleri tanımlayacak** ve düzeltme önerilerinde bulunacak
+1. **KullanÃ„Â±cÃ„Â± akÃ„Â±Ã…Å¸Ã„Â±nÃ„Â± analiz edecek** ve test senaryolarÃ„Â±nÃ„Â± tanÃ„Â±mlayacak
+2. Page Object Model deseni kullanarak **Playwright testi oluÃ…Å¸turacak**
+3. **Testleri ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±racak** (Chrome, Firefox, Safari)
+4. Ekran gÃƒÂ¶rÃƒÂ¼ntÃƒÂ¼leri, videolar ve izlemelerle **hatalarÃ„Â± yakalayacak**
+5. SonuÃƒÂ§lar ve artifact'larla **rapor oluÃ…Å¸turacak**
+6. **Dengesiz testleri tanÃ„Â±mlayacak** ve dÃƒÂ¼zeltme ÃƒÂ¶nerilerinde bulunacak
 
-## Örnek Kullanım
+## Ãƒâ€“rnek KullanÃ„Â±m
 
 ```
-Kullanıcı: /e2e Piyasa arama ve görüntüleme akışını test et
+KullanÃ„Â±cÃ„Â±: /e2e Piyasa arama ve gÃƒÂ¶rÃƒÂ¼ntÃƒÂ¼leme akÃ„Â±Ã…Å¸Ã„Â±nÃ„Â± test et
 
 Agent (e2e-runner):
-# E2E Test Oluşturma: Piyasa Arama ve Görüntüleme Akışı
+# E2E Test OluÃ…Å¸turma: Piyasa Arama ve GÃƒÂ¶rÃƒÂ¼ntÃƒÂ¼leme AkÃ„Â±Ã…Å¸Ã„Â±
 
-## Tanımlanan Test Senaryosu
+## TanÃ„Â±mlanan Test Senaryosu
 
-**Kullanıcı Yolculuğu:** Piyasa Arama → Sonuçları Görüntüle → Piyasaya Tıkla → Detayları Görüntüle
+**KullanÃ„Â±cÃ„Â± YolculuÃ„Å¸u:** Piyasa Arama Ã¢â€ â€™ SonuÃƒÂ§larÃ„Â± GÃƒÂ¶rÃƒÂ¼ntÃƒÂ¼le Ã¢â€ â€™ Piyasaya TÃ„Â±kla Ã¢â€ â€™ DetaylarÃ„Â± GÃƒÂ¶rÃƒÂ¼ntÃƒÂ¼le
 
-**Test Kapsamı:**
-1. Piyasalar sayfasına git
+**Test KapsamÃ„Â±:**
+1. Piyasalar sayfasÃ„Â±na git
 2. Semantik arama yap
-3. Arama sonuçlarını doğrula
-4. İlk sonuca tıkla
-5. Piyasa detay sayfasının yüklendiğini doğrula
-6. Grafiğin render olduğunu doğrula
+3. Arama sonuÃƒÂ§larÃ„Â±nÃ„Â± doÃ„Å¸rula
+4. Ã„Â°lk sonuca tÃ„Â±kla
+5. Piyasa detay sayfasÃ„Â±nÃ„Â±n yÃƒÂ¼klendiÃ„Å¸ini doÃ„Å¸rula
+6. GrafiÃ„Å¸in render olduÃ„Å¸unu doÃ„Å¸rula
 
-## Oluşturulan Test Kodu
+## OluÃ…Å¸turulan Test Kodu
 
 ```typescript
 // tests/e2e/markets/search-and-view.spec.ts
@@ -63,64 +76,64 @@ import { MarketsPage } from '../../pages/MarketsPage'
 import { MarketDetailsPage } from '../../pages/MarketDetailsPage'
 
 test.describe('Market Search and View Flow', () => {
-  test('kullanıcı piyasaları arayabilir ve detayları görüntüleyebilir', async ({ page }) => {
-    // 1. Piyasalar sayfasına git
+  test('kullanÃ„Â±cÃ„Â± piyasalarÃ„Â± arayabilir ve detaylarÃ„Â± gÃƒÂ¶rÃƒÂ¼ntÃƒÂ¼leyebilir', async ({ page }) => {
+    // 1. Piyasalar sayfasÃ„Â±na git
     const marketsPage = new MarketsPage(page)
     await marketsPage.goto()
 
-    // Sayfanın yüklendiğini doğrula
+    // SayfanÃ„Â±n yÃƒÂ¼klendiÃ„Å¸ini doÃ„Å¸rula
     await expect(page).toHaveTitle(/Markets/)
     await expect(page.locator('h1')).toContainText('Markets')
 
     // 2. Semantik arama yap
     await marketsPage.searchMarkets('election')
 
-    // API yanıtını bekle
+    // API yanÃ„Â±tÃ„Â±nÃ„Â± bekle
     await page.waitForResponse(resp =>
       resp.url().includes('/api/markets/search') && resp.status() === 200
     )
 
-    // 3. Arama sonuçlarını doğrula
+    // 3. Arama sonuÃƒÂ§larÃ„Â±nÃ„Â± doÃ„Å¸rula
     const marketCards = marketsPage.marketCards
     await expect(marketCards.first()).toBeVisible()
     const resultCount = await marketCards.count()
     expect(resultCount).toBeGreaterThan(0)
 
-    // Arama sonuçlarının ekran görüntüsünü al
+    // Arama sonuÃƒÂ§larÃ„Â±nÃ„Â±n ekran gÃƒÂ¶rÃƒÂ¼ntÃƒÂ¼sÃƒÂ¼nÃƒÂ¼ al
     await page.screenshot({ path: 'artifacts/search-results.png' })
 
-    // 4. İlk sonuca tıkla
+    // 4. Ã„Â°lk sonuca tÃ„Â±kla
     const firstMarketTitle = await marketCards.first().textContent()
     await marketCards.first().click()
 
-    // 5. Piyasa detay sayfasının yüklendiğini doğrula
+    // 5. Piyasa detay sayfasÃ„Â±nÃ„Â±n yÃƒÂ¼klendiÃ„Å¸ini doÃ„Å¸rula
     await expect(page).toHaveURL(/\/markets\/[a-z0-9-]+/)
 
     const detailsPage = new MarketDetailsPage(page)
     await expect(detailsPage.marketName).toBeVisible()
     await expect(detailsPage.marketDescription).toBeVisible()
 
-    // 6. Grafiğin render olduğunu doğrula
+    // 6. GrafiÃ„Å¸in render olduÃ„Å¸unu doÃ„Å¸rula
     await expect(detailsPage.priceChart).toBeVisible()
 
-    // Piyasa adının eşleştiğini doğrula
+    // Piyasa adÃ„Â±nÃ„Â±n eÃ…Å¸leÃ…Å¸tiÃ„Å¸ini doÃ„Å¸rula
     const detailsTitle = await detailsPage.marketName.textContent()
     expect(detailsTitle?.toLowerCase()).toContain(
       firstMarketTitle?.toLowerCase().substring(0, 20) || ''
     )
 
-    // Piyasa detaylarının ekran görüntüsünü al
+    // Piyasa detaylarÃ„Â±nÃ„Â±n ekran gÃƒÂ¶rÃƒÂ¼ntÃƒÂ¼sÃƒÂ¼nÃƒÂ¼ al
     await page.screenshot({ path: 'artifacts/market-details.png' })
   })
 
-  test('sonuç olmayan arama boş durumu göstermeli', async ({ page }) => {
+  test('sonuÃƒÂ§ olmayan arama boÃ…Å¸ durumu gÃƒÂ¶stermeli', async ({ page }) => {
     const marketsPage = new MarketsPage(page)
     await marketsPage.goto()
 
-    // Var olmayan piyasayı ara
+    // Var olmayan piyasayÃ„Â± ara
     await marketsPage.searchMarkets('xyznonexistentmarket123456')
 
-    // Boş durumu doğrula
+    // BoÃ…Å¸ durumu doÃ„Å¸rula
     await expect(page.locator('[data-testid="no-results"]')).toBeVisible()
     await expect(page.locator('[data-testid="no-results"]')).toContainText(
       /no.*results|no.*markets/i
@@ -130,47 +143,47 @@ test.describe('Market Search and View Flow', () => {
     expect(marketCount).toBe(0)
   })
 
-  test('aramayı temizleyebilir ve tüm piyasaları tekrar görebilir', async ({ page }) => {
+  test('aramayÃ„Â± temizleyebilir ve tÃƒÂ¼m piyasalarÃ„Â± tekrar gÃƒÂ¶rebilir', async ({ page }) => {
     const marketsPage = new MarketsPage(page)
     await marketsPage.goto()
 
-    // İlk piyasa sayısı
+    // Ã„Â°lk piyasa sayÃ„Â±sÃ„Â±
     const initialCount = await marketsPage.marketCards.count()
 
     // Arama yap
     await marketsPage.searchMarkets('trump')
     await page.waitForLoadState('networkidle')
 
-    // Filtrelenmiş sonuçları doğrula
+    // FiltrelenmiÃ…Å¸ sonuÃƒÂ§larÃ„Â± doÃ„Å¸rula
     const filteredCount = await marketsPage.marketCards.count()
     expect(filteredCount).toBeLessThan(initialCount)
 
-    // Aramayı temizle
+    // AramayÃ„Â± temizle
     await marketsPage.searchInput.clear()
     await page.waitForLoadState('networkidle')
 
-    // Tüm piyasaların tekrar gösterildiğini doğrula
+    // TÃƒÂ¼m piyasalarÃ„Â±n tekrar gÃƒÂ¶sterildiÃ„Å¸ini doÃ„Å¸rula
     const finalCount = await marketsPage.marketCards.count()
     expect(finalCount).toBe(initialCount)
   })
 })
 ```
 
-## Testleri Çalıştırma
+## Testleri Ãƒâ€¡alÃ„Â±Ã…Å¸tÃ„Â±rma
 
 ```bash
-# Oluşturulan testi çalıştır
+# OluÃ…Å¸turulan testi ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
 npx playwright test tests/e2e/markets/search-and-view.spec.ts
 
-3 worker kullanarak 3 test çalıştırılıyor
+3 worker kullanarak 3 test ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±rÃ„Â±lÃ„Â±yor
 
-  ✓  [chromium] › search-and-view.spec.ts:5:3 › user can search markets and view details (4.2s)
-  ✓  [chromium] › search-and-view.spec.ts:52:3 › search with no results shows empty state (1.8s)
-  ✓  [chromium] › search-and-view.spec.ts:67:3 › can clear search and see all markets again (2.9s)
+  Ã¢Å“â€œ  [chromium] Ã¢â‚¬Âº search-and-view.spec.ts:5:3 Ã¢â‚¬Âº user can search markets and view details (4.2s)
+  Ã¢Å“â€œ  [chromium] Ã¢â‚¬Âº search-and-view.spec.ts:52:3 Ã¢â‚¬Âº search with no results shows empty state (1.8s)
+  Ã¢Å“â€œ  [chromium] Ã¢â‚¬Âº search-and-view.spec.ts:67:3 Ã¢â‚¬Âº can clear search and see all markets again (2.9s)
 
   3 passed (9.1s)
 
-Oluşturulan artifact'lar:
+OluÃ…Å¸turulan artifact'lar:
 - artifacts/search-results.png
 - artifacts/market-details.png
 - playwright-report/index.html
@@ -179,91 +192,91 @@ Oluşturulan artifact'lar:
 ## Test Raporu
 
 ```
-╔══════════════════════════════════════════════════════════════╗
-║                    E2E Test Sonuçları                        ║
-╠══════════════════════════════════════════════════════════════╣
-║ Durum:      PASS: TÜM TESTLER GEÇTİ                             ║
-║ Toplam:     3 test                                           ║
-║ Geçti:      3 (%100)                                         ║
-║ Başarısız:  0                                                ║
-║ Dengesiz:   0                                                ║
-║ Süre:       9.1s                                             ║
-╚══════════════════════════════════════════════════════════════╝
+Ã¢â€¢â€Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢â€”
+Ã¢â€¢â€˜                    E2E Test SonuÃƒÂ§larÃ„Â±                        Ã¢â€¢â€˜
+Ã¢â€¢Â Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â£
+Ã¢â€¢â€˜ Durum:      PASS: TÃƒÅ“M TESTLER GEÃƒâ€¡TÃ„Â°                             Ã¢â€¢â€˜
+Ã¢â€¢â€˜ Toplam:     3 test                                           Ã¢â€¢â€˜
+Ã¢â€¢â€˜ GeÃƒÂ§ti:      3 (%100)                                         Ã¢â€¢â€˜
+Ã¢â€¢â€˜ BaÃ…Å¸arÃ„Â±sÃ„Â±z:  0                                                Ã¢â€¢â€˜
+Ã¢â€¢â€˜ Dengesiz:   0                                                Ã¢â€¢â€˜
+Ã¢â€¢â€˜ SÃƒÂ¼re:       9.1s                                             Ã¢â€¢â€˜
+Ã¢â€¢Å¡Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
 
 Artifact'lar:
- Ekran Görüntüleri: 2 dosya
+ Ekran GÃƒÂ¶rÃƒÂ¼ntÃƒÂ¼leri: 2 dosya
  Videolar: 0 dosya (sadece hatada)
- İzlemeler: 0 dosya (sadece hatada)
+ Ã„Â°zlemeler: 0 dosya (sadece hatada)
  HTML Rapor: playwright-report/index.html
 
-Raporu görüntüle: npx playwright show-report
+Raporu gÃƒÂ¶rÃƒÂ¼ntÃƒÂ¼le: npx playwright show-report
 ```
 
-PASS: E2E test paketi CI/CD entegrasyonuna hazır!
+PASS: E2E test paketi CI/CD entegrasyonuna hazÃ„Â±r!
 ```
 
-## Test Artifact'ları
+## Test Artifact'larÃ„Â±
 
-Testler çalıştığında, şu artifact'lar yakalanır:
+Testler ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±Ã„Å¸Ã„Â±nda, Ã…Å¸u artifact'lar yakalanÃ„Â±r:
 
-**Tüm Testlerde:**
-- Zaman çizelgesi ve sonuçlarla HTML Rapor
-- CI entegrasyonu için JUnit XML
+**TÃƒÂ¼m Testlerde:**
+- Zaman ÃƒÂ§izelgesi ve sonuÃƒÂ§larla HTML Rapor
+- CI entegrasyonu iÃƒÂ§in JUnit XML
 
 **Sadece Hatada:**
-- Başarısız durumun ekran görüntüsü
-- Testin video kaydı
-- Hata ayıklama için izleme dosyası (adım adım tekrar)
-- Network logları
-- Console logları
+- BaÃ…Å¸arÃ„Â±sÃ„Â±z durumun ekran gÃƒÂ¶rÃƒÂ¼ntÃƒÂ¼sÃƒÂ¼
+- Testin video kaydÃ„Â±
+- Hata ayÃ„Â±klama iÃƒÂ§in izleme dosyasÃ„Â± (adÃ„Â±m adÃ„Â±m tekrar)
+- Network loglarÃ„Â±
+- Console loglarÃ„Â±
 
-## Artifact'ları Görüntüleme
+## Artifact'larÃ„Â± GÃƒÂ¶rÃƒÂ¼ntÃƒÂ¼leme
 
 ```bash
-# HTML raporunu tarayıcıda görüntüle
+# HTML raporunu tarayÃ„Â±cÃ„Â±da gÃƒÂ¶rÃƒÂ¼ntÃƒÂ¼le
 npx playwright show-report
 
-# Belirli izleme dosyasını görüntüle
+# Belirli izleme dosyasÃ„Â±nÃ„Â± gÃƒÂ¶rÃƒÂ¼ntÃƒÂ¼le
 npx playwright show-trace artifacts/trace-abc123.zip
 
-# Ekran görüntüleri artifacts/ dizinine kaydedilir
+# Ekran gÃƒÂ¶rÃƒÂ¼ntÃƒÂ¼leri artifacts/ dizinine kaydedilir
 open artifacts/search-results.png
 ```
 
 ## Dengesiz Test Tespiti
 
-Bir test aralıklı olarak başarısız olursa:
+Bir test aralÃ„Â±klÃ„Â± olarak baÃ…Å¸arÃ„Â±sÃ„Â±z olursa:
 
 ```
-WARNING:  DENGESİZ TEST TESPİT EDİLDİ: tests/e2e/markets/trade.spec.ts
+WARNING:  DENGESÃ„Â°Z TEST TESPÃ„Â°T EDÃ„Â°LDÃ„Â°: tests/e2e/markets/trade.spec.ts
 
-Test 10 çalıştırmadan 7'sinde geçti (%70 geçme oranı)
+Test 10 ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±rmadan 7'sinde geÃƒÂ§ti (%70 geÃƒÂ§me oranÃ„Â±)
 
-Yaygın başarısızlık:
-"'[data-testid="confirm-btn"]' elementi için timeout"
+YaygÃ„Â±n baÃ…Å¸arÃ„Â±sÃ„Â±zlÃ„Â±k:
+"'[data-testid="confirm-btn"]' elementi iÃƒÂ§in timeout"
 
-Önerilen düzeltmeler:
-1. Açık bekleme ekle: await page.waitForSelector('[data-testid="confirm-btn"]')
-2. Timeout'u artır: { timeout: 10000 }
-3. Component'te yarış koşullarını kontrol et
-4. Elementin animasyon tarafından gizlenmediğini doğrula
+Ãƒâ€“nerilen dÃƒÂ¼zeltmeler:
+1. AÃƒÂ§Ã„Â±k bekleme ekle: await page.waitForSelector('[data-testid="confirm-btn"]')
+2. Timeout'u artÃ„Â±r: { timeout: 10000 }
+3. Component'te yarÃ„Â±Ã…Å¸ koÃ…Å¸ullarÃ„Â±nÃ„Â± kontrol et
+4. Elementin animasyon tarafÃ„Â±ndan gizlenmediÃ„Å¸ini doÃ„Å¸rula
 
-Karantina önerisi: Düzeltilene kadar test.fixme() olarak işaretle
+Karantina ÃƒÂ¶nerisi: DÃƒÂ¼zeltilene kadar test.fixme() olarak iÃ…Å¸aretle
 ```
 
-## Tarayıcı Yapılandırması
+## TarayÃ„Â±cÃ„Â± YapÃ„Â±landÃ„Â±rmasÃ„Â±
 
-Testler varsayılan olarak birden fazla tarayıcıda çalışır:
+Testler varsayÃ„Â±lan olarak birden fazla tarayÃ„Â±cÃ„Â±da ÃƒÂ§alÃ„Â±Ã…Å¸Ã„Â±r:
 - PASS: Chromium (Desktop Chrome)
 - PASS: Firefox (Desktop)
 - PASS: WebKit (Desktop Safari)
 - PASS: Mobile Chrome (opsiyonel)
 
-Tarayıcıları ayarlamak için `playwright.config.ts`'yi yapılandırın.
+TarayÃ„Â±cÃ„Â±larÃ„Â± ayarlamak iÃƒÂ§in `playwright.config.ts`'yi yapÃ„Â±landÃ„Â±rÃ„Â±n.
 
 ## CI/CD Entegrasyonu
 
-CI pipeline'ınıza ekleyin:
+CI pipeline'Ã„Â±nÃ„Â±za ekleyin:
 
 ```yaml
 # .github/workflows/e2e.yml
@@ -281,85 +294,85 @@ CI pipeline'ınıza ekleyin:
     path: playwright-report/
 ```
 
-## PMX'e Özgü Kritik Akışlar
+## PMX'e Ãƒâ€“zgÃƒÂ¼ Kritik AkÃ„Â±Ã…Å¸lar
 
-PMX için bu E2E testlerine öncelik verin:
+PMX iÃƒÂ§in bu E2E testlerine ÃƒÂ¶ncelik verin:
 
-**KRİTİK (Her Zaman Geçmeli):**
-1. Kullanıcı cüzdan bağlayabilir
-2. Kullanıcı piyasalara göz atabilir
-3. Kullanıcı piyasa arayabilir (semantik arama)
-4. Kullanıcı piyasa detaylarını görüntüleyebilir
-5. Kullanıcı işlem yapabilir (test fonlarıyla)
-6. Piyasa doğru çözülür
-7. Kullanıcı fon çekebilir
+**KRÃ„Â°TÃ„Â°K (Her Zaman GeÃƒÂ§meli):**
+1. KullanÃ„Â±cÃ„Â± cÃƒÂ¼zdan baÃ„Å¸layabilir
+2. KullanÃ„Â±cÃ„Â± piyasalara gÃƒÂ¶z atabilir
+3. KullanÃ„Â±cÃ„Â± piyasa arayabilir (semantik arama)
+4. KullanÃ„Â±cÃ„Â± piyasa detaylarÃ„Â±nÃ„Â± gÃƒÂ¶rÃƒÂ¼ntÃƒÂ¼leyebilir
+5. KullanÃ„Â±cÃ„Â± iÃ…Å¸lem yapabilir (test fonlarÃ„Â±yla)
+6. Piyasa doÃ„Å¸ru ÃƒÂ§ÃƒÂ¶zÃƒÂ¼lÃƒÂ¼r
+7. KullanÃ„Â±cÃ„Â± fon ÃƒÂ§ekebilir
 
-**ÖNEMLİ:**
-1. Piyasa oluşturma akışı
-2. Kullanıcı profil güncellemeleri
-3. Gerçek zamanlı fiyat güncellemeleri
-4. Grafik render'ı
-5. Piyasaları filtreleme ve sıralama
+**Ãƒâ€“NEMLÃ„Â°:**
+1. Piyasa oluÃ…Å¸turma akÃ„Â±Ã…Å¸Ã„Â±
+2. KullanÃ„Â±cÃ„Â± profil gÃƒÂ¼ncellemeleri
+3. GerÃƒÂ§ek zamanlÃ„Â± fiyat gÃƒÂ¼ncellemeleri
+4. Grafik render'Ã„Â±
+5. PiyasalarÃ„Â± filtreleme ve sÃ„Â±ralama
 6. Mobil responsive layout
 
-## En İyi Uygulamalar
+## En Ã„Â°yi Uygulamalar
 
 **YAPIN:**
-- PASS: Sürdürülebilirlik için Page Object Model kullanın
-- PASS: Selector'lar için data-testid nitelikleri kullanın
-- PASS: Rastgele timeout'lar değil, API yanıtlarını bekleyin
-- PASS: Kritik kullanıcı yolculuklarını uçtan uca test edin
-- PASS: Main'e merge etmeden önce testleri çalıştırın
-- PASS: Testler başarısız olduğunda artifact'ları inceleyin
+- PASS: SÃƒÂ¼rdÃƒÂ¼rÃƒÂ¼lebilirlik iÃƒÂ§in Page Object Model kullanÃ„Â±n
+- PASS: Selector'lar iÃƒÂ§in data-testid nitelikleri kullanÃ„Â±n
+- PASS: Rastgele timeout'lar deÃ„Å¸il, API yanÃ„Â±tlarÃ„Â±nÃ„Â± bekleyin
+- PASS: Kritik kullanÃ„Â±cÃ„Â± yolculuklarÃ„Â±nÃ„Â± uÃƒÂ§tan uca test edin
+- PASS: Main'e merge etmeden ÃƒÂ¶nce testleri ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±rÃ„Â±n
+- PASS: Testler baÃ…Å¸arÃ„Â±sÃ„Â±z olduÃ„Å¸unda artifact'larÃ„Â± inceleyin
 
 **YAPMAYIN:**
-- FAIL: Kırılgan selector'lar kullanmayın (CSS sınıfları değişebilir)
-- FAIL: Uygulama detaylarını test etmeyin
-- FAIL: Production'a karşı testler çalıştırmayın
-- FAIL: Dengesiz testleri görmezden gelmeyin
-- FAIL: Başarısızlıklarda artifact incelemesini atlamayın
-- FAIL: Her edge case'i E2E ile test etmeyin (unit testler kullanın)
+- FAIL: KÃ„Â±rÃ„Â±lgan selector'lar kullanmayÃ„Â±n (CSS sÃ„Â±nÃ„Â±flarÃ„Â± deÃ„Å¸iÃ…Å¸ebilir)
+- FAIL: Uygulama detaylarÃ„Â±nÃ„Â± test etmeyin
+- FAIL: Production'a karÃ…Å¸Ã„Â± testler ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±rmayÃ„Â±n
+- FAIL: Dengesiz testleri gÃƒÂ¶rmezden gelmeyin
+- FAIL: BaÃ…Å¸arÃ„Â±sÃ„Â±zlÃ„Â±klarda artifact incelemesini atlamayÃ„Â±n
+- FAIL: Her edge case'i E2E ile test etmeyin (unit testler kullanÃ„Â±n)
 
-## Önemli Notlar
+## Ãƒâ€“nemli Notlar
 
-**PMX için KRİTİK:**
-- Gerçek para içeren E2E testleri SADECE testnet/staging'de çalışmalıdır
-- Asla production'a karşı ticaret testleri çalıştırmayın
-- Finansal testler için `test.skip(process.env.NODE_ENV === 'production')` ayarlayın
-- Sadece küçük test fonlarıyla test cüzdanları kullanın
+**PMX iÃƒÂ§in KRÃ„Â°TÃ„Â°K:**
+- GerÃƒÂ§ek para iÃƒÂ§eren E2E testleri SADECE testnet/staging'de ÃƒÂ§alÃ„Â±Ã…Å¸malÃ„Â±dÃ„Â±r
+- Asla production'a karÃ…Å¸Ã„Â± ticaret testleri ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±rmayÃ„Â±n
+- Finansal testler iÃƒÂ§in `test.skip(process.env.NODE_ENV === 'production')` ayarlayÃ„Â±n
+- Sadece kÃƒÂ¼ÃƒÂ§ÃƒÂ¼k test fonlarÃ„Â±yla test cÃƒÂ¼zdanlarÃ„Â± kullanÃ„Â±n
 
-## Diğer Komutlarla Entegrasyon
+## DiÃ„Å¸er Komutlarla Entegrasyon
 
-- Test edilecek kritik yolculukları tanımlamak için `/plan` kullanın
-- Unit testler için `/tdd` kullanın (daha hızlı, daha ayrıntılı)
-- Entegrasyon ve kullanıcı yolculuk testleri için `/e2e` kullanın
-- Test kalitesini doğrulamak için `/code-review` kullanın
+- Test edilecek kritik yolculuklarÃ„Â± tanÃ„Â±mlamak iÃƒÂ§in `/plan` kullanÃ„Â±n
+- Unit testler iÃƒÂ§in `/tdd` kullanÃ„Â±n (daha hÃ„Â±zlÃ„Â±, daha ayrÃ„Â±ntÃ„Â±lÃ„Â±)
+- Entegrasyon ve kullanÃ„Â±cÃ„Â± yolculuk testleri iÃƒÂ§in `/e2e` kullanÃ„Â±n
+- Test kalitesini doÃ„Å¸rulamak iÃƒÂ§in `/code-review` kullanÃ„Â±n
 
-## İlgili Agent'lar
+## Ã„Â°lgili Agent'lar
 
-Bu komut, ECC tarafından sağlanan `e2e-runner` agent'ını çağırır.
+Bu komut, ECC tarafÃ„Â±ndan saÃ„Å¸lanan `e2e-runner` agent'Ã„Â±nÃ„Â± ÃƒÂ§aÃ„Å¸Ã„Â±rÃ„Â±r.
 
-Manuel kurulumlar için, kaynak dosya şurada bulunur:
+Manuel kurulumlar iÃƒÂ§in, kaynak dosya Ã…Å¸urada bulunur:
 `agents/e2e-runner.md`
 
-## Hızlı Komutlar
+## HÃ„Â±zlÃ„Â± Komutlar
 
 ```bash
-# Tüm E2E testlerini çalıştır
+# TÃƒÂ¼m E2E testlerini ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
 npx playwright test
 
-# Belirli test dosyasını çalıştır
+# Belirli test dosyasÃ„Â±nÃ„Â± ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
 npx playwright test tests/e2e/markets/search.spec.ts
 
-# Headed modda çalıştır (tarayıcıyı gör)
+# Headed modda ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r (tarayÃ„Â±cÃ„Â±yÃ„Â± gÃƒÂ¶r)
 npx playwright test --headed
 
 # Testi debug et
 npx playwright test --debug
 
-# Test kodu oluştur
+# Test kodu oluÃ…Å¸tur
 npx playwright codegen http://localhost:3000
 
-# Raporu görüntüle
+# Raporu gÃƒÂ¶rÃƒÂ¼ntÃƒÂ¼le
 npx playwright show-report
 ```

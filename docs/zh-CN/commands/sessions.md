@@ -1,22 +1,35 @@
 ---
-description: 管理Claude Code会话历史、别名和会话元数据。
+description: Ã§Â®Â¡Ã§Ââ€ Claude CodeÃ¤Â¼Å¡Ã¨Â¯ÂÃ¥Å½â€ Ã¥ÂÂ²Ã£â‚¬ÂÃ¥Ë†Â«Ã¥ÂÂÃ¥â€™Å’Ã¤Â¼Å¡Ã¨Â¯ÂÃ¥â€¦Æ’Ã¦â€¢Â°Ã¦ÂÂ®Ã£â‚¬â€š
 ---
 
-# Sessions 命令
+# Sessions Ã¥â€˜Â½Ã¤Â»Â¤
 
-管理 Claude Code 会话历史 - 列出、加载、设置别名和编辑存储在 `~/.claude/sessions/` 中的会话。
+## Safety And Authorization Rule
 
-## 用法
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+Ã§Â®Â¡Ã§Ââ€  Claude Code Ã¤Â¼Å¡Ã¨Â¯ÂÃ¥Å½â€ Ã¥ÂÂ² - Ã¥Ë†â€”Ã¥â€¡ÂºÃ£â‚¬ÂÃ¥Å Â Ã¨Â½Â½Ã£â‚¬ÂÃ¨Â®Â¾Ã§Â½Â®Ã¥Ë†Â«Ã¥ÂÂÃ¥â€™Å’Ã§Â¼â€“Ã¨Â¾â€˜Ã¥Â­ËœÃ¥â€šÂ¨Ã¥Å“Â¨ `~/.claude/sessions/` Ã¤Â¸Â­Ã§Å¡â€žÃ¤Â¼Å¡Ã¨Â¯ÂÃ£â‚¬â€š
+
+## Ã§â€Â¨Ã¦Â³â€¢
 
 `/sessions [list|load|alias|info|help] [options]`
 
-## 操作
+## Ã¦â€œÂÃ¤Â½Å“
 
-### 列出会话
+### Ã¥Ë†â€”Ã¥â€¡ÂºÃ¤Â¼Å¡Ã¨Â¯Â
 
-显示所有会话及其元数据，支持筛选和分页。
+Ã¦ËœÂ¾Ã§Â¤ÂºÃ¦â€°â‚¬Ã¦Å“â€°Ã¤Â¼Å¡Ã¨Â¯ÂÃ¥ÂÅ Ã¥â€¦Â¶Ã¥â€¦Æ’Ã¦â€¢Â°Ã¦ÂÂ®Ã¯Â¼Å’Ã¦â€Â¯Ã¦Å’ÂÃ§Â­â€ºÃ©â‚¬â€°Ã¥â€™Å’Ã¥Ë†â€ Ã©Â¡ÂµÃ£â‚¬â€š
 
-当您需要群组的操作员表层上下文时，使用 `/sessions info`：分支、工作树路径和会话最近性。
+Ã¥Â½â€œÃ¦â€šÂ¨Ã©Å“â‚¬Ã¨Â¦ÂÃ§Â¾Â¤Ã§Â»â€žÃ§Å¡â€žÃ¦â€œÂÃ¤Â½Å“Ã¥â€˜ËœÃ¨Â¡Â¨Ã¥Â±â€šÃ¤Â¸Å Ã¤Â¸â€¹Ã¦â€“â€¡Ã¦â€”Â¶Ã¯Â¼Å’Ã¤Â½Â¿Ã§â€Â¨ `/sessions info`Ã¯Â¼Å¡Ã¥Ë†â€ Ã¦â€Â¯Ã£â‚¬ÂÃ¥Â·Â¥Ã¤Â½Å“Ã¦Â â€˜Ã¨Â·Â¯Ã¥Â¾â€žÃ¥â€™Å’Ã¤Â¼Å¡Ã¨Â¯ÂÃ¦Å“â‚¬Ã¨Â¿â€˜Ã¦â‚¬Â§Ã£â‚¬â€š
 
 ```bash
 /sessions                              # List all sessions (default)
@@ -26,7 +39,7 @@ description: 管理Claude Code会话历史、别名和会话元数据。
 /sessions list --search abc            # Search by session ID
 ```
 
-**脚本：**
+**Ã¨â€žÅ¡Ã¦Å“Â¬Ã¯Â¼Å¡**
 
 ```bash
 node -e "
@@ -42,7 +55,7 @@ for (const a of aliases) aliasMap[a.sessionPath] = a.name;
 console.log('Sessions (showing ' + result.sessions.length + ' of ' + result.total + '):');
 console.log('');
 console.log('ID        Date        Time     Branch       Worktree           Alias');
-console.log('────────────────────────────────────────────────────────────────────');
+console.log('Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬');
 
 for (const s of result.sessions) {
   const alias = aliasMap[s.filename] || '';
@@ -57,9 +70,9 @@ for (const s of result.sessions) {
 "
 ```
 
-### 加载会话
+### Ã¥Å Â Ã¨Â½Â½Ã¤Â¼Å¡Ã¨Â¯Â
 
-加载并显示会话内容（通过 ID 或别名）。
+Ã¥Å Â Ã¨Â½Â½Ã¥Â¹Â¶Ã¦ËœÂ¾Ã§Â¤ÂºÃ¤Â¼Å¡Ã¨Â¯ÂÃ¥â€ â€¦Ã¥Â®Â¹Ã¯Â¼Ë†Ã©â‚¬Å¡Ã¨Â¿â€¡ ID Ã¦Ë†â€“Ã¥Ë†Â«Ã¥ÂÂÃ¯Â¼â€°Ã£â‚¬â€š
 
 ```bash
 /sessions load <id|alias>             # Load session
@@ -68,7 +81,7 @@ for (const s of result.sessions) {
 /sessions load my-alias               # By alias name
 ```
 
-**脚本：**
+**Ã¨â€žÅ¡Ã¦Å“Â¬Ã¯Â¼Å¡**
 
 ```bash
 node -e "
@@ -133,16 +146,16 @@ if (session.metadata.worktree) {
 " "$ARGUMENTS"
 ```
 
-### 创建别名
+### Ã¥Ë†â€ºÃ¥Â»ÂºÃ¥Ë†Â«Ã¥ÂÂ
 
-为会话创建一个易记的别名。
+Ã¤Â¸ÂºÃ¤Â¼Å¡Ã¨Â¯ÂÃ¥Ë†â€ºÃ¥Â»ÂºÃ¤Â¸â‚¬Ã¤Â¸ÂªÃ¦Ëœâ€œÃ¨Â®Â°Ã§Å¡â€žÃ¥Ë†Â«Ã¥ÂÂÃ£â‚¬â€š
 
 ```bash
 /sessions alias <id> <name>           # Create alias
 /sessions alias 2026-02-01 today-work # Create alias named "today-work"
 ```
 
-**脚本：**
+**Ã¨â€žÅ¡Ã¦Å“Â¬Ã¯Â¼Å¡**
 
 ```bash
 node -e "
@@ -166,24 +179,24 @@ if (!session) {
 
 const result = aa.setAlias(aliasName, session.filename);
 if (result.success) {
-  console.log('✓ Alias created: ' + aliasName + ' → ' + session.filename);
+  console.log('Ã¢Å“â€œ Alias created: ' + aliasName + ' Ã¢â€ â€™ ' + session.filename);
 } else {
-  console.log('✗ Error: ' + result.error);
+  console.log('Ã¢Å“â€” Error: ' + result.error);
   process.exit(1);
 }
 " "$ARGUMENTS"
 ```
 
-### 移除别名
+### Ã§Â§Â»Ã©â„¢Â¤Ã¥Ë†Â«Ã¥ÂÂ
 
-删除现有的别名。
+Ã¥Ë†Â Ã©â„¢Â¤Ã§Å½Â°Ã¦Å“â€°Ã§Å¡â€žÃ¥Ë†Â«Ã¥ÂÂÃ£â‚¬â€š
 
 ```bash
 /sessions alias --remove <name>        # Remove alias
 /sessions unalias <name>               # Same as above
 ```
 
-**脚本：**
+**Ã¨â€žÅ¡Ã¦Å“Â¬Ã¯Â¼Å¡**
 
 ```bash
 node -e "
@@ -197,23 +210,23 @@ if (!aliasName) {
 
 const result = aa.deleteAlias(aliasName);
 if (result.success) {
-  console.log('✓ Alias removed: ' + aliasName);
+  console.log('Ã¢Å“â€œ Alias removed: ' + aliasName);
 } else {
-  console.log('✗ Error: ' + result.error);
+  console.log('Ã¢Å“â€” Error: ' + result.error);
   process.exit(1);
 }
 " "$ARGUMENTS"
 ```
 
-### 会话信息
+### Ã¤Â¼Å¡Ã¨Â¯ÂÃ¤Â¿Â¡Ã¦ÂÂ¯
 
-显示会话的详细信息。
+Ã¦ËœÂ¾Ã§Â¤ÂºÃ¤Â¼Å¡Ã¨Â¯ÂÃ§Å¡â€žÃ¨Â¯Â¦Ã§Â»â€ Ã¤Â¿Â¡Ã¦ÂÂ¯Ã£â‚¬â€š
 
 ```bash
 /sessions info <id|alias>              # Show session details
 ```
 
-**脚本：**
+**Ã¨â€žÅ¡Ã¦Å“Â¬Ã¯Â¼Å¡**
 
 ```bash
 node -e "
@@ -235,7 +248,7 @@ const size = sm.getSessionSize(session.sessionPath);
 const aliases = aa.getAliasesForSession(session.filename);
 
 console.log('Session Information');
-console.log('════════════════════');
+console.log('Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â');
 console.log('ID:          ' + (session.shortId === 'no-id' ? '(none)' : session.shortId));
 console.log('Filename:    ' + session.filename);
 console.log('Date:        ' + session.date);
@@ -256,15 +269,15 @@ if (aliases.length > 0) {
 " "$ARGUMENTS"
 ```
 
-### 列出别名
+### Ã¥Ë†â€”Ã¥â€¡ÂºÃ¥Ë†Â«Ã¥ÂÂ
 
-显示所有会话别名。
+Ã¦ËœÂ¾Ã§Â¤ÂºÃ¦â€°â‚¬Ã¦Å“â€°Ã¤Â¼Å¡Ã¨Â¯ÂÃ¥Ë†Â«Ã¥ÂÂÃ£â‚¬â€š
 
 ```bash
 /sessions aliases                      # List all aliases
 ```
 
-**脚本：**
+**Ã¨â€žÅ¡Ã¦Å“Â¬Ã¯Â¼Å¡**
 
 ```bash
 node -e "
@@ -278,7 +291,7 @@ if (aliases.length === 0) {
   console.log('No aliases found.');
 } else {
   console.log('Name          Session File                    Title');
-  console.log('─────────────────────────────────────────────────────────────');
+  console.log('Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬');
   for (const a of aliases) {
     const name = a.name.padEnd(12);
     const file = (a.sessionPath.length > 30 ? a.sessionPath.slice(0, 27) + '...' : a.sessionPath).padEnd(30);
@@ -289,28 +302,28 @@ if (aliases.length === 0) {
 "
 ```
 
-## 操作员笔记
+## Ã¦â€œÂÃ¤Â½Å“Ã¥â€˜ËœÃ§Â¬â€Ã¨Â®Â°
 
-* 会话文件在头部持久化 `Project`、`Branch` 和 `Worktree`，以便 `/sessions info` 可以区分并行 tmux/工作树运行。
-* 对于指挥中心式监控，请结合使用 `/sessions info`、`git diff --stat` 以及由 `scripts/hooks/cost-tracker.js` 发出的成本指标。
+* Ã¤Â¼Å¡Ã¨Â¯ÂÃ¦â€“â€¡Ã¤Â»Â¶Ã¥Å“Â¨Ã¥Â¤Â´Ã©Æ’Â¨Ã¦Å’ÂÃ¤Â¹â€¦Ã¥Å’â€“ `Project`Ã£â‚¬Â`Branch` Ã¥â€™Å’ `Worktree`Ã¯Â¼Å’Ã¤Â»Â¥Ã¤Â¾Â¿ `/sessions info` Ã¥ÂÂ¯Ã¤Â»Â¥Ã¥Å’ÂºÃ¥Ë†â€ Ã¥Â¹Â¶Ã¨Â¡Å’ tmux/Ã¥Â·Â¥Ã¤Â½Å“Ã¦Â â€˜Ã¨Â¿ÂÃ¨Â¡Å’Ã£â‚¬â€š
+* Ã¥Â¯Â¹Ã¤ÂºÅ½Ã¦Å’â€¡Ã¦Å’Â¥Ã¤Â¸Â­Ã¥Â¿Æ’Ã¥Â¼ÂÃ§â€ºâ€˜Ã¦Å½Â§Ã¯Â¼Å’Ã¨Â¯Â·Ã§Â»â€œÃ¥ÂË†Ã¤Â½Â¿Ã§â€Â¨ `/sessions info`Ã£â‚¬Â`git diff --stat` Ã¤Â»Â¥Ã¥ÂÅ Ã§â€Â± `scripts/hooks/cost-tracker.js` Ã¥Ââ€˜Ã¥â€¡ÂºÃ§Å¡â€žÃ¦Ë†ÂÃ¦Å“Â¬Ã¦Å’â€¡Ã¦Â â€¡Ã£â‚¬â€š
 
-## 参数
+## Ã¥Ââ€šÃ¦â€¢Â°
 
 $ARGUMENTS:
 
-* `list [options]` - 列出会话
-  * `--limit <n>` - 最大显示会话数（默认：50）
-  * `--date <YYYY-MM-DD>` - 按日期筛选
-  * `--search <pattern>` - 在会话 ID 中搜索
-* `load <id|alias>` - 加载会话内容
-* `alias <id> <name>` - 为会话创建别名
-* `alias --remove <name>` - 移除别名
-* `unalias <name>` - 与 `--remove` 相同
-* `info <id|alias>` - 显示会话统计信息
-* `aliases` - 列出所有别名
-* `help` - 显示此帮助信息
+* `list [options]` - Ã¥Ë†â€”Ã¥â€¡ÂºÃ¤Â¼Å¡Ã¨Â¯Â
+  * `--limit <n>` - Ã¦Å“â‚¬Ã¥Â¤Â§Ã¦ËœÂ¾Ã§Â¤ÂºÃ¤Â¼Å¡Ã¨Â¯ÂÃ¦â€¢Â°Ã¯Â¼Ë†Ã©Â»ËœÃ¨Â®Â¤Ã¯Â¼Å¡50Ã¯Â¼â€°
+  * `--date <YYYY-MM-DD>` - Ã¦Å’â€°Ã¦â€”Â¥Ã¦Å“Å¸Ã§Â­â€ºÃ©â‚¬â€°
+  * `--search <pattern>` - Ã¥Å“Â¨Ã¤Â¼Å¡Ã¨Â¯Â ID Ã¤Â¸Â­Ã¦ÂÅ“Ã§Â´Â¢
+* `load <id|alias>` - Ã¥Å Â Ã¨Â½Â½Ã¤Â¼Å¡Ã¨Â¯ÂÃ¥â€ â€¦Ã¥Â®Â¹
+* `alias <id> <name>` - Ã¤Â¸ÂºÃ¤Â¼Å¡Ã¨Â¯ÂÃ¥Ë†â€ºÃ¥Â»ÂºÃ¥Ë†Â«Ã¥ÂÂ
+* `alias --remove <name>` - Ã§Â§Â»Ã©â„¢Â¤Ã¥Ë†Â«Ã¥ÂÂ
+* `unalias <name>` - Ã¤Â¸Å½ `--remove` Ã§â€ºÂ¸Ã¥ÂÅ’
+* `info <id|alias>` - Ã¦ËœÂ¾Ã§Â¤ÂºÃ¤Â¼Å¡Ã¨Â¯ÂÃ§Â»Å¸Ã¨Â®Â¡Ã¤Â¿Â¡Ã¦ÂÂ¯
+* `aliases` - Ã¥Ë†â€”Ã¥â€¡ÂºÃ¦â€°â‚¬Ã¦Å“â€°Ã¥Ë†Â«Ã¥ÂÂ
+* `help` - Ã¦ËœÂ¾Ã§Â¤ÂºÃ¦Â­Â¤Ã¥Â¸Â®Ã¥Å Â©Ã¤Â¿Â¡Ã¦ÂÂ¯
 
-## 示例
+## Ã§Â¤ÂºÃ¤Â¾â€¹
 
 ```bash
 # List all sessions
@@ -332,9 +345,9 @@ $ARGUMENTS:
 /sessions aliases
 ```
 
-## 备注
+## Ã¥Â¤â€¡Ã¦Â³Â¨
 
-* 会话以 Markdown 文件形式存储在 `~/.claude/sessions/`
-* 别名存储在 `~/.claude/session-aliases.json`
-* 会话 ID 可以缩短（通常前 4-8 个字符就足够唯一）
-* 为经常引用的会话使用别名
+* Ã¤Â¼Å¡Ã¨Â¯ÂÃ¤Â»Â¥ Markdown Ã¦â€“â€¡Ã¤Â»Â¶Ã¥Â½Â¢Ã¥Â¼ÂÃ¥Â­ËœÃ¥â€šÂ¨Ã¥Å“Â¨ `~/.claude/sessions/`
+* Ã¥Ë†Â«Ã¥ÂÂÃ¥Â­ËœÃ¥â€šÂ¨Ã¥Å“Â¨ `~/.claude/session-aliases.json`
+* Ã¤Â¼Å¡Ã¨Â¯Â ID Ã¥ÂÂ¯Ã¤Â»Â¥Ã§Â¼Â©Ã§Å¸Â­Ã¯Â¼Ë†Ã©â‚¬Å¡Ã¥Â¸Â¸Ã¥â€°Â 4-8 Ã¤Â¸ÂªÃ¥Â­â€”Ã§Â¬Â¦Ã¥Â°Â±Ã¨Â¶Â³Ã¥Â¤Å¸Ã¥â€Â¯Ã¤Â¸â‚¬Ã¯Â¼â€°
+* Ã¤Â¸ÂºÃ§Â»ÂÃ¥Â¸Â¸Ã¥Â¼â€¢Ã§â€Â¨Ã§Å¡â€žÃ¤Â¼Å¡Ã¨Â¯ÂÃ¤Â½Â¿Ã§â€Â¨Ã¥Ë†Â«Ã¥ÂÂ

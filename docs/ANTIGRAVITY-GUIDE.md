@@ -1,5 +1,18 @@
 # Antigravity Setup and Usage Guide
 
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
 Google's [Antigravity](https://antigravity.dev) is an AI coding IDE that uses a `.agent/` directory convention for configuration. ECC provides first-class support for Antigravity through its selective install system.
 
 ## Quick Start
@@ -24,11 +37,11 @@ ECC remaps its component structure to match Antigravity's expected layout:
 | `commands/` | `.agent/workflows/` | Slash commands become Antigravity workflows |
 | `agents/` | `.agent/skills/` | Agent definitions become Antigravity skills |
 
-> **Note on `.agents/` vs `.agent/` vs `agents/`**: The installer only handles three source paths explicitly: `rules` → `.agent/rules/`, `commands` → `.agent/workflows/`, and `agents` (no dot prefix) → `.agent/skills/`. The dot-prefixed `.agents/` directory in the ECC repo is a **static layout** for Codex/Antigravity skill definitions and `openai.yaml` configs — it is not directly mapped by the installer. Any `.agents/` path falls through to the default scaffold operation. If you want `.agents/skills/` content available in the Antigravity runtime, you must manually copy it to `.agent/skills/`.
+> **Note on `.agents/` vs `.agent/` vs `agents/`**: The installer only handles three source paths explicitly: `rules` Ã¢â€ â€™ `.agent/rules/`, `commands` Ã¢â€ â€™ `.agent/workflows/`, and `agents` (no dot prefix) Ã¢â€ â€™ `.agent/skills/`. The dot-prefixed `.agents/` directory in the ECC repo is a **static layout** for Codex/Antigravity skill definitions and `openai.yaml` configs Ã¢â‚¬â€ it is not directly mapped by the installer. Any `.agents/` path falls through to the default scaffold operation. If you want `.agents/skills/` content available in the Antigravity runtime, you must manually copy it to `.agent/skills/`.
 
 ### Key Differences from Claude Code
 
-- **Rules are flattened**: Claude Code nests rules under subdirectories (`rules/common/`, `rules/typescript/`). Antigravity expects a flat `rules/` directory — the installer handles this automatically.
+- **Rules are flattened**: Claude Code nests rules under subdirectories (`rules/common/`, `rules/typescript/`). Antigravity expects a flat `rules/` directory Ã¢â‚¬â€ the installer handles this automatically.
 - **Commands become workflows**: ECC's `/command` files land in `.agent/workflows/`, which is Antigravity's equivalent of slash commands.
 - **Agents become skills**: ECC agent definitions map to `.agent/skills/`, where Antigravity looks for skill configurations.
 
@@ -36,23 +49,23 @@ ECC remaps its component structure to match Antigravity's expected layout:
 
 ```
 your-project/
-├── .agent/
-│   ├── rules/
-│   │   ├── coding-standards.md
-│   │   ├── testing.md
-│   │   ├── security.md
-│   │   └── typescript.md          # language-specific rules
-│   ├── workflows/
-│   │   ├── plan.md
-│   │   ├── code-review.md
-│   │   ├── tdd.md
-│   │   └── ...
-│   ├── skills/
-│   │   ├── planner.md
-│   │   ├── code-reviewer.md
-│   │   ├── tdd-guide.md
-│   │   └── ...
-│   └── ecc-install-state.json     # tracks what ECC installed
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ .agent/
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ rules/
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ coding-standards.md
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ testing.md
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ security.md
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ typescript.md          # language-specific rules
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ workflows/
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ plan.md
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ code-review.md
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ tdd.md
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ ...
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ skills/
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ planner.md
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ code-reviewer.md
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ tdd-guide.md
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ ...
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ ecc-install-state.json     # tracks what ECC installed
 ```
 
 ## The `openai.yaml` Agent Config
@@ -103,19 +116,19 @@ node scripts/uninstall.js --target antigravity
 
 ### Install State
 
-The installer writes `.agent/ecc-install-state.json` to track which files ECC owns. This enables safe uninstall and repair — ECC will never touch files it didn't create.
+The installer writes `.agent/ecc-install-state.json` to track which files ECC owns. This enables safe uninstall and repair Ã¢â‚¬â€ ECC will never touch files it didn't create.
 
 ## Adding Custom Skills for Antigravity
 
 If you're contributing a new skill and want it available on Antigravity:
 
 1. Create the skill under `skills/your-skill-name/SKILL.md` as usual
-2. Add an agent definition at `agents/your-skill-name.md` — this is the path the installer maps to `.agent/skills/` at runtime, making your skill available in the Antigravity harness
-3. Add the Antigravity agent config at `.agents/skills/your-skill-name/agents/openai.yaml` — this is a static repo layout consumed by Codex for implicit invocation metadata
-4. Mirror the `SKILL.md` content to `.agents/skills/your-skill-name/SKILL.md` — this static copy is used by Codex and serves as a reference for Antigravity
+2. Add an agent definition at `agents/your-skill-name.md` Ã¢â‚¬â€ this is the path the installer maps to `.agent/skills/` at runtime, making your skill available in the Antigravity harness
+3. Add the Antigravity agent config at `.agents/skills/your-skill-name/agents/openai.yaml` Ã¢â‚¬â€ this is a static repo layout consumed by Codex for implicit invocation metadata
+4. Mirror the `SKILL.md` content to `.agents/skills/your-skill-name/SKILL.md` Ã¢â‚¬â€ this static copy is used by Codex and serves as a reference for Antigravity
 5. Mention in your PR that you added Antigravity support
 
-> **Key distinction**: The installer deploys `agents/` (no dot) → `.agent/skills/` — this is what makes skills available at runtime. The `.agents/` (dot-prefixed) directory is a separate static layout for Codex `openai.yaml` configs and is not auto-deployed by the installer.
+> **Key distinction**: The installer deploys `agents/` (no dot) Ã¢â€ â€™ `.agent/skills/` Ã¢â‚¬â€ this is what makes skills available at runtime. The `.agents/` (dot-prefixed) directory is a separate static layout for Codex `openai.yaml` configs and is not auto-deployed by the installer.
 
 See [CONTRIBUTING.md](../CONTRIBUTING.md) for the full contribution guide.
 
@@ -136,7 +149,7 @@ See [CONTRIBUTING.md](../CONTRIBUTING.md) for the full contribution guide.
 ### Skills not loading in Antigravity
 
 - Verify the `.agent/` directory exists in your project root (not home directory)
-- Check that `ecc-install-state.json` was created — if missing, re-run the installer
+- Check that `ecc-install-state.json` was created Ã¢â‚¬â€ if missing, re-run the installer
 - Ensure files have `.md` extension and valid frontmatter
 
 ### Rules not applying
@@ -151,6 +164,6 @@ See [CONTRIBUTING.md](../CONTRIBUTING.md) for the full contribution guide.
 
 ## Related Resources
 
-- [Selective Install Architecture](./SELECTIVE-INSTALL-ARCHITECTURE.md) — how the install system works under the hood
-- [Selective Install Design](./SELECTIVE-INSTALL-DESIGN.md) — design decisions and target adapter contracts
-- [CONTRIBUTING.md](../CONTRIBUTING.md) — how to contribute skills, agents, and commands
+- [Selective Install Architecture](./SELECTIVE-INSTALL-ARCHITECTURE.md) Ã¢â‚¬â€ how the install system works under the hood
+- [Selective Install Design](./SELECTIVE-INSTALL-DESIGN.md) Ã¢â‚¬â€ design decisions and target adapter contracts
+- [CONTRIBUTING.md](../CONTRIBUTING.md) Ã¢â‚¬â€ how to contribute skills, agents, and commands

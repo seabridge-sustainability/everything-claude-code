@@ -4,31 +4,44 @@ paths:
   - "**/Package.swift"
 ---
 
-# Swift 编码风格
+# Swift Ã§Â¼â€“Ã§Â ÂÃ©Â£Å½Ã¦Â Â¼
 
-> 本文件在 [common/coding-style.md](../common/coding-style.md) 的基础上扩展了 Swift 相关的内容。
+## Safety And Authorization Rule
 
-## 格式化
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-* **SwiftFormat** 用于自动格式化，**SwiftLint** 用于风格检查
-* `swift-format` 已作为替代方案捆绑在 Xcode 16+ 中
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-## 不变性
 
-* 优先使用 `let` 而非 `var` — 将所有内容定义为 `let`，仅在编译器要求时才改为 `var`
-* 默认使用具有值语义的 `struct`；仅在需要标识或引用语义时才使用 `class`
+> Ã¦Å“Â¬Ã¦â€“â€¡Ã¤Â»Â¶Ã¥Å“Â¨ [common/coding-style.md](../common/coding-style.md) Ã§Å¡â€žÃ¥Å¸ÂºÃ§Â¡â‚¬Ã¤Â¸Å Ã¦â€°Â©Ã¥Â±â€¢Ã¤Âºâ€  Swift Ã§â€ºÂ¸Ã¥â€¦Â³Ã§Å¡â€žÃ¥â€ â€¦Ã¥Â®Â¹Ã£â‚¬â€š
 
-## 命名
+## Ã¦Â Â¼Ã¥Â¼ÂÃ¥Å’â€“
 
-遵循 [Apple API 设计指南](https://www.swift.org/documentation/api-design-guidelines/)：
+* **SwiftFormat** Ã§â€Â¨Ã¤ÂºÅ½Ã¨â€¡ÂªÃ¥Å Â¨Ã¦Â Â¼Ã¥Â¼ÂÃ¥Å’â€“Ã¯Â¼Å’**SwiftLint** Ã§â€Â¨Ã¤ÂºÅ½Ã©Â£Å½Ã¦Â Â¼Ã¦Â£â‚¬Ã¦Å¸Â¥
+* `swift-format` Ã¥Â·Â²Ã¤Â½Å“Ã¤Â¸ÂºÃ¦â€ºÂ¿Ã¤Â»Â£Ã¦â€“Â¹Ã¦Â¡Ë†Ã¦Ââ€ Ã§Â»â€˜Ã¥Å“Â¨ Xcode 16+ Ã¤Â¸Â­
 
-* 在使用时保持清晰 — 省略不必要的词语
-* 根据方法和属性的作用而非类型来命名
-* 对于常量，使用 `static let` 而非全局常量
+## Ã¤Â¸ÂÃ¥ÂËœÃ¦â‚¬Â§
 
-## 错误处理
+* Ã¤Â¼ËœÃ¥â€¦Ë†Ã¤Â½Â¿Ã§â€Â¨ `let` Ã¨â‚¬Å’Ã©ÂÅ¾ `var` Ã¢â‚¬â€ Ã¥Â°â€ Ã¦â€°â‚¬Ã¦Å“â€°Ã¥â€ â€¦Ã¥Â®Â¹Ã¥Â®Å¡Ã¤Â¹â€°Ã¤Â¸Âº `let`Ã¯Â¼Å’Ã¤Â»â€¦Ã¥Å“Â¨Ã§Â¼â€“Ã¨Â¯â€˜Ã¥â„¢Â¨Ã¨Â¦ÂÃ¦Â±â€šÃ¦â€”Â¶Ã¦â€°ÂÃ¦â€Â¹Ã¤Â¸Âº `var`
+* Ã©Â»ËœÃ¨Â®Â¤Ã¤Â½Â¿Ã§â€Â¨Ã¥â€¦Â·Ã¦Å“â€°Ã¥â‚¬Â¼Ã¨Â¯Â­Ã¤Â¹â€°Ã§Å¡â€ž `struct`Ã¯Â¼â€ºÃ¤Â»â€¦Ã¥Å“Â¨Ã©Å“â‚¬Ã¨Â¦ÂÃ¦Â â€¡Ã¨Â¯â€ Ã¦Ë†â€“Ã¥Â¼â€¢Ã§â€Â¨Ã¨Â¯Â­Ã¤Â¹â€°Ã¦â€”Â¶Ã¦â€°ÂÃ¤Â½Â¿Ã§â€Â¨ `class`
 
-使用类型化 throws (Swift 6+) 和模式匹配：
+## Ã¥â€˜Â½Ã¥ÂÂ
+
+Ã©ÂÂµÃ¥Â¾Âª [Apple API Ã¨Â®Â¾Ã¨Â®Â¡Ã¦Å’â€¡Ã¥Ââ€”](https://www.swift.org/documentation/api-design-guidelines/)Ã¯Â¼Å¡
+
+* Ã¥Å“Â¨Ã¤Â½Â¿Ã§â€Â¨Ã¦â€”Â¶Ã¤Â¿ÂÃ¦Å’ÂÃ¦Â¸â€¦Ã¦â„¢Â° Ã¢â‚¬â€ Ã§Å“ÂÃ§â€¢Â¥Ã¤Â¸ÂÃ¥Â¿â€¦Ã¨Â¦ÂÃ§Å¡â€žÃ¨Â¯ÂÃ¨Â¯Â­
+* Ã¦Â Â¹Ã¦ÂÂ®Ã¦â€“Â¹Ã¦Â³â€¢Ã¥â€™Å’Ã¥Â±Å¾Ã¦â‚¬Â§Ã§Å¡â€žÃ¤Â½Å“Ã§â€Â¨Ã¨â‚¬Å’Ã©ÂÅ¾Ã§Â±Â»Ã¥Å¾â€¹Ã¦ÂÂ¥Ã¥â€˜Â½Ã¥ÂÂ
+* Ã¥Â¯Â¹Ã¤ÂºÅ½Ã¥Â¸Â¸Ã©â€¡ÂÃ¯Â¼Å’Ã¤Â½Â¿Ã§â€Â¨ `static let` Ã¨â‚¬Å’Ã©ÂÅ¾Ã¥â€¦Â¨Ã¥Â±â‚¬Ã¥Â¸Â¸Ã©â€¡Â
+
+## Ã©â€â„¢Ã¨Â¯Â¯Ã¥Â¤â€žÃ§Ââ€ 
+
+Ã¤Â½Â¿Ã§â€Â¨Ã§Â±Â»Ã¥Å¾â€¹Ã¥Å’â€“ throws (Swift 6+) Ã¥â€™Å’Ã¦Â¨Â¡Ã¥Â¼ÂÃ¥Å’Â¹Ã©â€¦ÂÃ¯Â¼Å¡
 
 ```swift
 func load(id: String) throws(LoadError) -> Item {
@@ -39,10 +52,10 @@ func load(id: String) throws(LoadError) -> Item {
 }
 ```
 
-## 并发
+## Ã¥Â¹Â¶Ã¥Ââ€˜
 
-启用 Swift 6 严格并发检查。优先使用：
+Ã¥ÂÂ¯Ã§â€Â¨ Swift 6 Ã¤Â¸Â¥Ã¦Â Â¼Ã¥Â¹Â¶Ã¥Ââ€˜Ã¦Â£â‚¬Ã¦Å¸Â¥Ã£â‚¬â€šÃ¤Â¼ËœÃ¥â€¦Ë†Ã¤Â½Â¿Ã§â€Â¨Ã¯Â¼Å¡
 
-* `Sendable` 值类型用于跨越隔离边界的数据
-* Actors 用于共享可变状态
-* 结构化并发 (`async let`, `TaskGroup`) 而非非结构化的 `Task {}`
+* `Sendable` Ã¥â‚¬Â¼Ã§Â±Â»Ã¥Å¾â€¹Ã§â€Â¨Ã¤ÂºÅ½Ã¨Â·Â¨Ã¨Â¶Å Ã©Å¡â€Ã§Â¦Â»Ã¨Â¾Â¹Ã§â€¢Å’Ã§Å¡â€žÃ¦â€¢Â°Ã¦ÂÂ®
+* Actors Ã§â€Â¨Ã¤ÂºÅ½Ã¥â€¦Â±Ã¤ÂºÂ«Ã¥ÂÂ¯Ã¥ÂËœÃ§Å Â¶Ã¦â‚¬Â
+* Ã§Â»â€œÃ¦Å¾â€žÃ¥Å’â€“Ã¥Â¹Â¶Ã¥Ââ€˜ (`async let`, `TaskGroup`) Ã¨â‚¬Å’Ã©ÂÅ¾Ã©ÂÅ¾Ã§Â»â€œÃ¦Å¾â€žÃ¥Å’â€“Ã§Å¡â€ž `Task {}`

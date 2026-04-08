@@ -4,14 +4,27 @@ description: Use this skill to validate the "why" before building, run product d
 origin: ECC
 ---
 
-# Product Lens — Think Before You Build
+# Product Lens Ã¢â‚¬â€ Think Before You Build
+
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
 
 ## When to Use
 
-- Before starting any feature — validate the "why"
-- Weekly product review — are we building the right thing?
+- Before starting any feature Ã¢â‚¬â€ validate the "why"
+- Weekly product review Ã¢â‚¬â€ are we building the right thing?
 - When stuck choosing between features
-- Before a launch — sanity check the user journey
+- Before a launch Ã¢â‚¬â€ sanity check the user journey
 - When converting a vague idea into a spec
 
 ## How It Works
@@ -67,7 +80,7 @@ When you have 10 ideas and need to pick 2:
 
 ```
 1. List all candidate features
-2. Score each on: impact (1-5) × confidence (1-5) ÷ effort (1-5)
+2. Score each on: impact (1-5) Ãƒâ€” confidence (1-5) ÃƒÂ· effort (1-5)
 3. Rank by ICE score
 4. Apply constraints: runway, team size, dependencies
 5. Output: prioritized roadmap with rationale

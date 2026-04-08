@@ -1,72 +1,85 @@
 ---
 name: deployment-patterns
-description: Deployment iş akışları, CI/CD pipeline kalıpları, Docker konteynerizasyonu, sağlık kontrolleri, rollback stratejileri ve web uygulamaları için üretim hazırlığı kontrol listeleri.
+description: Deployment iÃ…Å¸ akÃ„Â±Ã…Å¸larÃ„Â±, CI/CD pipeline kalÃ„Â±plarÃ„Â±, Docker konteynerizasyonu, saÃ„Å¸lÃ„Â±k kontrolleri, rollback stratejileri ve web uygulamalarÃ„Â± iÃƒÂ§in ÃƒÂ¼retim hazÃ„Â±rlÃ„Â±Ã„Å¸Ã„Â± kontrol listeleri.
 origin: ECC
 ---
 
-# Deployment Kalıpları
+# Deployment KalÃ„Â±plarÃ„Â±
 
-Üretim deployment iş akışları ve CI/CD en iyi uygulamaları.
+## Safety And Authorization Rule
 
-## Ne Zaman Aktifleştirmeli
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-- CI/CD pipeline'ları kurarken
-- Bir uygulamayı Docker'ize ederken
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+ÃƒÅ“retim deployment iÃ…Å¸ akÃ„Â±Ã…Å¸larÃ„Â± ve CI/CD en iyi uygulamalarÃ„Â±.
+
+## Ne Zaman AktifleÃ…Å¸tirmeli
+
+- CI/CD pipeline'larÃ„Â± kurarken
+- Bir uygulamayÃ„Â± Docker'ize ederken
 - Deployment stratejisi planlarken (blue-green, canary, rolling)
-- Sağlık kontrolleri ve hazırlık probe'ları uygularken
-- Üretim yayınına hazırlanırken
-- Ortama özgü ayarları yapılandırırken
+- SaÃ„Å¸lÃ„Â±k kontrolleri ve hazÃ„Â±rlÃ„Â±k probe'larÃ„Â± uygularken
+- ÃƒÅ“retim yayÃ„Â±nÃ„Â±na hazÃ„Â±rlanÃ„Â±rken
+- Ortama ÃƒÂ¶zgÃƒÂ¼ ayarlarÃ„Â± yapÃ„Â±landÃ„Â±rÃ„Â±rken
 
 ## Deployment Stratejileri
 
-### Rolling Deployment (Varsayılan)
+### Rolling Deployment (VarsayÃ„Â±lan)
 
-Instance'ları kademeli olarak değiştir — rollout sırasında eski ve yeni versiyonlar birlikte çalışır.
+Instance'larÃ„Â± kademeli olarak deÃ„Å¸iÃ…Å¸tir Ã¢â‚¬â€ rollout sÃ„Â±rasÃ„Â±nda eski ve yeni versiyonlar birlikte ÃƒÂ§alÃ„Â±Ã…Å¸Ã„Â±r.
 
 ```
-Instance 1: v1 → v2  (önce güncelle)
-Instance 2: v1        (hala v1 çalışıyor)
-Instance 3: v1        (hala v1 çalışıyor)
+Instance 1: v1 Ã¢â€ â€™ v2  (ÃƒÂ¶nce gÃƒÂ¼ncelle)
+Instance 2: v1        (hala v1 ÃƒÂ§alÃ„Â±Ã…Å¸Ã„Â±yor)
+Instance 3: v1        (hala v1 ÃƒÂ§alÃ„Â±Ã…Å¸Ã„Â±yor)
 
 Instance 1: v2
-Instance 2: v1 → v2  (ikinci olarak güncelle)
+Instance 2: v1 Ã¢â€ â€™ v2  (ikinci olarak gÃƒÂ¼ncelle)
 Instance 3: v1
 
 Instance 1: v2
 Instance 2: v2
-Instance 3: v1 → v2  (son olarak güncelle)
+Instance 3: v1 Ã¢â€ â€™ v2  (son olarak gÃƒÂ¼ncelle)
 ```
 
-**Artıları:** Sıfır kesinti, kademeli rollout
-**Eksileri:** İki versiyon aynı anda çalışır — geriye uyumlu değişiklikler gerektirir
-**Ne zaman kullanılır:** Standart deployment'lar, geriye uyumlu değişiklikler
+**ArtÃ„Â±larÃ„Â±:** SÃ„Â±fÃ„Â±r kesinti, kademeli rollout
+**Eksileri:** Ã„Â°ki versiyon aynÃ„Â± anda ÃƒÂ§alÃ„Â±Ã…Å¸Ã„Â±r Ã¢â‚¬â€ geriye uyumlu deÃ„Å¸iÃ…Å¸iklikler gerektirir
+**Ne zaman kullanÃ„Â±lÃ„Â±r:** Standart deployment'lar, geriye uyumlu deÃ„Å¸iÃ…Å¸iklikler
 
 ### Blue-Green Deployment
 
-İki özdeş ortam çalıştır. Trafiği atomik olarak değiştir.
+Ã„Â°ki ÃƒÂ¶zdeÃ…Å¸ ortam ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r. TrafiÃ„Å¸i atomik olarak deÃ„Å¸iÃ…Å¸tir.
 
 ```
-Blue  (v1) ← trafik
-Green (v2)   boşta, yeni versiyon çalışıyor
+Blue  (v1) Ã¢â€ Â trafik
+Green (v2)   boÃ…Å¸ta, yeni versiyon ÃƒÂ§alÃ„Â±Ã…Å¸Ã„Â±yor
 
-# Doğrulamadan sonra:
-Blue  (v1)   boşta (yedek haline gelir)
-Green (v2) ← trafik
+# DoÃ„Å¸rulamadan sonra:
+Blue  (v1)   boÃ…Å¸ta (yedek haline gelir)
+Green (v2) Ã¢â€ Â trafik
 ```
 
-**Artıları:** Anında rollback (blue'ya geri dön), temiz geçiş
-**Eksileri:** Deployment sırasında 2x altyapı gerektirir
-**Ne zaman kullanılır:** Kritik servisler, sorunlara sıfır tolerans
+**ArtÃ„Â±larÃ„Â±:** AnÃ„Â±nda rollback (blue'ya geri dÃƒÂ¶n), temiz geÃƒÂ§iÃ…Å¸
+**Eksileri:** Deployment sÃ„Â±rasÃ„Â±nda 2x altyapÃ„Â± gerektirir
+**Ne zaman kullanÃ„Â±lÃ„Â±r:** Kritik servisler, sorunlara sÃ„Â±fÃ„Â±r tolerans
 
 ### Canary Deployment
 
-Önce trafiğin küçük bir yüzdesini yeni versiyona yönlendir.
+Ãƒâ€“nce trafiÃ„Å¸in kÃƒÂ¼ÃƒÂ§ÃƒÂ¼k bir yÃƒÂ¼zdesini yeni versiyona yÃƒÂ¶nlendir.
 
 ```
 v1: %95 trafik
 v2:  %5 trafik  (canary)
 
-# Metrikler iyi görünüyorsa:
+# Metrikler iyi gÃƒÂ¶rÃƒÂ¼nÃƒÂ¼yorsa:
 v1: %50 trafik
 v2: %50 trafik
 
@@ -74,16 +87,16 @@ v2: %50 trafik
 v2: %100 trafik
 ```
 
-**Artıları:** Tam rollout'tan önce gerçek trafikle sorunları yakalar
-**Eksileri:** Trafik bölme altyapısı, izleme gerektirir
-**Ne zaman kullanılır:** Yüksek trafikli servisler, riskli değişiklikler, feature flag'ler
+**ArtÃ„Â±larÃ„Â±:** Tam rollout'tan ÃƒÂ¶nce gerÃƒÂ§ek trafikle sorunlarÃ„Â± yakalar
+**Eksileri:** Trafik bÃƒÂ¶lme altyapÃ„Â±sÃ„Â±, izleme gerektirir
+**Ne zaman kullanÃ„Â±lÃ„Â±r:** YÃƒÂ¼ksek trafikli servisler, riskli deÃ„Å¸iÃ…Å¸iklikler, feature flag'ler
 
 ## Docker
 
 ### Multi-Stage Dockerfile (Node.js)
 
 ```dockerfile
-# Stage 1: Bağımlılıkları yükle
+# Stage 1: BaÃ„Å¸Ã„Â±mlÃ„Â±lÃ„Â±klarÃ„Â± yÃƒÂ¼kle
 FROM node:22-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
@@ -165,24 +178,24 @@ HEALTHCHECK --interval=30s --timeout=3s CMD python -c "import urllib.request; ur
 CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "4"]
 ```
 
-### Docker En İyi Uygulamaları
+### Docker En Ã„Â°yi UygulamalarÃ„Â±
 
 ```
-# İYİ uygulamalar
-- Belirli versiyon tag'leri kullanın (node:22-alpine, node:latest değil)
-- Image boyutunu minimize etmek için multi-stage build'ler
-- Root olmayan kullanıcı olarak çalıştır
-- Önce bağımlılık dosyalarını kopyalayın (layer caching)
-- node_modules, .git, test'leri hariç tutmak için .dockerignore kullanın
-- HEALTHCHECK talimatı ekleyin
-- docker-compose veya k8s'te kaynak limitleri ayarlayın
+# Ã„Â°YÃ„Â° uygulamalar
+- Belirli versiyon tag'leri kullanÃ„Â±n (node:22-alpine, node:latest deÃ„Å¸il)
+- Image boyutunu minimize etmek iÃƒÂ§in multi-stage build'ler
+- Root olmayan kullanÃ„Â±cÃ„Â± olarak ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
+- Ãƒâ€“nce baÃ„Å¸Ã„Â±mlÃ„Â±lÃ„Â±k dosyalarÃ„Â±nÃ„Â± kopyalayÃ„Â±n (layer caching)
+- node_modules, .git, test'leri hariÃƒÂ§ tutmak iÃƒÂ§in .dockerignore kullanÃ„Â±n
+- HEALTHCHECK talimatÃ„Â± ekleyin
+- docker-compose veya k8s'te kaynak limitleri ayarlayÃ„Â±n
 
-# KÖTÜ uygulamalar
-- Root olarak çalıştırmak
+# KÃƒâ€“TÃƒÅ“ uygulamalar
+- Root olarak ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±rmak
 - :latest tag'lerini kullanmak
-- Tüm repo'yu tek COPY layer'da kopyalamak
-- Production image'de dev bağımlılıklarını yüklemek
-- Image'de secret'ları saklamak (env var veya secrets manager kullanın)
+- TÃƒÂ¼m repo'yu tek COPY layer'da kopyalamak
+- Production image'de dev baÃ„Å¸Ã„Â±mlÃ„Â±lÃ„Â±klarÃ„Â±nÃ„Â± yÃƒÂ¼klemek
+- Image'de secret'larÃ„Â± saklamak (env var veya secrets manager kullanÃ„Â±n)
 ```
 
 ## CI/CD Pipeline
@@ -244,34 +257,34 @@ jobs:
     steps:
       - name: Deploy to production
         run: |
-          # Platforma özgü deployment komutu
+          # Platforma ÃƒÂ¶zgÃƒÂ¼ deployment komutu
           # Railway: railway up
           # Vercel: vercel --prod
           # K8s: kubectl set image deployment/app app=ghcr.io/${{ github.repository }}:${{ github.sha }}
           echo "Deploying ${{ github.sha }}"
 ```
 
-### Pipeline Aşamaları
+### Pipeline AÃ…Å¸amalarÃ„Â±
 
 ```
-PR açıldığında:
-  lint → typecheck → unit tests → integration tests → preview deploy
+PR aÃƒÂ§Ã„Â±ldÃ„Â±Ã„Å¸Ã„Â±nda:
+  lint Ã¢â€ â€™ typecheck Ã¢â€ â€™ unit tests Ã¢â€ â€™ integration tests Ã¢â€ â€™ preview deploy
 
-Main'e merge edildiğinde:
-  lint → typecheck → unit tests → integration tests → build image → deploy staging → smoke tests → deploy production
+Main'e merge edildiÃ„Å¸inde:
+  lint Ã¢â€ â€™ typecheck Ã¢â€ â€™ unit tests Ã¢â€ â€™ integration tests Ã¢â€ â€™ build image Ã¢â€ â€™ deploy staging Ã¢â€ â€™ smoke tests Ã¢â€ â€™ deploy production
 ```
 
-## Sağlık Kontrolleri
+## SaÃ„Å¸lÃ„Â±k Kontrolleri
 
-### Sağlık Kontrolü Endpoint'i
+### SaÃ„Å¸lÃ„Â±k KontrolÃƒÂ¼ Endpoint'i
 
 ```typescript
-// Basit sağlık kontrolü
+// Basit saÃ„Å¸lÃ„Â±k kontrolÃƒÂ¼
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "ok" });
 });
 
-// Detaylı sağlık kontrolü (dahili izleme için)
+// DetaylÃ„Â± saÃ„Å¸lÃ„Â±k kontrolÃƒÂ¼ (dahili izleme iÃƒÂ§in)
 app.get("/health/detailed", async (req, res) => {
   const checks = {
     database: await checkDatabase(),
@@ -300,7 +313,7 @@ async function checkDatabase(): Promise<HealthCheck> {
 }
 ```
 
-### Kubernetes Probe'ları
+### Kubernetes Probe'larÃ„Â±
 
 ```yaml
 livenessProbe:
@@ -325,27 +338,27 @@ startupProbe:
     port: 3000
   initialDelaySeconds: 0
   periodSeconds: 5
-  failureThreshold: 30    # 30 * 5s = 150s max başlatma süresi
+  failureThreshold: 30    # 30 * 5s = 150s max baÃ…Å¸latma sÃƒÂ¼resi
 ```
 
-## Ortam Yapılandırması
+## Ortam YapÃ„Â±landÃ„Â±rmasÃ„Â±
 
-### Twelve-Factor App Kalıbı
+### Twelve-Factor App KalÃ„Â±bÃ„Â±
 
 ```bash
-# Tüm yapılandırma ortam değişkenleri ile — asla kodda değil
+# TÃƒÂ¼m yapÃ„Â±landÃ„Â±rma ortam deÃ„Å¸iÃ…Å¸kenleri ile Ã¢â‚¬â€ asla kodda deÃ„Å¸il
 DATABASE_URL=postgres://user:pass@host:5432/db
 REDIS_URL=redis://host:6379/0
-API_KEY=${API_KEY}           # secrets manager tarafından enjekte edilir
+API_KEY=${API_KEY}           # secrets manager tarafÃ„Â±ndan enjekte edilir
 LOG_LEVEL=info
 PORT=3000
 
-# Ortama özgü davranış
+# Ortama ÃƒÂ¶zgÃƒÂ¼ davranÃ„Â±Ã…Å¸
 NODE_ENV=production          # veya staging, development
-APP_ENV=production           # açık uygulama ortamı
+APP_ENV=production           # aÃƒÂ§Ã„Â±k uygulama ortamÃ„Â±
 ```
 
-### Yapılandırma Validasyonu
+### YapÃ„Â±landÃ„Â±rma Validasyonu
 
 ```typescript
 import { z } from "zod";
@@ -359,69 +372,69 @@ const envSchema = z.object({
   LOG_LEVEL: z.enum(["debug", "info", "warn", "error"]).default("info"),
 });
 
-// Başlangıçta validasyon yap — yapılandırma yanlışsa hızlı başarısız ol
+// BaÃ…Å¸langÃ„Â±ÃƒÂ§ta validasyon yap Ã¢â‚¬â€ yapÃ„Â±landÃ„Â±rma yanlÃ„Â±Ã…Å¸sa hÃ„Â±zlÃ„Â± baÃ…Å¸arÃ„Â±sÃ„Â±z ol
 export const env = envSchema.parse(process.env);
 ```
 
 ## Rollback Stratejisi
 
-### Anında Rollback
+### AnÃ„Â±nda Rollback
 
 ```bash
-# Docker/Kubernetes: önceki image'a işaret et
+# Docker/Kubernetes: ÃƒÂ¶nceki image'a iÃ…Å¸aret et
 kubectl rollout undo deployment/app
 
-# Vercel: önceki deployment'ı yükselt
+# Vercel: ÃƒÂ¶nceki deployment'Ã„Â± yÃƒÂ¼kselt
 vercel rollback
 
-# Railway: önceki commit'i tekrar deploy et
+# Railway: ÃƒÂ¶nceki commit'i tekrar deploy et
 railway up --commit <previous-sha>
 
-# Veritabanı: migration'ı rollback et (geri alınabilirse)
+# VeritabanÃ„Â±: migration'Ã„Â± rollback et (geri alÃ„Â±nabilirse)
 npx prisma migrate resolve --rolled-back <migration-name>
 ```
 
 ### Rollback Kontrol Listesi
 
-- [ ] Önceki image/artifact mevcut ve tag'lenmiş
-- [ ] Veritabanı migration'ları geriye uyumlu (yıkıcı değişiklik yok)
-- [ ] Feature flag'ler deploy olmadan yeni özellikleri devre dışı bırakabilir
-- [ ] Hata oranı artışları için izleme alarmları yapılandırılmış
-- [ ] Rollback üretim yayınından önce staging'de test edilmiş
+- [ ] Ãƒâ€“nceki image/artifact mevcut ve tag'lenmiÃ…Å¸
+- [ ] VeritabanÃ„Â± migration'larÃ„Â± geriye uyumlu (yÃ„Â±kÃ„Â±cÃ„Â± deÃ„Å¸iÃ…Å¸iklik yok)
+- [ ] Feature flag'ler deploy olmadan yeni ÃƒÂ¶zellikleri devre dÃ„Â±Ã…Å¸Ã„Â± bÃ„Â±rakabilir
+- [ ] Hata oranÃ„Â± artÃ„Â±Ã…Å¸larÃ„Â± iÃƒÂ§in izleme alarmlarÃ„Â± yapÃ„Â±landÃ„Â±rÃ„Â±lmÃ„Â±Ã…Å¸
+- [ ] Rollback ÃƒÂ¼retim yayÃ„Â±nÃ„Â±ndan ÃƒÂ¶nce staging'de test edilmiÃ…Å¸
 
-## Üretim Hazırlığı Kontrol Listesi
+## ÃƒÅ“retim HazÃ„Â±rlÃ„Â±Ã„Å¸Ã„Â± Kontrol Listesi
 
-Herhangi bir üretim deployment'ından önce:
+Herhangi bir ÃƒÂ¼retim deployment'Ã„Â±ndan ÃƒÂ¶nce:
 
 ### Uygulama
-- [ ] Tüm testler geçiyor (unit, integration, E2E)
-- [ ] Kodda veya yapılandırma dosyalarında hardcode edilmiş secret yok
-- [ ] Hata işleme tüm edge case'leri kapsıyor
-- [ ] Loglama yapılandırılmış (JSON) ve PII içermiyor
-- [ ] Sağlık kontrolü endpoint'i anlamlı durum döndürüyor
+- [ ] TÃƒÂ¼m testler geÃƒÂ§iyor (unit, integration, E2E)
+- [ ] Kodda veya yapÃ„Â±landÃ„Â±rma dosyalarÃ„Â±nda hardcode edilmiÃ…Å¸ secret yok
+- [ ] Hata iÃ…Å¸leme tÃƒÂ¼m edge case'leri kapsÃ„Â±yor
+- [ ] Loglama yapÃ„Â±landÃ„Â±rÃ„Â±lmÃ„Â±Ã…Å¸ (JSON) ve PII iÃƒÂ§ermiyor
+- [ ] SaÃ„Å¸lÃ„Â±k kontrolÃƒÂ¼ endpoint'i anlamlÃ„Â± durum dÃƒÂ¶ndÃƒÂ¼rÃƒÂ¼yor
 
-### Altyapı
-- [ ] Docker image yeniden üretilebilir şekilde build oluyor (sabitlenmiş versiyonlar)
-- [ ] Ortam değişkenleri dokümante edilmiş ve başlangıçta validate ediliyor
-- [ ] Kaynak limitleri ayarlanmış (CPU, bellek)
-- [ ] Horizontal scaling yapılandırılmış (min/max instance'lar)
-- [ ] Tüm endpoint'lerde SSL/TLS etkin
+### AltyapÃ„Â±
+- [ ] Docker image yeniden ÃƒÂ¼retilebilir Ã…Å¸ekilde build oluyor (sabitlenmiÃ…Å¸ versiyonlar)
+- [ ] Ortam deÃ„Å¸iÃ…Å¸kenleri dokÃƒÂ¼mante edilmiÃ…Å¸ ve baÃ…Å¸langÃ„Â±ÃƒÂ§ta validate ediliyor
+- [ ] Kaynak limitleri ayarlanmÃ„Â±Ã…Å¸ (CPU, bellek)
+- [ ] Horizontal scaling yapÃ„Â±landÃ„Â±rÃ„Â±lmÃ„Â±Ã…Å¸ (min/max instance'lar)
+- [ ] TÃƒÂ¼m endpoint'lerde SSL/TLS etkin
 
-### İzleme
-- [ ] Uygulama metrikleri export ediliyor (istek oranı, gecikme, hatalar)
-- [ ] Hata oranı > eşik için alarmlar yapılandırılmış
-- [ ] Log toplama kurulmuş (yapılandırılmış loglar, aranabilir)
-- [ ] Sağlık endpoint'inde uptime izleme
+### Ã„Â°zleme
+- [ ] Uygulama metrikleri export ediliyor (istek oranÃ„Â±, gecikme, hatalar)
+- [ ] Hata oranÃ„Â± > eÃ…Å¸ik iÃƒÂ§in alarmlar yapÃ„Â±landÃ„Â±rÃ„Â±lmÃ„Â±Ã…Å¸
+- [ ] Log toplama kurulmuÃ…Å¸ (yapÃ„Â±landÃ„Â±rÃ„Â±lmÃ„Â±Ã…Å¸ loglar, aranabilir)
+- [ ] SaÃ„Å¸lÃ„Â±k endpoint'inde uptime izleme
 
-### Güvenlik
-- [ ] Bağımlılıklar CVE'ler için taranmış
-- [ ] CORS sadece izin verilen origin'ler için yapılandırılmış
-- [ ] Halka açık endpoint'lerde hız sınırlama etkin
-- [ ] Kimlik doğrulama ve yetkilendirme doğrulanmış
-- [ ] Güvenlik header'ları ayarlanmış (CSP, HSTS, X-Frame-Options)
+### GÃƒÂ¼venlik
+- [ ] BaÃ„Å¸Ã„Â±mlÃ„Â±lÃ„Â±klar CVE'ler iÃƒÂ§in taranmÃ„Â±Ã…Å¸
+- [ ] CORS sadece izin verilen origin'ler iÃƒÂ§in yapÃ„Â±landÃ„Â±rÃ„Â±lmÃ„Â±Ã…Å¸
+- [ ] Halka aÃƒÂ§Ã„Â±k endpoint'lerde hÃ„Â±z sÃ„Â±nÃ„Â±rlama etkin
+- [ ] Kimlik doÃ„Å¸rulama ve yetkilendirme doÃ„Å¸rulanmÃ„Â±Ã…Å¸
+- [ ] GÃƒÂ¼venlik header'larÃ„Â± ayarlanmÃ„Â±Ã…Å¸ (CSP, HSTS, X-Frame-Options)
 
 ### Operasyonlar
-- [ ] Rollback planı dokümante edilmiş ve test edilmiş
-- [ ] Veritabanı migration'ı üretim boyutundaki veriye karşı test edilmiş
-- [ ] Yaygın hata senaryoları için runbook
-- [ ] Nöbet rotasyonu ve yükseltme yolu tanımlanmış
+- [ ] Rollback planÃ„Â± dokÃƒÂ¼mante edilmiÃ…Å¸ ve test edilmiÃ…Å¸
+- [ ] VeritabanÃ„Â± migration'Ã„Â± ÃƒÂ¼retim boyutundaki veriye karÃ…Å¸Ã„Â± test edilmiÃ…Å¸
+- [ ] YaygÃ„Â±n hata senaryolarÃ„Â± iÃƒÂ§in runbook
+- [ ] NÃƒÂ¶bet rotasyonu ve yÃƒÂ¼kseltme yolu tanÃ„Â±mlanmÃ„Â±Ã…Å¸

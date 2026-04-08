@@ -2,48 +2,61 @@
 |------|-------------|
 | cloud-infrastructure-security | Use this skill when deploying to cloud platforms, configuring infrastructure, managing IAM policies, setting up logging/monitoring, or implementing CI/CD pipelines. Provides cloud security checklist aligned with best practices. |
 
-# 雲端與基礎設施安全技能
+# Ã©â€ºÂ²Ã§Â«Â¯Ã¨Ë†â€¡Ã¥Å¸ÂºÃ§Â¤Å½Ã¨Â¨Â­Ã¦â€“Â½Ã¥Â®â€°Ã¥â€¦Â¨Ã¦Å â‚¬Ã¨Æ’Â½
 
-此技能確保雲端基礎設施、CI/CD 管線和部署設定遵循安全最佳實務並符合業界標準。
+## Safety And Authorization Rule
 
-## 何時啟用
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-- 部署應用程式到雲端平台（AWS、Vercel、Railway、Cloudflare）
-- 設定 IAM 角色和權限
-- 設置 CI/CD 管線
-- 實作基礎設施即程式碼（Terraform、CloudFormation）
-- 設定日誌和監控
-- 在雲端環境管理密鑰
-- 設置 CDN 和邊緣安全
-- 實作災難復原和備份策略
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-## 雲端安全檢查清單
 
-### 1. IAM 與存取控制
+Ã¦Â­Â¤Ã¦Å â‚¬Ã¨Æ’Â½Ã§Â¢ÂºÃ¤Â¿ÂÃ©â€ºÂ²Ã§Â«Â¯Ã¥Å¸ÂºÃ§Â¤Å½Ã¨Â¨Â­Ã¦â€“Â½Ã£â‚¬ÂCI/CD Ã§Â®Â¡Ã§Â·Å¡Ã¥â€™Å’Ã©Æ’Â¨Ã§Â½Â²Ã¨Â¨Â­Ã¥Â®Å¡Ã©ÂÂµÃ¥Â¾ÂªÃ¥Â®â€°Ã¥â€¦Â¨Ã¦Å“â‚¬Ã¤Â½Â³Ã¥Â¯Â¦Ã¥â€¹â„¢Ã¤Â¸Â¦Ã§Â¬Â¦Ã¥ÂË†Ã¦Â¥Â­Ã§â€¢Å’Ã¦Â¨â„¢Ã¦Âºâ€“Ã£â‚¬â€š
 
-#### 最小權限原則
+## Ã¤Â½â€¢Ã¦â„¢â€šÃ¥â€¢Å¸Ã§â€Â¨
+
+- Ã©Æ’Â¨Ã§Â½Â²Ã¦â€¡â€°Ã§â€Â¨Ã§Â¨â€¹Ã¥Â¼ÂÃ¥Ë†Â°Ã©â€ºÂ²Ã§Â«Â¯Ã¥Â¹Â³Ã¥ÂÂ°Ã¯Â¼Ë†AWSÃ£â‚¬ÂVercelÃ£â‚¬ÂRailwayÃ£â‚¬ÂCloudflareÃ¯Â¼â€°
+- Ã¨Â¨Â­Ã¥Â®Å¡ IAM Ã¨Â§â€™Ã¨â€°Â²Ã¥â€™Å’Ã¦Â¬Å Ã©â„¢Â
+- Ã¨Â¨Â­Ã§Â½Â® CI/CD Ã§Â®Â¡Ã§Â·Å¡
+- Ã¥Â¯Â¦Ã¤Â½Å“Ã¥Å¸ÂºÃ§Â¤Å½Ã¨Â¨Â­Ã¦â€“Â½Ã¥ÂÂ³Ã§Â¨â€¹Ã¥Â¼ÂÃ§Â¢Â¼Ã¯Â¼Ë†TerraformÃ£â‚¬ÂCloudFormationÃ¯Â¼â€°
+- Ã¨Â¨Â­Ã¥Â®Å¡Ã¦â€”Â¥Ã¨ÂªÅ’Ã¥â€™Å’Ã§â€ºÂ£Ã¦Å½Â§
+- Ã¥Å“Â¨Ã©â€ºÂ²Ã§Â«Â¯Ã§â€™Â°Ã¥Â¢Æ’Ã§Â®Â¡Ã§Ââ€ Ã¥Â¯â€ Ã©â€˜Â°
+- Ã¨Â¨Â­Ã§Â½Â® CDN Ã¥â€™Å’Ã©â€šÅ Ã§Â·Â£Ã¥Â®â€°Ã¥â€¦Â¨
+- Ã¥Â¯Â¦Ã¤Â½Å“Ã§ÂÂ½Ã©â€ºÂ£Ã¥Â¾Â©Ã¥Å½Å¸Ã¥â€™Å’Ã¥â€šâ„¢Ã¤Â»Â½Ã§Â­â€“Ã§â€¢Â¥
+
+## Ã©â€ºÂ²Ã§Â«Â¯Ã¥Â®â€°Ã¥â€¦Â¨Ã¦ÂªÂ¢Ã¦Å¸Â¥Ã¦Â¸â€¦Ã¥â€“Â®
+
+### 1. IAM Ã¨Ë†â€¡Ã¥Â­ËœÃ¥Ââ€“Ã¦Å½Â§Ã¥Ë†Â¶
+
+#### Ã¦Å“â‚¬Ã¥Â°ÂÃ¦Â¬Å Ã©â„¢ÂÃ¥Å½Å¸Ã¥â€°â€¡
 
 ```yaml
-# PASS: 正確：最小權限
+# PASS: Ã¦Â­Â£Ã§Â¢ÂºÃ¯Â¼Å¡Ã¦Å“â‚¬Ã¥Â°ÂÃ¦Â¬Å Ã©â„¢Â
 iam_role:
   permissions:
-    - s3:GetObject  # 只有讀取存取
+    - s3:GetObject  # Ã¥ÂÂªÃ¦Å“â€°Ã¨Â®â‚¬Ã¥Ââ€“Ã¥Â­ËœÃ¥Ââ€“
     - s3:ListBucket
   resources:
-    - arn:aws:s3:::my-bucket/*  # 只有特定 bucket
+    - arn:aws:s3:::my-bucket/*  # Ã¥ÂÂªÃ¦Å“â€°Ã§â€°Â¹Ã¥Â®Å¡ bucket
 
-# FAIL: 錯誤：過於廣泛的權限
+# FAIL: Ã©Å’Â¯Ã¨ÂªÂ¤Ã¯Â¼Å¡Ã©ÂÅ½Ã¦â€“Â¼Ã¥Â»Â£Ã¦Â³â€ºÃ§Å¡â€žÃ¦Â¬Å Ã©â„¢Â
 iam_role:
   permissions:
-    - s3:*  # 所有 S3 動作
+    - s3:*  # Ã¦â€°â‚¬Ã¦Å“â€° S3 Ã¥â€¹â€¢Ã¤Â½Å“
   resources:
-    - "*"  # 所有資源
+    - "*"  # Ã¦â€°â‚¬Ã¦Å“â€°Ã¨Â³â€¡Ã¦ÂºÂ
 ```
 
-#### 多因素認證（MFA）
+#### Ã¥Â¤Å¡Ã¥â€ºÂ Ã§Â´Â Ã¨ÂªÂÃ¨Â­â€°Ã¯Â¼Ë†MFAÃ¯Â¼â€°
 
 ```bash
-# 總是為 root/admin 帳戶啟用 MFA
+# Ã§Â¸Â½Ã¦ËœÂ¯Ã§â€šÂº root/admin Ã¥Â¸Â³Ã¦Ë†Â¶Ã¥â€¢Å¸Ã§â€Â¨ MFA
 aws iam enable-mfa-device \
   --user-name admin \
   --serial-number arn:aws:iam::123456789:mfa/admin \
@@ -51,55 +64,55 @@ aws iam enable-mfa-device \
   --authentication-code2 789012
 ```
 
-#### 驗證步驟
+#### Ã©Â©â€”Ã¨Â­â€°Ã¦Â­Â¥Ã©Â©Å¸
 
-- [ ] 生產環境不使用 root 帳戶
-- [ ] 所有特權帳戶啟用 MFA
-- [ ] 服務帳戶使用角色，非長期憑證
-- [ ] IAM 政策遵循最小權限
-- [ ] 定期進行存取審查
-- [ ] 未使用憑證已輪換或移除
+- [ ] Ã§â€Å¸Ã§â€Â¢Ã§â€™Â°Ã¥Â¢Æ’Ã¤Â¸ÂÃ¤Â½Â¿Ã§â€Â¨ root Ã¥Â¸Â³Ã¦Ë†Â¶
+- [ ] Ã¦â€°â‚¬Ã¦Å“â€°Ã§â€°Â¹Ã¦Â¬Å Ã¥Â¸Â³Ã¦Ë†Â¶Ã¥â€¢Å¸Ã§â€Â¨ MFA
+- [ ] Ã¦Å“ÂÃ¥â€¹â„¢Ã¥Â¸Â³Ã¦Ë†Â¶Ã¤Â½Â¿Ã§â€Â¨Ã¨Â§â€™Ã¨â€°Â²Ã¯Â¼Å’Ã©ÂÅ¾Ã©â€¢Â·Ã¦Å“Å¸Ã¦â€ â€˜Ã¨Â­â€°
+- [ ] IAM Ã¦â€Â¿Ã§Â­â€“Ã©ÂÂµÃ¥Â¾ÂªÃ¦Å“â‚¬Ã¥Â°ÂÃ¦Â¬Å Ã©â„¢Â
+- [ ] Ã¥Â®Å¡Ã¦Å“Å¸Ã©â‚¬Â²Ã¨Â¡Å’Ã¥Â­ËœÃ¥Ââ€“Ã¥Â¯Â©Ã¦Å¸Â¥
+- [ ] Ã¦Å“ÂªÃ¤Â½Â¿Ã§â€Â¨Ã¦â€ â€˜Ã¨Â­â€°Ã¥Â·Â²Ã¨Â¼ÂªÃ¦Ââ€ºÃ¦Ë†â€“Ã§Â§Â»Ã©â„¢Â¤
 
-### 2. 密鑰管理
+### 2. Ã¥Â¯â€ Ã©â€˜Â°Ã§Â®Â¡Ã§Ââ€ 
 
-#### 雲端密鑰管理器
+#### Ã©â€ºÂ²Ã§Â«Â¯Ã¥Â¯â€ Ã©â€˜Â°Ã§Â®Â¡Ã§Ââ€ Ã¥â„¢Â¨
 
 ```typescript
-// PASS: 正確：使用雲端密鑰管理器
+// PASS: Ã¦Â­Â£Ã§Â¢ÂºÃ¯Â¼Å¡Ã¤Â½Â¿Ã§â€Â¨Ã©â€ºÂ²Ã§Â«Â¯Ã¥Â¯â€ Ã©â€˜Â°Ã§Â®Â¡Ã§Ââ€ Ã¥â„¢Â¨
 import { SecretsManager } from '@aws-sdk/client-secrets-manager';
 
 const client = new SecretsManager({ region: 'us-east-1' });
 const secret = await client.getSecretValue({ SecretId: 'prod/api-key' });
 const apiKey = JSON.parse(secret.SecretString).key;
 
-// FAIL: 錯誤：寫死或只在環境變數
-const apiKey = process.env.API_KEY; // 未輪換、未稽核
+// FAIL: Ã©Å’Â¯Ã¨ÂªÂ¤Ã¯Â¼Å¡Ã¥Â¯Â«Ã¦Â­Â»Ã¦Ë†â€“Ã¥ÂÂªÃ¥Å“Â¨Ã§â€™Â°Ã¥Â¢Æ’Ã¨Â®Å Ã¦â€¢Â¸
+const apiKey = process.env.API_KEY; // Ã¦Å“ÂªÃ¨Â¼ÂªÃ¦Ââ€ºÃ£â‚¬ÂÃ¦Å“ÂªÃ§Â¨Â½Ã¦Â Â¸
 ```
 
-#### 密鑰輪換
+#### Ã¥Â¯â€ Ã©â€˜Â°Ã¨Â¼ÂªÃ¦Ââ€º
 
 ```bash
-# 為資料庫憑證設定自動輪換
+# Ã§â€šÂºÃ¨Â³â€¡Ã¦â€“â„¢Ã¥ÂºÂ«Ã¦â€ â€˜Ã¨Â­â€°Ã¨Â¨Â­Ã¥Â®Å¡Ã¨â€¡ÂªÃ¥â€¹â€¢Ã¨Â¼ÂªÃ¦Ââ€º
 aws secretsmanager rotate-secret \
   --secret-id prod/db-password \
   --rotation-lambda-arn arn:aws:lambda:region:account:function:rotate \
   --rotation-rules AutomaticallyAfterDays=30
 ```
 
-#### 驗證步驟
+#### Ã©Â©â€”Ã¨Â­â€°Ã¦Â­Â¥Ã©Â©Å¸
 
-- [ ] 所有密鑰儲存在雲端密鑰管理器（AWS Secrets Manager、Vercel Secrets）
-- [ ] 資料庫憑證啟用自動輪換
-- [ ] API 金鑰至少每季輪換
-- [ ] 程式碼、日誌或錯誤訊息中無密鑰
-- [ ] 密鑰存取啟用稽核日誌
+- [ ] Ã¦â€°â‚¬Ã¦Å“â€°Ã¥Â¯â€ Ã©â€˜Â°Ã¥â€žÂ²Ã¥Â­ËœÃ¥Å“Â¨Ã©â€ºÂ²Ã§Â«Â¯Ã¥Â¯â€ Ã©â€˜Â°Ã§Â®Â¡Ã§Ââ€ Ã¥â„¢Â¨Ã¯Â¼Ë†AWS Secrets ManagerÃ£â‚¬ÂVercel SecretsÃ¯Â¼â€°
+- [ ] Ã¨Â³â€¡Ã¦â€“â„¢Ã¥ÂºÂ«Ã¦â€ â€˜Ã¨Â­â€°Ã¥â€¢Å¸Ã§â€Â¨Ã¨â€¡ÂªÃ¥â€¹â€¢Ã¨Â¼ÂªÃ¦Ââ€º
+- [ ] API Ã©â€¡â€˜Ã©â€˜Â°Ã¨â€¡Â³Ã¥Â°â€˜Ã¦Â¯ÂÃ¥Â­Â£Ã¨Â¼ÂªÃ¦Ââ€º
+- [ ] Ã§Â¨â€¹Ã¥Â¼ÂÃ§Â¢Â¼Ã£â‚¬ÂÃ¦â€”Â¥Ã¨ÂªÅ’Ã¦Ë†â€“Ã©Å’Â¯Ã¨ÂªÂ¤Ã¨Â¨Å Ã¦ÂÂ¯Ã¤Â¸Â­Ã§â€žÂ¡Ã¥Â¯â€ Ã©â€˜Â°
+- [ ] Ã¥Â¯â€ Ã©â€˜Â°Ã¥Â­ËœÃ¥Ââ€“Ã¥â€¢Å¸Ã§â€Â¨Ã§Â¨Â½Ã¦Â Â¸Ã¦â€”Â¥Ã¨ÂªÅ’
 
-### 3. 網路安全
+### 3. Ã§Â¶Â²Ã¨Â·Â¯Ã¥Â®â€°Ã¥â€¦Â¨
 
-#### VPC 和防火牆設定
+#### VPC Ã¥â€™Å’Ã©ËœÂ²Ã§ÂÂ«Ã§â€°â€ Ã¨Â¨Â­Ã¥Â®Å¡
 
 ```terraform
-# PASS: 正確：限制的安全群組
+# PASS: Ã¦Â­Â£Ã§Â¢ÂºÃ¯Â¼Å¡Ã©â„¢ÂÃ¥Ë†Â¶Ã§Å¡â€žÃ¥Â®â€°Ã¥â€¦Â¨Ã§Â¾Â¤Ã§Âµâ€ž
 resource "aws_security_group" "app" {
   name = "app-sg"
 
@@ -107,42 +120,42 @@ resource "aws_security_group" "app" {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = ["10.0.0.0/16"]  # 只有內部 VPC
+    cidr_blocks = ["10.0.0.0/16"]  # Ã¥ÂÂªÃ¦Å“â€°Ã¥â€¦Â§Ã©Æ’Â¨ VPC
   }
 
   egress {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]  # 只有 HTTPS 輸出
+    cidr_blocks = ["0.0.0.0/0"]  # Ã¥ÂÂªÃ¦Å“â€° HTTPS Ã¨Â¼Â¸Ã¥â€¡Âº
   }
 }
 
-# FAIL: 錯誤：對網際網路開放
+# FAIL: Ã©Å’Â¯Ã¨ÂªÂ¤Ã¯Â¼Å¡Ã¥Â°ÂÃ§Â¶Â²Ã©Å¡â€ºÃ§Â¶Â²Ã¨Â·Â¯Ã©â€“â€¹Ã¦â€Â¾
 resource "aws_security_group" "bad" {
   ingress {
     from_port   = 0
     to_port     = 65535
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]  # 所有埠、所有 IP！
+    cidr_blocks = ["0.0.0.0/0"]  # Ã¦â€°â‚¬Ã¦Å“â€°Ã¥Å¸Â Ã£â‚¬ÂÃ¦â€°â‚¬Ã¦Å“â€° IPÃ¯Â¼Â
   }
 }
 ```
 
-#### 驗證步驟
+#### Ã©Â©â€”Ã¨Â­â€°Ã¦Â­Â¥Ã©Â©Å¸
 
-- [ ] 資料庫不可公開存取
-- [ ] SSH/RDP 埠限制為 VPN/堡壘機
-- [ ] 安全群組遵循最小權限
-- [ ] 網路 ACL 已設定
-- [ ] VPC 流量日誌已啟用
+- [ ] Ã¨Â³â€¡Ã¦â€“â„¢Ã¥ÂºÂ«Ã¤Â¸ÂÃ¥ÂÂ¯Ã¥â€¦Â¬Ã©â€“â€¹Ã¥Â­ËœÃ¥Ââ€“
+- [ ] SSH/RDP Ã¥Å¸Â Ã©â„¢ÂÃ¥Ë†Â¶Ã§â€šÂº VPN/Ã¥Â Â¡Ã¥Â£ËœÃ¦Â©Å¸
+- [ ] Ã¥Â®â€°Ã¥â€¦Â¨Ã§Â¾Â¤Ã§Âµâ€žÃ©ÂÂµÃ¥Â¾ÂªÃ¦Å“â‚¬Ã¥Â°ÂÃ¦Â¬Å Ã©â„¢Â
+- [ ] Ã§Â¶Â²Ã¨Â·Â¯ ACL Ã¥Â·Â²Ã¨Â¨Â­Ã¥Â®Å¡
+- [ ] VPC Ã¦ÂµÂÃ©â€¡ÂÃ¦â€”Â¥Ã¨ÂªÅ’Ã¥Â·Â²Ã¥â€¢Å¸Ã§â€Â¨
 
-### 4. 日誌與監控
+### 4. Ã¦â€”Â¥Ã¨ÂªÅ’Ã¨Ë†â€¡Ã§â€ºÂ£Ã¦Å½Â§
 
-#### CloudWatch/日誌設定
+#### CloudWatch/Ã¦â€”Â¥Ã¨ÂªÅ’Ã¨Â¨Â­Ã¥Â®Å¡
 
 ```typescript
-// PASS: 正確：全面日誌記錄
+// PASS: Ã¦Â­Â£Ã§Â¢ÂºÃ¯Â¼Å¡Ã¥â€¦Â¨Ã©ÂÂ¢Ã¦â€”Â¥Ã¨ÂªÅ’Ã¨Â¨ËœÃ©Å’â€ž
 import { CloudWatchLogsClient, CreateLogStreamCommand } from '@aws-sdk/client-cloudwatch-logs';
 
 const logSecurityEvent = async (event: SecurityEvent) => {
@@ -156,28 +169,28 @@ const logSecurityEvent = async (event: SecurityEvent) => {
         userId: event.userId,
         ip: event.ip,
         result: event.result,
-        // 永遠不要記錄敏感資料
+        // Ã¦Â°Â¸Ã©ÂÂ Ã¤Â¸ÂÃ¨Â¦ÂÃ¨Â¨ËœÃ©Å’â€žÃ¦â€¢ÂÃ¦â€žÅ¸Ã¨Â³â€¡Ã¦â€“â„¢
       })
     }]
   });
 };
 ```
 
-#### 驗證步驟
+#### Ã©Â©â€”Ã¨Â­â€°Ã¦Â­Â¥Ã©Â©Å¸
 
-- [ ] 所有服務啟用 CloudWatch/日誌記錄
-- [ ] 失敗的認證嘗試被記錄
-- [ ] 管理員動作被稽核
-- [ ] 日誌保留已設定（合規需 90+ 天）
-- [ ] 可疑活動設定警報
-- [ ] 日誌集中化且防篡改
+- [ ] Ã¦â€°â‚¬Ã¦Å“â€°Ã¦Å“ÂÃ¥â€¹â„¢Ã¥â€¢Å¸Ã§â€Â¨ CloudWatch/Ã¦â€”Â¥Ã¨ÂªÅ’Ã¨Â¨ËœÃ©Å’â€ž
+- [ ] Ã¥Â¤Â±Ã¦â€¢â€”Ã§Å¡â€žÃ¨ÂªÂÃ¨Â­â€°Ã¥Ëœâ€”Ã¨Â©Â¦Ã¨Â¢Â«Ã¨Â¨ËœÃ©Å’â€ž
+- [ ] Ã§Â®Â¡Ã§Ââ€ Ã¥â€œÂ¡Ã¥â€¹â€¢Ã¤Â½Å“Ã¨Â¢Â«Ã§Â¨Â½Ã¦Â Â¸
+- [ ] Ã¦â€”Â¥Ã¨ÂªÅ’Ã¤Â¿ÂÃ§â€¢â„¢Ã¥Â·Â²Ã¨Â¨Â­Ã¥Â®Å¡Ã¯Â¼Ë†Ã¥ÂË†Ã¨Â¦ÂÃ©Å“â‚¬ 90+ Ã¥Â¤Â©Ã¯Â¼â€°
+- [ ] Ã¥ÂÂ¯Ã§â€“â€˜Ã¦Â´Â»Ã¥â€¹â€¢Ã¨Â¨Â­Ã¥Â®Å¡Ã¨Â­Â¦Ã¥Â Â±
+- [ ] Ã¦â€”Â¥Ã¨ÂªÅ’Ã©â€ºâ€ Ã¤Â¸Â­Ã¥Å’â€“Ã¤Â¸â€Ã©ËœÂ²Ã§Â¯Â¡Ã¦â€Â¹
 
-### 5. CI/CD 管線安全
+### 5. CI/CD Ã§Â®Â¡Ã§Â·Å¡Ã¥Â®â€°Ã¥â€¦Â¨
 
-#### 安全管線設定
+#### Ã¥Â®â€°Ã¥â€¦Â¨Ã§Â®Â¡Ã§Â·Å¡Ã¨Â¨Â­Ã¥Â®Å¡
 
 ```yaml
-# PASS: 正確：安全的 GitHub Actions 工作流程
+# PASS: Ã¦Â­Â£Ã§Â¢ÂºÃ¯Â¼Å¡Ã¥Â®â€°Ã¥â€¦Â¨Ã§Å¡â€ž GitHub Actions Ã¥Â·Â¥Ã¤Â½Å“Ã¦ÂµÂÃ§Â¨â€¹
 name: Deploy
 
 on:
@@ -188,20 +201,20 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     permissions:
-      contents: read  # 最小權限
+      contents: read  # Ã¦Å“â‚¬Ã¥Â°ÂÃ¦Â¬Å Ã©â„¢Â
 
     steps:
       - uses: actions/checkout@v4
 
-      # 掃描密鑰
+      # Ã¦Å½Æ’Ã¦ÂÂÃ¥Â¯â€ Ã©â€˜Â°
       - name: Secret scanning
         uses: trufflesecurity/trufflehog@main
 
-      # 依賴稽核
+      # Ã¤Â¾ÂÃ¨Â³Â´Ã§Â¨Â½Ã¦Â Â¸
       - name: Audit dependencies
         run: npm audit --audit-level=high
 
-      # 使用 OIDC，非長期 tokens
+      # Ã¤Â½Â¿Ã§â€Â¨ OIDCÃ¯Â¼Å’Ã©ÂÅ¾Ã©â€¢Â·Ã¦Å“Å¸ tokens
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -209,40 +222,40 @@ jobs:
           aws-region: us-east-1
 ```
 
-#### 供應鏈安全
+#### Ã¤Â¾â€ºÃ¦â€¡â€°Ã©ÂË†Ã¥Â®â€°Ã¥â€¦Â¨
 
 ```json
-// package.json - 使用 lock 檔案和完整性檢查
+// package.json - Ã¤Â½Â¿Ã§â€Â¨ lock Ã¦Âªâ€Ã¦Â¡Ë†Ã¥â€™Å’Ã¥Â®Å’Ã¦â€¢Â´Ã¦â‚¬Â§Ã¦ÂªÂ¢Ã¦Å¸Â¥
 {
   "scripts": {
-    "install": "npm ci",  // 使用 ci 以獲得可重現建置
+    "install": "npm ci",  // Ã¤Â½Â¿Ã§â€Â¨ ci Ã¤Â»Â¥Ã§ÂÂ²Ã¥Â¾â€”Ã¥ÂÂ¯Ã©â€¡ÂÃ§ÂÂ¾Ã¥Â»ÂºÃ§Â½Â®
     "audit": "npm audit --audit-level=moderate",
     "check": "npm outdated"
   }
 }
 ```
 
-#### 驗證步驟
+#### Ã©Â©â€”Ã¨Â­â€°Ã¦Â­Â¥Ã©Â©Å¸
 
-- [ ] 使用 OIDC 而非長期憑證
-- [ ] 管線中的密鑰掃描
-- [ ] 依賴漏洞掃描
-- [ ] 容器映像掃描（如適用）
-- [ ] 強制執行分支保護規則
-- [ ] 合併前需要程式碼審查
-- [ ] 強制執行簽署 commits
+- [ ] Ã¤Â½Â¿Ã§â€Â¨ OIDC Ã¨â‚¬Å’Ã©ÂÅ¾Ã©â€¢Â·Ã¦Å“Å¸Ã¦â€ â€˜Ã¨Â­â€°
+- [ ] Ã§Â®Â¡Ã§Â·Å¡Ã¤Â¸Â­Ã§Å¡â€žÃ¥Â¯â€ Ã©â€˜Â°Ã¦Å½Æ’Ã¦ÂÂ
+- [ ] Ã¤Â¾ÂÃ¨Â³Â´Ã¦Â¼ÂÃ¦Â´Å¾Ã¦Å½Æ’Ã¦ÂÂ
+- [ ] Ã¥Â®Â¹Ã¥â„¢Â¨Ã¦ËœÂ Ã¥Æ’ÂÃ¦Å½Æ’Ã¦ÂÂÃ¯Â¼Ë†Ã¥Â¦â€šÃ©ÂÂ©Ã§â€Â¨Ã¯Â¼â€°
+- [ ] Ã¥Â¼Â·Ã¥Ë†Â¶Ã¥Å¸Â·Ã¨Â¡Å’Ã¥Ë†â€ Ã¦â€Â¯Ã¤Â¿ÂÃ¨Â­Â·Ã¨Â¦ÂÃ¥â€°â€¡
+- [ ] Ã¥ÂË†Ã¤Â½ÂµÃ¥â€°ÂÃ©Å“â‚¬Ã¨Â¦ÂÃ§Â¨â€¹Ã¥Â¼ÂÃ§Â¢Â¼Ã¥Â¯Â©Ã¦Å¸Â¥
+- [ ] Ã¥Â¼Â·Ã¥Ë†Â¶Ã¥Å¸Â·Ã¨Â¡Å’Ã§Â°Â½Ã§Â½Â² commits
 
-### 6. Cloudflare 與 CDN 安全
+### 6. Cloudflare Ã¨Ë†â€¡ CDN Ã¥Â®â€°Ã¥â€¦Â¨
 
-#### Cloudflare 安全設定
+#### Cloudflare Ã¥Â®â€°Ã¥â€¦Â¨Ã¨Â¨Â­Ã¥Â®Å¡
 
 ```typescript
-// PASS: 正確：帶安全標頭的 Cloudflare Workers
+// PASS: Ã¦Â­Â£Ã§Â¢ÂºÃ¯Â¼Å¡Ã¥Â¸Â¶Ã¥Â®â€°Ã¥â€¦Â¨Ã¦Â¨â„¢Ã©Â Â­Ã§Å¡â€ž Cloudflare Workers
 export default {
   async fetch(request: Request): Promise<Response> {
     const response = await fetch(request);
 
-    // 新增安全標頭
+    // Ã¦â€“Â°Ã¥Â¢Å¾Ã¥Â®â€°Ã¥â€¦Â¨Ã¦Â¨â„¢Ã©Â Â­
     const headers = new Headers(response.headers);
     headers.set('X-Frame-Options', 'DENY');
     headers.set('X-Content-Type-Options', 'nosniff');
@@ -257,100 +270,100 @@ export default {
 };
 ```
 
-#### WAF 規則
+#### WAF Ã¨Â¦ÂÃ¥â€°â€¡
 
 ```bash
-# 啟用 Cloudflare WAF 管理規則
-# - OWASP 核心規則集
-# - Cloudflare 管理規則集
-# - 速率限制規則
-# - Bot 保護
+# Ã¥â€¢Å¸Ã§â€Â¨ Cloudflare WAF Ã§Â®Â¡Ã§Ââ€ Ã¨Â¦ÂÃ¥â€°â€¡
+# - OWASP Ã¦Â Â¸Ã¥Â¿Æ’Ã¨Â¦ÂÃ¥â€°â€¡Ã©â€ºâ€ 
+# - Cloudflare Ã§Â®Â¡Ã§Ââ€ Ã¨Â¦ÂÃ¥â€°â€¡Ã©â€ºâ€ 
+# - Ã©â‚¬Å¸Ã§Å½â€¡Ã©â„¢ÂÃ¥Ë†Â¶Ã¨Â¦ÂÃ¥â€°â€¡
+# - Bot Ã¤Â¿ÂÃ¨Â­Â·
 ```
 
-#### 驗證步驟
+#### Ã©Â©â€”Ã¨Â­â€°Ã¦Â­Â¥Ã©Â©Å¸
 
-- [ ] WAF 啟用 OWASP 規則
-- [ ] 速率限制已設定
-- [ ] Bot 保護啟用
-- [ ] DDoS 保護啟用
-- [ ] 安全標頭已設定
-- [ ] SSL/TLS 嚴格模式啟用
+- [ ] WAF Ã¥â€¢Å¸Ã§â€Â¨ OWASP Ã¨Â¦ÂÃ¥â€°â€¡
+- [ ] Ã©â‚¬Å¸Ã§Å½â€¡Ã©â„¢ÂÃ¥Ë†Â¶Ã¥Â·Â²Ã¨Â¨Â­Ã¥Â®Å¡
+- [ ] Bot Ã¤Â¿ÂÃ¨Â­Â·Ã¥â€¢Å¸Ã§â€Â¨
+- [ ] DDoS Ã¤Â¿ÂÃ¨Â­Â·Ã¥â€¢Å¸Ã§â€Â¨
+- [ ] Ã¥Â®â€°Ã¥â€¦Â¨Ã¦Â¨â„¢Ã©Â Â­Ã¥Â·Â²Ã¨Â¨Â­Ã¥Â®Å¡
+- [ ] SSL/TLS Ã¥Å¡Â´Ã¦Â Â¼Ã¦Â¨Â¡Ã¥Â¼ÂÃ¥â€¢Å¸Ã§â€Â¨
 
-### 7. 備份與災難復原
+### 7. Ã¥â€šâ„¢Ã¤Â»Â½Ã¨Ë†â€¡Ã§ÂÂ½Ã©â€ºÂ£Ã¥Â¾Â©Ã¥Å½Å¸
 
-#### 自動備份
+#### Ã¨â€¡ÂªÃ¥â€¹â€¢Ã¥â€šâ„¢Ã¤Â»Â½
 
 ```terraform
-# PASS: 正確：自動 RDS 備份
+# PASS: Ã¦Â­Â£Ã§Â¢ÂºÃ¯Â¼Å¡Ã¨â€¡ÂªÃ¥â€¹â€¢ RDS Ã¥â€šâ„¢Ã¤Â»Â½
 resource "aws_db_instance" "main" {
   allocated_storage     = 20
   engine               = "postgres"
 
-  backup_retention_period = 30  # 30 天保留
+  backup_retention_period = 30  # 30 Ã¥Â¤Â©Ã¤Â¿ÂÃ§â€¢â„¢
   backup_window          = "03:00-04:00"
   maintenance_window     = "mon:04:00-mon:05:00"
 
   enabled_cloudwatch_logs_exports = ["postgresql"]
 
-  deletion_protection = true  # 防止意外刪除
+  deletion_protection = true  # Ã©ËœÂ²Ã¦Â­Â¢Ã¦â€žÂÃ¥Â¤â€“Ã¥Ë†ÂªÃ©â„¢Â¤
 }
 ```
 
-#### 驗證步驟
+#### Ã©Â©â€”Ã¨Â­â€°Ã¦Â­Â¥Ã©Â©Å¸
 
-- [ ] 已設定自動每日備份
-- [ ] 備份保留符合合規要求
-- [ ] 已啟用時間點復原
-- [ ] 每季執行備份測試
-- [ ] 災難復原計畫已記錄
-- [ ] RPO 和 RTO 已定義並測試
+- [ ] Ã¥Â·Â²Ã¨Â¨Â­Ã¥Â®Å¡Ã¨â€¡ÂªÃ¥â€¹â€¢Ã¦Â¯ÂÃ¦â€”Â¥Ã¥â€šâ„¢Ã¤Â»Â½
+- [ ] Ã¥â€šâ„¢Ã¤Â»Â½Ã¤Â¿ÂÃ§â€¢â„¢Ã§Â¬Â¦Ã¥ÂË†Ã¥ÂË†Ã¨Â¦ÂÃ¨Â¦ÂÃ¦Â±â€š
+- [ ] Ã¥Â·Â²Ã¥â€¢Å¸Ã§â€Â¨Ã¦â„¢â€šÃ©â€“â€œÃ©Â»Å¾Ã¥Â¾Â©Ã¥Å½Å¸
+- [ ] Ã¦Â¯ÂÃ¥Â­Â£Ã¥Å¸Â·Ã¨Â¡Å’Ã¥â€šâ„¢Ã¤Â»Â½Ã¦Â¸Â¬Ã¨Â©Â¦
+- [ ] Ã§ÂÂ½Ã©â€ºÂ£Ã¥Â¾Â©Ã¥Å½Å¸Ã¨Â¨Ë†Ã§â€¢Â«Ã¥Â·Â²Ã¨Â¨ËœÃ©Å’â€ž
+- [ ] RPO Ã¥â€™Å’ RTO Ã¥Â·Â²Ã¥Â®Å¡Ã§Â¾Â©Ã¤Â¸Â¦Ã¦Â¸Â¬Ã¨Â©Â¦
 
-## 部署前雲端安全檢查清單
+## Ã©Æ’Â¨Ã§Â½Â²Ã¥â€°ÂÃ©â€ºÂ²Ã§Â«Â¯Ã¥Â®â€°Ã¥â€¦Â¨Ã¦ÂªÂ¢Ã¦Å¸Â¥Ã¦Â¸â€¦Ã¥â€“Â®
 
-任何生產雲端部署前：
+Ã¤Â»Â»Ã¤Â½â€¢Ã§â€Å¸Ã§â€Â¢Ã©â€ºÂ²Ã§Â«Â¯Ã©Æ’Â¨Ã§Â½Â²Ã¥â€°ÂÃ¯Â¼Å¡
 
-- [ ] **IAM**：不使用 root 帳戶、啟用 MFA、最小權限政策
-- [ ] **密鑰**：所有密鑰在雲端密鑰管理器並有輪換
-- [ ] **網路**：安全群組受限、無公開資料庫
-- [ ] **日誌**：CloudWatch/日誌啟用並有保留
-- [ ] **監控**：異常設定警報
-- [ ] **CI/CD**：OIDC 認證、密鑰掃描、依賴稽核
-- [ ] **CDN/WAF**：Cloudflare WAF 啟用 OWASP 規則
-- [ ] **加密**：資料靜態和傳輸中加密
-- [ ] **備份**：自動備份並測試復原
-- [ ] **合規**：符合 GDPR/HIPAA 要求（如適用）
-- [ ] **文件**：基礎設施已記錄、建立操作手冊
-- [ ] **事件回應**：安全事件計畫就位
+- [ ] **IAM**Ã¯Â¼Å¡Ã¤Â¸ÂÃ¤Â½Â¿Ã§â€Â¨ root Ã¥Â¸Â³Ã¦Ë†Â¶Ã£â‚¬ÂÃ¥â€¢Å¸Ã§â€Â¨ MFAÃ£â‚¬ÂÃ¦Å“â‚¬Ã¥Â°ÂÃ¦Â¬Å Ã©â„¢ÂÃ¦â€Â¿Ã§Â­â€“
+- [ ] **Ã¥Â¯â€ Ã©â€˜Â°**Ã¯Â¼Å¡Ã¦â€°â‚¬Ã¦Å“â€°Ã¥Â¯â€ Ã©â€˜Â°Ã¥Å“Â¨Ã©â€ºÂ²Ã§Â«Â¯Ã¥Â¯â€ Ã©â€˜Â°Ã§Â®Â¡Ã§Ââ€ Ã¥â„¢Â¨Ã¤Â¸Â¦Ã¦Å“â€°Ã¨Â¼ÂªÃ¦Ââ€º
+- [ ] **Ã§Â¶Â²Ã¨Â·Â¯**Ã¯Â¼Å¡Ã¥Â®â€°Ã¥â€¦Â¨Ã§Â¾Â¤Ã§Âµâ€žÃ¥Ââ€”Ã©â„¢ÂÃ£â‚¬ÂÃ§â€žÂ¡Ã¥â€¦Â¬Ã©â€“â€¹Ã¨Â³â€¡Ã¦â€“â„¢Ã¥ÂºÂ«
+- [ ] **Ã¦â€”Â¥Ã¨ÂªÅ’**Ã¯Â¼Å¡CloudWatch/Ã¦â€”Â¥Ã¨ÂªÅ’Ã¥â€¢Å¸Ã§â€Â¨Ã¤Â¸Â¦Ã¦Å“â€°Ã¤Â¿ÂÃ§â€¢â„¢
+- [ ] **Ã§â€ºÂ£Ã¦Å½Â§**Ã¯Â¼Å¡Ã§â€¢Â°Ã¥Â¸Â¸Ã¨Â¨Â­Ã¥Â®Å¡Ã¨Â­Â¦Ã¥Â Â±
+- [ ] **CI/CD**Ã¯Â¼Å¡OIDC Ã¨ÂªÂÃ¨Â­â€°Ã£â‚¬ÂÃ¥Â¯â€ Ã©â€˜Â°Ã¦Å½Æ’Ã¦ÂÂÃ£â‚¬ÂÃ¤Â¾ÂÃ¨Â³Â´Ã§Â¨Â½Ã¦Â Â¸
+- [ ] **CDN/WAF**Ã¯Â¼Å¡Cloudflare WAF Ã¥â€¢Å¸Ã§â€Â¨ OWASP Ã¨Â¦ÂÃ¥â€°â€¡
+- [ ] **Ã¥Å Â Ã¥Â¯â€ **Ã¯Â¼Å¡Ã¨Â³â€¡Ã¦â€“â„¢Ã©ÂÅ“Ã¦â€¦â€¹Ã¥â€™Å’Ã¥â€šÂ³Ã¨Â¼Â¸Ã¤Â¸Â­Ã¥Å Â Ã¥Â¯â€ 
+- [ ] **Ã¥â€šâ„¢Ã¤Â»Â½**Ã¯Â¼Å¡Ã¨â€¡ÂªÃ¥â€¹â€¢Ã¥â€šâ„¢Ã¤Â»Â½Ã¤Â¸Â¦Ã¦Â¸Â¬Ã¨Â©Â¦Ã¥Â¾Â©Ã¥Å½Å¸
+- [ ] **Ã¥ÂË†Ã¨Â¦Â**Ã¯Â¼Å¡Ã§Â¬Â¦Ã¥ÂË† GDPR/HIPAA Ã¨Â¦ÂÃ¦Â±â€šÃ¯Â¼Ë†Ã¥Â¦â€šÃ©ÂÂ©Ã§â€Â¨Ã¯Â¼â€°
+- [ ] **Ã¦â€“â€¡Ã¤Â»Â¶**Ã¯Â¼Å¡Ã¥Å¸ÂºÃ§Â¤Å½Ã¨Â¨Â­Ã¦â€“Â½Ã¥Â·Â²Ã¨Â¨ËœÃ©Å’â€žÃ£â‚¬ÂÃ¥Â»ÂºÃ§Â«â€¹Ã¦â€œÂÃ¤Â½Å“Ã¦â€°â€¹Ã¥â€ Å 
+- [ ] **Ã¤Âºâ€¹Ã¤Â»Â¶Ã¥â€ºÅ¾Ã¦â€¡â€°**Ã¯Â¼Å¡Ã¥Â®â€°Ã¥â€¦Â¨Ã¤Âºâ€¹Ã¤Â»Â¶Ã¨Â¨Ë†Ã§â€¢Â«Ã¥Â°Â±Ã¤Â½Â
 
-## 常見雲端安全錯誤設定
+## Ã¥Â¸Â¸Ã¨Â¦â€¹Ã©â€ºÂ²Ã§Â«Â¯Ã¥Â®â€°Ã¥â€¦Â¨Ã©Å’Â¯Ã¨ÂªÂ¤Ã¨Â¨Â­Ã¥Â®Å¡
 
-### S3 Bucket 暴露
+### S3 Bucket Ã¦Å¡Â´Ã©Å“Â²
 
 ```bash
-# FAIL: 錯誤：公開 bucket
+# FAIL: Ã©Å’Â¯Ã¨ÂªÂ¤Ã¯Â¼Å¡Ã¥â€¦Â¬Ã©â€“â€¹ bucket
 aws s3api put-bucket-acl --bucket my-bucket --acl public-read
 
-# PASS: 正確：私有 bucket 並有特定存取
+# PASS: Ã¦Â­Â£Ã§Â¢ÂºÃ¯Â¼Å¡Ã§Â§ÂÃ¦Å“â€° bucket Ã¤Â¸Â¦Ã¦Å“â€°Ã§â€°Â¹Ã¥Â®Å¡Ã¥Â­ËœÃ¥Ââ€“
 aws s3api put-bucket-acl --bucket my-bucket --acl private
 aws s3api put-bucket-policy --bucket my-bucket --policy file://policy.json
 ```
 
-### RDS 公開存取
+### RDS Ã¥â€¦Â¬Ã©â€“â€¹Ã¥Â­ËœÃ¥Ââ€“
 
 ```terraform
-# FAIL: 錯誤
+# FAIL: Ã©Å’Â¯Ã¨ÂªÂ¤
 resource "aws_db_instance" "bad" {
-  publicly_accessible = true  # 絕不這樣做！
+  publicly_accessible = true  # Ã§Âµâ€¢Ã¤Â¸ÂÃ©â‚¬â„¢Ã¦Â¨Â£Ã¥ÂÅ¡Ã¯Â¼Â
 }
 
-# PASS: 正確
+# PASS: Ã¦Â­Â£Ã§Â¢Âº
 resource "aws_db_instance" "good" {
   publicly_accessible = false
   vpc_security_group_ids = [aws_security_group.db.id]
 }
 ```
 
-## 資源
+## Ã¨Â³â€¡Ã¦ÂºÂ
 
 - [AWS Security Best Practices](https://aws.amazon.com/security/best-practices/)
 - [CIS AWS Foundations Benchmark](https://www.cisecurity.org/benchmark/amazon_web_services)
@@ -358,4 +371,4 @@ resource "aws_db_instance" "good" {
 - [OWASP Cloud Security](https://owasp.org/www-project-cloud-security/)
 - [Terraform Security Best Practices](https://www.terraform.io/docs/cloud/guides/recommended-practices/)
 
-**記住**：雲端錯誤設定是資料外洩的主要原因。單一暴露的 S3 bucket 或過於寬鬆的 IAM 政策可能危及你的整個基礎設施。總是遵循最小權限原則和深度防禦。
+**Ã¨Â¨ËœÃ¤Â½Â**Ã¯Â¼Å¡Ã©â€ºÂ²Ã§Â«Â¯Ã©Å’Â¯Ã¨ÂªÂ¤Ã¨Â¨Â­Ã¥Â®Å¡Ã¦ËœÂ¯Ã¨Â³â€¡Ã¦â€“â„¢Ã¥Â¤â€“Ã¦Â´Â©Ã§Å¡â€žÃ¤Â¸Â»Ã¨Â¦ÂÃ¥Å½Å¸Ã¥â€ºÂ Ã£â‚¬â€šÃ¥â€“Â®Ã¤Â¸â‚¬Ã¦Å¡Â´Ã©Å“Â²Ã§Å¡â€ž S3 bucket Ã¦Ë†â€“Ã©ÂÅ½Ã¦â€“Â¼Ã¥Â¯Â¬Ã©Â¬â€ Ã§Å¡â€ž IAM Ã¦â€Â¿Ã§Â­â€“Ã¥ÂÂ¯Ã¨Æ’Â½Ã¥ÂÂ±Ã¥ÂÅ Ã¤Â½Â Ã§Å¡â€žÃ¦â€¢Â´Ã¥â‚¬â€¹Ã¥Å¸ÂºÃ§Â¤Å½Ã¨Â¨Â­Ã¦â€“Â½Ã£â‚¬â€šÃ§Â¸Â½Ã¦ËœÂ¯Ã©ÂÂµÃ¥Â¾ÂªÃ¦Å“â‚¬Ã¥Â°ÂÃ¦Â¬Å Ã©â„¢ÂÃ¥Å½Å¸Ã¥â€°â€¡Ã¥â€™Å’Ã¦Â·Â±Ã¥ÂºÂ¦Ã©ËœÂ²Ã§Â¦Â¦Ã£â‚¬â€š

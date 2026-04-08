@@ -1,3 +1,14 @@
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 ---
 name: cli-flags
 description: Reference for high-impact Claude Code CLI flags and settings.json options: --bare (10x faster startup), --add-dir (multi-repo), additionalDirectories, --agent, and --fork-session. Covers when and how to use each.
@@ -8,15 +19,15 @@ origin: ECC
 
 High-impact CLI flags and `settings.json` options that most users don't know about.
 
-## `--bare` — Skip Configs for Fast Scripted Calls
+## `--bare` Ã¢â‚¬â€ Skip Configs for Fast Scripted Calls
 
-By default, `claude` loads hooks, MCPs, CLAUDE.md files, and skill directory walks on startup. `--bare` skips all of that — up to 10x faster for scripted or `-p` (non-interactive) calls.
+By default, `claude` loads hooks, MCPs, CLAUDE.md files, and skill directory walks on startup. `--bare` skips all of that Ã¢â‚¬â€ up to 10x faster for scripted or `-p` (non-interactive) calls.
 
 ```bash
-# Standard (slow) — full config load
+# Standard (slow) Ã¢â‚¬â€ full config load
 claude -p "summarize this file" < myfile.txt
 
-# Bare (fast) — skip hooks, MCPs, CLAUDE.md, skill walks
+# Bare (fast) Ã¢â‚¬â€ skip hooks, MCPs, CLAUDE.md, skill walks
 claude --bare -p "summarize this file" < myfile.txt
 ```
 
@@ -24,9 +35,9 @@ claude --bare -p "summarize this file" < myfile.txt
 
 | Use case | Recommendation |
 |----------|---------------|
-| Interactive development sessions | Do NOT use `--bare` — you want hooks, MCPs, context |
-| CI/CD pipeline checks | Use `--bare` — deterministic, fast |
-| Scripted batch processing | Use `--bare` — no side effects |
+| Interactive development sessions | Do NOT use `--bare` Ã¢â‚¬â€ you want hooks, MCPs, context |
+| CI/CD pipeline checks | Use `--bare` Ã¢â‚¬â€ deterministic, fast |
+| Scripted batch processing | Use `--bare` Ã¢â‚¬â€ no side effects |
 | Quick one-off queries | Use `--bare` |
 | MCP tools required | Do NOT use `--bare` |
 
@@ -42,7 +53,7 @@ claude --bare --system-prompt "$(cat CLAUDE.md)" -p "task here"
 
 ---
 
-## `--add-dir` — Multi-Repo Sessions
+## `--add-dir` Ã¢â‚¬â€ Multi-Repo Sessions
 
 Adds an additional working directory to the session. Claude can read and edit files in both repos without switching contexts.
 
@@ -84,7 +95,7 @@ Or set it for your team in the repo-level `settings.json`:
 
 ---
 
-## `additionalDirectories` — Team-Wide Multi-Repo Config
+## `additionalDirectories` Ã¢â‚¬â€ Team-Wide Multi-Repo Config
 
 The `settings.json` equivalent of `--add-dir`. Set it once, never type it again.
 
@@ -106,7 +117,7 @@ The `settings.json` equivalent of `--add-dir`. Set it once, never type it again.
 
 ---
 
-## `--agent=<name>` — Launch a Named Agent Directly
+## `--agent=<name>` Ã¢â‚¬â€ Launch a Named Agent Directly
 
 Bypasses the normal interactive session and runs a specific agent from `.claude/agents/`.
 
@@ -133,7 +144,7 @@ claude --agent=planner -p "plan the new payment integration"
 
 ---
 
-## `--resume` + `--fork-session` — Fork from CLI
+## `--resume` + `--fork-session` Ã¢â‚¬â€ Fork from CLI
 
 See the `session-forking` skill for full details. Quick reference:
 

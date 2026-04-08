@@ -1,70 +1,83 @@
-# /learn - Yeniden Kullanılabilir Desenleri Çıkar
+# /learn - Yeniden KullanÃ„Â±labilir Desenleri Ãƒâ€¡Ã„Â±kar
 
-Mevcut oturumu analiz et ve skill olarak kaydetmeye değer desenleri çıkar.
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+Mevcut oturumu analiz et ve skill olarak kaydetmeye deÃ„Å¸er desenleri ÃƒÂ§Ã„Â±kar.
 
 ## Tetikleyici
 
-Önemsiz olmayan bir sorunu çözdüğünüzde, oturum sırasında herhangi bir noktada `/learn` komutunu çalıştırın.
+Ãƒâ€“nemsiz olmayan bir sorunu ÃƒÂ§ÃƒÂ¶zdÃƒÂ¼Ã„Å¸ÃƒÂ¼nÃƒÂ¼zde, oturum sÃ„Â±rasÃ„Â±nda herhangi bir noktada `/learn` komutunu ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±rÃ„Â±n.
 
-## Ne Çıkarılmalı
+## Ne Ãƒâ€¡Ã„Â±karÃ„Â±lmalÃ„Â±
 
-Şunları arayın:
+Ã…Å¾unlarÃ„Â± arayÃ„Â±n:
 
-1. **Hata Çözüm Desenleri**
-   - Hangi hata oluştu?
-   - Kök neden neydi?
-   - Onu ne düzeltti?
-   - Bu benzer hatalar için yeniden kullanılabilir mi?
+1. **Hata Ãƒâ€¡ÃƒÂ¶zÃƒÂ¼m Desenleri**
+   - Hangi hata oluÃ…Å¸tu?
+   - KÃƒÂ¶k neden neydi?
+   - Onu ne dÃƒÂ¼zeltti?
+   - Bu benzer hatalar iÃƒÂ§in yeniden kullanÃ„Â±labilir mi?
 
-2. **Hata Ayıklama Teknikleri**
-   - Bariz olmayan hata ayıklama adımları
-   - İşe yarayan araç kombinasyonları
-   - Tanılama desenleri
+2. **Hata AyÃ„Â±klama Teknikleri**
+   - Bariz olmayan hata ayÃ„Â±klama adÃ„Â±mlarÃ„Â±
+   - Ã„Â°Ã…Å¸e yarayan araÃƒÂ§ kombinasyonlarÃ„Â±
+   - TanÃ„Â±lama desenleri
 
-3. **Geçici Çözümler**
-   - Kütüphane gariplikleri
-   - API sınırlamaları
-   - Versiyona özel düzeltmeler
+3. **GeÃƒÂ§ici Ãƒâ€¡ÃƒÂ¶zÃƒÂ¼mler**
+   - KÃƒÂ¼tÃƒÂ¼phane gariplikleri
+   - API sÃ„Â±nÃ„Â±rlamalarÃ„Â±
+   - Versiyona ÃƒÂ¶zel dÃƒÂ¼zeltmeler
 
-4. **Projeye Özgü Desenler**
-   - Keşfedilen kod tabanı kuralları
+4. **Projeye Ãƒâ€“zgÃƒÂ¼ Desenler**
+   - KeÃ…Å¸fedilen kod tabanÃ„Â± kurallarÃ„Â±
    - Verilen mimari kararlar
    - Entegrasyon desenleri
 
-## Çıktı Formatı
+## Ãƒâ€¡Ã„Â±ktÃ„Â± FormatÃ„Â±
 
-`~/.claude/skills/learned/[desen-adi].md` konumunda bir skill dosyası oluştur:
+`~/.claude/skills/learned/[desen-adi].md` konumunda bir skill dosyasÃ„Â± oluÃ…Å¸tur:
 
 ```markdown
-# [Açıklayıcı Desen Adı]
+# [AÃƒÂ§Ã„Â±klayÃ„Â±cÃ„Â± Desen AdÃ„Â±]
 
-**Çıkarıldı:** [Tarih]
-**Bağlam:** [Bunun ne zaman geçerli olduğunun kısa açıklaması]
+**Ãƒâ€¡Ã„Â±karÃ„Â±ldÃ„Â±:** [Tarih]
+**BaÃ„Å¸lam:** [Bunun ne zaman geÃƒÂ§erli olduÃ„Å¸unun kÃ„Â±sa aÃƒÂ§Ã„Â±klamasÃ„Â±]
 
 ## Sorun
-[Bunun çözdüğü sorun - spesifik olun]
+[Bunun ÃƒÂ§ÃƒÂ¶zdÃƒÂ¼Ã„Å¸ÃƒÂ¼ sorun - spesifik olun]
 
-## Çözüm
-[Desen/teknik/geçici çözüm]
+## Ãƒâ€¡ÃƒÂ¶zÃƒÂ¼m
+[Desen/teknik/geÃƒÂ§ici ÃƒÂ§ÃƒÂ¶zÃƒÂ¼m]
 
-## Örnek
-[Uygulanabilirse kod örneği]
+## Ãƒâ€“rnek
+[Uygulanabilirse kod ÃƒÂ¶rneÃ„Å¸i]
 
-## Ne Zaman Kullanılır
-[Tetikleyici koşullar - bu skill'i neyin etkinleştirmesi gerektiği]
+## Ne Zaman KullanÃ„Â±lÃ„Â±r
+[Tetikleyici koÃ…Å¸ullar - bu skill'i neyin etkinleÃ…Å¸tirmesi gerektiÃ„Å¸i]
 ```
 
-## Süreç
+## SÃƒÂ¼reÃƒÂ§
 
-1. Çıkarılabilir desenler için oturumu incele
-2. En değerli/yeniden kullanılabilir içgörüyü tanımla
-3. Skill dosyasını taslak olarak hazırla
-4. Kaydetmeden önce kullanıcıdan onay iste
+1. Ãƒâ€¡Ã„Â±karÃ„Â±labilir desenler iÃƒÂ§in oturumu incele
+2. En deÃ„Å¸erli/yeniden kullanÃ„Â±labilir iÃƒÂ§gÃƒÂ¶rÃƒÂ¼yÃƒÂ¼ tanÃ„Â±mla
+3. Skill dosyasÃ„Â±nÃ„Â± taslak olarak hazÃ„Â±rla
+4. Kaydetmeden ÃƒÂ¶nce kullanÃ„Â±cÃ„Â±dan onay iste
 5. `~/.claude/skills/learned/` konumuna kaydet
 
 ## Notlar
 
-- Önemsiz düzeltmeleri çıkarmayın (yazım hataları, basit sözdizimi hataları)
-- Tek seferlik sorunları çıkarmayın (belirli API kesintileri, vb.)
-- Gelecekteki oturumlarda zaman kazandıracak desenlere odaklanın
-- Skill'leri odaklı tutun - skill başına bir desen
+- Ãƒâ€“nemsiz dÃƒÂ¼zeltmeleri ÃƒÂ§Ã„Â±karmayÃ„Â±n (yazÃ„Â±m hatalarÃ„Â±, basit sÃƒÂ¶zdizimi hatalarÃ„Â±)
+- Tek seferlik sorunlarÃ„Â± ÃƒÂ§Ã„Â±karmayÃ„Â±n (belirli API kesintileri, vb.)
+- Gelecekteki oturumlarda zaman kazandÃ„Â±racak desenlere odaklanÃ„Â±n
+- Skill'leri odaklÃ„Â± tutun - skill baÃ…Å¸Ã„Â±na bir desen

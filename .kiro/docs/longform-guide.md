@@ -1,8 +1,21 @@
 # Agentic Workflows: A Deep Dive
 
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
 ## Introduction
 
-This guide explores the philosophy and practice of agentic workflows—a development methodology where AI agents become active collaborators in the software development process. Rather than treating AI as a code completion tool, agentic workflows position AI as a thinking partner that can plan, execute, review, and iterate on complex tasks.
+This guide explores the philosophy and practice of agentic workflowsÃ¢â‚¬â€a development methodology where AI agents become active collaborators in the software development process. Rather than treating AI as a code completion tool, agentic workflows position AI as a thinking partner that can plan, execute, review, and iterate on complex tasks.
 
 ## What Are Agentic Workflows?
 
@@ -65,77 +78,77 @@ Hooks create a safety net and capture knowledge automatically.
 
 ```
 1. Invoke planner agent: "Plan a user authentication feature"
-   → Agent creates task breakdown with acceptance criteria
+   Ã¢â€ â€™ Agent creates task breakdown with acceptance criteria
 
 2. Invoke tdd-guide agent with tdd-workflow skill
-   → Agent writes failing tests first
-   → Agent implements minimal code to pass tests
-   → Agent refactors for quality
+   Ã¢â€ â€™ Agent writes failing tests first
+   Ã¢â€ â€™ Agent implements minimal code to pass tests
+   Ã¢â€ â€™ Agent refactors for quality
 
 3. Hooks trigger automatically:
-   → typecheck-on-edit runs after each file save
-   → code-review-on-write provides feedback after implementation
-   → quality-gate runs before commit
+   Ã¢â€ â€™ typecheck-on-edit runs after each file save
+   Ã¢â€ â€™ code-review-on-write provides feedback after implementation
+   Ã¢â€ â€™ quality-gate runs before commit
 
 4. Invoke code-reviewer agent for final review
-   → Agent checks for edge cases, error handling, documentation
+   Ã¢â€ â€™ Agent checks for edge cases, error handling, documentation
 ```
 
 ### Pattern 2: Security-First Development
 
 ```
 1. Enable security-review skill for the session
-   → Security patterns loaded into context
+   Ã¢â€ â€™ Security patterns loaded into context
 
 2. Invoke security-reviewer agent: "Review authentication implementation"
-   → Agent checks for common vulnerabilities
-   → Agent validates input sanitization
-   → Agent reviews cryptographic usage
+   Ã¢â€ â€™ Agent checks for common vulnerabilities
+   Ã¢â€ â€™ Agent validates input sanitization
+   Ã¢â€ â€™ Agent reviews cryptographic usage
 
 3. git-push-review hook triggers before push
-   → Agent performs final security check
-   → Agent blocks push if critical issues found
+   Ã¢â€ â€™ Agent performs final security check
+   Ã¢â€ â€™ Agent blocks push if critical issues found
 
 4. Update lessons-learned.md with security patterns
-   → extract-patterns hook suggests additions
+   Ã¢â€ â€™ extract-patterns hook suggests additions
 ```
 
 ### Pattern 3: Refactoring Legacy Code
 
 ```
 1. Invoke architect agent: "Analyze this module's architecture"
-   → Agent identifies coupling, cohesion issues
-   → Agent suggests refactoring strategy
+   Ã¢â€ â€™ Agent identifies coupling, cohesion issues
+   Ã¢â€ â€™ Agent suggests refactoring strategy
 
 2. Invoke refactor-cleaner agent with verification-loop skill
-   → Agent refactors incrementally
-   → Agent runs tests after each change
-   → Agent validates behavior preservation
+   Ã¢â€ â€™ Agent refactors incrementally
+   Ã¢â€ â€™ Agent runs tests after each change
+   Ã¢â€ â€™ Agent validates behavior preservation
 
 3. Invoke code-reviewer agent for quality check
-   → Agent ensures code quality improved
-   → Agent verifies documentation updated
+   Ã¢â€ â€™ Agent ensures code quality improved
+   Ã¢â€ â€™ Agent verifies documentation updated
 ```
 
 ### Pattern 4: Bug Investigation and Fix
 
 ```
 1. Invoke planner agent: "Investigate why login fails on mobile"
-   → Agent creates investigation plan
-   → Agent identifies files to examine
+   Ã¢â€ â€™ Agent creates investigation plan
+   Ã¢â€ â€™ Agent identifies files to examine
 
 2. Invoke build-error-resolver agent
-   → Agent reproduces the bug
-   → Agent writes failing test
-   → Agent implements fix
-   → Agent validates fix with tests
+   Ã¢â€ â€™ Agent reproduces the bug
+   Ã¢â€ â€™ Agent writes failing test
+   Ã¢â€ â€™ Agent implements fix
+   Ã¢â€ â€™ Agent validates fix with tests
 
 3. Invoke security-reviewer agent
-   → Agent ensures fix doesn't introduce vulnerabilities
+   Ã¢â€ â€™ Agent ensures fix doesn't introduce vulnerabilities
 
 4. doc-updater agent updates documentation
-   → Agent adds troubleshooting notes
-   → Agent updates changelog
+   Ã¢â€ â€™ Agent adds troubleshooting notes
+   Ã¢â€ â€™ Agent updates changelog
 ```
 
 ## Advanced Techniques
@@ -187,7 +200,7 @@ Each mode loads different rules and priorities.
 Chain specialized agents for complex workflows:
 
 ```
-planner → architect → tdd-guide → security-reviewer → doc-updater
+planner Ã¢â€ â€™ architect Ã¢â€ â€™ tdd-guide Ã¢â€ â€™ security-reviewer Ã¢â€ â€™ doc-updater
 ```
 
 Each agent builds on the previous agent's work, creating a pipeline.

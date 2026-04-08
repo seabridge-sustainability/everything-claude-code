@@ -1,29 +1,42 @@
-# 建置與修復
+# Ã¥Â»ÂºÃ§Â½Â®Ã¨Ë†â€¡Ã¤Â¿Â®Ã¥Â¾Â©
 
-增量修復 TypeScript 和建置錯誤：
+## Safety And Authorization Rule
 
-1. 執行建置：npm run build 或 pnpm build
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-2. 解析錯誤輸出：
-   - 依檔案分組
-   - 依嚴重性排序
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-3. 對每個錯誤：
-   - 顯示錯誤上下文（前後 5 行）
-   - 解釋問題
-   - 提出修復方案
-   - 套用修復
-   - 重新執行建置
-   - 驗證錯誤已解決
 
-4. 停止條件：
-   - 修復引入新錯誤
-   - 3 次嘗試後同樣錯誤仍存在
-   - 使用者要求暫停
+Ã¥Â¢Å¾Ã©â€¡ÂÃ¤Â¿Â®Ã¥Â¾Â© TypeScript Ã¥â€™Å’Ã¥Â»ÂºÃ§Â½Â®Ã©Å’Â¯Ã¨ÂªÂ¤Ã¯Â¼Å¡
 
-5. 顯示摘要：
-   - 已修復的錯誤
-   - 剩餘的錯誤
-   - 新引入的錯誤
+1. Ã¥Å¸Â·Ã¨Â¡Å’Ã¥Â»ÂºÃ§Â½Â®Ã¯Â¼Å¡npm run build Ã¦Ë†â€“ pnpm build
 
-為了安全，一次修復一個錯誤！
+2. Ã¨Â§Â£Ã¦Å¾ÂÃ©Å’Â¯Ã¨ÂªÂ¤Ã¨Â¼Â¸Ã¥â€¡ÂºÃ¯Â¼Å¡
+   - Ã¤Â¾ÂÃ¦Âªâ€Ã¦Â¡Ë†Ã¥Ë†â€ Ã§Âµâ€ž
+   - Ã¤Â¾ÂÃ¥Å¡Â´Ã©â€¡ÂÃ¦â‚¬Â§Ã¦Å½â€™Ã¥ÂºÂ
+
+3. Ã¥Â°ÂÃ¦Â¯ÂÃ¥â‚¬â€¹Ã©Å’Â¯Ã¨ÂªÂ¤Ã¯Â¼Å¡
+   - Ã©Â¡Â¯Ã§Â¤ÂºÃ©Å’Â¯Ã¨ÂªÂ¤Ã¤Â¸Å Ã¤Â¸â€¹Ã¦â€“â€¡Ã¯Â¼Ë†Ã¥â€°ÂÃ¥Â¾Å’ 5 Ã¨Â¡Å’Ã¯Â¼â€°
+   - Ã¨Â§Â£Ã©â€¡â€¹Ã¥â€¢ÂÃ©Â¡Å’
+   - Ã¦ÂÂÃ¥â€¡ÂºÃ¤Â¿Â®Ã¥Â¾Â©Ã¦â€“Â¹Ã¦Â¡Ë†
+   - Ã¥Â¥â€”Ã§â€Â¨Ã¤Â¿Â®Ã¥Â¾Â©
+   - Ã©â€¡ÂÃ¦â€“Â°Ã¥Å¸Â·Ã¨Â¡Å’Ã¥Â»ÂºÃ§Â½Â®
+   - Ã©Â©â€”Ã¨Â­â€°Ã©Å’Â¯Ã¨ÂªÂ¤Ã¥Â·Â²Ã¨Â§Â£Ã¦Â±Âº
+
+4. Ã¥ÂÅ“Ã¦Â­Â¢Ã¦Â¢ÂÃ¤Â»Â¶Ã¯Â¼Å¡
+   - Ã¤Â¿Â®Ã¥Â¾Â©Ã¥Â¼â€¢Ã¥â€¦Â¥Ã¦â€“Â°Ã©Å’Â¯Ã¨ÂªÂ¤
+   - 3 Ã¦Â¬Â¡Ã¥Ëœâ€”Ã¨Â©Â¦Ã¥Â¾Å’Ã¥ÂÅ’Ã¦Â¨Â£Ã©Å’Â¯Ã¨ÂªÂ¤Ã¤Â»ÂÃ¥Â­ËœÃ¥Å“Â¨
+   - Ã¤Â½Â¿Ã§â€Â¨Ã¨â‚¬â€¦Ã¨Â¦ÂÃ¦Â±â€šÃ¦Å¡Â«Ã¥ÂÅ“
+
+5. Ã©Â¡Â¯Ã§Â¤ÂºÃ¦â€˜ËœÃ¨Â¦ÂÃ¯Â¼Å¡
+   - Ã¥Â·Â²Ã¤Â¿Â®Ã¥Â¾Â©Ã§Å¡â€žÃ©Å’Â¯Ã¨ÂªÂ¤
+   - Ã¥â€°Â©Ã©Â¤ËœÃ§Å¡â€žÃ©Å’Â¯Ã¨ÂªÂ¤
+   - Ã¦â€“Â°Ã¥Â¼â€¢Ã¥â€¦Â¥Ã§Å¡â€žÃ©Å’Â¯Ã¨ÂªÂ¤
+
+Ã§â€šÂºÃ¤Âºâ€ Ã¥Â®â€°Ã¥â€¦Â¨Ã¯Â¼Å’Ã¤Â¸â‚¬Ã¦Â¬Â¡Ã¤Â¿Â®Ã¥Â¾Â©Ã¤Â¸â‚¬Ã¥â‚¬â€¹Ã©Å’Â¯Ã¨ÂªÂ¤Ã¯Â¼Â

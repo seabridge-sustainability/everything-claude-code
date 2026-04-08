@@ -1,5 +1,18 @@
 # Architecture Improvement Recommendations
 
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
 This document captures architect-level improvements for the Everything Claude Code (ECC) project. It is written from the perspective of a Claude Code coding architect aiming to improve maintainability, consistency, and long-term quality.
 
 ---
@@ -17,11 +30,11 @@ This document captures architect-level improvements for the Everything Claude Co
   - **Option B:** Maintain one `docs/catalog.json` (or YAML) that lists agents, commands, and skills with metadata; scripts and docs read from it. Requires discipline to update on add/remove.
 - **Short-term:** Manually sync AGENTS.md, README.md, and CLAUDE.md with actual counts and list any new agents (e.g. chief-of-staff, loop-operator, harness-optimizer) in the agent table.
 
-**Impact:** High — affects first impression and contributor trust.
+**Impact:** High Ã¢â‚¬â€ affects first impression and contributor trust.
 
 ---
 
-### 1.2 Command → Agent / Skill Map
+### 1.2 Command Ã¢â€ â€™ Agent / Skill Map
 
 **Issue:** There is no single machine- or human-readable map of "which command uses which agent(s) or skill(s)." This lives in README tables and individual command `.md` files, which can drift.
 
@@ -30,7 +43,7 @@ This document captures architect-level improvements for the Everything Claude Co
 - Add a **command registry** (e.g. in `docs/` or as frontmatter in command files) that lists for each command: name, description, primary agent(s), skills referenced. Can be generated from command file content or maintained by hand.
 - Expose a "map" in docs (e.g. `docs/COMMAND-AGENT-MAP.md`) or in the generated catalog for discoverability and for tooling (e.g. "which commands use tdd-guide?").
 
-**Impact:** Medium — improves discoverability and refactoring safety.
+**Impact:** Medium Ã¢â‚¬â€ improves discoverability and refactoring safety.
 
 ---
 
@@ -45,7 +58,7 @@ This document captures architect-level improvements for the Everything Claude Co
 - **Glob-based discovery:** Discover test files by pattern (e.g. `**/*.test.js` under `tests/`) and run them, with an optional allowlist/denylist for special cases. This makes new tests automatically part of the suite.
 - Keep a single entry point (`tests/run-all.js`) that runs discovered tests and aggregates results.
 
-**Impact:** High — prevents regression where new tests exist but are never executed.
+**Impact:** High Ã¢â‚¬â€ prevents regression where new tests exist but are never executed.
 
 ---
 
@@ -58,7 +71,7 @@ This document captures architect-level improvements for the Everything Claude Co
 - Introduce a coverage tool for Node scripts (e.g. `c8` or `nyc`) and run it in CI. Start with a baseline (e.g. 60%) and raise over time; or at least report coverage in CI without failing so the team can see trends.
 - Focus on `scripts/` (lib + hooks + ci) as the primary target; exclude one-off scripts if needed.
 
-**Impact:** Medium — aligns the project with its own AGENTS.md guidance (80%+ coverage) and surfaces untested paths.
+**Impact:** Medium Ã¢â‚¬â€ aligns the project with its own AGENTS.md guidance (80%+ coverage) and surfaces untested paths.
 
 ---
 
@@ -73,7 +86,7 @@ This document captures architect-level improvements for the Everything Claude Co
 - Use a JSON Schema validator (e.g. `ajv`) in `validate-hooks.js` to validate `hooks/hooks.json` against `schemas/hooks.schema.json`. Keep the validator as the single source of truth for structure; retain only hook-specific checks (e.g. inline JS syntax) in the script.
 - Ensures schema and validator stay in sync and allows IDE/editor validation via `$schema` in hooks.json.
 
-**Impact:** Medium — reduces drift and improves contributor experience when editing hooks.
+**Impact:** Medium Ã¢â‚¬â€ reduces drift and improves contributor experience when editing hooks.
 
 ---
 
@@ -88,7 +101,7 @@ This document captures architect-level improvements for the Everything Claude Co
 - Document in CONTRIBUTING.md that adding a skill may require updating `.agents/skills` and `.cursor/skills` (and how to do it).
 - Optionally: a CI check or script that compares `skills/` to the subsets and fails or warns if a skill is in one set but not the other when it should be (e.g. by convention or by a small manifest).
 
-**Impact:** Low–Medium — reduces cross-harness drift.
+**Impact:** LowÃ¢â‚¬â€œMedium Ã¢â‚¬â€ reduces cross-harness drift.
 
 ---
 
@@ -102,7 +115,7 @@ This document captures architect-level improvements for the Everything Claude Co
 - Consider: translation status file (e.g. `docs/i18n-status.md`) or CI that checks translation file existence/timestamps and warns if English was updated more recently than a translation.
 - Long-term: consider extraction/placeholder format (e.g. i18n keys) so translations reference the same structure as the English source.
 
-**Impact:** Medium — improves experience for non-English users and reduces confusion from outdated translations.
+**Impact:** Medium Ã¢â‚¬â€ improves experience for non-English users and reduces confusion from outdated translations.
 
 ---
 
@@ -117,7 +130,7 @@ This document captures architect-level improvements for the Everything Claude Co
 - Prefer Node for new hooks when possible (cross-platform, single runtime). If shell is required, document why and keep the surface small.
 - Ensure `ECC_HOOK_PROFILE` and `ECC_DISABLED_HOOKS` are respected in all code paths (including shell) so behavior is consistent.
 
-**Impact:** Low — maintains current design; improves if more hooks migrate to Node.
+**Impact:** Low Ã¢â‚¬â€ maintains current design; improves if more hooks migrate to Node.
 
 ---
 
@@ -130,8 +143,8 @@ This document captures architect-level improvements for the Everything Claude Co
 | Test discovery    | Glob-based test runner               | High     | Low     |
 | Coverage          | Add c8/nyc and CI coverage           | Medium   | Medium  |
 | Hook schema in CI | Validate hooks.json via schema       | Medium   | Low     |
-| Command map       | Command → agent/skill registry       | Medium   | Medium  |
-| Subset sync       | Document/CI for .agents/.cursor       | Low–Med  | Low–Med |
+| Command map       | Command Ã¢â€ â€™ agent/skill registry       | Medium   | Medium  |
+| Subset sync       | Document/CI for .agents/.cursor       | LowÃ¢â‚¬â€œMed  | LowÃ¢â‚¬â€œMed |
 | Translations      | Process + stale detection             | Medium   | Medium  |
 | Hook runtime      | Prefer Node; document shell use       | Low      | Low     |
 

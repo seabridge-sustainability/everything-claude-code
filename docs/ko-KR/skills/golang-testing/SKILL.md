@@ -1,33 +1,46 @@
 ---
 name: golang-testing
-description: 테이블 주도 테스트, 서브테스트, 벤치마크, 퍼징, 테스트 커버리지를 포함한 Go 테스팅 패턴. 관용적 Go 관행과 함께 TDD 방법론을 따릅니다.
+description: Ã­â€¦Å’Ã¬ÂÂ´Ã«Â¸â€ Ã¬Â£Â¼Ã«Ââ€ž Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸, Ã¬â€žÅ“Ã«Â¸Å’Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸, Ã«Â²Â¤Ã¬Â¹ËœÃ«Â§Ë†Ã­ÂÂ¬, Ã­ÂÂ¼Ã¬Â§â€¢, Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸ Ã¬Â»Â¤Ã«Â²â€žÃ«Â¦Â¬Ã¬Â§â‚¬Ã«Â¥Â¼ Ã­ÂÂ¬Ã­â€¢Â¨Ã­â€¢Å“ Go Ã­â€¦Å’Ã¬Å Â¤Ã­Å’â€¦ Ã­Å’Â¨Ã­â€žÂ´. ÃªÂ´â‚¬Ã¬Å¡Â©Ã¬Â Â Go ÃªÂ´â‚¬Ã­â€“â€°ÃªÂ³Â¼ Ã­â€¢Â¨ÃªÂ»Ëœ TDD Ã«Â°Â©Ã«Â²â€¢Ã«Â¡Â Ã¬Ââ€ž Ã«â€Â°Ã«Â¦â€¦Ã«â€¹Ë†Ã«â€¹Â¤.
 origin: ECC
 ---
 
-# Go 테스팅 패턴
+# Go Ã­â€¦Å’Ã¬Å Â¤Ã­Å’â€¦ Ã­Å’Â¨Ã­â€žÂ´
 
-TDD 방법론을 따르는 신뢰할 수 있고 유지보수 가능한 테스트 작성을 위한 포괄적인 Go 테스팅 패턴.
+## Safety And Authorization Rule
 
-## 활성화 시점
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-- 새로운 Go 함수나 메서드 작성 시
-- 기존 코드에 테스트 커버리지 추가 시
-- 성능이 중요한 코드에 벤치마크 생성 시
-- 입력 유효성 검사를 위한 퍼즈 테스트 구현 시
-- Go 프로젝트에서 TDD 워크플로우 따를 시
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-## Go에서의 TDD 워크플로우
 
-### RED-GREEN-REFACTOR 사이클
+TDD Ã«Â°Â©Ã«Â²â€¢Ã«Â¡Â Ã¬Ââ€ž Ã«â€Â°Ã«Â¥Â´Ã«Å â€ Ã¬â€¹Â Ã«Â¢Â°Ã­â€¢Â  Ã¬Ë†Ëœ Ã¬Å¾Ë†ÃªÂ³Â  Ã¬Å“Â Ã¬Â§â‚¬Ã«Â³Â´Ã¬Ë†Ëœ ÃªÂ°â‚¬Ã«Å Â¥Ã­â€¢Å“ Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸ Ã¬Å¾â€˜Ã¬â€žÂ±Ã¬Ââ€ž Ã¬Å“â€žÃ­â€¢Å“ Ã­ÂÂ¬ÃªÂ´â€žÃ¬Â ÂÃ¬ÂÂ¸ Go Ã­â€¦Å’Ã¬Å Â¤Ã­Å’â€¦ Ã­Å’Â¨Ã­â€žÂ´.
+
+## Ã­â„¢Å“Ã¬â€žÂ±Ã­â„¢â€ Ã¬â€¹Å“Ã¬Â Â
+
+- Ã¬Æ’Ë†Ã«Â¡Å“Ã¬Å¡Â´ Go Ã­â€¢Â¨Ã¬Ë†ËœÃ«â€šËœ Ã«Â©â€Ã¬â€žÅ“Ã«â€œÅ“ Ã¬Å¾â€˜Ã¬â€žÂ± Ã¬â€¹Å“
+- ÃªÂ¸Â°Ã¬Â¡Â´ Ã¬Â½â€Ã«â€œÅ“Ã¬â€”Â Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸ Ã¬Â»Â¤Ã«Â²â€žÃ«Â¦Â¬Ã¬Â§â‚¬ Ã¬Â¶â€ÃªÂ°â‚¬ Ã¬â€¹Å“
+- Ã¬â€žÂ±Ã«Å Â¥Ã¬ÂÂ´ Ã¬Â¤â€˜Ã¬Å¡â€Ã­â€¢Å“ Ã¬Â½â€Ã«â€œÅ“Ã¬â€”Â Ã«Â²Â¤Ã¬Â¹ËœÃ«Â§Ë†Ã­ÂÂ¬ Ã¬Æ’ÂÃ¬â€žÂ± Ã¬â€¹Å“
+- Ã¬Å¾â€¦Ã«Â Â¥ Ã¬Å“Â Ã­Å¡Â¨Ã¬â€žÂ± ÃªÂ²â‚¬Ã¬â€šÂ¬Ã«Â¥Â¼ Ã¬Å“â€žÃ­â€¢Å“ Ã­ÂÂ¼Ã¬Â¦Ë† Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸ ÃªÂµÂ¬Ã­Ëœâ€ž Ã¬â€¹Å“
+- Go Ã­â€â€žÃ«Â¡Å“Ã¬Â ÂÃ­Å Â¸Ã¬â€”ÂÃ¬â€žÅ“ TDD Ã¬â€ºÅ’Ã­ÂÂ¬Ã­â€Å’Ã«Â¡Å“Ã¬Å¡Â° Ã«â€Â°Ã«Â¥Â¼ Ã¬â€¹Å“
+
+## GoÃ¬â€”ÂÃ¬â€žÅ“Ã¬ÂËœ TDD Ã¬â€ºÅ’Ã­ÂÂ¬Ã­â€Å’Ã«Â¡Å“Ã¬Å¡Â°
+
+### RED-GREEN-REFACTOR Ã¬â€šÂ¬Ã¬ÂÂ´Ã­ÂÂ´
 
 ```
-RED     → Write a failing test first
-GREEN   → Write minimal code to pass the test
-REFACTOR → Improve code while keeping tests green
-REPEAT  → Continue with next requirement
+RED     Ã¢â€ â€™ Write a failing test first
+GREEN   Ã¢â€ â€™ Write minimal code to pass the test
+REFACTOR Ã¢â€ â€™ Improve code while keeping tests green
+REPEAT  Ã¢â€ â€™ Continue with next requirement
 ```
 
-### Go에서의 단계별 TDD
+### GoÃ¬â€”ÂÃ¬â€žÅ“Ã¬ÂËœ Ã«â€¹Â¨ÃªÂ³â€žÃ«Â³â€ž TDD
 
 ```go
 // Step 1: Define the interface/signature
@@ -69,9 +82,9 @@ func Add(a, b int) int {
 // Step 6: Refactor if needed, verify tests still pass
 ```
 
-## 테이블 주도 테스트
+## Ã­â€¦Å’Ã¬ÂÂ´Ã«Â¸â€ Ã¬Â£Â¼Ã«Ââ€ž Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸
 
-Go 테스트의 표준 패턴. 최소한의 코드로 포괄적인 커버리지를 가능하게 합니다.
+Go Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸Ã¬ÂËœ Ã­â€˜Å“Ã¬Â¤â‚¬ Ã­Å’Â¨Ã­â€žÂ´. Ã¬ÂµÅ“Ã¬â€ Å’Ã­â€¢Å“Ã¬ÂËœ Ã¬Â½â€Ã«â€œÅ“Ã«Â¡Å“ Ã­ÂÂ¬ÃªÂ´â€žÃ¬Â ÂÃ¬ÂÂ¸ Ã¬Â»Â¤Ã«Â²â€žÃ«Â¦Â¬Ã¬Â§â‚¬Ã«Â¥Â¼ ÃªÂ°â‚¬Ã«Å Â¥Ã­â€¢ËœÃªÂ²Å’ Ã­â€¢Â©Ã«â€¹Ë†Ã«â€¹Â¤.
 
 ```go
 func TestAdd(t *testing.T) {
@@ -99,7 +112,7 @@ func TestAdd(t *testing.T) {
 }
 ```
 
-### 에러 케이스가 있는 테이블 주도 테스트
+### Ã¬â€”ÂÃ«Å¸Â¬ Ã¬Â¼â‚¬Ã¬ÂÂ´Ã¬Å Â¤ÃªÂ°â‚¬ Ã¬Å¾Ë†Ã«Å â€ Ã­â€¦Å’Ã¬ÂÂ´Ã«Â¸â€ Ã¬Â£Â¼Ã«Ââ€ž Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸
 
 ```go
 func TestParseConfig(t *testing.T) {
@@ -154,9 +167,9 @@ func TestParseConfig(t *testing.T) {
 }
 ```
 
-## 서브테스트 및 서브벤치마크
+## Ã¬â€žÅ“Ã«Â¸Å’Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸ Ã«Â°Â Ã¬â€žÅ“Ã«Â¸Å’Ã«Â²Â¤Ã¬Â¹ËœÃ«Â§Ë†Ã­ÂÂ¬
 
-### 관련 테스트 구성
+### ÃªÂ´â‚¬Ã«Â Â¨ Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸ ÃªÂµÂ¬Ã¬â€žÂ±
 
 ```go
 func TestUser(t *testing.T) {
@@ -194,7 +207,7 @@ func TestUser(t *testing.T) {
 }
 ```
 
-### 병렬 서브테스트
+### Ã«Â³â€˜Ã«Â Â¬ Ã¬â€žÅ“Ã«Â¸Å’Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸
 
 ```go
 func TestParallel(t *testing.T) {
@@ -219,9 +232,9 @@ func TestParallel(t *testing.T) {
 }
 ```
 
-## 테스트 헬퍼
+## Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸ Ã­â€”Â¬Ã­ÂÂ¼
 
-### 헬퍼 함수
+### Ã­â€”Â¬Ã­ÂÂ¼ Ã­â€¢Â¨Ã¬Ë†Ëœ
 
 ```go
 func setupTestDB(t *testing.T) *sql.DB {
@@ -260,7 +273,7 @@ func assertEqual[T comparable](t *testing.T, got, want T) {
 }
 ```
 
-### 임시 파일 및 디렉터리
+### Ã¬Å¾â€žÃ¬â€¹Å“ Ã­Å’Å’Ã¬ÂÂ¼ Ã«Â°Â Ã«â€â€Ã«Â â€°Ã­â€žÂ°Ã«Â¦Â¬
 
 ```go
 func TestFileProcessing(t *testing.T) {
@@ -285,9 +298,9 @@ func TestFileProcessing(t *testing.T) {
 }
 ```
 
-## 골든 파일
+## ÃªÂ³Â¨Ã«â€œÂ  Ã­Å’Å’Ã¬ÂÂ¼
 
-`testdata/`에 저장된 예상 출력 파일에 대한 테스트.
+`testdata/`Ã¬â€”Â Ã¬Â â‚¬Ã¬Å¾Â¥Ã«ÂÅ“ Ã¬ËœË†Ã¬Æ’Â Ã¬Â¶Å“Ã«Â Â¥ Ã­Å’Å’Ã¬ÂÂ¼Ã¬â€”Â Ã«Å’â‚¬Ã­â€¢Å“ Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸.
 
 ```go
 var update = flag.Bool("update", false, "update golden files")
@@ -328,9 +341,9 @@ func TestRender(t *testing.T) {
 }
 ```
 
-## 인터페이스를 사용한 모킹
+## Ã¬ÂÂ¸Ã­â€žÂ°Ã­Å½ËœÃ¬ÂÂ´Ã¬Å Â¤Ã«Â¥Â¼ Ã¬â€šÂ¬Ã¬Å¡Â©Ã­â€¢Å“ Ã«ÂªÂ¨Ã­â€šÂ¹
 
-### 인터페이스 기반 모킹
+### Ã¬ÂÂ¸Ã­â€žÂ°Ã­Å½ËœÃ¬ÂÂ´Ã¬Å Â¤ ÃªÂ¸Â°Ã«Â°Ëœ Ã«ÂªÂ¨Ã­â€šÂ¹
 
 ```go
 // Define interface for dependencies
@@ -385,9 +398,9 @@ func TestUserService(t *testing.T) {
 }
 ```
 
-## 벤치마크
+## Ã«Â²Â¤Ã¬Â¹ËœÃ«Â§Ë†Ã­ÂÂ¬
 
-### 기본 벤치마크
+### ÃªÂ¸Â°Ã«Â³Â¸ Ã«Â²Â¤Ã¬Â¹ËœÃ«Â§Ë†Ã­ÂÂ¬
 
 ```go
 func BenchmarkProcess(b *testing.B) {
@@ -403,7 +416,7 @@ func BenchmarkProcess(b *testing.B) {
 // Output: BenchmarkProcess-8   10000   105234 ns/op   4096 B/op   10 allocs/op
 ```
 
-### 다양한 크기의 벤치마크
+### Ã«â€¹Â¤Ã¬â€“â€˜Ã­â€¢Å“ Ã­ÂÂ¬ÃªÂ¸Â°Ã¬ÂËœ Ã«Â²Â¤Ã¬Â¹ËœÃ«Â§Ë†Ã­ÂÂ¬
 
 ```go
 func BenchmarkSort(b *testing.B) {
@@ -425,7 +438,7 @@ func BenchmarkSort(b *testing.B) {
 }
 ```
 
-### 메모리 할당 벤치마크
+### Ã«Â©â€Ã«ÂªÂ¨Ã«Â¦Â¬ Ã­â€¢Â Ã«â€¹Â¹ Ã«Â²Â¤Ã¬Â¹ËœÃ«Â§Ë†Ã­ÂÂ¬
 
 ```go
 func BenchmarkStringConcat(b *testing.B) {
@@ -459,9 +472,9 @@ func BenchmarkStringConcat(b *testing.B) {
 }
 ```
 
-## 퍼징 (Go 1.18+)
+## Ã­ÂÂ¼Ã¬Â§â€¢ (Go 1.18+)
 
-### 기본 퍼즈 테스트
+### ÃªÂ¸Â°Ã«Â³Â¸ Ã­ÂÂ¼Ã¬Â¦Ë† Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸
 
 ```go
 func FuzzParseJSON(f *testing.F) {
@@ -491,7 +504,7 @@ func FuzzParseJSON(f *testing.F) {
 // Run: go test -fuzz=FuzzParseJSON -fuzztime=30s
 ```
 
-### 다중 입력 퍼즈 테스트
+### Ã«â€¹Â¤Ã¬Â¤â€˜ Ã¬Å¾â€¦Ã«Â Â¥ Ã­ÂÂ¼Ã¬Â¦Ë† Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸
 
 ```go
 func FuzzCompare(f *testing.F) {
@@ -519,9 +532,9 @@ func FuzzCompare(f *testing.F) {
 }
 ```
 
-## 테스트 커버리지
+## Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸ Ã¬Â»Â¤Ã«Â²â€žÃ«Â¦Â¬Ã¬Â§â‚¬
 
-### 커버리지 실행
+### Ã¬Â»Â¤Ã«Â²â€žÃ«Â¦Â¬Ã¬Â§â‚¬ Ã¬â€¹Â¤Ã­â€“â€°
 
 ```bash
 # Basic coverage
@@ -540,16 +553,16 @@ go tool cover -func=coverage.out
 go test -race -coverprofile=coverage.out ./...
 ```
 
-### 커버리지 목표
+### Ã¬Â»Â¤Ã«Â²â€žÃ«Â¦Â¬Ã¬Â§â‚¬ Ã«ÂªÂ©Ã­â€˜Å“
 
-| 코드 유형 | 목표 |
+| Ã¬Â½â€Ã«â€œÅ“ Ã¬Å“Â Ã­Ëœâ€¢ | Ã«ÂªÂ©Ã­â€˜Å“ |
 |-----------|--------|
-| 핵심 비즈니스 로직 | 100% |
-| 공개 API | 90%+ |
-| 일반 코드 | 80%+ |
-| 생성된 코드 | 제외 |
+| Ã­â€¢ÂµÃ¬â€¹Â¬ Ã«Â¹â€žÃ¬Â¦Ë†Ã«â€¹Ë†Ã¬Å Â¤ Ã«Â¡Å“Ã¬Â§Â | 100% |
+| ÃªÂ³ÂµÃªÂ°Å“ API | 90%+ |
+| Ã¬ÂÂ¼Ã«Â°Ëœ Ã¬Â½â€Ã«â€œÅ“ | 80%+ |
+| Ã¬Æ’ÂÃ¬â€žÂ±Ã«ÂÅ“ Ã¬Â½â€Ã«â€œÅ“ | Ã¬Â Å“Ã¬â„¢Â¸ |
 
-### 생성된 코드를 커버리지에서 제외
+### Ã¬Æ’ÂÃ¬â€žÂ±Ã«ÂÅ“ Ã¬Â½â€Ã«â€œÅ“Ã«Â¥Â¼ Ã¬Â»Â¤Ã«Â²â€žÃ«Â¦Â¬Ã¬Â§â‚¬Ã¬â€”ÂÃ¬â€žÅ“ Ã¬Â Å“Ã¬â„¢Â¸
 
 ```go
 //go:generate mockgen -source=interface.go -destination=mock_interface.go
@@ -558,7 +571,7 @@ go test -race -coverprofile=coverage.out ./...
 // go test -cover -tags=!generate ./...
 ```
 
-## HTTP 핸들러 테스팅
+## HTTP Ã­â€¢Â¸Ã«â€œÂ¤Ã«Å¸Â¬ Ã­â€¦Å’Ã¬Å Â¤Ã­Å’â€¦
 
 ```go
 func TestHealthHandler(t *testing.T) {
@@ -641,7 +654,7 @@ func TestAPIHandler(t *testing.T) {
 }
 ```
 
-## 테스팅 명령어
+## Ã­â€¦Å’Ã¬Å Â¤Ã­Å’â€¦ Ã«Âªâ€¦Ã«Â Â¹Ã¬â€“Â´
 
 ```bash
 # Run all tests
@@ -678,25 +691,25 @@ go test -fuzz=FuzzParse -fuzztime=30s ./...
 go test -count=10 ./...
 ```
 
-## 모범 사례
+## Ã«ÂªÂ¨Ã«Â²â€ Ã¬â€šÂ¬Ã«Â¡â‚¬
 
-**해야 할 것:**
-- 테스트를 먼저 작성 (TDD)
-- 포괄적인 커버리지를 위해 테이블 주도 테스트 사용
-- 구현이 아닌 동작을 테스트
-- 헬퍼 함수에서 `t.Helper()` 사용
-- 독립적인 테스트에 `t.Parallel()` 사용
-- `t.Cleanup()`으로 리소스 정리
-- 시나리오를 설명하는 의미 있는 테스트 이름 사용
+**Ã­â€¢Â´Ã¬â€¢Â¼ Ã­â€¢Â  ÃªÂ²Æ’:**
+- Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸Ã«Â¥Â¼ Ã«Â¨Â¼Ã¬Â â‚¬ Ã¬Å¾â€˜Ã¬â€žÂ± (TDD)
+- Ã­ÂÂ¬ÃªÂ´â€žÃ¬Â ÂÃ¬ÂÂ¸ Ã¬Â»Â¤Ã«Â²â€žÃ«Â¦Â¬Ã¬Â§â‚¬Ã«Â¥Â¼ Ã¬Å“â€žÃ­â€¢Â´ Ã­â€¦Å’Ã¬ÂÂ´Ã«Â¸â€ Ã¬Â£Â¼Ã«Ââ€ž Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸ Ã¬â€šÂ¬Ã¬Å¡Â©
+- ÃªÂµÂ¬Ã­Ëœâ€žÃ¬ÂÂ´ Ã¬â€¢â€žÃ«â€¹Å’ Ã«Ââ„¢Ã¬Å¾â€˜Ã¬Ââ€ž Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸
+- Ã­â€”Â¬Ã­ÂÂ¼ Ã­â€¢Â¨Ã¬Ë†ËœÃ¬â€”ÂÃ¬â€žÅ“ `t.Helper()` Ã¬â€šÂ¬Ã¬Å¡Â©
+- Ã«Ââ€¦Ã«Â¦Â½Ã¬Â ÂÃ¬ÂÂ¸ Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸Ã¬â€”Â `t.Parallel()` Ã¬â€šÂ¬Ã¬Å¡Â©
+- `t.Cleanup()`Ã¬Å“Â¼Ã«Â¡Å“ Ã«Â¦Â¬Ã¬â€ Å’Ã¬Å Â¤ Ã¬Â â€¢Ã«Â¦Â¬
+- Ã¬â€¹Å“Ã«â€šËœÃ«Â¦Â¬Ã¬ËœÂ¤Ã«Â¥Â¼ Ã¬â€žÂ¤Ã«Âªâ€¦Ã­â€¢ËœÃ«Å â€ Ã¬ÂËœÃ«Â¯Â¸ Ã¬Å¾Ë†Ã«Å â€ Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸ Ã¬ÂÂ´Ã«Â¦â€ž Ã¬â€šÂ¬Ã¬Å¡Â©
 
-**하지 말아야 할 것:**
-- 비공개 함수를 직접 테스트 (공개 API를 통해 테스트)
-- 테스트에서 `time.Sleep()` 사용 (채널이나 조건 사용)
-- 불안정한 테스트 무시 (수정하거나 제거)
-- 모든 것을 모킹 (가능하면 통합 테스트 선호)
-- 에러 경로 테스트 생략
+**Ã­â€¢ËœÃ¬Â§â‚¬ Ã«Â§ÂÃ¬â€¢â€žÃ¬â€¢Â¼ Ã­â€¢Â  ÃªÂ²Æ’:**
+- Ã«Â¹â€žÃªÂ³ÂµÃªÂ°Å“ Ã­â€¢Â¨Ã¬Ë†ËœÃ«Â¥Â¼ Ã¬Â§ÂÃ¬Â â€˜ Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸ (ÃªÂ³ÂµÃªÂ°Å“ APIÃ«Â¥Â¼ Ã­â€ ÂµÃ­â€¢Â´ Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸)
+- Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸Ã¬â€”ÂÃ¬â€žÅ“ `time.Sleep()` Ã¬â€šÂ¬Ã¬Å¡Â© (Ã¬Â±â€žÃ«â€žÂÃ¬ÂÂ´Ã«â€šËœ Ã¬Â¡Â°ÃªÂ±Â´ Ã¬â€šÂ¬Ã¬Å¡Â©)
+- Ã«Â¶Ë†Ã¬â€¢Ë†Ã¬Â â€¢Ã­â€¢Å“ Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸ Ã«Â¬Â´Ã¬â€¹Å“ (Ã¬Ë†ËœÃ¬Â â€¢Ã­â€¢ËœÃªÂ±Â°Ã«â€šËœ Ã¬Â Å“ÃªÂ±Â°)
+- Ã«ÂªÂ¨Ã«â€œÂ  ÃªÂ²Æ’Ã¬Ââ€ž Ã«ÂªÂ¨Ã­â€šÂ¹ (ÃªÂ°â‚¬Ã«Å Â¥Ã­â€¢ËœÃ«Â©Â´ Ã­â€ ÂµÃ­â€¢Â© Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸ Ã¬â€žÂ Ã­ËœÂ¸)
+- Ã¬â€”ÂÃ«Å¸Â¬ ÃªÂ²Â½Ã«Â¡Å“ Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸ Ã¬Æ’ÂÃ«Å¾Âµ
 
-## CI/CD 통합
+## CI/CD Ã­â€ ÂµÃ­â€¢Â©
 
 ```yaml
 # GitHub Actions example
@@ -717,4 +730,4 @@ test:
         awk -F'%' '{if ($1 < 80) exit 1}'
 ```
 
-**기억하세요**: 테스트는 문서입니다. 코드가 어떻게 사용되어야 하는지를 보여줍니다. 명확하게 작성하고 최신 상태로 유지하세요.
+**ÃªÂ¸Â°Ã¬â€“ÂµÃ­â€¢ËœÃ¬â€žÂ¸Ã¬Å¡â€**: Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸Ã«Å â€ Ã«Â¬Â¸Ã¬â€žÅ“Ã¬Å¾â€¦Ã«â€¹Ë†Ã«â€¹Â¤. Ã¬Â½â€Ã«â€œÅ“ÃªÂ°â‚¬ Ã¬â€“Â´Ã«â€“Â»ÃªÂ²Å’ Ã¬â€šÂ¬Ã¬Å¡Â©Ã«ÂËœÃ¬â€“Â´Ã¬â€¢Â¼ Ã­â€¢ËœÃ«Å â€Ã¬Â§â‚¬Ã«Â¥Â¼ Ã«Â³Â´Ã¬â€”Â¬Ã¬Â¤ÂÃ«â€¹Ë†Ã«â€¹Â¤. Ã«Âªâ€¦Ã­â„¢â€¢Ã­â€¢ËœÃªÂ²Å’ Ã¬Å¾â€˜Ã¬â€žÂ±Ã­â€¢ËœÃªÂ³Â  Ã¬ÂµÅ“Ã¬â€¹Â  Ã¬Æ’ÂÃ­Æ’Å“Ã«Â¡Å“ Ã¬Å“Â Ã¬Â§â‚¬Ã­â€¢ËœÃ¬â€žÂ¸Ã¬Å¡â€.

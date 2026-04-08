@@ -1,104 +1,117 @@
-# 術語對照表 (Terminology Glossary)
+# Ã¨Â¡â€œÃ¨ÂªÅ¾Ã¥Â°ÂÃ§â€¦Â§Ã¨Â¡Â¨ (Terminology Glossary)
 
-本文件記錄繁體中文翻譯的術語對照，確保翻譯一致性。
+## Safety And Authorization Rule
 
-## 狀態說明
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-- **已確認 (Confirmed)**: 經使用者確認的翻譯
-- **待確認 (Pending)**: 待使用者審核的翻譯
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+Ã¦Å“Â¬Ã¦â€“â€¡Ã¤Â»Â¶Ã¨Â¨ËœÃ©Å’â€žÃ§Â¹ÂÃ©Â«â€Ã¤Â¸Â­Ã¦â€“â€¡Ã§Â¿Â»Ã¨Â­Â¯Ã§Å¡â€žÃ¨Â¡â€œÃ¨ÂªÅ¾Ã¥Â°ÂÃ§â€¦Â§Ã¯Â¼Å’Ã§Â¢ÂºÃ¤Â¿ÂÃ§Â¿Â»Ã¨Â­Â¯Ã¤Â¸â‚¬Ã¨â€¡Â´Ã¦â‚¬Â§Ã£â‚¬â€š
+
+## Ã§â€¹â‚¬Ã¦â€¦â€¹Ã¨ÂªÂªÃ¦ËœÅ½
+
+- **Ã¥Â·Â²Ã§Â¢ÂºÃ¨ÂªÂ (Confirmed)**: Ã§Â¶â€œÃ¤Â½Â¿Ã§â€Â¨Ã¨â‚¬â€¦Ã§Â¢ÂºÃ¨ÂªÂÃ§Å¡â€žÃ§Â¿Â»Ã¨Â­Â¯
+- **Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ (Pending)**: Ã¥Â¾â€¦Ã¤Â½Â¿Ã§â€Â¨Ã¨â‚¬â€¦Ã¥Â¯Â©Ã¦Â Â¸Ã§Å¡â€žÃ§Â¿Â»Ã¨Â­Â¯
 
 ---
 
-## 術語表
+## Ã¨Â¡â€œÃ¨ÂªÅ¾Ã¨Â¡Â¨
 
-| English | zh-TW | 狀態 | 備註 |
+| English | zh-TW | Ã§â€¹â‚¬Ã¦â€¦â€¹ | Ã¥â€šâ„¢Ã¨Â¨Â» |
 |---------|-------|------|------|
-| Agent | Agent | 已確認 | 保留英文 |
-| Hook | Hook | 已確認 | 保留英文 |
-| Plugin | 外掛 | 已確認 | 台灣慣用 |
-| Token | Token | 已確認 | 保留英文 |
-| Skill | 技能 | 待確認 | |
-| Command | 指令 | 待確認 | |
-| Rule | 規則 | 待確認 | |
-| TDD (Test-Driven Development) | TDD（測試驅動開發） | 待確認 | 首次使用展開 |
-| E2E (End-to-End) | E2E（端對端） | 待確認 | 首次使用展開 |
-| API | API | 待確認 | 保留英文 |
-| CLI | CLI | 待確認 | 保留英文 |
-| IDE | IDE | 待確認 | 保留英文 |
-| MCP (Model Context Protocol) | MCP | 待確認 | 保留英文 |
-| Workflow | 工作流程 | 待確認 | |
-| Codebase | 程式碼庫 | 待確認 | |
-| Coverage | 覆蓋率 | 待確認 | |
-| Build | 建置 | 待確認 | |
-| Debug | 除錯 | 待確認 | |
-| Deploy | 部署 | 待確認 | |
-| Commit | Commit | 待確認 | Git 術語保留英文 |
-| PR (Pull Request) | PR | 待確認 | 保留英文 |
-| Branch | 分支 | 待確認 | |
-| Merge | 合併 | 待確認 | |
-| Repository | 儲存庫 | 待確認 | |
-| Fork | Fork | 待確認 | 保留英文 |
-| Supabase | Supabase | - | 產品名稱保留 |
-| Redis | Redis | - | 產品名稱保留 |
-| Playwright | Playwright | - | 產品名稱保留 |
-| TypeScript | TypeScript | - | 語言名稱保留 |
-| JavaScript | JavaScript | - | 語言名稱保留 |
-| Go/Golang | Go | - | 語言名稱保留 |
-| React | React | - | 框架名稱保留 |
-| Next.js | Next.js | - | 框架名稱保留 |
-| PostgreSQL | PostgreSQL | - | 產品名稱保留 |
-| RLS (Row Level Security) | RLS（列層級安全性） | 待確認 | 首次使用展開 |
-| OWASP | OWASP | - | 保留英文 |
-| XSS | XSS | - | 保留英文 |
-| SQL Injection | SQL 注入 | 待確認 | |
-| CSRF | CSRF | - | 保留英文 |
-| Refactor | 重構 | 待確認 | |
-| Dead Code | 無用程式碼 | 待確認 | |
-| Lint/Linter | Lint | 待確認 | 保留英文 |
-| Code Review | 程式碼審查 | 待確認 | |
-| Security Review | 安全性審查 | 待確認 | |
-| Best Practices | 最佳實務 | 待確認 | |
-| Edge Case | 邊界情況 | 待確認 | |
-| Happy Path | 正常流程 | 待確認 | |
-| Fallback | 備援方案 | 待確認 | |
-| Cache | 快取 | 待確認 | |
-| Queue | 佇列 | 待確認 | |
-| Pagination | 分頁 | 待確認 | |
-| Cursor | 游標 | 待確認 | |
-| Index | 索引 | 待確認 | |
-| Schema | 結構描述 | 待確認 | |
-| Migration | 遷移 | 待確認 | |
-| Transaction | 交易 | 待確認 | |
-| Concurrency | 並行 | 待確認 | |
-| Goroutine | Goroutine | - | Go 術語保留 |
-| Channel | Channel | 待確認 | Go context 可保留 |
-| Mutex | Mutex | - | 保留英文 |
-| Interface | 介面 | 待確認 | |
-| Struct | Struct | - | Go 術語保留 |
-| Mock | Mock | 待確認 | 測試術語可保留 |
-| Stub | Stub | 待確認 | 測試術語可保留 |
-| Fixture | Fixture | 待確認 | 測試術語可保留 |
-| Assertion | 斷言 | 待確認 | |
-| Snapshot | 快照 | 待確認 | |
-| Trace | 追蹤 | 待確認 | |
-| Artifact | 產出物 | 待確認 | |
-| CI/CD | CI/CD | - | 保留英文 |
-| Pipeline | 管線 | 待確認 | |
+| Agent | Agent | Ã¥Â·Â²Ã§Â¢ÂºÃ¨ÂªÂ | Ã¤Â¿ÂÃ§â€¢â„¢Ã¨â€¹Â±Ã¦â€“â€¡ |
+| Hook | Hook | Ã¥Â·Â²Ã§Â¢ÂºÃ¨ÂªÂ | Ã¤Â¿ÂÃ§â€¢â„¢Ã¨â€¹Â±Ã¦â€“â€¡ |
+| Plugin | Ã¥Â¤â€“Ã¦Å½â€º | Ã¥Â·Â²Ã§Â¢ÂºÃ¨ÂªÂ | Ã¥ÂÂ°Ã§ÂÂ£Ã¦â€¦Â£Ã§â€Â¨ |
+| Token | Token | Ã¥Â·Â²Ã§Â¢ÂºÃ¨ÂªÂ | Ã¤Â¿ÂÃ§â€¢â„¢Ã¨â€¹Â±Ã¦â€“â€¡ |
+| Skill | Ã¦Å â‚¬Ã¨Æ’Â½ | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | |
+| Command | Ã¦Å’â€¡Ã¤Â»Â¤ | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | |
+| Rule | Ã¨Â¦ÂÃ¥â€°â€¡ | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | |
+| TDD (Test-Driven Development) | TDDÃ¯Â¼Ë†Ã¦Â¸Â¬Ã¨Â©Â¦Ã©Â©â€¦Ã¥â€¹â€¢Ã©â€“â€¹Ã§â„¢Â¼Ã¯Â¼â€° | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | Ã©Â¦â€“Ã¦Â¬Â¡Ã¤Â½Â¿Ã§â€Â¨Ã¥Â±â€¢Ã©â€“â€¹ |
+| E2E (End-to-End) | E2EÃ¯Â¼Ë†Ã§Â«Â¯Ã¥Â°ÂÃ§Â«Â¯Ã¯Â¼â€° | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | Ã©Â¦â€“Ã¦Â¬Â¡Ã¤Â½Â¿Ã§â€Â¨Ã¥Â±â€¢Ã©â€“â€¹ |
+| API | API | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | Ã¤Â¿ÂÃ§â€¢â„¢Ã¨â€¹Â±Ã¦â€“â€¡ |
+| CLI | CLI | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | Ã¤Â¿ÂÃ§â€¢â„¢Ã¨â€¹Â±Ã¦â€“â€¡ |
+| IDE | IDE | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | Ã¤Â¿ÂÃ§â€¢â„¢Ã¨â€¹Â±Ã¦â€“â€¡ |
+| MCP (Model Context Protocol) | MCP | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | Ã¤Â¿ÂÃ§â€¢â„¢Ã¨â€¹Â±Ã¦â€“â€¡ |
+| Workflow | Ã¥Â·Â¥Ã¤Â½Å“Ã¦ÂµÂÃ§Â¨â€¹ | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | |
+| Codebase | Ã§Â¨â€¹Ã¥Â¼ÂÃ§Â¢Â¼Ã¥ÂºÂ« | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | |
+| Coverage | Ã¨Â¦â€ Ã¨â€œâ€¹Ã§Å½â€¡ | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | |
+| Build | Ã¥Â»ÂºÃ§Â½Â® | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | |
+| Debug | Ã©â„¢Â¤Ã©Å’Â¯ | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | |
+| Deploy | Ã©Æ’Â¨Ã§Â½Â² | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | |
+| Commit | Commit | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | Git Ã¨Â¡â€œÃ¨ÂªÅ¾Ã¤Â¿ÂÃ§â€¢â„¢Ã¨â€¹Â±Ã¦â€“â€¡ |
+| PR (Pull Request) | PR | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | Ã¤Â¿ÂÃ§â€¢â„¢Ã¨â€¹Â±Ã¦â€“â€¡ |
+| Branch | Ã¥Ë†â€ Ã¦â€Â¯ | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | |
+| Merge | Ã¥ÂË†Ã¤Â½Âµ | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | |
+| Repository | Ã¥â€žÂ²Ã¥Â­ËœÃ¥ÂºÂ« | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | |
+| Fork | Fork | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | Ã¤Â¿ÂÃ§â€¢â„¢Ã¨â€¹Â±Ã¦â€“â€¡ |
+| Supabase | Supabase | - | Ã§â€Â¢Ã¥â€œÂÃ¥ÂÂÃ§Â¨Â±Ã¤Â¿ÂÃ§â€¢â„¢ |
+| Redis | Redis | - | Ã§â€Â¢Ã¥â€œÂÃ¥ÂÂÃ§Â¨Â±Ã¤Â¿ÂÃ§â€¢â„¢ |
+| Playwright | Playwright | - | Ã§â€Â¢Ã¥â€œÂÃ¥ÂÂÃ§Â¨Â±Ã¤Â¿ÂÃ§â€¢â„¢ |
+| TypeScript | TypeScript | - | Ã¨ÂªÅ¾Ã¨Â¨â‚¬Ã¥ÂÂÃ§Â¨Â±Ã¤Â¿ÂÃ§â€¢â„¢ |
+| JavaScript | JavaScript | - | Ã¨ÂªÅ¾Ã¨Â¨â‚¬Ã¥ÂÂÃ§Â¨Â±Ã¤Â¿ÂÃ§â€¢â„¢ |
+| Go/Golang | Go | - | Ã¨ÂªÅ¾Ã¨Â¨â‚¬Ã¥ÂÂÃ§Â¨Â±Ã¤Â¿ÂÃ§â€¢â„¢ |
+| React | React | - | Ã¦Â¡â€ Ã¦Å¾Â¶Ã¥ÂÂÃ§Â¨Â±Ã¤Â¿ÂÃ§â€¢â„¢ |
+| Next.js | Next.js | - | Ã¦Â¡â€ Ã¦Å¾Â¶Ã¥ÂÂÃ§Â¨Â±Ã¤Â¿ÂÃ§â€¢â„¢ |
+| PostgreSQL | PostgreSQL | - | Ã§â€Â¢Ã¥â€œÂÃ¥ÂÂÃ§Â¨Â±Ã¤Â¿ÂÃ§â€¢â„¢ |
+| RLS (Row Level Security) | RLSÃ¯Â¼Ë†Ã¥Ë†â€”Ã¥Â±Â¤Ã§Â´Å¡Ã¥Â®â€°Ã¥â€¦Â¨Ã¦â‚¬Â§Ã¯Â¼â€° | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | Ã©Â¦â€“Ã¦Â¬Â¡Ã¤Â½Â¿Ã§â€Â¨Ã¥Â±â€¢Ã©â€“â€¹ |
+| OWASP | OWASP | - | Ã¤Â¿ÂÃ§â€¢â„¢Ã¨â€¹Â±Ã¦â€“â€¡ |
+| XSS | XSS | - | Ã¤Â¿ÂÃ§â€¢â„¢Ã¨â€¹Â±Ã¦â€“â€¡ |
+| SQL Injection | SQL Ã¦Â³Â¨Ã¥â€¦Â¥ | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | |
+| CSRF | CSRF | - | Ã¤Â¿ÂÃ§â€¢â„¢Ã¨â€¹Â±Ã¦â€“â€¡ |
+| Refactor | Ã©â€¡ÂÃ¦Â§â€¹ | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | |
+| Dead Code | Ã§â€žÂ¡Ã§â€Â¨Ã§Â¨â€¹Ã¥Â¼ÂÃ§Â¢Â¼ | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | |
+| Lint/Linter | Lint | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | Ã¤Â¿ÂÃ§â€¢â„¢Ã¨â€¹Â±Ã¦â€“â€¡ |
+| Code Review | Ã§Â¨â€¹Ã¥Â¼ÂÃ§Â¢Â¼Ã¥Â¯Â©Ã¦Å¸Â¥ | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | |
+| Security Review | Ã¥Â®â€°Ã¥â€¦Â¨Ã¦â‚¬Â§Ã¥Â¯Â©Ã¦Å¸Â¥ | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | |
+| Best Practices | Ã¦Å“â‚¬Ã¤Â½Â³Ã¥Â¯Â¦Ã¥â€¹â„¢ | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | |
+| Edge Case | Ã©â€šÅ Ã§â€¢Å’Ã¦Æ’â€¦Ã¦Â³Â | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | |
+| Happy Path | Ã¦Â­Â£Ã¥Â¸Â¸Ã¦ÂµÂÃ§Â¨â€¹ | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | |
+| Fallback | Ã¥â€šâ„¢Ã¦ÂÂ´Ã¦â€“Â¹Ã¦Â¡Ë† | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | |
+| Cache | Ã¥Â¿Â«Ã¥Ââ€“ | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | |
+| Queue | Ã¤Â½â€¡Ã¥Ë†â€” | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | |
+| Pagination | Ã¥Ë†â€ Ã©Â Â | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | |
+| Cursor | Ã¦Â¸Â¸Ã¦Â¨â„¢ | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | |
+| Index | Ã§Â´Â¢Ã¥Â¼â€¢ | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | |
+| Schema | Ã§ÂµÂÃ¦Â§â€¹Ã¦ÂÂÃ¨Â¿Â° | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | |
+| Migration | Ã©ÂÂ·Ã§Â§Â» | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | |
+| Transaction | Ã¤ÂºÂ¤Ã¦Ëœâ€œ | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | |
+| Concurrency | Ã¤Â¸Â¦Ã¨Â¡Å’ | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | |
+| Goroutine | Goroutine | - | Go Ã¨Â¡â€œÃ¨ÂªÅ¾Ã¤Â¿ÂÃ§â€¢â„¢ |
+| Channel | Channel | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | Go context Ã¥ÂÂ¯Ã¤Â¿ÂÃ§â€¢â„¢ |
+| Mutex | Mutex | - | Ã¤Â¿ÂÃ§â€¢â„¢Ã¨â€¹Â±Ã¦â€“â€¡ |
+| Interface | Ã¤Â»â€¹Ã©ÂÂ¢ | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | |
+| Struct | Struct | - | Go Ã¨Â¡â€œÃ¨ÂªÅ¾Ã¤Â¿ÂÃ§â€¢â„¢ |
+| Mock | Mock | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | Ã¦Â¸Â¬Ã¨Â©Â¦Ã¨Â¡â€œÃ¨ÂªÅ¾Ã¥ÂÂ¯Ã¤Â¿ÂÃ§â€¢â„¢ |
+| Stub | Stub | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | Ã¦Â¸Â¬Ã¨Â©Â¦Ã¨Â¡â€œÃ¨ÂªÅ¾Ã¥ÂÂ¯Ã¤Â¿ÂÃ§â€¢â„¢ |
+| Fixture | Fixture | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | Ã¦Â¸Â¬Ã¨Â©Â¦Ã¨Â¡â€œÃ¨ÂªÅ¾Ã¥ÂÂ¯Ã¤Â¿ÂÃ§â€¢â„¢ |
+| Assertion | Ã¦â€“Â·Ã¨Â¨â‚¬ | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | |
+| Snapshot | Ã¥Â¿Â«Ã§â€¦Â§ | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | |
+| Trace | Ã¨Â¿Â½Ã¨Â¹Â¤ | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | |
+| Artifact | Ã§â€Â¢Ã¥â€¡ÂºÃ§â€°Â© | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | |
+| CI/CD | CI/CD | - | Ã¤Â¿ÂÃ§â€¢â„¢Ã¨â€¹Â±Ã¦â€“â€¡ |
+| Pipeline | Ã§Â®Â¡Ã§Â·Å¡ | Ã¥Â¾â€¦Ã§Â¢ÂºÃ¨ÂªÂ | |
 
 ---
 
-## 翻譯原則
+## Ã§Â¿Â»Ã¨Â­Â¯Ã¥Å½Å¸Ã¥â€°â€¡
 
-1. **產品名稱**：保留英文（Supabase, Redis, Playwright）
-2. **程式語言**：保留英文（TypeScript, Go, JavaScript）
-3. **框架名稱**：保留英文（React, Next.js, Vue）
-4. **技術縮寫**：保留英文（API, CLI, IDE, MCP, TDD, E2E）
-5. **Git 術語**：大多保留英文（commit, PR, fork）
-6. **程式碼內容**：不翻譯（變數名、函式名、註解保持原樣，但說明性註解可翻譯）
-7. **首次出現**：縮寫首次出現時展開說明
+1. **Ã§â€Â¢Ã¥â€œÂÃ¥ÂÂÃ§Â¨Â±**Ã¯Â¼Å¡Ã¤Â¿ÂÃ§â€¢â„¢Ã¨â€¹Â±Ã¦â€“â€¡Ã¯Â¼Ë†Supabase, Redis, PlaywrightÃ¯Â¼â€°
+2. **Ã§Â¨â€¹Ã¥Â¼ÂÃ¨ÂªÅ¾Ã¨Â¨â‚¬**Ã¯Â¼Å¡Ã¤Â¿ÂÃ§â€¢â„¢Ã¨â€¹Â±Ã¦â€“â€¡Ã¯Â¼Ë†TypeScript, Go, JavaScriptÃ¯Â¼â€°
+3. **Ã¦Â¡â€ Ã¦Å¾Â¶Ã¥ÂÂÃ§Â¨Â±**Ã¯Â¼Å¡Ã¤Â¿ÂÃ§â€¢â„¢Ã¨â€¹Â±Ã¦â€“â€¡Ã¯Â¼Ë†React, Next.js, VueÃ¯Â¼â€°
+4. **Ã¦Å â‚¬Ã¨Â¡â€œÃ§Â¸Â®Ã¥Â¯Â«**Ã¯Â¼Å¡Ã¤Â¿ÂÃ§â€¢â„¢Ã¨â€¹Â±Ã¦â€“â€¡Ã¯Â¼Ë†API, CLI, IDE, MCP, TDD, E2EÃ¯Â¼â€°
+5. **Git Ã¨Â¡â€œÃ¨ÂªÅ¾**Ã¯Â¼Å¡Ã¥Â¤Â§Ã¥Â¤Å¡Ã¤Â¿ÂÃ§â€¢â„¢Ã¨â€¹Â±Ã¦â€“â€¡Ã¯Â¼Ë†commit, PR, forkÃ¯Â¼â€°
+6. **Ã§Â¨â€¹Ã¥Â¼ÂÃ§Â¢Â¼Ã¥â€¦Â§Ã¥Â®Â¹**Ã¯Â¼Å¡Ã¤Â¸ÂÃ§Â¿Â»Ã¨Â­Â¯Ã¯Â¼Ë†Ã¨Â®Å Ã¦â€¢Â¸Ã¥ÂÂÃ£â‚¬ÂÃ¥â€¡Â½Ã¥Â¼ÂÃ¥ÂÂÃ£â‚¬ÂÃ¨Â¨Â»Ã¨Â§Â£Ã¤Â¿ÂÃ¦Å’ÂÃ¥Å½Å¸Ã¦Â¨Â£Ã¯Â¼Å’Ã¤Â½â€ Ã¨ÂªÂªÃ¦ËœÅ½Ã¦â‚¬Â§Ã¨Â¨Â»Ã¨Â§Â£Ã¥ÂÂ¯Ã§Â¿Â»Ã¨Â­Â¯Ã¯Â¼â€°
+7. **Ã©Â¦â€“Ã¦Â¬Â¡Ã¥â€¡ÂºÃ§ÂÂ¾**Ã¯Â¼Å¡Ã§Â¸Â®Ã¥Â¯Â«Ã©Â¦â€“Ã¦Â¬Â¡Ã¥â€¡ÂºÃ§ÂÂ¾Ã¦â„¢â€šÃ¥Â±â€¢Ã©â€“â€¹Ã¨ÂªÂªÃ¦ËœÅ½
 
 ---
 
-## 更新記錄
+## Ã¦â€ºÂ´Ã¦â€“Â°Ã¨Â¨ËœÃ©Å’â€ž
 
-- 2024-XX-XX: 初版建立，含使用者已確認術語
+- 2024-XX-XX: Ã¥Ë†ÂÃ§â€°Ë†Ã¥Â»ÂºÃ§Â«â€¹Ã¯Â¼Å’Ã¥ÂÂ«Ã¤Â½Â¿Ã§â€Â¨Ã¨â‚¬â€¦Ã¥Â·Â²Ã§Â¢ÂºÃ¨ÂªÂÃ¨Â¡â€œÃ¨ÂªÅ¾

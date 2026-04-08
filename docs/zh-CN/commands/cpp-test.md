@@ -1,40 +1,53 @@
 ---
-description: 为 C++ 强制执行 TDD 工作流程。先编写 GoogleTest 测试，然后实现。使用 gcov/lcov 验证覆盖率。
+description: Ã¤Â¸Âº C++ Ã¥Â¼ÂºÃ¥Ë†Â¶Ã¦â€°Â§Ã¨Â¡Å’ TDD Ã¥Â·Â¥Ã¤Â½Å“Ã¦ÂµÂÃ§Â¨â€¹Ã£â‚¬â€šÃ¥â€¦Ë†Ã§Â¼â€“Ã¥â€ â„¢ GoogleTest Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¯Â¼Å’Ã§â€žÂ¶Ã¥ÂÅ½Ã¥Â®Å¾Ã§Å½Â°Ã£â‚¬â€šÃ¤Â½Â¿Ã§â€Â¨ gcov/lcov Ã©ÂªÅ’Ã¨Â¯ÂÃ¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡Ã£â‚¬â€š
 ---
 
-# C++ TDD 命令
+# C++ TDD Ã¥â€˜Â½Ã¤Â»Â¤
 
-此命令使用 GoogleTest/GoogleMock 与 CMake/CTest，为 C++ 代码强制执行测试驱动开发方法。
+## Safety And Authorization Rule
 
-## 此命令的作用
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-1. **定义接口**：首先搭建类/函数签名
-2. **编写测试**：创建全面的 GoogleTest 测试用例（RED 阶段）
-3. **运行测试**：验证测试因正确原因失败
-4. **实现代码**：编写最少代码以通过测试（GREEN 阶段）
-5. **重构**：在保持测试通过的同时改进代码
-6. **检查覆盖率**：确保覆盖率在 80% 以上
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-## 何时使用
 
-在以下情况使用 `/cpp-test`：
+Ã¦Â­Â¤Ã¥â€˜Â½Ã¤Â»Â¤Ã¤Â½Â¿Ã§â€Â¨ GoogleTest/GoogleMock Ã¤Â¸Å½ CMake/CTestÃ¯Â¼Å’Ã¤Â¸Âº C++ Ã¤Â»Â£Ã§Â ÂÃ¥Â¼ÂºÃ¥Ë†Â¶Ã¦â€°Â§Ã¨Â¡Å’Ã¦Âµâ€¹Ã¨Â¯â€¢Ã©Â©Â±Ã¥Å Â¨Ã¥Â¼â‚¬Ã¥Ââ€˜Ã¦â€“Â¹Ã¦Â³â€¢Ã£â‚¬â€š
 
-* 实现新的 C++ 函数或类时
-* 为现有代码增加测试覆盖率时
-* 修复错误时（先编写失败的测试）
-* 构建关键业务逻辑时
-* 学习 C++ 中的 TDD 工作流时
+## Ã¦Â­Â¤Ã¥â€˜Â½Ã¤Â»Â¤Ã§Å¡â€žÃ¤Â½Å“Ã§â€Â¨
 
-## TDD 循环
+1. **Ã¥Â®Å¡Ã¤Â¹â€°Ã¦Å½Â¥Ã¥ÂÂ£**Ã¯Â¼Å¡Ã©Â¦â€“Ã¥â€¦Ë†Ã¦ÂÂ­Ã¥Â»ÂºÃ§Â±Â»/Ã¥â€¡Â½Ã¦â€¢Â°Ã§Â­Â¾Ã¥ÂÂ
+2. **Ã§Â¼â€“Ã¥â€ â„¢Ã¦Âµâ€¹Ã¨Â¯â€¢**Ã¯Â¼Å¡Ã¥Ë†â€ºÃ¥Â»ÂºÃ¥â€¦Â¨Ã©ÂÂ¢Ã§Å¡â€ž GoogleTest Ã¦Âµâ€¹Ã¨Â¯â€¢Ã§â€Â¨Ã¤Â¾â€¹Ã¯Â¼Ë†RED Ã©ËœÂ¶Ã¦Â®ÂµÃ¯Â¼â€°
+3. **Ã¨Â¿ÂÃ¨Â¡Å’Ã¦Âµâ€¹Ã¨Â¯â€¢**Ã¯Â¼Å¡Ã©ÂªÅ’Ã¨Â¯ÂÃ¦Âµâ€¹Ã¨Â¯â€¢Ã¥â€ºÂ Ã¦Â­Â£Ã§Â¡Â®Ã¥Å½Å¸Ã¥â€ºÂ Ã¥Â¤Â±Ã¨Â´Â¥
+4. **Ã¥Â®Å¾Ã§Å½Â°Ã¤Â»Â£Ã§Â Â**Ã¯Â¼Å¡Ã§Â¼â€“Ã¥â€ â„¢Ã¦Å“â‚¬Ã¥Â°â€˜Ã¤Â»Â£Ã§Â ÂÃ¤Â»Â¥Ã©â‚¬Å¡Ã¨Â¿â€¡Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¯Â¼Ë†GREEN Ã©ËœÂ¶Ã¦Â®ÂµÃ¯Â¼â€°
+5. **Ã©â€¡ÂÃ¦Å¾â€ž**Ã¯Â¼Å¡Ã¥Å“Â¨Ã¤Â¿ÂÃ¦Å’ÂÃ¦Âµâ€¹Ã¨Â¯â€¢Ã©â‚¬Å¡Ã¨Â¿â€¡Ã§Å¡â€žÃ¥ÂÅ’Ã¦â€”Â¶Ã¦â€Â¹Ã¨Â¿â€ºÃ¤Â»Â£Ã§Â Â
+6. **Ã¦Â£â‚¬Ã¦Å¸Â¥Ã¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡**Ã¯Â¼Å¡Ã§Â¡Â®Ã¤Â¿ÂÃ¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡Ã¥Å“Â¨ 80% Ã¤Â»Â¥Ã¤Â¸Å 
+
+## Ã¤Â½â€¢Ã¦â€”Â¶Ã¤Â½Â¿Ã§â€Â¨
+
+Ã¥Å“Â¨Ã¤Â»Â¥Ã¤Â¸â€¹Ã¦Æ’â€¦Ã¥â€ ÂµÃ¤Â½Â¿Ã§â€Â¨ `/cpp-test`Ã¯Â¼Å¡
+
+* Ã¥Â®Å¾Ã§Å½Â°Ã¦â€“Â°Ã§Å¡â€ž C++ Ã¥â€¡Â½Ã¦â€¢Â°Ã¦Ë†â€“Ã§Â±Â»Ã¦â€”Â¶
+* Ã¤Â¸ÂºÃ§Å½Â°Ã¦Å“â€°Ã¤Â»Â£Ã§Â ÂÃ¥Â¢Å¾Ã¥Å Â Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡Ã¦â€”Â¶
+* Ã¤Â¿Â®Ã¥Â¤ÂÃ©â€â„¢Ã¨Â¯Â¯Ã¦â€”Â¶Ã¯Â¼Ë†Ã¥â€¦Ë†Ã§Â¼â€“Ã¥â€ â„¢Ã¥Â¤Â±Ã¨Â´Â¥Ã§Å¡â€žÃ¦Âµâ€¹Ã¨Â¯â€¢Ã¯Â¼â€°
+* Ã¦Å¾â€žÃ¥Â»ÂºÃ¥â€¦Â³Ã©â€Â®Ã¤Â¸Å¡Ã¥Å Â¡Ã©â‚¬Â»Ã¨Â¾â€˜Ã¦â€”Â¶
+* Ã¥Â­Â¦Ã¤Â¹Â  C++ Ã¤Â¸Â­Ã§Å¡â€ž TDD Ã¥Â·Â¥Ã¤Â½Å“Ã¦ÂµÂÃ¦â€”Â¶
+
+## TDD Ã¥Â¾ÂªÃ§Å½Â¯
 
 ```
-RED     → 编写失败的 GoogleTest 测试
-GREEN   → 实现最小化代码以通过测试
-REFACTOR → 改进代码，测试保持通过
-REPEAT  → 下一个测试用例
+RED     Ã¢â€ â€™ Ã§Â¼â€“Ã¥â€ â„¢Ã¥Â¤Â±Ã¨Â´Â¥Ã§Å¡â€ž GoogleTest Ã¦Âµâ€¹Ã¨Â¯â€¢
+GREEN   Ã¢â€ â€™ Ã¥Â®Å¾Ã§Å½Â°Ã¦Å“â‚¬Ã¥Â°ÂÃ¥Å’â€“Ã¤Â»Â£Ã§Â ÂÃ¤Â»Â¥Ã©â‚¬Å¡Ã¨Â¿â€¡Ã¦Âµâ€¹Ã¨Â¯â€¢
+REFACTOR Ã¢â€ â€™ Ã¦â€Â¹Ã¨Â¿â€ºÃ¤Â»Â£Ã§Â ÂÃ¯Â¼Å’Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¤Â¿ÂÃ¦Å’ÂÃ©â‚¬Å¡Ã¨Â¿â€¡
+REPEAT  Ã¢â€ â€™ Ã¤Â¸â€¹Ã¤Â¸â‚¬Ã¤Â¸ÂªÃ¦Âµâ€¹Ã¨Â¯â€¢Ã§â€Â¨Ã¤Â¾â€¹
 ```
 
-## 示例会话
+## Ã§Â¤ÂºÃ¤Â¾â€¹Ã¤Â¼Å¡Ã¨Â¯Â
 
 ````
 User: /cpp-test I need a function to validate email addresses
@@ -108,7 +121,7 @@ $ cmake --build build && ctest --test-dir build --output-on-failure
 FAIL
 ```
 
-✓ Tests fail as expected (unimplemented).
+Ã¢Å“â€œ Tests fail as expected (unimplemented).
 
 ## Step 4: Implement Minimal Code (GREEN)
 
@@ -139,7 +152,7 @@ $ cmake --build build && ctest --test-dir build --output-on-failure
 100% tests passed.
 ```
 
-✓ All tests passing!
+Ã¢Å“â€œ All tests passing!
 
 ## Step 6: Check Coverage
 
@@ -152,14 +165,14 @@ $ lcov --list coverage.info
 validator/email.cpp     | 100%
 ```
 
-✓ Coverage: 100%
+Ã¢Å“â€œ Coverage: 100%
 
 ## TDD Complete!
 ````
 
-## 测试模式
+## Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¦Â¨Â¡Ã¥Â¼Â
 
-### 基础测试
+### Ã¥Å¸ÂºÃ§Â¡â‚¬Ã¦Âµâ€¹Ã¨Â¯â€¢
 
 ```cpp
 TEST(SuiteName, TestName) {
@@ -170,7 +183,7 @@ TEST(SuiteName, TestName) {
 }
 ```
 
-### 测试夹具
+### Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¥Â¤Â¹Ã¥â€¦Â·
 
 ```cpp
 class DatabaseTest : public ::testing::Test {
@@ -186,7 +199,7 @@ TEST_F(DatabaseTest, InsertsRecord) {
 }
 ```
 
-### 参数化测试
+### Ã¥Ââ€šÃ¦â€¢Â°Ã¥Å’â€“Ã¦Âµâ€¹Ã¨Â¯â€¢
 
 ```cpp
 class PrimeTest : public ::testing::TestWithParam<std::pair<int, bool>> {};
@@ -203,7 +216,7 @@ INSTANTIATE_TEST_SUITE_P(Primes, PrimeTest, ::testing::Values(
 ));
 ```
 
-## 覆盖率命令
+## Ã¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡Ã¥â€˜Â½Ã¤Â»Â¤
 
 ```bash
 # Build with coverage
@@ -218,40 +231,40 @@ lcov --remove coverage.info '/usr/*' --output-file coverage.info
 genhtml coverage.info --output-directory coverage_html
 ```
 
-## 覆盖率目标
+## Ã¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡Ã§â€ºÂ®Ã¦Â â€¡
 
-| 代码类型 | 目标 |
+| Ã¤Â»Â£Ã§Â ÂÃ§Â±Â»Ã¥Å¾â€¹ | Ã§â€ºÂ®Ã¦Â â€¡ |
 |-----------|--------|
-| 关键业务逻辑 | 100% |
-| 公共 API | 90%+ |
-| 通用代码 | 80%+ |
-| 生成的代码 | 排除 |
+| Ã¥â€¦Â³Ã©â€Â®Ã¤Â¸Å¡Ã¥Å Â¡Ã©â‚¬Â»Ã¨Â¾â€˜ | 100% |
+| Ã¥â€¦Â¬Ã¥â€¦Â± API | 90%+ |
+| Ã©â‚¬Å¡Ã§â€Â¨Ã¤Â»Â£Ã§Â Â | 80%+ |
+| Ã§â€Å¸Ã¦Ë†ÂÃ§Å¡â€žÃ¤Â»Â£Ã§Â Â | Ã¦Å½â€™Ã©â„¢Â¤ |
 
-## TDD 最佳实践
+## TDD Ã¦Å“â‚¬Ã¤Â½Â³Ã¥Â®Å¾Ã¨Â·Âµ
 
-**应做：**
+**Ã¥Âºâ€Ã¥ÂÅ¡Ã¯Â¼Å¡**
 
-* 先编写测试，再进行任何实现
-* 每次更改后运行测试
-* 在适当时使用 `EXPECT_*`（继续）而非 `ASSERT_*`（停止）
-* 测试行为，而非实现细节
-* 包含边界情况（空值、null、最大值、边界条件）
+* Ã¥â€¦Ë†Ã§Â¼â€“Ã¥â€ â„¢Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¯Â¼Å’Ã¥â€ ÂÃ¨Â¿â€ºÃ¨Â¡Å’Ã¤Â»Â»Ã¤Â½â€¢Ã¥Â®Å¾Ã§Å½Â°
+* Ã¦Â¯ÂÃ¦Â¬Â¡Ã¦â€ºÂ´Ã¦â€Â¹Ã¥ÂÅ½Ã¨Â¿ÂÃ¨Â¡Å’Ã¦Âµâ€¹Ã¨Â¯â€¢
+* Ã¥Å“Â¨Ã©â‚¬â€šÃ¥Â½â€œÃ¦â€”Â¶Ã¤Â½Â¿Ã§â€Â¨ `EXPECT_*`Ã¯Â¼Ë†Ã§Â»Â§Ã§Â»Â­Ã¯Â¼â€°Ã¨â‚¬Å’Ã©ÂÅ¾ `ASSERT_*`Ã¯Â¼Ë†Ã¥ÂÅ“Ã¦Â­Â¢Ã¯Â¼â€°
+* Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¨Â¡Å’Ã¤Â¸ÂºÃ¯Â¼Å’Ã¨â‚¬Å’Ã©ÂÅ¾Ã¥Â®Å¾Ã§Å½Â°Ã§Â»â€ Ã¨Å â€š
+* Ã¥Å’â€¦Ã¥ÂÂ«Ã¨Â¾Â¹Ã§â€¢Å’Ã¦Æ’â€¦Ã¥â€ ÂµÃ¯Â¼Ë†Ã§Â©ÂºÃ¥â‚¬Â¼Ã£â‚¬ÂnullÃ£â‚¬ÂÃ¦Å“â‚¬Ã¥Â¤Â§Ã¥â‚¬Â¼Ã£â‚¬ÂÃ¨Â¾Â¹Ã§â€¢Å’Ã¦ÂÂ¡Ã¤Â»Â¶Ã¯Â¼â€°
 
-**不应做：**
+**Ã¤Â¸ÂÃ¥Âºâ€Ã¥ÂÅ¡Ã¯Â¼Å¡**
 
-* 在编写测试之前实现代码
-* 跳过 RED 阶段
-* 直接测试私有方法（通过公共 API 进行测试）
-* 在测试中使用 `sleep`
-* 忽略不稳定的测试
+* Ã¥Å“Â¨Ã§Â¼â€“Ã¥â€ â„¢Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¤Â¹â€¹Ã¥â€°ÂÃ¥Â®Å¾Ã§Å½Â°Ã¤Â»Â£Ã§Â Â
+* Ã¨Â·Â³Ã¨Â¿â€¡ RED Ã©ËœÂ¶Ã¦Â®Âµ
+* Ã§â€ºÂ´Ã¦Å½Â¥Ã¦Âµâ€¹Ã¨Â¯â€¢Ã§Â§ÂÃ¦Å“â€°Ã¦â€“Â¹Ã¦Â³â€¢Ã¯Â¼Ë†Ã©â‚¬Å¡Ã¨Â¿â€¡Ã¥â€¦Â¬Ã¥â€¦Â± API Ã¨Â¿â€ºÃ¨Â¡Å’Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¯Â¼â€°
+* Ã¥Å“Â¨Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¤Â¸Â­Ã¤Â½Â¿Ã§â€Â¨ `sleep`
+* Ã¥Â¿Â½Ã§â€¢Â¥Ã¤Â¸ÂÃ§Â¨Â³Ã¥Â®Å¡Ã§Å¡â€žÃ¦Âµâ€¹Ã¨Â¯â€¢
 
-## 相关命令
+## Ã§â€ºÂ¸Ã¥â€¦Â³Ã¥â€˜Â½Ã¤Â»Â¤
 
-* `/cpp-build` - 修复构建错误
-* `/cpp-review` - 在实现后审查代码
-* `/verify` - 运行完整的验证循环
+* `/cpp-build` - Ã¤Â¿Â®Ã¥Â¤ÂÃ¦Å¾â€žÃ¥Â»ÂºÃ©â€â„¢Ã¨Â¯Â¯
+* `/cpp-review` - Ã¥Å“Â¨Ã¥Â®Å¾Ã§Å½Â°Ã¥ÂÅ½Ã¥Â®Â¡Ã¦Å¸Â¥Ã¤Â»Â£Ã§Â Â
+* `/verify` - Ã¨Â¿ÂÃ¨Â¡Å’Ã¥Â®Å’Ã¦â€¢Â´Ã§Å¡â€žÃ©ÂªÅ’Ã¨Â¯ÂÃ¥Â¾ÂªÃ§Å½Â¯
 
-## 相关
+## Ã§â€ºÂ¸Ã¥â€¦Â³
 
-* 技能：`skills/cpp-testing/`
-* 技能：`skills/tdd-workflow/`
+* Ã¦Å â‚¬Ã¨Æ’Â½Ã¯Â¼Å¡`skills/cpp-testing/`
+* Ã¦Å â‚¬Ã¨Æ’Â½Ã¯Â¼Å¡`skills/tdd-workflow/`

@@ -1,5 +1,18 @@
 # Search & Indexing Guide
 
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
 Search allows you to find specific moments inside videos using natural language queries, exact keywords, or visual scene descriptions.
 
 ## Prerequisites
@@ -15,7 +28,7 @@ Index the transcribed speech content of a video for semantic and keyword search:
 ```python
 video = coll.get_video(video_id)
 
-# force=True makes indexing idempotent — skips if already indexed
+# force=True makes indexing idempotent Ã¢â‚¬â€ skips if already indexed
 video.index_spoken_words(force=True)
 ```
 
@@ -129,7 +142,7 @@ except InvalidRequestError as e:
 
 **Important notes:**
 
-- Use `SearchType.semantic` with `index_type=IndexType.scene` — this is the most reliable combination and works on all plans.
+- Use `SearchType.semantic` with `index_type=IndexType.scene` Ã¢â‚¬â€ this is the most reliable combination and works on all plans.
 - `SearchType.scene` exists but may not be available on all plans (e.g. Free tier). Prefer `SearchType.semantic` with `IndexType.scene`.
 - The `scene_index_id` parameter is optional. If omitted, the search runs against all scene indexes on the video. Pass it to target a specific index.
 - You can create multiple scene indexes per video (with different prompts or extraction types) and search them independently using `scene_index_id`.
@@ -227,4 +240,4 @@ print(stream_url)
 - **Use keyword search for precision**: When you need exact term matches, keyword search avoids semantic drift.
 - **Handle "No results found"**: `video.search()` raises `InvalidRequestError` when no results match. Always wrap search calls in try/except and treat `"No results found"` as an empty result set.
 - **Filter scene search noise**: Semantic scene search can return low-relevance results for vague queries. Use `score_threshold=0.3` (or higher) to filter noise.
-- **Idempotent indexing**: Use `index_spoken_words(force=True)` to safely re-index. `index_scenes()` has no `force` parameter — wrap it in try/except and extract the existing `scene_index_id` from the error message with `re.search(r"id\s+([a-f0-9]+)", str(e))`.
+- **Idempotent indexing**: Use `index_spoken_words(force=True)` to safely re-index. `index_scenes()` has no `force` parameter Ã¢â‚¬â€ wrap it in try/except and extract the existing `scene_index_id` from the error message with `re.search(r"id\s+([a-f0-9]+)", str(e))`.

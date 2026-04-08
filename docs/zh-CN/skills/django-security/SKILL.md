@@ -1,24 +1,37 @@
 ---
 name: django-security
-description: Django 安全最佳实践、认证、授权、CSRF 防护、SQL 注入预防、XSS 预防和安全部署配置。
+description: Django Ã¥Â®â€°Ã¥â€¦Â¨Ã¦Å“â‚¬Ã¤Â½Â³Ã¥Â®Å¾Ã¨Â·ÂµÃ£â‚¬ÂÃ¨Â®Â¤Ã¨Â¯ÂÃ£â‚¬ÂÃ¦Å½Ë†Ã¦ÂÆ’Ã£â‚¬ÂCSRF Ã©ËœÂ²Ã¦Å Â¤Ã£â‚¬ÂSQL Ã¦Â³Â¨Ã¥â€¦Â¥Ã©Â¢â€žÃ©ËœÂ²Ã£â‚¬ÂXSS Ã©Â¢â€žÃ©ËœÂ²Ã¥â€™Å’Ã¥Â®â€°Ã¥â€¦Â¨Ã©Æ’Â¨Ã§Â½Â²Ã©â€¦ÂÃ§Â½Â®Ã£â‚¬â€š
 origin: ECC
 ---
 
-# Django 安全最佳实践
+# Django Ã¥Â®â€°Ã¥â€¦Â¨Ã¦Å“â‚¬Ã¤Â½Â³Ã¥Â®Å¾Ã¨Â·Âµ
 
-保护 Django 应用程序免受常见漏洞侵害的全面安全指南。
+## Safety And Authorization Rule
 
-## 何时启用
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-* 设置 Django 认证和授权时
-* 实现用户权限和角色时
-* 配置生产环境安全设置时
-* 审查 Django 应用程序的安全问题时
-* 将 Django 应用程序部署到生产环境时
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-## 核心安全设置
 
-### 生产环境设置配置
+Ã¤Â¿ÂÃ¦Å Â¤ Django Ã¥Âºâ€Ã§â€Â¨Ã§Â¨â€¹Ã¥ÂºÂÃ¥â€¦ÂÃ¥Ââ€”Ã¥Â¸Â¸Ã¨Â§ÂÃ¦Â¼ÂÃ¦Â´Å¾Ã¤Â¾ÂµÃ¥Â®Â³Ã§Å¡â€žÃ¥â€¦Â¨Ã©ÂÂ¢Ã¥Â®â€°Ã¥â€¦Â¨Ã¦Å’â€¡Ã¥Ââ€”Ã£â‚¬â€š
+
+## Ã¤Â½â€¢Ã¦â€”Â¶Ã¥ÂÂ¯Ã§â€Â¨
+
+* Ã¨Â®Â¾Ã§Â½Â® Django Ã¨Â®Â¤Ã¨Â¯ÂÃ¥â€™Å’Ã¦Å½Ë†Ã¦ÂÆ’Ã¦â€”Â¶
+* Ã¥Â®Å¾Ã§Å½Â°Ã§â€Â¨Ã¦Ë†Â·Ã¦ÂÆ’Ã©â„¢ÂÃ¥â€™Å’Ã¨Â§â€™Ã¨â€°Â²Ã¦â€”Â¶
+* Ã©â€¦ÂÃ§Â½Â®Ã§â€Å¸Ã¤ÂºÂ§Ã§Å½Â¯Ã¥Â¢Æ’Ã¥Â®â€°Ã¥â€¦Â¨Ã¨Â®Â¾Ã§Â½Â®Ã¦â€”Â¶
+* Ã¥Â®Â¡Ã¦Å¸Â¥ Django Ã¥Âºâ€Ã§â€Â¨Ã§Â¨â€¹Ã¥ÂºÂÃ§Å¡â€žÃ¥Â®â€°Ã¥â€¦Â¨Ã©â€”Â®Ã©Â¢ËœÃ¦â€”Â¶
+* Ã¥Â°â€  Django Ã¥Âºâ€Ã§â€Â¨Ã§Â¨â€¹Ã¥ÂºÂÃ©Æ’Â¨Ã§Â½Â²Ã¥Ë†Â°Ã§â€Å¸Ã¤ÂºÂ§Ã§Å½Â¯Ã¥Â¢Æ’Ã¦â€”Â¶
+
+## Ã¦Â Â¸Ã¥Â¿Æ’Ã¥Â®â€°Ã¥â€¦Â¨Ã¨Â®Â¾Ã§Â½Â®
+
+### Ã§â€Å¸Ã¤ÂºÂ§Ã§Å½Â¯Ã¥Â¢Æ’Ã¨Â®Â¾Ã§Â½Â®Ã©â€¦ÂÃ§Â½Â®
 
 ```python
 # settings/production.py
@@ -70,9 +83,9 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 ```
 
-## 认证
+## Ã¨Â®Â¤Ã¨Â¯Â
 
-### 自定义用户模型
+### Ã¨â€¡ÂªÃ¥Â®Å¡Ã¤Â¹â€°Ã§â€Â¨Ã¦Ë†Â·Ã¦Â¨Â¡Ã¥Å¾â€¹
 
 ```python
 # apps/users/models.py
@@ -100,7 +113,7 @@ class User(AbstractUser):
 AUTH_USER_MODEL = 'users.User'
 ```
 
-### 密码哈希
+### Ã¥Â¯â€ Ã§Â ÂÃ¥â€œË†Ã¥Â¸Å’
 
 ```python
 # Django uses PBKDF2 by default. For stronger security:
@@ -112,7 +125,7 @@ PASSWORD_HASHERS = [
 ]
 ```
 
-### 会话管理
+### Ã¤Â¼Å¡Ã¨Â¯ÂÃ§Â®Â¡Ã§Ââ€ 
 
 ```python
 # Session configuration
@@ -123,9 +136,9 @@ SESSION_SAVE_EVERY_REQUEST = False
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Better UX, but less secure
 ```
 
-## 授权
+## Ã¦Å½Ë†Ã¦ÂÆ’
 
-### 权限
+### Ã¦ÂÆ’Ã©â„¢Â
 
 ```python
 # models.py
@@ -161,7 +174,7 @@ class PostUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
         return Post.objects.filter(author=self.request.user)
 ```
 
-### 自定义权限
+### Ã¨â€¡ÂªÃ¥Â®Å¡Ã¤Â¹â€°Ã¦ÂÆ’Ã©â„¢Â
 
 ```python
 # permissions.py
@@ -193,7 +206,7 @@ class IsVerifiedUser(permissions.BasePermission):
         return request.user and request.user.is_authenticated and request.user.is_verified
 ```
 
-### 基于角色的访问控制 (RBAC)
+### Ã¥Å¸ÂºÃ¤ÂºÅ½Ã¨Â§â€™Ã¨â€°Â²Ã§Å¡â€žÃ¨Â®Â¿Ã©â€”Â®Ã¦Å½Â§Ã¥Ë†Â¶ (RBAC)
 
 ```python
 # models.py
@@ -224,9 +237,9 @@ class AdminRequiredMixin:
         return super().dispatch(request, *args, **kwargs)
 ```
 
-## SQL 注入防护
+## SQL Ã¦Â³Â¨Ã¥â€¦Â¥Ã©ËœÂ²Ã¦Å Â¤
 
-### Django ORM 保护
+### Django ORM Ã¤Â¿ÂÃ¦Å Â¤
 
 ```python
 # GOOD: Django ORM automatically escapes parameters
@@ -254,7 +267,7 @@ def search_users_complex(query):
     )  # Safe
 ```
 
-### 使用 raw() 的额外安全措施
+### Ã¤Â½Â¿Ã§â€Â¨ raw() Ã§Å¡â€žÃ©Â¢ÂÃ¥Â¤â€“Ã¥Â®â€°Ã¥â€¦Â¨Ã¦Å½ÂªÃ¦â€“Â½
 
 ```python
 # If you must use raw SQL, always use parameters
@@ -264,9 +277,9 @@ User.objects.raw(
 )
 ```
 
-## XSS 防护
+## XSS Ã©ËœÂ²Ã¦Å Â¤
 
-### 模板转义
+### Ã¦Â¨Â¡Ã¦ÂÂ¿Ã¨Â½Â¬Ã¤Â¹â€°
 
 ```django
 {# Django auto-escapes variables by default - SAFE #}
@@ -285,7 +298,7 @@ User.objects.raw(
 </script>
 ```
 
-### 安全字符串处理
+### Ã¥Â®â€°Ã¥â€¦Â¨Ã¥Â­â€”Ã§Â¬Â¦Ã¤Â¸Â²Ã¥Â¤â€žÃ§Ââ€ 
 
 ```python
 from django.utils.safestring import mark_safe
@@ -306,7 +319,7 @@ def greet_user(username):
     return format_html('<span class="user">{}</span>', escape(username))
 ```
 
-### HTTP 头部
+### HTTP Ã¥Â¤Â´Ã©Æ’Â¨
 
 ```python
 # settings.py
@@ -330,9 +343,9 @@ class SecurityHeaderMiddleware:
         return response
 ```
 
-## CSRF 防护
+## CSRF Ã©ËœÂ²Ã¦Å Â¤
 
-### 默认 CSRF 防护
+### Ã©Â»ËœÃ¨Â®Â¤ CSRF Ã©ËœÂ²Ã¦Å Â¤
 
 ```python
 # settings.py - CSRF is enabled by default
@@ -374,7 +387,7 @@ fetch('/api/endpoint/', {
 });
 ```
 
-### 豁免视图（谨慎使用）
+### Ã¨Â±ÂÃ¥â€¦ÂÃ¨Â§â€ Ã¥â€ºÂ¾Ã¯Â¼Ë†Ã¨Â°Â¨Ã¦â€¦Å½Ã¤Â½Â¿Ã§â€Â¨Ã¯Â¼â€°
 
 ```python
 from django.views.decorators.csrf import csrf_exempt
@@ -385,9 +398,9 @@ def webhook_view(request):
     pass
 ```
 
-## 文件上传安全
+## Ã¦â€“â€¡Ã¤Â»Â¶Ã¤Â¸Å Ã¤Â¼Â Ã¥Â®â€°Ã¥â€¦Â¨
 
-### 文件验证
+### Ã¦â€“â€¡Ã¤Â»Â¶Ã©ÂªÅ’Ã¨Â¯Â
 
 ```python
 import os
@@ -414,7 +427,7 @@ class Document(models.Model):
     )
 ```
 
-### 安全的文件存储
+### Ã¥Â®â€°Ã¥â€¦Â¨Ã§Å¡â€žÃ¦â€“â€¡Ã¤Â»Â¶Ã¥Â­ËœÃ¥â€šÂ¨
 
 ```python
 # settings.py
@@ -429,9 +442,9 @@ MEDIA_DOMAIN = 'https://media.example.com'
 # Use a separate server or S3 for media files
 ```
 
-## API 安全
+## API Ã¥Â®â€°Ã¥â€¦Â¨
 
-### 速率限制
+### Ã©â‚¬Å¸Ã§Å½â€¡Ã©â„¢ÂÃ¥Ë†Â¶
 
 ```python
 # settings.py
@@ -459,7 +472,7 @@ class SustainedRateThrottle(UserRateThrottle):
     rate = '1000/day'
 ```
 
-### API 认证
+### API Ã¨Â®Â¤Ã¨Â¯Â
 
 ```python
 # settings.py
@@ -484,9 +497,9 @@ def protected_view(request):
     return Response({'message': 'You are authenticated'})
 ```
 
-## 安全头部
+## Ã¥Â®â€°Ã¥â€¦Â¨Ã¥Â¤Â´Ã©Æ’Â¨
 
-### 内容安全策略
+### Ã¥â€ â€¦Ã¥Â®Â¹Ã¥Â®â€°Ã¥â€¦Â¨Ã§Â­â€“Ã§â€¢Â¥
 
 ```python
 # settings.py
@@ -513,9 +526,9 @@ class CSPMiddleware:
         return response
 ```
 
-## 环境变量
+## Ã§Å½Â¯Ã¥Â¢Æ’Ã¥ÂËœÃ©â€¡Â
 
-### 管理密钥
+### Ã§Â®Â¡Ã§Ââ€ Ã¥Â¯â€ Ã©â€™Â¥
 
 ```python
 # Use python-decouple or django-environ
@@ -540,7 +553,7 @@ DATABASE_URL=postgresql://user:password@localhost:5432/dbname
 ALLOWED_HOSTS=example.com,www.example.com
 ```
 
-## 记录安全事件
+## Ã¨Â®Â°Ã¥Â½â€¢Ã¥Â®â€°Ã¥â€¦Â¨Ã¤Âºâ€¹Ã¤Â»Â¶
 
 ```python
 # settings.py
@@ -573,21 +586,21 @@ LOGGING = {
 }
 ```
 
-## 快速安全检查清单
+## Ã¥Â¿Â«Ã©â‚¬Å¸Ã¥Â®â€°Ã¥â€¦Â¨Ã¦Â£â‚¬Ã¦Å¸Â¥Ã¦Â¸â€¦Ã¥Ââ€¢
 
-| 检查项 | 描述 |
+| Ã¦Â£â‚¬Ã¦Å¸Â¥Ã©Â¡Â¹ | Ã¦ÂÂÃ¨Â¿Â° |
 |-------|-------------|
-| `DEBUG = False` | 切勿在生产环境中启用 DEBUG |
-| 仅限 HTTPS | 强制 SSL，使用安全 Cookie |
-| 强密钥 | 对 SECRET\_KEY 使用环境变量 |
-| 密码验证 | 启用所有密码验证器 |
-| CSRF 防护 | 默认启用，不要禁用 |
-| XSS 防护 | Django 自动转义，不要在用户输入上使用 `&#124;safe` |
-| SQL 注入 | 使用 ORM，切勿在查询中拼接字符串 |
-| 文件上传 | 验证文件类型和大小 |
-| 速率限制 | 限制 API 端点访问频率 |
-| 安全头部 | CSP、X-Frame-Options、HSTS |
-| 日志记录 | 记录安全事件 |
-| 更新 | 保持 Django 及其依赖项为最新版本 |
+| `DEBUG = False` | Ã¥Ë†â€¡Ã¥â€¹Â¿Ã¥Å“Â¨Ã§â€Å¸Ã¤ÂºÂ§Ã§Å½Â¯Ã¥Â¢Æ’Ã¤Â¸Â­Ã¥ÂÂ¯Ã§â€Â¨ DEBUG |
+| Ã¤Â»â€¦Ã©â„¢Â HTTPS | Ã¥Â¼ÂºÃ¥Ë†Â¶ SSLÃ¯Â¼Å’Ã¤Â½Â¿Ã§â€Â¨Ã¥Â®â€°Ã¥â€¦Â¨ Cookie |
+| Ã¥Â¼ÂºÃ¥Â¯â€ Ã©â€™Â¥ | Ã¥Â¯Â¹ SECRET\_KEY Ã¤Â½Â¿Ã§â€Â¨Ã§Å½Â¯Ã¥Â¢Æ’Ã¥ÂËœÃ©â€¡Â |
+| Ã¥Â¯â€ Ã§Â ÂÃ©ÂªÅ’Ã¨Â¯Â | Ã¥ÂÂ¯Ã§â€Â¨Ã¦â€°â‚¬Ã¦Å“â€°Ã¥Â¯â€ Ã§Â ÂÃ©ÂªÅ’Ã¨Â¯ÂÃ¥â„¢Â¨ |
+| CSRF Ã©ËœÂ²Ã¦Å Â¤ | Ã©Â»ËœÃ¨Â®Â¤Ã¥ÂÂ¯Ã§â€Â¨Ã¯Â¼Å’Ã¤Â¸ÂÃ¨Â¦ÂÃ§Â¦ÂÃ§â€Â¨ |
+| XSS Ã©ËœÂ²Ã¦Å Â¤ | Django Ã¨â€¡ÂªÃ¥Å Â¨Ã¨Â½Â¬Ã¤Â¹â€°Ã¯Â¼Å’Ã¤Â¸ÂÃ¨Â¦ÂÃ¥Å“Â¨Ã§â€Â¨Ã¦Ë†Â·Ã¨Â¾â€œÃ¥â€¦Â¥Ã¤Â¸Å Ã¤Â½Â¿Ã§â€Â¨ `&#124;safe` |
+| SQL Ã¦Â³Â¨Ã¥â€¦Â¥ | Ã¤Â½Â¿Ã§â€Â¨ ORMÃ¯Â¼Å’Ã¥Ë†â€¡Ã¥â€¹Â¿Ã¥Å“Â¨Ã¦Å¸Â¥Ã¨Â¯Â¢Ã¤Â¸Â­Ã¦â€¹Â¼Ã¦Å½Â¥Ã¥Â­â€”Ã§Â¬Â¦Ã¤Â¸Â² |
+| Ã¦â€“â€¡Ã¤Â»Â¶Ã¤Â¸Å Ã¤Â¼Â  | Ã©ÂªÅ’Ã¨Â¯ÂÃ¦â€“â€¡Ã¤Â»Â¶Ã§Â±Â»Ã¥Å¾â€¹Ã¥â€™Å’Ã¥Â¤Â§Ã¥Â°Â |
+| Ã©â‚¬Å¸Ã§Å½â€¡Ã©â„¢ÂÃ¥Ë†Â¶ | Ã©â„¢ÂÃ¥Ë†Â¶ API Ã§Â«Â¯Ã§â€šÂ¹Ã¨Â®Â¿Ã©â€”Â®Ã©Â¢â€˜Ã§Å½â€¡ |
+| Ã¥Â®â€°Ã¥â€¦Â¨Ã¥Â¤Â´Ã©Æ’Â¨ | CSPÃ£â‚¬ÂX-Frame-OptionsÃ£â‚¬ÂHSTS |
+| Ã¦â€”Â¥Ã¥Â¿â€”Ã¨Â®Â°Ã¥Â½â€¢ | Ã¨Â®Â°Ã¥Â½â€¢Ã¥Â®â€°Ã¥â€¦Â¨Ã¤Âºâ€¹Ã¤Â»Â¶ |
+| Ã¦â€ºÂ´Ã¦â€“Â° | Ã¤Â¿ÂÃ¦Å’Â Django Ã¥ÂÅ Ã¥â€¦Â¶Ã¤Â¾ÂÃ¨Âµâ€“Ã©Â¡Â¹Ã¤Â¸ÂºÃ¦Å“â‚¬Ã¦â€“Â°Ã§â€°Ë†Ã¦Å“Â¬ |
 
-请记住：安全是一个过程，而非产品。请定期审查并更新您的安全实践。
+Ã¨Â¯Â·Ã¨Â®Â°Ã¤Â½ÂÃ¯Â¼Å¡Ã¥Â®â€°Ã¥â€¦Â¨Ã¦ËœÂ¯Ã¤Â¸â‚¬Ã¤Â¸ÂªÃ¨Â¿â€¡Ã§Â¨â€¹Ã¯Â¼Å’Ã¨â‚¬Å’Ã©ÂÅ¾Ã¤ÂºÂ§Ã¥â€œÂÃ£â‚¬â€šÃ¨Â¯Â·Ã¥Â®Å¡Ã¦Å“Å¸Ã¥Â®Â¡Ã¦Å¸Â¥Ã¥Â¹Â¶Ã¦â€ºÂ´Ã¦â€“Â°Ã¦â€šÂ¨Ã§Å¡â€žÃ¥Â®â€°Ã¥â€¦Â¨Ã¥Â®Å¾Ã¨Â·ÂµÃ£â‚¬â€š

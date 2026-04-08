@@ -3,33 +3,46 @@ name: strategic-compact
 description: Suggests manual context compaction at logical intervals to preserve context through task phases rather than arbitrary auto-compaction.
 ---
 
-# 策略性壓縮技能
+# Ã§Â­â€“Ã§â€¢Â¥Ã¦â‚¬Â§Ã¥Â£â€œÃ§Â¸Â®Ã¦Å â‚¬Ã¨Æ’Â½
 
-在工作流程的策略點建議手動 `/compact`，而非依賴任意的自動壓縮。
+## Safety And Authorization Rule
 
-## 為什麼需要策略性壓縮？
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-自動壓縮在任意點觸發：
-- 經常在任務中途，丟失重要上下文
-- 不知道邏輯任務邊界
-- 可能中斷複雜的多步驟操作
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-邏輯邊界的策略性壓縮：
-- **探索後、執行前** - 壓縮研究上下文，保留實作計畫
-- **完成里程碑後** - 為下一階段重新開始
-- **主要上下文轉換前** - 在不同任務前清除探索上下文
 
-## 運作方式
+Ã¥Å“Â¨Ã¥Â·Â¥Ã¤Â½Å“Ã¦ÂµÂÃ§Â¨â€¹Ã§Å¡â€žÃ§Â­â€“Ã§â€¢Â¥Ã©Â»Å¾Ã¥Â»ÂºÃ¨Â­Â°Ã¦â€°â€¹Ã¥â€¹â€¢ `/compact`Ã¯Â¼Å’Ã¨â‚¬Å’Ã©ÂÅ¾Ã¤Â¾ÂÃ¨Â³Â´Ã¤Â»Â»Ã¦â€žÂÃ§Å¡â€žÃ¨â€¡ÂªÃ¥â€¹â€¢Ã¥Â£â€œÃ§Â¸Â®Ã£â‚¬â€š
 
-`suggest-compact.sh` 腳本在 PreToolUse（Edit/Write）執行並：
+## Ã§â€šÂºÃ¤Â»â‚¬Ã©ÂºÂ¼Ã©Å“â‚¬Ã¨Â¦ÂÃ§Â­â€“Ã§â€¢Â¥Ã¦â‚¬Â§Ã¥Â£â€œÃ§Â¸Â®Ã¯Â¼Å¸
 
-1. **追蹤工具呼叫** - 計算工作階段中的工具呼叫次數
-2. **門檻偵測** - 在可設定門檻建議（預設：50 次呼叫）
-3. **定期提醒** - 門檻後每 25 次呼叫提醒一次
+Ã¨â€¡ÂªÃ¥â€¹â€¢Ã¥Â£â€œÃ§Â¸Â®Ã¥Å“Â¨Ã¤Â»Â»Ã¦â€žÂÃ©Â»Å¾Ã¨Â§Â¸Ã§â„¢Â¼Ã¯Â¼Å¡
+- Ã§Â¶â€œÃ¥Â¸Â¸Ã¥Å“Â¨Ã¤Â»Â»Ã¥â€¹â„¢Ã¤Â¸Â­Ã©â‚¬â€Ã¯Â¼Å’Ã¤Â¸Å¸Ã¥Â¤Â±Ã©â€¡ÂÃ¨Â¦ÂÃ¤Â¸Å Ã¤Â¸â€¹Ã¦â€“â€¡
+- Ã¤Â¸ÂÃ§Å¸Â¥Ã©Ââ€œÃ©â€šÂÃ¨Â¼Â¯Ã¤Â»Â»Ã¥â€¹â„¢Ã©â€šÅ Ã§â€¢Å’
+- Ã¥ÂÂ¯Ã¨Æ’Â½Ã¤Â¸Â­Ã¦â€“Â·Ã¨Â¤â€¡Ã©â€ºÅ“Ã§Å¡â€žÃ¥Â¤Å¡Ã¦Â­Â¥Ã©Â©Å¸Ã¦â€œÂÃ¤Â½Å“
 
-## Hook 設定
+Ã©â€šÂÃ¨Â¼Â¯Ã©â€šÅ Ã§â€¢Å’Ã§Å¡â€žÃ§Â­â€“Ã§â€¢Â¥Ã¦â‚¬Â§Ã¥Â£â€œÃ§Â¸Â®Ã¯Â¼Å¡
+- **Ã¦Å½Â¢Ã§Â´Â¢Ã¥Â¾Å’Ã£â‚¬ÂÃ¥Å¸Â·Ã¨Â¡Å’Ã¥â€°Â** - Ã¥Â£â€œÃ§Â¸Â®Ã§Â â€Ã§Â©Â¶Ã¤Â¸Å Ã¤Â¸â€¹Ã¦â€“â€¡Ã¯Â¼Å’Ã¤Â¿ÂÃ§â€¢â„¢Ã¥Â¯Â¦Ã¤Â½Å“Ã¨Â¨Ë†Ã§â€¢Â«
+- **Ã¥Â®Å’Ã¦Ë†ÂÃ©â€¡Å’Ã§Â¨â€¹Ã§Â¢â€˜Ã¥Â¾Å’** - Ã§â€šÂºÃ¤Â¸â€¹Ã¤Â¸â‚¬Ã©Å¡Å½Ã¦Â®ÂµÃ©â€¡ÂÃ¦â€“Â°Ã©â€“â€¹Ã¥Â§â€¹
+- **Ã¤Â¸Â»Ã¨Â¦ÂÃ¤Â¸Å Ã¤Â¸â€¹Ã¦â€“â€¡Ã¨Â½â€°Ã¦Ââ€ºÃ¥â€°Â** - Ã¥Å“Â¨Ã¤Â¸ÂÃ¥ÂÅ’Ã¤Â»Â»Ã¥â€¹â„¢Ã¥â€°ÂÃ¦Â¸â€¦Ã©â„¢Â¤Ã¦Å½Â¢Ã§Â´Â¢Ã¤Â¸Å Ã¤Â¸â€¹Ã¦â€“â€¡
 
-新增到你的 `~/.claude/settings.json`：
+## Ã©Ââ€¹Ã¤Â½Å“Ã¦â€“Â¹Ã¥Â¼Â
+
+`suggest-compact.sh` Ã¨â€¦Â³Ã¦Å“Â¬Ã¥Å“Â¨ PreToolUseÃ¯Â¼Ë†Edit/WriteÃ¯Â¼â€°Ã¥Å¸Â·Ã¨Â¡Å’Ã¤Â¸Â¦Ã¯Â¼Å¡
+
+1. **Ã¨Â¿Â½Ã¨Â¹Â¤Ã¥Â·Â¥Ã¥â€¦Â·Ã¥â€˜Â¼Ã¥ÂÂ«** - Ã¨Â¨Ë†Ã§Â®â€”Ã¥Â·Â¥Ã¤Â½Å“Ã©Å¡Å½Ã¦Â®ÂµÃ¤Â¸Â­Ã§Å¡â€žÃ¥Â·Â¥Ã¥â€¦Â·Ã¥â€˜Â¼Ã¥ÂÂ«Ã¦Â¬Â¡Ã¦â€¢Â¸
+2. **Ã©â€“â‚¬Ã¦ÂªÂ»Ã¥ÂÂµÃ¦Â¸Â¬** - Ã¥Å“Â¨Ã¥ÂÂ¯Ã¨Â¨Â­Ã¥Â®Å¡Ã©â€“â‚¬Ã¦ÂªÂ»Ã¥Â»ÂºÃ¨Â­Â°Ã¯Â¼Ë†Ã©Â ÂÃ¨Â¨Â­Ã¯Â¼Å¡50 Ã¦Â¬Â¡Ã¥â€˜Â¼Ã¥ÂÂ«Ã¯Â¼â€°
+3. **Ã¥Â®Å¡Ã¦Å“Å¸Ã¦ÂÂÃ©â€ â€™** - Ã©â€“â‚¬Ã¦ÂªÂ»Ã¥Â¾Å’Ã¦Â¯Â 25 Ã¦Â¬Â¡Ã¥â€˜Â¼Ã¥ÂÂ«Ã¦ÂÂÃ©â€ â€™Ã¤Â¸â‚¬Ã¦Â¬Â¡
+
+## Hook Ã¨Â¨Â­Ã¥Â®Å¡
+
+Ã¦â€“Â°Ã¥Â¢Å¾Ã¥Ë†Â°Ã¤Â½Â Ã§Å¡â€ž `~/.claude/settings.json`Ã¯Â¼Å¡
 
 ```json
 {
@@ -45,19 +58,19 @@ description: Suggests manual context compaction at logical intervals to preserve
 }
 ```
 
-## 設定
+## Ã¨Â¨Â­Ã¥Â®Å¡
 
-環境變數：
-- `COMPACT_THRESHOLD` - 第一次建議前的工具呼叫次數（預設：50）
+Ã§â€™Â°Ã¥Â¢Æ’Ã¨Â®Å Ã¦â€¢Â¸Ã¯Â¼Å¡
+- `COMPACT_THRESHOLD` - Ã§Â¬Â¬Ã¤Â¸â‚¬Ã¦Â¬Â¡Ã¥Â»ÂºÃ¨Â­Â°Ã¥â€°ÂÃ§Å¡â€žÃ¥Â·Â¥Ã¥â€¦Â·Ã¥â€˜Â¼Ã¥ÂÂ«Ã¦Â¬Â¡Ã¦â€¢Â¸Ã¯Â¼Ë†Ã©Â ÂÃ¨Â¨Â­Ã¯Â¼Å¡50Ã¯Â¼â€°
 
-## 最佳實務
+## Ã¦Å“â‚¬Ã¤Â½Â³Ã¥Â¯Â¦Ã¥â€¹â„¢
 
-1. **規劃後壓縮** - 計畫確定後，壓縮以重新開始
-2. **除錯後壓縮** - 繼續前清除錯誤解決上下文
-3. **不要在實作中途壓縮** - 為相關變更保留上下文
-4. **閱讀建議** - Hook 告訴你*何時*，你決定*是否*
+1. **Ã¨Â¦ÂÃ¥Å Æ’Ã¥Â¾Å’Ã¥Â£â€œÃ§Â¸Â®** - Ã¨Â¨Ë†Ã§â€¢Â«Ã§Â¢ÂºÃ¥Â®Å¡Ã¥Â¾Å’Ã¯Â¼Å’Ã¥Â£â€œÃ§Â¸Â®Ã¤Â»Â¥Ã©â€¡ÂÃ¦â€“Â°Ã©â€“â€¹Ã¥Â§â€¹
+2. **Ã©â„¢Â¤Ã©Å’Â¯Ã¥Â¾Å’Ã¥Â£â€œÃ§Â¸Â®** - Ã§Â¹Â¼Ã§ÂºÅ’Ã¥â€°ÂÃ¦Â¸â€¦Ã©â„¢Â¤Ã©Å’Â¯Ã¨ÂªÂ¤Ã¨Â§Â£Ã¦Â±ÂºÃ¤Â¸Å Ã¤Â¸â€¹Ã¦â€“â€¡
+3. **Ã¤Â¸ÂÃ¨Â¦ÂÃ¥Å“Â¨Ã¥Â¯Â¦Ã¤Â½Å“Ã¤Â¸Â­Ã©â‚¬â€Ã¥Â£â€œÃ§Â¸Â®** - Ã§â€šÂºÃ§â€ºÂ¸Ã©â€”Å“Ã¨Â®Å Ã¦â€ºÂ´Ã¤Â¿ÂÃ§â€¢â„¢Ã¤Â¸Å Ã¤Â¸â€¹Ã¦â€“â€¡
+4. **Ã©â€“Â±Ã¨Â®â‚¬Ã¥Â»ÂºÃ¨Â­Â°** - Hook Ã¥â€˜Å Ã¨Â¨Â´Ã¤Â½Â *Ã¤Â½â€¢Ã¦â„¢â€š*Ã¯Â¼Å’Ã¤Â½Â Ã¦Â±ÂºÃ¥Â®Å¡*Ã¦ËœÂ¯Ã¥ÂÂ¦*
 
-## 相關
+## Ã§â€ºÂ¸Ã©â€”Å“
 
-- [Longform Guide](https://x.com/affaanmustafa/status/2014040193557471352) - Token 優化章節
-- 記憶持久性 hooks - 用於壓縮後存活的狀態
+- [Longform Guide](https://x.com/affaanmustafa/status/2014040193557471352) - Token Ã¥â€žÂªÃ¥Å’â€“Ã§Â«Â Ã§Â¯â‚¬
+- Ã¨Â¨ËœÃ¦â€ Â¶Ã¦Å’ÂÃ¤Â¹â€¦Ã¦â‚¬Â§ hooks - Ã§â€Â¨Ã¦â€“Â¼Ã¥Â£â€œÃ§Â¸Â®Ã¥Â¾Å’Ã¥Â­ËœÃ¦Â´Â»Ã§Å¡â€žÃ§â€¹â‚¬Ã¦â€¦â€¹

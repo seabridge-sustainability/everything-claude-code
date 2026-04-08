@@ -6,19 +6,32 @@ paths:
   - "**/*.jsx"
 ---
 
-# TypeScript/JavaScript 编码风格
+# TypeScript/JavaScript Ã§Â¼â€“Ã§Â ÂÃ©Â£Å½Ã¦Â Â¼
 
-> 本文件基于 [common/coding-style.md](../common/coding-style.md) 扩展，包含 TypeScript/JavaScript 特定内容。
+## Safety And Authorization Rule
 
-## 类型与接口
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-使用类型使公共 API、共享模型和组件属性显式化、可读且可复用。
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-### 公共 API
 
-* 为导出的函数、共享工具函数和公共类方法添加参数类型和返回类型
-* 让 TypeScript 推断明显的局部变量类型
-* 将重复的内联对象结构提取为命名类型或接口
+> Ã¦Å“Â¬Ã¦â€“â€¡Ã¤Â»Â¶Ã¥Å¸ÂºÃ¤ÂºÅ½ [common/coding-style.md](../common/coding-style.md) Ã¦â€°Â©Ã¥Â±â€¢Ã¯Â¼Å’Ã¥Å’â€¦Ã¥ÂÂ« TypeScript/JavaScript Ã§â€°Â¹Ã¥Â®Å¡Ã¥â€ â€¦Ã¥Â®Â¹Ã£â‚¬â€š
+
+## Ã§Â±Â»Ã¥Å¾â€¹Ã¤Â¸Å½Ã¦Å½Â¥Ã¥ÂÂ£
+
+Ã¤Â½Â¿Ã§â€Â¨Ã§Â±Â»Ã¥Å¾â€¹Ã¤Â½Â¿Ã¥â€¦Â¬Ã¥â€¦Â± APIÃ£â‚¬ÂÃ¥â€¦Â±Ã¤ÂºÂ«Ã¦Â¨Â¡Ã¥Å¾â€¹Ã¥â€™Å’Ã§Â»â€žÃ¤Â»Â¶Ã¥Â±Å¾Ã¦â‚¬Â§Ã¦ËœÂ¾Ã¥Â¼ÂÃ¥Å’â€“Ã£â‚¬ÂÃ¥ÂÂ¯Ã¨Â¯Â»Ã¤Â¸â€Ã¥ÂÂ¯Ã¥Â¤ÂÃ§â€Â¨Ã£â‚¬â€š
+
+### Ã¥â€¦Â¬Ã¥â€¦Â± API
+
+* Ã¤Â¸ÂºÃ¥Â¯Â¼Ã¥â€¡ÂºÃ§Å¡â€žÃ¥â€¡Â½Ã¦â€¢Â°Ã£â‚¬ÂÃ¥â€¦Â±Ã¤ÂºÂ«Ã¥Â·Â¥Ã¥â€¦Â·Ã¥â€¡Â½Ã¦â€¢Â°Ã¥â€™Å’Ã¥â€¦Â¬Ã¥â€¦Â±Ã§Â±Â»Ã¦â€“Â¹Ã¦Â³â€¢Ã¦Â·Â»Ã¥Å Â Ã¥Ââ€šÃ¦â€¢Â°Ã§Â±Â»Ã¥Å¾â€¹Ã¥â€™Å’Ã¨Â¿â€Ã¥â€ºÅ¾Ã§Â±Â»Ã¥Å¾â€¹
+* Ã¨Â®Â© TypeScript Ã¦Å½Â¨Ã¦â€“Â­Ã¦ËœÅ½Ã¦ËœÂ¾Ã§Å¡â€žÃ¥Â±â‚¬Ã©Æ’Â¨Ã¥ÂËœÃ©â€¡ÂÃ§Â±Â»Ã¥Å¾â€¹
+* Ã¥Â°â€ Ã©â€¡ÂÃ¥Â¤ÂÃ§Å¡â€žÃ¥â€ â€¦Ã¨Ââ€Ã¥Â¯Â¹Ã¨Â±Â¡Ã§Â»â€œÃ¦Å¾â€žÃ¦ÂÂÃ¥Ââ€“Ã¤Â¸ÂºÃ¥â€˜Â½Ã¥ÂÂÃ§Â±Â»Ã¥Å¾â€¹Ã¦Ë†â€“Ã¦Å½Â¥Ã¥ÂÂ£
 
 ```typescript
 // WRONG: Exported function without explicit types
@@ -37,11 +50,11 @@ export function formatUser(user: User): string {
 }
 ```
 
-### 接口与类型别名
+### Ã¦Å½Â¥Ã¥ÂÂ£Ã¤Â¸Å½Ã§Â±Â»Ã¥Å¾â€¹Ã¥Ë†Â«Ã¥ÂÂ
 
-* 使用 `interface` 定义可能被扩展或实现的对象结构
-* 使用 `type` 定义联合类型、交叉类型、元组、映射类型和工具类型
-* 优先使用字符串字面量联合类型而非 `enum`，除非需要 `enum` 以实现互操作性
+* Ã¤Â½Â¿Ã§â€Â¨ `interface` Ã¥Â®Å¡Ã¤Â¹â€°Ã¥ÂÂ¯Ã¨Æ’Â½Ã¨Â¢Â«Ã¦â€°Â©Ã¥Â±â€¢Ã¦Ë†â€“Ã¥Â®Å¾Ã§Å½Â°Ã§Å¡â€žÃ¥Â¯Â¹Ã¨Â±Â¡Ã§Â»â€œÃ¦Å¾â€ž
+* Ã¤Â½Â¿Ã§â€Â¨ `type` Ã¥Â®Å¡Ã¤Â¹â€°Ã¨Ââ€Ã¥ÂË†Ã§Â±Â»Ã¥Å¾â€¹Ã£â‚¬ÂÃ¤ÂºÂ¤Ã¥Ââ€°Ã§Â±Â»Ã¥Å¾â€¹Ã£â‚¬ÂÃ¥â€¦Æ’Ã§Â»â€žÃ£â‚¬ÂÃ¦ËœÂ Ã¥Â°â€žÃ§Â±Â»Ã¥Å¾â€¹Ã¥â€™Å’Ã¥Â·Â¥Ã¥â€¦Â·Ã§Â±Â»Ã¥Å¾â€¹
+* Ã¤Â¼ËœÃ¥â€¦Ë†Ã¤Â½Â¿Ã§â€Â¨Ã¥Â­â€”Ã§Â¬Â¦Ã¤Â¸Â²Ã¥Â­â€”Ã©ÂÂ¢Ã©â€¡ÂÃ¨Ââ€Ã¥ÂË†Ã§Â±Â»Ã¥Å¾â€¹Ã¨â‚¬Å’Ã©ÂÅ¾ `enum`Ã¯Â¼Å’Ã©â„¢Â¤Ã©ÂÅ¾Ã©Å“â‚¬Ã¨Â¦Â `enum` Ã¤Â»Â¥Ã¥Â®Å¾Ã§Å½Â°Ã¤Âºâ€™Ã¦â€œÂÃ¤Â½Å“Ã¦â‚¬Â§
 
 ```typescript
 interface User {
@@ -55,11 +68,11 @@ type UserWithRole = User & {
 }
 ```
 
-### 避免使用 `any`
+### Ã©ÂÂ¿Ã¥â€¦ÂÃ¤Â½Â¿Ã§â€Â¨ `any`
 
-* 在应用程序代码中避免使用 `any`
-* 对外部或不受信任的输入使用 `unknown`，然后安全地缩小其类型范围
-* 当值的类型依赖于调用者时，使用泛型
+* Ã¥Å“Â¨Ã¥Âºâ€Ã§â€Â¨Ã§Â¨â€¹Ã¥ÂºÂÃ¤Â»Â£Ã§Â ÂÃ¤Â¸Â­Ã©ÂÂ¿Ã¥â€¦ÂÃ¤Â½Â¿Ã§â€Â¨ `any`
+* Ã¥Â¯Â¹Ã¥Â¤â€“Ã©Æ’Â¨Ã¦Ë†â€“Ã¤Â¸ÂÃ¥Ââ€”Ã¤Â¿Â¡Ã¤Â»Â»Ã§Å¡â€žÃ¨Â¾â€œÃ¥â€¦Â¥Ã¤Â½Â¿Ã§â€Â¨ `unknown`Ã¯Â¼Å’Ã§â€žÂ¶Ã¥ÂÅ½Ã¥Â®â€°Ã¥â€¦Â¨Ã¥Å“Â°Ã§Â¼Â©Ã¥Â°ÂÃ¥â€¦Â¶Ã§Â±Â»Ã¥Å¾â€¹Ã¨Å’Æ’Ã¥â€ºÂ´
+* Ã¥Â½â€œÃ¥â‚¬Â¼Ã§Å¡â€žÃ§Â±Â»Ã¥Å¾â€¹Ã¤Â¾ÂÃ¨Âµâ€“Ã¤ÂºÅ½Ã¨Â°Æ’Ã§â€Â¨Ã¨â‚¬â€¦Ã¦â€”Â¶Ã¯Â¼Å’Ã¤Â½Â¿Ã§â€Â¨Ã¦Â³â€ºÃ¥Å¾â€¹
 
 ```typescript
 // WRONG: any removes type safety
@@ -77,11 +90,11 @@ function getErrorMessage(error: unknown): string {
 }
 ```
 
-### React 属性
+### React Ã¥Â±Å¾Ã¦â‚¬Â§
 
-* 使用命名的 `interface` 或 `type` 定义组件属性
-* 显式地定义回调属性类型
-* 除非有特定原因，否则不要使用 `React.FC`
+* Ã¤Â½Â¿Ã§â€Â¨Ã¥â€˜Â½Ã¥ÂÂÃ§Å¡â€ž `interface` Ã¦Ë†â€“ `type` Ã¥Â®Å¡Ã¤Â¹â€°Ã§Â»â€žÃ¤Â»Â¶Ã¥Â±Å¾Ã¦â‚¬Â§
+* Ã¦ËœÂ¾Ã¥Â¼ÂÃ¥Å“Â°Ã¥Â®Å¡Ã¤Â¹â€°Ã¥â€ºÅ¾Ã¨Â°Æ’Ã¥Â±Å¾Ã¦â‚¬Â§Ã§Â±Â»Ã¥Å¾â€¹
+* Ã©â„¢Â¤Ã©ÂÅ¾Ã¦Å“â€°Ã§â€°Â¹Ã¥Â®Å¡Ã¥Å½Å¸Ã¥â€ºÂ Ã¯Â¼Å’Ã¥ÂÂ¦Ã¥Ë†â„¢Ã¤Â¸ÂÃ¨Â¦ÂÃ¤Â½Â¿Ã§â€Â¨ `React.FC`
 
 ```typescript
 interface User {
@@ -99,10 +112,10 @@ function UserCard({ user, onSelect }: UserCardProps) {
 }
 ```
 
-### JavaScript 文件
+### JavaScript Ã¦â€“â€¡Ã¤Â»Â¶
 
-* 在 `.js` 和 `.jsx` 文件中，当类型能提高清晰度且迁移到 TypeScript 不可行时，使用 JSDoc
-* 保持 JSDoc 与运行时行为一致
+* Ã¥Å“Â¨ `.js` Ã¥â€™Å’ `.jsx` Ã¦â€“â€¡Ã¤Â»Â¶Ã¤Â¸Â­Ã¯Â¼Å’Ã¥Â½â€œÃ§Â±Â»Ã¥Å¾â€¹Ã¨Æ’Â½Ã¦ÂÂÃ©Â«ËœÃ¦Â¸â€¦Ã¦â„¢Â°Ã¥ÂºÂ¦Ã¤Â¸â€Ã¨Â¿ÂÃ§Â§Â»Ã¥Ë†Â° TypeScript Ã¤Â¸ÂÃ¥ÂÂ¯Ã¨Â¡Å’Ã¦â€”Â¶Ã¯Â¼Å’Ã¤Â½Â¿Ã§â€Â¨ JSDoc
+* Ã¤Â¿ÂÃ¦Å’Â JSDoc Ã¤Â¸Å½Ã¨Â¿ÂÃ¨Â¡Å’Ã¦â€”Â¶Ã¨Â¡Å’Ã¤Â¸ÂºÃ¤Â¸â‚¬Ã¨â€¡Â´
 
 ```javascript
 /**
@@ -114,9 +127,9 @@ export function formatUser(user) {
 }
 ```
 
-## 不可变性
+## Ã¤Â¸ÂÃ¥ÂÂ¯Ã¥ÂËœÃ¦â‚¬Â§
 
-使用展开运算符进行不可变更新：
+Ã¤Â½Â¿Ã§â€Â¨Ã¥Â±â€¢Ã¥Â¼â‚¬Ã¨Â¿ÂÃ§Â®â€”Ã§Â¬Â¦Ã¨Â¿â€ºÃ¨Â¡Å’Ã¤Â¸ÂÃ¥ÂÂ¯Ã¥ÂËœÃ¦â€ºÂ´Ã¦â€“Â°Ã¯Â¼Å¡
 
 ```typescript
 interface User {
@@ -139,9 +152,9 @@ function updateUser(user: Readonly<User>, name: string): User {
 }
 ```
 
-## 错误处理
+## Ã©â€â„¢Ã¨Â¯Â¯Ã¥Â¤â€žÃ§Ââ€ 
 
-使用 async/await 配合 try-catch 并安全地缩小未知错误类型范围：
+Ã¤Â½Â¿Ã§â€Â¨ async/await Ã©â€¦ÂÃ¥ÂË† try-catch Ã¥Â¹Â¶Ã¥Â®â€°Ã¥â€¦Â¨Ã¥Å“Â°Ã§Â¼Â©Ã¥Â°ÂÃ¦Å“ÂªÃ§Å¸Â¥Ã©â€â„¢Ã¨Â¯Â¯Ã§Â±Â»Ã¥Å¾â€¹Ã¨Å’Æ’Ã¥â€ºÂ´Ã¯Â¼Å¡
 
 ```typescript
 interface User {
@@ -176,9 +189,9 @@ async function loadUser(userId: string): Promise<User> {
 }
 ```
 
-## 输入验证
+## Ã¨Â¾â€œÃ¥â€¦Â¥Ã©ÂªÅ’Ã¨Â¯Â
 
-使用 Zod 进行基于模式的验证，并从模式推断类型：
+Ã¤Â½Â¿Ã§â€Â¨ Zod Ã¨Â¿â€ºÃ¨Â¡Å’Ã¥Å¸ÂºÃ¤ÂºÅ½Ã¦Â¨Â¡Ã¥Â¼ÂÃ§Å¡â€žÃ©ÂªÅ’Ã¨Â¯ÂÃ¯Â¼Å’Ã¥Â¹Â¶Ã¤Â»Å½Ã¦Â¨Â¡Ã¥Â¼ÂÃ¦Å½Â¨Ã¦â€“Â­Ã§Â±Â»Ã¥Å¾â€¹Ã¯Â¼Å¡
 
 ```typescript
 import { z } from 'zod'
@@ -195,6 +208,6 @@ const validated: UserInput = userSchema.parse(input)
 
 ## Console.log
 
-* 生产代码中不允许出现 `console.log` 语句
-* 请使用适当的日志库替代
-* 查看钩子以进行自动检测
+* Ã§â€Å¸Ã¤ÂºÂ§Ã¤Â»Â£Ã§Â ÂÃ¤Â¸Â­Ã¤Â¸ÂÃ¥â€¦ÂÃ¨Â®Â¸Ã¥â€¡ÂºÃ§Å½Â° `console.log` Ã¨Â¯Â­Ã¥ÂÂ¥
+* Ã¨Â¯Â·Ã¤Â½Â¿Ã§â€Â¨Ã©â‚¬â€šÃ¥Â½â€œÃ§Å¡â€žÃ¦â€”Â¥Ã¥Â¿â€”Ã¥Âºâ€œÃ¦â€ºÂ¿Ã¤Â»Â£
+* Ã¦Å¸Â¥Ã§Å“â€¹Ã©â€™Â©Ã¥Â­ÂÃ¤Â»Â¥Ã¨Â¿â€ºÃ¨Â¡Å’Ã¨â€¡ÂªÃ¥Å Â¨Ã¦Â£â‚¬Ã¦Âµâ€¹

@@ -1,34 +1,47 @@
 ---
 name: bun-runtime
-description: Bun 作为运行时、包管理器、打包器和测试运行器。何时选择 Bun 而非 Node、迁移注意事项以及 Vercel 支持。
+description: Bun Ã¤Â½Å“Ã¤Â¸ÂºÃ¨Â¿ÂÃ¨Â¡Å’Ã¦â€”Â¶Ã£â‚¬ÂÃ¥Å’â€¦Ã§Â®Â¡Ã§Ââ€ Ã¥â„¢Â¨Ã£â‚¬ÂÃ¦â€°â€œÃ¥Å’â€¦Ã¥â„¢Â¨Ã¥â€™Å’Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¨Â¿ÂÃ¨Â¡Å’Ã¥â„¢Â¨Ã£â‚¬â€šÃ¤Â½â€¢Ã¦â€”Â¶Ã©â‚¬â€°Ã¦â€¹Â© Bun Ã¨â‚¬Å’Ã©ÂÅ¾ NodeÃ£â‚¬ÂÃ¨Â¿ÂÃ§Â§Â»Ã¦Â³Â¨Ã¦â€žÂÃ¤Âºâ€¹Ã©Â¡Â¹Ã¤Â»Â¥Ã¥ÂÅ  Vercel Ã¦â€Â¯Ã¦Å’ÂÃ£â‚¬â€š
 origin: ECC
 ---
 
-# Bun 运行时
+# Bun Ã¨Â¿ÂÃ¨Â¡Å’Ã¦â€”Â¶
 
-Bun 是一个快速的全能 JavaScript 运行时和工具集：运行时、包管理器、打包器和测试运行器。
+## Safety And Authorization Rule
 
-## 何时使用
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-* **优先选择 Bun** 用于：新的 JS/TS 项目、安装/运行速度很重要的脚本、使用 Bun 运行时的 Vercel 部署，以及当您想要单一工具链（运行 + 安装 + 测试 + 构建）时。
-* **优先选择 Node** 用于：最大的生态系统兼容性、假定使用 Node 的遗留工具，或者当某个依赖项存在已知的 Bun 问题时。
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-在以下情况下使用：采用 Bun、从 Node 迁移、编写或调试 Bun 脚本/测试，或在 Vercel 或其他平台上配置 Bun。
 
-## 工作原理
+Bun Ã¦ËœÂ¯Ã¤Â¸â‚¬Ã¤Â¸ÂªÃ¥Â¿Â«Ã©â‚¬Å¸Ã§Å¡â€žÃ¥â€¦Â¨Ã¨Æ’Â½ JavaScript Ã¨Â¿ÂÃ¨Â¡Å’Ã¦â€”Â¶Ã¥â€™Å’Ã¥Â·Â¥Ã¥â€¦Â·Ã©â€ºâ€ Ã¯Â¼Å¡Ã¨Â¿ÂÃ¨Â¡Å’Ã¦â€”Â¶Ã£â‚¬ÂÃ¥Å’â€¦Ã§Â®Â¡Ã§Ââ€ Ã¥â„¢Â¨Ã£â‚¬ÂÃ¦â€°â€œÃ¥Å’â€¦Ã¥â„¢Â¨Ã¥â€™Å’Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¨Â¿ÂÃ¨Â¡Å’Ã¥â„¢Â¨Ã£â‚¬â€š
 
-* **运行时**：开箱即用的 Node 兼容运行时（基于 JavaScriptCore，用 Zig 实现）。
-* **包管理器**：`bun install` 比 npm/yarn 快得多。在当前 Bun 中，锁文件默认为 `bun.lock`（文本）；旧版本使用 `bun.lockb`（二进制）。
-* **打包器**：用于应用程序和库的内置打包器和转译器。
-* **测试运行器**：内置的 `bun test`，具有类似 Jest 的 API。
+## Ã¤Â½â€¢Ã¦â€”Â¶Ã¤Â½Â¿Ã§â€Â¨
 
-**从 Node 迁移**：将 `node script.js` 替换为 `bun run script.js` 或 `bun script.js`。运行 `bun install` 代替 `npm install`；大多数包都能工作。使用 `bun run` 来执行 npm 脚本；使用 `bun x` 进行 npx 风格的临时运行。支持 Node 内置模块；在存在 Bun API 的地方优先使用它们以获得更好的性能。
+* **Ã¤Â¼ËœÃ¥â€¦Ë†Ã©â‚¬â€°Ã¦â€¹Â© Bun** Ã§â€Â¨Ã¤ÂºÅ½Ã¯Â¼Å¡Ã¦â€“Â°Ã§Å¡â€ž JS/TS Ã©Â¡Â¹Ã§â€ºÂ®Ã£â‚¬ÂÃ¥Â®â€°Ã¨Â£â€¦/Ã¨Â¿ÂÃ¨Â¡Å’Ã©â‚¬Å¸Ã¥ÂºÂ¦Ã¥Â¾Ë†Ã©â€¡ÂÃ¨Â¦ÂÃ§Å¡â€žÃ¨â€žÅ¡Ã¦Å“Â¬Ã£â‚¬ÂÃ¤Â½Â¿Ã§â€Â¨ Bun Ã¨Â¿ÂÃ¨Â¡Å’Ã¦â€”Â¶Ã§Å¡â€ž Vercel Ã©Æ’Â¨Ã§Â½Â²Ã¯Â¼Å’Ã¤Â»Â¥Ã¥ÂÅ Ã¥Â½â€œÃ¦â€šÂ¨Ã¦Æ’Â³Ã¨Â¦ÂÃ¥Ââ€¢Ã¤Â¸â‚¬Ã¥Â·Â¥Ã¥â€¦Â·Ã©â€œÂ¾Ã¯Â¼Ë†Ã¨Â¿ÂÃ¨Â¡Å’ + Ã¥Â®â€°Ã¨Â£â€¦ + Ã¦Âµâ€¹Ã¨Â¯â€¢ + Ã¦Å¾â€žÃ¥Â»ÂºÃ¯Â¼â€°Ã¦â€”Â¶Ã£â‚¬â€š
+* **Ã¤Â¼ËœÃ¥â€¦Ë†Ã©â‚¬â€°Ã¦â€¹Â© Node** Ã§â€Â¨Ã¤ÂºÅ½Ã¯Â¼Å¡Ã¦Å“â‚¬Ã¥Â¤Â§Ã§Å¡â€žÃ§â€Å¸Ã¦â‚¬ÂÃ§Â³Â»Ã§Â»Å¸Ã¥â€¦Â¼Ã¥Â®Â¹Ã¦â‚¬Â§Ã£â‚¬ÂÃ¥Ââ€¡Ã¥Â®Å¡Ã¤Â½Â¿Ã§â€Â¨ Node Ã§Å¡â€žÃ©Ââ€”Ã§â€¢â„¢Ã¥Â·Â¥Ã¥â€¦Â·Ã¯Â¼Å’Ã¦Ë†â€“Ã¨â‚¬â€¦Ã¥Â½â€œÃ¦Å¸ÂÃ¤Â¸ÂªÃ¤Â¾ÂÃ¨Âµâ€“Ã©Â¡Â¹Ã¥Â­ËœÃ¥Å“Â¨Ã¥Â·Â²Ã§Å¸Â¥Ã§Å¡â€ž Bun Ã©â€”Â®Ã©Â¢ËœÃ¦â€”Â¶Ã£â‚¬â€š
 
-**Vercel**：在项目设置中将运行时设置为 Bun。构建命令：`bun run build` 或 `bun build ./src/index.ts --outdir=dist`。安装命令：`bun install --frozen-lockfile` 用于可重复的部署。
+Ã¥Å“Â¨Ã¤Â»Â¥Ã¤Â¸â€¹Ã¦Æ’â€¦Ã¥â€ ÂµÃ¤Â¸â€¹Ã¤Â½Â¿Ã§â€Â¨Ã¯Â¼Å¡Ã©â€¡â€¡Ã§â€Â¨ BunÃ£â‚¬ÂÃ¤Â»Å½ Node Ã¨Â¿ÂÃ§Â§Â»Ã£â‚¬ÂÃ§Â¼â€“Ã¥â€ â„¢Ã¦Ë†â€“Ã¨Â°Æ’Ã¨Â¯â€¢ Bun Ã¨â€žÅ¡Ã¦Å“Â¬/Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¯Â¼Å’Ã¦Ë†â€“Ã¥Å“Â¨ Vercel Ã¦Ë†â€“Ã¥â€¦Â¶Ã¤Â»â€“Ã¥Â¹Â³Ã¥ÂÂ°Ã¤Â¸Å Ã©â€¦ÂÃ§Â½Â® BunÃ£â‚¬â€š
 
-## 示例
+## Ã¥Â·Â¥Ã¤Â½Å“Ã¥Å½Å¸Ã§Ââ€ 
 
-### 运行和安装
+* **Ã¨Â¿ÂÃ¨Â¡Å’Ã¦â€”Â¶**Ã¯Â¼Å¡Ã¥Â¼â‚¬Ã§Â®Â±Ã¥ÂÂ³Ã§â€Â¨Ã§Å¡â€ž Node Ã¥â€¦Â¼Ã¥Â®Â¹Ã¨Â¿ÂÃ¨Â¡Å’Ã¦â€”Â¶Ã¯Â¼Ë†Ã¥Å¸ÂºÃ¤ÂºÅ½ JavaScriptCoreÃ¯Â¼Å’Ã§â€Â¨ Zig Ã¥Â®Å¾Ã§Å½Â°Ã¯Â¼â€°Ã£â‚¬â€š
+* **Ã¥Å’â€¦Ã§Â®Â¡Ã§Ââ€ Ã¥â„¢Â¨**Ã¯Â¼Å¡`bun install` Ã¦Â¯â€ npm/yarn Ã¥Â¿Â«Ã¥Â¾â€”Ã¥Â¤Å¡Ã£â‚¬â€šÃ¥Å“Â¨Ã¥Â½â€œÃ¥â€°Â Bun Ã¤Â¸Â­Ã¯Â¼Å’Ã©â€ÂÃ¦â€“â€¡Ã¤Â»Â¶Ã©Â»ËœÃ¨Â®Â¤Ã¤Â¸Âº `bun.lock`Ã¯Â¼Ë†Ã¦â€“â€¡Ã¦Å“Â¬Ã¯Â¼â€°Ã¯Â¼â€ºÃ¦â€”Â§Ã§â€°Ë†Ã¦Å“Â¬Ã¤Â½Â¿Ã§â€Â¨ `bun.lockb`Ã¯Â¼Ë†Ã¤ÂºÅ’Ã¨Â¿â€ºÃ¥Ë†Â¶Ã¯Â¼â€°Ã£â‚¬â€š
+* **Ã¦â€°â€œÃ¥Å’â€¦Ã¥â„¢Â¨**Ã¯Â¼Å¡Ã§â€Â¨Ã¤ÂºÅ½Ã¥Âºâ€Ã§â€Â¨Ã§Â¨â€¹Ã¥ÂºÂÃ¥â€™Å’Ã¥Âºâ€œÃ§Å¡â€žÃ¥â€ â€¦Ã§Â½Â®Ã¦â€°â€œÃ¥Å’â€¦Ã¥â„¢Â¨Ã¥â€™Å’Ã¨Â½Â¬Ã¨Â¯â€˜Ã¥â„¢Â¨Ã£â‚¬â€š
+* **Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¨Â¿ÂÃ¨Â¡Å’Ã¥â„¢Â¨**Ã¯Â¼Å¡Ã¥â€ â€¦Ã§Â½Â®Ã§Å¡â€ž `bun test`Ã¯Â¼Å’Ã¥â€¦Â·Ã¦Å“â€°Ã§Â±Â»Ã¤Â¼Â¼ Jest Ã§Å¡â€ž APIÃ£â‚¬â€š
+
+**Ã¤Â»Å½ Node Ã¨Â¿ÂÃ§Â§Â»**Ã¯Â¼Å¡Ã¥Â°â€  `node script.js` Ã¦â€ºÂ¿Ã¦ÂÂ¢Ã¤Â¸Âº `bun run script.js` Ã¦Ë†â€“ `bun script.js`Ã£â‚¬â€šÃ¨Â¿ÂÃ¨Â¡Å’ `bun install` Ã¤Â»Â£Ã¦â€ºÂ¿ `npm install`Ã¯Â¼â€ºÃ¥Â¤Â§Ã¥Â¤Å¡Ã¦â€¢Â°Ã¥Å’â€¦Ã©Æ’Â½Ã¨Æ’Â½Ã¥Â·Â¥Ã¤Â½Å“Ã£â‚¬â€šÃ¤Â½Â¿Ã§â€Â¨ `bun run` Ã¦ÂÂ¥Ã¦â€°Â§Ã¨Â¡Å’ npm Ã¨â€žÅ¡Ã¦Å“Â¬Ã¯Â¼â€ºÃ¤Â½Â¿Ã§â€Â¨ `bun x` Ã¨Â¿â€ºÃ¨Â¡Å’ npx Ã©Â£Å½Ã¦Â Â¼Ã§Å¡â€žÃ¤Â¸Â´Ã¦â€”Â¶Ã¨Â¿ÂÃ¨Â¡Å’Ã£â‚¬â€šÃ¦â€Â¯Ã¦Å’Â Node Ã¥â€ â€¦Ã§Â½Â®Ã¦Â¨Â¡Ã¥Ââ€”Ã¯Â¼â€ºÃ¥Å“Â¨Ã¥Â­ËœÃ¥Å“Â¨ Bun API Ã§Å¡â€žÃ¥Å“Â°Ã¦â€“Â¹Ã¤Â¼ËœÃ¥â€¦Ë†Ã¤Â½Â¿Ã§â€Â¨Ã¥Â®Æ’Ã¤Â»Â¬Ã¤Â»Â¥Ã¨Å½Â·Ã¥Â¾â€”Ã¦â€ºÂ´Ã¥Â¥Â½Ã§Å¡â€žÃ¦â‚¬Â§Ã¨Æ’Â½Ã£â‚¬â€š
+
+**Vercel**Ã¯Â¼Å¡Ã¥Å“Â¨Ã©Â¡Â¹Ã§â€ºÂ®Ã¨Â®Â¾Ã§Â½Â®Ã¤Â¸Â­Ã¥Â°â€ Ã¨Â¿ÂÃ¨Â¡Å’Ã¦â€”Â¶Ã¨Â®Â¾Ã§Â½Â®Ã¤Â¸Âº BunÃ£â‚¬â€šÃ¦Å¾â€žÃ¥Â»ÂºÃ¥â€˜Â½Ã¤Â»Â¤Ã¯Â¼Å¡`bun run build` Ã¦Ë†â€“ `bun build ./src/index.ts --outdir=dist`Ã£â‚¬â€šÃ¥Â®â€°Ã¨Â£â€¦Ã¥â€˜Â½Ã¤Â»Â¤Ã¯Â¼Å¡`bun install --frozen-lockfile` Ã§â€Â¨Ã¤ÂºÅ½Ã¥ÂÂ¯Ã©â€¡ÂÃ¥Â¤ÂÃ§Å¡â€žÃ©Æ’Â¨Ã§Â½Â²Ã£â‚¬â€š
+
+## Ã§Â¤ÂºÃ¤Â¾â€¹
+
+### Ã¨Â¿ÂÃ¨Â¡Å’Ã¥â€™Å’Ã¥Â®â€°Ã¨Â£â€¦
 
 ```bash
 # Install dependencies (creates/updates bun.lock or bun.lockb)
@@ -40,14 +53,14 @@ bun run src/index.ts
 bun src/index.ts
 ```
 
-### 脚本和环境变量
+### Ã¨â€žÅ¡Ã¦Å“Â¬Ã¥â€™Å’Ã§Å½Â¯Ã¥Â¢Æ’Ã¥ÂËœÃ©â€¡Â
 
 ```bash
 bun run --env-file=.env dev
 FOO=bar bun run script.ts
 ```
 
-### 测试
+### Ã¦Âµâ€¹Ã¨Â¯â€¢
 
 ```bash
 bun test
@@ -63,7 +76,7 @@ test("add", () => {
 });
 ```
 
-### 运行时 API
+### Ã¨Â¿ÂÃ¨Â¡Å’Ã¦â€”Â¶ API
 
 ```typescript
 const file = Bun.file("package.json");
@@ -77,8 +90,8 @@ Bun.serve({
 });
 ```
 
-## 最佳实践
+## Ã¦Å“â‚¬Ã¤Â½Â³Ã¥Â®Å¾Ã¨Â·Âµ
 
-* 提交锁文件（`bun.lock` 或 `bun.lockb`）以实现可重复的安装。
-* 在脚本中优先使用 `bun run`。对于 TypeScript，Bun 原生运行 `.ts`。
-* 保持依赖项最新；Bun 和生态系统发展迅速。
+* Ã¦ÂÂÃ¤ÂºÂ¤Ã©â€ÂÃ¦â€“â€¡Ã¤Â»Â¶Ã¯Â¼Ë†`bun.lock` Ã¦Ë†â€“ `bun.lockb`Ã¯Â¼â€°Ã¤Â»Â¥Ã¥Â®Å¾Ã§Å½Â°Ã¥ÂÂ¯Ã©â€¡ÂÃ¥Â¤ÂÃ§Å¡â€žÃ¥Â®â€°Ã¨Â£â€¦Ã£â‚¬â€š
+* Ã¥Å“Â¨Ã¨â€žÅ¡Ã¦Å“Â¬Ã¤Â¸Â­Ã¤Â¼ËœÃ¥â€¦Ë†Ã¤Â½Â¿Ã§â€Â¨ `bun run`Ã£â‚¬â€šÃ¥Â¯Â¹Ã¤ÂºÅ½ TypeScriptÃ¯Â¼Å’Bun Ã¥Å½Å¸Ã§â€Å¸Ã¨Â¿ÂÃ¨Â¡Å’ `.ts`Ã£â‚¬â€š
+* Ã¤Â¿ÂÃ¦Å’ÂÃ¤Â¾ÂÃ¨Âµâ€“Ã©Â¡Â¹Ã¦Å“â‚¬Ã¦â€“Â°Ã¯Â¼â€ºBun Ã¥â€™Å’Ã§â€Å¸Ã¦â‚¬ÂÃ§Â³Â»Ã§Â»Å¸Ã¥Ââ€˜Ã¥Â±â€¢Ã¨Â¿â€¦Ã©â‚¬Å¸Ã£â‚¬â€š

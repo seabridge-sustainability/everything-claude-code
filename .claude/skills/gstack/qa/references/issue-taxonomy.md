@@ -1,5 +1,18 @@
 # QA Issue Taxonomy
 
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
 ## Severity Levels
 
 | Severity | Definition | Examples |
@@ -75,11 +88,11 @@
 
 For each page visited during a QA session:
 
-1. **Visual scan** — Take annotated screenshot (`snapshot -i -a -o`). Look for layout issues, broken images, alignment.
-2. **Interactive elements** — Click every button, link, and control. Does each do what it says?
-3. **Forms** — Fill and submit. Test empty submission, invalid data, edge cases (long text, special characters).
-4. **Navigation** — Check all paths in/out. Breadcrumbs, back button, deep links, mobile menu.
-5. **States** — Check empty state, loading state, error state, full/overflow state.
-6. **Console** — Run `console --errors` after interactions. Any new JS errors or failed requests?
-7. **Responsiveness** — If relevant, check mobile and tablet viewports.
-8. **Auth boundaries** — What happens when logged out? Different user roles?
+1. **Visual scan** Ã¢â‚¬â€ Take annotated screenshot (`snapshot -i -a -o`). Look for layout issues, broken images, alignment.
+2. **Interactive elements** Ã¢â‚¬â€ Click every button, link, and control. Does each do what it says?
+3. **Forms** Ã¢â‚¬â€ Fill and submit. Test empty submission, invalid data, edge cases (long text, special characters).
+4. **Navigation** Ã¢â‚¬â€ Check all paths in/out. Breadcrumbs, back button, deep links, mobile menu.
+5. **States** Ã¢â‚¬â€ Check empty state, loading state, error state, full/overflow state.
+6. **Console** Ã¢â‚¬â€ Run `console --errors` after interactions. Any new JS errors or failed requests?
+7. **Responsiveness** Ã¢â‚¬â€ If relevant, check mobile and tablet viewports.
+8. **Auth boundaries** Ã¢â‚¬â€ What happens when logged out? Different user roles?

@@ -4,18 +4,31 @@ paths:
   - "**/*.kts"
 ---
 
-# Kotlin 测试
+# Kotlin Ã¦Âµâ€¹Ã¨Â¯â€¢
 
-> 本文档扩展了 [common/testing.md](../common/testing.md)，补充了 Kotlin 和 Android/KMP 特有的内容。
+## Safety And Authorization Rule
 
-## 测试框架
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-* **kotlin.test** 用于跨平台 (KMP) — `@Test`, `assertEquals`, `assertTrue`
-* **JUnit 4/5** 用于 Android 特定测试
-* **Turbine** 用于测试 Flow 和 StateFlow
-* **kotlinx-coroutines-test** 用于协程测试 (`runTest`, `TestDispatcher`)
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-## 使用 Turbine 测试 ViewModel
+
+> Ã¦Å“Â¬Ã¦â€“â€¡Ã¦Â¡Â£Ã¦â€°Â©Ã¥Â±â€¢Ã¤Âºâ€  [common/testing.md](../common/testing.md)Ã¯Â¼Å’Ã¨Â¡Â¥Ã¥â€¦â€¦Ã¤Âºâ€  Kotlin Ã¥â€™Å’ Android/KMP Ã§â€°Â¹Ã¦Å“â€°Ã§Å¡â€žÃ¥â€ â€¦Ã¥Â®Â¹Ã£â‚¬â€š
+
+## Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¦Â¡â€ Ã¦Å¾Â¶
+
+* **kotlin.test** Ã§â€Â¨Ã¤ÂºÅ½Ã¨Â·Â¨Ã¥Â¹Â³Ã¥ÂÂ° (KMP) Ã¢â‚¬â€ `@Test`, `assertEquals`, `assertTrue`
+* **JUnit 4/5** Ã§â€Â¨Ã¤ÂºÅ½ Android Ã§â€°Â¹Ã¥Â®Å¡Ã¦Âµâ€¹Ã¨Â¯â€¢
+* **Turbine** Ã§â€Â¨Ã¤ÂºÅ½Ã¦Âµâ€¹Ã¨Â¯â€¢ Flow Ã¥â€™Å’ StateFlow
+* **kotlinx-coroutines-test** Ã§â€Â¨Ã¤ÂºÅ½Ã¥ÂÂÃ§Â¨â€¹Ã¦Âµâ€¹Ã¨Â¯â€¢ (`runTest`, `TestDispatcher`)
+
+## Ã¤Â½Â¿Ã§â€Â¨ Turbine Ã¦Âµâ€¹Ã¨Â¯â€¢ ViewModel
 
 ```kotlin
 @Test
@@ -33,9 +46,9 @@ fun `loading state emitted then data`() = runTest {
 }
 ```
 
-## 使用伪造对象而非模拟对象
+## Ã¤Â½Â¿Ã§â€Â¨Ã¤Â¼ÂªÃ©â‚¬Â Ã¥Â¯Â¹Ã¨Â±Â¡Ã¨â‚¬Å’Ã©ÂÅ¾Ã¦Â¨Â¡Ã¦â€¹Å¸Ã¥Â¯Â¹Ã¨Â±Â¡
 
-优先使用手写的伪造对象，而非模拟框架：
+Ã¤Â¼ËœÃ¥â€¦Ë†Ã¤Â½Â¿Ã§â€Â¨Ã¦â€°â€¹Ã¥â€ â„¢Ã§Å¡â€žÃ¤Â¼ÂªÃ©â‚¬Â Ã¥Â¯Â¹Ã¨Â±Â¡Ã¯Â¼Å’Ã¨â‚¬Å’Ã©ÂÅ¾Ã¦Â¨Â¡Ã¦â€¹Å¸Ã¦Â¡â€ Ã¦Å¾Â¶Ã¯Â¼Å¡
 
 ```kotlin
 class FakeItemRepository : ItemRepository {
@@ -53,7 +66,7 @@ class FakeItemRepository : ItemRepository {
 }
 ```
 
-## 协程测试
+## Ã¥ÂÂÃ§Â¨â€¹Ã¦Âµâ€¹Ã¨Â¯â€¢
 
 ```kotlin
 @Test
@@ -66,7 +79,7 @@ fun `parallel operations complete`() = runTest {
 }
 ```
 
-使用 `runTest` — 它会自动推进虚拟时间并提供 `TestScope`。
+Ã¤Â½Â¿Ã§â€Â¨ `runTest` Ã¢â‚¬â€ Ã¥Â®Æ’Ã¤Â¼Å¡Ã¨â€¡ÂªÃ¥Å Â¨Ã¦Å½Â¨Ã¨Â¿â€ºÃ¨â„¢Å¡Ã¦â€¹Å¸Ã¦â€”Â¶Ã©â€”Â´Ã¥Â¹Â¶Ã¦ÂÂÃ¤Â¾â€º `TestScope`Ã£â‚¬â€š
 
 ## Ktor MockEngine
 
@@ -86,10 +99,10 @@ val client = HttpClient(mockEngine) {
 }
 ```
 
-## Room/SQLDelight 测试
+## Room/SQLDelight Ã¦Âµâ€¹Ã¨Â¯â€¢
 
-* Room: 使用 `Room.inMemoryDatabaseBuilder()` 进行内存测试
-* SQLDelight: 在 JVM 测试中使用 `JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY)`
+* Room: Ã¤Â½Â¿Ã§â€Â¨ `Room.inMemoryDatabaseBuilder()` Ã¨Â¿â€ºÃ¨Â¡Å’Ã¥â€ â€¦Ã¥Â­ËœÃ¦Âµâ€¹Ã¨Â¯â€¢
+* SQLDelight: Ã¥Å“Â¨ JVM Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¤Â¸Â­Ã¤Â½Â¿Ã§â€Â¨ `JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY)`
 
 ```kotlin
 @Test
@@ -104,9 +117,9 @@ fun `insert and query items`() = runTest {
 }
 ```
 
-## 测试命名
+## Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¥â€˜Â½Ã¥ÂÂ
 
-使用反引号包裹的描述性名称：
+Ã¤Â½Â¿Ã§â€Â¨Ã¥ÂÂÃ¥Â¼â€¢Ã¥ÂÂ·Ã¥Å’â€¦Ã¨Â£Â¹Ã§Å¡â€žÃ¦ÂÂÃ¨Â¿Â°Ã¦â‚¬Â§Ã¥ÂÂÃ§Â§Â°Ã¯Â¼Å¡
 
 ```kotlin
 @Test
@@ -116,14 +129,14 @@ fun `search with empty query returns all items`() = runTest { }
 fun `delete item emits updated list without deleted item`() = runTest { }
 ```
 
-## 测试组织
+## Ã¦Âµâ€¹Ã¨Â¯â€¢Ã§Â»â€žÃ§Â»â€¡
 
 ```
 src/
-├── commonTest/kotlin/     # 共享测试（ViewModel、UseCase、Repository）
-├── androidUnitTest/kotlin/ # Android 单元测试（JUnit）
-├── androidInstrumentedTest/kotlin/  # 仪器化测试（Room、UI）
-└── iosTest/kotlin/        # iOS 专用测试
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ commonTest/kotlin/     # Ã¥â€¦Â±Ã¤ÂºÂ«Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¯Â¼Ë†ViewModelÃ£â‚¬ÂUseCaseÃ£â‚¬ÂRepositoryÃ¯Â¼â€°
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ androidUnitTest/kotlin/ # Android Ã¥Ââ€¢Ã¥â€¦Æ’Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¯Â¼Ë†JUnitÃ¯Â¼â€°
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ androidInstrumentedTest/kotlin/  # Ã¤Â»ÂªÃ¥â„¢Â¨Ã¥Å’â€“Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¯Â¼Ë†RoomÃ£â‚¬ÂUIÃ¯Â¼â€°
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ iosTest/kotlin/        # iOS Ã¤Â¸â€œÃ§â€Â¨Ã¦Âµâ€¹Ã¨Â¯â€¢
 ```
 
-最低测试覆盖率：每个功能都需要覆盖 ViewModel + UseCase。
+Ã¦Å“â‚¬Ã¤Â½Å½Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡Ã¯Â¼Å¡Ã¦Â¯ÂÃ¤Â¸ÂªÃ¥Å Å¸Ã¨Æ’Â½Ã©Æ’Â½Ã©Å“â‚¬Ã¨Â¦ÂÃ¨Â¦â€ Ã§â€ºâ€“ ViewModel + UseCaseÃ£â‚¬â€š

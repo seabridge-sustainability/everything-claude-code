@@ -4,6 +4,19 @@ description: Enforce test-driven development workflow. Scaffold interfaces, gene
 
 # TDD Command
 
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
 This command invokes the **tdd-guide** agent to enforce test-driven development methodology.
 
 ## What This Command Does
@@ -38,7 +51,7 @@ The tdd-guide agent will:
 ## TDD Cycle
 
 ```
-RED → GREEN → REFACTOR → REPEAT
+RED Ã¢â€ â€™ GREEN Ã¢â€ â€™ REFACTOR Ã¢â€ â€™ REPEAT
 
 RED:      Write a failing test
 GREEN:    Write minimal code to pass
@@ -127,7 +140,7 @@ describe('calculateLiquidityScore', () => {
 npm test lib/liquidity.test.ts
 
 FAIL lib/liquidity.test.ts
-  ✕ should return high score for liquid market (2 ms)
+  Ã¢Å“â€¢ should return high score for liquid market (2 ms)
     Error: Not implemented
 
 1 test failed, 0 passed
@@ -172,9 +185,9 @@ export function calculateLiquidityScore(market: MarketData): number {
 npm test lib/liquidity.test.ts
 
 PASS lib/liquidity.test.ts
-  ✓ should return high score for liquid market (3 ms)
-  ✓ should return low score for illiquid market (2 ms)
-  ✓ should handle edge case: zero volume (1 ms)
+  Ã¢Å“â€œ should return high score for liquid market (3 ms)
+  Ã¢Å“â€œ should return low score for illiquid market (2 ms)
+  Ã¢Å“â€œ should handle edge case: zero volume (1 ms)
 
 3 tests passed
 ```
@@ -229,9 +242,9 @@ export function calculateLiquidityScore(market: MarketData): number {
 npm test lib/liquidity.test.ts
 
 PASS lib/liquidity.test.ts
-  ✓ should return high score for liquid market (3 ms)
-  ✓ should return low score for illiquid market (2 ms)
-  ✓ should handle edge case: zero volume (1 ms)
+  Ã¢Å“â€œ should return high score for liquid market (3 ms)
+  Ã¢Å“â€œ should return low score for illiquid market (2 ms)
+  Ã¢Å“â€œ should handle edge case: zero volume (1 ms)
 
 3 tests passed
 ```

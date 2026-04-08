@@ -1,24 +1,37 @@
-# RTStream 参考
+# RTStream Ã¥Ââ€šÃ¨â‚¬Æ’
 
-RTStream 操作的代码级详情。工作流程指南请参阅 [rtstream.md](rtstream.md)。
-有关使用指导和流程选择，请从 [../SKILL.md](../SKILL.md) 开始。
+## Safety And Authorization Rule
 
-基于 [docs.videodb.io](https://docs.videodb.io/pages/ingest/live-streams/realtime-apis.md)。
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+RTStream Ã¦â€œÂÃ¤Â½Å“Ã§Å¡â€žÃ¤Â»Â£Ã§Â ÂÃ§ÂºÂ§Ã¨Â¯Â¦Ã¦Æ’â€¦Ã£â‚¬â€šÃ¥Â·Â¥Ã¤Â½Å“Ã¦ÂµÂÃ§Â¨â€¹Ã¦Å’â€¡Ã¥Ââ€”Ã¨Â¯Â·Ã¥Ââ€šÃ©Ëœâ€¦ [rtstream.md](rtstream.md)Ã£â‚¬â€š
+Ã¦Å“â€°Ã¥â€¦Â³Ã¤Â½Â¿Ã§â€Â¨Ã¦Å’â€¡Ã¥Â¯Â¼Ã¥â€™Å’Ã¦ÂµÂÃ§Â¨â€¹Ã©â‚¬â€°Ã¦â€¹Â©Ã¯Â¼Å’Ã¨Â¯Â·Ã¤Â»Å½ [../SKILL.md](../SKILL.md) Ã¥Â¼â‚¬Ã¥Â§â€¹Ã£â‚¬â€š
+
+Ã¥Å¸ÂºÃ¤ÂºÅ½ [docs.videodb.io](https://docs.videodb.io/pages/ingest/live-streams/realtime-apis.md)Ã£â‚¬â€š
 
 ***
 
-## Collection RTStream 方法
+## Collection RTStream Ã¦â€“Â¹Ã¦Â³â€¢
 
-`Collection` 上用于管理 RTStream 的方法：
+`Collection` Ã¤Â¸Å Ã§â€Â¨Ã¤ÂºÅ½Ã§Â®Â¡Ã§Ââ€  RTStream Ã§Å¡â€žÃ¦â€“Â¹Ã¦Â³â€¢Ã¯Â¼Å¡
 
-| 方法 | 返回 | 描述 |
+| Ã¦â€“Â¹Ã¦Â³â€¢ | Ã¨Â¿â€Ã¥â€ºÅ¾ | Ã¦ÂÂÃ¨Â¿Â° |
 |--------|---------|-------------|
-| `coll.connect_rtstream(url, name, ...)` | `RTStream` | 从 RTSP/RTMP URL 创建新的 RTStream |
-| `coll.get_rtstream(id)` | `RTStream` | 通过 ID 获取现有的 RTStream |
-| `coll.list_rtstreams(limit, offset, status, name, ordering)` | `List[RTStream]` | 列出集合中的所有 RTStream |
-| `coll.search(query, namespace="rtstream")` | `RTStreamSearchResult` | 在所有 RTStream 中搜索 |
+| `coll.connect_rtstream(url, name, ...)` | `RTStream` | Ã¤Â»Å½ RTSP/RTMP URL Ã¥Ë†â€ºÃ¥Â»ÂºÃ¦â€“Â°Ã§Å¡â€ž RTStream |
+| `coll.get_rtstream(id)` | `RTStream` | Ã©â‚¬Å¡Ã¨Â¿â€¡ ID Ã¨Å½Â·Ã¥Ââ€“Ã§Å½Â°Ã¦Å“â€°Ã§Å¡â€ž RTStream |
+| `coll.list_rtstreams(limit, offset, status, name, ordering)` | `List[RTStream]` | Ã¥Ë†â€”Ã¥â€¡ÂºÃ©â€ºâ€ Ã¥ÂË†Ã¤Â¸Â­Ã§Å¡â€žÃ¦â€°â‚¬Ã¦Å“â€° RTStream |
+| `coll.search(query, namespace="rtstream")` | `RTStreamSearchResult` | Ã¥Å“Â¨Ã¦â€°â‚¬Ã¦Å“â€° RTStream Ã¤Â¸Â­Ã¦ÂÅ“Ã§Â´Â¢ |
 
-### 连接 RTStream
+### Ã¨Â¿Å¾Ã¦Å½Â¥ RTStream
 
 ```python
 import videodb
@@ -37,13 +50,13 @@ rtstream = coll.connect_rtstream(
 )
 ```
 
-### 获取现有 RTStream
+### Ã¨Å½Â·Ã¥Ââ€“Ã§Å½Â°Ã¦Å“â€° RTStream
 
 ```python
 rtstream = coll.get_rtstream("rts-xxx")
 ```
 
-### 列出 RTStream
+### Ã¥Ë†â€”Ã¥â€¡Âº RTStream
 
 ```python
 rtstreams = coll.list_rtstreams(
@@ -58,9 +71,9 @@ for rts in rtstreams:
     print(f"{rts.id}: {rts.name} - {rts.status}")
 ```
 
-### 从捕获会话获取
+### Ã¤Â»Å½Ã¦Ââ€¢Ã¨Å½Â·Ã¤Â¼Å¡Ã¨Â¯ÂÃ¨Å½Â·Ã¥Ââ€“
 
-捕获会话激活后，检索 RTStream 对象：
+Ã¦Ââ€¢Ã¨Å½Â·Ã¤Â¼Å¡Ã¨Â¯ÂÃ¦Â¿â‚¬Ã¦Â´Â»Ã¥ÂÅ½Ã¯Â¼Å’Ã¦Â£â‚¬Ã§Â´Â¢ RTStream Ã¥Â¯Â¹Ã¨Â±Â¡Ã¯Â¼Å¡
 
 ```python
 session = conn.get_capture_session(session_id)
@@ -70,7 +83,7 @@ displays = session.get_rtstream("screen")
 system_audios = session.get_rtstream("system_audio")
 ```
 
-或使用 `capture_session.active` WebSocket 事件中的 `rtstreams` 数据：
+Ã¦Ë†â€“Ã¤Â½Â¿Ã§â€Â¨ `capture_session.active` WebSocket Ã¤Âºâ€¹Ã¤Â»Â¶Ã¤Â¸Â­Ã§Å¡â€ž `rtstreams` Ã¦â€¢Â°Ã¦ÂÂ®Ã¯Â¼Å¡
 
 ```python
 for rts in rtstreams:
@@ -79,26 +92,26 @@ for rts in rtstreams:
 
 ***
 
-## RTStream 方法
+## RTStream Ã¦â€“Â¹Ã¦Â³â€¢
 
-| 方法 | 返回 | 描述 |
+| Ã¦â€“Â¹Ã¦Â³â€¢ | Ã¨Â¿â€Ã¥â€ºÅ¾ | Ã¦ÂÂÃ¨Â¿Â° |
 |--------|---------|-------------|
-| `rtstream.start()` | `None` | 开始摄取 |
-| `rtstream.stop()` | `None` | 停止摄取 |
-| `rtstream.generate_stream(start, end)` | `str` | 流式传输录制的片段（Unix 时间戳） |
-| `rtstream.export(name=None)` | `RTStreamExportResult` | 导出为永久视频 |
-| `rtstream.index_visuals(prompt, ...)` | `RTStreamSceneIndex` | 创建带 AI 分析的视觉索引 |
-| `rtstream.index_audio(prompt, ...)` | `RTStreamSceneIndex` | 创建带 LLM 摘要的音频索引 |
-| `rtstream.list_scene_indexes()` | `List[RTStreamSceneIndex]` | 列出流上的所有场景索引 |
-| `rtstream.get_scene_index(index_id)` | `RTStreamSceneIndex` | 获取特定场景索引 |
-| `rtstream.search(query, ...)` | `RTStreamSearchResult` | 搜索索引内容 |
-| `rtstream.start_transcript(ws_connection_id, engine)` | `dict` | 开始实时转录 |
-| `rtstream.get_transcript(page, page_size, start, end, since)` | `dict` | 获取转录页面 |
-| `rtstream.stop_transcript(engine)` | `dict` | 停止转录 |
+| `rtstream.start()` | `None` | Ã¥Â¼â‚¬Ã¥Â§â€¹Ã¦â€˜â€žÃ¥Ââ€“ |
+| `rtstream.stop()` | `None` | Ã¥ÂÅ“Ã¦Â­Â¢Ã¦â€˜â€žÃ¥Ââ€“ |
+| `rtstream.generate_stream(start, end)` | `str` | Ã¦ÂµÂÃ¥Â¼ÂÃ¤Â¼Â Ã¨Â¾â€œÃ¥Â½â€¢Ã¥Ë†Â¶Ã§Å¡â€žÃ§â€°â€¡Ã¦Â®ÂµÃ¯Â¼Ë†Unix Ã¦â€”Â¶Ã©â€”Â´Ã¦Ë†Â³Ã¯Â¼â€° |
+| `rtstream.export(name=None)` | `RTStreamExportResult` | Ã¥Â¯Â¼Ã¥â€¡ÂºÃ¤Â¸ÂºÃ¦Â°Â¸Ã¤Â¹â€¦Ã¨Â§â€ Ã©Â¢â€˜ |
+| `rtstream.index_visuals(prompt, ...)` | `RTStreamSceneIndex` | Ã¥Ë†â€ºÃ¥Â»ÂºÃ¥Â¸Â¦ AI Ã¥Ë†â€ Ã¦Å¾ÂÃ§Å¡â€žÃ¨Â§â€ Ã¨Â§â€°Ã§Â´Â¢Ã¥Â¼â€¢ |
+| `rtstream.index_audio(prompt, ...)` | `RTStreamSceneIndex` | Ã¥Ë†â€ºÃ¥Â»ÂºÃ¥Â¸Â¦ LLM Ã¦â€˜ËœÃ¨Â¦ÂÃ§Å¡â€žÃ©Å¸Â³Ã©Â¢â€˜Ã§Â´Â¢Ã¥Â¼â€¢ |
+| `rtstream.list_scene_indexes()` | `List[RTStreamSceneIndex]` | Ã¥Ë†â€”Ã¥â€¡ÂºÃ¦ÂµÂÃ¤Â¸Å Ã§Å¡â€žÃ¦â€°â‚¬Ã¦Å“â€°Ã¥Å“ÂºÃ¦â„¢Â¯Ã§Â´Â¢Ã¥Â¼â€¢ |
+| `rtstream.get_scene_index(index_id)` | `RTStreamSceneIndex` | Ã¨Å½Â·Ã¥Ââ€“Ã§â€°Â¹Ã¥Â®Å¡Ã¥Å“ÂºÃ¦â„¢Â¯Ã§Â´Â¢Ã¥Â¼â€¢ |
+| `rtstream.search(query, ...)` | `RTStreamSearchResult` | Ã¦ÂÅ“Ã§Â´Â¢Ã§Â´Â¢Ã¥Â¼â€¢Ã¥â€ â€¦Ã¥Â®Â¹ |
+| `rtstream.start_transcript(ws_connection_id, engine)` | `dict` | Ã¥Â¼â‚¬Ã¥Â§â€¹Ã¥Â®Å¾Ã¦â€”Â¶Ã¨Â½Â¬Ã¥Â½â€¢ |
+| `rtstream.get_transcript(page, page_size, start, end, since)` | `dict` | Ã¨Å½Â·Ã¥Ââ€“Ã¨Â½Â¬Ã¥Â½â€¢Ã©Â¡ÂµÃ©ÂÂ¢ |
+| `rtstream.stop_transcript(engine)` | `dict` | Ã¥ÂÅ“Ã¦Â­Â¢Ã¨Â½Â¬Ã¥Â½â€¢ |
 
 ***
 
-## 启动和停止
+## Ã¥ÂÂ¯Ã¥Å Â¨Ã¥â€™Å’Ã¥ÂÅ“Ã¦Â­Â¢
 
 ```python
 # Begin ingestion
@@ -112,9 +125,9 @@ rtstream.stop()
 
 ***
 
-## 生成流
+## Ã§â€Å¸Ã¦Ë†ÂÃ¦ÂµÂ
 
-使用 Unix 时间戳（而非秒数偏移）从录制内容生成播放流：
+Ã¤Â½Â¿Ã§â€Â¨ Unix Ã¦â€”Â¶Ã©â€”Â´Ã¦Ë†Â³Ã¯Â¼Ë†Ã¨â‚¬Å’Ã©ÂÅ¾Ã§Â§â€™Ã¦â€¢Â°Ã¥ÂÂÃ§Â§Â»Ã¯Â¼â€°Ã¤Â»Å½Ã¥Â½â€¢Ã¥Ë†Â¶Ã¥â€ â€¦Ã¥Â®Â¹Ã§â€Å¸Ã¦Ë†ÂÃ¦â€™Â­Ã¦â€Â¾Ã¦ÂµÂÃ¯Â¼Å¡
 
 ```python
 import time
@@ -135,9 +148,9 @@ print(f"Recorded stream: {stream_url}")
 
 ***
 
-## 导出为视频
+## Ã¥Â¯Â¼Ã¥â€¡ÂºÃ¤Â¸ÂºÃ¨Â§â€ Ã©Â¢â€˜
 
-将录制的流导出为集合中的永久视频：
+Ã¥Â°â€ Ã¥Â½â€¢Ã¥Ë†Â¶Ã§Å¡â€žÃ¦ÂµÂÃ¥Â¯Â¼Ã¥â€¡ÂºÃ¤Â¸ÂºÃ©â€ºâ€ Ã¥ÂË†Ã¤Â¸Â­Ã§Å¡â€žÃ¦Â°Â¸Ã¤Â¹â€¦Ã¨Â§â€ Ã©Â¢â€˜Ã¯Â¼Å¡
 
 ```python
 export_result = rtstream.export(name="Meeting Recording 2024-01-15")
@@ -148,32 +161,32 @@ print(f"Player URL: {export_result.player_url}")
 print(f"Duration: {export_result.duration}s")
 ```
 
-### RTStreamExportResult 属性
+### RTStreamExportResult Ã¥Â±Å¾Ã¦â‚¬Â§
 
-| 属性 | 类型 | 描述 |
+| Ã¥Â±Å¾Ã¦â‚¬Â§ | Ã§Â±Â»Ã¥Å¾â€¹ | Ã¦ÂÂÃ¨Â¿Â° |
 |----------|------|-------------|
-| `video_id` | `str` | 导出视频的 ID |
-| `stream_url` | `str` | HLS 流 URL |
-| `player_url` | `str` | Web 播放器 URL |
-| `name` | `str` | 视频名称 |
-| `duration` | `float` | 时长（秒） |
+| `video_id` | `str` | Ã¥Â¯Â¼Ã¥â€¡ÂºÃ¨Â§â€ Ã©Â¢â€˜Ã§Å¡â€ž ID |
+| `stream_url` | `str` | HLS Ã¦ÂµÂ URL |
+| `player_url` | `str` | Web Ã¦â€™Â­Ã¦â€Â¾Ã¥â„¢Â¨ URL |
+| `name` | `str` | Ã¨Â§â€ Ã©Â¢â€˜Ã¥ÂÂÃ§Â§Â° |
+| `duration` | `float` | Ã¦â€”Â¶Ã©â€¢Â¿Ã¯Â¼Ë†Ã§Â§â€™Ã¯Â¼â€° |
 
 ***
 
-## AI 管道
+## AI Ã§Â®Â¡Ã©Ââ€œ
 
-AI 管道处理实时流并通过 WebSocket 发送结果。
+AI Ã§Â®Â¡Ã©Ââ€œÃ¥Â¤â€žÃ§Ââ€ Ã¥Â®Å¾Ã¦â€”Â¶Ã¦ÂµÂÃ¥Â¹Â¶Ã©â‚¬Å¡Ã¨Â¿â€¡ WebSocket Ã¥Ââ€˜Ã©â‚¬ÂÃ§Â»â€œÃ¦Å¾Å“Ã£â‚¬â€š
 
-### RTStream AI 管道方法
+### RTStream AI Ã§Â®Â¡Ã©Ââ€œÃ¦â€“Â¹Ã¦Â³â€¢
 
-| 方法 | 返回 | 描述 |
+| Ã¦â€“Â¹Ã¦Â³â€¢ | Ã¨Â¿â€Ã¥â€ºÅ¾ | Ã¦ÂÂÃ¨Â¿Â° |
 |--------|---------|-------------|
-| `rtstream.index_audio(prompt, batch_config, ...)` | `RTStreamSceneIndex` | 开始带 LLM 摘要的音频索引 |
-| `rtstream.index_visuals(prompt, batch_config, ...)` | `RTStreamSceneIndex` | 开始屏幕内容的视觉索引 |
+| `rtstream.index_audio(prompt, batch_config, ...)` | `RTStreamSceneIndex` | Ã¥Â¼â‚¬Ã¥Â§â€¹Ã¥Â¸Â¦ LLM Ã¦â€˜ËœÃ¨Â¦ÂÃ§Å¡â€žÃ©Å¸Â³Ã©Â¢â€˜Ã§Â´Â¢Ã¥Â¼â€¢ |
+| `rtstream.index_visuals(prompt, batch_config, ...)` | `RTStreamSceneIndex` | Ã¥Â¼â‚¬Ã¥Â§â€¹Ã¥Â±ÂÃ¥Â¹â€¢Ã¥â€ â€¦Ã¥Â®Â¹Ã§Å¡â€žÃ¨Â§â€ Ã¨Â§â€°Ã§Â´Â¢Ã¥Â¼â€¢ |
 
-### 音频索引
+### Ã©Å¸Â³Ã©Â¢â€˜Ã§Â´Â¢Ã¥Â¼â€¢
 
-以一定间隔生成音频内容的 LLM 摘要：
+Ã¤Â»Â¥Ã¤Â¸â‚¬Ã¥Â®Å¡Ã©â€”Â´Ã©Å¡â€Ã§â€Å¸Ã¦Ë†ÂÃ©Å¸Â³Ã©Â¢â€˜Ã¥â€ â€¦Ã¥Â®Â¹Ã§Å¡â€ž LLM Ã¦â€˜ËœÃ¨Â¦ÂÃ¯Â¼Å¡
 
 ```python
 audio_index = rtstream.index_audio(
@@ -185,15 +198,15 @@ audio_index = rtstream.index_audio(
 )
 ```
 
-**音频 batch\_config 选项：**
+**Ã©Å¸Â³Ã©Â¢â€˜ batch\_config Ã©â‚¬â€°Ã©Â¡Â¹Ã¯Â¼Å¡**
 
-| 类型 | 值 | 描述 |
+| Ã§Â±Â»Ã¥Å¾â€¹ | Ã¥â‚¬Â¼ | Ã¦ÂÂÃ¨Â¿Â° |
 |------|-------|-------------|
-| `"word"` | count | 每 N 个词分段 |
-| `"sentence"` | count | 每 N 个句子分段 |
-| `"time"` | seconds | 每 N 秒分段 |
+| `"word"` | count | Ã¦Â¯Â N Ã¤Â¸ÂªÃ¨Â¯ÂÃ¥Ë†â€ Ã¦Â®Âµ |
+| `"sentence"` | count | Ã¦Â¯Â N Ã¤Â¸ÂªÃ¥ÂÂ¥Ã¥Â­ÂÃ¥Ë†â€ Ã¦Â®Âµ |
+| `"time"` | seconds | Ã¦Â¯Â N Ã§Â§â€™Ã¥Ë†â€ Ã¦Â®Âµ |
 
-示例：
+Ã§Â¤ÂºÃ¤Â¾â€¹Ã¯Â¼Å¡
 
 ```python
 {"type": "word", "value": 50}      # every 50 words
@@ -201,11 +214,11 @@ audio_index = rtstream.index_audio(
 {"type": "time", "value": 30}      # every 30 seconds
 ```
 
-结果通过 `audio_index` WebSocket 通道送达。
+Ã§Â»â€œÃ¦Å¾Å“Ã©â‚¬Å¡Ã¨Â¿â€¡ `audio_index` WebSocket Ã©â‚¬Å¡Ã©Ââ€œÃ©â‚¬ÂÃ¨Â¾Â¾Ã£â‚¬â€š
 
-### 视觉索引
+### Ã¨Â§â€ Ã¨Â§â€°Ã§Â´Â¢Ã¥Â¼â€¢
 
-生成视觉内容的 AI 描述：
+Ã§â€Å¸Ã¦Ë†ÂÃ¨Â§â€ Ã¨Â§â€°Ã¥â€ â€¦Ã¥Â®Â¹Ã§Å¡â€ž AI Ã¦ÂÂÃ¨Â¿Â°Ã¯Â¼Å¡
 
 ```python
 scene_index = rtstream.index_visuals(
@@ -217,29 +230,29 @@ scene_index = rtstream.index_visuals(
 )
 ```
 
-**参数：**
+**Ã¥Ââ€šÃ¦â€¢Â°Ã¯Â¼Å¡**
 
-| 参数 | 类型 | 描述 |
+| Ã¥Ââ€šÃ¦â€¢Â° | Ã§Â±Â»Ã¥Å¾â€¹ | Ã¦ÂÂÃ¨Â¿Â° |
 |-----------|------|-------------|
-| `prompt` | `str` | AI 模型的指令（支持结构化 JSON 输出） |
-| `batch_config` | `dict` | 控制帧采样（见下文） |
-| `model_name` | `str` | 模型层级：`"mini"`、`"basic"`、`"pro"`、`"ultra"` |
-| `name` | `str` | 索引名称（可选） |
-| `ws_connection_id` | `str` | 用于接收结果的 WebSocket 连接 ID |
+| `prompt` | `str` | AI Ã¦Â¨Â¡Ã¥Å¾â€¹Ã§Å¡â€žÃ¦Å’â€¡Ã¤Â»Â¤Ã¯Â¼Ë†Ã¦â€Â¯Ã¦Å’ÂÃ§Â»â€œÃ¦Å¾â€žÃ¥Å’â€“ JSON Ã¨Â¾â€œÃ¥â€¡ÂºÃ¯Â¼â€° |
+| `batch_config` | `dict` | Ã¦Å½Â§Ã¥Ë†Â¶Ã¥Â¸Â§Ã©â€¡â€¡Ã¦Â Â·Ã¯Â¼Ë†Ã¨Â§ÂÃ¤Â¸â€¹Ã¦â€“â€¡Ã¯Â¼â€° |
+| `model_name` | `str` | Ã¦Â¨Â¡Ã¥Å¾â€¹Ã¥Â±â€šÃ§ÂºÂ§Ã¯Â¼Å¡`"mini"`Ã£â‚¬Â`"basic"`Ã£â‚¬Â`"pro"`Ã£â‚¬Â`"ultra"` |
+| `name` | `str` | Ã§Â´Â¢Ã¥Â¼â€¢Ã¥ÂÂÃ§Â§Â°Ã¯Â¼Ë†Ã¥ÂÂ¯Ã©â‚¬â€°Ã¯Â¼â€° |
+| `ws_connection_id` | `str` | Ã§â€Â¨Ã¤ÂºÅ½Ã¦Å½Â¥Ã¦â€Â¶Ã§Â»â€œÃ¦Å¾Å“Ã§Å¡â€ž WebSocket Ã¨Â¿Å¾Ã¦Å½Â¥ ID |
 
-**视觉 batch\_config：**
+**Ã¨Â§â€ Ã¨Â§â€° batch\_configÃ¯Â¼Å¡**
 
-| 键 | 类型 | 描述 |
+| Ã©â€Â® | Ã§Â±Â»Ã¥Å¾â€¹ | Ã¦ÂÂÃ¨Â¿Â° |
 |-----|------|-------------|
-| `type` | `str` | 仅 `"time"` 支持视觉索引 |
-| `value` | `int` | 窗口大小（秒） |
-| `frame_count` | `int` | 每个窗口提取的帧数 |
+| `type` | `str` | Ã¤Â»â€¦ `"time"` Ã¦â€Â¯Ã¦Å’ÂÃ¨Â§â€ Ã¨Â§â€°Ã§Â´Â¢Ã¥Â¼â€¢ |
+| `value` | `int` | Ã§Âªâ€”Ã¥ÂÂ£Ã¥Â¤Â§Ã¥Â°ÂÃ¯Â¼Ë†Ã§Â§â€™Ã¯Â¼â€° |
+| `frame_count` | `int` | Ã¦Â¯ÂÃ¤Â¸ÂªÃ§Âªâ€”Ã¥ÂÂ£Ã¦ÂÂÃ¥Ââ€“Ã§Å¡â€žÃ¥Â¸Â§Ã¦â€¢Â° |
 
-示例：`{"type": "time", "value": 2, "frame_count": 5}` 每 2 秒采样 5 帧并将其发送到模型。
+Ã§Â¤ÂºÃ¤Â¾â€¹Ã¯Â¼Å¡`{"type": "time", "value": 2, "frame_count": 5}` Ã¦Â¯Â 2 Ã§Â§â€™Ã©â€¡â€¡Ã¦Â Â· 5 Ã¥Â¸Â§Ã¥Â¹Â¶Ã¥Â°â€ Ã¥â€¦Â¶Ã¥Ââ€˜Ã©â‚¬ÂÃ¥Ë†Â°Ã¦Â¨Â¡Ã¥Å¾â€¹Ã£â‚¬â€š
 
-**结构化 JSON 输出：**
+**Ã§Â»â€œÃ¦Å¾â€žÃ¥Å’â€“ JSON Ã¨Â¾â€œÃ¥â€¡ÂºÃ¯Â¼Å¡**
 
-使用请求 JSON 格式的提示语以获得结构化响应：
+Ã¤Â½Â¿Ã§â€Â¨Ã¨Â¯Â·Ã¦Â±â€š JSON Ã¦Â Â¼Ã¥Â¼ÂÃ§Å¡â€žÃ¦ÂÂÃ§Â¤ÂºÃ¨Â¯Â­Ã¤Â»Â¥Ã¨Å½Â·Ã¥Â¾â€”Ã§Â»â€œÃ¦Å¾â€žÃ¥Å’â€“Ã¥â€œÂÃ¥Âºâ€Ã¯Â¼Å¡
 
 ```python
 scene_index = rtstream.index_visuals(
@@ -258,18 +271,18 @@ Return only valid JSON.""",
 )
 ```
 
-结果通过 `scene_index` WebSocket 通道送达。
+Ã§Â»â€œÃ¦Å¾Å“Ã©â‚¬Å¡Ã¨Â¿â€¡ `scene_index` WebSocket Ã©â‚¬Å¡Ã©Ââ€œÃ©â‚¬ÂÃ¨Â¾Â¾Ã£â‚¬â€š
 
 ***
 
-## 批处理配置摘要
+## Ã¦â€°Â¹Ã¥Â¤â€žÃ§Ââ€ Ã©â€¦ÂÃ§Â½Â®Ã¦â€˜ËœÃ¨Â¦Â
 
-| 索引类型 | `type` 选项 | `value` | 额外键 |
+| Ã§Â´Â¢Ã¥Â¼â€¢Ã§Â±Â»Ã¥Å¾â€¹ | `type` Ã©â‚¬â€°Ã©Â¡Â¹ | `value` | Ã©Â¢ÂÃ¥Â¤â€“Ã©â€Â® |
 |---------------|----------------|---------|------------|
-| **音频** | `"word"`、`"sentence"`、`"time"` | words/sentences/seconds | - |
-| **视觉** | 仅 `"time"` | seconds | `frame_count` |
+| **Ã©Å¸Â³Ã©Â¢â€˜** | `"word"`Ã£â‚¬Â`"sentence"`Ã£â‚¬Â`"time"` | words/sentences/seconds | - |
+| **Ã¨Â§â€ Ã¨Â§â€°** | Ã¤Â»â€¦ `"time"` | seconds | `frame_count` |
 
-示例：
+Ã§Â¤ÂºÃ¤Â¾â€¹Ã¯Â¼Å¡
 
 ```python
 # Audio: every 50 words
@@ -284,9 +297,9 @@ Return only valid JSON.""",
 
 ***
 
-## 转录
+## Ã¨Â½Â¬Ã¥Â½â€¢
 
-通过 WebSocket 进行实时转录：
+Ã©â‚¬Å¡Ã¨Â¿â€¡ WebSocket Ã¨Â¿â€ºÃ¨Â¡Å’Ã¥Â®Å¾Ã¦â€”Â¶Ã¨Â½Â¬Ã¥Â½â€¢Ã¯Â¼Å¡
 
 ```python
 # Start live transcription
@@ -309,13 +322,13 @@ transcript = rtstream.get_transcript(
 rtstream.stop_transcript(engine=None)
 ```
 
-转录结果通过 `transcript` WebSocket 通道送达。
+Ã¨Â½Â¬Ã¥Â½â€¢Ã§Â»â€œÃ¦Å¾Å“Ã©â‚¬Å¡Ã¨Â¿â€¡ `transcript` WebSocket Ã©â‚¬Å¡Ã©Ââ€œÃ©â‚¬ÂÃ¨Â¾Â¾Ã£â‚¬â€š
 
 ***
 
 ## RTStreamSceneIndex
 
-当您调用 `index_audio()` 或 `index_visuals()` 时，该方法返回一个 `RTStreamSceneIndex` 对象。此对象表示正在运行的索引，并提供用于管理场景和警报的方法。
+Ã¥Â½â€œÃ¦â€šÂ¨Ã¨Â°Æ’Ã§â€Â¨ `index_audio()` Ã¦Ë†â€“ `index_visuals()` Ã¦â€”Â¶Ã¯Â¼Å’Ã¨Â¯Â¥Ã¦â€“Â¹Ã¦Â³â€¢Ã¨Â¿â€Ã¥â€ºÅ¾Ã¤Â¸â‚¬Ã¤Â¸Âª `RTStreamSceneIndex` Ã¥Â¯Â¹Ã¨Â±Â¡Ã£â‚¬â€šÃ¦Â­Â¤Ã¥Â¯Â¹Ã¨Â±Â¡Ã¨Â¡Â¨Ã§Â¤ÂºÃ¦Â­Â£Ã¥Å“Â¨Ã¨Â¿ÂÃ¨Â¡Å’Ã§Å¡â€žÃ§Â´Â¢Ã¥Â¼â€¢Ã¯Â¼Å’Ã¥Â¹Â¶Ã¦ÂÂÃ¤Â¾â€ºÃ§â€Â¨Ã¤ÂºÅ½Ã§Â®Â¡Ã§Ââ€ Ã¥Å“ÂºÃ¦â„¢Â¯Ã¥â€™Å’Ã¨Â­Â¦Ã¦Å Â¥Ã§Å¡â€žÃ¦â€“Â¹Ã¦Â³â€¢Ã£â‚¬â€š
 
 ```python
 # index_visuals returns an RTStreamSceneIndex
@@ -331,33 +344,33 @@ audio_index = rtstream.index_audio(
 )
 ```
 
-### RTStreamSceneIndex 属性
+### RTStreamSceneIndex Ã¥Â±Å¾Ã¦â‚¬Â§
 
-| 属性 | 类型 | 描述 |
+| Ã¥Â±Å¾Ã¦â‚¬Â§ | Ã§Â±Â»Ã¥Å¾â€¹ | Ã¦ÂÂÃ¨Â¿Â° |
 |----------|------|-------------|
-| `rtstream_index_id` | `str` | 索引的唯一 ID |
-| `rtstream_id` | `str` | 父 RTStream 的 ID |
-| `extraction_type` | `str` | 提取类型（`time` 或 `transcript`） |
-| `extraction_config` | `dict` | 提取配置 |
-| `prompt` | `str` | 用于分析的提示语 |
-| `name` | `str` | 索引名称 |
-| `status` | `str` | 状态（`connected`、`stopped`） |
+| `rtstream_index_id` | `str` | Ã§Â´Â¢Ã¥Â¼â€¢Ã§Å¡â€žÃ¥â€Â¯Ã¤Â¸â‚¬ ID |
+| `rtstream_id` | `str` | Ã§Ë†Â¶ RTStream Ã§Å¡â€ž ID |
+| `extraction_type` | `str` | Ã¦ÂÂÃ¥Ââ€“Ã§Â±Â»Ã¥Å¾â€¹Ã¯Â¼Ë†`time` Ã¦Ë†â€“ `transcript`Ã¯Â¼â€° |
+| `extraction_config` | `dict` | Ã¦ÂÂÃ¥Ââ€“Ã©â€¦ÂÃ§Â½Â® |
+| `prompt` | `str` | Ã§â€Â¨Ã¤ÂºÅ½Ã¥Ë†â€ Ã¦Å¾ÂÃ§Å¡â€žÃ¦ÂÂÃ§Â¤ÂºÃ¨Â¯Â­ |
+| `name` | `str` | Ã§Â´Â¢Ã¥Â¼â€¢Ã¥ÂÂÃ§Â§Â° |
+| `status` | `str` | Ã§Å Â¶Ã¦â‚¬ÂÃ¯Â¼Ë†`connected`Ã£â‚¬Â`stopped`Ã¯Â¼â€° |
 
-### RTStreamSceneIndex 方法
+### RTStreamSceneIndex Ã¦â€“Â¹Ã¦Â³â€¢
 
-| 方法 | 返回 | 描述 |
+| Ã¦â€“Â¹Ã¦Â³â€¢ | Ã¨Â¿â€Ã¥â€ºÅ¾ | Ã¦ÂÂÃ¨Â¿Â° |
 |--------|---------|-------------|
-| `index.get_scenes(start, end, page, page_size)` | `dict` | 获取已索引的场景 |
-| `index.start()` | `None` | 启动/恢复索引 |
-| `index.stop()` | `None` | 停止索引 |
-| `index.create_alert(event_id, callback_url, ws_connection_id)` | `str` | 创建事件检测警报 |
-| `index.list_alerts()` | `list` | 列出此索引上的所有警报 |
-| `index.enable_alert(alert_id)` | `None` | 启用警报 |
-| `index.disable_alert(alert_id)` | `None` | 禁用警报 |
+| `index.get_scenes(start, end, page, page_size)` | `dict` | Ã¨Å½Â·Ã¥Ââ€“Ã¥Â·Â²Ã§Â´Â¢Ã¥Â¼â€¢Ã§Å¡â€žÃ¥Å“ÂºÃ¦â„¢Â¯ |
+| `index.start()` | `None` | Ã¥ÂÂ¯Ã¥Å Â¨/Ã¦ÂÂ¢Ã¥Â¤ÂÃ§Â´Â¢Ã¥Â¼â€¢ |
+| `index.stop()` | `None` | Ã¥ÂÅ“Ã¦Â­Â¢Ã§Â´Â¢Ã¥Â¼â€¢ |
+| `index.create_alert(event_id, callback_url, ws_connection_id)` | `str` | Ã¥Ë†â€ºÃ¥Â»ÂºÃ¤Âºâ€¹Ã¤Â»Â¶Ã¦Â£â‚¬Ã¦Âµâ€¹Ã¨Â­Â¦Ã¦Å Â¥ |
+| `index.list_alerts()` | `list` | Ã¥Ë†â€”Ã¥â€¡ÂºÃ¦Â­Â¤Ã§Â´Â¢Ã¥Â¼â€¢Ã¤Â¸Å Ã§Å¡â€žÃ¦â€°â‚¬Ã¦Å“â€°Ã¨Â­Â¦Ã¦Å Â¥ |
+| `index.enable_alert(alert_id)` | `None` | Ã¥ÂÂ¯Ã§â€Â¨Ã¨Â­Â¦Ã¦Å Â¥ |
+| `index.disable_alert(alert_id)` | `None` | Ã§Â¦ÂÃ§â€Â¨Ã¨Â­Â¦Ã¦Å Â¥ |
 
-### 获取场景
+### Ã¨Å½Â·Ã¥Ââ€“Ã¥Å“ÂºÃ¦â„¢Â¯
 
-从索引轮询已索引的场景：
+Ã¤Â»Å½Ã§Â´Â¢Ã¥Â¼â€¢Ã¨Â½Â®Ã¨Â¯Â¢Ã¥Â·Â²Ã§Â´Â¢Ã¥Â¼â€¢Ã§Å¡â€žÃ¥Å“ÂºÃ¦â„¢Â¯Ã¯Â¼Å¡
 
 ```python
 result = scene_index.get_scenes(
@@ -375,7 +388,7 @@ if result["next_page"]:
     pass
 ```
 
-### 管理场景索引
+### Ã§Â®Â¡Ã§Ââ€ Ã¥Å“ÂºÃ¦â„¢Â¯Ã§Â´Â¢Ã¥Â¼â€¢
 
 ```python
 # List all indexes on the stream
@@ -393,18 +406,18 @@ scene_index.start()
 
 ***
 
-## 事件
+## Ã¤Âºâ€¹Ã¤Â»Â¶
 
-事件是可重用的检测规则。创建一次，即可通过警报附加到任何索引。
+Ã¤Âºâ€¹Ã¤Â»Â¶Ã¦ËœÂ¯Ã¥ÂÂ¯Ã©â€¡ÂÃ§â€Â¨Ã§Å¡â€žÃ¦Â£â‚¬Ã¦Âµâ€¹Ã¨Â§â€žÃ¥Ë†â„¢Ã£â‚¬â€šÃ¥Ë†â€ºÃ¥Â»ÂºÃ¤Â¸â‚¬Ã¦Â¬Â¡Ã¯Â¼Å’Ã¥ÂÂ³Ã¥ÂÂ¯Ã©â‚¬Å¡Ã¨Â¿â€¡Ã¨Â­Â¦Ã¦Å Â¥Ã©â„¢â€žÃ¥Å Â Ã¥Ë†Â°Ã¤Â»Â»Ã¤Â½â€¢Ã§Â´Â¢Ã¥Â¼â€¢Ã£â‚¬â€š
 
-### 连接事件方法
+### Ã¨Â¿Å¾Ã¦Å½Â¥Ã¤Âºâ€¹Ã¤Â»Â¶Ã¦â€“Â¹Ã¦Â³â€¢
 
-| 方法 | 返回 | 描述 |
+| Ã¦â€“Â¹Ã¦Â³â€¢ | Ã¨Â¿â€Ã¥â€ºÅ¾ | Ã¦ÂÂÃ¨Â¿Â° |
 |--------|---------|-------------|
-| `conn.create_event(event_prompt, label)` | `str` (event\_id) | 创建检测事件 |
-| `conn.list_events()` | `list` | 列出所有事件 |
+| `conn.create_event(event_prompt, label)` | `str` (event\_id) | Ã¥Ë†â€ºÃ¥Â»ÂºÃ¦Â£â‚¬Ã¦Âµâ€¹Ã¤Âºâ€¹Ã¤Â»Â¶ |
+| `conn.list_events()` | `list` | Ã¥Ë†â€”Ã¥â€¡ÂºÃ¦â€°â‚¬Ã¦Å“â€°Ã¤Âºâ€¹Ã¤Â»Â¶ |
 
-### 创建事件
+### Ã¥Ë†â€ºÃ¥Â»ÂºÃ¤Âºâ€¹Ã¤Â»Â¶
 
 ```python
 event_id = conn.create_event(
@@ -413,7 +426,7 @@ event_id = conn.create_event(
 )
 ```
 
-### 列出事件
+### Ã¥Ë†â€”Ã¥â€¡ÂºÃ¤Âºâ€¹Ã¤Â»Â¶
 
 ```python
 events = conn.list_events()
@@ -423,11 +436,11 @@ for event in events:
 
 ***
 
-## 警报
+## Ã¨Â­Â¦Ã¦Å Â¥
 
-警报将事件连接到索引以实现实时通知。当 AI 检测到与事件描述匹配的内容时，会发送警报。
+Ã¨Â­Â¦Ã¦Å Â¥Ã¥Â°â€ Ã¤Âºâ€¹Ã¤Â»Â¶Ã¨Â¿Å¾Ã¦Å½Â¥Ã¥Ë†Â°Ã§Â´Â¢Ã¥Â¼â€¢Ã¤Â»Â¥Ã¥Â®Å¾Ã§Å½Â°Ã¥Â®Å¾Ã¦â€”Â¶Ã©â‚¬Å¡Ã§Å¸Â¥Ã£â‚¬â€šÃ¥Â½â€œ AI Ã¦Â£â‚¬Ã¦Âµâ€¹Ã¥Ë†Â°Ã¤Â¸Å½Ã¤Âºâ€¹Ã¤Â»Â¶Ã¦ÂÂÃ¨Â¿Â°Ã¥Å’Â¹Ã©â€¦ÂÃ§Å¡â€žÃ¥â€ â€¦Ã¥Â®Â¹Ã¦â€”Â¶Ã¯Â¼Å’Ã¤Â¼Å¡Ã¥Ââ€˜Ã©â‚¬ÂÃ¨Â­Â¦Ã¦Å Â¥Ã£â‚¬â€š
 
-### 创建警报
+### Ã¥Ë†â€ºÃ¥Â»ÂºÃ¨Â­Â¦Ã¦Å Â¥
 
 ```python
 # Get the RTStreamSceneIndex from index_visuals
@@ -444,9 +457,9 @@ alert_id = scene_index.create_alert(
 )
 ```
 
-**注意：** `callback_url` 是必需的。如果仅使用 WebSocket 交付，请传递空字符串 `""`。
+**Ã¦Â³Â¨Ã¦â€žÂÃ¯Â¼Å¡** `callback_url` Ã¦ËœÂ¯Ã¥Â¿â€¦Ã©Å“â‚¬Ã§Å¡â€žÃ£â‚¬â€šÃ¥Â¦â€šÃ¦Å¾Å“Ã¤Â»â€¦Ã¤Â½Â¿Ã§â€Â¨ WebSocket Ã¤ÂºÂ¤Ã¤Â»ËœÃ¯Â¼Å’Ã¨Â¯Â·Ã¤Â¼Â Ã©â‚¬â€™Ã§Â©ÂºÃ¥Â­â€”Ã§Â¬Â¦Ã¤Â¸Â² `""`Ã£â‚¬â€š
 
-### 管理警报
+### Ã§Â®Â¡Ã§Ââ€ Ã¨Â­Â¦Ã¦Å Â¥
 
 ```python
 # List all alerts on an index
@@ -457,14 +470,14 @@ scene_index.disable_alert(alert_id)
 scene_index.enable_alert(alert_id)
 ```
 
-### 警报交付
+### Ã¨Â­Â¦Ã¦Å Â¥Ã¤ÂºÂ¤Ã¤Â»Ëœ
 
-| 方法 | 延迟 | 使用场景 |
+| Ã¦â€“Â¹Ã¦Â³â€¢ | Ã¥Â»Â¶Ã¨Â¿Å¸ | Ã¤Â½Â¿Ã§â€Â¨Ã¥Å“ÂºÃ¦â„¢Â¯ |
 |--------|---------|----------|
-| WebSocket | 实时 | 仪表板、实时 UI |
-| Webhook | < 1 秒 | 服务器到服务器、自动化 |
+| WebSocket | Ã¥Â®Å¾Ã¦â€”Â¶ | Ã¤Â»ÂªÃ¨Â¡Â¨Ã¦ÂÂ¿Ã£â‚¬ÂÃ¥Â®Å¾Ã¦â€”Â¶ UI |
+| Webhook | < 1 Ã§Â§â€™ | Ã¦Å“ÂÃ¥Å Â¡Ã¥â„¢Â¨Ã¥Ë†Â°Ã¦Å“ÂÃ¥Å Â¡Ã¥â„¢Â¨Ã£â‚¬ÂÃ¨â€¡ÂªÃ¥Å Â¨Ã¥Å’â€“ |
 
-### WebSocket 警报事件
+### WebSocket Ã¨Â­Â¦Ã¦Å Â¥Ã¤Âºâ€¹Ã¤Â»Â¶
 
 ```json
 {
@@ -478,7 +491,7 @@ scene_index.enable_alert(alert_id)
 }
 ```
 
-### Webhook 负载
+### Webhook Ã¨Â´Å¸Ã¨Â½Â½
 
 ```json
 {
@@ -496,29 +509,29 @@ scene_index.enable_alert(alert_id)
 
 ***
 
-## WebSocket 集成
+## WebSocket Ã©â€ºâ€ Ã¦Ë†Â
 
-所有实时 AI 结果均通过 WebSocket 交付。将 `ws_connection_id` 传递给：
+Ã¦â€°â‚¬Ã¦Å“â€°Ã¥Â®Å¾Ã¦â€”Â¶ AI Ã§Â»â€œÃ¦Å¾Å“Ã¥Ââ€¡Ã©â‚¬Å¡Ã¨Â¿â€¡ WebSocket Ã¤ÂºÂ¤Ã¤Â»ËœÃ£â‚¬â€šÃ¥Â°â€  `ws_connection_id` Ã¤Â¼Â Ã©â‚¬â€™Ã§Â»â„¢Ã¯Â¼Å¡
 
 * `rtstream.start_transcript()`
 * `rtstream.index_audio()`
 * `rtstream.index_visuals()`
 * `scene_index.create_alert()`
 
-### WebSocket 通道
+### WebSocket Ã©â‚¬Å¡Ã©Ââ€œ
 
-| 通道 | 来源 | 内容 |
+| Ã©â‚¬Å¡Ã©Ââ€œ | Ã¦ÂÂ¥Ã¦ÂºÂ | Ã¥â€ â€¦Ã¥Â®Â¹ |
 |---------|--------|---------|
-| `transcript` | `start_transcript()` | 实时语音转文本 |
-| `scene_index` | `index_visuals()` | 视觉分析结果 |
-| `audio_index` | `index_audio()` | 音频分析结果 |
-| `alert` | `create_alert()` | 警报通知 |
+| `transcript` | `start_transcript()` | Ã¥Â®Å¾Ã¦â€”Â¶Ã¨Â¯Â­Ã©Å¸Â³Ã¨Â½Â¬Ã¦â€“â€¡Ã¦Å“Â¬ |
+| `scene_index` | `index_visuals()` | Ã¨Â§â€ Ã¨Â§â€°Ã¥Ë†â€ Ã¦Å¾ÂÃ§Â»â€œÃ¦Å¾Å“ |
+| `audio_index` | `index_audio()` | Ã©Å¸Â³Ã©Â¢â€˜Ã¥Ë†â€ Ã¦Å¾ÂÃ§Â»â€œÃ¦Å¾Å“ |
+| `alert` | `create_alert()` | Ã¨Â­Â¦Ã¦Å Â¥Ã©â‚¬Å¡Ã§Å¸Â¥ |
 
-有关 WebSocket 事件结构和 ws\_listener 用法，请参阅 [capture-reference.md](capture-reference.md)。
+Ã¦Å“â€°Ã¥â€¦Â³ WebSocket Ã¤Âºâ€¹Ã¤Â»Â¶Ã§Â»â€œÃ¦Å¾â€žÃ¥â€™Å’ ws\_listener Ã§â€Â¨Ã¦Â³â€¢Ã¯Â¼Å’Ã¨Â¯Â·Ã¥Ââ€šÃ©Ëœâ€¦ [capture-reference.md](capture-reference.md)Ã£â‚¬â€š
 
 ***
 
-## 完整工作流程
+## Ã¥Â®Å’Ã¦â€¢Â´Ã¥Â·Â¥Ã¤Â½Å“Ã¦ÂµÂÃ§Â¨â€¹
 
 ```python
 import time

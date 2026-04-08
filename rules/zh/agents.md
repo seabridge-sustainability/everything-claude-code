@@ -1,50 +1,63 @@
-# 代理编排
+# Ã¤Â»Â£Ã§Ââ€ Ã§Â¼â€“Ã¦Å½â€™
 
-## 可用代理
+## Safety And Authorization Rule
 
-位于 `~/.claude/agents/`：
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-| 代理 | 用途 | 何时使用 |
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+## Ã¥ÂÂ¯Ã§â€Â¨Ã¤Â»Â£Ã§Ââ€ 
+
+Ã¤Â½ÂÃ¤ÂºÅ½ `~/.claude/agents/`Ã¯Â¼Å¡
+
+| Ã¤Â»Â£Ã§Ââ€  | Ã§â€Â¨Ã©â‚¬â€ | Ã¤Â½â€¢Ã¦â€”Â¶Ã¤Â½Â¿Ã§â€Â¨ |
 |-------|---------|------------|
-| planner | 实现规划 | 复杂功能、重构 |
-| architect | 系统设计 | 架构决策 |
-| tdd-guide | 测试驱动开发 | 新功能、bug 修复 |
-| code-reviewer | 代码审查 | 编写代码后 |
-| security-reviewer | 安全分析 | 提交前 |
-| build-error-resolver | 修复构建错误 | 构建失败时 |
-| e2e-runner | E2E 测试 | 关键用户流程 |
-| refactor-cleaner | 死代码清理 | 代码维护 |
-| doc-updater | 文档 | 更新文档 |
-| rust-reviewer | Rust 代码审查 | Rust 项目 |
+| planner | Ã¥Â®Å¾Ã§Å½Â°Ã¨Â§â€žÃ¥Ë†â€™ | Ã¥Â¤ÂÃ¦Ââ€šÃ¥Å Å¸Ã¨Æ’Â½Ã£â‚¬ÂÃ©â€¡ÂÃ¦Å¾â€ž |
+| architect | Ã§Â³Â»Ã§Â»Å¸Ã¨Â®Â¾Ã¨Â®Â¡ | Ã¦Å¾Â¶Ã¦Å¾â€žÃ¥â€ Â³Ã§Â­â€“ |
+| tdd-guide | Ã¦Âµâ€¹Ã¨Â¯â€¢Ã©Â©Â±Ã¥Å Â¨Ã¥Â¼â‚¬Ã¥Ââ€˜ | Ã¦â€“Â°Ã¥Å Å¸Ã¨Æ’Â½Ã£â‚¬Âbug Ã¤Â¿Â®Ã¥Â¤Â |
+| code-reviewer | Ã¤Â»Â£Ã§Â ÂÃ¥Â®Â¡Ã¦Å¸Â¥ | Ã§Â¼â€“Ã¥â€ â„¢Ã¤Â»Â£Ã§Â ÂÃ¥ÂÅ½ |
+| security-reviewer | Ã¥Â®â€°Ã¥â€¦Â¨Ã¥Ë†â€ Ã¦Å¾Â | Ã¦ÂÂÃ¤ÂºÂ¤Ã¥â€°Â |
+| build-error-resolver | Ã¤Â¿Â®Ã¥Â¤ÂÃ¦Å¾â€žÃ¥Â»ÂºÃ©â€â„¢Ã¨Â¯Â¯ | Ã¦Å¾â€žÃ¥Â»ÂºÃ¥Â¤Â±Ã¨Â´Â¥Ã¦â€”Â¶ |
+| e2e-runner | E2E Ã¦Âµâ€¹Ã¨Â¯â€¢ | Ã¥â€¦Â³Ã©â€Â®Ã§â€Â¨Ã¦Ë†Â·Ã¦ÂµÂÃ§Â¨â€¹ |
+| refactor-cleaner | Ã¦Â­Â»Ã¤Â»Â£Ã§Â ÂÃ¦Â¸â€¦Ã§Ââ€  | Ã¤Â»Â£Ã§Â ÂÃ§Â»Â´Ã¦Å Â¤ |
+| doc-updater | Ã¦â€“â€¡Ã¦Â¡Â£ | Ã¦â€ºÂ´Ã¦â€“Â°Ã¦â€“â€¡Ã¦Â¡Â£ |
+| rust-reviewer | Rust Ã¤Â»Â£Ã§Â ÂÃ¥Â®Â¡Ã¦Å¸Â¥ | Rust Ã©Â¡Â¹Ã§â€ºÂ® |
 
-## 立即使用代理
+## Ã§Â«â€¹Ã¥ÂÂ³Ã¤Â½Â¿Ã§â€Â¨Ã¤Â»Â£Ã§Ââ€ 
 
-无需用户提示：
-1. 复杂功能请求 - 使用 **planner** 代理
-2. 刚编写/修改的代码 - 使用 **code-reviewer** 代理
-3. Bug 修复或新功能 - 使用 **tdd-guide** 代理
-4. 架构决策 - 使用 **architect** 代理
+Ã¦â€”Â Ã©Å“â‚¬Ã§â€Â¨Ã¦Ë†Â·Ã¦ÂÂÃ§Â¤ÂºÃ¯Â¼Å¡
+1. Ã¥Â¤ÂÃ¦Ââ€šÃ¥Å Å¸Ã¨Æ’Â½Ã¨Â¯Â·Ã¦Â±â€š - Ã¤Â½Â¿Ã§â€Â¨ **planner** Ã¤Â»Â£Ã§Ââ€ 
+2. Ã¥Ë†Å¡Ã§Â¼â€“Ã¥â€ â„¢/Ã¤Â¿Â®Ã¦â€Â¹Ã§Å¡â€žÃ¤Â»Â£Ã§Â Â - Ã¤Â½Â¿Ã§â€Â¨ **code-reviewer** Ã¤Â»Â£Ã§Ââ€ 
+3. Bug Ã¤Â¿Â®Ã¥Â¤ÂÃ¦Ë†â€“Ã¦â€“Â°Ã¥Å Å¸Ã¨Æ’Â½ - Ã¤Â½Â¿Ã§â€Â¨ **tdd-guide** Ã¤Â»Â£Ã§Ââ€ 
+4. Ã¦Å¾Â¶Ã¦Å¾â€žÃ¥â€ Â³Ã§Â­â€“ - Ã¤Â½Â¿Ã§â€Â¨ **architect** Ã¤Â»Â£Ã§Ââ€ 
 
-## 并行任务执行
+## Ã¥Â¹Â¶Ã¨Â¡Å’Ã¤Â»Â»Ã¥Å Â¡Ã¦â€°Â§Ã¨Â¡Å’
 
-对独立操作始终使用并行 Task 执行：
+Ã¥Â¯Â¹Ã§â€¹Â¬Ã§Â«â€¹Ã¦â€œÂÃ¤Â½Å“Ã¥Â§â€¹Ã§Â»Ë†Ã¤Â½Â¿Ã§â€Â¨Ã¥Â¹Â¶Ã¨Â¡Å’ Task Ã¦â€°Â§Ã¨Â¡Å’Ã¯Â¼Å¡
 
 ```markdown
-# 好：并行执行
-同时启动 3 个代理：
-1. 代理 1：认证模块安全分析
-2. 代理 2：缓存系统性能审查
-3. 代理 3：工具类型检查
+# Ã¥Â¥Â½Ã¯Â¼Å¡Ã¥Â¹Â¶Ã¨Â¡Å’Ã¦â€°Â§Ã¨Â¡Å’
+Ã¥ÂÅ’Ã¦â€”Â¶Ã¥ÂÂ¯Ã¥Å Â¨ 3 Ã¤Â¸ÂªÃ¤Â»Â£Ã§Ââ€ Ã¯Â¼Å¡
+1. Ã¤Â»Â£Ã§Ââ€  1Ã¯Â¼Å¡Ã¨Â®Â¤Ã¨Â¯ÂÃ¦Â¨Â¡Ã¥Ââ€”Ã¥Â®â€°Ã¥â€¦Â¨Ã¥Ë†â€ Ã¦Å¾Â
+2. Ã¤Â»Â£Ã§Ââ€  2Ã¯Â¼Å¡Ã§Â¼â€œÃ¥Â­ËœÃ§Â³Â»Ã§Â»Å¸Ã¦â‚¬Â§Ã¨Æ’Â½Ã¥Â®Â¡Ã¦Å¸Â¥
+3. Ã¤Â»Â£Ã§Ââ€  3Ã¯Â¼Å¡Ã¥Â·Â¥Ã¥â€¦Â·Ã§Â±Â»Ã¥Å¾â€¹Ã¦Â£â‚¬Ã¦Å¸Â¥
 
-# 坏：不必要的顺序
-先代理 1，然后代理 2，然后代理 3
+# Ã¥ÂÂÃ¯Â¼Å¡Ã¤Â¸ÂÃ¥Â¿â€¦Ã¨Â¦ÂÃ§Å¡â€žÃ©Â¡ÂºÃ¥ÂºÂ
+Ã¥â€¦Ë†Ã¤Â»Â£Ã§Ââ€  1Ã¯Â¼Å’Ã§â€žÂ¶Ã¥ÂÅ½Ã¤Â»Â£Ã§Ââ€  2Ã¯Â¼Å’Ã§â€žÂ¶Ã¥ÂÅ½Ã¤Â»Â£Ã§Ââ€  3
 ```
 
-## 多视角分析
+## Ã¥Â¤Å¡Ã¨Â§â€ Ã¨Â§â€™Ã¥Ë†â€ Ã¦Å¾Â
 
-对于复杂问题，使用分角色子代理：
-- 事实审查者
-- 高级工程师
-- 安全专家
-- 一致性审查者
-- 冗余检查者
+Ã¥Â¯Â¹Ã¤ÂºÅ½Ã¥Â¤ÂÃ¦Ââ€šÃ©â€”Â®Ã©Â¢ËœÃ¯Â¼Å’Ã¤Â½Â¿Ã§â€Â¨Ã¥Ë†â€ Ã¨Â§â€™Ã¨â€°Â²Ã¥Â­ÂÃ¤Â»Â£Ã§Ââ€ Ã¯Â¼Å¡
+- Ã¤Âºâ€¹Ã¥Â®Å¾Ã¥Â®Â¡Ã¦Å¸Â¥Ã¨â‚¬â€¦
+- Ã©Â«ËœÃ§ÂºÂ§Ã¥Â·Â¥Ã§Â¨â€¹Ã¥Â¸Ë†
+- Ã¥Â®â€°Ã¥â€¦Â¨Ã¤Â¸â€œÃ¥Â®Â¶
+- Ã¤Â¸â‚¬Ã¨â€¡Â´Ã¦â‚¬Â§Ã¥Â®Â¡Ã¦Å¸Â¥Ã¨â‚¬â€¦
+- Ã¥â€ â€”Ã¤Â½â„¢Ã¦Â£â‚¬Ã¦Å¸Â¥Ã¨â‚¬â€¦

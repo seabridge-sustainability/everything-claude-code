@@ -1,48 +1,61 @@
 # Kodlama Stili
 
-## Immutability (KRİTİK)
+## Safety And Authorization Rule
 
-DAIMA yeni nesneler oluştur, mevcut olanları ASLA değiştirme:
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+## Immutability (KRÃ„Â°TÃ„Â°K)
+
+DAIMA yeni nesneler oluÃ…Å¸tur, mevcut olanlarÃ„Â± ASLA deÃ„Å¸iÃ…Å¸tirme:
 
 ```
 // Pseudocode
-YANLIŞ:  modify(original, field, value) → original'i yerinde değiştirir
-DOĞRU: update(original, field, value) → değişiklikle birlikte yeni kopya döner
+YANLIÃ…Å¾:  modify(original, field, value) Ã¢â€ â€™ original'i yerinde deÃ„Å¸iÃ…Å¸tirir
+DOÃ„Å¾RU: update(original, field, value) Ã¢â€ â€™ deÃ„Å¸iÃ…Å¸iklikle birlikte yeni kopya dÃƒÂ¶ner
 ```
 
-Gerekçe: Immutable veri gizli yan etkileri önler, debug'ı kolaylaştırır ve güvenli eşzamanlılık sağlar.
+GerekÃƒÂ§e: Immutable veri gizli yan etkileri ÃƒÂ¶nler, debug'Ã„Â± kolaylaÃ…Å¸tÃ„Â±rÃ„Â±r ve gÃƒÂ¼venli eÃ…Å¸zamanlÃ„Â±lÃ„Â±k saÃ„Å¸lar.
 
 ## Dosya Organizasyonu
 
-ÇOK KÜÇÜK DOSYA > AZ BÜYÜK DOSYA:
-- Yüksek kohezyon, düşük coupling
-- Tipik 200-400 satır, maksimum 800
-- Büyük modüllerden utility'leri çıkar
-- Type'a göre değil, feature/domain'e göre organize et
+Ãƒâ€¡OK KÃƒÅ“Ãƒâ€¡ÃƒÅ“K DOSYA > AZ BÃƒÅ“YÃƒÅ“K DOSYA:
+- YÃƒÂ¼ksek kohezyon, dÃƒÂ¼Ã…Å¸ÃƒÂ¼k coupling
+- Tipik 200-400 satÃ„Â±r, maksimum 800
+- BÃƒÂ¼yÃƒÂ¼k modÃƒÂ¼llerden utility'leri ÃƒÂ§Ã„Â±kar
+- Type'a gÃƒÂ¶re deÃ„Å¸il, feature/domain'e gÃƒÂ¶re organize et
 
-## Hata Yönetimi
+## Hata YÃƒÂ¶netimi
 
-Hataları DAIMA kapsamlı bir şekilde yönet:
-- Her seviyede hataları açıkça ele al
-- UI'ye yönelik kodda kullanıcı dostu hata mesajları ver
-- Server tarafında detaylı hata bağlamı logla
-- Hataları asla sessizce yutma
+HatalarÃ„Â± DAIMA kapsamlÃ„Â± bir Ã…Å¸ekilde yÃƒÂ¶net:
+- Her seviyede hatalarÃ„Â± aÃƒÂ§Ã„Â±kÃƒÂ§a ele al
+- UI'ye yÃƒÂ¶nelik kodda kullanÃ„Â±cÃ„Â± dostu hata mesajlarÃ„Â± ver
+- Server tarafÃ„Â±nda detaylÃ„Â± hata baÃ„Å¸lamÃ„Â± logla
+- HatalarÃ„Â± asla sessizce yutma
 
 ## Input Validasyonu
 
-Sistem sınırlarında DAIMA validate et:
-- İşlemeden önce tüm kullanıcı girdilerini validate et
-- Mümkün olan yerlerde schema tabanlı validasyon kullan
-- Açık hata mesajlarıyla hızlıca başarısız ol
-- Harici verilere asla güvenme (API yanıtları, kullanıcı girdisi, dosya içeriği)
+Sistem sÃ„Â±nÃ„Â±rlarÃ„Â±nda DAIMA validate et:
+- Ã„Â°Ã…Å¸lemeden ÃƒÂ¶nce tÃƒÂ¼m kullanÃ„Â±cÃ„Â± girdilerini validate et
+- MÃƒÂ¼mkÃƒÂ¼n olan yerlerde schema tabanlÃ„Â± validasyon kullan
+- AÃƒÂ§Ã„Â±k hata mesajlarÃ„Â±yla hÃ„Â±zlÃ„Â±ca baÃ…Å¸arÃ„Â±sÃ„Â±z ol
+- Harici verilere asla gÃƒÂ¼venme (API yanÃ„Â±tlarÃ„Â±, kullanÃ„Â±cÃ„Â± girdisi, dosya iÃƒÂ§eriÃ„Å¸i)
 
 ## Kod Kalitesi Kontrol Listesi
 
-İşi tamamlandı olarak işaretlemeden önce:
-- [ ] Kod okunabilir ve iyi adlandırılmış
-- [ ] Fonksiyonlar küçük (<50 satır)
-- [ ] Dosyalar odaklı (<800 satır)
-- [ ] Derin iç içe geçme yok (>4 seviye)
-- [ ] Düzgün hata yönetimi
-- [ ] Hardcoded değer yok (sabit veya config kullan)
-- [ ] Mutasyon yok (immutable pattern'ler kullanıldı)
+Ã„Â°Ã…Å¸i tamamlandÃ„Â± olarak iÃ…Å¸aretlemeden ÃƒÂ¶nce:
+- [ ] Kod okunabilir ve iyi adlandÃ„Â±rÃ„Â±lmÃ„Â±Ã…Å¸
+- [ ] Fonksiyonlar kÃƒÂ¼ÃƒÂ§ÃƒÂ¼k (<50 satÃ„Â±r)
+- [ ] Dosyalar odaklÃ„Â± (<800 satÃ„Â±r)
+- [ ] Derin iÃƒÂ§ iÃƒÂ§e geÃƒÂ§me yok (>4 seviye)
+- [ ] DÃƒÂ¼zgÃƒÂ¼n hata yÃƒÂ¶netimi
+- [ ] Hardcoded deÃ„Å¸er yok (sabit veya config kullan)
+- [ ] Mutasyon yok (immutable pattern'ler kullanÃ„Â±ldÃ„Â±)

@@ -1,5 +1,18 @@
 # Skill Development Guide
 
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
 A comprehensive guide to creating effective skills for Everything Claude Code (ECC).
 
 ## Table of Contents
@@ -54,13 +67,13 @@ Skills activate when:
 
 ```
 skills/
-└── your-skill-name/
-    ├── SKILL.md           # Required: Main skill definition
-    ├── examples/          # Optional: Code examples
-    │   ├── basic.ts
-    │   └── advanced.ts
-    └── references/        # Optional: External references
-        └── links.md
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ your-skill-name/
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ SKILL.md           # Required: Main skill definition
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ examples/          # Optional: Code examples
+    Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ basic.ts
+    Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ advanced.ts
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ references/        # Optional: External references
+        Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ links.md
 ```
 
 ### SKILL.md Format
@@ -402,10 +415,10 @@ For complex decisions:
 
 \`\`\`
 Need to fetch data?
-├── Single request → use fetch directly
-├── Multiple independent → Promise.all()
-├── Multiple dependent → await sequentially
-└── With caching → use SWR or React Query
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Single request Ã¢â€ â€™ use fetch directly
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Multiple independent Ã¢â€ â€™ Promise.all()
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Multiple dependent Ã¢â€ â€™ await sequentially
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ With caching Ã¢â€ â€™ use SWR or React Query
 \`\`\`
 ```
 
@@ -789,16 +802,16 @@ origin: ECC
 
 \`\`\`
 app/
-├── main.py              # FastAPI app entry point
-├── routers/             # Route handlers
-│   ├── users.py
-│   └── items.py
-├── models/              # Pydantic models
-│   ├── user.py
-│   └── item.py
-├── services/            # Business logic
-│   └── user_service.py
-└── dependencies.py      # Shared dependencies
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ main.py              # FastAPI app entry point
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ routers/             # Route handlers
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ users.py
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ items.py
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ models/              # Pydantic models
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ user.py
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ item.py
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ services/            # Business logic
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ user_service.py
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ dependencies.py      # Shared dependencies
 \`\`\`
 
 ## Dependency Injection

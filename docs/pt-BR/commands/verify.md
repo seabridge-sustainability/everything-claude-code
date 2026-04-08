@@ -1,10 +1,23 @@
 # Comando Verification
 
-Rode verificação abrangente no estado atual do codebase.
+## Safety And Authorization Rule
 
-## Instruções
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-Execute a verificação nesta ordem exata:
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+Rode verificaÃƒÂ§ÃƒÂ£o abrangente no estado atual do codebase.
+
+## InstruÃƒÂ§ÃƒÂµes
+
+Execute a verificaÃƒÂ§ÃƒÂ£o nesta ordem exata:
 
 1. **Build Check**
    - Rode o comando de build deste projeto
@@ -24,16 +37,16 @@ Execute a verificação nesta ordem exata:
    - Reporte percentual de cobertura
 
 5. **Console.log Audit**
-   - Procure por console.log em arquivos de código-fonte
-   - Reporte localizações
+   - Procure por console.log em arquivos de cÃƒÂ³digo-fonte
+   - Reporte localizaÃƒÂ§ÃƒÂµes
 
 6. **Git Status**
-   - Mostre mudanças não commitadas
-   - Mostre arquivos modificados desde o último commit
+   - Mostre mudanÃƒÂ§as nÃƒÂ£o commitadas
+   - Mostre arquivos modificados desde o ÃƒÂºltimo commit
 
-## Saída
+## SaÃƒÂ­da
 
-Produza um relatório conciso de verificação:
+Produza um relatÃƒÂ³rio conciso de verificaÃƒÂ§ÃƒÂ£o:
 
 ```
 VERIFICATION: [PASS/FAIL]
@@ -48,12 +61,12 @@ Logs:     [OK/X console.logs]
 Ready for PR: [YES/NO]
 ```
 
-Se houver problemas críticos, liste-os com sugestões de correção.
+Se houver problemas crÃƒÂ­ticos, liste-os com sugestÃƒÂµes de correÃƒÂ§ÃƒÂ£o.
 
 ## Argumentos
 
 $ARGUMENTS podem ser:
 - `quick` - Apenas build + types
-- `full` - Todas as checagens (padrão)
+- `full` - Todas as checagens (padrÃƒÂ£o)
 - `pre-commit` - Checagens relevantes para commits
 - `pre-pr` - Checagens completas mais security scan

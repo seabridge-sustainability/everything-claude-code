@@ -1,27 +1,40 @@
 ---
 name: springboot-tdd
-description: 使用JUnit 5、Mockito、MockMvc、Testcontainers和JaCoCo进行Spring Boot的测试驱动开发。适用于添加功能、修复错误或重构时。
+description: Ã¤Â½Â¿Ã§â€Â¨JUnit 5Ã£â‚¬ÂMockitoÃ£â‚¬ÂMockMvcÃ£â‚¬ÂTestcontainersÃ¥â€™Å’JaCoCoÃ¨Â¿â€ºÃ¨Â¡Å’Spring BootÃ§Å¡â€žÃ¦Âµâ€¹Ã¨Â¯â€¢Ã©Â©Â±Ã¥Å Â¨Ã¥Â¼â‚¬Ã¥Ââ€˜Ã£â‚¬â€šÃ©â‚¬â€šÃ§â€Â¨Ã¤ÂºÅ½Ã¦Â·Â»Ã¥Å Â Ã¥Å Å¸Ã¨Æ’Â½Ã£â‚¬ÂÃ¤Â¿Â®Ã¥Â¤ÂÃ©â€â„¢Ã¨Â¯Â¯Ã¦Ë†â€“Ã©â€¡ÂÃ¦Å¾â€žÃ¦â€”Â¶Ã£â‚¬â€š
 origin: ECC
 ---
 
-# Spring Boot TDD 工作流程
+# Spring Boot TDD Ã¥Â·Â¥Ã¤Â½Å“Ã¦ÂµÂÃ§Â¨â€¹
 
-适用于 Spring Boot 服务、覆盖率 80%+（单元 + 集成）的 TDD 指南。
+## Safety And Authorization Rule
 
-## 何时使用
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-* 新功能或端点
-* 错误修复或重构
-* 添加数据访问逻辑或安全规则
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-## 工作流程
 
-1. 先写测试（它们应该失败）
-2. 实现最小代码以通过测试
-3. 在测试通过后进行重构
-4. 强制覆盖率（JaCoCo）
+Ã©â‚¬â€šÃ§â€Â¨Ã¤ÂºÅ½ Spring Boot Ã¦Å“ÂÃ¥Å Â¡Ã£â‚¬ÂÃ¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡ 80%+Ã¯Â¼Ë†Ã¥Ââ€¢Ã¥â€¦Æ’ + Ã©â€ºâ€ Ã¦Ë†ÂÃ¯Â¼â€°Ã§Å¡â€ž TDD Ã¦Å’â€¡Ã¥Ââ€”Ã£â‚¬â€š
 
-## 单元测试 (JUnit 5 + Mockito)
+## Ã¤Â½â€¢Ã¦â€”Â¶Ã¤Â½Â¿Ã§â€Â¨
+
+* Ã¦â€“Â°Ã¥Å Å¸Ã¨Æ’Â½Ã¦Ë†â€“Ã§Â«Â¯Ã§â€šÂ¹
+* Ã©â€â„¢Ã¨Â¯Â¯Ã¤Â¿Â®Ã¥Â¤ÂÃ¦Ë†â€“Ã©â€¡ÂÃ¦Å¾â€ž
+* Ã¦Â·Â»Ã¥Å Â Ã¦â€¢Â°Ã¦ÂÂ®Ã¨Â®Â¿Ã©â€”Â®Ã©â‚¬Â»Ã¨Â¾â€˜Ã¦Ë†â€“Ã¥Â®â€°Ã¥â€¦Â¨Ã¨Â§â€žÃ¥Ë†â„¢
+
+## Ã¥Â·Â¥Ã¤Â½Å“Ã¦ÂµÂÃ§Â¨â€¹
+
+1. Ã¥â€¦Ë†Ã¥â€ â„¢Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¯Â¼Ë†Ã¥Â®Æ’Ã¤Â»Â¬Ã¥Âºâ€Ã¨Â¯Â¥Ã¥Â¤Â±Ã¨Â´Â¥Ã¯Â¼â€°
+2. Ã¥Â®Å¾Ã§Å½Â°Ã¦Å“â‚¬Ã¥Â°ÂÃ¤Â»Â£Ã§Â ÂÃ¤Â»Â¥Ã©â‚¬Å¡Ã¨Â¿â€¡Ã¦Âµâ€¹Ã¨Â¯â€¢
+3. Ã¥Å“Â¨Ã¦Âµâ€¹Ã¨Â¯â€¢Ã©â‚¬Å¡Ã¨Â¿â€¡Ã¥ÂÅ½Ã¨Â¿â€ºÃ¨Â¡Å’Ã©â€¡ÂÃ¦Å¾â€ž
+4. Ã¥Â¼ÂºÃ¥Ë†Â¶Ã¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡Ã¯Â¼Ë†JaCoCoÃ¯Â¼â€°
+
+## Ã¥Ââ€¢Ã¥â€¦Æ’Ã¦Âµâ€¹Ã¨Â¯â€¢ (JUnit 5 + Mockito)
 
 ```java
 @ExtendWith(MockitoExtension.class)
@@ -42,13 +55,13 @@ class MarketServiceTest {
 }
 ```
 
-模式：
+Ã¦Â¨Â¡Ã¥Â¼ÂÃ¯Â¼Å¡
 
 * Arrange-Act-Assert
-* 避免部分模拟；优先使用显式桩
-* 使用 `@ParameterizedTest` 处理变体
+* Ã©ÂÂ¿Ã¥â€¦ÂÃ©Æ’Â¨Ã¥Ë†â€ Ã¦Â¨Â¡Ã¦â€¹Å¸Ã¯Â¼â€ºÃ¤Â¼ËœÃ¥â€¦Ë†Ã¤Â½Â¿Ã§â€Â¨Ã¦ËœÂ¾Ã¥Â¼ÂÃ¦Â¡Â©
+* Ã¤Â½Â¿Ã§â€Â¨ `@ParameterizedTest` Ã¥Â¤â€žÃ§Ââ€ Ã¥ÂËœÃ¤Â½â€œ
 
-## Web 层测试 (MockMvc)
+## Web Ã¥Â±â€šÃ¦Âµâ€¹Ã¨Â¯â€¢ (MockMvc)
 
 ```java
 @WebMvcTest(MarketController.class)
@@ -67,7 +80,7 @@ class MarketControllerTest {
 }
 ```
 
-## 集成测试 (SpringBootTest)
+## Ã©â€ºâ€ Ã¦Ë†ÂÃ¦Âµâ€¹Ã¨Â¯â€¢ (SpringBootTest)
 
 ```java
 @SpringBootTest
@@ -88,7 +101,7 @@ class MarketIntegrationTest {
 }
 ```
 
-## 持久层测试 (DataJpaTest)
+## Ã¦Å’ÂÃ¤Â¹â€¦Ã¥Â±â€šÃ¦Âµâ€¹Ã¨Â¯â€¢ (DataJpaTest)
 
 ```java
 @DataJpaTest
@@ -111,12 +124,12 @@ class MarketRepositoryTest {
 
 ## Testcontainers
 
-* 对 Postgres/Redis 使用可复用的容器以镜像生产环境
-* 通过 `@DynamicPropertySource` 连接，将 JDBC URL 注入 Spring 上下文
+* Ã¥Â¯Â¹ Postgres/Redis Ã¤Â½Â¿Ã§â€Â¨Ã¥ÂÂ¯Ã¥Â¤ÂÃ§â€Â¨Ã§Å¡â€žÃ¥Â®Â¹Ã¥â„¢Â¨Ã¤Â»Â¥Ã©â€¢Å“Ã¥Æ’ÂÃ§â€Å¸Ã¤ÂºÂ§Ã§Å½Â¯Ã¥Â¢Æ’
+* Ã©â‚¬Å¡Ã¨Â¿â€¡ `@DynamicPropertySource` Ã¨Â¿Å¾Ã¦Å½Â¥Ã¯Â¼Å’Ã¥Â°â€  JDBC URL Ã¦Â³Â¨Ã¥â€¦Â¥ Spring Ã¤Â¸Å Ã¤Â¸â€¹Ã¦â€“â€¡
 
-## 覆盖率 (JaCoCo)
+## Ã¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡ (JaCoCo)
 
-Maven 片段：
+Maven Ã§â€°â€¡Ã¦Â®ÂµÃ¯Â¼Å¡
 
 ```xml
 <plugin>
@@ -136,13 +149,13 @@ Maven 片段：
 </plugin>
 ```
 
-## 断言
+## Ã¦â€“Â­Ã¨Â¨â‚¬
 
-* 为可读性，优先使用 AssertJ (`assertThat`)
-* 对于 JSON 响应，使用 `jsonPath`
-* 对于异常：`assertThatThrownBy(...)`
+* Ã¤Â¸ÂºÃ¥ÂÂ¯Ã¨Â¯Â»Ã¦â‚¬Â§Ã¯Â¼Å’Ã¤Â¼ËœÃ¥â€¦Ë†Ã¤Â½Â¿Ã§â€Â¨ AssertJ (`assertThat`)
+* Ã¥Â¯Â¹Ã¤ÂºÅ½ JSON Ã¥â€œÂÃ¥Âºâ€Ã¯Â¼Å’Ã¤Â½Â¿Ã§â€Â¨ `jsonPath`
+* Ã¥Â¯Â¹Ã¤ÂºÅ½Ã¥Â¼â€šÃ¥Â¸Â¸Ã¯Â¼Å¡`assertThatThrownBy(...)`
 
-## 测试数据构建器
+## Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¦â€¢Â°Ã¦ÂÂ®Ã¦Å¾â€žÃ¥Â»ÂºÃ¥â„¢Â¨
 
 ```java
 class MarketBuilder {
@@ -152,9 +165,9 @@ class MarketBuilder {
 }
 ```
 
-## CI 命令
+## CI Ã¥â€˜Â½Ã¤Â»Â¤
 
-* Maven: `mvn -T 4 test` 或 `mvn verify`
+* Maven: `mvn -T 4 test` Ã¦Ë†â€“ `mvn verify`
 * Gradle: `./gradlew test jacocoTestReport`
 
-**记住**：保持测试快速、隔离且确定。测试行为，而非实现细节。
+**Ã¨Â®Â°Ã¤Â½Â**Ã¯Â¼Å¡Ã¤Â¿ÂÃ¦Å’ÂÃ¦Âµâ€¹Ã¨Â¯â€¢Ã¥Â¿Â«Ã©â‚¬Å¸Ã£â‚¬ÂÃ©Å¡â€Ã§Â¦Â»Ã¤Â¸â€Ã§Â¡Â®Ã¥Â®Å¡Ã£â‚¬â€šÃ¦Âµâ€¹Ã¨Â¯â€¢Ã¨Â¡Å’Ã¤Â¸ÂºÃ¯Â¼Å’Ã¨â‚¬Å’Ã©ÂÅ¾Ã¥Â®Å¾Ã§Å½Â°Ã§Â»â€ Ã¨Å â€šÃ£â‚¬â€š

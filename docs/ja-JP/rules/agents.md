@@ -1,49 +1,62 @@
-# Agent オーケストレーション
+# Agent Ã£â€šÂªÃ£Æ’Â¼Ã£â€šÂ±Ã£â€šÂ¹Ã£Æ’Ë†Ã£Æ’Â¬Ã£Æ’Â¼Ã£â€šÂ·Ã£Æ’Â§Ã£Æ’Â³
 
-## 利用可能な Agent
+## Safety And Authorization Rule
 
-`~/.claude/agents/` に配置:
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-| Agent | 目的 | 使用タイミング |
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+## Ã¥Ë†Â©Ã§â€Â¨Ã¥ÂÂ¯Ã¨Æ’Â½Ã£ÂÂª Agent
+
+`~/.claude/agents/` Ã£ÂÂ«Ã©â€¦ÂÃ§Â½Â®:
+
+| Agent | Ã§â€ºÂ®Ã§Å¡â€ž | Ã¤Â½Â¿Ã§â€Â¨Ã£â€šÂ¿Ã£â€šÂ¤Ã£Æ’Å¸Ã£Æ’Â³Ã£â€šÂ° |
 |-------|---------|-------------|
-| planner | 実装計画 | 複雑な機能、リファクタリング |
-| architect | システム設計 | アーキテクチャの意思決定 |
-| tdd-guide | テスト駆動開発 | 新機能、バグ修正 |
-| code-reviewer | コードレビュー | コード記述後 |
-| security-reviewer | セキュリティ分析 | コミット前 |
-| build-error-resolver | ビルドエラー修正 | ビルド失敗時 |
-| e2e-runner | E2Eテスト | 重要なユーザーフロー |
-| refactor-cleaner | デッドコードクリーンアップ | コードメンテナンス |
-| doc-updater | ドキュメント | ドキュメント更新 |
+| planner | Ã¥Â®Å¸Ã¨Â£â€¦Ã¨Â¨Ë†Ã§â€Â» | Ã¨Â¤â€¡Ã©â€ºâ€˜Ã£ÂÂªÃ¦Â©Å¸Ã¨Æ’Â½Ã£â‚¬ÂÃ£Æ’ÂªÃ£Æ’â€¢Ã£â€šÂ¡Ã£â€šÂ¯Ã£â€šÂ¿Ã£Æ’ÂªÃ£Æ’Â³Ã£â€šÂ° |
+| architect | Ã£â€šÂ·Ã£â€šÂ¹Ã£Æ’â€ Ã£Æ’Â Ã¨Â¨Â­Ã¨Â¨Ë† | Ã£â€šÂ¢Ã£Æ’Â¼Ã£â€šÂ­Ã£Æ’â€ Ã£â€šÂ¯Ã£Æ’ÂÃ£Æ’Â£Ã£ÂÂ®Ã¦â€žÂÃ¦â‚¬ÂÃ¦Â±ÂºÃ¥Â®Å¡ |
+| tdd-guide | Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã©Â§â€ Ã¥â€¹â€¢Ã©â€“â€¹Ã§â„¢Âº | Ã¦â€“Â°Ã¦Â©Å¸Ã¨Æ’Â½Ã£â‚¬ÂÃ£Æ’ÂÃ£â€šÂ°Ã¤Â¿Â®Ã¦Â­Â£ |
+| code-reviewer | Ã£â€šÂ³Ã£Æ’Â¼Ã£Æ’â€°Ã£Æ’Â¬Ã£Æ’â€œÃ£Æ’Â¥Ã£Æ’Â¼ | Ã£â€šÂ³Ã£Æ’Â¼Ã£Æ’â€°Ã¨Â¨ËœÃ¨Â¿Â°Ã¥Â¾Å’ |
+| security-reviewer | Ã£â€šÂ»Ã£â€šÂ­Ã£Æ’Â¥Ã£Æ’ÂªÃ£Æ’â€ Ã£â€šÂ£Ã¥Ë†â€ Ã¦Å¾Â | Ã£â€šÂ³Ã£Æ’Å¸Ã£Æ’Æ’Ã£Æ’Ë†Ã¥â€°Â |
+| build-error-resolver | Ã£Æ’â€œÃ£Æ’Â«Ã£Æ’â€°Ã£â€šÂ¨Ã£Æ’Â©Ã£Æ’Â¼Ã¤Â¿Â®Ã¦Â­Â£ | Ã£Æ’â€œÃ£Æ’Â«Ã£Æ’â€°Ã¥Â¤Â±Ã¦â€¢â€”Ã¦â„¢â€š |
+| e2e-runner | E2EÃ£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë† | Ã©â€¡ÂÃ¨Â¦ÂÃ£ÂÂªÃ£Æ’Â¦Ã£Æ’Â¼Ã£â€šÂ¶Ã£Æ’Â¼Ã£Æ’â€¢Ã£Æ’Â­Ã£Æ’Â¼ |
+| refactor-cleaner | Ã£Æ’â€¡Ã£Æ’Æ’Ã£Æ’â€°Ã£â€šÂ³Ã£Æ’Â¼Ã£Æ’â€°Ã£â€šÂ¯Ã£Æ’ÂªÃ£Æ’Â¼Ã£Æ’Â³Ã£â€šÂ¢Ã£Æ’Æ’Ã£Æ’â€” | Ã£â€šÂ³Ã£Æ’Â¼Ã£Æ’â€°Ã£Æ’Â¡Ã£Æ’Â³Ã£Æ’â€ Ã£Æ’Å Ã£Æ’Â³Ã£â€šÂ¹ |
+| doc-updater | Ã£Æ’â€°Ã£â€šÂ­Ã£Æ’Â¥Ã£Æ’Â¡Ã£Æ’Â³Ã£Æ’Ë† | Ã£Æ’â€°Ã£â€šÂ­Ã£Æ’Â¥Ã£Æ’Â¡Ã£Æ’Â³Ã£Æ’Ë†Ã¦â€ºÂ´Ã¦â€“Â° |
 
-## Agent の即座の使用
+## Agent Ã£ÂÂ®Ã¥ÂÂ³Ã¥ÂºÂ§Ã£ÂÂ®Ã¤Â½Â¿Ã§â€Â¨
 
-ユーザープロンプト不要:
-1. 複雑な機能リクエスト - **planner** agent を使用
-2. コード作成/変更直後 - **code-reviewer** agent を使用
-3. バグ修正または新機能 - **tdd-guide** agent を使用
-4. アーキテクチャの意思決定 - **architect** agent を使用
+Ã£Æ’Â¦Ã£Æ’Â¼Ã£â€šÂ¶Ã£Æ’Â¼Ã£Æ’â€”Ã£Æ’Â­Ã£Æ’Â³Ã£Æ’â€”Ã£Æ’Ë†Ã¤Â¸ÂÃ¨Â¦Â:
+1. Ã¨Â¤â€¡Ã©â€ºâ€˜Ã£ÂÂªÃ¦Â©Å¸Ã¨Æ’Â½Ã£Æ’ÂªÃ£â€šÂ¯Ã£â€šÂ¨Ã£â€šÂ¹Ã£Æ’Ë† - **planner** agent Ã£â€šâ€™Ã¤Â½Â¿Ã§â€Â¨
+2. Ã£â€šÂ³Ã£Æ’Â¼Ã£Æ’â€°Ã¤Â½Å“Ã¦Ë†Â/Ã¥Â¤â€°Ã¦â€ºÂ´Ã§â€ºÂ´Ã¥Â¾Å’ - **code-reviewer** agent Ã£â€šâ€™Ã¤Â½Â¿Ã§â€Â¨
+3. Ã£Æ’ÂÃ£â€šÂ°Ã¤Â¿Â®Ã¦Â­Â£Ã£ÂÂ¾Ã£ÂÅ¸Ã£ÂÂ¯Ã¦â€“Â°Ã¦Â©Å¸Ã¨Æ’Â½ - **tdd-guide** agent Ã£â€šâ€™Ã¤Â½Â¿Ã§â€Â¨
+4. Ã£â€šÂ¢Ã£Æ’Â¼Ã£â€šÂ­Ã£Æ’â€ Ã£â€šÂ¯Ã£Æ’ÂÃ£Æ’Â£Ã£ÂÂ®Ã¦â€žÂÃ¦â‚¬ÂÃ¦Â±ÂºÃ¥Â®Å¡ - **architect** agent Ã£â€šâ€™Ã¤Â½Â¿Ã§â€Â¨
 
-## 並列タスク実行
+## Ã¤Â¸Â¦Ã¥Ë†â€”Ã£â€šÂ¿Ã£â€šÂ¹Ã£â€šÂ¯Ã¥Â®Å¸Ã¨Â¡Å’
 
-独立した操作には常に並列 Task 実行を使用してください:
+Ã§â€¹Â¬Ã§Â«â€¹Ã£Ââ€”Ã£ÂÅ¸Ã¦â€œÂÃ¤Â½Å“Ã£ÂÂ«Ã£ÂÂ¯Ã¥Â¸Â¸Ã£ÂÂ«Ã¤Â¸Â¦Ã¥Ë†â€” Task Ã¥Â®Å¸Ã¨Â¡Å’Ã£â€šâ€™Ã¤Â½Â¿Ã§â€Â¨Ã£Ââ€”Ã£ÂÂ¦Ã£ÂÂÃ£ÂÂ Ã£Ââ€¢Ã£Ââ€ž:
 
 ```markdown
-# 良い例: 並列実行
-3つの agent を並列起動:
-1. Agent 1: 認証モジュールのセキュリティ分析
-2. Agent 2: キャッシュシステムのパフォーマンスレビュー
-3. Agent 3: ユーティリティの型チェック
+# Ã¨â€°Â¯Ã£Ââ€žÃ¤Â¾â€¹: Ã¤Â¸Â¦Ã¥Ë†â€”Ã¥Â®Å¸Ã¨Â¡Å’
+3Ã£ÂÂ¤Ã£ÂÂ® agent Ã£â€šâ€™Ã¤Â¸Â¦Ã¥Ë†â€”Ã¨ÂµÂ·Ã¥â€¹â€¢:
+1. Agent 1: Ã¨ÂªÂÃ¨Â¨Â¼Ã£Æ’Â¢Ã£â€šÂ¸Ã£Æ’Â¥Ã£Æ’Â¼Ã£Æ’Â«Ã£ÂÂ®Ã£â€šÂ»Ã£â€šÂ­Ã£Æ’Â¥Ã£Æ’ÂªÃ£Æ’â€ Ã£â€šÂ£Ã¥Ë†â€ Ã¦Å¾Â
+2. Agent 2: Ã£â€šÂ­Ã£Æ’Â£Ã£Æ’Æ’Ã£â€šÂ·Ã£Æ’Â¥Ã£â€šÂ·Ã£â€šÂ¹Ã£Æ’â€ Ã£Æ’Â Ã£ÂÂ®Ã£Æ’â€˜Ã£Æ’â€¢Ã£â€šÂ©Ã£Æ’Â¼Ã£Æ’Å¾Ã£Æ’Â³Ã£â€šÂ¹Ã£Æ’Â¬Ã£Æ’â€œÃ£Æ’Â¥Ã£Æ’Â¼
+3. Agent 3: Ã£Æ’Â¦Ã£Æ’Â¼Ã£Æ’â€ Ã£â€šÂ£Ã£Æ’ÂªÃ£Æ’â€ Ã£â€šÂ£Ã£ÂÂ®Ã¥Å¾â€¹Ã£Æ’ÂÃ£â€šÂ§Ã£Æ’Æ’Ã£â€šÂ¯
 
-# 悪い例: 不要な逐次実行
-最初に agent 1、次に agent 2、そして agent 3
+# Ã¦â€šÂªÃ£Ââ€žÃ¤Â¾â€¹: Ã¤Â¸ÂÃ¨Â¦ÂÃ£ÂÂªÃ©â‚¬ÂÃ¦Â¬Â¡Ã¥Â®Å¸Ã¨Â¡Å’
+Ã¦Å“â‚¬Ã¥Ë†ÂÃ£ÂÂ« agent 1Ã£â‚¬ÂÃ¦Â¬Â¡Ã£ÂÂ« agent 2Ã£â‚¬ÂÃ£ÂÂÃ£Ââ€”Ã£ÂÂ¦ agent 3
 ```
 
-## 多角的分析
+## Ã¥Â¤Å¡Ã¨Â§â€™Ã§Å¡â€žÃ¥Ë†â€ Ã¦Å¾Â
 
-複雑な問題には、役割分担したサブ agent を使用:
-- 事実レビュー担当
-- シニアエンジニア
-- セキュリティエキスパート
-- 一貫性レビュー担当
-- 冗長性チェック担当
+Ã¨Â¤â€¡Ã©â€ºâ€˜Ã£ÂÂªÃ¥â€¢ÂÃ©Â¡Å’Ã£ÂÂ«Ã£ÂÂ¯Ã£â‚¬ÂÃ¥Â½Â¹Ã¥â€°Â²Ã¥Ë†â€ Ã¦â€¹â€¦Ã£Ââ€”Ã£ÂÅ¸Ã£â€šÂµÃ£Æ’â€“ agent Ã£â€šâ€™Ã¤Â½Â¿Ã§â€Â¨:
+- Ã¤Âºâ€¹Ã¥Â®Å¸Ã£Æ’Â¬Ã£Æ’â€œÃ£Æ’Â¥Ã£Æ’Â¼Ã¦â€¹â€¦Ã¥Â½â€œ
+- Ã£â€šÂ·Ã£Æ’â€¹Ã£â€šÂ¢Ã£â€šÂ¨Ã£Æ’Â³Ã£â€šÂ¸Ã£Æ’â€¹Ã£â€šÂ¢
+- Ã£â€šÂ»Ã£â€šÂ­Ã£Æ’Â¥Ã£Æ’ÂªÃ£Æ’â€ Ã£â€šÂ£Ã£â€šÂ¨Ã£â€šÂ­Ã£â€šÂ¹Ã£Æ’â€˜Ã£Æ’Â¼Ã£Æ’Ë†
+- Ã¤Â¸â‚¬Ã¨Â²Â«Ã¦â‚¬Â§Ã£Æ’Â¬Ã£Æ’â€œÃ£Æ’Â¥Ã£Æ’Â¼Ã¦â€¹â€¦Ã¥Â½â€œ
+- Ã¥â€ â€”Ã©â€¢Â·Ã¦â‚¬Â§Ã£Æ’ÂÃ£â€šÂ§Ã£Æ’Æ’Ã£â€šÂ¯Ã¦â€¹â€¦Ã¥Â½â€œ

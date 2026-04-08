@@ -1,5 +1,18 @@
 # Data Migration Specialist Review Checklist
 
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
 Scope: When SCOPE_MIGRATIONS=true
 Output: JSON objects, one finding per line. Schema:
 {"severity":"CRITICAL|INFORMATIONAL","confidence":N,"path":"file","line":N,"category":"data-migration","summary":"...","fix":"...","fingerprint":"path:line:data-migration","specialist":"data-migration"}
@@ -17,7 +30,7 @@ If no findings: output `NO FINDINGS` and nothing else.
 
 ### Data Loss Risk
 - Dropping columns that still contain data (add deprecation period first)
-- Changing column types that truncate data (varchar(255) → varchar(50))
+- Changing column types that truncate data (varchar(255) Ã¢â€ â€™ varchar(50))
 - Removing tables without verifying no code references them
 - Renaming columns without updating all references (ORM, raw SQL, views)
 - NOT NULL constraints added to columns with existing NULL values (needs backfill first)

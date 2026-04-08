@@ -1,33 +1,46 @@
 ---
 name: golang-testing
-description: Go测试模式包括表格驱动测试、子测试、基准测试、模糊测试和测试覆盖率。遵循TDD方法论，采用地道的Go实践。
+description: GoÃ¦Âµâ€¹Ã¨Â¯â€¢Ã¦Â¨Â¡Ã¥Â¼ÂÃ¥Å’â€¦Ã¦â€¹Â¬Ã¨Â¡Â¨Ã¦Â Â¼Ã©Â©Â±Ã¥Å Â¨Ã¦Âµâ€¹Ã¨Â¯â€¢Ã£â‚¬ÂÃ¥Â­ÂÃ¦Âµâ€¹Ã¨Â¯â€¢Ã£â‚¬ÂÃ¥Å¸ÂºÃ¥â€¡â€ Ã¦Âµâ€¹Ã¨Â¯â€¢Ã£â‚¬ÂÃ¦Â¨Â¡Ã§Â³Å Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¥â€™Å’Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡Ã£â‚¬â€šÃ©ÂÂµÃ¥Â¾ÂªTDDÃ¦â€“Â¹Ã¦Â³â€¢Ã¨Â®ÂºÃ¯Â¼Å’Ã©â€¡â€¡Ã§â€Â¨Ã¥Å“Â°Ã©Ââ€œÃ§Å¡â€žGoÃ¥Â®Å¾Ã¨Â·ÂµÃ£â‚¬â€š
 origin: ECC
 ---
 
-# Go 测试模式
+# Go Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¦Â¨Â¡Ã¥Â¼Â
 
-遵循 TDD 方法论，用于编写可靠、可维护测试的全面 Go 测试模式。
+## Safety And Authorization Rule
 
-## 何时激活
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-* 编写新的 Go 函数或方法时
-* 为现有代码添加测试覆盖率时
-* 为性能关键代码创建基准测试时
-* 为输入验证实现模糊测试时
-* 在 Go 项目中遵循 TDD 工作流时
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-## Go 的 TDD 工作流
 
-### 红-绿-重构循环
+Ã©ÂÂµÃ¥Â¾Âª TDD Ã¦â€“Â¹Ã¦Â³â€¢Ã¨Â®ÂºÃ¯Â¼Å’Ã§â€Â¨Ã¤ÂºÅ½Ã§Â¼â€“Ã¥â€ â„¢Ã¥ÂÂ¯Ã©ÂÂ Ã£â‚¬ÂÃ¥ÂÂ¯Ã§Â»Â´Ã¦Å Â¤Ã¦Âµâ€¹Ã¨Â¯â€¢Ã§Å¡â€žÃ¥â€¦Â¨Ã©ÂÂ¢ Go Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¦Â¨Â¡Ã¥Â¼ÂÃ£â‚¬â€š
+
+## Ã¤Â½â€¢Ã¦â€”Â¶Ã¦Â¿â‚¬Ã¦Â´Â»
+
+* Ã§Â¼â€“Ã¥â€ â„¢Ã¦â€“Â°Ã§Å¡â€ž Go Ã¥â€¡Â½Ã¦â€¢Â°Ã¦Ë†â€“Ã¦â€“Â¹Ã¦Â³â€¢Ã¦â€”Â¶
+* Ã¤Â¸ÂºÃ§Å½Â°Ã¦Å“â€°Ã¤Â»Â£Ã§Â ÂÃ¦Â·Â»Ã¥Å Â Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡Ã¦â€”Â¶
+* Ã¤Â¸ÂºÃ¦â‚¬Â§Ã¨Æ’Â½Ã¥â€¦Â³Ã©â€Â®Ã¤Â»Â£Ã§Â ÂÃ¥Ë†â€ºÃ¥Â»ÂºÃ¥Å¸ÂºÃ¥â€¡â€ Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¦â€”Â¶
+* Ã¤Â¸ÂºÃ¨Â¾â€œÃ¥â€¦Â¥Ã©ÂªÅ’Ã¨Â¯ÂÃ¥Â®Å¾Ã§Å½Â°Ã¦Â¨Â¡Ã§Â³Å Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¦â€”Â¶
+* Ã¥Å“Â¨ Go Ã©Â¡Â¹Ã§â€ºÂ®Ã¤Â¸Â­Ã©ÂÂµÃ¥Â¾Âª TDD Ã¥Â·Â¥Ã¤Â½Å“Ã¦ÂµÂÃ¦â€”Â¶
+
+## Go Ã§Å¡â€ž TDD Ã¥Â·Â¥Ã¤Â½Å“Ã¦ÂµÂ
+
+### Ã§ÂºÂ¢-Ã§Â»Â¿-Ã©â€¡ÂÃ¦Å¾â€žÃ¥Â¾ÂªÃ§Å½Â¯
 
 ```
-RED     → 首先编写一个失败的测试
-GREEN   → 编写最少的代码来通过测试
-REFACTOR → 改进代码，同时保持测试通过
-REPEAT  → 继续处理下一个需求
+RED     Ã¢â€ â€™ Ã©Â¦â€“Ã¥â€¦Ë†Ã§Â¼â€“Ã¥â€ â„¢Ã¤Â¸â‚¬Ã¤Â¸ÂªÃ¥Â¤Â±Ã¨Â´Â¥Ã§Å¡â€žÃ¦Âµâ€¹Ã¨Â¯â€¢
+GREEN   Ã¢â€ â€™ Ã§Â¼â€“Ã¥â€ â„¢Ã¦Å“â‚¬Ã¥Â°â€˜Ã§Å¡â€žÃ¤Â»Â£Ã§Â ÂÃ¦ÂÂ¥Ã©â‚¬Å¡Ã¨Â¿â€¡Ã¦Âµâ€¹Ã¨Â¯â€¢
+REFACTOR Ã¢â€ â€™ Ã¦â€Â¹Ã¨Â¿â€ºÃ¤Â»Â£Ã§Â ÂÃ¯Â¼Å’Ã¥ÂÅ’Ã¦â€”Â¶Ã¤Â¿ÂÃ¦Å’ÂÃ¦Âµâ€¹Ã¨Â¯â€¢Ã©â‚¬Å¡Ã¨Â¿â€¡
+REPEAT  Ã¢â€ â€™ Ã§Â»Â§Ã§Â»Â­Ã¥Â¤â€žÃ§Ââ€ Ã¤Â¸â€¹Ã¤Â¸â‚¬Ã¤Â¸ÂªÃ©Å“â‚¬Ã¦Â±â€š
 ```
 
-### Go 中的分步 TDD
+### Go Ã¤Â¸Â­Ã§Å¡â€žÃ¥Ë†â€ Ã¦Â­Â¥ TDD
 
 ```go
 // Step 1: Define the interface/signature
@@ -69,9 +82,9 @@ func Add(a, b int) int {
 // Step 6: Refactor if needed, verify tests still pass
 ```
 
-## 表驱动测试
+## Ã¨Â¡Â¨Ã©Â©Â±Ã¥Å Â¨Ã¦Âµâ€¹Ã¨Â¯â€¢
 
-Go 测试的标准模式。以最少的代码实现全面的覆盖。
+Go Ã¦Âµâ€¹Ã¨Â¯â€¢Ã§Å¡â€žÃ¦Â â€¡Ã¥â€¡â€ Ã¦Â¨Â¡Ã¥Â¼ÂÃ£â‚¬â€šÃ¤Â»Â¥Ã¦Å“â‚¬Ã¥Â°â€˜Ã§Å¡â€žÃ¤Â»Â£Ã§Â ÂÃ¥Â®Å¾Ã§Å½Â°Ã¥â€¦Â¨Ã©ÂÂ¢Ã§Å¡â€žÃ¨Â¦â€ Ã§â€ºâ€“Ã£â‚¬â€š
 
 ```go
 func TestAdd(t *testing.T) {
@@ -99,7 +112,7 @@ func TestAdd(t *testing.T) {
 }
 ```
 
-### 包含错误情况的表驱动测试
+### Ã¥Å’â€¦Ã¥ÂÂ«Ã©â€â„¢Ã¨Â¯Â¯Ã¦Æ’â€¦Ã¥â€ ÂµÃ§Å¡â€žÃ¨Â¡Â¨Ã©Â©Â±Ã¥Å Â¨Ã¦Âµâ€¹Ã¨Â¯â€¢
 
 ```go
 func TestParseConfig(t *testing.T) {
@@ -154,9 +167,9 @@ func TestParseConfig(t *testing.T) {
 }
 ```
 
-## 子测试和子基准测试
+## Ã¥Â­ÂÃ¦Âµâ€¹Ã¨Â¯â€¢Ã¥â€™Å’Ã¥Â­ÂÃ¥Å¸ÂºÃ¥â€¡â€ Ã¦Âµâ€¹Ã¨Â¯â€¢
 
-### 组织相关测试
+### Ã§Â»â€žÃ§Â»â€¡Ã§â€ºÂ¸Ã¥â€¦Â³Ã¦Âµâ€¹Ã¨Â¯â€¢
 
 ```go
 func TestUser(t *testing.T) {
@@ -194,7 +207,7 @@ func TestUser(t *testing.T) {
 }
 ```
 
-### 并行子测试
+### Ã¥Â¹Â¶Ã¨Â¡Å’Ã¥Â­ÂÃ¦Âµâ€¹Ã¨Â¯â€¢
 
 ```go
 func TestParallel(t *testing.T) {
@@ -219,9 +232,9 @@ func TestParallel(t *testing.T) {
 }
 ```
 
-## 测试辅助函数
+## Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¨Â¾â€¦Ã¥Å Â©Ã¥â€¡Â½Ã¦â€¢Â°
 
-### 辅助函数
+### Ã¨Â¾â€¦Ã¥Å Â©Ã¥â€¡Â½Ã¦â€¢Â°
 
 ```go
 func setupTestDB(t *testing.T) *sql.DB {
@@ -260,7 +273,7 @@ func assertEqual[T comparable](t *testing.T, got, want T) {
 }
 ```
 
-### 临时文件和目录
+### Ã¤Â¸Â´Ã¦â€”Â¶Ã¦â€“â€¡Ã¤Â»Â¶Ã¥â€™Å’Ã§â€ºÂ®Ã¥Â½â€¢
 
 ```go
 func TestFileProcessing(t *testing.T) {
@@ -285,9 +298,9 @@ func TestFileProcessing(t *testing.T) {
 }
 ```
 
-## 黄金文件
+## Ã©Â»â€žÃ©â€¡â€˜Ã¦â€“â€¡Ã¤Â»Â¶
 
-针对存储在 `testdata/` 中的预期输出文件进行测试。
+Ã©â€™Ë†Ã¥Â¯Â¹Ã¥Â­ËœÃ¥â€šÂ¨Ã¥Å“Â¨ `testdata/` Ã¤Â¸Â­Ã§Å¡â€žÃ©Â¢â€žÃ¦Å“Å¸Ã¨Â¾â€œÃ¥â€¡ÂºÃ¦â€“â€¡Ã¤Â»Â¶Ã¨Â¿â€ºÃ¨Â¡Å’Ã¦Âµâ€¹Ã¨Â¯â€¢Ã£â‚¬â€š
 
 ```go
 var update = flag.Bool("update", false, "update golden files")
@@ -328,9 +341,9 @@ func TestRender(t *testing.T) {
 }
 ```
 
-## 使用接口进行模拟
+## Ã¤Â½Â¿Ã§â€Â¨Ã¦Å½Â¥Ã¥ÂÂ£Ã¨Â¿â€ºÃ¨Â¡Å’Ã¦Â¨Â¡Ã¦â€¹Å¸
 
-### 基于接口的模拟
+### Ã¥Å¸ÂºÃ¤ÂºÅ½Ã¦Å½Â¥Ã¥ÂÂ£Ã§Å¡â€žÃ¦Â¨Â¡Ã¦â€¹Å¸
 
 ```go
 // Define interface for dependencies
@@ -385,9 +398,9 @@ func TestUserService(t *testing.T) {
 }
 ```
 
-## 基准测试
+## Ã¥Å¸ÂºÃ¥â€¡â€ Ã¦Âµâ€¹Ã¨Â¯â€¢
 
-### 基本基准测试
+### Ã¥Å¸ÂºÃ¦Å“Â¬Ã¥Å¸ÂºÃ¥â€¡â€ Ã¦Âµâ€¹Ã¨Â¯â€¢
 
 ```go
 func BenchmarkProcess(b *testing.B) {
@@ -403,7 +416,7 @@ func BenchmarkProcess(b *testing.B) {
 // Output: BenchmarkProcess-8   10000   105234 ns/op   4096 B/op   10 allocs/op
 ```
 
-### 不同大小的基准测试
+### Ã¤Â¸ÂÃ¥ÂÅ’Ã¥Â¤Â§Ã¥Â°ÂÃ§Å¡â€žÃ¥Å¸ÂºÃ¥â€¡â€ Ã¦Âµâ€¹Ã¨Â¯â€¢
 
 ```go
 func BenchmarkSort(b *testing.B) {
@@ -425,7 +438,7 @@ func BenchmarkSort(b *testing.B) {
 }
 ```
 
-### 内存分配基准测试
+### Ã¥â€ â€¦Ã¥Â­ËœÃ¥Ë†â€ Ã©â€¦ÂÃ¥Å¸ÂºÃ¥â€¡â€ Ã¦Âµâ€¹Ã¨Â¯â€¢
 
 ```go
 func BenchmarkStringConcat(b *testing.B) {
@@ -459,9 +472,9 @@ func BenchmarkStringConcat(b *testing.B) {
 }
 ```
 
-## 模糊测试 (Go 1.18+)
+## Ã¦Â¨Â¡Ã§Â³Å Ã¦Âµâ€¹Ã¨Â¯â€¢ (Go 1.18+)
 
-### 基本模糊测试
+### Ã¥Å¸ÂºÃ¦Å“Â¬Ã¦Â¨Â¡Ã§Â³Å Ã¦Âµâ€¹Ã¨Â¯â€¢
 
 ```go
 func FuzzParseJSON(f *testing.F) {
@@ -491,7 +504,7 @@ func FuzzParseJSON(f *testing.F) {
 // Run: go test -fuzz=FuzzParseJSON -fuzztime=30s
 ```
 
-### 多输入模糊测试
+### Ã¥Â¤Å¡Ã¨Â¾â€œÃ¥â€¦Â¥Ã¦Â¨Â¡Ã§Â³Å Ã¦Âµâ€¹Ã¨Â¯â€¢
 
 ```go
 func FuzzCompare(f *testing.F) {
@@ -519,9 +532,9 @@ func FuzzCompare(f *testing.F) {
 }
 ```
 
-## 测试覆盖率
+## Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡
 
-### 运行覆盖率
+### Ã¨Â¿ÂÃ¨Â¡Å’Ã¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡
 
 ```bash
 # Basic coverage
@@ -540,16 +553,16 @@ go tool cover -func=coverage.out
 go test -race -coverprofile=coverage.out ./...
 ```
 
-### 覆盖率目标
+### Ã¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡Ã§â€ºÂ®Ã¦Â â€¡
 
-| 代码类型 | 目标 |
+| Ã¤Â»Â£Ã§Â ÂÃ§Â±Â»Ã¥Å¾â€¹ | Ã§â€ºÂ®Ã¦Â â€¡ |
 |-----------|--------|
-| 关键业务逻辑 | 100% |
-| 公共 API | 90%+ |
-| 通用代码 | 80%+ |
-| 生成的代码 | 排除 |
+| Ã¥â€¦Â³Ã©â€Â®Ã¤Â¸Å¡Ã¥Å Â¡Ã©â‚¬Â»Ã¨Â¾â€˜ | 100% |
+| Ã¥â€¦Â¬Ã¥â€¦Â± API | 90%+ |
+| Ã©â‚¬Å¡Ã§â€Â¨Ã¤Â»Â£Ã§Â Â | 80%+ |
+| Ã§â€Å¸Ã¦Ë†ÂÃ§Å¡â€žÃ¤Â»Â£Ã§Â Â | Ã¦Å½â€™Ã©â„¢Â¤ |
 
-### 从覆盖率中排除生成的代码
+### Ã¤Â»Å½Ã¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡Ã¤Â¸Â­Ã¦Å½â€™Ã©â„¢Â¤Ã§â€Å¸Ã¦Ë†ÂÃ§Å¡â€žÃ¤Â»Â£Ã§Â Â
 
 ```go
 //go:generate mockgen -source=interface.go -destination=mock_interface.go
@@ -558,7 +571,7 @@ go test -race -coverprofile=coverage.out ./...
 // go test -cover -tags=!generate ./...
 ```
 
-## HTTP 处理器测试
+## HTTP Ã¥Â¤â€žÃ§Ââ€ Ã¥â„¢Â¨Ã¦Âµâ€¹Ã¨Â¯â€¢
 
 ```go
 func TestHealthHandler(t *testing.T) {
@@ -641,7 +654,7 @@ func TestAPIHandler(t *testing.T) {
 }
 ```
 
-## 命令测试
+## Ã¥â€˜Â½Ã¤Â»Â¤Ã¦Âµâ€¹Ã¨Â¯â€¢
 
 ```bash
 # Run all tests
@@ -678,27 +691,27 @@ go test -fuzz=FuzzParse -fuzztime=30s ./...
 go test -count=10 ./...
 ```
 
-## 最佳实践
+## Ã¦Å“â‚¬Ã¤Â½Â³Ã¥Â®Å¾Ã¨Â·Âµ
 
-**应该：**
+**Ã¥Âºâ€Ã¨Â¯Â¥Ã¯Â¼Å¡**
 
-* **先**写测试 (TDD)
-* 使用表驱动测试以实现全面覆盖
-* 测试行为，而非实现
-* 在辅助函数中使用 `t.Helper()`
-* 对于独立的测试使用 `t.Parallel()`
-* 使用 `t.Cleanup()` 清理资源
-* 使用描述场景的有意义的测试名称
+* **Ã¥â€¦Ë†**Ã¥â€ â„¢Ã¦Âµâ€¹Ã¨Â¯â€¢ (TDD)
+* Ã¤Â½Â¿Ã§â€Â¨Ã¨Â¡Â¨Ã©Â©Â±Ã¥Å Â¨Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¤Â»Â¥Ã¥Â®Å¾Ã§Å½Â°Ã¥â€¦Â¨Ã©ÂÂ¢Ã¨Â¦â€ Ã§â€ºâ€“
+* Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¨Â¡Å’Ã¤Â¸ÂºÃ¯Â¼Å’Ã¨â‚¬Å’Ã©ÂÅ¾Ã¥Â®Å¾Ã§Å½Â°
+* Ã¥Å“Â¨Ã¨Â¾â€¦Ã¥Å Â©Ã¥â€¡Â½Ã¦â€¢Â°Ã¤Â¸Â­Ã¤Â½Â¿Ã§â€Â¨ `t.Helper()`
+* Ã¥Â¯Â¹Ã¤ÂºÅ½Ã§â€¹Â¬Ã§Â«â€¹Ã§Å¡â€žÃ¦Âµâ€¹Ã¨Â¯â€¢Ã¤Â½Â¿Ã§â€Â¨ `t.Parallel()`
+* Ã¤Â½Â¿Ã§â€Â¨ `t.Cleanup()` Ã¦Â¸â€¦Ã§Ââ€ Ã¨Âµâ€žÃ¦ÂºÂ
+* Ã¤Â½Â¿Ã§â€Â¨Ã¦ÂÂÃ¨Â¿Â°Ã¥Å“ÂºÃ¦â„¢Â¯Ã§Å¡â€žÃ¦Å“â€°Ã¦â€žÂÃ¤Â¹â€°Ã§Å¡â€žÃ¦Âµâ€¹Ã¨Â¯â€¢Ã¥ÂÂÃ§Â§Â°
 
-**不应该：**
+**Ã¤Â¸ÂÃ¥Âºâ€Ã¨Â¯Â¥Ã¯Â¼Å¡**
 
-* 直接测试私有函数 (通过公共 API 测试)
-* 在测试中使用 `time.Sleep()` (使用通道或条件)
-* 忽略不稳定的测试 (修复或移除它们)
-* 模拟所有东西 (在可能的情况下优先使用集成测试)
-* 跳过错误路径测试
+* Ã§â€ºÂ´Ã¦Å½Â¥Ã¦Âµâ€¹Ã¨Â¯â€¢Ã§Â§ÂÃ¦Å“â€°Ã¥â€¡Â½Ã¦â€¢Â° (Ã©â‚¬Å¡Ã¨Â¿â€¡Ã¥â€¦Â¬Ã¥â€¦Â± API Ã¦Âµâ€¹Ã¨Â¯â€¢)
+* Ã¥Å“Â¨Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¤Â¸Â­Ã¤Â½Â¿Ã§â€Â¨ `time.Sleep()` (Ã¤Â½Â¿Ã§â€Â¨Ã©â‚¬Å¡Ã©Ââ€œÃ¦Ë†â€“Ã¦ÂÂ¡Ã¤Â»Â¶)
+* Ã¥Â¿Â½Ã§â€¢Â¥Ã¤Â¸ÂÃ§Â¨Â³Ã¥Â®Å¡Ã§Å¡â€žÃ¦Âµâ€¹Ã¨Â¯â€¢ (Ã¤Â¿Â®Ã¥Â¤ÂÃ¦Ë†â€“Ã§Â§Â»Ã©â„¢Â¤Ã¥Â®Æ’Ã¤Â»Â¬)
+* Ã¦Â¨Â¡Ã¦â€¹Å¸Ã¦â€°â‚¬Ã¦Å“â€°Ã¤Â¸Å“Ã¨Â¥Â¿ (Ã¥Å“Â¨Ã¥ÂÂ¯Ã¨Æ’Â½Ã§Å¡â€žÃ¦Æ’â€¦Ã¥â€ ÂµÃ¤Â¸â€¹Ã¤Â¼ËœÃ¥â€¦Ë†Ã¤Â½Â¿Ã§â€Â¨Ã©â€ºâ€ Ã¦Ë†ÂÃ¦Âµâ€¹Ã¨Â¯â€¢)
+* Ã¨Â·Â³Ã¨Â¿â€¡Ã©â€â„¢Ã¨Â¯Â¯Ã¨Â·Â¯Ã¥Â¾â€žÃ¦Âµâ€¹Ã¨Â¯â€¢
 
-## 与 CI/CD 集成
+## Ã¤Â¸Å½ CI/CD Ã©â€ºâ€ Ã¦Ë†Â
 
 ```yaml
 # GitHub Actions example
@@ -719,4 +732,4 @@ test:
         awk -F'%' '{if ($1 < 80) exit 1}'
 ```
 
-**记住**：测试即文档。它们展示了你的代码应如何使用。清晰地编写它们并保持更新。
+**Ã¨Â®Â°Ã¤Â½Â**Ã¯Â¼Å¡Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¥ÂÂ³Ã¦â€“â€¡Ã¦Â¡Â£Ã£â‚¬â€šÃ¥Â®Æ’Ã¤Â»Â¬Ã¥Â±â€¢Ã§Â¤ÂºÃ¤Âºâ€ Ã¤Â½Â Ã§Å¡â€žÃ¤Â»Â£Ã§Â ÂÃ¥Âºâ€Ã¥Â¦â€šÃ¤Â½â€¢Ã¤Â½Â¿Ã§â€Â¨Ã£â‚¬â€šÃ¦Â¸â€¦Ã¦â„¢Â°Ã¥Å“Â°Ã§Â¼â€“Ã¥â€ â„¢Ã¥Â®Æ’Ã¤Â»Â¬Ã¥Â¹Â¶Ã¤Â¿ÂÃ¦Å’ÂÃ¦â€ºÂ´Ã¦â€“Â°Ã£â‚¬â€š

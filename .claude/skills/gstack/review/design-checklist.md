@@ -1,10 +1,23 @@
 # Design Review Checklist (Lite)
 
-> **Subset of DESIGN_METHODOLOGY** — when adding items here, also update `generateDesignMethodology()` in `scripts/gen-skill-docs.ts`, and vice versa.
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+> **Subset of DESIGN_METHODOLOGY** Ã¢â‚¬â€ when adding items here, also update `generateDesignMethodology()` in `scripts/gen-skill-docs.ts`, and vice versa.
 
 ## Instructions
 
-This checklist applies to **source code in the diff** — not rendered output. Read each changed frontend file (full file, not just diff hunks) and flag anti-patterns.
+This checklist applies to **source code in the diff** Ã¢â‚¬â€ not rendered output. Read each changed frontend file (full file, not just diff hunks) and flag anti-patterns.
 
 **Trigger:** Only run this checklist if the diff touches frontend files. Use `gstack-diff-scope` to detect:
 
@@ -22,23 +35,23 @@ If `SCOPE_FRONTEND=false`, skip the entire design review silently.
 
 Each item is tagged with a detection confidence level:
 
-- **[HIGH]** — Reliably detectable via grep/pattern match. Definitive findings.
-- **[MEDIUM]** — Detectable via pattern aggregation or heuristic. Flag as findings but expect some noise.
-- **[LOW]** — Requires understanding visual intent. Present as: "Possible issue — verify visually or run /design-review."
+- **[HIGH]** Ã¢â‚¬â€ Reliably detectable via grep/pattern match. Definitive findings.
+- **[MEDIUM]** Ã¢â‚¬â€ Detectable via pattern aggregation or heuristic. Flag as findings but expect some noise.
+- **[LOW]** Ã¢â‚¬â€ Requires understanding visual intent. Present as: "Possible issue Ã¢â‚¬â€ verify visually or run /design-review."
 
 ---
 
 ## Classification
 
-**AUTO-FIX** (mechanical CSS fixes only — HIGH confidence, no design judgment needed):
-- `outline: none` without replacement → add `outline: revert` or `&:focus-visible { outline: 2px solid currentColor; }`
-- `!important` in new CSS → remove and fix specificity
-- `font-size` < 16px on body text → bump to 16px
+**AUTO-FIX** (mechanical CSS fixes only Ã¢â‚¬â€ HIGH confidence, no design judgment needed):
+- `outline: none` without replacement Ã¢â€ â€™ add `outline: revert` or `&:focus-visible { outline: 2px solid currentColor; }`
+- `!important` in new CSS Ã¢â€ â€™ remove and fix specificity
+- `font-size` < 16px on body text Ã¢â€ â€™ bump to 16px
 
-**ASK** (everything else — requires design judgment):
+**ASK** (everything else Ã¢â‚¬â€ requires design judgment):
 - All AI slop findings, typography structure, spacing choices, interaction state gaps, DESIGN.md violations
 
-**LOW confidence items** → present as "Possible: [description]. Verify visually or run /design-review." Never AUTO-FIX.
+**LOW confidence items** Ã¢â€ â€™ present as "Possible: [description]. Verify visually or run /design-review." Never AUTO-FIX.
 
 ---
 
@@ -48,14 +61,14 @@ Each item is tagged with a detection confidence level:
 Design Review: N issues (X auto-fixable, Y need input, Z possible)
 
 **AUTO-FIXED:**
-- [file:line] Problem → fix applied
+- [file:line] Problem Ã¢â€ â€™ fix applied
 
 **NEEDS INPUT:**
 - [file:line] Problem description
   Recommended fix: suggested fix
 
 **POSSIBLE (verify visually):**
-- [file:line] Possible issue — verify with /design-review
+- [file:line] Possible issue Ã¢â‚¬â€ verify with /design-review
 ```
 
 If no issues found: `Design Review: No issues found.`
@@ -66,19 +79,19 @@ If no frontend files changed: skip silently, no output.
 
 ## Categories
 
-### 1. AI Slop Detection (6 items) — highest priority
+### 1. AI Slop Detection (6 items) Ã¢â‚¬â€ highest priority
 
 These are the telltale signs of AI-generated UI that no designer at a respected studio would ship.
 
-- **[MEDIUM]** Purple/violet/indigo gradient backgrounds or blue-to-purple color schemes. Look for `linear-gradient` with values in the `#6366f1`–`#8b5cf6` range, or CSS custom properties resolving to purple/violet.
+- **[MEDIUM]** Purple/violet/indigo gradient backgrounds or blue-to-purple color schemes. Look for `linear-gradient` with values in the `#6366f1`Ã¢â‚¬â€œ`#8b5cf6` range, or CSS custom properties resolving to purple/violet.
 
 - **[LOW]** The 3-column feature grid: icon-in-colored-circle + bold title + 2-line description, repeated 3x symmetrically. Look for a grid/flex container with exactly 3 children that each contain a circular element + heading + paragraph.
 
 - **[LOW]** Icons in colored circles as section decoration. Look for elements with `border-radius: 50%` + a background color used as decorative containers for icons.
 
-- **[HIGH]** Centered everything: `text-align: center` on all headings, descriptions, and cards. Grep for `text-align: center` density — if >60% of text containers use center alignment, flag it.
+- **[HIGH]** Centered everything: `text-align: center` on all headings, descriptions, and cards. Grep for `text-align: center` density Ã¢â‚¬â€ if >60% of text containers use center alignment, flag it.
 
-- **[MEDIUM]** Uniform bubbly border-radius on every element: same large radius (16px+) applied to cards, buttons, inputs, containers uniformly. Aggregate `border-radius` values — if >80% use the same value ≥16px, flag it.
+- **[MEDIUM]** Uniform bubbly border-radius on every element: same large radius (16px+) applied to cards, buttons, inputs, containers uniformly. Aggregate `border-radius` values Ã¢â‚¬â€ if >80% use the same value Ã¢â€°Â¥16px, flag it.
 
 - **[MEDIUM]** Generic hero copy: "Welcome to [X]", "Unlock the power of...", "Your all-in-one solution for...", "Revolutionize your...", "Streamline your workflow". Grep HTML/JSX content for these patterns.
 
@@ -108,7 +121,7 @@ These are the telltale signs of AI-generated UI that no designer at a respected 
 
 - **[HIGH]** `outline: none` or `outline: 0` without a replacement focus indicator. Grep for `outline:\s*none` or `outline:\s*0`. This removes keyboard accessibility.
 
-- **[LOW]** Touch targets < 44px on interactive elements. Check `min-height`/`min-width`/`padding` on buttons and links. Requires computing effective size from multiple properties — low confidence from code alone.
+- **[LOW]** Touch targets < 44px on interactive elements. Check `min-height`/`min-width`/`padding` on buttons and links. Requires computing effective size from multiple properties Ã¢â‚¬â€ low confidence from code alone.
 
 ### 5. DESIGN.md Violations (3 items, conditional)
 

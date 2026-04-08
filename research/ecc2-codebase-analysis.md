@@ -1,7 +1,20 @@
 # ECC2 Codebase Research Report
 
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
 **Date:** 2026-03-26
-**Subject:** `ecc-tui` v0.1.0 — Agentic IDE Control Plane
+**Subject:** `ecc-tui` v0.1.0 Ã¢â‚¬â€ Agentic IDE Control Plane
 **Total Lines:** 4,417 across 15 `.rs` files
 
 ## 1. Architecture Overview
@@ -26,10 +39,10 @@ ECC2 is a Rust TUI application that orchestrates AI coding agent sessions. It us
 
 ### Key Architectural Patterns
 
-- **DbWriter thread** in `session/runtime.rs` — dedicated OS thread for SQLite writes from async context via `mpsc::unbounded_channel` with oneshot acknowledgements. Clean solution to the "SQLite from async" problem.
-- **Session state machine** with enforced transitions: `Pending → {Running, Failed, Stopped}`, `Running → {Idle, Completed, Failed, Stopped}`, etc.
-- **Ring buffer** for session output — `OUTPUT_BUFFER_LIMIT = 1000` lines per session with automatic eviction.
-- **Risk scoring** on tool calls — 4-axis analysis (base tool risk, file sensitivity, blast radius, irreversibility) producing composite 0.0–1.0 scores with suggested actions (Allow/Review/RequireConfirmation/Block).
+- **DbWriter thread** in `session/runtime.rs` Ã¢â‚¬â€ dedicated OS thread for SQLite writes from async context via `mpsc::unbounded_channel` with oneshot acknowledgements. Clean solution to the "SQLite from async" problem.
+- **Session state machine** with enforced transitions: `Pending Ã¢â€ â€™ {Running, Failed, Stopped}`, `Running Ã¢â€ â€™ {Idle, Completed, Failed, Stopped}`, etc.
+- **Ring buffer** for session output Ã¢â‚¬â€ `OUTPUT_BUFFER_LIMIT = 1000` lines per session with automatic eviction.
+- **Risk scoring** on tool calls Ã¢â‚¬â€ 4-axis analysis (base tool risk, file sensitivity, blast radius, irreversibility) producing composite 0.0Ã¢â‚¬â€œ1.0 scores with suggested actions (Allow/Review/RequireConfirmation/Block).
 
 ## 2. Code Quality Metrics
 
@@ -46,21 +59,21 @@ ECC2 is a Rust TUI application that orchestrates AI coding agent sessions. It us
 
 ## 3. Identified Gaps
 
-### 3.1 Comms Module — Send Without Receive
+### 3.1 Comms Module Ã¢â‚¬â€ Send Without Receive
 
 `comms/mod.rs` (36 lines) has `send()` but no `receive()`, `poll()`, `inbox()`, or `subscribe()`. The `messages` table exists in SQLite, but nothing reads from it. The inter-agent messaging story is half-built.
 
 **Impact:** Agents cannot coordinate. The `TaskHandoff`, `Query`, `Response`, and `Conflict` message types are defined but unusable.
 
-### 3.2 New Session Dialog — Stub
+### 3.2 New Session Dialog Ã¢â‚¬â€ Stub
 
-`dashboard.rs:495` — `new_session()` logs `"New session dialog requested"` but does nothing. Users must use the CLI (`ecc start --task "..."`) to create sessions; the TUI dashboard cannot.
+`dashboard.rs:495` Ã¢â‚¬â€ `new_session()` logs `"New session dialog requested"` but does nothing. Users must use the CLI (`ecc start --task "..."`) to create sessions; the TUI dashboard cannot.
 
 ### 3.3 Single Agent Support
 
-`session/manager.rs` — `agent_program()` only supports `"claude"`. The CLI accepts `--agent` but anything other than `"claude"` fails. No codex, opencode, or custom agent support.
+`session/manager.rs` Ã¢â‚¬â€ `agent_program()` only supports `"claude"`. The CLI accepts `--agent` but anything other than `"claude"` fails. No codex, opencode, or custom agent support.
 
-### 3.4 Config — File-Only
+### 3.4 Config Ã¢â‚¬â€ File-Only
 
 `Config::load()` reads `~/.claude/ecc2.toml` only. The implementation lacks environment variable overrides (e.g., `ECC_DB_PATH`, `ECC_WORKTREE_ROOT`) and CLI flags for configuration.
 
@@ -72,7 +85,7 @@ ECC2 is a Rust TUI application that orchestrates AI coding agent sessions. It us
 
 `SessionMetrics` tracks tokens, cost, duration, tool_calls, files_changed per session. But there's no aggregate view: total cost across sessions, average duration, top tools by usage, etc. The Metrics pane in the dashboard shows per-session detail only.
 
-### 3.7 Daemon — No Health Reporting
+### 3.7 Daemon Ã¢â‚¬â€ No Health Reporting
 
 `session/daemon.rs` runs an infinite loop checking session timeouts. No health endpoint, no log rotation, no PID file, no signal handling for graceful shutdown. `Ctrl+C` during daemon mode kills the process uncleanly.
 
@@ -94,16 +107,16 @@ ECC2 is a Rust TUI application that orchestrates AI coding agent sessions. It us
 | `tui/widgets.rs` | 3 | Token meter rendering and thresholds |
 
 **Direct coverage gaps:**
-- `comms/mod.rs` — 0 tests
-- `worktree/mod.rs` — 0 tests
+- `comms/mod.rs` Ã¢â‚¬â€ 0 tests
+- `worktree/mod.rs` Ã¢â‚¬â€ 0 tests
 
 The core I/O-heavy paths are no longer completely untested: `manager.rs`, `runtime.rs`, and `daemon.rs` each have targeted tests. The remaining gap is breadth rather than total absence, especially around `comms/`, `worktree/`, and more adversarial process/worktree failure cases.
 
 ## 5. Security Observations
 
 - **No secrets in code.** Config reads from TOML file, no hardcoded credentials.
-- **Process spawning** uses `tokio::process::Command` with explicit `Stdio::piped()` — no shell injection vectors.
-- **Risk scoring** is a strong feature — catches `rm -rf`, `git push --force origin main`, file access to `.env`/secrets.
+- **Process spawning** uses `tokio::process::Command` with explicit `Stdio::piped()` Ã¢â‚¬â€ no shell injection vectors.
+- **Risk scoring** is a strong feature Ã¢â‚¬â€ catches `rm -rf`, `git push --force origin main`, file access to `.env`/secrets.
 - **No input sanitization on session task strings.** The task string is passed directly to `claude --print`. If the task contains shell metacharacters, it could be exploited depending on how `Command` handles argument quoting. Currently safe (arguments are not shell-interpreted), but worth auditing.
 
 ## 6. Dependency Health
@@ -123,28 +136,28 @@ The core I/O-heavy paths are no longer completely untested: `manager.rs`, `runti
 
 ## 7. Recommendations (Prioritized)
 
-### P0 — Quick Wins
+### P0 Ã¢â‚¬â€ Quick Wins
 
-1. **Add environment variable support to `Config::load()`** — `ECC_DB_PATH`, `ECC_WORKTREE_ROOT`, `ECC_DEFAULT_AGENT`. Standard practice for CLI tools.
+1. **Add environment variable support to `Config::load()`** Ã¢â‚¬â€ `ECC_DB_PATH`, `ECC_WORKTREE_ROOT`, `ECC_DEFAULT_AGENT`. Standard practice for CLI tools.
 
-### P1 — Feature Completions
+### P1 Ã¢â‚¬â€ Feature Completions
 
-2. **Implement `comms::receive()` / `comms::poll()`** — read unread messages from the `messages` table, optionally with a `broadcast` channel for real-time delivery. Wire it into the dashboard.
-3. **Build the new-session dialog in the TUI** — modal form with task input, agent selector, worktree toggle. Should call `session::manager::create_session()`.
-4. **Add aggregate metrics** — total cost, average session duration, tool call frequency, cost per session. Show in the Metrics pane.
+2. **Implement `comms::receive()` / `comms::poll()`** Ã¢â‚¬â€ read unread messages from the `messages` table, optionally with a `broadcast` channel for real-time delivery. Wire it into the dashboard.
+3. **Build the new-session dialog in the TUI** Ã¢â‚¬â€ modal form with task input, agent selector, worktree toggle. Should call `session::manager::create_session()`.
+4. **Add aggregate metrics** Ã¢â‚¬â€ total cost, average session duration, tool call frequency, cost per session. Show in the Metrics pane.
 
-### P2 — Robustness
+### P2 Ã¢â‚¬â€ Robustness
 
-5. **Expand integration coverage for `manager.rs`, `runtime.rs`, and `daemon.rs`** — the repo now has baseline tests here, but it still needs failure-path coverage around process crashes, timeouts, and cleanup edge cases.
-6. **Add first-party tests for `worktree/mod.rs` and `comms/mod.rs`** — these are still uncovered and back important orchestration features.
-7. **Add daemon health reporting** — PID file, structured logging, graceful shutdown via signal handler.
-8. **Task string security audit** — The session task uses `claude --print` via `tokio::process::Command`. Verify arguments are never shell-interpreted. Checklist: confirm `Command` arg usage, threat-model metacharacter injection, input validation/escaping strategy, logging of raw inputs, and automated tests. Re-audit if invocation code changes.
-9. **Break up `dashboard.rs`** — extract SessionsPane, OutputPane, MetricsPane, LogPane into separate files under `tui/panes/`.
+5. **Expand integration coverage for `manager.rs`, `runtime.rs`, and `daemon.rs`** Ã¢â‚¬â€ the repo now has baseline tests here, but it still needs failure-path coverage around process crashes, timeouts, and cleanup edge cases.
+6. **Add first-party tests for `worktree/mod.rs` and `comms/mod.rs`** Ã¢â‚¬â€ these are still uncovered and back important orchestration features.
+7. **Add daemon health reporting** Ã¢â‚¬â€ PID file, structured logging, graceful shutdown via signal handler.
+8. **Task string security audit** Ã¢â‚¬â€ The session task uses `claude --print` via `tokio::process::Command`. Verify arguments are never shell-interpreted. Checklist: confirm `Command` arg usage, threat-model metacharacter injection, input validation/escaping strategy, logging of raw inputs, and automated tests. Re-audit if invocation code changes.
+9. **Break up `dashboard.rs`** Ã¢â‚¬â€ extract SessionsPane, OutputPane, MetricsPane, LogPane into separate files under `tui/panes/`.
 
-### P3 — Extensibility
+### P3 Ã¢â‚¬â€ Extensibility
 
-10. **Multi-agent support** — make `agent_program()` pluggable. Add `codex`, `opencode`, `custom` agent types.
-11. **Config validation** — validate risk thresholds sum correctly, budget values are positive, paths exist.
+10. **Multi-agent support** Ã¢â‚¬â€ make `agent_program()` pluggable. Add `codex`, `opencode`, `custom` agent types.
+11. **Config validation** Ã¢â‚¬â€ validate risk thresholds sum correctly, budget values are positive, paths exist.
 
 ## 8. Comparison with Ratatui 0.29 Best Practices
 
@@ -156,7 +169,7 @@ The codebase follows ratatui conventions well:
 
 **Minor deviations:**
 - The `Dashboard` struct directly holds `StateStore` (SQLite connection). Ratatui best practice is to keep the state store behind an `Arc<Mutex<>>` to allow background updates. Currently the TUI owns the DB exclusively, which blocks adding a background metrics refresh task.
-- No `Clear` widget usage when rendering the help overlay — could cause rendering artifacts on some terminals.
+- No `Clear` widget usage when rendering the help overlay Ã¢â‚¬â€ could cause rendering artifacts on some terminals.
 
 ## 9. Risk Assessment
 

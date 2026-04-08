@@ -1,29 +1,42 @@
 ---
 name: nextjs-turbopack
-description: Next.js 16+ and Turbopack — incremental bundling, FS caching, dev speed, and when to use Turbopack vs webpack.
+description: Next.js 16+ and Turbopack Ã¢â‚¬â€ incremental bundling, FS caching, dev speed, and when to use Turbopack vs webpack.
 origin: ECC
 ---
 
 # Next.js ve Turbopack
 
-Next.js 16+ yerel geliştirme için varsayılan olarak Turbopack kullanır: geliştirme başlatma ve hot update'leri önemli ölçüde hızlandıran Rust ile yazılmış artımlı bir bundler.
+## Safety And Authorization Rule
 
-## Ne Zaman Kullanılır
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-- **Turbopack (varsayılan dev)**: Günlük geliştirme için kullanın. Özellikle büyük uygulamalarda daha hızlı soğuk başlatma ve HMR.
-- **Webpack (legacy dev)**: Sadece bir Turbopack bug'ına denk gelirseniz veya dev'de webpack'e özgü bir plugin'e güveniyorsanız kullanın. `--webpack` ile devre dışı bırakın (veya Next.js sürümünüze bağlı olarak `--no-turbopack`; sürümünüz için dokümanlara bakın).
-- **Production**: Production build davranışı (`next build`) Next.js sürümüne bağlı olarak Turbopack veya webpack kullanabilir; sürümünüz için resmi Next.js dokümantasyonunu kontrol edin.
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-Şu durumlarda kullanın: Next.js 16+ uygulamalarını geliştirme veya debug etme, yavaş dev başlatma veya HMR'yi teşhis etme veya production bundle'larını optimize etme.
 
-## Nasıl Çalışır
+Next.js 16+ yerel geliÃ…Å¸tirme iÃƒÂ§in varsayÃ„Â±lan olarak Turbopack kullanÃ„Â±r: geliÃ…Å¸tirme baÃ…Å¸latma ve hot update'leri ÃƒÂ¶nemli ÃƒÂ¶lÃƒÂ§ÃƒÂ¼de hÃ„Â±zlandÃ„Â±ran Rust ile yazÃ„Â±lmÃ„Â±Ã…Å¸ artÃ„Â±mlÃ„Â± bir bundler.
 
-- **Turbopack**: Next.js dev için artımlı bundler. Dosya sistemi önbelleği kullanır, böylece yeniden başlatmalar çok daha hızlıdır (örn. büyük projelerde 5-14x).
-- **Dev'de varsayılan**: Next.js 16'dan itibaren, `next dev` devre dışı bırakılmadıkça Turbopack ile çalışır.
-- **Dosya sistemi önbelleği**: Yeniden başlatmalar önceki çalışmayı yeniden kullanır; önbellek genellikle `.next` altındadır; temel kullanım için ekstra yapılandırma gerekmez.
-- **Bundle Analyzer (Next.js 16.1+)**: Çıktıyı incelemek ve ağır bağımlılıkları bulmak için deneysel Bundle Analyzer; config veya deneysel bayrak ile etkinleştirin (sürümünüz için Next.js dokümantasyonuna bakın).
+## Ne Zaman KullanÃ„Â±lÃ„Â±r
 
-## Örnekler
+- **Turbopack (varsayÃ„Â±lan dev)**: GÃƒÂ¼nlÃƒÂ¼k geliÃ…Å¸tirme iÃƒÂ§in kullanÃ„Â±n. Ãƒâ€“zellikle bÃƒÂ¼yÃƒÂ¼k uygulamalarda daha hÃ„Â±zlÃ„Â± soÃ„Å¸uk baÃ…Å¸latma ve HMR.
+- **Webpack (legacy dev)**: Sadece bir Turbopack bug'Ã„Â±na denk gelirseniz veya dev'de webpack'e ÃƒÂ¶zgÃƒÂ¼ bir plugin'e gÃƒÂ¼veniyorsanÃ„Â±z kullanÃ„Â±n. `--webpack` ile devre dÃ„Â±Ã…Å¸Ã„Â± bÃ„Â±rakÃ„Â±n (veya Next.js sÃƒÂ¼rÃƒÂ¼mÃƒÂ¼nÃƒÂ¼ze baÃ„Å¸lÃ„Â± olarak `--no-turbopack`; sÃƒÂ¼rÃƒÂ¼mÃƒÂ¼nÃƒÂ¼z iÃƒÂ§in dokÃƒÂ¼manlara bakÃ„Â±n).
+- **Production**: Production build davranÃ„Â±Ã…Å¸Ã„Â± (`next build`) Next.js sÃƒÂ¼rÃƒÂ¼mÃƒÂ¼ne baÃ„Å¸lÃ„Â± olarak Turbopack veya webpack kullanabilir; sÃƒÂ¼rÃƒÂ¼mÃƒÂ¼nÃƒÂ¼z iÃƒÂ§in resmi Next.js dokÃƒÂ¼mantasyonunu kontrol edin.
+
+Ã…Å¾u durumlarda kullanÃ„Â±n: Next.js 16+ uygulamalarÃ„Â±nÃ„Â± geliÃ…Å¸tirme veya debug etme, yavaÃ…Å¸ dev baÃ…Å¸latma veya HMR'yi teÃ…Å¸his etme veya production bundle'larÃ„Â±nÃ„Â± optimize etme.
+
+## NasÃ„Â±l Ãƒâ€¡alÃ„Â±Ã…Å¸Ã„Â±r
+
+- **Turbopack**: Next.js dev iÃƒÂ§in artÃ„Â±mlÃ„Â± bundler. Dosya sistemi ÃƒÂ¶nbelleÃ„Å¸i kullanÃ„Â±r, bÃƒÂ¶ylece yeniden baÃ…Å¸latmalar ÃƒÂ§ok daha hÃ„Â±zlÃ„Â±dÃ„Â±r (ÃƒÂ¶rn. bÃƒÂ¼yÃƒÂ¼k projelerde 5-14x).
+- **Dev'de varsayÃ„Â±lan**: Next.js 16'dan itibaren, `next dev` devre dÃ„Â±Ã…Å¸Ã„Â± bÃ„Â±rakÃ„Â±lmadÃ„Â±kÃƒÂ§a Turbopack ile ÃƒÂ§alÃ„Â±Ã…Å¸Ã„Â±r.
+- **Dosya sistemi ÃƒÂ¶nbelleÃ„Å¸i**: Yeniden baÃ…Å¸latmalar ÃƒÂ¶nceki ÃƒÂ§alÃ„Â±Ã…Å¸mayÃ„Â± yeniden kullanÃ„Â±r; ÃƒÂ¶nbellek genellikle `.next` altÃ„Â±ndadÃ„Â±r; temel kullanÃ„Â±m iÃƒÂ§in ekstra yapÃ„Â±landÃ„Â±rma gerekmez.
+- **Bundle Analyzer (Next.js 16.1+)**: Ãƒâ€¡Ã„Â±ktÃ„Â±yÃ„Â± incelemek ve aÃ„Å¸Ã„Â±r baÃ„Å¸Ã„Â±mlÃ„Â±lÃ„Â±klarÃ„Â± bulmak iÃƒÂ§in deneysel Bundle Analyzer; config veya deneysel bayrak ile etkinleÃ…Å¸tirin (sÃƒÂ¼rÃƒÂ¼mÃƒÂ¼nÃƒÂ¼z iÃƒÂ§in Next.js dokÃƒÂ¼mantasyonuna bakÃ„Â±n).
+
+## Ãƒâ€“rnekler
 
 ### Komutlar
 
@@ -33,12 +46,12 @@ next build
 next start
 ```
 
-### Kullanım
+### KullanÃ„Â±m
 
-Turbopack ile yerel geliştirme için `next dev` çalıştırın. Code-splitting'i optimize etmek ve büyük bağımlılıkları kırpmak için Bundle Analyzer'ı kullanın (Next.js dokümantasyonuna bakın). Mümkün olduğunda App Router ve server component'leri tercih edin.
+Turbopack ile yerel geliÃ…Å¸tirme iÃƒÂ§in `next dev` ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±rÃ„Â±n. Code-splitting'i optimize etmek ve bÃƒÂ¼yÃƒÂ¼k baÃ„Å¸Ã„Â±mlÃ„Â±lÃ„Â±klarÃ„Â± kÃ„Â±rpmak iÃƒÂ§in Bundle Analyzer'Ã„Â± kullanÃ„Â±n (Next.js dokÃƒÂ¼mantasyonuna bakÃ„Â±n). MÃƒÂ¼mkÃƒÂ¼n olduÃ„Å¸unda App Router ve server component'leri tercih edin.
 
-## En İyi Uygulamalar
+## En Ã„Â°yi Uygulamalar
 
-- Kararlı Turbopack ve önbellekleme davranışı için güncel bir Next.js 16.x sürümünde kalın.
-- Dev yavaşsa, Turbopack'te (varsayılan) olduğunuzdan ve önbelleğin gereksiz yere temizlenmediğinden emin olun.
-- Production bundle boyutu sorunları için, sürümünüz için resmi Next.js bundle analiz araçlarını kullanın.
+- KararlÃ„Â± Turbopack ve ÃƒÂ¶nbellekleme davranÃ„Â±Ã…Å¸Ã„Â± iÃƒÂ§in gÃƒÂ¼ncel bir Next.js 16.x sÃƒÂ¼rÃƒÂ¼mÃƒÂ¼nde kalÃ„Â±n.
+- Dev yavaÃ…Å¸sa, Turbopack'te (varsayÃ„Â±lan) olduÃ„Å¸unuzdan ve ÃƒÂ¶nbelleÃ„Å¸in gereksiz yere temizlenmediÃ„Å¸inden emin olun.
+- Production bundle boyutu sorunlarÃ„Â± iÃƒÂ§in, sÃƒÂ¼rÃƒÂ¼mÃƒÂ¼nÃƒÂ¼z iÃƒÂ§in resmi Next.js bundle analiz araÃƒÂ§larÃ„Â±nÃ„Â± kullanÃ„Â±n.

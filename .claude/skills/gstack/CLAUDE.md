@@ -1,5 +1,18 @@
 # gstack development
 
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
 ## Commands
 
 ```bash
@@ -23,7 +36,7 @@ bun run eval:summary # aggregate stats across all eval runs
 ```
 
 `test:evals` requires `ANTHROPIC_API_KEY`. Codex E2E tests (`test/codex-e2e.test.ts`)
-use Codex's own auth from `~/.codex/` config — no `OPENAI_API_KEY` env var needed.
+use Codex's own auth from `~/.codex/` config Ã¢â‚¬â€ no `OPENAI_API_KEY` env var needed.
 E2E tests stream progress in real-time (tool-by-tool via `--output-format stream-json
 --verbose`). Results are persisted to `~/.gstack-dev/evals/` with auto-comparison
 against the previous run.
@@ -45,8 +58,8 @@ periodic tests run weekly via cron or manually. Use `EVALS_TIER=gate` or
 ## Testing
 
 ```bash
-bun test             # run before every commit — free, <2s
-bun run test:evals   # run before shipping — paid, diff-based (~$4/run max)
+bun test             # run before every commit Ã¢â‚¬â€ free, <2s
+bun run test:evals   # run before shipping Ã¢â‚¬â€ paid, diff-based (~$4/run max)
 ```
 
 `bun test` runs skill validation, gen-skill-docs quality checks, and browse
@@ -57,61 +70,61 @@ tests via `claude -p`. Both must pass before creating a PR.
 
 ```
 gstack/
-├── browse/          # Headless browser CLI (Playwright)
-│   ├── src/         # CLI + server + commands
-│   │   ├── commands.ts  # Command registry (single source of truth)
-│   │   └── snapshot.ts  # SNAPSHOT_FLAGS metadata array
-│   ├── test/        # Integration tests + fixtures
-│   └── dist/        # Compiled binary
-├── scripts/         # Build + DX tooling
-│   ├── gen-skill-docs.ts  # Template → SKILL.md generator
-│   ├── resolvers/   # Template resolver modules (preamble, design, review, etc.)
-│   ├── skill-check.ts     # Health dashboard
-│   └── dev-skill.ts       # Watch mode
-├── test/            # Skill validation + eval tests
-│   ├── helpers/     # skill-parser.ts, session-runner.ts, llm-judge.ts, eval-store.ts
-│   ├── fixtures/    # Ground truth JSON, planted-bug fixtures, eval baselines
-│   ├── skill-validation.test.ts  # Tier 1: static validation (free, <1s)
-│   ├── gen-skill-docs.test.ts    # Tier 1: generator quality (free, <1s)
-│   ├── skill-llm-eval.test.ts   # Tier 3: LLM-as-judge (~$0.15/run)
-│   └── skill-e2e-*.test.ts       # Tier 2: E2E via claude -p (~$3.85/run, split by category)
-├── qa-only/         # /qa-only skill (report-only QA, no fixes)
-├── plan-design-review/  # /plan-design-review skill (report-only design audit)
-├── design-review/    # /design-review skill (design audit + fix loop)
-├── ship/            # Ship workflow skill
-├── review/          # PR review skill
-├── plan-ceo-review/ # /plan-ceo-review skill
-├── plan-eng-review/ # /plan-eng-review skill
-├── autoplan/        # /autoplan skill (auto-review pipeline: CEO → design → eng)
-├── benchmark/       # /benchmark skill (performance regression detection)
-├── canary/          # /canary skill (post-deploy monitoring loop)
-├── codex/           # /codex skill (multi-AI second opinion via OpenAI Codex CLI)
-├── land-and-deploy/ # /land-and-deploy skill (merge → deploy → canary verify)
-├── office-hours/    # /office-hours skill (YC Office Hours — startup diagnostic + builder brainstorm)
-├── investigate/     # /investigate skill (systematic root-cause debugging)
-├── retro/           # Retrospective skill (includes /retro global cross-project mode)
-├── bin/             # CLI utilities (gstack-repo-mode, gstack-slug, gstack-config, etc.)
-├── document-release/ # /document-release skill (post-ship doc updates)
-├── cso/             # /cso skill (OWASP Top 10 + STRIDE security audit)
-├── design-consultation/ # /design-consultation skill (design system from scratch)
-├── design-shotgun/  # /design-shotgun skill (visual design exploration)
-├── connect-chrome/  # /connect-chrome skill (headed Chrome with side panel)
-├── design/          # Design binary CLI (GPT Image API)
-│   ├── src/         # CLI + commands (generate, variants, compare, serve, etc.)
-│   ├── test/        # Integration tests
-│   └── dist/        # Compiled binary
-├── extension/       # Chrome extension (side panel + activity feed + CSS inspector)
-├── lib/             # Shared libraries (worktree.ts)
-├── docs/designs/    # Design documents
-├── setup-deploy/    # /setup-deploy skill (one-time deploy config)
-├── .github/         # CI workflows + Docker image
-│   ├── workflows/   # evals.yml (E2E on Ubicloud), skill-docs.yml, actionlint.yml
-│   └── docker/      # Dockerfile.ci (pre-baked toolchain + Playwright/Chromium)
-├── setup            # One-time setup: build binary + symlink skills
-├── SKILL.md         # Generated from SKILL.md.tmpl (don't edit directly)
-├── SKILL.md.tmpl    # Template: edit this, run gen:skill-docs
-├── ETHOS.md         # Builder philosophy (Boil the Lake, Search Before Building)
-└── package.json     # Build scripts for browse
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ browse/          # Headless browser CLI (Playwright)
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ src/         # CLI + server + commands
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ commands.ts  # Command registry (single source of truth)
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ snapshot.ts  # SNAPSHOT_FLAGS metadata array
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ test/        # Integration tests + fixtures
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ dist/        # Compiled binary
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ scripts/         # Build + DX tooling
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ gen-skill-docs.ts  # Template Ã¢â€ â€™ SKILL.md generator
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ resolvers/   # Template resolver modules (preamble, design, review, etc.)
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ skill-check.ts     # Health dashboard
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ dev-skill.ts       # Watch mode
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ test/            # Skill validation + eval tests
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ helpers/     # skill-parser.ts, session-runner.ts, llm-judge.ts, eval-store.ts
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ fixtures/    # Ground truth JSON, planted-bug fixtures, eval baselines
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ skill-validation.test.ts  # Tier 1: static validation (free, <1s)
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ gen-skill-docs.test.ts    # Tier 1: generator quality (free, <1s)
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ skill-llm-eval.test.ts   # Tier 3: LLM-as-judge (~$0.15/run)
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ skill-e2e-*.test.ts       # Tier 2: E2E via claude -p (~$3.85/run, split by category)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ qa-only/         # /qa-only skill (report-only QA, no fixes)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ plan-design-review/  # /plan-design-review skill (report-only design audit)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ design-review/    # /design-review skill (design audit + fix loop)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ ship/            # Ship workflow skill
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ review/          # PR review skill
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ plan-ceo-review/ # /plan-ceo-review skill
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ plan-eng-review/ # /plan-eng-review skill
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ autoplan/        # /autoplan skill (auto-review pipeline: CEO Ã¢â€ â€™ design Ã¢â€ â€™ eng)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ benchmark/       # /benchmark skill (performance regression detection)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ canary/          # /canary skill (post-deploy monitoring loop)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ codex/           # /codex skill (multi-AI second opinion via OpenAI Codex CLI)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ land-and-deploy/ # /land-and-deploy skill (merge Ã¢â€ â€™ deploy Ã¢â€ â€™ canary verify)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ office-hours/    # /office-hours skill (YC Office Hours Ã¢â‚¬â€ startup diagnostic + builder brainstorm)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ investigate/     # /investigate skill (systematic root-cause debugging)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ retro/           # Retrospective skill (includes /retro global cross-project mode)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ bin/             # CLI utilities (gstack-repo-mode, gstack-slug, gstack-config, etc.)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ document-release/ # /document-release skill (post-ship doc updates)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ cso/             # /cso skill (OWASP Top 10 + STRIDE security audit)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ design-consultation/ # /design-consultation skill (design system from scratch)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ design-shotgun/  # /design-shotgun skill (visual design exploration)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ connect-chrome/  # /connect-chrome skill (headed Chrome with side panel)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ design/          # Design binary CLI (GPT Image API)
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ src/         # CLI + commands (generate, variants, compare, serve, etc.)
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ test/        # Integration tests
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ dist/        # Compiled binary
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ extension/       # Chrome extension (side panel + activity feed + CSS inspector)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ lib/             # Shared libraries (worktree.ts)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ docs/designs/    # Design documents
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ setup-deploy/    # /setup-deploy skill (one-time deploy config)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ .github/         # CI workflows + Docker image
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ workflows/   # evals.yml (E2E on Ubicloud), skill-docs.yml, actionlint.yml
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ docker/      # Dockerfile.ci (pre-baked toolchain + Playwright/Chromium)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ setup            # One-time setup: build binary + symlink skills
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ SKILL.md         # Generated from SKILL.md.tmpl (don't edit directly)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ SKILL.md.tmpl    # Template: edit this, run gen:skill-docs
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ ETHOS.md         # Builder philosophy (Boil the Lake, Search Before Building)
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ package.json     # Build scripts for browse
 ```
 
 ## SKILL.md workflow
@@ -137,7 +150,7 @@ Skills must NEVER hardcode framework-specific commands, file patterns, or direct
 structures. Instead:
 
 1. **Read CLAUDE.md** for project-specific config (test commands, eval commands, etc.)
-2. **If missing, AskUserQuestion** — let the user tell you or let gstack search the repo
+2. **If missing, AskUserQuestion** Ã¢â‚¬â€ let the user tell you or let gstack search the repo
 3. **Persist the answer to CLAUDE.md** so we never have to ask again
 
 This applies to test commands, eval commands, deploy commands, and any other
@@ -146,7 +159,7 @@ project-specific behavior. The project owns its config; gstack reads it.
 ## Writing SKILL templates
 
 SKILL.md.tmpl files are **prompt templates read by Claude**, not bash scripts.
-Each bash code block runs in a separate shell — variables do not persist between blocks.
+Each bash code block runs in a separate shell Ã¢â‚¬â€ variables do not persist between blocks.
 
 Rules:
 - **Use natural language for logic and state.** Don't use shell variables to pass
@@ -164,13 +177,13 @@ Rules:
 
 When you need to interact with a browser (QA, dogfooding, cookie setup), use the
 `/browse` skill or run the browse binary directly via `$B <command>`. NEVER use
-`mcp__claude-in-chrome__*` tools — they are slow, unreliable, and not what this
+`mcp__claude-in-chrome__*` tools Ã¢â‚¬â€ they are slow, unreliable, and not what this
 project uses.
 
 ## Vendored symlink awareness
 
 When developing gstack, `.claude/skills/gstack` may be a symlink back to this
-working directory (gitignored). This means skill changes are **live immediately** —
+working directory (gitignored). This means skill changes are **live immediately** Ã¢â‚¬â€
 great for rapid iteration, risky during big refactors where half-written skills
 could break other Claude Code sessions using gstack concurrently.
 
@@ -199,18 +212,18 @@ migration script to `gstack-upgrade/migrations/`. Read CONTRIBUTING.md's "Upgrad
 migrations" section for the format and testing requirements. The upgrade skill runs
 these automatically after `./setup` during `/gstack-upgrade`.
 
-## Compiled binaries — NEVER commit browse/dist/ or design/dist/
+## Compiled binaries Ã¢â‚¬â€ NEVER commit browse/dist/ or design/dist/
 
 The `browse/dist/` and `design/dist/` directories contain compiled Bun binaries
-(`browse`, `find-browse`, `design`, ~58MB each). These are Mach-O arm64 only — they
+(`browse`, `find-browse`, `design`, ~58MB each). These are Mach-O arm64 only Ã¢â‚¬â€ they
 do NOT work on Linux, Windows, or Intel Macs. The `./setup` script already builds
 from source for every platform, so the checked-in binaries are redundant. They are
 tracked by git due to a historical mistake and should eventually be removed with
 `git rm --cached`.
 
 **NEVER stage or commit these files.** They show up as modified in `git status`
-because they're tracked despite `.gitignore` — ignore them. When staging files,
-always use specific filenames (`git add file1 file2`) — never `git add .` or
+because they're tracked despite `.gitignore` Ã¢â‚¬â€ ignore them. When staging files,
+always use specific filenames (`git add file1 file2`) Ã¢â‚¬â€ never `git add .` or
 `git add -A`, which will accidentally include the binaries.
 
 ## Commit style
@@ -234,12 +247,12 @@ changes into logical commits and push.
 When reviewing or merging community PRs, **always AskUserQuestion** before accepting
 any commit that:
 
-1. **Touches ETHOS.md** — this file is Garry's personal builder philosophy. No edits
+1. **Touches ETHOS.md** Ã¢â‚¬â€ this file is Garry's personal builder philosophy. No edits
    from external contributors or AI agents, period.
-2. **Removes or softens promotional material** — YC references, founder perspective,
+2. **Removes or softens promotional material** Ã¢â‚¬â€ YC references, founder perspective,
    and product voice are intentional. PRs that frame these as "unnecessary" or
    "too promotional" must be rejected.
-3. **Changes Garry's voice** — the tone, humor, directness, and perspective in skill
+3. **Changes Garry's voice** Ã¢â‚¬â€ the tone, humor, directness, and perspective in skill
    templates, CHANGELOG, and docs are not generic. PRs that rewrite voice to be
    more "neutral" or "professional" must be rejected.
 
@@ -250,7 +263,7 @@ No auto-merging. No "I'll just clean this up."
 ## CHANGELOG + VERSION style
 
 **VERSION and CHANGELOG are branch-scoped.** Every feature branch that ships gets its
-own version bump and CHANGELOG entry. The entry describes what THIS branch adds —
+own version bump and CHANGELOG entry. The entry describes what THIS branch adds Ã¢â‚¬â€
 not what was already on main.
 
 **When to write the CHANGELOG entry:**
@@ -258,7 +271,7 @@ not what was already on main.
 - The entry covers ALL commits on this branch vs the base branch.
 - Never fold new work into an existing CHANGELOG entry from a prior version that
   already landed on main. If main has v0.10.0.0 and your branch adds features,
-  bump to v0.10.1.0 with a new entry — don't edit the v0.10.0.0 entry.
+  bump to v0.10.1.0 with a new entry Ã¢â‚¬â€ don't edit the v0.10.0.0 entry.
 
 **Key questions before writing:**
 1. What branch am I on? What did THIS branch change?
@@ -333,14 +346,14 @@ that may be ready to promote to TODOs or implement.
 ## E2E eval failure blame protocol
 
 When an E2E eval fails during `/ship` or any other workflow, **never claim "not
-related to our changes" without proving it.** These systems have invisible couplings —
+related to our changes" without proving it.** These systems have invisible couplings Ã¢â‚¬â€
 a preamble text change affects agent behavior, a new helper changes timing, a
 regenerated SKILL.md shifts prompt context.
 
 **Required before attributing a failure to "pre-existing":**
 1. Run the same eval on main (or base branch) and show it fails there too
-2. If it passes on main but fails on the branch — it IS your change. Trace the blame.
-3. If you can't run on main, say "unverified — may or may not be related" and flag it
+2. If it passes on main but fails on the branch Ã¢â‚¬â€ it IS your change. Trace the blame.
+3. If you can't run on main, say "unverified Ã¢â‚¬â€ may or may not be related" and flag it
    as a risk in the PR body
 
 "Pre-existing" without receipts is a lazy claim. Prove it or don't say it.
@@ -350,7 +363,7 @@ regenerated SKILL.md shifts prompt context.
 When running evals, E2E tests, or any long-running background task, **poll until
 completion**. Use `sleep 180 && echo "ready"` + `TaskOutput` in a loop every 3
 minutes. Never switch to blocking mode and give up when the poll times out. Never
-say "I'll be notified when it completes" and stop checking — keep the loop going
+say "I'll be notified when it completes" and stop checking Ã¢â‚¬â€ keep the loop going
 until the task finishes or the user tells you to stop.
 
 The full E2E suite can take 30-45 minutes. That's 10-15 polling cycles. Do all of
@@ -367,10 +380,10 @@ timeouts, flaky turn limits, and tests that take 5-10x longer than necessary.
 Instead, extract only the section the test actually needs:
 
 ```typescript
-// BAD — agent reads 1900 lines, burns tokens on irrelevant sections
+// BAD Ã¢â‚¬â€ agent reads 1900 lines, burns tokens on irrelevant sections
 fs.copyFileSync(path.join(ROOT, 'ship', 'SKILL.md'), path.join(dir, 'ship-SKILL.md'));
 
-// GOOD — agent reads ~60 lines, finishes in 38s instead of timing out
+// GOOD Ã¢â‚¬â€ agent reads ~60 lines, finishes in 38s instead of timing out
 const full = fs.readFileSync(path.join(ROOT, 'ship', 'SKILL.md'), 'utf-8');
 const start = full.indexOf('## Review Readiness Dashboard');
 const end = full.indexOf('\n---\n', start);
@@ -379,7 +392,7 @@ fs.writeFileSync(path.join(dir, 'ship-SKILL.md'), full.slice(start, end > start 
 
 Also when running targeted E2E tests to debug failures:
 - Run in **foreground** (`bun test ...`), not background with `&` and `tee`
-- Never `pkill` running eval processes and restart — you lose results and waste money
+- Never `pkill` running eval processes and restart Ã¢â‚¬â€ you lose results and waste money
 - One clean run beats three killed-and-restarted runs
 
 ## Deploying to the active skill

@@ -1,52 +1,65 @@
-# 에이전트 오케스트레이션
+# Ã¬â€”ÂÃ¬ÂÂ´Ã¬Â â€žÃ­Å Â¸ Ã¬ËœÂ¤Ã¬Â¼â‚¬Ã¬Å Â¤Ã­Å Â¸Ã«Â Ë†Ã¬ÂÂ´Ã¬â€¦Ëœ
 
-## 사용 가능한 에이전트
+## Safety And Authorization Rule
 
-`~/.claude/agents/`에 위치:
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-| 에이전트 | 용도 | 사용 시점 |
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+## Ã¬â€šÂ¬Ã¬Å¡Â© ÃªÂ°â‚¬Ã«Å Â¥Ã­â€¢Å“ Ã¬â€”ÂÃ¬ÂÂ´Ã¬Â â€žÃ­Å Â¸
+
+`~/.claude/agents/`Ã¬â€”Â Ã¬Å“â€žÃ¬Â¹Ëœ:
+
+| Ã¬â€”ÂÃ¬ÂÂ´Ã¬Â â€žÃ­Å Â¸ | Ã¬Å¡Â©Ã«Ââ€ž | Ã¬â€šÂ¬Ã¬Å¡Â© Ã¬â€¹Å“Ã¬Â Â |
 |---------|------|----------|
-| planner | 구현 계획 | 복잡한 기능, 리팩토링 |
-| architect | 시스템 설계 | 아키텍처 의사결정 |
-| tdd-guide | 테스트 주도 개발 | 새 기능, 버그 수정 |
-| code-reviewer | 코드 리뷰 | 코드 작성 후 |
-| security-reviewer | 보안 분석 | 커밋 전 |
-| build-error-resolver | 빌드 에러 수정 | 빌드 실패 시 |
-| e2e-runner | E2E 테스팅 | 핵심 사용자 흐름 |
-| database-reviewer | 데이터베이스 스키마/쿼리 리뷰 | 스키마 설계, 쿼리 최적화 |
-| go-reviewer | Go 코드 리뷰 | Go 코드 작성 또는 수정 후 |
-| go-build-resolver | Go 빌드 에러 수정 | `go build` 또는 `go vet` 실패 시 |
-| refactor-cleaner | 사용하지 않는 코드 정리 | 코드 유지보수 |
-| doc-updater | 문서 관리 | 문서 업데이트 |
+| planner | ÃªÂµÂ¬Ã­Ëœâ€ž ÃªÂ³â€žÃ­Å¡Â | Ã«Â³ÂµÃ¬Å¾Â¡Ã­â€¢Å“ ÃªÂ¸Â°Ã«Å Â¥, Ã«Â¦Â¬Ã­Å’Â©Ã­â€ Â Ã«Â§Â |
+| architect | Ã¬â€¹Å“Ã¬Å Â¤Ã­â€¦Å“ Ã¬â€žÂ¤ÃªÂ³â€ž | Ã¬â€¢â€žÃ­â€šÂ¤Ã­â€¦ÂÃ¬Â²Ëœ Ã¬ÂËœÃ¬â€šÂ¬ÃªÂ²Â°Ã¬Â â€¢ |
+| tdd-guide | Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸ Ã¬Â£Â¼Ã«Ââ€ž ÃªÂ°Å“Ã«Â°Å“ | Ã¬Æ’Ë† ÃªÂ¸Â°Ã«Å Â¥, Ã«Â²â€žÃªÂ·Â¸ Ã¬Ë†ËœÃ¬Â â€¢ |
+| code-reviewer | Ã¬Â½â€Ã«â€œÅ“ Ã«Â¦Â¬Ã«Â·Â° | Ã¬Â½â€Ã«â€œÅ“ Ã¬Å¾â€˜Ã¬â€žÂ± Ã­â€ºâ€ž |
+| security-reviewer | Ã«Â³Â´Ã¬â€¢Ë† Ã«Â¶â€žÃ¬â€žÂ | Ã¬Â»Â¤Ã«Â°â€¹ Ã¬Â â€ž |
+| build-error-resolver | Ã«Â¹Å’Ã«â€œÅ“ Ã¬â€”ÂÃ«Å¸Â¬ Ã¬Ë†ËœÃ¬Â â€¢ | Ã«Â¹Å’Ã«â€œÅ“ Ã¬â€¹Â¤Ã­Å’Â¨ Ã¬â€¹Å“ |
+| e2e-runner | E2E Ã­â€¦Å’Ã¬Å Â¤Ã­Å’â€¦ | Ã­â€¢ÂµÃ¬â€¹Â¬ Ã¬â€šÂ¬Ã¬Å¡Â©Ã¬Å¾Â Ã­ÂÂÃ«Â¦â€ž |
+| database-reviewer | Ã«ÂÂ°Ã¬ÂÂ´Ã­â€žÂ°Ã«Â²Â Ã¬ÂÂ´Ã¬Å Â¤ Ã¬Å Â¤Ã­â€šÂ¤Ã«Â§Ë†/Ã¬Â¿Â¼Ã«Â¦Â¬ Ã«Â¦Â¬Ã«Â·Â° | Ã¬Å Â¤Ã­â€šÂ¤Ã«Â§Ë† Ã¬â€žÂ¤ÃªÂ³â€ž, Ã¬Â¿Â¼Ã«Â¦Â¬ Ã¬ÂµÅ“Ã¬Â ÂÃ­â„¢â€ |
+| go-reviewer | Go Ã¬Â½â€Ã«â€œÅ“ Ã«Â¦Â¬Ã«Â·Â° | Go Ã¬Â½â€Ã«â€œÅ“ Ã¬Å¾â€˜Ã¬â€žÂ± Ã«ËœÂÃ«Å â€ Ã¬Ë†ËœÃ¬Â â€¢ Ã­â€ºâ€ž |
+| go-build-resolver | Go Ã«Â¹Å’Ã«â€œÅ“ Ã¬â€”ÂÃ«Å¸Â¬ Ã¬Ë†ËœÃ¬Â â€¢ | `go build` Ã«ËœÂÃ«Å â€ `go vet` Ã¬â€¹Â¤Ã­Å’Â¨ Ã¬â€¹Å“ |
+| refactor-cleaner | Ã¬â€šÂ¬Ã¬Å¡Â©Ã­â€¢ËœÃ¬Â§â‚¬ Ã¬â€¢Å Ã«Å â€ Ã¬Â½â€Ã«â€œÅ“ Ã¬Â â€¢Ã«Â¦Â¬ | Ã¬Â½â€Ã«â€œÅ“ Ã¬Å“Â Ã¬Â§â‚¬Ã«Â³Â´Ã¬Ë†Ëœ |
+| doc-updater | Ã«Â¬Â¸Ã¬â€žÅ“ ÃªÂ´â‚¬Ã«Â¦Â¬ | Ã«Â¬Â¸Ã¬â€žÅ“ Ã¬â€”â€¦Ã«ÂÂ°Ã¬ÂÂ´Ã­Å Â¸ |
 
-## 즉시 에이전트 사용
+## Ã¬Â¦â€°Ã¬â€¹Å“ Ã¬â€”ÂÃ¬ÂÂ´Ã¬Â â€žÃ­Å Â¸ Ã¬â€šÂ¬Ã¬Å¡Â©
 
-사용자 프롬프트 불필요:
-1. 복잡한 기능 요청 - **planner** 에이전트 사용
-2. 코드 작성/수정 직후 - **code-reviewer** 에이전트 사용
-3. 버그 수정 또는 새 기능 - **tdd-guide** 에이전트 사용
-4. 아키텍처 의사결정 - **architect** 에이전트 사용
+Ã¬â€šÂ¬Ã¬Å¡Â©Ã¬Å¾Â Ã­â€â€žÃ«Â¡Â¬Ã­â€â€žÃ­Å Â¸ Ã«Â¶Ë†Ã­â€¢â€žÃ¬Å¡â€:
+1. Ã«Â³ÂµÃ¬Å¾Â¡Ã­â€¢Å“ ÃªÂ¸Â°Ã«Å Â¥ Ã¬Å¡â€Ã¬Â²Â­ - **planner** Ã¬â€”ÂÃ¬ÂÂ´Ã¬Â â€žÃ­Å Â¸ Ã¬â€šÂ¬Ã¬Å¡Â©
+2. Ã¬Â½â€Ã«â€œÅ“ Ã¬Å¾â€˜Ã¬â€žÂ±/Ã¬Ë†ËœÃ¬Â â€¢ Ã¬Â§ÂÃ­â€ºâ€ž - **code-reviewer** Ã¬â€”ÂÃ¬ÂÂ´Ã¬Â â€žÃ­Å Â¸ Ã¬â€šÂ¬Ã¬Å¡Â©
+3. Ã«Â²â€žÃªÂ·Â¸ Ã¬Ë†ËœÃ¬Â â€¢ Ã«ËœÂÃ«Å â€ Ã¬Æ’Ë† ÃªÂ¸Â°Ã«Å Â¥ - **tdd-guide** Ã¬â€”ÂÃ¬ÂÂ´Ã¬Â â€žÃ­Å Â¸ Ã¬â€šÂ¬Ã¬Å¡Â©
+4. Ã¬â€¢â€žÃ­â€šÂ¤Ã­â€¦ÂÃ¬Â²Ëœ Ã¬ÂËœÃ¬â€šÂ¬ÃªÂ²Â°Ã¬Â â€¢ - **architect** Ã¬â€”ÂÃ¬ÂÂ´Ã¬Â â€žÃ­Å Â¸ Ã¬â€šÂ¬Ã¬Å¡Â©
 
-## 병렬 Task 실행
+## Ã«Â³â€˜Ã«Â Â¬ Task Ã¬â€¹Â¤Ã­â€“â€°
 
-독립적인 작업에는 항상 병렬 Task 실행 사용:
+Ã«Ââ€¦Ã«Â¦Â½Ã¬Â ÂÃ¬ÂÂ¸ Ã¬Å¾â€˜Ã¬â€”â€¦Ã¬â€”ÂÃ«Å â€ Ã­â€¢Â­Ã¬Æ’Â Ã«Â³â€˜Ã«Â Â¬ Task Ã¬â€¹Â¤Ã­â€“â€° Ã¬â€šÂ¬Ã¬Å¡Â©:
 
 ```markdown
-# 좋음: 병렬 실행
-3개 에이전트를 병렬로 실행:
-1. 에이전트 1: 인증 모듈 보안 분석
-2. 에이전트 2: 캐시 시스템 성능 리뷰
-3. 에이전트 3: 유틸리티 타입 검사
+# Ã¬Â¢â€¹Ã¬ÂÅ’: Ã«Â³â€˜Ã«Â Â¬ Ã¬â€¹Â¤Ã­â€“â€°
+3ÃªÂ°Å“ Ã¬â€”ÂÃ¬ÂÂ´Ã¬Â â€žÃ­Å Â¸Ã«Â¥Â¼ Ã«Â³â€˜Ã«Â Â¬Ã«Â¡Å“ Ã¬â€¹Â¤Ã­â€“â€°:
+1. Ã¬â€”ÂÃ¬ÂÂ´Ã¬Â â€žÃ­Å Â¸ 1: Ã¬ÂÂ¸Ã¬Â¦Â Ã«ÂªÂ¨Ã«â€œË† Ã«Â³Â´Ã¬â€¢Ë† Ã«Â¶â€žÃ¬â€žÂ
+2. Ã¬â€”ÂÃ¬ÂÂ´Ã¬Â â€žÃ­Å Â¸ 2: Ã¬ÂºÂÃ¬â€¹Å“ Ã¬â€¹Å“Ã¬Å Â¤Ã­â€¦Å“ Ã¬â€žÂ±Ã«Å Â¥ Ã«Â¦Â¬Ã«Â·Â°
+3. Ã¬â€”ÂÃ¬ÂÂ´Ã¬Â â€žÃ­Å Â¸ 3: Ã¬Å“Â Ã­â€¹Â¸Ã«Â¦Â¬Ã­â€¹Â° Ã­Æ’â‚¬Ã¬Å¾â€¦ ÃªÂ²â‚¬Ã¬â€šÂ¬
 
-# 나쁨: 불필요하게 순차 실행
-먼저 에이전트 1, 그다음 에이전트 2, 그다음 에이전트 3
+# Ã«â€šËœÃ¬ÂÂ¨: Ã«Â¶Ë†Ã­â€¢â€žÃ¬Å¡â€Ã­â€¢ËœÃªÂ²Å’ Ã¬Ë†Å“Ã¬Â°Â¨ Ã¬â€¹Â¤Ã­â€“â€°
+Ã«Â¨Â¼Ã¬Â â‚¬ Ã¬â€”ÂÃ¬ÂÂ´Ã¬Â â€žÃ­Å Â¸ 1, ÃªÂ·Â¸Ã«â€¹Â¤Ã¬ÂÅ’ Ã¬â€”ÂÃ¬ÂÂ´Ã¬Â â€žÃ­Å Â¸ 2, ÃªÂ·Â¸Ã«â€¹Â¤Ã¬ÂÅ’ Ã¬â€”ÂÃ¬ÂÂ´Ã¬Â â€žÃ­Å Â¸ 3
 ```
 
-## 다중 관점 분석
+## Ã«â€¹Â¤Ã¬Â¤â€˜ ÃªÂ´â‚¬Ã¬Â Â Ã«Â¶â€žÃ¬â€žÂ
 
-복잡한 문제에는 역할 분리 서브에이전트 사용:
-- 사실 검증 리뷰어
-- 시니어 엔지니어
-- 보안 전문가
-- 일관성 검토자
-- 중복 검사자
+Ã«Â³ÂµÃ¬Å¾Â¡Ã­â€¢Å“ Ã«Â¬Â¸Ã¬Â Å“Ã¬â€”ÂÃ«Å â€ Ã¬â€”Â­Ã­â€¢Â  Ã«Â¶â€žÃ«Â¦Â¬ Ã¬â€žÅ“Ã«Â¸Å’Ã¬â€”ÂÃ¬ÂÂ´Ã¬Â â€žÃ­Å Â¸ Ã¬â€šÂ¬Ã¬Å¡Â©:
+- Ã¬â€šÂ¬Ã¬â€¹Â¤ ÃªÂ²â‚¬Ã¬Â¦Â Ã«Â¦Â¬Ã«Â·Â°Ã¬â€“Â´
+- Ã¬â€¹Å“Ã«â€¹Ë†Ã¬â€“Â´ Ã¬â€”â€Ã¬Â§â‚¬Ã«â€¹Ë†Ã¬â€“Â´
+- Ã«Â³Â´Ã¬â€¢Ë† Ã¬Â â€žÃ«Â¬Â¸ÃªÂ°â‚¬
+- Ã¬ÂÂ¼ÃªÂ´â‚¬Ã¬â€žÂ± ÃªÂ²â‚¬Ã­â€ Â Ã¬Å¾Â
+- Ã¬Â¤â€˜Ã«Â³Âµ ÃªÂ²â‚¬Ã¬â€šÂ¬Ã¬Å¾Â

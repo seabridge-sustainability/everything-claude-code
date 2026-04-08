@@ -6,6 +6,19 @@ origin: ECC
 
 # Django Development Patterns
 
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
 Production-grade Django architecture patterns for scalable, maintainable applications.
 
 ## When to Activate
@@ -22,32 +35,32 @@ Production-grade Django architecture patterns for scalable, maintainable applica
 
 ```
 myproject/
-├── config/
-│   ├── __init__.py
-│   ├── settings/
-│   │   ├── __init__.py
-│   │   ├── base.py          # Base settings
-│   │   ├── development.py   # Dev settings
-│   │   ├── production.py    # Production settings
-│   │   └── test.py          # Test settings
-│   ├── urls.py
-│   ├── wsgi.py
-│   └── asgi.py
-├── manage.py
-└── apps/
-    ├── __init__.py
-    ├── users/
-    │   ├── __init__.py
-    │   ├── models.py
-    │   ├── views.py
-    │   ├── serializers.py
-    │   ├── urls.py
-    │   ├── permissions.py
-    │   ├── filters.py
-    │   ├── services.py
-    │   └── tests/
-    └── products/
-        └── ...
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ config/
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ __init__.py
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ settings/
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ __init__.py
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ base.py          # Base settings
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ development.py   # Dev settings
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ production.py    # Production settings
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ test.py          # Test settings
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ urls.py
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ wsgi.py
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ asgi.py
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ manage.py
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ apps/
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ __init__.py
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ users/
+    Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ __init__.py
+    Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ models.py
+    Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ views.py
+    Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ serializers.py
+    Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ urls.py
+    Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ permissions.py
+    Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ filters.py
+    Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ services.py
+    Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ tests/
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ products/
+        Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ ...
 ```
 
 ### Split Settings Pattern

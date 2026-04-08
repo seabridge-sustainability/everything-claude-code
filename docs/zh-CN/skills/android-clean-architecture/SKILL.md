@@ -1,56 +1,69 @@
 ---
 name: android-clean-architecture
-description: 适用于Android和Kotlin多平台项目的Clean Architecture模式——模块结构、依赖规则、用例、仓库以及数据层模式。
+description: Ã©â‚¬â€šÃ§â€Â¨Ã¤ÂºÅ½AndroidÃ¥â€™Å’KotlinÃ¥Â¤Å¡Ã¥Â¹Â³Ã¥ÂÂ°Ã©Â¡Â¹Ã§â€ºÂ®Ã§Å¡â€žClean ArchitectureÃ¦Â¨Â¡Ã¥Â¼ÂÃ¢â‚¬â€Ã¢â‚¬â€Ã¦Â¨Â¡Ã¥Ââ€”Ã§Â»â€œÃ¦Å¾â€žÃ£â‚¬ÂÃ¤Â¾ÂÃ¨Âµâ€“Ã¨Â§â€žÃ¥Ë†â„¢Ã£â‚¬ÂÃ§â€Â¨Ã¤Â¾â€¹Ã£â‚¬ÂÃ¤Â»â€œÃ¥Âºâ€œÃ¤Â»Â¥Ã¥ÂÅ Ã¦â€¢Â°Ã¦ÂÂ®Ã¥Â±â€šÃ¦Â¨Â¡Ã¥Â¼ÂÃ£â‚¬â€š
 origin: ECC
 ---
 
-# Android 整洁架构
+# Android Ã¦â€¢Â´Ã¦Â´ÂÃ¦Å¾Â¶Ã¦Å¾â€ž
 
-适用于 Android 和 KMP 项目的整洁架构模式。涵盖模块边界、依赖反转、UseCase/Repository 模式，以及使用 Room、SQLDelight 和 Ktor 的数据层设计。
+## Safety And Authorization Rule
 
-## 何时启用
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-* 构建 Android 或 KMP 项目模块结构
-* 实现 UseCases、Repositories 或 DataSources
-* 设计各层（领域层、数据层、表示层）之间的数据流
-* 使用 Koin 或 Hilt 设置依赖注入
-* 在分层架构中使用 Room、SQLDelight 或 Ktor
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-## 模块结构
 
-### 推荐布局
+Ã©â‚¬â€šÃ§â€Â¨Ã¤ÂºÅ½ Android Ã¥â€™Å’ KMP Ã©Â¡Â¹Ã§â€ºÂ®Ã§Å¡â€žÃ¦â€¢Â´Ã¦Â´ÂÃ¦Å¾Â¶Ã¦Å¾â€žÃ¦Â¨Â¡Ã¥Â¼ÂÃ£â‚¬â€šÃ¦Â¶ÂµÃ§â€ºâ€“Ã¦Â¨Â¡Ã¥Ââ€”Ã¨Â¾Â¹Ã§â€¢Å’Ã£â‚¬ÂÃ¤Â¾ÂÃ¨Âµâ€“Ã¥ÂÂÃ¨Â½Â¬Ã£â‚¬ÂUseCase/Repository Ã¦Â¨Â¡Ã¥Â¼ÂÃ¯Â¼Å’Ã¤Â»Â¥Ã¥ÂÅ Ã¤Â½Â¿Ã§â€Â¨ RoomÃ£â‚¬ÂSQLDelight Ã¥â€™Å’ Ktor Ã§Å¡â€žÃ¦â€¢Â°Ã¦ÂÂ®Ã¥Â±â€šÃ¨Â®Â¾Ã¨Â®Â¡Ã£â‚¬â€š
+
+## Ã¤Â½â€¢Ã¦â€”Â¶Ã¥ÂÂ¯Ã§â€Â¨
+
+* Ã¦Å¾â€žÃ¥Â»Âº Android Ã¦Ë†â€“ KMP Ã©Â¡Â¹Ã§â€ºÂ®Ã¦Â¨Â¡Ã¥Ââ€”Ã§Â»â€œÃ¦Å¾â€ž
+* Ã¥Â®Å¾Ã§Å½Â° UseCasesÃ£â‚¬ÂRepositories Ã¦Ë†â€“ DataSources
+* Ã¨Â®Â¾Ã¨Â®Â¡Ã¥Ââ€žÃ¥Â±â€šÃ¯Â¼Ë†Ã©Â¢â€ Ã¥Å¸Å¸Ã¥Â±â€šÃ£â‚¬ÂÃ¦â€¢Â°Ã¦ÂÂ®Ã¥Â±â€šÃ£â‚¬ÂÃ¨Â¡Â¨Ã§Â¤ÂºÃ¥Â±â€šÃ¯Â¼â€°Ã¤Â¹â€¹Ã©â€”Â´Ã§Å¡â€žÃ¦â€¢Â°Ã¦ÂÂ®Ã¦ÂµÂ
+* Ã¤Â½Â¿Ã§â€Â¨ Koin Ã¦Ë†â€“ Hilt Ã¨Â®Â¾Ã§Â½Â®Ã¤Â¾ÂÃ¨Âµâ€“Ã¦Â³Â¨Ã¥â€¦Â¥
+* Ã¥Å“Â¨Ã¥Ë†â€ Ã¥Â±â€šÃ¦Å¾Â¶Ã¦Å¾â€žÃ¤Â¸Â­Ã¤Â½Â¿Ã§â€Â¨ RoomÃ£â‚¬ÂSQLDelight Ã¦Ë†â€“ Ktor
+
+## Ã¦Â¨Â¡Ã¥Ââ€”Ã§Â»â€œÃ¦Å¾â€ž
+
+### Ã¦Å½Â¨Ã¨ÂÂÃ¥Â¸Æ’Ã¥Â±â‚¬
 
 ```
 project/
-├── app/                  # Android 入口点，DI 装配，Application 类
-├── core/                 # 共享工具类，基类，错误类型
-├── domain/               # 用例，领域模型，仓库接口（纯 Kotlin）
-├── data/                 # 仓库实现，数据源，数据库，网络
-├── presentation/         # 界面，ViewModel，UI 模型，导航
-├── design-system/        # 可复用的 Compose 组件，主题，排版
-└── feature/              # 功能模块（可选，用于大型项目）
-    ├── auth/
-    ├── settings/
-    └── profile/
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ app/                  # Android Ã¥â€¦Â¥Ã¥ÂÂ£Ã§â€šÂ¹Ã¯Â¼Å’DI Ã¨Â£â€¦Ã©â€¦ÂÃ¯Â¼Å’Application Ã§Â±Â»
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ core/                 # Ã¥â€¦Â±Ã¤ÂºÂ«Ã¥Â·Â¥Ã¥â€¦Â·Ã§Â±Â»Ã¯Â¼Å’Ã¥Å¸ÂºÃ§Â±Â»Ã¯Â¼Å’Ã©â€â„¢Ã¨Â¯Â¯Ã§Â±Â»Ã¥Å¾â€¹
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ domain/               # Ã§â€Â¨Ã¤Â¾â€¹Ã¯Â¼Å’Ã©Â¢â€ Ã¥Å¸Å¸Ã¦Â¨Â¡Ã¥Å¾â€¹Ã¯Â¼Å’Ã¤Â»â€œÃ¥Âºâ€œÃ¦Å½Â¥Ã¥ÂÂ£Ã¯Â¼Ë†Ã§ÂºÂ¯ KotlinÃ¯Â¼â€°
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ data/                 # Ã¤Â»â€œÃ¥Âºâ€œÃ¥Â®Å¾Ã§Å½Â°Ã¯Â¼Å’Ã¦â€¢Â°Ã¦ÂÂ®Ã¦ÂºÂÃ¯Â¼Å’Ã¦â€¢Â°Ã¦ÂÂ®Ã¥Âºâ€œÃ¯Â¼Å’Ã§Â½â€˜Ã§Â»Å“
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ presentation/         # Ã§â€¢Å’Ã©ÂÂ¢Ã¯Â¼Å’ViewModelÃ¯Â¼Å’UI Ã¦Â¨Â¡Ã¥Å¾â€¹Ã¯Â¼Å’Ã¥Â¯Â¼Ã¨Ë†Âª
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ design-system/        # Ã¥ÂÂ¯Ã¥Â¤ÂÃ§â€Â¨Ã§Å¡â€ž Compose Ã§Â»â€žÃ¤Â»Â¶Ã¯Â¼Å’Ã¤Â¸Â»Ã©Â¢ËœÃ¯Â¼Å’Ã¦Å½â€™Ã§â€°Ë†
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ feature/              # Ã¥Å Å¸Ã¨Æ’Â½Ã¦Â¨Â¡Ã¥Ââ€”Ã¯Â¼Ë†Ã¥ÂÂ¯Ã©â‚¬â€°Ã¯Â¼Å’Ã§â€Â¨Ã¤ÂºÅ½Ã¥Â¤Â§Ã¥Å¾â€¹Ã©Â¡Â¹Ã§â€ºÂ®Ã¯Â¼â€°
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ auth/
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ settings/
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ profile/
 ```
 
-### 依赖规则
+### Ã¤Â¾ÂÃ¨Âµâ€“Ã¨Â§â€žÃ¥Ë†â„¢
 
 ```
-app → presentation, domain, data, core
-presentation → domain, design-system, core
-data → domain, core
-domain → core (或无依赖)
-core → (无依赖)
+app Ã¢â€ â€™ presentation, domain, data, core
+presentation Ã¢â€ â€™ domain, design-system, core
+data Ã¢â€ â€™ domain, core
+domain Ã¢â€ â€™ core (Ã¦Ë†â€“Ã¦â€”Â Ã¤Â¾ÂÃ¨Âµâ€“)
+core Ã¢â€ â€™ (Ã¦â€”Â Ã¤Â¾ÂÃ¨Âµâ€“)
 ```
 
-**关键**：`domain` 绝不能依赖 `data`、`presentation` 或任何框架。它仅包含纯 Kotlin 代码。
+**Ã¥â€¦Â³Ã©â€Â®**Ã¯Â¼Å¡`domain` Ã§Â»ÂÃ¤Â¸ÂÃ¨Æ’Â½Ã¤Â¾ÂÃ¨Âµâ€“ `data`Ã£â‚¬Â`presentation` Ã¦Ë†â€“Ã¤Â»Â»Ã¤Â½â€¢Ã¦Â¡â€ Ã¦Å¾Â¶Ã£â‚¬â€šÃ¥Â®Æ’Ã¤Â»â€¦Ã¥Å’â€¦Ã¥ÂÂ«Ã§ÂºÂ¯ Kotlin Ã¤Â»Â£Ã§Â ÂÃ£â‚¬â€š
 
-## 领域层
+## Ã©Â¢â€ Ã¥Å¸Å¸Ã¥Â±â€š
 
-### UseCase 模式
+### UseCase Ã¦Â¨Â¡Ã¥Â¼Â
 
-每个 UseCase 代表一个业务操作。使用 `operator fun invoke` 以获得简洁的调用点：
+Ã¦Â¯ÂÃ¤Â¸Âª UseCase Ã¤Â»Â£Ã¨Â¡Â¨Ã¤Â¸â‚¬Ã¤Â¸ÂªÃ¤Â¸Å¡Ã¥Å Â¡Ã¦â€œÂÃ¤Â½Å“Ã£â‚¬â€šÃ¤Â½Â¿Ã§â€Â¨ `operator fun invoke` Ã¤Â»Â¥Ã¨Å½Â·Ã¥Â¾â€”Ã§Â®â‚¬Ã¦Â´ÂÃ§Å¡â€žÃ¨Â°Æ’Ã§â€Â¨Ã§â€šÂ¹Ã¯Â¼Å¡
 
 ```kotlin
 class GetItemsByCategoryUseCase(
@@ -71,9 +84,9 @@ class ObserveUserProgressUseCase(
 }
 ```
 
-### 领域模型
+### Ã©Â¢â€ Ã¥Å¸Å¸Ã¦Â¨Â¡Ã¥Å¾â€¹
 
-领域模型是普通的 Kotlin 数据类——没有框架注解：
+Ã©Â¢â€ Ã¥Å¸Å¸Ã¦Â¨Â¡Ã¥Å¾â€¹Ã¦ËœÂ¯Ã¦â„¢Â®Ã©â‚¬Å¡Ã§Å¡â€ž Kotlin Ã¦â€¢Â°Ã¦ÂÂ®Ã§Â±Â»Ã¢â‚¬â€Ã¢â‚¬â€Ã¦Â²Â¡Ã¦Å“â€°Ã¦Â¡â€ Ã¦Å¾Â¶Ã¦Â³Â¨Ã¨Â§Â£Ã¯Â¼Å¡
 
 ```kotlin
 data class Item(
@@ -88,9 +101,9 @@ data class Item(
 enum class Status { DRAFT, ACTIVE, ARCHIVED }
 ```
 
-### 仓库接口
+### Ã¤Â»â€œÃ¥Âºâ€œÃ¦Å½Â¥Ã¥ÂÂ£
 
-在领域层定义，在数据层实现：
+Ã¥Å“Â¨Ã©Â¢â€ Ã¥Å¸Å¸Ã¥Â±â€šÃ¥Â®Å¡Ã¤Â¹â€°Ã¯Â¼Å’Ã¥Å“Â¨Ã¦â€¢Â°Ã¦ÂÂ®Ã¥Â±â€šÃ¥Â®Å¾Ã§Å½Â°Ã¯Â¼Å¡
 
 ```kotlin
 interface ItemRepository {
@@ -100,11 +113,11 @@ interface ItemRepository {
 }
 ```
 
-## 数据层
+## Ã¦â€¢Â°Ã¦ÂÂ®Ã¥Â±â€š
 
-### 仓库实现
+### Ã¤Â»â€œÃ¥Âºâ€œÃ¥Â®Å¾Ã§Å½Â°
 
-协调本地和远程数据源：
+Ã¥ÂÂÃ¨Â°Æ’Ã¦Å“Â¬Ã¥Å“Â°Ã¥â€™Å’Ã¨Â¿Å“Ã§Â¨â€¹Ã¦â€¢Â°Ã¦ÂÂ®Ã¦ÂºÂÃ¯Â¼Å¡
 
 ```kotlin
 class ItemRepositoryImpl(
@@ -134,9 +147,9 @@ class ItemRepositoryImpl(
 }
 ```
 
-### 映射器模式
+### Ã¦ËœÂ Ã¥Â°â€žÃ¥â„¢Â¨Ã¦Â¨Â¡Ã¥Â¼Â
 
-将映射器作为扩展函数放在数据模型附近：
+Ã¥Â°â€ Ã¦ËœÂ Ã¥Â°â€žÃ¥â„¢Â¨Ã¤Â½Å“Ã¤Â¸ÂºÃ¦â€°Â©Ã¥Â±â€¢Ã¥â€¡Â½Ã¦â€¢Â°Ã¦â€Â¾Ã¥Å“Â¨Ã¦â€¢Â°Ã¦ÂÂ®Ã¦Â¨Â¡Ã¥Å¾â€¹Ã©â„¢â€žÃ¨Â¿â€˜Ã¯Â¼Å¡
 
 ```kotlin
 // In data layer
@@ -159,7 +172,7 @@ fun ItemDto.toEntity() = ItemEntity(
 )
 ```
 
-### Room 数据库 (Android)
+### Room Ã¦â€¢Â°Ã¦ÂÂ®Ã¥Âºâ€œ (Android)
 
 ```kotlin
 @Entity(tableName = "items")
@@ -209,7 +222,7 @@ observeAll:
 SELECT * FROM ItemEntity;
 ```
 
-### Ktor 网络客户端 (KMP)
+### Ktor Ã§Â½â€˜Ã§Â»Å“Ã¥Â®Â¢Ã¦Ë†Â·Ã§Â«Â¯ (KMP)
 
 ```kotlin
 class ItemRemoteDataSource(private val client: HttpClient) {
@@ -229,9 +242,9 @@ val httpClient = HttpClient {
 }
 ```
 
-## 依赖注入
+## Ã¤Â¾ÂÃ¨Âµâ€“Ã¦Â³Â¨Ã¥â€¦Â¥
 
-### Koin (适用于 KMP)
+### Koin (Ã©â‚¬â€šÃ§â€Â¨Ã¤ÂºÅ½ KMP)
 
 ```kotlin
 // Domain module
@@ -254,7 +267,7 @@ val presentationModule = module {
 }
 ```
 
-### Hilt (仅限 Android)
+### Hilt (Ã¤Â»â€¦Ã©â„¢Â Android)
 
 ```kotlin
 @Module
@@ -270,11 +283,11 @@ class ItemListViewModel @Inject constructor(
 ) : ViewModel()
 ```
 
-## 错误处理
+## Ã©â€â„¢Ã¨Â¯Â¯Ã¥Â¤â€žÃ§Ââ€ 
 
-### Result/Try 模式
+### Result/Try Ã¦Â¨Â¡Ã¥Â¼Â
 
-使用 `Result<T>` 或自定义密封类型进行错误传播：
+Ã¤Â½Â¿Ã§â€Â¨ `Result<T>` Ã¦Ë†â€“Ã¨â€¡ÂªÃ¥Â®Å¡Ã¤Â¹â€°Ã¥Â¯â€ Ã¥Â°ÂÃ§Â±Â»Ã¥Å¾â€¹Ã¨Â¿â€ºÃ¨Â¡Å’Ã©â€â„¢Ã¨Â¯Â¯Ã¤Â¼Â Ã¦â€™Â­Ã¯Â¼Å¡
 
 ```kotlin
 sealed interface Try<out T> {
@@ -288,7 +301,7 @@ sealed interface AppError {
     data object Unauthorized : AppError
 }
 
-// In ViewModel — map to UI state
+// In ViewModel Ã¢â‚¬â€ map to UI state
 viewModelScope.launch {
     when (val result = getItems(category)) {
         is Try.Success -> _state.update { it.copy(items = result.value, isLoading = false) }
@@ -297,9 +310,9 @@ viewModelScope.launch {
 }
 ```
 
-## 约定插件 (Gradle)
+## Ã§ÂºÂ¦Ã¥Â®Å¡Ã¦Ââ€™Ã¤Â»Â¶ (Gradle)
 
-对于 KMP 项目，使用约定插件以减少构建文件重复：
+Ã¥Â¯Â¹Ã¤ÂºÅ½ KMP Ã©Â¡Â¹Ã§â€ºÂ®Ã¯Â¼Å’Ã¤Â½Â¿Ã§â€Â¨Ã§ÂºÂ¦Ã¥Â®Å¡Ã¦Ââ€™Ã¤Â»Â¶Ã¤Â»Â¥Ã¥â€¡ÂÃ¥Â°â€˜Ã¦Å¾â€žÃ¥Â»ÂºÃ¦â€“â€¡Ã¤Â»Â¶Ã©â€¡ÂÃ¥Â¤ÂÃ¯Â¼Å¡
 
 ```kotlin
 // build-logic/src/main/kotlin/kmp-library.gradle.kts
@@ -317,23 +330,23 @@ kotlin {
 }
 ```
 
-在模块中应用：
+Ã¥Å“Â¨Ã¦Â¨Â¡Ã¥Ââ€”Ã¤Â¸Â­Ã¥Âºâ€Ã§â€Â¨Ã¯Â¼Å¡
 
 ```kotlin
 // domain/build.gradle.kts
 plugins { id("kmp-library") }
 ```
 
-## 应避免的反模式
+## Ã¥Âºâ€Ã©ÂÂ¿Ã¥â€¦ÂÃ§Å¡â€žÃ¥ÂÂÃ¦Â¨Â¡Ã¥Â¼Â
 
-* 在 `domain` 中导入 Android 框架类——保持其为纯 Kotlin
-* 向 UI 层暴露数据库实体或 DTO——始终映射到领域模型
-* 将业务逻辑放在 ViewModels 中——提取到 UseCases
-* 使用 `GlobalScope` 或非结构化协程——使用 `viewModelScope` 或结构化并发
-* 臃肿的仓库实现——拆分为专注的 DataSources
-* 循环模块依赖——如果 A 依赖 B，则 B 绝不能依赖 A
+* Ã¥Å“Â¨ `domain` Ã¤Â¸Â­Ã¥Â¯Â¼Ã¥â€¦Â¥ Android Ã¦Â¡â€ Ã¦Å¾Â¶Ã§Â±Â»Ã¢â‚¬â€Ã¢â‚¬â€Ã¤Â¿ÂÃ¦Å’ÂÃ¥â€¦Â¶Ã¤Â¸ÂºÃ§ÂºÂ¯ Kotlin
+* Ã¥Ââ€˜ UI Ã¥Â±â€šÃ¦Å¡Â´Ã©Å“Â²Ã¦â€¢Â°Ã¦ÂÂ®Ã¥Âºâ€œÃ¥Â®Å¾Ã¤Â½â€œÃ¦Ë†â€“ DTOÃ¢â‚¬â€Ã¢â‚¬â€Ã¥Â§â€¹Ã§Â»Ë†Ã¦ËœÂ Ã¥Â°â€žÃ¥Ë†Â°Ã©Â¢â€ Ã¥Å¸Å¸Ã¦Â¨Â¡Ã¥Å¾â€¹
+* Ã¥Â°â€ Ã¤Â¸Å¡Ã¥Å Â¡Ã©â‚¬Â»Ã¨Â¾â€˜Ã¦â€Â¾Ã¥Å“Â¨ ViewModels Ã¤Â¸Â­Ã¢â‚¬â€Ã¢â‚¬â€Ã¦ÂÂÃ¥Ââ€“Ã¥Ë†Â° UseCases
+* Ã¤Â½Â¿Ã§â€Â¨ `GlobalScope` Ã¦Ë†â€“Ã©ÂÅ¾Ã§Â»â€œÃ¦Å¾â€žÃ¥Å’â€“Ã¥ÂÂÃ§Â¨â€¹Ã¢â‚¬â€Ã¢â‚¬â€Ã¤Â½Â¿Ã§â€Â¨ `viewModelScope` Ã¦Ë†â€“Ã§Â»â€œÃ¦Å¾â€žÃ¥Å’â€“Ã¥Â¹Â¶Ã¥Ââ€˜
+* Ã¨â€¡Æ’Ã¨â€šÂ¿Ã§Å¡â€žÃ¤Â»â€œÃ¥Âºâ€œÃ¥Â®Å¾Ã§Å½Â°Ã¢â‚¬â€Ã¢â‚¬â€Ã¦â€¹â€ Ã¥Ë†â€ Ã¤Â¸ÂºÃ¤Â¸â€œÃ¦Â³Â¨Ã§Å¡â€ž DataSources
+* Ã¥Â¾ÂªÃ§Å½Â¯Ã¦Â¨Â¡Ã¥Ââ€”Ã¤Â¾ÂÃ¨Âµâ€“Ã¢â‚¬â€Ã¢â‚¬â€Ã¥Â¦â€šÃ¦Å¾Å“ A Ã¤Â¾ÂÃ¨Âµâ€“ BÃ¯Â¼Å’Ã¥Ë†â„¢ B Ã§Â»ÂÃ¤Â¸ÂÃ¨Æ’Â½Ã¤Â¾ÂÃ¨Âµâ€“ A
 
-## 参考
+## Ã¥Ââ€šÃ¨â‚¬Æ’
 
-查看技能：`compose-multiplatform-patterns` 了解 UI 模式。
-查看技能：`kotlin-coroutines-flows` 了解异步模式。
+Ã¦Å¸Â¥Ã§Å“â€¹Ã¦Å â‚¬Ã¨Æ’Â½Ã¯Â¼Å¡`compose-multiplatform-patterns` Ã¤Âºâ€ Ã¨Â§Â£ UI Ã¦Â¨Â¡Ã¥Â¼ÂÃ£â‚¬â€š
+Ã¦Å¸Â¥Ã§Å“â€¹Ã¦Å â‚¬Ã¨Æ’Â½Ã¯Â¼Å¡`kotlin-coroutines-flows` Ã¤Âºâ€ Ã¨Â§Â£Ã¥Â¼â€šÃ¦Â­Â¥Ã¦Â¨Â¡Ã¥Â¼ÂÃ£â‚¬â€š

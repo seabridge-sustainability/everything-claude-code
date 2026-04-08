@@ -15,7 +15,7 @@ allowed-tools:
   - AskUserQuestion
 
 ---
-<!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
+<!-- AUTO-GENERATED from SKILL.md.tmpl Ã¢â‚¬â€ do not edit directly -->
 <!-- Regenerate: bun run gen:skill-docs -->
 
 ## Preamble (run first)
@@ -51,6 +51,19 @@ if [ "$_TEL" != "off" ]; then
 echo '{"skill":"browse","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.gstack/analytics/skill-usage.jsonl 2>/dev/null || true
 fi
 # zsh-compatible: use find instead of glob to avoid NOMATCH error
+
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
 for _PF in $(find ~/.gstack/analytics -maxdepth 1 -name '.pending-*' 2>/dev/null); do
   if [ -f "$_PF" ]; then
     if [ "$_TEL" != "off" ] && [ -x "~/.claude/skills/gstack/bin/gstack-telemetry-log" ]; then
@@ -87,18 +100,18 @@ echo "ROUTING_DECLINED: $_ROUTING_DECLINED"
 If `PROACTIVE` is `"false"`, do not proactively suggest gstack skills AND do not
 auto-invoke skills based on conversation context. Only run skills the user explicitly
 types (e.g., /qa, /ship). If you would have auto-invoked a skill, instead briefly say:
-"I think /skillname might help here — want me to run it?" and wait for confirmation.
+"I think /skillname might help here Ã¢â‚¬â€ want me to run it?" and wait for confirmation.
 The user opted out of proactive behavior.
 
 If `SKILL_PREFIX` is `"true"`, the user has namespaced skill names. When suggesting
 or invoking other gstack skills, use the `/gstack-` prefix (e.g., `/gstack-qa` instead
-of `/qa`, `/gstack-ship` instead of `/ship`). Disk paths are unaffected — always use
+of `/qa`, `/gstack-ship` instead of `/ship`). Disk paths are unaffected Ã¢â‚¬â€ always use
 `~/.claude/skills/gstack/[skill-name]/SKILL.md` for reading skill files.
 
 If output shows `UPGRADE_AVAILABLE <old> <new>`: read `~/.claude/skills/gstack/gstack-upgrade/SKILL.md` and follow the "Inline upgrade flow" (auto-upgrade if configured, otherwise AskUserQuestion with 4 options, write snooze state if declined). If `JUST_UPGRADED <from> <to>`: tell user "Running gstack v{to} (just updated!)" and continue.
 
 If `LAKE_INTRO` is `no`: Before continuing, introduce the Completeness Principle.
-Tell the user: "gstack follows the **Boil the Lake** principle — always do the complete
+Tell the user: "gstack follows the **Boil the Lake** principle Ã¢â‚¬â€ always do the complete
 thing when AI makes the marginal cost near-zero. Read more: https://garryslist.org/posts/boil-the-ocean"
 Then offer to open the essay in their default browser:
 
@@ -125,15 +138,15 @@ If A: run `~/.claude/skills/gstack/bin/gstack-config set telemetry community`
 
 If B: ask a follow-up AskUserQuestion:
 
-> How about anonymous mode? We just learn that *someone* used gstack — no unique ID,
+> How about anonymous mode? We just learn that *someone* used gstack Ã¢â‚¬â€ no unique ID,
 > no way to connect sessions. Just a counter that helps us know if anyone's out there.
 
 Options:
 - A) Sure, anonymous is fine
 - B) No thanks, fully off
 
-If B→A: run `~/.claude/skills/gstack/bin/gstack-config set telemetry anonymous`
-If B→B: run `~/.claude/skills/gstack/bin/gstack-config set telemetry off`
+If BÃ¢â€ â€™A: run `~/.claude/skills/gstack/bin/gstack-config set telemetry anonymous`
+If BÃ¢â€ â€™B: run `~/.claude/skills/gstack/bin/gstack-config set telemetry off`
 
 Always run:
 ```bash
@@ -145,13 +158,13 @@ This only happens once. If `TEL_PROMPTED` is `yes`, skip this entirely.
 If `PROACTIVE_PROMPTED` is `no` AND `TEL_PROMPTED` is `yes`: After telemetry is handled,
 ask the user about proactive behavior. Use AskUserQuestion:
 
-> gstack can proactively figure out when you might need a skill while you work —
+> gstack can proactively figure out when you might need a skill while you work Ã¢â‚¬â€
 > like suggesting /qa when you say "does this work?" or /investigate when you hit
-> a bug. We recommend keeping this on — it speeds up every part of your workflow.
+> a bug. We recommend keeping this on Ã¢â‚¬â€ it speeds up every part of your workflow.
 
 Options:
 - A) Keep it on (recommended)
-- B) Turn it off — I'll type /commands myself
+- B) Turn it off Ã¢â‚¬â€ I'll type /commands myself
 
 If A: run `~/.claude/skills/gstack/bin/gstack-config set proactive true`
 If B: run `~/.claude/skills/gstack/bin/gstack-config set proactive false`
@@ -187,18 +200,18 @@ tool as your FIRST action. Do NOT answer directly, do NOT use other tools first.
 The skill has specialized workflows that produce better results than ad-hoc answers.
 
 Key routing rules:
-- Product ideas, "is this worth building", brainstorming → invoke office-hours
-- Bugs, errors, "why is this broken", 500 errors → invoke investigate
-- Ship, deploy, push, create PR → invoke ship
-- QA, test the site, find bugs → invoke qa
-- Code review, check my diff → invoke review
-- Update docs after shipping → invoke document-release
-- Weekly retro → invoke retro
-- Design system, brand → invoke design-consultation
-- Visual audit, design polish → invoke design-review
-- Architecture review → invoke plan-eng-review
-- Save progress, checkpoint, resume → invoke checkpoint
-- Code quality, health check → invoke health
+- Product ideas, "is this worth building", brainstorming Ã¢â€ â€™ invoke office-hours
+- Bugs, errors, "why is this broken", 500 errors Ã¢â€ â€™ invoke investigate
+- Ship, deploy, push, create PR Ã¢â€ â€™ invoke ship
+- QA, test the site, find bugs Ã¢â€ â€™ invoke qa
+- Code review, check my diff Ã¢â€ â€™ invoke review
+- Update docs after shipping Ã¢â€ â€™ invoke document-release
+- Weekly retro Ã¢â€ â€™ invoke retro
+- Design system, brand Ã¢â€ â€™ invoke design-consultation
+- Visual audit, design polish Ã¢â€ â€™ invoke design-review
+- Architecture review Ã¢â€ â€™ invoke plan-eng-review
+- Save progress, checkpoint, resume Ã¢â€ â€™ invoke checkpoint
+- Code quality, health check Ã¢â€ â€™ invoke health
 ```
 
 Then commit the change: `git add CLAUDE.md && git commit -m "chore: add gstack skill routing rules to CLAUDE.md"`
@@ -214,15 +227,15 @@ This only happens once per project. If `HAS_ROUTING` is `yes` or `ROUTING_DECLIN
 
 **Writing rules:** No em dashes (use commas, periods, "..."). No AI vocabulary (delve, crucial, robust, comprehensive, nuanced, etc.). Short paragraphs. End with what to do.
 
-The user always has context you don't. Cross-model agreement is a recommendation, not a decision — the user decides.
+The user always has context you don't. Cross-model agreement is a recommendation, not a decision Ã¢â‚¬â€ the user decides.
 
 ## Completion Status Protocol
 
 When completing a skill workflow, report status using one of:
-- **DONE** — All steps completed successfully. Evidence provided for each claim.
-- **DONE_WITH_CONCERNS** — Completed, but with issues the user should know about. List each concern.
-- **BLOCKED** — Cannot proceed. State what is blocking and what was tried.
-- **NEEDS_CONTEXT** — Missing information required to continue. State exactly what you need.
+- **DONE** Ã¢â‚¬â€ All steps completed successfully. Evidence provided for each claim.
+- **DONE_WITH_CONCERNS** Ã¢â‚¬â€ Completed, but with issues the user should know about. List each concern.
+- **BLOCKED** Ã¢â‚¬â€ Cannot proceed. State what is blocking and what was tried.
+- **NEEDS_CONTEXT** Ã¢â‚¬â€ Missing information required to continue. State exactly what you need.
 
 ### Escalation
 
@@ -266,9 +279,9 @@ Determine the skill name from the `name:` field in this file's YAML frontmatter.
 Determine the outcome from the workflow result (success if completed normally, error
 if it failed, abort if the user interrupted).
 
-**PLAN MODE EXCEPTION — ALWAYS RUN:** This command writes telemetry to
+**PLAN MODE EXCEPTION Ã¢â‚¬â€ ALWAYS RUN:** This command writes telemetry to
 `~/.gstack/analytics/` (user config directory, not project files). The skill
-preamble already writes to the same directory — this is the same pattern.
+preamble already writes to the same directory Ã¢â‚¬â€ this is the same pattern.
 Skipping this command loses session duration and outcome data.
 
 Run this bash:
@@ -308,7 +321,7 @@ artifacts that inform the plan, not code changes:
 - Writing to the plan file (already allowed by plan mode)
 - `open` commands for viewing generated artifacts (comparison boards, HTML previews)
 
-These are read-only in spirit — they inspect the live site, generate visual artifacts,
+These are read-only in spirit Ã¢â‚¬â€ they inspect the live site, generate visual artifacts,
 or get independent opinions. They do NOT modify project source files.
 
 ## Plan Status Footer
@@ -316,8 +329,8 @@ or get independent opinions. They do NOT modify project source files.
 When you are in plan mode and about to call ExitPlanMode:
 
 1. Check if the plan file already has a `## GSTACK REVIEW REPORT` section.
-2. If it DOES — skip (a review skill already wrote a richer report).
-3. If it does NOT — run this command:
+2. If it DOES Ã¢â‚¬â€ skip (a review skill already wrote a richer report).
+3. If it does NOT Ã¢â‚¬â€ run this command:
 
 \`\`\`bash
 ~/.claude/skills/gstack/bin/gstack-review-read
@@ -335,16 +348,16 @@ Then write a `## GSTACK REVIEW REPORT` section to the end of the plan file:
 
 | Review | Trigger | Why | Runs | Status | Findings |
 |--------|---------|-----|------|--------|----------|
-| CEO Review | \`/plan-ceo-review\` | Scope & strategy | 0 | — | — |
-| Codex Review | \`/codex review\` | Independent 2nd opinion | 0 | — | — |
-| Eng Review | \`/plan-eng-review\` | Architecture & tests (required) | 0 | — | — |
-| Design Review | \`/plan-design-review\` | UI/UX gaps | 0 | — | — |
-| DX Review | \`/plan-devex-review\` | Developer experience gaps | 0 | — | — |
+| CEO Review | \`/plan-ceo-review\` | Scope & strategy | 0 | Ã¢â‚¬â€ | Ã¢â‚¬â€ |
+| Codex Review | \`/codex review\` | Independent 2nd opinion | 0 | Ã¢â‚¬â€ | Ã¢â‚¬â€ |
+| Eng Review | \`/plan-eng-review\` | Architecture & tests (required) | 0 | Ã¢â‚¬â€ | Ã¢â‚¬â€ |
+| Design Review | \`/plan-design-review\` | UI/UX gaps | 0 | Ã¢â‚¬â€ | Ã¢â‚¬â€ |
+| DX Review | \`/plan-devex-review\` | Developer experience gaps | 0 | Ã¢â‚¬â€ | Ã¢â‚¬â€ |
 
-**VERDICT:** NO REVIEWS YET — run \`/autoplan\` for full review pipeline, or individual reviews above.
+**VERDICT:** NO REVIEWS YET Ã¢â‚¬â€ run \`/autoplan\` for full review pipeline, or individual reviews above.
 \`\`\`
 
-**PLAN MODE EXCEPTION — ALWAYS RUN:** This writes to the plan file, which is the one
+**PLAN MODE EXCEPTION Ã¢â‚¬â€ ALWAYS RUN:** This writes to the plan file, which is the one
 file you are allowed to edit in plan mode. The plan file review report is part of the
 plan's living status.
 
@@ -509,7 +522,7 @@ The snapshot is your primary tool for understanding and interacting with pages.
 -D        --diff                  Unified diff against previous snapshot (first call stores baseline)
 -a        --annotate              Annotated screenshot with red overlay boxes and ref labels
 -o <path> --output                Output path for annotated screenshot (default: <temp>/browse-annotated.png)
--C        --cursor-interactive    Cursor-interactive elements (@c refs — divs with pointer, onclick)
+-C        --cursor-interactive    Cursor-interactive elements (@c refs Ã¢â‚¬â€ divs with pointer, onclick)
 ```
 
 All flags can be combined freely. `-o` only applies when `-a` is also used.
@@ -532,7 +545,7 @@ $B click @c1       # cursor-interactive ref (from -C)
   @e3 [button] "Submit"
 ```
 
-Refs are invalidated on navigation — run `snapshot` again after `goto`.
+Refs are invalidated on navigation Ã¢â‚¬â€ run `snapshot` again after `goto`.
 
 ## CSS Inspector & Style Modification
 
@@ -584,7 +597,7 @@ $B prettyscreenshot --cleanup --scroll-to ".pricing" --width 1440 ~/Desktop/hero
 | `accessibility` | Full ARIA tree |
 | `forms` | Form fields as JSON |
 | `html [selector]` | innerHTML of selector (throws if not found), or full page HTML if no selector given |
-| `links` | All links as "text → href" |
+| `links` | All links as "text Ã¢â€ â€™ href" |
 | `text` | Cleaned page text |
 
 ### Interaction
@@ -600,7 +613,7 @@ $B prettyscreenshot --cleanup --scroll-to ".pricing" --width 1440 ~/Desktop/hero
 | `fill <sel> <val>` | Fill input |
 | `header <name>:<value>` | Set custom request header (colon-separated, sensitive values auto-redacted) |
 | `hover <sel>` | Hover element |
-| `press <key>` | Press key — Enter, Tab, Escape, ArrowUp/Down/Left/Right, Backspace, Delete, Home, End, PageUp, PageDown, or modifiers like Shift+Enter |
+| `press <key>` | Press key Ã¢â‚¬â€ Enter, Tab, Escape, ArrowUp/Down/Left/Right, Backspace, Delete, Home, End, PageUp, PageDown, or modifiers like Shift+Enter |
 | `scroll [sel]` | Scroll element into view, or scroll to page bottom if no selector |
 | `select <sel> <val>` | Select dropdown option by value, label, or visible text |
 | `style <sel> <prop> <value> | style --undo [N]` | Modify CSS property on element (with undo support) |
@@ -619,7 +632,7 @@ $B prettyscreenshot --cleanup --scroll-to ".pricing" --width 1440 ~/Desktop/hero
 | `css <sel> <prop>` | Computed CSS value |
 | `dialog [--clear]` | Dialog messages |
 | `eval <file>` | Run JavaScript from file and return result as string (path must be under /tmp or cwd) |
-| `inspect [selector] [--all] [--history]` | Deep CSS inspection via CDP — full rule cascade, box model, computed styles |
+| `inspect [selector] [--all] [--history]` | Deep CSS inspection via CDP Ã¢â‚¬â€ full rule cascade, box model, computed styles |
 | `is <prop> <sel>` | State check (visible/hidden/enabled/disabled/checked/editable/focused) |
 | `js <expr>` | Run JavaScript expression and return result as string |
 | `network [--clear]` | Network requests |
@@ -646,7 +659,7 @@ $B prettyscreenshot --cleanup --scroll-to ".pricing" --width 1440 ~/Desktop/hero
 | `chain` | Run commands from JSON stdin. Format: [["cmd","arg1",...],...] |
 | `frame <sel|@ref|--name n|--url pattern|main>` | Switch to iframe context (or main to return) |
 | `inbox [--clear]` | List messages from sidebar scout inbox |
-| `watch [stop]` | Passive observation — periodic snapshots while user browses |
+| `watch [stop]` | Passive observation Ã¢â‚¬â€ periodic snapshots while user browses |
 
 ### Tabs
 | Command | Description |

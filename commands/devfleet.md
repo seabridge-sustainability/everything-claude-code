@@ -1,8 +1,21 @@
 ---
-description: Orchestrate parallel Claude Code agents via Claude DevFleet — plan projects from natural language, dispatch agents in isolated worktrees, monitor progress, and read structured reports.
+description: Orchestrate parallel Claude Code agents via Claude DevFleet Ã¢â‚¬â€ plan projects from natural language, dispatch agents in isolated worktrees, monitor progress, and read structured reports.
 ---
 
-# DevFleet — Multi-Agent Orchestration
+# DevFleet Ã¢â‚¬â€ Multi-Agent Orchestration
+
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
 
 Orchestrate parallel Claude Code agents via Claude DevFleet. Each agent runs in an isolated git worktree with full tooling.
 
@@ -12,13 +25,13 @@ Requires the DevFleet MCP server: `claude mcp add devfleet --transport http http
 
 ```
 User describes project
-  → plan_project(prompt) → mission DAG with dependencies
-  → Show plan, get approval
-  → dispatch_mission(M1) → Agent spawns in worktree
-  → M1 completes → auto-merge → M2 auto-dispatches (depends_on M1)
-  → M2 completes → auto-merge
-  → get_report(M2) → files_changed, what_done, errors, next_steps
-  → Report summary to user
+  Ã¢â€ â€™ plan_project(prompt) Ã¢â€ â€™ mission DAG with dependencies
+  Ã¢â€ â€™ Show plan, get approval
+  Ã¢â€ â€™ dispatch_mission(M1) Ã¢â€ â€™ Agent spawns in worktree
+  Ã¢â€ â€™ M1 completes Ã¢â€ â€™ auto-merge Ã¢â€ â€™ M2 auto-dispatches (depends_on M1)
+  Ã¢â€ â€™ M2 completes Ã¢â€ â€™ auto-merge
+  Ã¢â€ â€™ get_report(M2) Ã¢â€ â€™ files_changed, what_done, errors, next_steps
+  Ã¢â€ â€™ Report summary to user
 ```
 
 ## Workflow
@@ -44,7 +57,7 @@ mcp__devfleet__dispatch_mission(mission_id="<first_mission_id>")
 
 The remaining missions auto-dispatch as their dependencies complete (because `plan_project` creates them with `auto_dispatch=true`). When manually creating missions with `create_mission`, you must explicitly set `auto_dispatch=true` for this behavior.
 
-4. **Monitor progress** — check what's running:
+4. **Monitor progress** Ã¢â‚¬â€ check what's running:
 
 ```
 mcp__devfleet__get_dashboard()
@@ -88,5 +101,5 @@ Call this for every mission that reached a terminal state. Reports contain: file
 - Include mission titles and IDs when reporting status
 - If a mission fails, read its report to understand errors before retrying
 - Agent concurrency is configurable (default: 3). Excess missions queue and auto-dispatch as slots free up. Check `get_dashboard()` for slot availability.
-- Dependencies form a DAG — never create circular dependencies
+- Dependencies form a DAG Ã¢â‚¬â€ never create circular dependencies
 - Each agent auto-merges its worktree on completion. If a merge conflict occurs, the changes remain on the worktree branch for manual resolution.

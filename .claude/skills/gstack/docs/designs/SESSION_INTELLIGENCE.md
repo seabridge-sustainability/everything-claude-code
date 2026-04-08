@@ -1,5 +1,18 @@
 # Session Intelligence Layer
 
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
 ## The Problem
 
 Claude Code's context window is ephemeral. Every session starts fresh. When
@@ -36,35 +49,35 @@ After compaction, re-read them."
 ## The Architecture
 
 ```
-                   ┌─────────────────────────────────────┐
-                   │        Claude Context Window         │
-                   │   (ephemeral, ~167K token limit)     │
-                   │                                      │
-                   │   Compaction fires ──► summary only   │
-                   └──────────────┬──────────────────────┘
-                                  │
+                   Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+                   Ã¢â€â€š        Claude Context Window         Ã¢â€â€š
+                   Ã¢â€â€š   (ephemeral, ~167K token limit)     Ã¢â€â€š
+                   Ã¢â€â€š                                      Ã¢â€â€š
+                   Ã¢â€â€š   Compaction fires Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€“Âº summary only   Ã¢â€â€š
+                   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+                                  Ã¢â€â€š
                           reads on start / after compaction
-                                  │
-                   ┌──────────────▼──────────────────────┐
-                   │    ~/.gstack/projects/$SLUG/         │
-                   │    (persistent, survives everything) │
-                   │                                      │
-                   │  ceo-plans/         ← /plan-ceo-review
-                   │  eng-reviews/       ← /plan-eng-review
-                   │  design-reviews/    ← /plan-design-review
-                   │  checkpoints/       ← /checkpoint (new)
-                   │  timeline.jsonl     ← every skill (new)
-                   │  learnings.jsonl    ← /learn
-                   └─────────────────────────────────────┘
-                                  │
+                                  Ã¢â€â€š
+                   Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€“Â¼Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+                   Ã¢â€â€š    ~/.gstack/projects/$SLUG/         Ã¢â€â€š
+                   Ã¢â€â€š    (persistent, survives everything) Ã¢â€â€š
+                   Ã¢â€â€š                                      Ã¢â€â€š
+                   Ã¢â€â€š  ceo-plans/         Ã¢â€ Â /plan-ceo-review
+                   Ã¢â€â€š  eng-reviews/       Ã¢â€ Â /plan-eng-review
+                   Ã¢â€â€š  design-reviews/    Ã¢â€ Â /plan-design-review
+                   Ã¢â€â€š  checkpoints/       Ã¢â€ Â /checkpoint (new)
+                   Ã¢â€â€š  timeline.jsonl     Ã¢â€ Â every skill (new)
+                   Ã¢â€â€š  learnings.jsonl    Ã¢â€ Â /learn
+                   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+                                  Ã¢â€â€š
                           rolled up weekly
-                                  │
-                   ┌──────────────▼──────────────────────┐
-                   │           /retro                      │
-                   │  Timeline: 3 /review, 2 /ship, ...   │
-                   │  Health trends: compile 8/10 (↑2)     │
-                   │  Learnings applied: 4 this week       │
-                   └─────────────────────────────────────┘
+                                  Ã¢â€â€š
+                   Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€“Â¼Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
+                   Ã¢â€â€š           /retro                      Ã¢â€â€š
+                   Ã¢â€â€š  Timeline: 3 /review, 2 /ship, ...   Ã¢â€â€š
+                   Ã¢â€â€š  Health trends: compile 8/10 (Ã¢â€ â€˜2)     Ã¢â€â€š
+                   Ã¢â€â€š  Learnings applied: 4 this week       Ã¢â€â€š
+                   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
 ```
 
 ## The Features
@@ -110,7 +123,7 @@ Session 2: Agent reads the plan after preamble. Doesn't re-ask decisions.
 Session 3: /checkpoint saves progress. Timeline shows 2 /review, 1 /ship.
 Session 4: Compaction fires mid-refactor. Agent re-reads the checkpoint.
            Recovers key decisions, types, remaining work. Continues.
-Session 5: /retro rolls up the week. Health trend: 6/10 → 8/10.
+Session 5: /retro rolls up the week. Health trend: 6/10 Ã¢â€ â€™ 8/10.
            Timeline shows 12 skill invocations across 3 branches.
 
 The project's AI history is no longer ephemeral. It persists, compounds,

@@ -4,32 +4,45 @@ paths:
   - "**/*.kts"
 ---
 
-# Kotlin 模式
+# Kotlin Ã¦Â¨Â¡Ã¥Â¼Â
 
-> 此文件扩展了 [common/patterns.md](../common/patterns.md) 的内容，增加了 Kotlin 和 Android/KMP 特定的内容。
+## Safety And Authorization Rule
 
-## 依赖注入
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-首选构造函数注入。使用 Koin（KMP）或 Hilt（仅限 Android）：
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+> Ã¦Â­Â¤Ã¦â€“â€¡Ã¤Â»Â¶Ã¦â€°Â©Ã¥Â±â€¢Ã¤Âºâ€  [common/patterns.md](../common/patterns.md) Ã§Å¡â€žÃ¥â€ â€¦Ã¥Â®Â¹Ã¯Â¼Å’Ã¥Â¢Å¾Ã¥Å Â Ã¤Âºâ€  Kotlin Ã¥â€™Å’ Android/KMP Ã§â€°Â¹Ã¥Â®Å¡Ã§Å¡â€žÃ¥â€ â€¦Ã¥Â®Â¹Ã£â‚¬â€š
+
+## Ã¤Â¾ÂÃ¨Âµâ€“Ã¦Â³Â¨Ã¥â€¦Â¥
+
+Ã©Â¦â€“Ã©â‚¬â€°Ã¦Å¾â€žÃ©â‚¬Â Ã¥â€¡Â½Ã¦â€¢Â°Ã¦Â³Â¨Ã¥â€¦Â¥Ã£â‚¬â€šÃ¤Â½Â¿Ã§â€Â¨ KoinÃ¯Â¼Ë†KMPÃ¯Â¼â€°Ã¦Ë†â€“ HiltÃ¯Â¼Ë†Ã¤Â»â€¦Ã©â„¢Â AndroidÃ¯Â¼â€°Ã¯Â¼Å¡
 
 ```kotlin
-// Koin — declare modules
+// Koin Ã¢â‚¬â€ declare modules
 val dataModule = module {
     single<ItemRepository> { ItemRepositoryImpl(get(), get()) }
     factory { GetItemsUseCase(get()) }
     viewModelOf(::ItemListViewModel)
 }
 
-// Hilt — annotations
+// Hilt Ã¢â‚¬â€ annotations
 @HiltViewModel
 class ItemListViewModel @Inject constructor(
     private val getItems: GetItemsUseCase
 ) : ViewModel()
 ```
 
-## ViewModel 模式
+## ViewModel Ã¦Â¨Â¡Ã¥Â¼Â
 
-单一状态对象、事件接收器、单向数据流：
+Ã¥Ââ€¢Ã¤Â¸â‚¬Ã§Å Â¶Ã¦â‚¬ÂÃ¥Â¯Â¹Ã¨Â±Â¡Ã£â‚¬ÂÃ¤Âºâ€¹Ã¤Â»Â¶Ã¦Å½Â¥Ã¦â€Â¶Ã¥â„¢Â¨Ã£â‚¬ÂÃ¥Ââ€¢Ã¥Ââ€˜Ã¦â€¢Â°Ã¦ÂÂ®Ã¦ÂµÂÃ¯Â¼Å¡
 
 ```kotlin
 data class ScreenState(
@@ -50,11 +63,11 @@ class ScreenViewModel(private val useCase: GetItemsUseCase) : ViewModel() {
 }
 ```
 
-## 仓库模式
+## Ã¤Â»â€œÃ¥Âºâ€œÃ¦Â¨Â¡Ã¥Â¼Â
 
-* `suspend` 函数返回 `Result<T>` 或自定义错误类型
-* 对于响应式流使用 `Flow`
-* 协调本地和远程数据源
+* `suspend` Ã¥â€¡Â½Ã¦â€¢Â°Ã¨Â¿â€Ã¥â€ºÅ¾ `Result<T>` Ã¦Ë†â€“Ã¨â€¡ÂªÃ¥Â®Å¡Ã¤Â¹â€°Ã©â€â„¢Ã¨Â¯Â¯Ã§Â±Â»Ã¥Å¾â€¹
+* Ã¥Â¯Â¹Ã¤ÂºÅ½Ã¥â€œÂÃ¥Âºâ€Ã¥Â¼ÂÃ¦ÂµÂÃ¤Â½Â¿Ã§â€Â¨ `Flow`
+* Ã¥ÂÂÃ¨Â°Æ’Ã¦Å“Â¬Ã¥Å“Â°Ã¥â€™Å’Ã¨Â¿Å“Ã§Â¨â€¹Ã¦â€¢Â°Ã¦ÂÂ®Ã¦ÂºÂ
 
 ```kotlin
 interface ItemRepository {
@@ -64,9 +77,9 @@ interface ItemRepository {
 }
 ```
 
-## 用例模式
+## Ã§â€Â¨Ã¤Â¾â€¹Ã¦Â¨Â¡Ã¥Â¼Â
 
-单一职责，`operator fun invoke`：
+Ã¥Ââ€¢Ã¤Â¸â‚¬Ã¨ÂÅ’Ã¨Â´Â£Ã¯Â¼Å’`operator fun invoke`Ã¯Â¼Å¡
 
 ```kotlin
 class GetItemUseCase(private val repository: ItemRepository) {
@@ -84,7 +97,7 @@ class GetItemsUseCase(private val repository: ItemRepository) {
 
 ## expect/actual (KMP)
 
-用于平台特定的实现：
+Ã§â€Â¨Ã¤ÂºÅ½Ã¥Â¹Â³Ã¥ÂÂ°Ã§â€°Â¹Ã¥Â®Å¡Ã§Å¡â€žÃ¥Â®Å¾Ã§Å½Â°Ã¯Â¼Å¡
 
 ```kotlin
 // commonMain
@@ -109,13 +122,13 @@ actual class SecureStorage {
 }
 ```
 
-## 协程模式
+## Ã¥ÂÂÃ§Â¨â€¹Ã¦Â¨Â¡Ã¥Â¼Â
 
-* 在 ViewModels 中使用 `viewModelScope`，对于结构化的子工作使用 `coroutineScope`
-* 对于来自冷流的 StateFlow 使用 `stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), initialValue)`
-* 当子任务失败应独立处理时使用 `supervisorScope`
+* Ã¥Å“Â¨ ViewModels Ã¤Â¸Â­Ã¤Â½Â¿Ã§â€Â¨ `viewModelScope`Ã¯Â¼Å’Ã¥Â¯Â¹Ã¤ÂºÅ½Ã§Â»â€œÃ¦Å¾â€žÃ¥Å’â€“Ã§Å¡â€žÃ¥Â­ÂÃ¥Â·Â¥Ã¤Â½Å“Ã¤Â½Â¿Ã§â€Â¨ `coroutineScope`
+* Ã¥Â¯Â¹Ã¤ÂºÅ½Ã¦ÂÂ¥Ã¨â€¡ÂªÃ¥â€ Â·Ã¦ÂµÂÃ§Å¡â€ž StateFlow Ã¤Â½Â¿Ã§â€Â¨ `stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), initialValue)`
+* Ã¥Â½â€œÃ¥Â­ÂÃ¤Â»Â»Ã¥Å Â¡Ã¥Â¤Â±Ã¨Â´Â¥Ã¥Âºâ€Ã§â€¹Â¬Ã§Â«â€¹Ã¥Â¤â€žÃ§Ââ€ Ã¦â€”Â¶Ã¤Â½Â¿Ã§â€Â¨ `supervisorScope`
 
-## 使用 DSL 的构建器模式
+## Ã¤Â½Â¿Ã§â€Â¨ DSL Ã§Å¡â€žÃ¦Å¾â€žÃ¥Â»ÂºÃ¥â„¢Â¨Ã¦Â¨Â¡Ã¥Â¼Â
 
 ```kotlin
 class HttpClientConfig {
@@ -141,7 +154,7 @@ val client = httpClient {
 }
 ```
 
-## 参考
+## Ã¥Ââ€šÃ¨â‚¬Æ’
 
-有关详细的协程模式，请参阅技能：`kotlin-coroutines-flows`。
-有关模块和分层模式，请参阅技能：`android-clean-architecture`。
+Ã¦Å“â€°Ã¥â€¦Â³Ã¨Â¯Â¦Ã§Â»â€ Ã§Å¡â€žÃ¥ÂÂÃ§Â¨â€¹Ã¦Â¨Â¡Ã¥Â¼ÂÃ¯Â¼Å’Ã¨Â¯Â·Ã¥Ââ€šÃ©Ëœâ€¦Ã¦Å â‚¬Ã¨Æ’Â½Ã¯Â¼Å¡`kotlin-coroutines-flows`Ã£â‚¬â€š
+Ã¦Å“â€°Ã¥â€¦Â³Ã¦Â¨Â¡Ã¥Ââ€”Ã¥â€™Å’Ã¥Ë†â€ Ã¥Â±â€šÃ¦Â¨Â¡Ã¥Â¼ÂÃ¯Â¼Å’Ã¨Â¯Â·Ã¥Ââ€šÃ©Ëœâ€¦Ã¦Å â‚¬Ã¨Æ’Â½Ã¯Â¼Å¡`android-clean-architecture`Ã£â‚¬â€š

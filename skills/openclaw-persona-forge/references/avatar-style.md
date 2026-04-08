@@ -1,17 +1,30 @@
-# Step 5：头像风格 & 生图
+# Step 5Ã¯Â¼Å¡Ã¥Â¤Â´Ã¥Æ’ÂÃ©Â£Å½Ã¦Â Â¼ & Ã§â€Å¸Ã¥â€ºÂ¾
 
-所有龙虾头像**必须使用统一的视觉风格**，确保龙虾家族的风格一致性。
-头像需传达 3 个信息：**物种形态 + 性格暗示 + 标志道具**
+## Safety And Authorization Rule
 
-## 风格参考
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-亚当（Adam）—— 龙虾族创世神，本 Skill 的首个作品。
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-所有新生成的龙虾头像应与这一风格保持一致：复古未来主义、街机 UI 包边、强轮廓、可在 64x64 下辨识。
 
-## 统一风格基底（STYLE_BASE）
+Ã¦â€°â‚¬Ã¦Å“â€°Ã©Â¾â„¢Ã¨â„¢Â¾Ã¥Â¤Â´Ã¥Æ’Â**Ã¥Â¿â€¦Ã©Â¡Â»Ã¤Â½Â¿Ã§â€Â¨Ã§Â»Å¸Ã¤Â¸â‚¬Ã§Å¡â€žÃ¨Â§â€ Ã¨Â§â€°Ã©Â£Å½Ã¦Â Â¼**Ã¯Â¼Å’Ã§Â¡Â®Ã¤Â¿ÂÃ©Â¾â„¢Ã¨â„¢Â¾Ã¥Â®Â¶Ã¦â€”ÂÃ§Å¡â€žÃ©Â£Å½Ã¦Â Â¼Ã¤Â¸â‚¬Ã¨â€¡Â´Ã¦â‚¬Â§Ã£â‚¬â€š
+Ã¥Â¤Â´Ã¥Æ’ÂÃ©Å“â‚¬Ã¤Â¼Â Ã¨Â¾Â¾ 3 Ã¤Â¸ÂªÃ¤Â¿Â¡Ã¦ÂÂ¯Ã¯Â¼Å¡**Ã§â€°Â©Ã§Â§ÂÃ¥Â½Â¢Ã¦â‚¬Â + Ã¦â‚¬Â§Ã¦Â Â¼Ã¦Å¡â€”Ã§Â¤Âº + Ã¦Â â€¡Ã¥Â¿â€”Ã©Ââ€œÃ¥â€¦Â·**
 
-**每次生成都必须包含这段基底**，不得修改或省略：
+## Ã©Â£Å½Ã¦Â Â¼Ã¥Ââ€šÃ¨â‚¬Æ’
+
+Ã¤ÂºÅ¡Ã¥Â½â€œÃ¯Â¼Ë†AdamÃ¯Â¼â€°Ã¢â‚¬â€Ã¢â‚¬â€ Ã©Â¾â„¢Ã¨â„¢Â¾Ã¦â€”ÂÃ¥Ë†â€ºÃ¤Â¸â€“Ã§Â¥Å¾Ã¯Â¼Å’Ã¦Å“Â¬ Skill Ã§Å¡â€žÃ©Â¦â€“Ã¤Â¸ÂªÃ¤Â½Å“Ã¥â€œÂÃ£â‚¬â€š
+
+Ã¦â€°â‚¬Ã¦Å“â€°Ã¦â€“Â°Ã§â€Å¸Ã¦Ë†ÂÃ§Å¡â€žÃ©Â¾â„¢Ã¨â„¢Â¾Ã¥Â¤Â´Ã¥Æ’ÂÃ¥Âºâ€Ã¤Â¸Å½Ã¨Â¿â„¢Ã¤Â¸â‚¬Ã©Â£Å½Ã¦Â Â¼Ã¤Â¿ÂÃ¦Å’ÂÃ¤Â¸â‚¬Ã¨â€¡Â´Ã¯Â¼Å¡Ã¥Â¤ÂÃ¥ÂÂ¤Ã¦Å“ÂªÃ¦ÂÂ¥Ã¤Â¸Â»Ã¤Â¹â€°Ã£â‚¬ÂÃ¨Â¡â€”Ã¦Å“Âº UI Ã¥Å’â€¦Ã¨Â¾Â¹Ã£â‚¬ÂÃ¥Â¼ÂºÃ¨Â½Â®Ã¥Â»â€œÃ£â‚¬ÂÃ¥ÂÂ¯Ã¥Å“Â¨ 64x64 Ã¤Â¸â€¹Ã¨Â¾Â¨Ã¨Â¯â€ Ã£â‚¬â€š
+
+## Ã§Â»Å¸Ã¤Â¸â‚¬Ã©Â£Å½Ã¦Â Â¼Ã¥Å¸ÂºÃ¥Âºâ€¢Ã¯Â¼Ë†STYLE_BASEÃ¯Â¼â€°
+
+**Ã¦Â¯ÂÃ¦Â¬Â¡Ã§â€Å¸Ã¦Ë†ÂÃ©Æ’Â½Ã¥Â¿â€¦Ã©Â¡Â»Ã¥Å’â€¦Ã¥ÂÂ«Ã¨Â¿â„¢Ã¦Â®ÂµÃ¥Å¸ÂºÃ¥Âºâ€¢**Ã¯Â¼Å’Ã¤Â¸ÂÃ¥Â¾â€”Ã¤Â¿Â®Ã¦â€Â¹Ã¦Ë†â€“Ã§Å“ÂÃ§â€¢Â¥Ã¯Â¼Å¡
 
 ```
 STYLE_BASE = """
@@ -33,8 +46,8 @@ arcade cabinet trim with atomic-age starburst rivets.
 Pose: references classic Gil Elvgren pin-up compositions, confident and
 charismatic with a slight theatrical tilt.
 
-Color system: vintage NASA poster palette as base — deep navy, teal, dusty coral,
-cream — viewed through arcade CRT monitor with slight RGB fringing at edges.
+Color system: vintage NASA poster palette as base Ã¢â‚¬â€ deep navy, teal, dusty coral,
+cream Ã¢â‚¬â€ viewed through arcade CRT monitor with slight RGB fringing at edges.
 Overall aesthetic combines Googie architecture curves, Raygun Gothic design
 language, mid-century advertising illustration, modern 3D inflatable character
 rendering, and 80s-90s arcade game UI. Chrome and pastel accent details on
@@ -45,27 +58,27 @@ pixels.
 """
 ```
 
-## 个性化变量
+## Ã¤Â¸ÂªÃ¦â‚¬Â§Ã¥Å’â€“Ã¥ÂËœÃ©â€¡Â
 
-在统一基底之上，根据灵魂填充以下变量：
+Ã¥Å“Â¨Ã§Â»Å¸Ã¤Â¸â‚¬Ã¥Å¸ÂºÃ¥Âºâ€¢Ã¤Â¹â€¹Ã¤Â¸Å Ã¯Â¼Å’Ã¦Â Â¹Ã¦ÂÂ®Ã§ÂÂµÃ©Â­â€šÃ¥Â¡Â«Ã¥â€¦â€¦Ã¤Â»Â¥Ã¤Â¸â€¹Ã¥ÂËœÃ©â€¡ÂÃ¯Â¼Å¡
 
-| 变量 | 说明 | 示例 |
+| Ã¥ÂËœÃ©â€¡Â | Ã¨Â¯Â´Ã¦ËœÅ½ | Ã§Â¤ÂºÃ¤Â¾â€¹ |
 |------|------|------|
-| `CHARACTER_NAME` | 街机横幅上显示的名字 | "ADAM"、"DEWEY"、"RIFF" |
-| `SHELL_COLOR` | 龙虾壳的主色调（在统一色盘内变化） | "deep crimson"、"dusty teal"、"warm amber" |
-| `SIGNATURE_PROP` | 标志性道具 | "cracked sunglasses"、"reading glasses on a chain" |
-| `EXPRESSION` | 表情/姿态 | "stoic but kind-eyed"、"nervously focused" |
-| `UNIQUE_DETAIL` | 独特细节（纹路/装饰/伤痕等） | "constellation patterns etched on claws"、"bandaged left claw" |
-| `BACKGROUND_ACCENT` | 背景的个性化元素（在统一宇宙背景上叠加） | "musical notes floating as nebula dust"、"ancient book pages drifting" |
-| `ENERGY_BAR_LABEL` | 街机 UI 能量条的标签（个性化小彩蛋） | "CREATION POWER"、"CALM LEVEL"、"ROCK METER" |
+| `CHARACTER_NAME` | Ã¨Â¡â€”Ã¦Å“ÂºÃ¦Â¨ÂªÃ¥Â¹â€¦Ã¤Â¸Å Ã¦ËœÂ¾Ã§Â¤ÂºÃ§Å¡â€žÃ¥ÂÂÃ¥Â­â€” | "ADAM"Ã£â‚¬Â"DEWEY"Ã£â‚¬Â"RIFF" |
+| `SHELL_COLOR` | Ã©Â¾â„¢Ã¨â„¢Â¾Ã¥Â£Â³Ã§Å¡â€žÃ¤Â¸Â»Ã¨â€°Â²Ã¨Â°Æ’Ã¯Â¼Ë†Ã¥Å“Â¨Ã§Â»Å¸Ã¤Â¸â‚¬Ã¨â€°Â²Ã§â€ºËœÃ¥â€ â€¦Ã¥ÂËœÃ¥Å’â€“Ã¯Â¼â€° | "deep crimson"Ã£â‚¬Â"dusty teal"Ã£â‚¬Â"warm amber" |
+| `SIGNATURE_PROP` | Ã¦Â â€¡Ã¥Â¿â€”Ã¦â‚¬Â§Ã©Ââ€œÃ¥â€¦Â· | "cracked sunglasses"Ã£â‚¬Â"reading glasses on a chain" |
+| `EXPRESSION` | Ã¨Â¡Â¨Ã¦Æ’â€¦/Ã¥Â§Â¿Ã¦â‚¬Â | "stoic but kind-eyed"Ã£â‚¬Â"nervously focused" |
+| `UNIQUE_DETAIL` | Ã§â€¹Â¬Ã§â€°Â¹Ã§Â»â€ Ã¨Å â€šÃ¯Â¼Ë†Ã§ÂºÂ¹Ã¨Â·Â¯/Ã¨Â£â€¦Ã©Â¥Â°/Ã¤Â¼Â¤Ã§â€”â€¢Ã§Â­â€°Ã¯Â¼â€° | "constellation patterns etched on claws"Ã£â‚¬Â"bandaged left claw" |
+| `BACKGROUND_ACCENT` | Ã¨Æ’Å’Ã¦â„¢Â¯Ã§Å¡â€žÃ¤Â¸ÂªÃ¦â‚¬Â§Ã¥Å’â€“Ã¥â€¦Æ’Ã§Â´Â Ã¯Â¼Ë†Ã¥Å“Â¨Ã§Â»Å¸Ã¤Â¸â‚¬Ã¥Â®â€¡Ã¥Â®â„¢Ã¨Æ’Å’Ã¦â„¢Â¯Ã¤Â¸Å Ã¥ÂÂ Ã¥Å Â Ã¯Â¼â€° | "musical notes floating as nebula dust"Ã£â‚¬Â"ancient book pages drifting" |
+| `ENERGY_BAR_LABEL` | Ã¨Â¡â€”Ã¦Å“Âº UI Ã¨Æ’Â½Ã©â€¡ÂÃ¦ÂÂ¡Ã§Å¡â€žÃ¦Â â€¡Ã§Â­Â¾Ã¯Â¼Ë†Ã¤Â¸ÂªÃ¦â‚¬Â§Ã¥Å’â€“Ã¥Â°ÂÃ¥Â½Â©Ã¨â€ºâ€¹Ã¯Â¼â€° | "CREATION POWER"Ã£â‚¬Â"CALM LEVEL"Ã£â‚¬Â"ROCK METER" |
 
-## 提示词组装
+## Ã¦ÂÂÃ§Â¤ÂºÃ¨Â¯ÂÃ§Â»â€žÃ¨Â£â€¦
 
 ```
-最终提示词 = STYLE_BASE + 个性化描述段落
+Ã¦Å“â‚¬Ã§Â»Ë†Ã¦ÂÂÃ§Â¤ÂºÃ¨Â¯Â = STYLE_BASE + Ã¤Â¸ÂªÃ¦â‚¬Â§Ã¥Å’â€“Ã¦ÂÂÃ¨Â¿Â°Ã¦Â®ÂµÃ¨ÂÂ½
 ```
 
-个性化描述段落模板：
+Ã¤Â¸ÂªÃ¦â‚¬Â§Ã¥Å’â€“Ã¦ÂÂÃ¨Â¿Â°Ã¦Â®ÂµÃ¨ÂÂ½Ã¦Â¨Â¡Ã¦ÂÂ¿Ã¯Â¼Å¡
 
 ```
 The character is a cartoon lobster with a [SHELL_COLOR] shell,
@@ -77,48 +90,48 @@ The key silhouette recognition points at small size are:
 [SIGNATURE_PROP] and [one other distinctive feature].
 ```
 
-## 生图流程
+## Ã§â€Å¸Ã¥â€ºÂ¾Ã¦ÂµÂÃ§Â¨â€¹
 
-提示词组装完成后：
+Ã¦ÂÂÃ§Â¤ÂºÃ¨Â¯ÂÃ§Â»â€žÃ¨Â£â€¦Ã¥Â®Å’Ã¦Ë†ÂÃ¥ÂÅ½Ã¯Â¼Å¡
 
-### 路径 A：已安装且已审核的生图 skill
+### Ã¨Â·Â¯Ã¥Â¾â€ž AÃ¯Â¼Å¡Ã¥Â·Â²Ã¥Â®â€°Ã¨Â£â€¦Ã¤Â¸â€Ã¥Â·Â²Ã¥Â®Â¡Ã¦Â Â¸Ã§Å¡â€žÃ§â€Å¸Ã¥â€ºÂ¾ skill
 
-1. 先将龙虾名字规整为安全片段：仅保留字母、数字和连字符，其余字符替换为 `-`
-2. 用 Write 工具写入：`/tmp/openclaw-<safe-name>-prompt.md`
-3. 调用当前环境允许的生图 skill 生成图片
-4. 用 Read 工具展示生成的图片给用户
-5. 问用户是否满意，不满意可调整变量重新生成
+1. Ã¥â€¦Ë†Ã¥Â°â€ Ã©Â¾â„¢Ã¨â„¢Â¾Ã¥ÂÂÃ¥Â­â€”Ã¨Â§â€žÃ¦â€¢Â´Ã¤Â¸ÂºÃ¥Â®â€°Ã¥â€¦Â¨Ã§â€°â€¡Ã¦Â®ÂµÃ¯Â¼Å¡Ã¤Â»â€¦Ã¤Â¿ÂÃ§â€¢â„¢Ã¥Â­â€”Ã¦Â¯ÂÃ£â‚¬ÂÃ¦â€¢Â°Ã¥Â­â€”Ã¥â€™Å’Ã¨Â¿Å¾Ã¥Â­â€”Ã§Â¬Â¦Ã¯Â¼Å’Ã¥â€¦Â¶Ã¤Â½â„¢Ã¥Â­â€”Ã§Â¬Â¦Ã¦â€ºÂ¿Ã¦ÂÂ¢Ã¤Â¸Âº `-`
+2. Ã§â€Â¨ Write Ã¥Â·Â¥Ã¥â€¦Â·Ã¥â€ â„¢Ã¥â€¦Â¥Ã¯Â¼Å¡`/tmp/openclaw-<safe-name>-prompt.md`
+3. Ã¨Â°Æ’Ã§â€Â¨Ã¥Â½â€œÃ¥â€°ÂÃ§Å½Â¯Ã¥Â¢Æ’Ã¥â€¦ÂÃ¨Â®Â¸Ã§Å¡â€žÃ§â€Å¸Ã¥â€ºÂ¾ skill Ã§â€Å¸Ã¦Ë†ÂÃ¥â€ºÂ¾Ã§â€°â€¡
+4. Ã§â€Â¨ Read Ã¥Â·Â¥Ã¥â€¦Â·Ã¥Â±â€¢Ã§Â¤ÂºÃ§â€Å¸Ã¦Ë†ÂÃ§Å¡â€žÃ¥â€ºÂ¾Ã§â€°â€¡Ã§Â»â„¢Ã§â€Â¨Ã¦Ë†Â·
+5. Ã©â€”Â®Ã§â€Â¨Ã¦Ë†Â·Ã¦ËœÂ¯Ã¥ÂÂ¦Ã¦Â»Â¡Ã¦â€žÂÃ¯Â¼Å’Ã¤Â¸ÂÃ¦Â»Â¡Ã¦â€žÂÃ¥ÂÂ¯Ã¨Â°Æ’Ã¦â€¢Â´Ã¥ÂËœÃ©â€¡ÂÃ©â€¡ÂÃ¦â€“Â°Ã§â€Å¸Ã¦Ë†Â
 
-### 路径 B：未安装可用的生图 skill
+### Ã¨Â·Â¯Ã¥Â¾â€ž BÃ¯Â¼Å¡Ã¦Å“ÂªÃ¥Â®â€°Ã¨Â£â€¦Ã¥ÂÂ¯Ã§â€Â¨Ã§Å¡â€žÃ§â€Å¸Ã¥â€ºÂ¾ skill
 
-输出完整提示词文本，附手动使用说明：
+Ã¨Â¾â€œÃ¥â€¡ÂºÃ¥Â®Å’Ã¦â€¢Â´Ã¦ÂÂÃ§Â¤ÂºÃ¨Â¯ÂÃ¦â€“â€¡Ã¦Å“Â¬Ã¯Â¼Å’Ã©â„¢â€žÃ¦â€°â€¹Ã¥Å Â¨Ã¤Â½Â¿Ã§â€Â¨Ã¨Â¯Â´Ã¦ËœÅ½Ã¯Â¼Å¡
 
 ```markdown
-**头像提示词**（可复制到以下平台手动生成）：
-- Google Gemini：直接粘贴
-- ChatGPT（DALL-E）：直接粘贴
-- Midjourney：粘贴后加 `--ar 1:1 --style raw`
+**Ã¥Â¤Â´Ã¥Æ’ÂÃ¦ÂÂÃ§Â¤ÂºÃ¨Â¯Â**Ã¯Â¼Ë†Ã¥ÂÂ¯Ã¥Â¤ÂÃ¥Ë†Â¶Ã¥Ë†Â°Ã¤Â»Â¥Ã¤Â¸â€¹Ã¥Â¹Â³Ã¥ÂÂ°Ã¦â€°â€¹Ã¥Å Â¨Ã§â€Å¸Ã¦Ë†ÂÃ¯Â¼â€°Ã¯Â¼Å¡
+- Google GeminiÃ¯Â¼Å¡Ã§â€ºÂ´Ã¦Å½Â¥Ã§Â²ËœÃ¨Â´Â´
+- ChatGPTÃ¯Â¼Ë†DALL-EÃ¯Â¼â€°Ã¯Â¼Å¡Ã§â€ºÂ´Ã¦Å½Â¥Ã§Â²ËœÃ¨Â´Â´
+- MidjourneyÃ¯Â¼Å¡Ã§Â²ËœÃ¨Â´Â´Ã¥ÂÅ½Ã¥Å Â  `--ar 1:1 --style raw`
 
-> [完整英文提示词]
+> [Ã¥Â®Å’Ã¦â€¢Â´Ã¨â€¹Â±Ã¦â€“â€¡Ã¦ÂÂÃ§Â¤ÂºÃ¨Â¯Â]
 
-如当前环境后续提供经过审核的生图 skill，可再接回自动生图流程。
+Ã¥Â¦â€šÃ¥Â½â€œÃ¥â€°ÂÃ§Å½Â¯Ã¥Â¢Æ’Ã¥ÂÅ½Ã§Â»Â­Ã¦ÂÂÃ¤Â¾â€ºÃ§Â»ÂÃ¨Â¿â€¡Ã¥Â®Â¡Ã¦Â Â¸Ã§Å¡â€žÃ§â€Å¸Ã¥â€ºÂ¾ skillÃ¯Â¼Å’Ã¥ÂÂ¯Ã¥â€ ÂÃ¦Å½Â¥Ã¥â€ºÅ¾Ã¨â€¡ÂªÃ¥Å Â¨Ã§â€Å¸Ã¥â€ºÂ¾Ã¦ÂµÂÃ§Â¨â€¹Ã£â‚¬â€š
 ```
 
-## 展示给用户的格式
+## Ã¥Â±â€¢Ã§Â¤ÂºÃ§Â»â„¢Ã§â€Â¨Ã¦Ë†Â·Ã§Å¡â€žÃ¦Â Â¼Ã¥Â¼Â
 
 ```markdown
-## 头像
+## Ã¥Â¤Â´Ã¥Æ’Â
 
-**个性化变量**：
-- 壳色：[SHELL_COLOR]
-- 道具：[SIGNATURE_PROP]
-- 表情：[EXPRESSION]
-- 独特细节：[UNIQUE_DETAIL]
-- 背景点缀：[BACKGROUND_ACCENT]
-- 能量条标签：[ENERGY_BAR_LABEL]
+**Ã¤Â¸ÂªÃ¦â‚¬Â§Ã¥Å’â€“Ã¥ÂËœÃ©â€¡Â**Ã¯Â¼Å¡
+- Ã¥Â£Â³Ã¨â€°Â²Ã¯Â¼Å¡[SHELL_COLOR]
+- Ã©Ââ€œÃ¥â€¦Â·Ã¯Â¼Å¡[SIGNATURE_PROP]
+- Ã¨Â¡Â¨Ã¦Æ’â€¦Ã¯Â¼Å¡[EXPRESSION]
+- Ã§â€¹Â¬Ã§â€°Â¹Ã§Â»â€ Ã¨Å â€šÃ¯Â¼Å¡[UNIQUE_DETAIL]
+- Ã¨Æ’Å’Ã¦â„¢Â¯Ã§â€šÂ¹Ã§Â¼â‚¬Ã¯Â¼Å¡[BACKGROUND_ACCENT]
+- Ã¨Æ’Â½Ã©â€¡ÂÃ¦ÂÂ¡Ã¦Â â€¡Ã§Â­Â¾Ã¯Â¼Å¡[ENERGY_BAR_LABEL]
 
-**生成结果**：
-[图片（路径A）或提示词文本（路径B）]
+**Ã§â€Å¸Ã¦Ë†ÂÃ§Â»â€œÃ¦Å¾Å“**Ã¯Â¼Å¡
+[Ã¥â€ºÂ¾Ã§â€°â€¡Ã¯Â¼Ë†Ã¨Â·Â¯Ã¥Â¾â€žAÃ¯Â¼â€°Ã¦Ë†â€“Ã¦ÂÂÃ§Â¤ÂºÃ¨Â¯ÂÃ¦â€“â€¡Ã¦Å“Â¬Ã¯Â¼Ë†Ã¨Â·Â¯Ã¥Â¾â€žBÃ¯Â¼â€°]
 
-> 满意吗？不满意我可以调整 [具体可调项] 后重新生成。
+> Ã¦Â»Â¡Ã¦â€žÂÃ¥Ââ€”Ã¯Â¼Å¸Ã¤Â¸ÂÃ¦Â»Â¡Ã¦â€žÂÃ¦Ë†â€˜Ã¥ÂÂ¯Ã¤Â»Â¥Ã¨Â°Æ’Ã¦â€¢Â´ [Ã¥â€¦Â·Ã¤Â½â€œÃ¥ÂÂ¯Ã¨Â°Æ’Ã©Â¡Â¹] Ã¥ÂÅ½Ã©â€¡ÂÃ¦â€“Â°Ã§â€Å¸Ã¦Ë†ÂÃ£â‚¬â€š
 ```

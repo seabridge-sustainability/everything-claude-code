@@ -1,27 +1,40 @@
-# 模型路由命令
+# Ã¦Â¨Â¡Ã¥Å¾â€¹Ã¨Â·Â¯Ã§â€Â±Ã¥â€˜Â½Ã¤Â»Â¤
 
-根据任务复杂度和预算推荐最佳模型层级。
+## Safety And Authorization Rule
 
-## 用法
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+Ã¦Â Â¹Ã¦ÂÂ®Ã¤Â»Â»Ã¥Å Â¡Ã¥Â¤ÂÃ¦Ââ€šÃ¥ÂºÂ¦Ã¥â€™Å’Ã©Â¢â€žÃ§Â®â€”Ã¦Å½Â¨Ã¨ÂÂÃ¦Å“â‚¬Ã¤Â½Â³Ã¦Â¨Â¡Ã¥Å¾â€¹Ã¥Â±â€šÃ§ÂºÂ§Ã£â‚¬â€š
+
+## Ã§â€Â¨Ã¦Â³â€¢
 
 `/model-route [task-description] [--budget low|med|high]`
 
-## 路由启发式规则
+## Ã¨Â·Â¯Ã§â€Â±Ã¥ÂÂ¯Ã¥Ââ€˜Ã¥Â¼ÂÃ¨Â§â€žÃ¥Ë†â„¢
 
-* `haiku`: 确定性、低风险的机械性变更
-* `sonnet`: 实现和重构的默认选择
-* `opus`: 架构设计、深度评审、模糊需求
+* `haiku`: Ã§Â¡Â®Ã¥Â®Å¡Ã¦â‚¬Â§Ã£â‚¬ÂÃ¤Â½Å½Ã©Â£Å½Ã©â„¢Â©Ã§Å¡â€žÃ¦Å“ÂºÃ¦Â¢Â°Ã¦â‚¬Â§Ã¥ÂËœÃ¦â€ºÂ´
+* `sonnet`: Ã¥Â®Å¾Ã§Å½Â°Ã¥â€™Å’Ã©â€¡ÂÃ¦Å¾â€žÃ§Å¡â€žÃ©Â»ËœÃ¨Â®Â¤Ã©â‚¬â€°Ã¦â€¹Â©
+* `opus`: Ã¦Å¾Â¶Ã¦Å¾â€žÃ¨Â®Â¾Ã¨Â®Â¡Ã£â‚¬ÂÃ¦Â·Â±Ã¥ÂºÂ¦Ã¨Â¯â€žÃ¥Â®Â¡Ã£â‚¬ÂÃ¦Â¨Â¡Ã§Â³Å Ã©Å“â‚¬Ã¦Â±â€š
 
-## 必需输出
+## Ã¥Â¿â€¦Ã©Å“â‚¬Ã¨Â¾â€œÃ¥â€¡Âº
 
-* 推荐的模型
-* 置信度
-* 该模型适合的原因
-* 如果首次尝试失败，备用的回退模型
+* Ã¦Å½Â¨Ã¨ÂÂÃ§Å¡â€žÃ¦Â¨Â¡Ã¥Å¾â€¹
+* Ã§Â½Â®Ã¤Â¿Â¡Ã¥ÂºÂ¦
+* Ã¨Â¯Â¥Ã¦Â¨Â¡Ã¥Å¾â€¹Ã©â‚¬â€šÃ¥ÂË†Ã§Å¡â€žÃ¥Å½Å¸Ã¥â€ºÂ 
+* Ã¥Â¦â€šÃ¦Å¾Å“Ã©Â¦â€“Ã¦Â¬Â¡Ã¥Â°ÂÃ¨Â¯â€¢Ã¥Â¤Â±Ã¨Â´Â¥Ã¯Â¼Å’Ã¥Â¤â€¡Ã§â€Â¨Ã§Å¡â€žÃ¥â€ºÅ¾Ã©â‚¬â‚¬Ã¦Â¨Â¡Ã¥Å¾â€¹
 
-## 参数
+## Ã¥Ââ€šÃ¦â€¢Â°
 
 $ARGUMENTS:
 
-* `[task-description]` 可选，自由文本
-* `--budget low|med|high` 可选
+* `[task-description]` Ã¥ÂÂ¯Ã©â‚¬â€°Ã¯Â¼Å’Ã¨â€¡ÂªÃ§â€Â±Ã¦â€“â€¡Ã¦Å“Â¬
+* `--budget low|med|high` Ã¥ÂÂ¯Ã©â‚¬â€°

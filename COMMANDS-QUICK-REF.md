@@ -1,5 +1,18 @@
 # Commands Quick Reference
 
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
 > 59 slash commands installed globally. Type `/` in any Claude Code session to invoke.
 
 ---
@@ -8,11 +21,11 @@
 
 | Command | What it does |
 |---------|-------------|
-| `/plan` | Restate requirements, assess risks, write step-by-step implementation plan — **waits for your confirm before touching code** |
-| `/tdd` | Enforce test-driven development: scaffold interface → write failing test → implement → verify 80%+ coverage |
+| `/plan` | Restate requirements, assess risks, write step-by-step implementation plan Ã¢â‚¬â€ **waits for your confirm before touching code** |
+| `/tdd` | Enforce test-driven development: scaffold interface Ã¢â€ â€™ write failing test Ã¢â€ â€™ implement Ã¢â€ â€™ verify 80%+ coverage |
 | `/code-review` | Full code quality, security, and maintainability review of changed files |
-| `/build-fix` | Detect and fix build errors — delegates to the right build-resolver agent automatically |
-| `/verify` | Run the full verification loop: build → lint → test → type-check |
+| `/build-fix` | Detect and fix build errors Ã¢â‚¬â€ delegates to the right build-resolver agent automatically |
+| `/verify` | Run the full verification loop: build Ã¢â€ â€™ lint Ã¢â€ â€™ test Ã¢â€ â€™ type-check |
 | `/quality-gate` | Quality gate check against project standards |
 
 ---
@@ -36,11 +49,11 @@
 | Command | What it does |
 |---------|-------------|
 | `/code-review` | Universal code review |
-| `/python-review` | Python — PEP 8, type hints, security, idiomatic patterns |
-| `/go-review` | Go — idiomatic patterns, concurrency safety, error handling |
-| `/kotlin-review` | Kotlin — null safety, coroutine safety, clean architecture |
-| `/rust-review` | Rust — ownership, lifetimes, unsafe usage |
-| `/cpp-review` | C++ — memory safety, modern idioms, concurrency |
+| `/python-review` | Python Ã¢â‚¬â€ PEP 8, type hints, security, idiomatic patterns |
+| `/go-review` | Go Ã¢â‚¬â€ idiomatic patterns, concurrency safety, error handling |
+| `/kotlin-review` | Kotlin Ã¢â‚¬â€ null safety, coroutine safety, clean architecture |
+| `/rust-review` | Rust Ã¢â‚¬â€ ownership, lifetimes, unsafe usage |
+| `/cpp-review` | C++ Ã¢â‚¬â€ memory safety, modern idioms, concurrency |
 
 ---
 
@@ -81,7 +94,7 @@
 | `/sessions` | Browse, search, and manage session history with aliases from `~/.claude/session-data/` (with legacy reads from `~/.claude/sessions/`) |
 | `/checkpoint` | Mark a checkpoint in the current session |
 | `/aside` | Answer a quick side question without losing current task context |
-| `/context-budget` | Analyse context window usage — find token overhead, optimise |
+| `/context-budget` | Analyse context window usage Ã¢â‚¬â€ find token overhead, optimise |
 
 ---
 
@@ -96,7 +109,7 @@
 | `/instinct-status` | Show all learned instincts (project + global) with confidence scores |
 | `/instinct-export` | Export instincts to a file |
 | `/instinct-import` | Import instincts from a file or URL |
-| `/skill-create` | Analyse local git history → generate a reusable skill |
+| `/skill-create` | Analyse local git history Ã¢â€ â€™ generate a reusable skill |
 | `/skill-health` | Skill portfolio health dashboard with analytics |
 | `/rules-distill` | Scan skills, extract cross-cutting principles, distill into rules |
 
@@ -127,7 +140,7 @@
 |---------|-------------|
 | `/loop-start` | Start a recurring agent loop on an interval |
 | `/loop-status` | Check status of running loops |
-| `/claw` | Start NanoClaw v2 — persistent REPL with model routing, skill hot-load, branching, and metrics |
+| `/claw` | Start NanoClaw v2 Ã¢â‚¬â€ persistent REPL with model routing, skill hot-load, branching, and metrics |
 
 ---
 
@@ -147,13 +160,13 @@
 ## Quick Decision Guide
 
 ```
-Starting a new feature?         → /plan first, then /tdd
-Code just written?              → /code-review
-Build broken?                   → /build-fix
-Need live docs?                 → /docs <library>
-Session about to end?           → /save-session or /learn-eval
-Resuming next day?              → /resume-session
-Context getting heavy?          → /context-budget then /checkpoint
-Want to extract what you learned? → /learn-eval then /evolve
-Running repeated tasks?         → /loop-start
+Starting a new feature?         Ã¢â€ â€™ /plan first, then /tdd
+Code just written?              Ã¢â€ â€™ /code-review
+Build broken?                   Ã¢â€ â€™ /build-fix
+Need live docs?                 Ã¢â€ â€™ /docs <library>
+Session about to end?           Ã¢â€ â€™ /save-session or /learn-eval
+Resuming next day?              Ã¢â€ â€™ /resume-session
+Context getting heavy?          Ã¢â€ â€™ /context-budget then /checkpoint
+Want to extract what you learned? Ã¢â€ â€™ /learn-eval then /evolve
+Running repeated tasks?         Ã¢â€ â€™ /loop-start
 ```

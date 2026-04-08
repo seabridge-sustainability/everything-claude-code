@@ -1,73 +1,86 @@
-# SaaS 애플리케이션 — 프로젝트 CLAUDE.md
+# SaaS Ã¬â€¢Â Ã­â€Å’Ã«Â¦Â¬Ã¬Â¼â‚¬Ã¬ÂÂ´Ã¬â€¦Ëœ Ã¢â‚¬â€ Ã­â€â€žÃ«Â¡Å“Ã¬Â ÂÃ­Å Â¸ CLAUDE.md
 
-> Next.js + Supabase + Stripe SaaS 애플리케이션을 위한 실제 사용 예제입니다.
-> 프로젝트 루트에 복사한 후 기술 스택에 맞게 커스터마이즈하세요.
+## Safety And Authorization Rule
 
-## 프로젝트 개요
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-**기술 스택:** Next.js 15 (App Router), TypeScript, Supabase (인증 + DB), Stripe (결제), Tailwind CSS, Playwright (E2E)
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-**아키텍처:** 기본적으로 Server Components 사용. Client Components는 상호작용이 필요한 경우에만 사용. API route는 webhook용, Server Action은 mutation용.
 
-## 핵심 규칙
+> Next.js + Supabase + Stripe SaaS Ã¬â€¢Â Ã­â€Å’Ã«Â¦Â¬Ã¬Â¼â‚¬Ã¬ÂÂ´Ã¬â€¦ËœÃ¬Ââ€ž Ã¬Å“â€žÃ­â€¢Å“ Ã¬â€¹Â¤Ã¬Â Å“ Ã¬â€šÂ¬Ã¬Å¡Â© Ã¬ËœË†Ã¬Â Å“Ã¬Å¾â€¦Ã«â€¹Ë†Ã«â€¹Â¤.
+> Ã­â€â€žÃ«Â¡Å“Ã¬Â ÂÃ­Å Â¸ Ã«Â£Â¨Ã­Å Â¸Ã¬â€”Â Ã«Â³ÂµÃ¬â€šÂ¬Ã­â€¢Å“ Ã­â€ºâ€ž ÃªÂ¸Â°Ã¬Ë†Â  Ã¬Å Â¤Ã­Æ’ÂÃ¬â€”Â Ã«Â§Å¾ÃªÂ²Å’ Ã¬Â»Â¤Ã¬Å Â¤Ã­â€žÂ°Ã«Â§Ë†Ã¬ÂÂ´Ã¬Â¦Ë†Ã­â€¢ËœÃ¬â€žÂ¸Ã¬Å¡â€.
 
-### 데이터베이스
+## Ã­â€â€žÃ«Â¡Å“Ã¬Â ÂÃ­Å Â¸ ÃªÂ°Å“Ã¬Å¡â€
 
-- 모든 쿼리는 RLS가 활성화된 Supabase client 사용 — RLS를 절대 우회하지 않음
-- 마이그레이션은 `supabase/migrations/`에 저장 — 데이터베이스를 직접 수정하지 않음
-- `select('*')` 대신 명시적 컬럼 목록이 포함된 `select()` 사용
-- 모든 사용자 대상 쿼리에는 무제한 결과를 방지하기 위해 `.limit()` 포함 필수
+**ÃªÂ¸Â°Ã¬Ë†Â  Ã¬Å Â¤Ã­Æ’Â:** Next.js 15 (App Router), TypeScript, Supabase (Ã¬ÂÂ¸Ã¬Â¦Â + DB), Stripe (ÃªÂ²Â°Ã¬Â Å“), Tailwind CSS, Playwright (E2E)
 
-### 인증
+**Ã¬â€¢â€žÃ­â€šÂ¤Ã­â€¦ÂÃ¬Â²Ëœ:** ÃªÂ¸Â°Ã«Â³Â¸Ã¬Â ÂÃ¬Å“Â¼Ã«Â¡Å“ Server Components Ã¬â€šÂ¬Ã¬Å¡Â©. Client ComponentsÃ«Å â€ Ã¬Æ’ÂÃ­ËœÂ¸Ã¬Å¾â€˜Ã¬Å¡Â©Ã¬ÂÂ´ Ã­â€¢â€žÃ¬Å¡â€Ã­â€¢Å“ ÃªÂ²Â½Ã¬Å¡Â°Ã¬â€”ÂÃ«Â§Å’ Ã¬â€šÂ¬Ã¬Å¡Â©. API routeÃ«Å â€ webhookÃ¬Å¡Â©, Server ActionÃ¬Ââ‚¬ mutationÃ¬Å¡Â©.
 
-- Server Components에서는 `@supabase/ssr`의 `createServerClient()` 사용
-- Client Components에서는 `@supabase/ssr`의 `createBrowserClient()` 사용
-- 보호된 라우트는 `getUser()`로 확인 — 인증에 `getSession()`만 단독으로 신뢰하지 않음
-- `middleware.ts`의 Middleware가 매 요청마다 인증 토큰 갱신
+## Ã­â€¢ÂµÃ¬â€¹Â¬ ÃªÂ·Å“Ã¬Â¹â„¢
 
-### 결제
+### Ã«ÂÂ°Ã¬ÂÂ´Ã­â€žÂ°Ã«Â²Â Ã¬ÂÂ´Ã¬Å Â¤
 
-- Stripe webhook 핸들러는 `app/api/webhooks/stripe/route.ts`에 위치
-- 클라이언트 측 가격 데이터를 절대 신뢰하지 않음 — 항상 서버 측에서 Stripe로부터 조회
-- 구독 상태는 webhook에 의해 동기화되는 `subscription_status` 컬럼으로 확인
-- 무료 플랜 사용자: 프로젝트 3개, 일일 API 호출 100회
+- Ã«ÂªÂ¨Ã«â€œÂ  Ã¬Â¿Â¼Ã«Â¦Â¬Ã«Å â€ RLSÃªÂ°â‚¬ Ã­â„¢Å“Ã¬â€žÂ±Ã­â„¢â€Ã«ÂÅ“ Supabase client Ã¬â€šÂ¬Ã¬Å¡Â© Ã¢â‚¬â€ RLSÃ«Â¥Â¼ Ã¬Â Ë†Ã«Å’â‚¬ Ã¬Å¡Â°Ã­Å¡Å’Ã­â€¢ËœÃ¬Â§â‚¬ Ã¬â€¢Å Ã¬ÂÅ’
+- Ã«Â§Ë†Ã¬ÂÂ´ÃªÂ·Â¸Ã«Â Ë†Ã¬ÂÂ´Ã¬â€¦ËœÃ¬Ââ‚¬ `supabase/migrations/`Ã¬â€”Â Ã¬Â â‚¬Ã¬Å¾Â¥ Ã¢â‚¬â€ Ã«ÂÂ°Ã¬ÂÂ´Ã­â€žÂ°Ã«Â²Â Ã¬ÂÂ´Ã¬Å Â¤Ã«Â¥Â¼ Ã¬Â§ÂÃ¬Â â€˜ Ã¬Ë†ËœÃ¬Â â€¢Ã­â€¢ËœÃ¬Â§â‚¬ Ã¬â€¢Å Ã¬ÂÅ’
+- `select('*')` Ã«Å’â‚¬Ã¬â€¹Â  Ã«Âªâ€¦Ã¬â€¹Å“Ã¬Â Â Ã¬Â»Â¬Ã«Å¸Â¼ Ã«ÂªÂ©Ã«Â¡ÂÃ¬ÂÂ´ Ã­ÂÂ¬Ã­â€¢Â¨Ã«ÂÅ“ `select()` Ã¬â€šÂ¬Ã¬Å¡Â©
+- Ã«ÂªÂ¨Ã«â€œÂ  Ã¬â€šÂ¬Ã¬Å¡Â©Ã¬Å¾Â Ã«Å’â‚¬Ã¬Æ’Â Ã¬Â¿Â¼Ã«Â¦Â¬Ã¬â€”ÂÃ«Å â€ Ã«Â¬Â´Ã¬Â Å“Ã­â€¢Å“ ÃªÂ²Â°ÃªÂ³Â¼Ã«Â¥Â¼ Ã«Â°Â©Ã¬Â§â‚¬Ã­â€¢ËœÃªÂ¸Â° Ã¬Å“â€žÃ­â€¢Â´ `.limit()` Ã­ÂÂ¬Ã­â€¢Â¨ Ã­â€¢â€žÃ¬Ë†Ëœ
 
-### 코드 스타일
+### Ã¬ÂÂ¸Ã¬Â¦Â
 
-- 코드나 주석에 이모지 사용 금지
-- 불변 패턴만 사용 — spread 연산자 사용, 직접 변경 금지
-- Server Components: `'use client'` 디렉티브 없음, `useState`/`useEffect` 없음
-- Client Components: 파일 상단에 `'use client'` 작성, 최소한으로 유지 — 로직은 hooks로 분리
-- 모든 입력 유효성 검사에 Zod 스키마 사용 선호 (API route, 폼, 환경 변수)
+- Server ComponentsÃ¬â€”ÂÃ¬â€žÅ“Ã«Å â€ `@supabase/ssr`Ã¬ÂËœ `createServerClient()` Ã¬â€šÂ¬Ã¬Å¡Â©
+- Client ComponentsÃ¬â€”ÂÃ¬â€žÅ“Ã«Å â€ `@supabase/ssr`Ã¬ÂËœ `createBrowserClient()` Ã¬â€šÂ¬Ã¬Å¡Â©
+- Ã«Â³Â´Ã­ËœÂ¸Ã«ÂÅ“ Ã«ÂÂ¼Ã¬Å¡Â°Ã­Å Â¸Ã«Å â€ `getUser()`Ã«Â¡Å“ Ã­â„¢â€¢Ã¬ÂÂ¸ Ã¢â‚¬â€ Ã¬ÂÂ¸Ã¬Â¦ÂÃ¬â€”Â `getSession()`Ã«Â§Å’ Ã«â€¹Â¨Ã«Ââ€¦Ã¬Å“Â¼Ã«Â¡Å“ Ã¬â€¹Â Ã«Â¢Â°Ã­â€¢ËœÃ¬Â§â‚¬ Ã¬â€¢Å Ã¬ÂÅ’
+- `middleware.ts`Ã¬ÂËœ MiddlewareÃªÂ°â‚¬ Ã«Â§Â¤ Ã¬Å¡â€Ã¬Â²Â­Ã«Â§Ë†Ã«â€¹Â¤ Ã¬ÂÂ¸Ã¬Â¦Â Ã­â€ Â Ã­ÂÂ° ÃªÂ°Â±Ã¬â€¹Â 
 
-## 파일 구조
+### ÃªÂ²Â°Ã¬Â Å“
+
+- Stripe webhook Ã­â€¢Â¸Ã«â€œÂ¤Ã«Å¸Â¬Ã«Å â€ `app/api/webhooks/stripe/route.ts`Ã¬â€”Â Ã¬Å“â€žÃ¬Â¹Ëœ
+- Ã­ÂÂ´Ã«ÂÂ¼Ã¬ÂÂ´Ã¬â€“Â¸Ã­Å Â¸ Ã¬Â¸Â¡ ÃªÂ°â‚¬ÃªÂ²Â© Ã«ÂÂ°Ã¬ÂÂ´Ã­â€žÂ°Ã«Â¥Â¼ Ã¬Â Ë†Ã«Å’â‚¬ Ã¬â€¹Â Ã«Â¢Â°Ã­â€¢ËœÃ¬Â§â‚¬ Ã¬â€¢Å Ã¬ÂÅ’ Ã¢â‚¬â€ Ã­â€¢Â­Ã¬Æ’Â Ã¬â€žÅ“Ã«Â²â€ž Ã¬Â¸Â¡Ã¬â€”ÂÃ¬â€žÅ“ StripeÃ«Â¡Å“Ã«Â¶â‚¬Ã­â€žÂ° Ã¬Â¡Â°Ã­Å¡Å’
+- ÃªÂµÂ¬Ã«Ââ€¦ Ã¬Æ’ÂÃ­Æ’Å“Ã«Å â€ webhookÃ¬â€”Â Ã¬ÂËœÃ­â€¢Â´ Ã«Ââ„¢ÃªÂ¸Â°Ã­â„¢â€Ã«ÂËœÃ«Å â€ `subscription_status` Ã¬Â»Â¬Ã«Å¸Â¼Ã¬Å“Â¼Ã«Â¡Å“ Ã­â„¢â€¢Ã¬ÂÂ¸
+- Ã«Â¬Â´Ã«Â£Å’ Ã­â€Å’Ã«Å¾Å“ Ã¬â€šÂ¬Ã¬Å¡Â©Ã¬Å¾Â: Ã­â€â€žÃ«Â¡Å“Ã¬Â ÂÃ­Å Â¸ 3ÃªÂ°Å“, Ã¬ÂÂ¼Ã¬ÂÂ¼ API Ã­ËœÂ¸Ã¬Â¶Å“ 100Ã­Å¡Å’
+
+### Ã¬Â½â€Ã«â€œÅ“ Ã¬Å Â¤Ã­Æ’â‚¬Ã¬ÂÂ¼
+
+- Ã¬Â½â€Ã«â€œÅ“Ã«â€šËœ Ã¬Â£Â¼Ã¬â€žÂÃ¬â€”Â Ã¬ÂÂ´Ã«ÂªÂ¨Ã¬Â§â‚¬ Ã¬â€šÂ¬Ã¬Å¡Â© ÃªÂ¸Ë†Ã¬Â§â‚¬
+- Ã«Â¶Ë†Ã«Â³â‚¬ Ã­Å’Â¨Ã­â€žÂ´Ã«Â§Å’ Ã¬â€šÂ¬Ã¬Å¡Â© Ã¢â‚¬â€ spread Ã¬â€”Â°Ã¬â€šÂ°Ã¬Å¾Â Ã¬â€šÂ¬Ã¬Å¡Â©, Ã¬Â§ÂÃ¬Â â€˜ Ã«Â³â‚¬ÃªÂ²Â½ ÃªÂ¸Ë†Ã¬Â§â‚¬
+- Server Components: `'use client'` Ã«â€â€Ã«Â â€°Ã­â€¹Â°Ã«Â¸Å’ Ã¬â€”â€ Ã¬ÂÅ’, `useState`/`useEffect` Ã¬â€”â€ Ã¬ÂÅ’
+- Client Components: Ã­Å’Å’Ã¬ÂÂ¼ Ã¬Æ’ÂÃ«â€¹Â¨Ã¬â€”Â `'use client'` Ã¬Å¾â€˜Ã¬â€žÂ±, Ã¬ÂµÅ“Ã¬â€ Å’Ã­â€¢Å“Ã¬Å“Â¼Ã«Â¡Å“ Ã¬Å“Â Ã¬Â§â‚¬ Ã¢â‚¬â€ Ã«Â¡Å“Ã¬Â§ÂÃ¬Ââ‚¬ hooksÃ«Â¡Å“ Ã«Â¶â€žÃ«Â¦Â¬
+- Ã«ÂªÂ¨Ã«â€œÂ  Ã¬Å¾â€¦Ã«Â Â¥ Ã¬Å“Â Ã­Å¡Â¨Ã¬â€žÂ± ÃªÂ²â‚¬Ã¬â€šÂ¬Ã¬â€”Â Zod Ã¬Å Â¤Ã­â€šÂ¤Ã«Â§Ë† Ã¬â€šÂ¬Ã¬Å¡Â© Ã¬â€žÂ Ã­ËœÂ¸ (API route, Ã­ÂÂ¼, Ã­â„¢ËœÃªÂ²Â½ Ã«Â³â‚¬Ã¬Ë†Ëœ)
+
+## Ã­Å’Å’Ã¬ÂÂ¼ ÃªÂµÂ¬Ã¬Â¡Â°
 
 ```
 src/
   app/
-    (auth)/          # 인증 페이지 (로그인, 회원가입, 비밀번호 찾기)
-    (dashboard)/     # 보호된 대시보드 페이지
+    (auth)/          # Ã¬ÂÂ¸Ã¬Â¦Â Ã­Å½ËœÃ¬ÂÂ´Ã¬Â§â‚¬ (Ã«Â¡Å“ÃªÂ·Â¸Ã¬ÂÂ¸, Ã­Å¡Å’Ã¬â€ºÂÃªÂ°â‚¬Ã¬Å¾â€¦, Ã«Â¹â€žÃ«Â°â‚¬Ã«Â²Ë†Ã­ËœÂ¸ Ã¬Â°Â¾ÃªÂ¸Â°)
+    (dashboard)/     # Ã«Â³Â´Ã­ËœÂ¸Ã«ÂÅ“ Ã«Å’â‚¬Ã¬â€¹Å“Ã«Â³Â´Ã«â€œÅ“ Ã­Å½ËœÃ¬ÂÂ´Ã¬Â§â‚¬
     api/
       webhooks/      # Stripe, Supabase webhooks
-    layout.tsx       # Provider가 포함된 루트 레이아웃
+    layout.tsx       # ProviderÃªÂ°â‚¬ Ã­ÂÂ¬Ã­â€¢Â¨Ã«ÂÅ“ Ã«Â£Â¨Ã­Å Â¸ Ã«Â Ë†Ã¬ÂÂ´Ã¬â€¢â€žÃ¬â€ºÆ’
   components/
-    ui/              # Shadcn/ui 컴포넌트
-    forms/           # 유효성 검사가 포함된 폼 컴포넌트
-    dashboard/       # 대시보드 전용 컴포넌트
-  hooks/             # 커스텀 React hooks
+    ui/              # Shadcn/ui Ã¬Â»Â´Ã­ÂÂ¬Ã«â€žÅ’Ã­Å Â¸
+    forms/           # Ã¬Å“Â Ã­Å¡Â¨Ã¬â€žÂ± ÃªÂ²â‚¬Ã¬â€šÂ¬ÃªÂ°â‚¬ Ã­ÂÂ¬Ã­â€¢Â¨Ã«ÂÅ“ Ã­ÂÂ¼ Ã¬Â»Â´Ã­ÂÂ¬Ã«â€žÅ’Ã­Å Â¸
+    dashboard/       # Ã«Å’â‚¬Ã¬â€¹Å“Ã«Â³Â´Ã«â€œÅ“ Ã¬Â â€žÃ¬Å¡Â© Ã¬Â»Â´Ã­ÂÂ¬Ã«â€žÅ’Ã­Å Â¸
+  hooks/             # Ã¬Â»Â¤Ã¬Å Â¤Ã­â€¦â‚¬ React hooks
   lib/
-    supabase/        # Supabase client 팩토리
-    stripe/          # Stripe client 및 헬퍼
-    utils.ts         # 범용 유틸리티
-  types/             # 공유 TypeScript 타입
+    supabase/        # Supabase client Ã­Å’Â©Ã­â€ Â Ã«Â¦Â¬
+    stripe/          # Stripe client Ã«Â°Â Ã­â€”Â¬Ã­ÂÂ¼
+    utils.ts         # Ã«Â²â€Ã¬Å¡Â© Ã¬Å“Â Ã­â€¹Â¸Ã«Â¦Â¬Ã­â€¹Â°
+  types/             # ÃªÂ³ÂµÃ¬Å“Â  TypeScript Ã­Æ’â‚¬Ã¬Å¾â€¦
 supabase/
-  migrations/        # 데이터베이스 마이그레이션
-  seed.sql           # 개발용 시드 데이터
+  migrations/        # Ã«ÂÂ°Ã¬ÂÂ´Ã­â€žÂ°Ã«Â²Â Ã¬ÂÂ´Ã¬Å Â¤ Ã«Â§Ë†Ã¬ÂÂ´ÃªÂ·Â¸Ã«Â Ë†Ã¬ÂÂ´Ã¬â€¦Ëœ
+  seed.sql           # ÃªÂ°Å“Ã«Â°Å“Ã¬Å¡Â© Ã¬â€¹Å“Ã«â€œÅ“ Ã«ÂÂ°Ã¬ÂÂ´Ã­â€žÂ°
 ```
 
-## 주요 패턴
+## Ã¬Â£Â¼Ã¬Å¡â€ Ã­Å’Â¨Ã­â€žÂ´
 
-### API 응답 형식
+### API Ã¬Ââ€˜Ã«â€¹Âµ Ã­Ëœâ€¢Ã¬â€¹Â
 
 ```typescript
 type ApiResponse<T> =
@@ -75,7 +88,7 @@ type ApiResponse<T> =
   | { success: false; error: string; code?: string }
 ```
 
-### Server Action 패턴
+### Server Action Ã­Å’Â¨Ã­â€žÂ´
 
 ```typescript
 'use server'
@@ -108,59 +121,59 @@ export async function createProject(formData: FormData) {
 }
 ```
 
-## 환경 변수
+## Ã­â„¢ËœÃªÂ²Â½ Ã«Â³â‚¬Ã¬Ë†Ëœ
 
 ```bash
 # Supabase
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_ROLE_KEY=     # 서버 전용, 클라이언트에 절대 노출 금지
+SUPABASE_SERVICE_ROLE_KEY=     # Ã¬â€žÅ“Ã«Â²â€ž Ã¬Â â€žÃ¬Å¡Â©, Ã­ÂÂ´Ã«ÂÂ¼Ã¬ÂÂ´Ã¬â€“Â¸Ã­Å Â¸Ã¬â€”Â Ã¬Â Ë†Ã«Å’â‚¬ Ã«â€¦Â¸Ã¬Â¶Å“ ÃªÂ¸Ë†Ã¬Â§â‚¬
 
 # Stripe
 STRIPE_SECRET_KEY=
 STRIPE_WEBHOOK_SECRET=
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
 
-# 앱
+# Ã¬â€¢Â±
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
-## 테스트 전략
+## Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸ Ã¬Â â€žÃ«Å¾Âµ
 
 ```bash
-/tdd                    # 새 기능에 대한 단위 + 통합 테스트
-/e2e                    # 인증 흐름, 결제, 대시보드에 대한 Playwright 테스트
-/test-coverage          # 80% 이상 커버리지 확인
+/tdd                    # Ã¬Æ’Ë† ÃªÂ¸Â°Ã«Å Â¥Ã¬â€”Â Ã«Å’â‚¬Ã­â€¢Å“ Ã«â€¹Â¨Ã¬Å“â€ž + Ã­â€ ÂµÃ­â€¢Â© Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸
+/e2e                    # Ã¬ÂÂ¸Ã¬Â¦Â Ã­ÂÂÃ«Â¦â€ž, ÃªÂ²Â°Ã¬Â Å“, Ã«Å’â‚¬Ã¬â€¹Å“Ã«Â³Â´Ã«â€œÅ“Ã¬â€”Â Ã«Å’â‚¬Ã­â€¢Å“ Playwright Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸
+/test-coverage          # 80% Ã¬ÂÂ´Ã¬Æ’Â Ã¬Â»Â¤Ã«Â²â€žÃ«Â¦Â¬Ã¬Â§â‚¬ Ã­â„¢â€¢Ã¬ÂÂ¸
 ```
 
-### 핵심 E2E 흐름
+### Ã­â€¢ÂµÃ¬â€¹Â¬ E2E Ã­ÂÂÃ«Â¦â€ž
 
-1. 회원가입 → 이메일 인증 → 첫 프로젝트 생성
-2. 로그인 → 대시보드 → CRUD 작업
-3. 플랜 업그레이드 → Stripe checkout → 구독 활성화
-4. Webhook: 구독 취소 → 무료 플랜으로 다운그레이드
+1. Ã­Å¡Å’Ã¬â€ºÂÃªÂ°â‚¬Ã¬Å¾â€¦ Ã¢â€ â€™ Ã¬ÂÂ´Ã«Â©â€Ã¬ÂÂ¼ Ã¬ÂÂ¸Ã¬Â¦Â Ã¢â€ â€™ Ã¬Â²Â« Ã­â€â€žÃ«Â¡Å“Ã¬Â ÂÃ­Å Â¸ Ã¬Æ’ÂÃ¬â€žÂ±
+2. Ã«Â¡Å“ÃªÂ·Â¸Ã¬ÂÂ¸ Ã¢â€ â€™ Ã«Å’â‚¬Ã¬â€¹Å“Ã«Â³Â´Ã«â€œÅ“ Ã¢â€ â€™ CRUD Ã¬Å¾â€˜Ã¬â€”â€¦
+3. Ã­â€Å’Ã«Å¾Å“ Ã¬â€”â€¦ÃªÂ·Â¸Ã«Â Ë†Ã¬ÂÂ´Ã«â€œÅ“ Ã¢â€ â€™ Stripe checkout Ã¢â€ â€™ ÃªÂµÂ¬Ã«Ââ€¦ Ã­â„¢Å“Ã¬â€žÂ±Ã­â„¢â€
+4. Webhook: ÃªÂµÂ¬Ã«Ââ€¦ Ã¬Â·Â¨Ã¬â€ Å’ Ã¢â€ â€™ Ã«Â¬Â´Ã«Â£Å’ Ã­â€Å’Ã«Å¾Å“Ã¬Å“Â¼Ã«Â¡Å“ Ã«â€¹Â¤Ã¬Å¡Â´ÃªÂ·Â¸Ã«Â Ë†Ã¬ÂÂ´Ã«â€œÅ“
 
-## ECC 워크플로우
+## ECC Ã¬â€ºÅ’Ã­ÂÂ¬Ã­â€Å’Ã«Â¡Å“Ã¬Å¡Â°
 
 ```bash
-# 기능 계획 수립
+# ÃªÂ¸Â°Ã«Å Â¥ ÃªÂ³â€žÃ­Å¡Â Ã¬Ë†ËœÃ«Â¦Â½
 /plan "Add team invitations with email notifications"
 
-# TDD로 개발
+# TDDÃ«Â¡Å“ ÃªÂ°Å“Ã«Â°Å“
 /tdd
 
-# 커밋 전
+# Ã¬Â»Â¤Ã«Â°â€¹ Ã¬Â â€ž
 /code-review
 /security-scan
 
-# 릴리스 전
+# Ã«Â¦Â´Ã«Â¦Â¬Ã¬Å Â¤ Ã¬Â â€ž
 /e2e
 /test-coverage
 ```
 
-## Git 워크플로우
+## Git Ã¬â€ºÅ’Ã­ÂÂ¬Ã­â€Å’Ã«Â¡Å“Ã¬Å¡Â°
 
-- `feat:` 새 기능, `fix:` 버그 수정, `refactor:` 코드 변경
-- `main`에서 기능 브랜치 생성, PR 필수
-- CI 실행 항목: lint, 타입 체크, 단위 테스트, E2E 테스트
-- 배포: PR 시 Vercel 미리보기, `main` 병합 시 프로덕션 배포
+- `feat:` Ã¬Æ’Ë† ÃªÂ¸Â°Ã«Å Â¥, `fix:` Ã«Â²â€žÃªÂ·Â¸ Ã¬Ë†ËœÃ¬Â â€¢, `refactor:` Ã¬Â½â€Ã«â€œÅ“ Ã«Â³â‚¬ÃªÂ²Â½
+- `main`Ã¬â€”ÂÃ¬â€žÅ“ ÃªÂ¸Â°Ã«Å Â¥ Ã«Â¸Å’Ã«Å¾Å“Ã¬Â¹Ëœ Ã¬Æ’ÂÃ¬â€žÂ±, PR Ã­â€¢â€žÃ¬Ë†Ëœ
+- CI Ã¬â€¹Â¤Ã­â€“â€° Ã­â€¢Â­Ã«ÂªÂ©: lint, Ã­Æ’â‚¬Ã¬Å¾â€¦ Ã¬Â²Â´Ã­ÂÂ¬, Ã«â€¹Â¨Ã¬Å“â€ž Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸, E2E Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸
+- Ã«Â°Â°Ã­ÂÂ¬: PR Ã¬â€¹Å“ Vercel Ã«Â¯Â¸Ã«Â¦Â¬Ã«Â³Â´ÃªÂ¸Â°, `main` Ã«Â³â€˜Ã­â€¢Â© Ã¬â€¹Å“ Ã­â€â€žÃ«Â¡Å“Ã«Ââ€¢Ã¬â€¦Ëœ Ã«Â°Â°Ã­ÂÂ¬

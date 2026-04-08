@@ -6,6 +6,19 @@ origin: ECC
 
 # Codebase Onboarding
 
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
 Systematically analyze an unfamiliar codebase and produce a structured onboarding guide. Designed for developers joining a new project or setting up Claude Code in an existing repo for the first time.
 
 ## When to Use
@@ -24,26 +37,26 @@ Gather raw signals about the project without reading every file. Run these check
 
 ```
 1. Package manifest detection
-   → package.json, go.mod, Cargo.toml, pyproject.toml, pom.xml, build.gradle,
+   Ã¢â€ â€™ package.json, go.mod, Cargo.toml, pyproject.toml, pom.xml, build.gradle,
      Gemfile, composer.json, mix.exs, pubspec.yaml
 
 2. Framework fingerprinting
-   → next.config.*, nuxt.config.*, angular.json, vite.config.*,
+   Ã¢â€ â€™ next.config.*, nuxt.config.*, angular.json, vite.config.*,
      django settings, flask app factory, fastapi main, rails config
 
 3. Entry point identification
-   → main.*, index.*, app.*, server.*, cmd/, src/main/
+   Ã¢â€ â€™ main.*, index.*, app.*, server.*, cmd/, src/main/
 
 4. Directory structure snapshot
-   → Top 2 levels of the directory tree, ignoring node_modules, vendor,
+   Ã¢â€ â€™ Top 2 levels of the directory tree, ignoring node_modules, vendor,
      .git, dist, build, __pycache__, .next
 
 5. Config and tooling detection
-   → .eslintrc*, .prettierrc*, tsconfig.json, Makefile, Dockerfile,
+   Ã¢â€ â€™ .eslintrc*, .prettierrc*, tsconfig.json, Makefile, Dockerfile,
      docker-compose*, .github/workflows/, .env.example, CI configs
 
 6. Test structure detection
-   → tests/, test/, __tests__/, *_test.go, *.spec.ts, *.test.js,
+   Ã¢â€ â€™ tests/, test/, __tests__/, *_test.go, *.spec.ts, *.test.js,
      pytest.ini, jest.config.*, vitest.config.*
 ```
 
@@ -66,14 +79,14 @@ From the reconnaissance data, identify:
 **Key Directories**
 Map the top-level directories to their purpose:
 
-<!-- Example for a React project — replace with detected directories -->
+<!-- Example for a React project Ã¢â‚¬â€ replace with detected directories -->
 ```
-src/components/  → React UI components
-src/api/         → API route handlers
-src/lib/         → Shared utilities
-src/db/          → Database models and migrations
-tests/           → Test suites
-scripts/         → Build and deployment scripts
+src/components/  Ã¢â€ â€™ React UI components
+src/api/         Ã¢â€ â€™ API route handlers
+src/lib/         Ã¢â€ â€™ Shared utilities
+src/db/          Ã¢â€ â€™ Database models and migrations
+tests/           Ã¢â€ â€™ Test suites
+scripts/         Ã¢â€ â€™ Build and deployment scripts
 ```
 
 **Data Flow**
@@ -117,7 +130,7 @@ Produce two outputs:
 [2-3 sentences: what this project does and who it serves]
 
 ## Tech Stack
-<!-- Example for a Next.js project — replace with detected stack -->
+<!-- Example for a Next.js project Ã¢â‚¬â€ replace with detected stack -->
 | Layer | Technology | Version |
 |-------|-----------|---------|
 | Language | TypeScript | 5.x |
@@ -130,14 +143,14 @@ Produce two outputs:
 [Diagram or description of how components connect]
 
 ## Key Entry Points
-<!-- Example for a Next.js project — replace with detected paths -->
-- **API routes**: `src/app/api/` — Next.js route handlers
-- **UI pages**: `src/app/(dashboard)/` — authenticated pages
-- **Database**: `prisma/schema.prisma` — data model source of truth
-- **Config**: `next.config.ts` — build and runtime config
+<!-- Example for a Next.js project Ã¢â‚¬â€ replace with detected paths -->
+- **API routes**: `src/app/api/` Ã¢â‚¬â€ Next.js route handlers
+- **UI pages**: `src/app/(dashboard)/` Ã¢â‚¬â€ authenticated pages
+- **Database**: `prisma/schema.prisma` Ã¢â‚¬â€ data model source of truth
+- **Config**: `next.config.ts` Ã¢â‚¬â€ build and runtime config
 
 ## Directory Map
-[Top-level directory → purpose mapping]
+[Top-level directory Ã¢â€ â€™ purpose mapping]
 
 ## Request Lifecycle
 [Trace one API request from entry to response]
@@ -149,7 +162,7 @@ Produce two outputs:
 - [Git workflow]
 
 ## Common Tasks
-<!-- Example for a Node.js project — replace with detected commands -->
+<!-- Example for a Node.js project Ã¢â‚¬â€ replace with detected commands -->
 - **Run dev server**: `npm run dev`
 - **Run tests**: `npm test`
 - **Run linter**: `npm run lint`
@@ -157,7 +170,7 @@ Produce two outputs:
 - **Build for production**: `npm run build`
 
 ## Where to Look
-<!-- Example for a Next.js project — replace with detected paths -->
+<!-- Example for a Next.js project Ã¢â‚¬â€ replace with detected paths -->
 | I want to... | Look at... |
 |--------------|-----------|
 | Add an API endpoint | `src/app/api/` |
@@ -169,7 +182,7 @@ Produce two outputs:
 
 #### Output 2: Starter CLAUDE.md
 
-Generate or update a project-specific CLAUDE.md based on detected conventions. If `CLAUDE.md` already exists, read it first and enhance it — preserve existing project-specific instructions and clearly call out what was added or changed.
+Generate or update a project-specific CLAUDE.md based on detected conventions. If `CLAUDE.md` already exists, read it first and enhance it Ã¢â‚¬â€ preserve existing project-specific instructions and clearly call out what was added or changed.
 
 ```markdown
 # Project Instructions
@@ -192,7 +205,7 @@ Generate or update a project-specific CLAUDE.md based on detected conventions. I
 - Lint: `[detected lint command]`
 
 ## Project Structure
-[Key directory → purpose map]
+[Key directory Ã¢â€ â€™ purpose map]
 
 ## Conventions
 - [Commit style if detectable]
@@ -202,24 +215,24 @@ Generate or update a project-specific CLAUDE.md based on detected conventions. I
 
 ## Best Practices
 
-1. **Don't read everything** — reconnaissance should use Glob and Grep, not Read on every file. Read selectively only for ambiguous signals.
-2. **Verify, don't guess** — if a framework is detected from config but the actual code uses something different, trust the code.
-3. **Respect existing CLAUDE.md** — if one already exists, enhance it rather than replacing it. Call out what's new vs existing.
-4. **Stay concise** — the onboarding guide should be scannable in 2 minutes. Details belong in the code, not the guide.
-5. **Flag unknowns** — if a convention can't be confidently detected, say so rather than guessing. "Could not determine test runner" is better than a wrong answer.
+1. **Don't read everything** Ã¢â‚¬â€ reconnaissance should use Glob and Grep, not Read on every file. Read selectively only for ambiguous signals.
+2. **Verify, don't guess** Ã¢â‚¬â€ if a framework is detected from config but the actual code uses something different, trust the code.
+3. **Respect existing CLAUDE.md** Ã¢â‚¬â€ if one already exists, enhance it rather than replacing it. Call out what's new vs existing.
+4. **Stay concise** Ã¢â‚¬â€ the onboarding guide should be scannable in 2 minutes. Details belong in the code, not the guide.
+5. **Flag unknowns** Ã¢â‚¬â€ if a convention can't be confidently detected, say so rather than guessing. "Could not determine test runner" is better than a wrong answer.
 
 ## Anti-Patterns to Avoid
 
-- Generating a CLAUDE.md that's longer than 100 lines — keep it focused
-- Listing every dependency — highlight only the ones that shape how you write code
-- Describing obvious directory names — `src/` doesn't need an explanation
-- Copying the README — the onboarding guide adds structural insight the README lacks
+- Generating a CLAUDE.md that's longer than 100 lines Ã¢â‚¬â€ keep it focused
+- Listing every dependency Ã¢â‚¬â€ highlight only the ones that shape how you write code
+- Describing obvious directory names Ã¢â‚¬â€ `src/` doesn't need an explanation
+- Copying the README Ã¢â‚¬â€ the onboarding guide adds structural insight the README lacks
 
 ## Examples
 
 ### Example 1: First time in a new repo
 **User**: "Onboard me to this codebase"
-**Action**: Run full 4-phase workflow → produce Onboarding Guide + Starter CLAUDE.md
+**Action**: Run full 4-phase workflow Ã¢â€ â€™ produce Onboarding Guide + Starter CLAUDE.md
 **Output**: Onboarding Guide printed directly to the conversation, plus a `CLAUDE.md` written to the project root
 
 ### Example 2: Generate CLAUDE.md for existing project

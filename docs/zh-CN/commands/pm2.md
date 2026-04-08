@@ -1,63 +1,76 @@
-# PM2 初始化
+# PM2 Ã¥Ë†ÂÃ¥Â§â€¹Ã¥Å’â€“
 
-自动分析项目并生成 PM2 服务命令。
+## Safety And Authorization Rule
 
-**命令**: `$ARGUMENTS`
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+Ã¨â€¡ÂªÃ¥Å Â¨Ã¥Ë†â€ Ã¦Å¾ÂÃ©Â¡Â¹Ã§â€ºÂ®Ã¥Â¹Â¶Ã§â€Å¸Ã¦Ë†Â PM2 Ã¦Å“ÂÃ¥Å Â¡Ã¥â€˜Â½Ã¤Â»Â¤Ã£â‚¬â€š
+
+**Ã¥â€˜Â½Ã¤Â»Â¤**: `$ARGUMENTS`
 
 ***
 
-## 工作流程
+## Ã¥Â·Â¥Ã¤Â½Å“Ã¦ÂµÂÃ§Â¨â€¹
 
-1. 检查 PM2（如果缺失，通过 `npm install -g pm2` 安装）
-2. 扫描项目以识别服务（前端/后端/数据库）
-3. 生成配置文件和各命令文件
+1. Ã¦Â£â‚¬Ã¦Å¸Â¥ PM2Ã¯Â¼Ë†Ã¥Â¦â€šÃ¦Å¾Å“Ã§Â¼ÂºÃ¥Â¤Â±Ã¯Â¼Å’Ã©â‚¬Å¡Ã¨Â¿â€¡ `npm install -g pm2` Ã¥Â®â€°Ã¨Â£â€¦Ã¯Â¼â€°
+2. Ã¦â€°Â«Ã¦ÂÂÃ©Â¡Â¹Ã§â€ºÂ®Ã¤Â»Â¥Ã¨Â¯â€ Ã¥Ë†Â«Ã¦Å“ÂÃ¥Å Â¡Ã¯Â¼Ë†Ã¥â€°ÂÃ§Â«Â¯/Ã¥ÂÅ½Ã§Â«Â¯/Ã¦â€¢Â°Ã¦ÂÂ®Ã¥Âºâ€œÃ¯Â¼â€°
+3. Ã§â€Å¸Ã¦Ë†ÂÃ©â€¦ÂÃ§Â½Â®Ã¦â€“â€¡Ã¤Â»Â¶Ã¥â€™Å’Ã¥Ââ€žÃ¥â€˜Â½Ã¤Â»Â¤Ã¦â€“â€¡Ã¤Â»Â¶
 
 ***
 
-## 服务检测
+## Ã¦Å“ÂÃ¥Å Â¡Ã¦Â£â‚¬Ã¦Âµâ€¹
 
-| 类型 | 检测方式 | 默认端口 |
+| Ã§Â±Â»Ã¥Å¾â€¹ | Ã¦Â£â‚¬Ã¦Âµâ€¹Ã¦â€“Â¹Ã¥Â¼Â | Ã©Â»ËœÃ¨Â®Â¤Ã§Â«Â¯Ã¥ÂÂ£ |
 |------|-----------|--------------|
 | Vite | vite.config.\* | 5173 |
 | Next.js | next.config.\* | 3000 |
 | Nuxt | nuxt.config.\* | 3000 |
-| CRA | package.json 中的 react-scripts | 3000 |
-| Express/Node | server/backend/api 目录 + package.json | 3000 |
+| CRA | package.json Ã¤Â¸Â­Ã§Å¡â€ž react-scripts | 3000 |
+| Express/Node | server/backend/api Ã§â€ºÂ®Ã¥Â½â€¢ + package.json | 3000 |
 | FastAPI/Flask | requirements.txt / pyproject.toml | 8000 |
 | Go | go.mod / main.go | 8080 |
 
-**端口检测优先级**: 用户指定 > .env 文件 > 配置文件 > 脚本参数 > 默认端口
+**Ã§Â«Â¯Ã¥ÂÂ£Ã¦Â£â‚¬Ã¦Âµâ€¹Ã¤Â¼ËœÃ¥â€¦Ë†Ã§ÂºÂ§**: Ã§â€Â¨Ã¦Ë†Â·Ã¦Å’â€¡Ã¥Â®Å¡ > .env Ã¦â€“â€¡Ã¤Â»Â¶ > Ã©â€¦ÂÃ§Â½Â®Ã¦â€“â€¡Ã¤Â»Â¶ > Ã¨â€žÅ¡Ã¦Å“Â¬Ã¥Ââ€šÃ¦â€¢Â° > Ã©Â»ËœÃ¨Â®Â¤Ã§Â«Â¯Ã¥ÂÂ£
 
 ***
 
-## 生成的文件
+## Ã§â€Å¸Ã¦Ë†ÂÃ§Å¡â€žÃ¦â€“â€¡Ã¤Â»Â¶
 
 ```
 project/
-├── ecosystem.config.cjs              # PM2 配置文件
-├── {backend}/start.cjs               # Python 包装器（如适用）
-└── .claude/
-    ├── commands/
-    │   ├── pm2-all.md                # 启动所有 + 监控
-    │   ├── pm2-all-stop.md           # 停止所有
-    │   ├── pm2-all-restart.md        # 重启所有
-    │   ├── pm2-{port}.md             # 启动单个 + 日志
-    │   ├── pm2-{port}-stop.md        # 停止单个
-    │   ├── pm2-{port}-restart.md     # 重启单个
-    │   ├── pm2-logs.md               # 查看所有日志
-    │   └── pm2-status.md             # 查看状态
-    └── scripts/
-        ├── pm2-logs-{port}.ps1       # 单个服务日志
-        └── pm2-monit.ps1             # PM2 监控器
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ ecosystem.config.cjs              # PM2 Ã©â€¦ÂÃ§Â½Â®Ã¦â€“â€¡Ã¤Â»Â¶
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ {backend}/start.cjs               # Python Ã¥Å’â€¦Ã¨Â£â€¦Ã¥â„¢Â¨Ã¯Â¼Ë†Ã¥Â¦â€šÃ©â‚¬â€šÃ§â€Â¨Ã¯Â¼â€°
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ .claude/
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ commands/
+    Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ pm2-all.md                # Ã¥ÂÂ¯Ã¥Å Â¨Ã¦â€°â‚¬Ã¦Å“â€° + Ã§â€ºâ€˜Ã¦Å½Â§
+    Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ pm2-all-stop.md           # Ã¥ÂÅ“Ã¦Â­Â¢Ã¦â€°â‚¬Ã¦Å“â€°
+    Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ pm2-all-restart.md        # Ã©â€¡ÂÃ¥ÂÂ¯Ã¦â€°â‚¬Ã¦Å“â€°
+    Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ pm2-{port}.md             # Ã¥ÂÂ¯Ã¥Å Â¨Ã¥Ââ€¢Ã¤Â¸Âª + Ã¦â€”Â¥Ã¥Â¿â€”
+    Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ pm2-{port}-stop.md        # Ã¥ÂÅ“Ã¦Â­Â¢Ã¥Ââ€¢Ã¤Â¸Âª
+    Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ pm2-{port}-restart.md     # Ã©â€¡ÂÃ¥ÂÂ¯Ã¥Ââ€¢Ã¤Â¸Âª
+    Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ pm2-logs.md               # Ã¦Å¸Â¥Ã§Å“â€¹Ã¦â€°â‚¬Ã¦Å“â€°Ã¦â€”Â¥Ã¥Â¿â€”
+    Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ pm2-status.md             # Ã¦Å¸Â¥Ã§Å“â€¹Ã§Å Â¶Ã¦â‚¬Â
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ scripts/
+        Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ pm2-logs-{port}.ps1       # Ã¥Ââ€¢Ã¤Â¸ÂªÃ¦Å“ÂÃ¥Å Â¡Ã¦â€”Â¥Ã¥Â¿â€”
+        Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ pm2-monit.ps1             # PM2 Ã§â€ºâ€˜Ã¦Å½Â§Ã¥â„¢Â¨
 ```
 
 ***
 
-## Windows 配置（重要）
+## Windows Ã©â€¦ÂÃ§Â½Â®Ã¯Â¼Ë†Ã©â€¡ÂÃ¨Â¦ÂÃ¯Â¼â€°
 
 ### ecosystem.config.cjs
 
-**必须使用 `.cjs` 扩展名**
+**Ã¥Â¿â€¦Ã©Â¡Â»Ã¤Â½Â¿Ã§â€Â¨ `.cjs` Ã¦â€°Â©Ã¥Â±â€¢Ã¥ÂÂ**
 
 ```javascript
 module.exports = {
@@ -83,16 +96,16 @@ module.exports = {
 }
 ```
 
-**框架脚本路径:**
+**Ã¦Â¡â€ Ã¦Å¾Â¶Ã¨â€žÅ¡Ã¦Å“Â¬Ã¨Â·Â¯Ã¥Â¾â€ž:**
 
-| 框架 | script | args |
+| Ã¦Â¡â€ Ã¦Å¾Â¶ | script | args |
 |-----------|--------|------|
 | Vite | `node_modules/vite/bin/vite.js` | `--port {port}` |
 | Next.js | `node_modules/next/dist/bin/next` | `dev -p {port}` |
 | Nuxt | `node_modules/nuxt/bin/nuxt.mjs` | `dev --port {port}` |
-| Express | `src/index.js` 或 `server.js` | - |
+| Express | `src/index.js` Ã¦Ë†â€“ `server.js` | - |
 
-### Python 包装脚本 (start.cjs)
+### Python Ã¥Å’â€¦Ã¨Â£â€¦Ã¨â€žÅ¡Ã¦Å“Â¬ (start.cjs)
 
 ```javascript
 const { spawn } = require('child_process');
@@ -104,12 +117,12 @@ proc.on('close', (code) => process.exit(code));
 
 ***
 
-## 命令文件模板（最简内容）
+## Ã¥â€˜Â½Ã¤Â»Â¤Ã¦â€“â€¡Ã¤Â»Â¶Ã¦Â¨Â¡Ã¦ÂÂ¿Ã¯Â¼Ë†Ã¦Å“â‚¬Ã§Â®â‚¬Ã¥â€ â€¦Ã¥Â®Â¹Ã¯Â¼â€°
 
-### pm2-all.md (启动所有 + 监控)
+### pm2-all.md (Ã¥ÂÂ¯Ã¥Å Â¨Ã¦â€°â‚¬Ã¦Å“â€° + Ã§â€ºâ€˜Ã¦Å½Â§)
 
 ````markdown
-启动所有服务并打开 PM2 监控器。
+Ã¥ÂÂ¯Ã¥Å Â¨Ã¦â€°â‚¬Ã¦Å“â€°Ã¦Å“ÂÃ¥Å Â¡Ã¥Â¹Â¶Ã¦â€°â€œÃ¥Â¼â‚¬ PM2 Ã§â€ºâ€˜Ã¦Å½Â§Ã¥â„¢Â¨Ã£â‚¬â€š
 ```bash
 cd "{PROJECT_ROOT}" && pm2 start ecosystem.config.cjs && start wt.exe -d "{PROJECT_ROOT}" pwsh -NoExit -c "pm2 monit"
 ```
@@ -118,7 +131,7 @@ cd "{PROJECT_ROOT}" && pm2 start ecosystem.config.cjs && start wt.exe -d "{PROJE
 ### pm2-all-stop.md
 
 ````markdown
-停止所有服务。
+Ã¥ÂÅ“Ã¦Â­Â¢Ã¦â€°â‚¬Ã¦Å“â€°Ã¦Å“ÂÃ¥Å Â¡Ã£â‚¬â€š
 ```bash
 cd "{PROJECT_ROOT}" && pm2 stop all
 ```
@@ -127,16 +140,16 @@ cd "{PROJECT_ROOT}" && pm2 stop all
 ### pm2-all-restart.md
 
 ````markdown
-重启所有服务。
+Ã©â€¡ÂÃ¥ÂÂ¯Ã¦â€°â‚¬Ã¦Å“â€°Ã¦Å“ÂÃ¥Å Â¡Ã£â‚¬â€š
 ```bash
 cd "{PROJECT_ROOT}" && pm2 restart all
 ```
 ````
 
-### pm2-{port}.md (启动单个 + 日志)
+### pm2-{port}.md (Ã¥ÂÂ¯Ã¥Å Â¨Ã¥Ââ€¢Ã¤Â¸Âª + Ã¦â€”Â¥Ã¥Â¿â€”)
 
 ````markdown
-启动 {name} ({port}) 并打开日志。
+Ã¥ÂÂ¯Ã¥Å Â¨ {name} ({port}) Ã¥Â¹Â¶Ã¦â€°â€œÃ¥Â¼â‚¬Ã¦â€”Â¥Ã¥Â¿â€”Ã£â‚¬â€š
 ```bash
 cd "{PROJECT_ROOT}" && pm2 start ecosystem.config.cjs --only {name} && start wt.exe -d "{PROJECT_ROOT}" pwsh -NoExit -c "pm2 logs {name}"
 ```
@@ -145,7 +158,7 @@ cd "{PROJECT_ROOT}" && pm2 start ecosystem.config.cjs --only {name} && start wt.
 ### pm2-{port}-stop.md
 
 ````markdown
-停止 {name} ({port})。
+Ã¥ÂÅ“Ã¦Â­Â¢ {name} ({port})Ã£â‚¬â€š
 ```bash
 cd "{PROJECT_ROOT}" && pm2 stop {name}
 ```
@@ -154,7 +167,7 @@ cd "{PROJECT_ROOT}" && pm2 stop {name}
 ### pm2-{port}-restart.md
 
 ````markdown
-重启 {name} ({port})。
+Ã©â€¡ÂÃ¥ÂÂ¯ {name} ({port})Ã£â‚¬â€š
 ```bash
 cd "{PROJECT_ROOT}" && pm2 restart {name}
 ```
@@ -163,7 +176,7 @@ cd "{PROJECT_ROOT}" && pm2 restart {name}
 ### pm2-logs.md
 
 ````markdown
-查看所有 PM2 日志。
+Ã¦Å¸Â¥Ã§Å“â€¹Ã¦â€°â‚¬Ã¦Å“â€° PM2 Ã¦â€”Â¥Ã¥Â¿â€”Ã£â‚¬â€š
 ```bash
 cd "{PROJECT_ROOT}" && pm2 logs
 ```
@@ -172,20 +185,20 @@ cd "{PROJECT_ROOT}" && pm2 logs
 ### pm2-status.md
 
 ````markdown
-查看 PM2 状态。
+Ã¦Å¸Â¥Ã§Å“â€¹ PM2 Ã§Å Â¶Ã¦â‚¬ÂÃ£â‚¬â€š
 ```bash
 cd "{PROJECT_ROOT}" && pm2 status
 ```
 ````
 
-### PowerShell 脚本 (pm2-logs-{port}.ps1)
+### PowerShell Ã¨â€žÅ¡Ã¦Å“Â¬ (pm2-logs-{port}.ps1)
 
 ```powershell
 Set-Location "{PROJECT_ROOT}"
 pm2 logs {name}
 ```
 
-### PowerShell 脚本 (pm2-monit.ps1)
+### PowerShell Ã¨â€žÅ¡Ã¦Å“Â¬ (pm2-monit.ps1)
 
 ```powershell
 Set-Location "{PROJECT_ROOT}"
@@ -194,43 +207,43 @@ pm2 monit
 
 ***
 
-## 关键规则
+## Ã¥â€¦Â³Ã©â€Â®Ã¨Â§â€žÃ¥Ë†â„¢
 
-1. **配置文件**: `ecosystem.config.cjs` (不是 .js)
-2. **Node.js**: 直接指定 bin 路径 + 解释器
-3. **Python**: Node.js 包装脚本 + `windowsHide: true`
-4. **打开新窗口**: `start wt.exe -d "{path}" pwsh -NoExit -c "command"`
-5. **最简内容**: 每个命令文件只有 1-2 行描述 + bash 代码块
-6. **直接执行**: 无需 AI 解析，直接运行 bash 命令
-
-***
-
-## 执行
-
-基于 `$ARGUMENTS`，执行初始化：
-
-1. 扫描项目服务
-2. 生成 `ecosystem.config.cjs`
-3. 为 Python 服务生成 `{backend}/start.cjs`（如果适用）
-4. 在 `.claude/commands/` 中生成命令文件
-5. 在 `.claude/scripts/` 中生成脚本文件
-6. **更新项目 CLAUDE.md**，添加 PM2 信息（见下文）
-7. **显示完成摘要**，包含终端命令
+1. **Ã©â€¦ÂÃ§Â½Â®Ã¦â€“â€¡Ã¤Â»Â¶**: `ecosystem.config.cjs` (Ã¤Â¸ÂÃ¦ËœÂ¯ .js)
+2. **Node.js**: Ã§â€ºÂ´Ã¦Å½Â¥Ã¦Å’â€¡Ã¥Â®Å¡ bin Ã¨Â·Â¯Ã¥Â¾â€ž + Ã¨Â§Â£Ã©â€¡Å Ã¥â„¢Â¨
+3. **Python**: Node.js Ã¥Å’â€¦Ã¨Â£â€¦Ã¨â€žÅ¡Ã¦Å“Â¬ + `windowsHide: true`
+4. **Ã¦â€°â€œÃ¥Â¼â‚¬Ã¦â€“Â°Ã§Âªâ€”Ã¥ÂÂ£**: `start wt.exe -d "{path}" pwsh -NoExit -c "command"`
+5. **Ã¦Å“â‚¬Ã§Â®â‚¬Ã¥â€ â€¦Ã¥Â®Â¹**: Ã¦Â¯ÂÃ¤Â¸ÂªÃ¥â€˜Â½Ã¤Â»Â¤Ã¦â€“â€¡Ã¤Â»Â¶Ã¥ÂÂªÃ¦Å“â€° 1-2 Ã¨Â¡Å’Ã¦ÂÂÃ¨Â¿Â° + bash Ã¤Â»Â£Ã§Â ÂÃ¥Ââ€”
+6. **Ã§â€ºÂ´Ã¦Å½Â¥Ã¦â€°Â§Ã¨Â¡Å’**: Ã¦â€”Â Ã©Å“â‚¬ AI Ã¨Â§Â£Ã¦Å¾ÂÃ¯Â¼Å’Ã§â€ºÂ´Ã¦Å½Â¥Ã¨Â¿ÂÃ¨Â¡Å’ bash Ã¥â€˜Â½Ã¤Â»Â¤
 
 ***
 
-## 初始化后：更新 CLAUDE.md
+## Ã¦â€°Â§Ã¨Â¡Å’
 
-生成文件后，将 PM2 部分追加到项目的 `CLAUDE.md`（如果不存在则创建）：
+Ã¥Å¸ÂºÃ¤ÂºÅ½ `$ARGUMENTS`Ã¯Â¼Å’Ã¦â€°Â§Ã¨Â¡Å’Ã¥Ë†ÂÃ¥Â§â€¹Ã¥Å’â€“Ã¯Â¼Å¡
+
+1. Ã¦â€°Â«Ã¦ÂÂÃ©Â¡Â¹Ã§â€ºÂ®Ã¦Å“ÂÃ¥Å Â¡
+2. Ã§â€Å¸Ã¦Ë†Â `ecosystem.config.cjs`
+3. Ã¤Â¸Âº Python Ã¦Å“ÂÃ¥Å Â¡Ã§â€Å¸Ã¦Ë†Â `{backend}/start.cjs`Ã¯Â¼Ë†Ã¥Â¦â€šÃ¦Å¾Å“Ã©â‚¬â€šÃ§â€Â¨Ã¯Â¼â€°
+4. Ã¥Å“Â¨ `.claude/commands/` Ã¤Â¸Â­Ã§â€Å¸Ã¦Ë†ÂÃ¥â€˜Â½Ã¤Â»Â¤Ã¦â€“â€¡Ã¤Â»Â¶
+5. Ã¥Å“Â¨ `.claude/scripts/` Ã¤Â¸Â­Ã§â€Å¸Ã¦Ë†ÂÃ¨â€žÅ¡Ã¦Å“Â¬Ã¦â€“â€¡Ã¤Â»Â¶
+6. **Ã¦â€ºÂ´Ã¦â€“Â°Ã©Â¡Â¹Ã§â€ºÂ® CLAUDE.md**Ã¯Â¼Å’Ã¦Â·Â»Ã¥Å Â  PM2 Ã¤Â¿Â¡Ã¦ÂÂ¯Ã¯Â¼Ë†Ã¨Â§ÂÃ¤Â¸â€¹Ã¦â€“â€¡Ã¯Â¼â€°
+7. **Ã¦ËœÂ¾Ã§Â¤ÂºÃ¥Â®Å’Ã¦Ë†ÂÃ¦â€˜ËœÃ¨Â¦Â**Ã¯Â¼Å’Ã¥Å’â€¦Ã¥ÂÂ«Ã§Â»Ë†Ã§Â«Â¯Ã¥â€˜Â½Ã¤Â»Â¤
+
+***
+
+## Ã¥Ë†ÂÃ¥Â§â€¹Ã¥Å’â€“Ã¥ÂÅ½Ã¯Â¼Å¡Ã¦â€ºÂ´Ã¦â€“Â° CLAUDE.md
+
+Ã§â€Å¸Ã¦Ë†ÂÃ¦â€“â€¡Ã¤Â»Â¶Ã¥ÂÅ½Ã¯Â¼Å’Ã¥Â°â€  PM2 Ã©Æ’Â¨Ã¥Ë†â€ Ã¨Â¿Â½Ã¥Å Â Ã¥Ë†Â°Ã©Â¡Â¹Ã§â€ºÂ®Ã§Å¡â€ž `CLAUDE.md`Ã¯Â¼Ë†Ã¥Â¦â€šÃ¦Å¾Å“Ã¤Â¸ÂÃ¥Â­ËœÃ¥Å“Â¨Ã¥Ë†â„¢Ã¥Ë†â€ºÃ¥Â»ÂºÃ¯Â¼â€°Ã¯Â¼Å¡
 
 ````markdown
-## PM2 服务
+## PM2 Ã¦Å“ÂÃ¥Å Â¡
 
-| 端口 | 名称 | 类型 |
+| Ã§Â«Â¯Ã¥ÂÂ£ | Ã¥ÂÂÃ§Â§Â° | Ã§Â±Â»Ã¥Å¾â€¹ |
 |------|------|------|
 | {port} | {name} | {type} |
 
-**终端命令：**
+**Ã§Â»Ë†Ã§Â«Â¯Ã¥â€˜Â½Ã¤Â»Â¤Ã¯Â¼Å¡**
 ```bash
 pm2 start ecosystem.config.cjs   # First time
 pm2 start all                    # After first time
@@ -242,42 +255,42 @@ pm2 resurrect                    # Restore saved list
 ```
 ````
 
-**更新 CLAUDE.md 的规则：**
+**Ã¦â€ºÂ´Ã¦â€“Â° CLAUDE.md Ã§Å¡â€žÃ¨Â§â€žÃ¥Ë†â„¢Ã¯Â¼Å¡**
 
-* 如果存在 PM2 部分，替换它
-* 如果不存在，追加到末尾
-* 保持内容精简且必要
+* Ã¥Â¦â€šÃ¦Å¾Å“Ã¥Â­ËœÃ¥Å“Â¨ PM2 Ã©Æ’Â¨Ã¥Ë†â€ Ã¯Â¼Å’Ã¦â€ºÂ¿Ã¦ÂÂ¢Ã¥Â®Æ’
+* Ã¥Â¦â€šÃ¦Å¾Å“Ã¤Â¸ÂÃ¥Â­ËœÃ¥Å“Â¨Ã¯Â¼Å’Ã¨Â¿Â½Ã¥Å Â Ã¥Ë†Â°Ã¦Å“Â«Ã¥Â°Â¾
+* Ã¤Â¿ÂÃ¦Å’ÂÃ¥â€ â€¦Ã¥Â®Â¹Ã§Â²Â¾Ã§Â®â‚¬Ã¤Â¸â€Ã¥Â¿â€¦Ã¨Â¦Â
 
 ***
 
-## 初始化后：显示摘要
+## Ã¥Ë†ÂÃ¥Â§â€¹Ã¥Å’â€“Ã¥ÂÅ½Ã¯Â¼Å¡Ã¦ËœÂ¾Ã§Â¤ÂºÃ¦â€˜ËœÃ¨Â¦Â
 
-所有文件生成后，输出：
+Ã¦â€°â‚¬Ã¦Å“â€°Ã¦â€“â€¡Ã¤Â»Â¶Ã§â€Å¸Ã¦Ë†ÂÃ¥ÂÅ½Ã¯Â¼Å’Ã¨Â¾â€œÃ¥â€¡ÂºÃ¯Â¼Å¡
 
 ```
-## PM2 初始化完成
+## PM2 Ã¥Ë†ÂÃ¥Â§â€¹Ã¥Å’â€“Ã¥Â®Å’Ã¦Ë†Â
 
-**服务列表：**
+**Ã¦Å“ÂÃ¥Å Â¡Ã¥Ë†â€”Ã¨Â¡Â¨Ã¯Â¼Å¡**
 
-| 端口 | 名称 | 类型 |
+| Ã§Â«Â¯Ã¥ÂÂ£ | Ã¥ÂÂÃ§Â§Â° | Ã§Â±Â»Ã¥Å¾â€¹ |
 |------|------|------|
 | {port} | {name} | {type} |
 
-**Claude 指令：** /pm2-all, /pm2-all-stop, /pm2-{port}, /pm2-{port}-stop, /pm2-logs, /pm2-status
+**Claude Ã¦Å’â€¡Ã¤Â»Â¤Ã¯Â¼Å¡** /pm2-all, /pm2-all-stop, /pm2-{port}, /pm2-{port}-stop, /pm2-logs, /pm2-status
 
-**终端命令：**
-## 首次运行（使用配置文件）
+**Ã§Â»Ë†Ã§Â«Â¯Ã¥â€˜Â½Ã¤Â»Â¤Ã¯Â¼Å¡**
+## Ã©Â¦â€“Ã¦Â¬Â¡Ã¨Â¿ÂÃ¨Â¡Å’Ã¯Â¼Ë†Ã¤Â½Â¿Ã§â€Â¨Ã©â€¦ÂÃ§Â½Â®Ã¦â€“â€¡Ã¤Â»Â¶Ã¯Â¼â€°
 pm2 start ecosystem.config.cjs && pm2 save
 
-## 首次之后（简化命令）
-pm2 start all          # 启动全部
-pm2 stop all           # 停止全部
-pm2 restart all        # 重启全部
-pm2 start {name}       # 启动单个
-pm2 stop {name}        # 停止单个
-pm2 logs               # 查看日志
-pm2 monit              # 监控面板
-pm2 resurrect          # 恢复已保存进程
+## Ã©Â¦â€“Ã¦Â¬Â¡Ã¤Â¹â€¹Ã¥ÂÅ½Ã¯Â¼Ë†Ã§Â®â‚¬Ã¥Å’â€“Ã¥â€˜Â½Ã¤Â»Â¤Ã¯Â¼â€°
+pm2 start all          # Ã¥ÂÂ¯Ã¥Å Â¨Ã¥â€¦Â¨Ã©Æ’Â¨
+pm2 stop all           # Ã¥ÂÅ“Ã¦Â­Â¢Ã¥â€¦Â¨Ã©Æ’Â¨
+pm2 restart all        # Ã©â€¡ÂÃ¥ÂÂ¯Ã¥â€¦Â¨Ã©Æ’Â¨
+pm2 start {name}       # Ã¥ÂÂ¯Ã¥Å Â¨Ã¥Ââ€¢Ã¤Â¸Âª
+pm2 stop {name}        # Ã¥ÂÅ“Ã¦Â­Â¢Ã¥Ââ€¢Ã¤Â¸Âª
+pm2 logs               # Ã¦Å¸Â¥Ã§Å“â€¹Ã¦â€”Â¥Ã¥Â¿â€”
+pm2 monit              # Ã§â€ºâ€˜Ã¦Å½Â§Ã©ÂÂ¢Ã¦ÂÂ¿
+pm2 resurrect          # Ã¦ÂÂ¢Ã¥Â¤ÂÃ¥Â·Â²Ã¤Â¿ÂÃ¥Â­ËœÃ¨Â¿â€ºÃ§Â¨â€¹
 
-**提示：** 首次启动后运行 `pm2 save` 以启用简化命令。
+**Ã¦ÂÂÃ§Â¤ÂºÃ¯Â¼Å¡** Ã©Â¦â€“Ã¦Â¬Â¡Ã¥ÂÂ¯Ã¥Å Â¨Ã¥ÂÅ½Ã¨Â¿ÂÃ¨Â¡Å’ `pm2 save` Ã¤Â»Â¥Ã¥ÂÂ¯Ã§â€Â¨Ã§Â®â‚¬Ã¥Å’â€“Ã¥â€˜Â½Ã¤Â»Â¤Ã£â‚¬â€š
 ```

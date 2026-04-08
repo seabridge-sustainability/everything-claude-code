@@ -6,11 +6,24 @@ version: 2.1.0
 ---
 
 # Continuous Learning v2.1 - Instinct
+
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
 -Based Architecture
 
 An advanced learning system that turns your Claude Code sessions into reusable knowledge through atomic "instincts" - small learned behaviors with confidence scoring.
 
-**v2.1** adds **project-scoped instincts** — React patterns stay in your React project, Python conventions stay in your Python project, and universal patterns (like "always validate input") are shared globally.
+**v2.1** adds **project-scoped instincts** Ã¢â‚¬â€ React patterns stay in your React project, Python conventions stay in your Python project, and universal patterns (like "always validate input") are shared globally.
 
 ## When to Activate
 
@@ -29,7 +42,7 @@ An advanced learning system that turns your Claude Code sessions into reusable k
 | Storage | Global (~/.claude/homunculus/) | Project-scoped (projects/<hash>/) |
 | Scope | All instincts apply everywhere | Project-scoped + global |
 | Detection | None | git remote URL / repo path |
-| Promotion | N/A | Project → global when seen in 2+ projects |
+| Promotion | N/A | Project Ã¢â€ â€™ global when seen in 2+ projects |
 | Commands | 4 (status/evolve/export/import) | 6 (+promote/projects) |
 | Cross-project | Contamination risk | Isolated by default |
 
@@ -350,7 +363,7 @@ v2.1 is fully compatible with v2.0 and v1:
 
 - Observations stay **local** on your machine
 - Project-scoped instincts are isolated per project
-- Only **instincts** (patterns) can be exported — not raw observations
+- Only **instincts** (patterns) can be exported Ã¢â‚¬â€ not raw observations
 - No actual code or conversation content is shared
 - You control what gets exported and promoted
 

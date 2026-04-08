@@ -1,44 +1,57 @@
 ---
 name: backend-patterns
-description: Node.js, Express ve Next.js API routes için backend mimari kalıpları, API tasarımı, veritabanı optimizasyonu ve sunucu tarafı en iyi uygulamalar.
+description: Node.js, Express ve Next.js API routes iÃƒÂ§in backend mimari kalÃ„Â±plarÃ„Â±, API tasarÃ„Â±mÃ„Â±, veritabanÃ„Â± optimizasyonu ve sunucu tarafÃ„Â± en iyi uygulamalar.
 origin: ECC
 ---
 
-# Backend Geliştirme Kalıpları
+# Backend GeliÃ…Å¸tirme KalÃ„Â±plarÃ„Â±
 
-Ölçeklenebilir sunucu tarafı uygulamalar için backend mimari kalıpları ve en iyi uygulamalar.
+## Safety And Authorization Rule
 
-## Ne Zaman Aktifleştirmelisiniz
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+Ãƒâ€“lÃƒÂ§eklenebilir sunucu tarafÃ„Â± uygulamalar iÃƒÂ§in backend mimari kalÃ„Â±plarÃ„Â± ve en iyi uygulamalar.
+
+## Ne Zaman AktifleÃ…Å¸tirmelisiniz
 
 - REST veya GraphQL API endpoint'leri tasarlarken
-- Repository, service veya controller katmanları uygularken
-- Veritabanı sorgularını optimize ederken (N+1, indeksleme, bağlantı havuzu)
-- Önbellekleme eklerken (Redis, in-memory, HTTP cache başlıkları)
-- Arka plan işleri veya async işleme ayarlarken
-- API'ler için hata yönetimi ve doğrulama yapılandırırken
-- Middleware oluştururken (auth, logging, rate limiting)
+- Repository, service veya controller katmanlarÃ„Â± uygularken
+- VeritabanÃ„Â± sorgularÃ„Â±nÃ„Â± optimize ederken (N+1, indeksleme, baÃ„Å¸lantÃ„Â± havuzu)
+- Ãƒâ€“nbellekleme eklerken (Redis, in-memory, HTTP cache baÃ…Å¸lÃ„Â±klarÃ„Â±)
+- Arka plan iÃ…Å¸leri veya async iÃ…Å¸leme ayarlarken
+- API'ler iÃƒÂ§in hata yÃƒÂ¶netimi ve doÃ„Å¸rulama yapÃ„Â±landÃ„Â±rÃ„Â±rken
+- Middleware oluÃ…Å¸tururken (auth, logging, rate limiting)
 
-## API Tasarım Kalıpları
+## API TasarÃ„Â±m KalÃ„Â±plarÃ„Â±
 
-### RESTful API Yapısı
+### RESTful API YapÃ„Â±sÃ„Â±
 
 ```typescript
-// PASS: Kaynak tabanlı URL'ler
-GET    /api/markets                 # Kaynakları listele
+// PASS: Kaynak tabanlÃ„Â± URL'ler
+GET    /api/markets                 # KaynaklarÃ„Â± listele
 GET    /api/markets/:id             # Tek kaynak getir
-POST   /api/markets                 # Kaynak oluştur
-PUT    /api/markets/:id             # Kaynağı değiştir (tam)
-PATCH  /api/markets/:id             # Kaynağı güncelle (kısmi)
-DELETE /api/markets/:id             # Kaynağı sil
+POST   /api/markets                 # Kaynak oluÃ…Å¸tur
+PUT    /api/markets/:id             # KaynaÃ„Å¸Ã„Â± deÃ„Å¸iÃ…Å¸tir (tam)
+PATCH  /api/markets/:id             # KaynaÃ„Å¸Ã„Â± gÃƒÂ¼ncelle (kÃ„Â±smi)
+DELETE /api/markets/:id             # KaynaÃ„Å¸Ã„Â± sil
 
-// PASS: Filtreleme, sıralama, sayfalama için query parametreleri
+// PASS: Filtreleme, sÃ„Â±ralama, sayfalama iÃƒÂ§in query parametreleri
 GET /api/markets?status=active&sort=volume&limit=20&offset=0
 ```
 
-### Repository Kalıbı
+### Repository KalÃ„Â±bÃ„Â±
 
 ```typescript
-// Veri erişim mantığını soyutla
+// Veri eriÃ…Å¸im mantÃ„Â±Ã„Å¸Ã„Â±nÃ„Â± soyutla
 interface MarketRepository {
   findAll(filters?: MarketFilters): Promise<Market[]>
   findById(id: string): Promise<Market | null>
@@ -65,26 +78,26 @@ class SupabaseMarketRepository implements MarketRepository {
     return data
   }
 
-  // Diğer metodlar...
+  // DiÃ„Å¸er metodlar...
 }
 ```
 
-### Service Katmanı Kalıbı
+### Service KatmanÃ„Â± KalÃ„Â±bÃ„Â±
 
 ```typescript
-// İş mantığı veri erişiminden ayrılmış
+// Ã„Â°Ã…Å¸ mantÃ„Â±Ã„Å¸Ã„Â± veri eriÃ…Å¸iminden ayrÃ„Â±lmÃ„Â±Ã…Å¸
 class MarketService {
   constructor(private marketRepo: MarketRepository) {}
 
   async searchMarkets(query: string, limit: number = 10): Promise<Market[]> {
-    // İş mantığı
+    // Ã„Â°Ã…Å¸ mantÃ„Â±Ã„Å¸Ã„Â±
     const embedding = await generateEmbedding(query)
     const results = await this.vectorSearch(embedding, limit)
 
     // Tam veriyi getir
     const markets = await this.marketRepo.findByIds(results.map(r => r.id))
 
-    // Benzerliğe göre sırala
+    // BenzerliÃ„Å¸e gÃƒÂ¶re sÃ„Â±rala
     return markets.sort((a, b) => {
       const scoreA = results.find(r => r.id === a.id)?.score || 0
       const scoreB = results.find(r => r.id === b.id)?.score || 0
@@ -98,10 +111,10 @@ class MarketService {
 }
 ```
 
-### Middleware Kalıbı
+### Middleware KalÃ„Â±bÃ„Â±
 
 ```typescript
-// Request/response işleme hattı
+// Request/response iÃ…Å¸leme hattÃ„Â±
 export function withAuth(handler: NextApiHandler): NextApiHandler {
   return async (req, res) => {
     const token = req.headers.authorization?.replace('Bearer ', '')
@@ -120,18 +133,18 @@ export function withAuth(handler: NextApiHandler): NextApiHandler {
   }
 }
 
-// Kullanım
+// KullanÃ„Â±m
 export default withAuth(async (req, res) => {
-  // Handler req.user'a erişebilir
+  // Handler req.user'a eriÃ…Å¸ebilir
 })
 ```
 
-## Veritabanı Kalıpları
+## VeritabanÃ„Â± KalÃ„Â±plarÃ„Â±
 
 ### Sorgu Optimizasyonu
 
 ```typescript
-// PASS: İYİ: Sadece gerekli sütunları seç
+// PASS: Ã„Â°YÃ„Â°: Sadece gerekli sÃƒÂ¼tunlarÃ„Â± seÃƒÂ§
 const { data } = await supabase
   .from('markets')
   .select('id, name, status, volume')
@@ -139,22 +152,22 @@ const { data } = await supabase
   .order('volume', { ascending: false })
   .limit(10)
 
-// FAIL: KÖTÜ: Her şeyi seç
+// FAIL: KÃƒâ€“TÃƒÅ“: Her Ã…Å¸eyi seÃƒÂ§
 const { data } = await supabase
   .from('markets')
   .select('*')
 ```
 
-### N+1 Sorgu Önleme
+### N+1 Sorgu Ãƒâ€“nleme
 
 ```typescript
-// FAIL: KÖTÜ: N+1 sorgu problemi
+// FAIL: KÃƒâ€“TÃƒÅ“: N+1 sorgu problemi
 const markets = await getMarkets()
 for (const market of markets) {
   market.creator = await getUser(market.creator_id)  // N sorgu
 }
 
-// PASS: İYİ: Toplu getirme
+// PASS: Ã„Â°YÃ„Â°: Toplu getirme
 const markets = await getMarkets()
 const creatorIds = markets.map(m => m.creator_id)
 const creators = await getUsers(creatorIds)  // 1 sorgu
@@ -165,7 +178,7 @@ markets.forEach(market => {
 })
 ```
 
-### Transaction Kalıbı
+### Transaction KalÃ„Â±bÃ„Â±
 
 ```typescript
 async function createMarketWithPosition(
@@ -191,7 +204,7 @@ RETURNS jsonb
 LANGUAGE plpgsql
 AS $$
 BEGIN
-  -- Transaction otomatik başlar
+  -- Transaction otomatik baÃ…Å¸lar
   INSERT INTO markets VALUES (market_data);
   INSERT INTO positions VALUES (position_data);
   RETURN jsonb_build_object('success', true);
@@ -203,9 +216,9 @@ END;
 $$;
 ```
 
-## Önbellekleme Stratejileri
+## Ãƒâ€“nbellekleme Stratejileri
 
-### Redis Önbellekleme Katmanı
+### Redis Ãƒâ€“nbellekleme KatmanÃ„Â±
 
 ```typescript
 class CachedMarketRepository implements MarketRepository {
@@ -215,18 +228,18 @@ class CachedMarketRepository implements MarketRepository {
   ) {}
 
   async findById(id: string): Promise<Market | null> {
-    // Önce önbelleği kontrol et
+    // Ãƒâ€“nce ÃƒÂ¶nbelleÃ„Å¸i kontrol et
     const cached = await this.redis.get(`market:${id}`)
 
     if (cached) {
       return JSON.parse(cached)
     }
 
-    // Cache miss - veritabanından getir
+    // Cache miss - veritabanÃ„Â±ndan getir
     const market = await this.baseRepo.findById(id)
 
     if (market) {
-      // 5 dakika önbellekle
+      // 5 dakika ÃƒÂ¶nbellekle
       await this.redis.setex(`market:${id}`, 300, JSON.stringify(market))
     }
 
@@ -239,13 +252,13 @@ class CachedMarketRepository implements MarketRepository {
 }
 ```
 
-### Cache-Aside Kalıbı
+### Cache-Aside KalÃ„Â±bÃ„Â±
 
 ```typescript
 async function getMarketWithCache(id: string): Promise<Market> {
   const cacheKey = `market:${id}`
 
-  // Önbelleği dene
+  // Ãƒâ€“nbelleÃ„Å¸i dene
   const cached = await redis.get(cacheKey)
   if (cached) return JSON.parse(cached)
 
@@ -254,16 +267,16 @@ async function getMarketWithCache(id: string): Promise<Market> {
 
   if (!market) throw new Error('Market not found')
 
-  // Önbelleği güncelle
+  // Ãƒâ€“nbelleÃ„Å¸i gÃƒÂ¼ncelle
   await redis.setex(cacheKey, 300, JSON.stringify(market))
 
   return market
 }
 ```
 
-## Hata Yönetimi Kalıpları
+## Hata YÃƒÂ¶netimi KalÃ„Â±plarÃ„Â±
 
-### Merkezi Hata Yöneticisi
+### Merkezi Hata YÃƒÂ¶neticisi
 
 ```typescript
 class ApiError extends Error {
@@ -293,7 +306,7 @@ export function errorHandler(error: unknown, req: Request): Response {
     }, { status: 400 })
   }
 
-  // Beklenmeyen hataları logla
+  // Beklenmeyen hatalarÃ„Â± logla
   console.error('Unexpected error:', error)
 
   return NextResponse.json({
@@ -302,7 +315,7 @@ export function errorHandler(error: unknown, req: Request): Response {
   }, { status: 500 })
 }
 
-// Kullanım
+// KullanÃ„Â±m
 export async function GET(request: Request) {
   try {
     const data = await fetchData()
@@ -339,13 +352,13 @@ async function fetchWithRetry<T>(
   throw lastError!
 }
 
-// Kullanım
+// KullanÃ„Â±m
 const data = await fetchWithRetry(() => fetchFromAPI())
 ```
 
-## Kimlik Doğrulama ve Yetkilendirme
+## Kimlik DoÃ„Å¸rulama ve Yetkilendirme
 
-### JWT Token Doğrulama
+### JWT Token DoÃ„Å¸rulama
 
 ```typescript
 import jwt from 'jsonwebtoken'
@@ -375,7 +388,7 @@ export async function requireAuth(request: Request) {
   return verifyToken(token)
 }
 
-// API route'unda kullanım
+// API route'unda kullanÃ„Â±m
 export async function GET(request: Request) {
   const user = await requireAuth(request)
 
@@ -385,7 +398,7 @@ export async function GET(request: Request) {
 }
 ```
 
-### Rol Tabanlı Erişim Kontrolü
+### Rol TabanlÃ„Â± EriÃ…Å¸im KontrolÃƒÂ¼
 
 ```typescript
 type Permission = 'read' | 'write' | 'delete' | 'admin'
@@ -419,10 +432,10 @@ export function requirePermission(permission: Permission) {
   }
 }
 
-// Kullanım - HOF handler'ı sarar
+// KullanÃ„Â±m - HOF handler'Ã„Â± sarar
 export const DELETE = requirePermission('delete')(
   async (request: Request, user: User) => {
-    // Handler doğrulanmış yetki ile kullanıcı alır
+    // Handler doÃ„Å¸rulanmÃ„Â±Ã…Å¸ yetki ile kullanÃ„Â±cÃ„Â± alÃ„Â±r
     return new Response('Deleted', { status: 200 })
   }
 )
@@ -444,14 +457,14 @@ class RateLimiter {
     const now = Date.now()
     const requests = this.requests.get(identifier) || []
 
-    // Pencere dışındaki eski istekleri kaldır
+    // Pencere dÃ„Â±Ã…Å¸Ã„Â±ndaki eski istekleri kaldÃ„Â±r
     const recentRequests = requests.filter(time => now - time < windowMs)
 
     if (recentRequests.length >= maxRequests) {
-      return false  // Rate limit aşıldı
+      return false  // Rate limit aÃ…Å¸Ã„Â±ldÃ„Â±
     }
 
-    // Mevcut isteği ekle
+    // Mevcut isteÃ„Å¸i ekle
     recentRequests.push(now)
     this.requests.set(identifier, recentRequests)
 
@@ -472,13 +485,13 @@ export async function GET(request: Request) {
     }, { status: 429 })
   }
 
-  // İstekle devam et
+  // Ã„Â°stekle devam et
 }
 ```
 
-## Arka Plan İşleri ve Kuyruklar
+## Arka Plan Ã„Â°Ã…Å¸leri ve Kuyruklar
 
-### Basit Kuyruk Kalıbı
+### Basit Kuyruk KalÃ„Â±bÃ„Â±
 
 ```typescript
 class JobQueue<T> {
@@ -510,11 +523,11 @@ class JobQueue<T> {
   }
 
   private async execute(job: T): Promise<void> {
-    // İş yürütme mantığı
+    // Ã„Â°Ã…Å¸ yÃƒÂ¼rÃƒÂ¼tme mantÃ„Â±Ã„Å¸Ã„Â±
   }
 }
 
-// Market indeksleme için kullanım
+// Market indeksleme iÃƒÂ§in kullanÃ„Â±m
 interface IndexJob {
   marketId: string
 }
@@ -524,16 +537,16 @@ const indexQueue = new JobQueue<IndexJob>()
 export async function POST(request: Request) {
   const { marketId } = await request.json()
 
-  // Bloke etmek yerine kuyruğa ekle
+  // Bloke etmek yerine kuyruÃ„Å¸a ekle
   await indexQueue.add({ marketId })
 
   return NextResponse.json({ success: true, message: 'Job queued' })
 }
 ```
 
-## Loglama ve İzleme
+## Loglama ve Ã„Â°zleme
 
-### Yapılandırılmış Loglama
+### YapÃ„Â±landÃ„Â±rÃ„Â±lmÃ„Â±Ã…Å¸ Loglama
 
 ```typescript
 interface LogContext {
@@ -575,7 +588,7 @@ class Logger {
 
 const logger = new Logger()
 
-// Kullanım
+// KullanÃ„Â±m
 export async function GET(request: Request) {
   const requestId = crypto.randomUUID()
 
@@ -595,4 +608,4 @@ export async function GET(request: Request) {
 }
 ```
 
-**Unutmayın**: Backend kalıpları ölçeklenebilir, sürdürülebilir sunucu tarafı uygulamalar sağlar. Karmaşıklık seviyenize uyan kalıpları seçin.
+**UnutmayÃ„Â±n**: Backend kalÃ„Â±plarÃ„Â± ÃƒÂ¶lÃƒÂ§eklenebilir, sÃƒÂ¼rdÃƒÂ¼rÃƒÂ¼lebilir sunucu tarafÃ„Â± uygulamalar saÃ„Å¸lar. KarmaÃ…Å¸Ã„Â±klÃ„Â±k seviyenize uyan kalÃ„Â±plarÃ„Â± seÃƒÂ§in.

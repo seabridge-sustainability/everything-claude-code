@@ -6,6 +6,19 @@ origin: ECC
 
 # Deployment Patterns
 
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
 Production deployment workflows and CI/CD best practices.
 
 ## When to Activate
@@ -21,24 +34,24 @@ Production deployment workflows and CI/CD best practices.
 
 ### Rolling Deployment (Default)
 
-Replace instances gradually — old and new versions run simultaneously during rollout.
+Replace instances gradually Ã¢â‚¬â€ old and new versions run simultaneously during rollout.
 
 ```
-Instance 1: v1 → v2  (update first)
+Instance 1: v1 Ã¢â€ â€™ v2  (update first)
 Instance 2: v1        (still running v1)
 Instance 3: v1        (still running v1)
 
 Instance 1: v2
-Instance 2: v1 → v2  (update second)
+Instance 2: v1 Ã¢â€ â€™ v2  (update second)
 Instance 3: v1
 
 Instance 1: v2
 Instance 2: v2
-Instance 3: v1 → v2  (update last)
+Instance 3: v1 Ã¢â€ â€™ v2  (update last)
 ```
 
 **Pros:** Zero downtime, gradual rollout
-**Cons:** Two versions run simultaneously — requires backward-compatible changes
+**Cons:** Two versions run simultaneously Ã¢â‚¬â€ requires backward-compatible changes
 **Use when:** Standard deployments, backward-compatible changes
 
 ### Blue-Green Deployment
@@ -46,12 +59,12 @@ Instance 3: v1 → v2  (update last)
 Run two identical environments. Switch traffic atomically.
 
 ```
-Blue  (v1) ← traffic
+Blue  (v1) Ã¢â€ Â traffic
 Green (v2)   idle, running new version
 
 # After verification:
 Blue  (v1)   idle (becomes standby)
-Green (v2) ← traffic
+Green (v2) Ã¢â€ Â traffic
 ```
 
 **Pros:** Instant rollback (switch back to blue), clean cutover
@@ -255,10 +268,10 @@ jobs:
 
 ```
 PR opened:
-  lint → typecheck → unit tests → integration tests → preview deploy
+  lint Ã¢â€ â€™ typecheck Ã¢â€ â€™ unit tests Ã¢â€ â€™ integration tests Ã¢â€ â€™ preview deploy
 
 Merged to main:
-  lint → typecheck → unit tests → integration tests → build image → deploy staging → smoke tests → deploy production
+  lint Ã¢â€ â€™ typecheck Ã¢â€ â€™ unit tests Ã¢â€ â€™ integration tests Ã¢â€ â€™ build image Ã¢â€ â€™ deploy staging Ã¢â€ â€™ smoke tests Ã¢â€ â€™ deploy production
 ```
 
 ## Health Checks
@@ -333,7 +346,7 @@ startupProbe:
 ### Twelve-Factor App Pattern
 
 ```bash
-# All config via environment variables — never in code
+# All config via environment variables Ã¢â‚¬â€ never in code
 DATABASE_URL=postgres://user:pass@host:5432/db
 REDIS_URL=redis://host:6379/0
 API_KEY=${API_KEY}           # injected by secrets manager
@@ -359,7 +372,7 @@ const envSchema = z.object({
   LOG_LEVEL: z.enum(["debug", "info", "warn", "error"]).default("info"),
 });
 
-// Validate at startup — fail fast if config is wrong
+// Validate at startup Ã¢â‚¬â€ fail fast if config is wrong
 export const env = envSchema.parse(process.env);
 ```
 

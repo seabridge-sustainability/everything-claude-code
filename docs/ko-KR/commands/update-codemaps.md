@@ -1,60 +1,73 @@
-# 코드맵 업데이트
+# Ã¬Â½â€Ã«â€œÅ“Ã«Â§Âµ Ã¬â€”â€¦Ã«ÂÂ°Ã¬ÂÂ´Ã­Å Â¸
 
-코드베이스 구조를 분석하고 토큰 효율적인 아키텍처 문서를 생성합니다.
+## Safety And Authorization Rule
 
-## 1단계: 프로젝트 구조 스캔
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-1. 프로젝트 유형 식별 (모노레포, 단일 앱, 라이브러리, 마이크로서비스)
-2. 모든 소스 디렉토리 찾기 (src/, lib/, app/, packages/)
-3. 엔트리 포인트 매핑 (main.ts, index.ts, app.py, main.go 등)
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-## 2단계: 코드맵 생성
 
-`docs/CODEMAPS/`에 코드맵 생성 또는 업데이트:
+Ã¬Â½â€Ã«â€œÅ“Ã«Â²Â Ã¬ÂÂ´Ã¬Å Â¤ ÃªÂµÂ¬Ã¬Â¡Â°Ã«Â¥Â¼ Ã«Â¶â€žÃ¬â€žÂÃ­â€¢ËœÃªÂ³Â  Ã­â€ Â Ã­ÂÂ° Ã­Å¡Â¨Ã¬Å“Â¨Ã¬Â ÂÃ¬ÂÂ¸ Ã¬â€¢â€žÃ­â€šÂ¤Ã­â€¦ÂÃ¬Â²Ëœ Ã«Â¬Â¸Ã¬â€žÅ“Ã«Â¥Â¼ Ã¬Æ’ÂÃ¬â€žÂ±Ã­â€¢Â©Ã«â€¹Ë†Ã«â€¹Â¤.
 
-| 파일 | 내용 |
+## 1Ã«â€¹Â¨ÃªÂ³â€ž: Ã­â€â€žÃ«Â¡Å“Ã¬Â ÂÃ­Å Â¸ ÃªÂµÂ¬Ã¬Â¡Â° Ã¬Å Â¤Ã¬Âºâ€
+
+1. Ã­â€â€žÃ«Â¡Å“Ã¬Â ÂÃ­Å Â¸ Ã¬Å“Â Ã­Ëœâ€¢ Ã¬â€¹ÂÃ«Â³â€ž (Ã«ÂªÂ¨Ã«â€¦Â¸Ã«Â Ë†Ã­ÂÂ¬, Ã«â€¹Â¨Ã¬ÂÂ¼ Ã¬â€¢Â±, Ã«ÂÂ¼Ã¬ÂÂ´Ã«Â¸Å’Ã«Å¸Â¬Ã«Â¦Â¬, Ã«Â§Ë†Ã¬ÂÂ´Ã­ÂÂ¬Ã«Â¡Å“Ã¬â€žÅ“Ã«Â¹â€žÃ¬Å Â¤)
+2. Ã«ÂªÂ¨Ã«â€œÂ  Ã¬â€ Å’Ã¬Å Â¤ Ã«â€â€Ã«Â â€°Ã­â€ Â Ã«Â¦Â¬ Ã¬Â°Â¾ÃªÂ¸Â° (src/, lib/, app/, packages/)
+3. Ã¬â€”â€Ã­Å Â¸Ã«Â¦Â¬ Ã­ÂÂ¬Ã¬ÂÂ¸Ã­Å Â¸ Ã«Â§Â¤Ã­â€¢â€˜ (main.ts, index.ts, app.py, main.go Ã«â€œÂ±)
+
+## 2Ã«â€¹Â¨ÃªÂ³â€ž: Ã¬Â½â€Ã«â€œÅ“Ã«Â§Âµ Ã¬Æ’ÂÃ¬â€žÂ±
+
+`docs/CODEMAPS/`Ã¬â€”Â Ã¬Â½â€Ã«â€œÅ“Ã«Â§Âµ Ã¬Æ’ÂÃ¬â€žÂ± Ã«ËœÂÃ«Å â€ Ã¬â€”â€¦Ã«ÂÂ°Ã¬ÂÂ´Ã­Å Â¸:
+
+| Ã­Å’Å’Ã¬ÂÂ¼ | Ã«â€šÂ´Ã¬Å¡Â© |
 |------|------|
-| `INDEX.md` | 전체 코드베이스 개요와 영역별 링크 |
-| `backend.md` | API 라우트, 미들웨어 체인, 서비스 → 리포지토리 매핑 |
-| `frontend.md` | 페이지 트리, 컴포넌트 계층, 상태 관리 흐름 |
-| `database.md` | 데이터베이스 스키마, 마이그레이션, 저장소 계층 |
-| `integrations.md` | 외부 서비스, 서드파티 통합, 어댑터 |
-| `workers.md` | 백그라운드 작업, 큐, 스케줄러 |
+| `INDEX.md` | Ã¬Â â€žÃ¬Â²Â´ Ã¬Â½â€Ã«â€œÅ“Ã«Â²Â Ã¬ÂÂ´Ã¬Å Â¤ ÃªÂ°Å“Ã¬Å¡â€Ã¬â„¢â‚¬ Ã¬ËœÂÃ¬â€”Â­Ã«Â³â€ž Ã«Â§ÂÃ­ÂÂ¬ |
+| `backend.md` | API Ã«ÂÂ¼Ã¬Å¡Â°Ã­Å Â¸, Ã«Â¯Â¸Ã«â€œÂ¤Ã¬â€ºÂ¨Ã¬â€“Â´ Ã¬Â²Â´Ã¬ÂÂ¸, Ã¬â€žÅ“Ã«Â¹â€žÃ¬Å Â¤ Ã¢â€ â€™ Ã«Â¦Â¬Ã­ÂÂ¬Ã¬Â§â‚¬Ã­â€ Â Ã«Â¦Â¬ Ã«Â§Â¤Ã­â€¢â€˜ |
+| `frontend.md` | Ã­Å½ËœÃ¬ÂÂ´Ã¬Â§â‚¬ Ã­Å Â¸Ã«Â¦Â¬, Ã¬Â»Â´Ã­ÂÂ¬Ã«â€žÅ’Ã­Å Â¸ ÃªÂ³â€žÃ¬Â¸Âµ, Ã¬Æ’ÂÃ­Æ’Å“ ÃªÂ´â‚¬Ã«Â¦Â¬ Ã­ÂÂÃ«Â¦â€ž |
+| `database.md` | Ã«ÂÂ°Ã¬ÂÂ´Ã­â€žÂ°Ã«Â²Â Ã¬ÂÂ´Ã¬Å Â¤ Ã¬Å Â¤Ã­â€šÂ¤Ã«Â§Ë†, Ã«Â§Ë†Ã¬ÂÂ´ÃªÂ·Â¸Ã«Â Ë†Ã¬ÂÂ´Ã¬â€¦Ëœ, Ã¬Â â‚¬Ã¬Å¾Â¥Ã¬â€ Å’ ÃªÂ³â€žÃ¬Â¸Âµ |
+| `integrations.md` | Ã¬â„¢Â¸Ã«Â¶â‚¬ Ã¬â€žÅ“Ã«Â¹â€žÃ¬Å Â¤, Ã¬â€žÅ“Ã«â€œÅ“Ã­Å’Å’Ã­â€¹Â° Ã­â€ ÂµÃ­â€¢Â©, Ã¬â€“Â´Ã«Å’â€˜Ã­â€žÂ° |
+| `workers.md` | Ã«Â°Â±ÃªÂ·Â¸Ã«ÂÂ¼Ã¬Å¡Â´Ã«â€œÅ“ Ã¬Å¾â€˜Ã¬â€”â€¦, Ã­ÂÂ, Ã¬Å Â¤Ã¬Â¼â‚¬Ã¬Â¤â€žÃ«Å¸Â¬ |
 
-### 코드맵 형식
+### Ã¬Â½â€Ã«â€œÅ“Ã«Â§Âµ Ã­Ëœâ€¢Ã¬â€¹Â
 
-각 코드맵은 토큰 효율적이어야 합니다 — AI 컨텍스트 소비에 최적화:
+ÃªÂ°Â Ã¬Â½â€Ã«â€œÅ“Ã«Â§ÂµÃ¬Ââ‚¬ Ã­â€ Â Ã­ÂÂ° Ã­Å¡Â¨Ã¬Å“Â¨Ã¬Â ÂÃ¬ÂÂ´Ã¬â€“Â´Ã¬â€¢Â¼ Ã­â€¢Â©Ã«â€¹Ë†Ã«â€¹Â¤ Ã¢â‚¬â€ AI Ã¬Â»Â¨Ã­â€¦ÂÃ¬Å Â¤Ã­Å Â¸ Ã¬â€ Å’Ã«Â¹â€žÃ¬â€”Â Ã¬ÂµÅ“Ã¬Â ÂÃ­â„¢â€:
 
 ```markdown
-# Backend 아키텍처
+# Backend Ã¬â€¢â€žÃ­â€šÂ¤Ã­â€¦ÂÃ¬Â²Ëœ
 
-## 라우트
-POST /api/users → UserController.create → UserService.create → UserRepo.insert
-GET  /api/users/:id → UserController.get → UserService.findById → UserRepo.findById
+## Ã«ÂÂ¼Ã¬Å¡Â°Ã­Å Â¸
+POST /api/users Ã¢â€ â€™ UserController.create Ã¢â€ â€™ UserService.create Ã¢â€ â€™ UserRepo.insert
+GET  /api/users/:id Ã¢â€ â€™ UserController.get Ã¢â€ â€™ UserService.findById Ã¢â€ â€™ UserRepo.findById
 
-## 주요 파일
-src/services/user.ts (비즈니스 로직, 120줄)
-src/repos/user.ts (데이터베이스 접근, 80줄)
+## Ã¬Â£Â¼Ã¬Å¡â€ Ã­Å’Å’Ã¬ÂÂ¼
+src/services/user.ts (Ã«Â¹â€žÃ¬Â¦Ë†Ã«â€¹Ë†Ã¬Å Â¤ Ã«Â¡Å“Ã¬Â§Â, 120Ã¬Â¤â€ž)
+src/repos/user.ts (Ã«ÂÂ°Ã¬ÂÂ´Ã­â€žÂ°Ã«Â²Â Ã¬ÂÂ´Ã¬Å Â¤ Ã¬Â â€˜ÃªÂ·Â¼, 80Ã¬Â¤â€ž)
 
-## 의존성
-- PostgreSQL (주 데이터 저장소)
-- Redis (세션 캐시, 속도 제한)
-- Stripe (결제 처리)
+## Ã¬ÂËœÃ¬Â¡Â´Ã¬â€žÂ±
+- PostgreSQL (Ã¬Â£Â¼ Ã«ÂÂ°Ã¬ÂÂ´Ã­â€žÂ° Ã¬Â â‚¬Ã¬Å¾Â¥Ã¬â€ Å’)
+- Redis (Ã¬â€žÂ¸Ã¬â€¦Ëœ Ã¬ÂºÂÃ¬â€¹Å“, Ã¬â€ ÂÃ«Ââ€ž Ã¬Â Å“Ã­â€¢Å“)
+- Stripe (ÃªÂ²Â°Ã¬Â Å“ Ã¬Â²ËœÃ«Â¦Â¬)
 ```
 
-## 3단계: 영역 분류
+## 3Ã«â€¹Â¨ÃªÂ³â€ž: Ã¬ËœÂÃ¬â€”Â­ Ã«Â¶â€žÃ«Â¥Ëœ
 
-생성기는 파일 경로 패턴을 기반으로 영역을 자동 분류합니다:
+Ã¬Æ’ÂÃ¬â€žÂ±ÃªÂ¸Â°Ã«Å â€ Ã­Å’Å’Ã¬ÂÂ¼ ÃªÂ²Â½Ã«Â¡Å“ Ã­Å’Â¨Ã­â€žÂ´Ã¬Ââ€ž ÃªÂ¸Â°Ã«Â°ËœÃ¬Å“Â¼Ã«Â¡Å“ Ã¬ËœÂÃ¬â€”Â­Ã¬Ââ€ž Ã¬Å¾ÂÃ«Ââ„¢ Ã«Â¶â€žÃ«Â¥ËœÃ­â€¢Â©Ã«â€¹Ë†Ã«â€¹Â¤:
 
-1. 프론트엔드: `app/`, `pages/`, `components/`, `hooks/`, `.tsx`, `.jsx`
-2. 백엔드: `api/`, `routes/`, `controllers/`, `services/`, `.route.ts`
-3. 데이터베이스: `db/`, `migrations/`, `prisma/`, `repositories/`
-4. 통합: `integrations/`, `adapters/`, `connectors/`, `plugins/`
-5. 워커: `workers/`, `jobs/`, `queues/`, `tasks/`, `cron/`
+1. Ã­â€â€žÃ«Â¡Â Ã­Å Â¸Ã¬â€”â€Ã«â€œÅ“: `app/`, `pages/`, `components/`, `hooks/`, `.tsx`, `.jsx`
+2. Ã«Â°Â±Ã¬â€”â€Ã«â€œÅ“: `api/`, `routes/`, `controllers/`, `services/`, `.route.ts`
+3. Ã«ÂÂ°Ã¬ÂÂ´Ã­â€žÂ°Ã«Â²Â Ã¬ÂÂ´Ã¬Å Â¤: `db/`, `migrations/`, `prisma/`, `repositories/`
+4. Ã­â€ ÂµÃ­â€¢Â©: `integrations/`, `adapters/`, `connectors/`, `plugins/`
+5. Ã¬â€ºÅ’Ã¬Â»Â¤: `workers/`, `jobs/`, `queues/`, `tasks/`, `cron/`
 
-## 4단계: 메타데이터 추가
+## 4Ã«â€¹Â¨ÃªÂ³â€ž: Ã«Â©â€Ã­Æ’â‚¬Ã«ÂÂ°Ã¬ÂÂ´Ã­â€žÂ° Ã¬Â¶â€ÃªÂ°â‚¬
 
-각 코드맵에 최신 정보 헤더를 추가합니다:
+ÃªÂ°Â Ã¬Â½â€Ã«â€œÅ“Ã«Â§ÂµÃ¬â€”Â Ã¬ÂµÅ“Ã¬â€¹Â  Ã¬Â â€¢Ã«Â³Â´ Ã­â€”Â¤Ã«Ââ€Ã«Â¥Â¼ Ã¬Â¶â€ÃªÂ°â‚¬Ã­â€¢Â©Ã«â€¹Ë†Ã«â€¹Â¤:
 
 ```markdown
 **Last Updated:** 2026-03-12
@@ -62,18 +75,18 @@ src/repos/user.ts (데이터베이스 접근, 80줄)
 **Total Lines:** 1875
 ```
 
-## 5단계: 인덱스와 영역 문서 동기화
+## 5Ã«â€¹Â¨ÃªÂ³â€ž: Ã¬ÂÂ¸Ã«ÂÂ±Ã¬Å Â¤Ã¬â„¢â‚¬ Ã¬ËœÂÃ¬â€”Â­ Ã«Â¬Â¸Ã¬â€žÅ“ Ã«Ââ„¢ÃªÂ¸Â°Ã­â„¢â€
 
-`INDEX.md`는 생성된 영역 문서를 링크하고 요약해야 합니다:
-- 각 영역의 파일 수와 총 라인 수
-- 감지된 엔트리 포인트
-- 저장소 트리의 간단한 ASCII 개요
-- 영역별 세부 문서 링크
+`INDEX.md`Ã«Å â€ Ã¬Æ’ÂÃ¬â€žÂ±Ã«ÂÅ“ Ã¬ËœÂÃ¬â€”Â­ Ã«Â¬Â¸Ã¬â€žÅ“Ã«Â¥Â¼ Ã«Â§ÂÃ­ÂÂ¬Ã­â€¢ËœÃªÂ³Â  Ã¬Å¡â€Ã¬â€¢Â½Ã­â€¢Â´Ã¬â€¢Â¼ Ã­â€¢Â©Ã«â€¹Ë†Ã«â€¹Â¤:
+- ÃªÂ°Â Ã¬ËœÂÃ¬â€”Â­Ã¬ÂËœ Ã­Å’Å’Ã¬ÂÂ¼ Ã¬Ë†ËœÃ¬â„¢â‚¬ Ã¬Â´Â Ã«ÂÂ¼Ã¬ÂÂ¸ Ã¬Ë†Ëœ
+- ÃªÂ°ÂÃ¬Â§â‚¬Ã«ÂÅ“ Ã¬â€”â€Ã­Å Â¸Ã«Â¦Â¬ Ã­ÂÂ¬Ã¬ÂÂ¸Ã­Å Â¸
+- Ã¬Â â‚¬Ã¬Å¾Â¥Ã¬â€ Å’ Ã­Å Â¸Ã«Â¦Â¬Ã¬ÂËœ ÃªÂ°â€žÃ«â€¹Â¨Ã­â€¢Å“ ASCII ÃªÂ°Å“Ã¬Å¡â€
+- Ã¬ËœÂÃ¬â€”Â­Ã«Â³â€ž Ã¬â€žÂ¸Ã«Â¶â‚¬ Ã«Â¬Â¸Ã¬â€žÅ“ Ã«Â§ÂÃ­ÂÂ¬
 
-## 팁
+## Ã­Å’Â
 
-- **구현 세부사항이 아닌 상위 구조**에 집중
-- 전체 코드 블록 대신 **파일 경로와 함수 시그니처** 사용
-- 효율적인 컨텍스트 로딩을 위해 각 코드맵을 **1000 토큰 미만**으로 유지
-- 장황한 설명 대신 데이터 흐름에 ASCII 다이어그램 사용
-- 주요 기능 추가 또는 리팩토링 세션 후 `npx tsx scripts/codemaps/generate.ts` 실행
+- **ÃªÂµÂ¬Ã­Ëœâ€ž Ã¬â€žÂ¸Ã«Â¶â‚¬Ã¬â€šÂ¬Ã­â€¢Â­Ã¬ÂÂ´ Ã¬â€¢â€žÃ«â€¹Å’ Ã¬Æ’ÂÃ¬Å“â€ž ÃªÂµÂ¬Ã¬Â¡Â°**Ã¬â€”Â Ã¬Â§â€˜Ã¬Â¤â€˜
+- Ã¬Â â€žÃ¬Â²Â´ Ã¬Â½â€Ã«â€œÅ“ Ã«Â¸â€Ã«Â¡Â Ã«Å’â‚¬Ã¬â€¹Â  **Ã­Å’Å’Ã¬ÂÂ¼ ÃªÂ²Â½Ã«Â¡Å“Ã¬â„¢â‚¬ Ã­â€¢Â¨Ã¬Ë†Ëœ Ã¬â€¹Å“ÃªÂ·Â¸Ã«â€¹Ë†Ã¬Â²Ëœ** Ã¬â€šÂ¬Ã¬Å¡Â©
+- Ã­Å¡Â¨Ã¬Å“Â¨Ã¬Â ÂÃ¬ÂÂ¸ Ã¬Â»Â¨Ã­â€¦ÂÃ¬Å Â¤Ã­Å Â¸ Ã«Â¡Å“Ã«â€Â©Ã¬Ââ€ž Ã¬Å“â€žÃ­â€¢Â´ ÃªÂ°Â Ã¬Â½â€Ã«â€œÅ“Ã«Â§ÂµÃ¬Ââ€ž **1000 Ã­â€ Â Ã­ÂÂ° Ã«Â¯Â¸Ã«Â§Å’**Ã¬Å“Â¼Ã«Â¡Å“ Ã¬Å“Â Ã¬Â§â‚¬
+- Ã¬Å¾Â¥Ã­â„¢Â©Ã­â€¢Å“ Ã¬â€žÂ¤Ã«Âªâ€¦ Ã«Å’â‚¬Ã¬â€¹Â  Ã«ÂÂ°Ã¬ÂÂ´Ã­â€žÂ° Ã­ÂÂÃ«Â¦â€žÃ¬â€”Â ASCII Ã«â€¹Â¤Ã¬ÂÂ´Ã¬â€“Â´ÃªÂ·Â¸Ã«Å¾Â¨ Ã¬â€šÂ¬Ã¬Å¡Â©
+- Ã¬Â£Â¼Ã¬Å¡â€ ÃªÂ¸Â°Ã«Å Â¥ Ã¬Â¶â€ÃªÂ°â‚¬ Ã«ËœÂÃ«Å â€ Ã«Â¦Â¬Ã­Å’Â©Ã­â€ Â Ã«Â§Â Ã¬â€žÂ¸Ã¬â€¦Ëœ Ã­â€ºâ€ž `npx tsx scripts/codemaps/generate.ts` Ã¬â€¹Â¤Ã­â€“â€°

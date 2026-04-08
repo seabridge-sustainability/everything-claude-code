@@ -3,62 +3,75 @@ name: security-review
 description: Use this skill when adding authentication, handling user input, working with secrets, creating API endpoints, or implementing payment/sensitive features. Provides comprehensive security checklist and patterns.
 ---
 
-# 安全性審查技能
+# Ã¥Â®â€°Ã¥â€¦Â¨Ã¦â‚¬Â§Ã¥Â¯Â©Ã¦Å¸Â¥Ã¦Å â‚¬Ã¨Æ’Â½
 
-此技能確保所有程式碼遵循安全性最佳實務並識別潛在漏洞。
+## Safety And Authorization Rule
 
-## 何時啟用
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-- 實作認證或授權
-- 處理使用者輸入或檔案上傳
-- 建立新的 API 端點
-- 處理密鑰或憑證
-- 實作支付功能
-- 儲存或傳輸敏感資料
-- 整合第三方 API
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-## 安全性檢查清單
 
-### 1. 密鑰管理
+Ã¦Â­Â¤Ã¦Å â‚¬Ã¨Æ’Â½Ã§Â¢ÂºÃ¤Â¿ÂÃ¦â€°â‚¬Ã¦Å“â€°Ã§Â¨â€¹Ã¥Â¼ÂÃ§Â¢Â¼Ã©ÂÂµÃ¥Â¾ÂªÃ¥Â®â€°Ã¥â€¦Â¨Ã¦â‚¬Â§Ã¦Å“â‚¬Ã¤Â½Â³Ã¥Â¯Â¦Ã¥â€¹â„¢Ã¤Â¸Â¦Ã¨Â­ËœÃ¥Ë†Â¥Ã¦Â½â€ºÃ¥Å“Â¨Ã¦Â¼ÂÃ¦Â´Å¾Ã£â‚¬â€š
 
-#### FAIL: 絕不這樣做
+## Ã¤Â½â€¢Ã¦â„¢â€šÃ¥â€¢Å¸Ã§â€Â¨
+
+- Ã¥Â¯Â¦Ã¤Â½Å“Ã¨ÂªÂÃ¨Â­â€°Ã¦Ë†â€“Ã¦Å½Ë†Ã¦Â¬Å 
+- Ã¨â„¢â€¢Ã§Ââ€ Ã¤Â½Â¿Ã§â€Â¨Ã¨â‚¬â€¦Ã¨Â¼Â¸Ã¥â€¦Â¥Ã¦Ë†â€“Ã¦Âªâ€Ã¦Â¡Ë†Ã¤Â¸Å Ã¥â€šÂ³
+- Ã¥Â»ÂºÃ§Â«â€¹Ã¦â€“Â°Ã§Å¡â€ž API Ã§Â«Â¯Ã©Â»Å¾
+- Ã¨â„¢â€¢Ã§Ââ€ Ã¥Â¯â€ Ã©â€˜Â°Ã¦Ë†â€“Ã¦â€ â€˜Ã¨Â­â€°
+- Ã¥Â¯Â¦Ã¤Â½Å“Ã¦â€Â¯Ã¤Â»ËœÃ¥Å Å¸Ã¨Æ’Â½
+- Ã¥â€žÂ²Ã¥Â­ËœÃ¦Ë†â€“Ã¥â€šÂ³Ã¨Â¼Â¸Ã¦â€¢ÂÃ¦â€žÅ¸Ã¨Â³â€¡Ã¦â€“â„¢
+- Ã¦â€¢Â´Ã¥ÂË†Ã§Â¬Â¬Ã¤Â¸â€°Ã¦â€“Â¹ API
+
+## Ã¥Â®â€°Ã¥â€¦Â¨Ã¦â‚¬Â§Ã¦ÂªÂ¢Ã¦Å¸Â¥Ã¦Â¸â€¦Ã¥â€“Â®
+
+### 1. Ã¥Â¯â€ Ã©â€˜Â°Ã§Â®Â¡Ã§Ââ€ 
+
+#### FAIL: Ã§Âµâ€¢Ã¤Â¸ÂÃ©â‚¬â„¢Ã¦Â¨Â£Ã¥ÂÅ¡
 ```typescript
-const apiKey = "sk-proj-xxxxx"  // 寫死的密鑰
-const dbPassword = "password123" // 在原始碼中
+const apiKey = "sk-proj-xxxxx"  // Ã¥Â¯Â«Ã¦Â­Â»Ã§Å¡â€žÃ¥Â¯â€ Ã©â€˜Â°
+const dbPassword = "password123" // Ã¥Å“Â¨Ã¥Å½Å¸Ã¥Â§â€¹Ã§Â¢Â¼Ã¤Â¸Â­
 ```
 
-#### PASS: 總是這樣做
+#### PASS: Ã§Â¸Â½Ã¦ËœÂ¯Ã©â‚¬â„¢Ã¦Â¨Â£Ã¥ÂÅ¡
 ```typescript
 const apiKey = process.env.OPENAI_API_KEY
 const dbUrl = process.env.DATABASE_URL
 
-// 驗證密鑰存在
+// Ã©Â©â€”Ã¨Â­â€°Ã¥Â¯â€ Ã©â€˜Â°Ã¥Â­ËœÃ¥Å“Â¨
 if (!apiKey) {
   throw new Error('OPENAI_API_KEY not configured')
 }
 ```
 
-#### 驗證步驟
-- [ ] 無寫死的 API 金鑰、Token 或密碼
-- [ ] 所有密鑰在環境變數中
-- [ ] `.env.local` 在 .gitignore 中
-- [ ] git 歷史中無密鑰
-- [ ] 生產密鑰在託管平台（Vercel、Railway）中
+#### Ã©Â©â€”Ã¨Â­â€°Ã¦Â­Â¥Ã©Â©Å¸
+- [ ] Ã§â€žÂ¡Ã¥Â¯Â«Ã¦Â­Â»Ã§Å¡â€ž API Ã©â€¡â€˜Ã©â€˜Â°Ã£â‚¬ÂToken Ã¦Ë†â€“Ã¥Â¯â€ Ã§Â¢Â¼
+- [ ] Ã¦â€°â‚¬Ã¦Å“â€°Ã¥Â¯â€ Ã©â€˜Â°Ã¥Å“Â¨Ã§â€™Â°Ã¥Â¢Æ’Ã¨Â®Å Ã¦â€¢Â¸Ã¤Â¸Â­
+- [ ] `.env.local` Ã¥Å“Â¨ .gitignore Ã¤Â¸Â­
+- [ ] git Ã¦Â­Â·Ã¥ÂÂ²Ã¤Â¸Â­Ã§â€žÂ¡Ã¥Â¯â€ Ã©â€˜Â°
+- [ ] Ã§â€Å¸Ã§â€Â¢Ã¥Â¯â€ Ã©â€˜Â°Ã¥Å“Â¨Ã¨Â¨â€”Ã§Â®Â¡Ã¥Â¹Â³Ã¥ÂÂ°Ã¯Â¼Ë†VercelÃ£â‚¬ÂRailwayÃ¯Â¼â€°Ã¤Â¸Â­
 
-### 2. 輸入驗證
+### 2. Ã¨Â¼Â¸Ã¥â€¦Â¥Ã©Â©â€”Ã¨Â­â€°
 
-#### 總是驗證使用者輸入
+#### Ã§Â¸Â½Ã¦ËœÂ¯Ã©Â©â€”Ã¨Â­â€°Ã¤Â½Â¿Ã§â€Â¨Ã¨â‚¬â€¦Ã¨Â¼Â¸Ã¥â€¦Â¥
 ```typescript
 import { z } from 'zod'
 
-// 定義驗證 schema
+// Ã¥Â®Å¡Ã§Â¾Â©Ã©Â©â€”Ã¨Â­â€° schema
 const CreateUserSchema = z.object({
   email: z.string().email(),
   name: z.string().min(1).max(100),
   age: z.number().int().min(0).max(150)
 })
 
-// 處理前驗證
+// Ã¨â„¢â€¢Ã§Ââ€ Ã¥â€°ÂÃ©Â©â€”Ã¨Â­â€°
 export async function createUser(input: unknown) {
   try {
     const validated = CreateUserSchema.parse(input)
@@ -72,22 +85,22 @@ export async function createUser(input: unknown) {
 }
 ```
 
-#### 檔案上傳驗證
+#### Ã¦Âªâ€Ã¦Â¡Ë†Ã¤Â¸Å Ã¥â€šÂ³Ã©Â©â€”Ã¨Â­â€°
 ```typescript
 function validateFileUpload(file: File) {
-  // 大小檢查（最大 5MB）
+  // Ã¥Â¤Â§Ã¥Â°ÂÃ¦ÂªÂ¢Ã¦Å¸Â¥Ã¯Â¼Ë†Ã¦Å“â‚¬Ã¥Â¤Â§ 5MBÃ¯Â¼â€°
   const maxSize = 5 * 1024 * 1024
   if (file.size > maxSize) {
     throw new Error('File too large (max 5MB)')
   }
 
-  // 類型檢查
+  // Ã©Â¡Å¾Ã¥Å¾â€¹Ã¦ÂªÂ¢Ã¦Å¸Â¥
   const allowedTypes = ['image/jpeg', 'image/png', 'image/gif']
   if (!allowedTypes.includes(file.type)) {
     throw new Error('Invalid file type')
   }
 
-  // 副檔名檢查
+  // Ã¥â€°Â¯Ã¦Âªâ€Ã¥ÂÂÃ¦ÂªÂ¢Ã¦Å¸Â¥
   const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif']
   const extension = file.name.toLowerCase().match(/\.[^.]+$/)?.[0]
   if (!extension || !allowedExtensions.includes(extension)) {
@@ -98,59 +111,59 @@ function validateFileUpload(file: File) {
 }
 ```
 
-#### 驗證步驟
-- [ ] 所有使用者輸入以 schema 驗證
-- [ ] 檔案上傳受限（大小、類型、副檔名）
-- [ ] 查詢中不直接使用使用者輸入
-- [ ] 白名單驗證（非黑名單）
-- [ ] 錯誤訊息不洩露敏感資訊
+#### Ã©Â©â€”Ã¨Â­â€°Ã¦Â­Â¥Ã©Â©Å¸
+- [ ] Ã¦â€°â‚¬Ã¦Å“â€°Ã¤Â½Â¿Ã§â€Â¨Ã¨â‚¬â€¦Ã¨Â¼Â¸Ã¥â€¦Â¥Ã¤Â»Â¥ schema Ã©Â©â€”Ã¨Â­â€°
+- [ ] Ã¦Âªâ€Ã¦Â¡Ë†Ã¤Â¸Å Ã¥â€šÂ³Ã¥Ââ€”Ã©â„¢ÂÃ¯Â¼Ë†Ã¥Â¤Â§Ã¥Â°ÂÃ£â‚¬ÂÃ©Â¡Å¾Ã¥Å¾â€¹Ã£â‚¬ÂÃ¥â€°Â¯Ã¦Âªâ€Ã¥ÂÂÃ¯Â¼â€°
+- [ ] Ã¦Å¸Â¥Ã¨Â©Â¢Ã¤Â¸Â­Ã¤Â¸ÂÃ§â€ºÂ´Ã¦Å½Â¥Ã¤Â½Â¿Ã§â€Â¨Ã¤Â½Â¿Ã§â€Â¨Ã¨â‚¬â€¦Ã¨Â¼Â¸Ã¥â€¦Â¥
+- [ ] Ã§â„¢Â½Ã¥ÂÂÃ¥â€“Â®Ã©Â©â€”Ã¨Â­â€°Ã¯Â¼Ë†Ã©ÂÅ¾Ã©Â»â€˜Ã¥ÂÂÃ¥â€“Â®Ã¯Â¼â€°
+- [ ] Ã©Å’Â¯Ã¨ÂªÂ¤Ã¨Â¨Å Ã¦ÂÂ¯Ã¤Â¸ÂÃ¦Â´Â©Ã©Å“Â²Ã¦â€¢ÂÃ¦â€žÅ¸Ã¨Â³â€¡Ã¨Â¨Å 
 
-### 3. SQL 注入預防
+### 3. SQL Ã¦Â³Â¨Ã¥â€¦Â¥Ã©Â ÂÃ©ËœÂ²
 
-#### FAIL: 絕不串接 SQL
+#### FAIL: Ã§Âµâ€¢Ã¤Â¸ÂÃ¤Â¸Â²Ã¦Å½Â¥ SQL
 ```typescript
-// 危險 - SQL 注入漏洞
+// Ã¥ÂÂ±Ã©Å¡Âª - SQL Ã¦Â³Â¨Ã¥â€¦Â¥Ã¦Â¼ÂÃ¦Â´Å¾
 const query = `SELECT * FROM users WHERE email = '${userEmail}'`
 await db.query(query)
 ```
 
-#### PASS: 總是使用參數化查詢
+#### PASS: Ã§Â¸Â½Ã¦ËœÂ¯Ã¤Â½Â¿Ã§â€Â¨Ã¥ÂÆ’Ã¦â€¢Â¸Ã¥Å’â€“Ã¦Å¸Â¥Ã¨Â©Â¢
 ```typescript
-// 安全 - 參數化查詢
+// Ã¥Â®â€°Ã¥â€¦Â¨ - Ã¥ÂÆ’Ã¦â€¢Â¸Ã¥Å’â€“Ã¦Å¸Â¥Ã¨Â©Â¢
 const { data } = await supabase
   .from('users')
   .select('*')
   .eq('email', userEmail)
 
-// 或使用原始 SQL
+// Ã¦Ë†â€“Ã¤Â½Â¿Ã§â€Â¨Ã¥Å½Å¸Ã¥Â§â€¹ SQL
 await db.query(
   'SELECT * FROM users WHERE email = $1',
   [userEmail]
 )
 ```
 
-#### 驗證步驟
-- [ ] 所有資料庫查詢使用參數化查詢
-- [ ] SQL 中無字串串接
-- [ ] ORM/查詢建構器正確使用
-- [ ] Supabase 查詢正確淨化
+#### Ã©Â©â€”Ã¨Â­â€°Ã¦Â­Â¥Ã©Â©Å¸
+- [ ] Ã¦â€°â‚¬Ã¦Å“â€°Ã¨Â³â€¡Ã¦â€“â„¢Ã¥ÂºÂ«Ã¦Å¸Â¥Ã¨Â©Â¢Ã¤Â½Â¿Ã§â€Â¨Ã¥ÂÆ’Ã¦â€¢Â¸Ã¥Å’â€“Ã¦Å¸Â¥Ã¨Â©Â¢
+- [ ] SQL Ã¤Â¸Â­Ã§â€žÂ¡Ã¥Â­â€”Ã¤Â¸Â²Ã¤Â¸Â²Ã¦Å½Â¥
+- [ ] ORM/Ã¦Å¸Â¥Ã¨Â©Â¢Ã¥Â»ÂºÃ¦Â§â€¹Ã¥â„¢Â¨Ã¦Â­Â£Ã§Â¢ÂºÃ¤Â½Â¿Ã§â€Â¨
+- [ ] Supabase Ã¦Å¸Â¥Ã¨Â©Â¢Ã¦Â­Â£Ã§Â¢ÂºÃ¦Â·Â¨Ã¥Å’â€“
 
-### 4. 認證與授權
+### 4. Ã¨ÂªÂÃ¨Â­â€°Ã¨Ë†â€¡Ã¦Å½Ë†Ã¦Â¬Å 
 
-#### JWT Token 處理
+#### JWT Token Ã¨â„¢â€¢Ã§Ââ€ 
 ```typescript
-// FAIL: 錯誤：localStorage（易受 XSS 攻擊）
+// FAIL: Ã©Å’Â¯Ã¨ÂªÂ¤Ã¯Â¼Å¡localStorageÃ¯Â¼Ë†Ã¦Ëœâ€œÃ¥Ââ€” XSS Ã¦â€Â»Ã¦â€œÅ Ã¯Â¼â€°
 localStorage.setItem('token', token)
 
-// PASS: 正確：httpOnly cookies
+// PASS: Ã¦Â­Â£Ã§Â¢ÂºÃ¯Â¼Å¡httpOnly cookies
 res.setHeader('Set-Cookie',
   `token=${token}; HttpOnly; Secure; SameSite=Strict; Max-Age=3600`)
 ```
 
-#### 授權檢查
+#### Ã¦Å½Ë†Ã¦Â¬Å Ã¦ÂªÂ¢Ã¦Å¸Â¥
 ```typescript
 export async function deleteUser(userId: string, requesterId: string) {
-  // 總是先驗證授權
+  // Ã§Â¸Â½Ã¦ËœÂ¯Ã¥â€¦Ë†Ã©Â©â€”Ã¨Â­â€°Ã¦Å½Ë†Ã¦Â¬Å 
   const requester = await db.users.findUnique({
     where: { id: requesterId }
   })
@@ -162,41 +175,41 @@ export async function deleteUser(userId: string, requesterId: string) {
     )
   }
 
-  // 繼續刪除
+  // Ã§Â¹Â¼Ã§ÂºÅ’Ã¥Ë†ÂªÃ©â„¢Â¤
   await db.users.delete({ where: { id: userId } })
 }
 ```
 
-#### Row Level Security（Supabase）
+#### Row Level SecurityÃ¯Â¼Ë†SupabaseÃ¯Â¼â€°
 ```sql
--- 在所有表格上啟用 RLS
+-- Ã¥Å“Â¨Ã¦â€°â‚¬Ã¦Å“â€°Ã¨Â¡Â¨Ã¦Â Â¼Ã¤Â¸Å Ã¥â€¢Å¸Ã§â€Â¨ RLS
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 
--- 使用者只能查看自己的資料
+-- Ã¤Â½Â¿Ã§â€Â¨Ã¨â‚¬â€¦Ã¥ÂÂªÃ¨Æ’Â½Ã¦Å¸Â¥Ã§Å“â€¹Ã¨â€¡ÂªÃ¥Â·Â±Ã§Å¡â€žÃ¨Â³â€¡Ã¦â€“â„¢
 CREATE POLICY "Users view own data"
   ON users FOR SELECT
   USING (auth.uid() = id);
 
--- 使用者只能更新自己的資料
+-- Ã¤Â½Â¿Ã§â€Â¨Ã¨â‚¬â€¦Ã¥ÂÂªÃ¨Æ’Â½Ã¦â€ºÂ´Ã¦â€“Â°Ã¨â€¡ÂªÃ¥Â·Â±Ã§Å¡â€žÃ¨Â³â€¡Ã¦â€“â„¢
 CREATE POLICY "Users update own data"
   ON users FOR UPDATE
   USING (auth.uid() = id);
 ```
 
-#### 驗證步驟
-- [ ] Token 儲存在 httpOnly cookies（非 localStorage）
-- [ ] 敏感操作前有授權檢查
-- [ ] Supabase 已啟用 Row Level Security
-- [ ] 已實作基於角色的存取控制
-- [ ] 工作階段管理安全
+#### Ã©Â©â€”Ã¨Â­â€°Ã¦Â­Â¥Ã©Â©Å¸
+- [ ] Token Ã¥â€žÂ²Ã¥Â­ËœÃ¥Å“Â¨ httpOnly cookiesÃ¯Â¼Ë†Ã©ÂÅ¾ localStorageÃ¯Â¼â€°
+- [ ] Ã¦â€¢ÂÃ¦â€žÅ¸Ã¦â€œÂÃ¤Â½Å“Ã¥â€°ÂÃ¦Å“â€°Ã¦Å½Ë†Ã¦Â¬Å Ã¦ÂªÂ¢Ã¦Å¸Â¥
+- [ ] Supabase Ã¥Â·Â²Ã¥â€¢Å¸Ã§â€Â¨ Row Level Security
+- [ ] Ã¥Â·Â²Ã¥Â¯Â¦Ã¤Â½Å“Ã¥Å¸ÂºÃ¦â€“Â¼Ã¨Â§â€™Ã¨â€°Â²Ã§Å¡â€žÃ¥Â­ËœÃ¥Ââ€“Ã¦Å½Â§Ã¥Ë†Â¶
+- [ ] Ã¥Â·Â¥Ã¤Â½Å“Ã©Å¡Å½Ã¦Â®ÂµÃ§Â®Â¡Ã§Ââ€ Ã¥Â®â€°Ã¥â€¦Â¨
 
-### 5. XSS 預防
+### 5. XSS Ã©Â ÂÃ©ËœÂ²
 
-#### 淨化 HTML
+#### Ã¦Â·Â¨Ã¥Å’â€“ HTML
 ```typescript
 import DOMPurify from 'isomorphic-dompurify'
 
-// 總是淨化使用者提供的 HTML
+// Ã§Â¸Â½Ã¦ËœÂ¯Ã¦Â·Â¨Ã¥Å’â€“Ã¤Â½Â¿Ã§â€Â¨Ã¨â‚¬â€¦Ã¦ÂÂÃ¤Â¾â€ºÃ§Å¡â€ž HTML
 function renderUserContent(html: string) {
   const clean = DOMPurify.sanitize(html, {
     ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'p'],
@@ -224,13 +237,13 @@ const securityHeaders = [
 ]
 ```
 
-#### 驗證步驟
-- [ ] 使用者提供的 HTML 已淨化
-- [ ] CSP headers 已設定
-- [ ] 無未驗證的動態內容渲染
-- [ ] 使用 React 內建 XSS 保護
+#### Ã©Â©â€”Ã¨Â­â€°Ã¦Â­Â¥Ã©Â©Å¸
+- [ ] Ã¤Â½Â¿Ã§â€Â¨Ã¨â‚¬â€¦Ã¦ÂÂÃ¤Â¾â€ºÃ§Å¡â€ž HTML Ã¥Â·Â²Ã¦Â·Â¨Ã¥Å’â€“
+- [ ] CSP headers Ã¥Â·Â²Ã¨Â¨Â­Ã¥Â®Å¡
+- [ ] Ã§â€žÂ¡Ã¦Å“ÂªÃ©Â©â€”Ã¨Â­â€°Ã§Å¡â€žÃ¥â€¹â€¢Ã¦â€¦â€¹Ã¥â€¦Â§Ã¥Â®Â¹Ã¦Â¸Â²Ã¦Å¸â€œ
+- [ ] Ã¤Â½Â¿Ã§â€Â¨ React Ã¥â€¦Â§Ã¥Â»Âº XSS Ã¤Â¿ÂÃ¨Â­Â·
 
-### 6. CSRF 保護
+### 6. CSRF Ã¤Â¿ÂÃ¨Â­Â·
 
 #### CSRF Tokens
 ```typescript
@@ -246,7 +259,7 @@ export async function POST(request: Request) {
     )
   }
 
-  // 處理請求
+  // Ã¨â„¢â€¢Ã§Ââ€ Ã¨Â«â€¹Ã¦Â±â€š
 }
 ```
 
@@ -256,61 +269,61 @@ res.setHeader('Set-Cookie',
   `session=${sessionId}; HttpOnly; Secure; SameSite=Strict`)
 ```
 
-#### 驗證步驟
-- [ ] 狀態變更操作有 CSRF tokens
-- [ ] 所有 cookies 設定 SameSite=Strict
-- [ ] 已實作 Double-submit cookie 模式
+#### Ã©Â©â€”Ã¨Â­â€°Ã¦Â­Â¥Ã©Â©Å¸
+- [ ] Ã§â€¹â‚¬Ã¦â€¦â€¹Ã¨Â®Å Ã¦â€ºÂ´Ã¦â€œÂÃ¤Â½Å“Ã¦Å“â€° CSRF tokens
+- [ ] Ã¦â€°â‚¬Ã¦Å“â€° cookies Ã¨Â¨Â­Ã¥Â®Å¡ SameSite=Strict
+- [ ] Ã¥Â·Â²Ã¥Â¯Â¦Ã¤Â½Å“ Double-submit cookie Ã¦Â¨Â¡Ã¥Â¼Â
 
-### 7. 速率限制
+### 7. Ã©â‚¬Å¸Ã§Å½â€¡Ã©â„¢ÂÃ¥Ë†Â¶
 
-#### API 速率限制
+#### API Ã©â‚¬Å¸Ã§Å½â€¡Ã©â„¢ÂÃ¥Ë†Â¶
 ```typescript
 import rateLimit from 'express-rate-limit'
 
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 分鐘
-  max: 100, // 每視窗 100 個請求
+  windowMs: 15 * 60 * 1000, // 15 Ã¥Ë†â€ Ã©ÂËœ
+  max: 100, // Ã¦Â¯ÂÃ¨Â¦â€“Ã§Âªâ€” 100 Ã¥â‚¬â€¹Ã¨Â«â€¹Ã¦Â±â€š
   message: 'Too many requests'
 })
 
-// 套用到路由
+// Ã¥Â¥â€”Ã§â€Â¨Ã¥Ë†Â°Ã¨Â·Â¯Ã§â€Â±
 app.use('/api/', limiter)
 ```
 
-#### 昂貴操作
+#### Ã¦Ëœâ€šÃ¨Â²Â´Ã¦â€œÂÃ¤Â½Å“
 ```typescript
-// 搜尋的積極速率限制
+// Ã¦ÂÅ“Ã¥Â°â€¹Ã§Å¡â€žÃ§Â©ÂÃ¦Â¥ÂµÃ©â‚¬Å¸Ã§Å½â€¡Ã©â„¢ÂÃ¥Ë†Â¶
 const searchLimiter = rateLimit({
-  windowMs: 60 * 1000, // 1 分鐘
-  max: 10, // 每分鐘 10 個請求
+  windowMs: 60 * 1000, // 1 Ã¥Ë†â€ Ã©ÂËœ
+  max: 10, // Ã¦Â¯ÂÃ¥Ë†â€ Ã©ÂËœ 10 Ã¥â‚¬â€¹Ã¨Â«â€¹Ã¦Â±â€š
   message: 'Too many search requests'
 })
 
 app.use('/api/search', searchLimiter)
 ```
 
-#### 驗證步驟
-- [ ] 所有 API 端點有速率限制
-- [ ] 昂貴操作有更嚴格限制
-- [ ] 基於 IP 的速率限制
-- [ ] 基於使用者的速率限制（已認證）
+#### Ã©Â©â€”Ã¨Â­â€°Ã¦Â­Â¥Ã©Â©Å¸
+- [ ] Ã¦â€°â‚¬Ã¦Å“â€° API Ã§Â«Â¯Ã©Â»Å¾Ã¦Å“â€°Ã©â‚¬Å¸Ã§Å½â€¡Ã©â„¢ÂÃ¥Ë†Â¶
+- [ ] Ã¦Ëœâ€šÃ¨Â²Â´Ã¦â€œÂÃ¤Â½Å“Ã¦Å“â€°Ã¦â€ºÂ´Ã¥Å¡Â´Ã¦Â Â¼Ã©â„¢ÂÃ¥Ë†Â¶
+- [ ] Ã¥Å¸ÂºÃ¦â€“Â¼ IP Ã§Å¡â€žÃ©â‚¬Å¸Ã§Å½â€¡Ã©â„¢ÂÃ¥Ë†Â¶
+- [ ] Ã¥Å¸ÂºÃ¦â€“Â¼Ã¤Â½Â¿Ã§â€Â¨Ã¨â‚¬â€¦Ã§Å¡â€žÃ©â‚¬Å¸Ã§Å½â€¡Ã©â„¢ÂÃ¥Ë†Â¶Ã¯Â¼Ë†Ã¥Â·Â²Ã¨ÂªÂÃ¨Â­â€°Ã¯Â¼â€°
 
-### 8. 敏感資料暴露
+### 8. Ã¦â€¢ÂÃ¦â€žÅ¸Ã¨Â³â€¡Ã¦â€“â„¢Ã¦Å¡Â´Ã©Å“Â²
 
-#### 日誌記錄
+#### Ã¦â€”Â¥Ã¨ÂªÅ’Ã¨Â¨ËœÃ©Å’â€ž
 ```typescript
-// FAIL: 錯誤：記錄敏感資料
+// FAIL: Ã©Å’Â¯Ã¨ÂªÂ¤Ã¯Â¼Å¡Ã¨Â¨ËœÃ©Å’â€žÃ¦â€¢ÂÃ¦â€žÅ¸Ã¨Â³â€¡Ã¦â€“â„¢
 console.log('User login:', { email, password })
 console.log('Payment:', { cardNumber, cvv })
 
-// PASS: 正確：遮蔽敏感資料
+// PASS: Ã¦Â­Â£Ã§Â¢ÂºÃ¯Â¼Å¡Ã©ÂÂ®Ã¨â€Â½Ã¦â€¢ÂÃ¦â€žÅ¸Ã¨Â³â€¡Ã¦â€“â„¢
 console.log('User login:', { email, userId })
 console.log('Payment:', { last4: card.last4, userId })
 ```
 
-#### 錯誤訊息
+#### Ã©Å’Â¯Ã¨ÂªÂ¤Ã¨Â¨Å Ã¦ÂÂ¯
 ```typescript
-// FAIL: 錯誤：暴露內部細節
+// FAIL: Ã©Å’Â¯Ã¨ÂªÂ¤Ã¯Â¼Å¡Ã¦Å¡Â´Ã©Å“Â²Ã¥â€¦Â§Ã©Æ’Â¨Ã§Â´Â°Ã§Â¯â‚¬
 catch (error) {
   return NextResponse.json(
     { error: error.message, stack: error.stack },
@@ -318,7 +331,7 @@ catch (error) {
   )
 }
 
-// PASS: 正確：通用錯誤訊息
+// PASS: Ã¦Â­Â£Ã§Â¢ÂºÃ¯Â¼Å¡Ã©â‚¬Å¡Ã§â€Â¨Ã©Å’Â¯Ã¨ÂªÂ¤Ã¨Â¨Å Ã¦ÂÂ¯
 catch (error) {
   console.error('Internal error:', error)
   return NextResponse.json(
@@ -328,15 +341,15 @@ catch (error) {
 }
 ```
 
-#### 驗證步驟
-- [ ] 日誌中無密碼、token 或密鑰
-- [ ] 使用者收到通用錯誤訊息
-- [ ] 詳細錯誤只在伺服器日誌
-- [ ] 不向使用者暴露堆疊追蹤
+#### Ã©Â©â€”Ã¨Â­â€°Ã¦Â­Â¥Ã©Â©Å¸
+- [ ] Ã¦â€”Â¥Ã¨ÂªÅ’Ã¤Â¸Â­Ã§â€žÂ¡Ã¥Â¯â€ Ã§Â¢Â¼Ã£â‚¬Âtoken Ã¦Ë†â€“Ã¥Â¯â€ Ã©â€˜Â°
+- [ ] Ã¤Â½Â¿Ã§â€Â¨Ã¨â‚¬â€¦Ã¦â€Â¶Ã¥Ë†Â°Ã©â‚¬Å¡Ã§â€Â¨Ã©Å’Â¯Ã¨ÂªÂ¤Ã¨Â¨Å Ã¦ÂÂ¯
+- [ ] Ã¨Â©Â³Ã§Â´Â°Ã©Å’Â¯Ã¨ÂªÂ¤Ã¥ÂÂªÃ¥Å“Â¨Ã¤Â¼ÂºÃ¦Å“ÂÃ¥â„¢Â¨Ã¦â€”Â¥Ã¨ÂªÅ’
+- [ ] Ã¤Â¸ÂÃ¥Ââ€˜Ã¤Â½Â¿Ã§â€Â¨Ã¨â‚¬â€¦Ã¦Å¡Â´Ã©Å“Â²Ã¥Â â€ Ã§â€“Å Ã¨Â¿Â½Ã¨Â¹Â¤
 
-### 9. 區塊鏈安全（Solana）
+### 9. Ã¥Ââ‚¬Ã¥Â¡Å Ã©ÂË†Ã¥Â®â€°Ã¥â€¦Â¨Ã¯Â¼Ë†SolanaÃ¯Â¼â€°
 
-#### 錢包驗證
+#### Ã©Å’Â¢Ã¥Å’â€¦Ã©Â©â€”Ã¨Â­â€°
 ```typescript
 import { verify } from '@solana/web3.js'
 
@@ -358,20 +371,20 @@ async function verifyWalletOwnership(
 }
 ```
 
-#### 交易驗證
+#### Ã¤ÂºÂ¤Ã¦Ëœâ€œÃ©Â©â€”Ã¨Â­â€°
 ```typescript
 async function verifyTransaction(transaction: Transaction) {
-  // 驗證收款人
+  // Ã©Â©â€”Ã¨Â­â€°Ã¦â€Â¶Ã¦Â¬Â¾Ã¤ÂºÂº
   if (transaction.to !== expectedRecipient) {
     throw new Error('Invalid recipient')
   }
 
-  // 驗證金額
+  // Ã©Â©â€”Ã¨Â­â€°Ã©â€¡â€˜Ã©Â¡Â
   if (transaction.amount > maxAmount) {
     throw new Error('Amount exceeds limit')
   }
 
-  // 驗證使用者有足夠餘額
+  // Ã©Â©â€”Ã¨Â­â€°Ã¤Â½Â¿Ã§â€Â¨Ã¨â‚¬â€¦Ã¦Å“â€°Ã¨Â¶Â³Ã¥Â¤Â Ã©Â¤ËœÃ©Â¡Â
   const balance = await getBalance(transaction.from)
   if (balance < transaction.amount) {
     throw new Error('Insufficient balance')
@@ -381,56 +394,56 @@ async function verifyTransaction(transaction: Transaction) {
 }
 ```
 
-#### 驗證步驟
-- [ ] 錢包簽章已驗證
-- [ ] 交易詳情已驗證
-- [ ] 交易前有餘額檢查
-- [ ] 無盲目交易簽署
+#### Ã©Â©â€”Ã¨Â­â€°Ã¦Â­Â¥Ã©Â©Å¸
+- [ ] Ã©Å’Â¢Ã¥Å’â€¦Ã§Â°Â½Ã§Â«Â Ã¥Â·Â²Ã©Â©â€”Ã¨Â­â€°
+- [ ] Ã¤ÂºÂ¤Ã¦Ëœâ€œÃ¨Â©Â³Ã¦Æ’â€¦Ã¥Â·Â²Ã©Â©â€”Ã¨Â­â€°
+- [ ] Ã¤ÂºÂ¤Ã¦Ëœâ€œÃ¥â€°ÂÃ¦Å“â€°Ã©Â¤ËœÃ©Â¡ÂÃ¦ÂªÂ¢Ã¦Å¸Â¥
+- [ ] Ã§â€žÂ¡Ã§â€ºÂ²Ã§â€ºÂ®Ã¤ÂºÂ¤Ã¦Ëœâ€œÃ§Â°Â½Ã§Â½Â²
 
-### 10. 依賴安全
+### 10. Ã¤Â¾ÂÃ¨Â³Â´Ã¥Â®â€°Ã¥â€¦Â¨
 
-#### 定期更新
+#### Ã¥Â®Å¡Ã¦Å“Å¸Ã¦â€ºÂ´Ã¦â€“Â°
 ```bash
-# 檢查漏洞
+# Ã¦ÂªÂ¢Ã¦Å¸Â¥Ã¦Â¼ÂÃ¦Â´Å¾
 npm audit
 
-# 自動修復可修復的問題
+# Ã¨â€¡ÂªÃ¥â€¹â€¢Ã¤Â¿Â®Ã¥Â¾Â©Ã¥ÂÂ¯Ã¤Â¿Â®Ã¥Â¾Â©Ã§Å¡â€žÃ¥â€¢ÂÃ©Â¡Å’
 npm audit fix
 
-# 更新依賴
+# Ã¦â€ºÂ´Ã¦â€“Â°Ã¤Â¾ÂÃ¨Â³Â´
 npm update
 
-# 檢查過時套件
+# Ã¦ÂªÂ¢Ã¦Å¸Â¥Ã©ÂÅ½Ã¦â„¢â€šÃ¥Â¥â€”Ã¤Â»Â¶
 npm outdated
 ```
 
-#### Lock 檔案
+#### Lock Ã¦Âªâ€Ã¦Â¡Ë†
 ```bash
-# 總是 commit lock 檔案
+# Ã§Â¸Â½Ã¦ËœÂ¯ commit lock Ã¦Âªâ€Ã¦Â¡Ë†
 git add package-lock.json
 
-# 在 CI/CD 中使用以獲得可重現的建置
-npm ci  # 而非 npm install
+# Ã¥Å“Â¨ CI/CD Ã¤Â¸Â­Ã¤Â½Â¿Ã§â€Â¨Ã¤Â»Â¥Ã§ÂÂ²Ã¥Â¾â€”Ã¥ÂÂ¯Ã©â€¡ÂÃ§ÂÂ¾Ã§Å¡â€žÃ¥Â»ÂºÃ§Â½Â®
+npm ci  # Ã¨â‚¬Å’Ã©ÂÅ¾ npm install
 ```
 
-#### 驗證步驟
-- [ ] 依賴保持最新
-- [ ] 無已知漏洞（npm audit 乾淨）
-- [ ] Lock 檔案已 commit
-- [ ] GitHub 上已啟用 Dependabot
-- [ ] 定期安全更新
+#### Ã©Â©â€”Ã¨Â­â€°Ã¦Â­Â¥Ã©Â©Å¸
+- [ ] Ã¤Â¾ÂÃ¨Â³Â´Ã¤Â¿ÂÃ¦Å’ÂÃ¦Å“â‚¬Ã¦â€“Â°
+- [ ] Ã§â€žÂ¡Ã¥Â·Â²Ã§Å¸Â¥Ã¦Â¼ÂÃ¦Â´Å¾Ã¯Â¼Ë†npm audit Ã¤Â¹Â¾Ã¦Â·Â¨Ã¯Â¼â€°
+- [ ] Lock Ã¦Âªâ€Ã¦Â¡Ë†Ã¥Â·Â² commit
+- [ ] GitHub Ã¤Â¸Å Ã¥Â·Â²Ã¥â€¢Å¸Ã§â€Â¨ Dependabot
+- [ ] Ã¥Â®Å¡Ã¦Å“Å¸Ã¥Â®â€°Ã¥â€¦Â¨Ã¦â€ºÂ´Ã¦â€“Â°
 
-## 安全測試
+## Ã¥Â®â€°Ã¥â€¦Â¨Ã¦Â¸Â¬Ã¨Â©Â¦
 
-### 自動化安全測試
+### Ã¨â€¡ÂªÃ¥â€¹â€¢Ã¥Å’â€“Ã¥Â®â€°Ã¥â€¦Â¨Ã¦Â¸Â¬Ã¨Â©Â¦
 ```typescript
-// 測試認證
+// Ã¦Â¸Â¬Ã¨Â©Â¦Ã¨ÂªÂÃ¨Â­â€°
 test('requires authentication', async () => {
   const response = await fetch('/api/protected')
   expect(response.status).toBe(401)
 })
 
-// 測試授權
+// Ã¦Â¸Â¬Ã¨Â©Â¦Ã¦Å½Ë†Ã¦Â¬Å 
 test('requires admin role', async () => {
   const response = await fetch('/api/admin', {
     headers: { Authorization: `Bearer ${userToken}` }
@@ -438,7 +451,7 @@ test('requires admin role', async () => {
   expect(response.status).toBe(403)
 })
 
-// 測試輸入驗證
+// Ã¦Â¸Â¬Ã¨Â©Â¦Ã¨Â¼Â¸Ã¥â€¦Â¥Ã©Â©â€”Ã¨Â­â€°
 test('rejects invalid input', async () => {
   const response = await fetch('/api/users', {
     method: 'POST',
@@ -447,7 +460,7 @@ test('rejects invalid input', async () => {
   expect(response.status).toBe(400)
 })
 
-// 測試速率限制
+// Ã¦Â¸Â¬Ã¨Â©Â¦Ã©â‚¬Å¸Ã§Å½â€¡Ã©â„¢ÂÃ¥Ë†Â¶
 test('enforces rate limits', async () => {
   const requests = Array(101).fill(null).map(() =>
     fetch('/api/endpoint')
@@ -460,29 +473,29 @@ test('enforces rate limits', async () => {
 })
 ```
 
-## 部署前安全檢查清單
+## Ã©Æ’Â¨Ã§Â½Â²Ã¥â€°ÂÃ¥Â®â€°Ã¥â€¦Â¨Ã¦ÂªÂ¢Ã¦Å¸Â¥Ã¦Â¸â€¦Ã¥â€“Â®
 
-任何生產部署前：
+Ã¤Â»Â»Ã¤Â½â€¢Ã§â€Å¸Ã§â€Â¢Ã©Æ’Â¨Ã§Â½Â²Ã¥â€°ÂÃ¯Â¼Å¡
 
-- [ ] **密鑰**：無寫死密鑰，全在環境變數中
-- [ ] **輸入驗證**：所有使用者輸入已驗證
-- [ ] **SQL 注入**：所有查詢已參數化
-- [ ] **XSS**：使用者內容已淨化
-- [ ] **CSRF**：保護已啟用
-- [ ] **認證**：正確的 token 處理
-- [ ] **授權**：角色檢查已就位
-- [ ] **速率限制**：所有端點已啟用
-- [ ] **HTTPS**：生產環境強制使用
-- [ ] **安全標頭**：CSP、X-Frame-Options 已設定
-- [ ] **錯誤處理**：錯誤中無敏感資料
-- [ ] **日誌記錄**：無敏感資料被記錄
-- [ ] **依賴**：最新，無漏洞
-- [ ] **Row Level Security**：Supabase 已啟用
-- [ ] **CORS**：正確設定
-- [ ] **檔案上傳**：已驗證（大小、類型）
-- [ ] **錢包簽章**：已驗證（如果是區塊鏈）
+- [ ] **Ã¥Â¯â€ Ã©â€˜Â°**Ã¯Â¼Å¡Ã§â€žÂ¡Ã¥Â¯Â«Ã¦Â­Â»Ã¥Â¯â€ Ã©â€˜Â°Ã¯Â¼Å’Ã¥â€¦Â¨Ã¥Å“Â¨Ã§â€™Â°Ã¥Â¢Æ’Ã¨Â®Å Ã¦â€¢Â¸Ã¤Â¸Â­
+- [ ] **Ã¨Â¼Â¸Ã¥â€¦Â¥Ã©Â©â€”Ã¨Â­â€°**Ã¯Â¼Å¡Ã¦â€°â‚¬Ã¦Å“â€°Ã¤Â½Â¿Ã§â€Â¨Ã¨â‚¬â€¦Ã¨Â¼Â¸Ã¥â€¦Â¥Ã¥Â·Â²Ã©Â©â€”Ã¨Â­â€°
+- [ ] **SQL Ã¦Â³Â¨Ã¥â€¦Â¥**Ã¯Â¼Å¡Ã¦â€°â‚¬Ã¦Å“â€°Ã¦Å¸Â¥Ã¨Â©Â¢Ã¥Â·Â²Ã¥ÂÆ’Ã¦â€¢Â¸Ã¥Å’â€“
+- [ ] **XSS**Ã¯Â¼Å¡Ã¤Â½Â¿Ã§â€Â¨Ã¨â‚¬â€¦Ã¥â€¦Â§Ã¥Â®Â¹Ã¥Â·Â²Ã¦Â·Â¨Ã¥Å’â€“
+- [ ] **CSRF**Ã¯Â¼Å¡Ã¤Â¿ÂÃ¨Â­Â·Ã¥Â·Â²Ã¥â€¢Å¸Ã§â€Â¨
+- [ ] **Ã¨ÂªÂÃ¨Â­â€°**Ã¯Â¼Å¡Ã¦Â­Â£Ã§Â¢ÂºÃ§Å¡â€ž token Ã¨â„¢â€¢Ã§Ââ€ 
+- [ ] **Ã¦Å½Ë†Ã¦Â¬Å **Ã¯Â¼Å¡Ã¨Â§â€™Ã¨â€°Â²Ã¦ÂªÂ¢Ã¦Å¸Â¥Ã¥Â·Â²Ã¥Â°Â±Ã¤Â½Â
+- [ ] **Ã©â‚¬Å¸Ã§Å½â€¡Ã©â„¢ÂÃ¥Ë†Â¶**Ã¯Â¼Å¡Ã¦â€°â‚¬Ã¦Å“â€°Ã§Â«Â¯Ã©Â»Å¾Ã¥Â·Â²Ã¥â€¢Å¸Ã§â€Â¨
+- [ ] **HTTPS**Ã¯Â¼Å¡Ã§â€Å¸Ã§â€Â¢Ã§â€™Â°Ã¥Â¢Æ’Ã¥Â¼Â·Ã¥Ë†Â¶Ã¤Â½Â¿Ã§â€Â¨
+- [ ] **Ã¥Â®â€°Ã¥â€¦Â¨Ã¦Â¨â„¢Ã©Â Â­**Ã¯Â¼Å¡CSPÃ£â‚¬ÂX-Frame-Options Ã¥Â·Â²Ã¨Â¨Â­Ã¥Â®Å¡
+- [ ] **Ã©Å’Â¯Ã¨ÂªÂ¤Ã¨â„¢â€¢Ã§Ââ€ **Ã¯Â¼Å¡Ã©Å’Â¯Ã¨ÂªÂ¤Ã¤Â¸Â­Ã§â€žÂ¡Ã¦â€¢ÂÃ¦â€žÅ¸Ã¨Â³â€¡Ã¦â€“â„¢
+- [ ] **Ã¦â€”Â¥Ã¨ÂªÅ’Ã¨Â¨ËœÃ©Å’â€ž**Ã¯Â¼Å¡Ã§â€žÂ¡Ã¦â€¢ÂÃ¦â€žÅ¸Ã¨Â³â€¡Ã¦â€“â„¢Ã¨Â¢Â«Ã¨Â¨ËœÃ©Å’â€ž
+- [ ] **Ã¤Â¾ÂÃ¨Â³Â´**Ã¯Â¼Å¡Ã¦Å“â‚¬Ã¦â€“Â°Ã¯Â¼Å’Ã§â€žÂ¡Ã¦Â¼ÂÃ¦Â´Å¾
+- [ ] **Row Level Security**Ã¯Â¼Å¡Supabase Ã¥Â·Â²Ã¥â€¢Å¸Ã§â€Â¨
+- [ ] **CORS**Ã¯Â¼Å¡Ã¦Â­Â£Ã§Â¢ÂºÃ¨Â¨Â­Ã¥Â®Å¡
+- [ ] **Ã¦Âªâ€Ã¦Â¡Ë†Ã¤Â¸Å Ã¥â€šÂ³**Ã¯Â¼Å¡Ã¥Â·Â²Ã©Â©â€”Ã¨Â­â€°Ã¯Â¼Ë†Ã¥Â¤Â§Ã¥Â°ÂÃ£â‚¬ÂÃ©Â¡Å¾Ã¥Å¾â€¹Ã¯Â¼â€°
+- [ ] **Ã©Å’Â¢Ã¥Å’â€¦Ã§Â°Â½Ã§Â«Â **Ã¯Â¼Å¡Ã¥Â·Â²Ã©Â©â€”Ã¨Â­â€°Ã¯Â¼Ë†Ã¥Â¦â€šÃ¦Å¾Å“Ã¦ËœÂ¯Ã¥Ââ‚¬Ã¥Â¡Å Ã©ÂË†Ã¯Â¼â€°
 
-## 資源
+## Ã¨Â³â€¡Ã¦ÂºÂ
 
 - [OWASP Top 10](https://owasp.org/www-project-top-ten/)
 - [Next.js Security](https://nextjs.org/docs/security)
@@ -491,4 +504,4 @@ test('enforces rate limits', async () => {
 
 ---
 
-**記住**：安全性不是可選的。一個漏洞可能危及整個平台。有疑慮時，選擇謹慎的做法。
+**Ã¨Â¨ËœÃ¤Â½Â**Ã¯Â¼Å¡Ã¥Â®â€°Ã¥â€¦Â¨Ã¦â‚¬Â§Ã¤Â¸ÂÃ¦ËœÂ¯Ã¥ÂÂ¯Ã©ÂÂ¸Ã§Å¡â€žÃ£â‚¬â€šÃ¤Â¸â‚¬Ã¥â‚¬â€¹Ã¦Â¼ÂÃ¦Â´Å¾Ã¥ÂÂ¯Ã¨Æ’Â½Ã¥ÂÂ±Ã¥ÂÅ Ã¦â€¢Â´Ã¥â‚¬â€¹Ã¥Â¹Â³Ã¥ÂÂ°Ã£â‚¬â€šÃ¦Å“â€°Ã§â€“â€˜Ã¦â€¦Â®Ã¦â„¢â€šÃ¯Â¼Å’Ã©ÂÂ¸Ã¦â€œâ€¡Ã¨Â¬Â¹Ã¦â€¦Å½Ã§Å¡â€žÃ¥ÂÅ¡Ã¦Â³â€¢Ã£â‚¬â€š

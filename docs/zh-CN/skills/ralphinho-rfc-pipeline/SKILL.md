@@ -1,28 +1,41 @@
 ---
 name: ralphinho-rfc-pipeline
-description: 基于RFC驱动的多智能体DAG执行模式，包含质量门、合并队列和工作单元编排。
+description: Ã¥Å¸ÂºÃ¤ÂºÅ½RFCÃ©Â©Â±Ã¥Å Â¨Ã§Å¡â€žÃ¥Â¤Å¡Ã¦â„¢ÂºÃ¨Æ’Â½Ã¤Â½â€œDAGÃ¦â€°Â§Ã¨Â¡Å’Ã¦Â¨Â¡Ã¥Â¼ÂÃ¯Â¼Å’Ã¥Å’â€¦Ã¥ÂÂ«Ã¨Â´Â¨Ã©â€¡ÂÃ©â€”Â¨Ã£â‚¬ÂÃ¥ÂË†Ã¥Â¹Â¶Ã©ËœÅ¸Ã¥Ë†â€”Ã¥â€™Å’Ã¥Â·Â¥Ã¤Â½Å“Ã¥Ââ€¢Ã¥â€¦Æ’Ã§Â¼â€“Ã¦Å½â€™Ã£â‚¬â€š
 origin: ECC
 ---
 
-# Ralphinho RFC 管道
+# Ralphinho RFC Ã§Â®Â¡Ã©Ââ€œ
 
-灵感来源于 [humanplane](https://github.com/humanplane) 风格的 RFC 分解模式和多单元编排工作流。
+## Safety And Authorization Rule
 
-当一个功能对于单次代理处理来说过于庞大，必须拆分为独立可验证的工作单元时，请使用此技能。
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-## 管道阶段
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-1. RFC 接收
-2. DAG 分解
-3. 单元分配
-4. 单元实现
-5. 单元验证
-6. 合并队列与集成
-7. 最终系统验证
 
-## 单元规范模板
+Ã§ÂÂµÃ¦â€žÅ¸Ã¦ÂÂ¥Ã¦ÂºÂÃ¤ÂºÅ½ [humanplane](https://github.com/humanplane) Ã©Â£Å½Ã¦Â Â¼Ã§Å¡â€ž RFC Ã¥Ë†â€ Ã¨Â§Â£Ã¦Â¨Â¡Ã¥Â¼ÂÃ¥â€™Å’Ã¥Â¤Å¡Ã¥Ââ€¢Ã¥â€¦Æ’Ã§Â¼â€“Ã¦Å½â€™Ã¥Â·Â¥Ã¤Â½Å“Ã¦ÂµÂÃ£â‚¬â€š
 
-每个工作单元应包含：
+Ã¥Â½â€œÃ¤Â¸â‚¬Ã¤Â¸ÂªÃ¥Å Å¸Ã¨Æ’Â½Ã¥Â¯Â¹Ã¤ÂºÅ½Ã¥Ââ€¢Ã¦Â¬Â¡Ã¤Â»Â£Ã§Ââ€ Ã¥Â¤â€žÃ§Ââ€ Ã¦ÂÂ¥Ã¨Â¯Â´Ã¨Â¿â€¡Ã¤ÂºÅ½Ã¥ÂºÅ¾Ã¥Â¤Â§Ã¯Â¼Å’Ã¥Â¿â€¦Ã©Â¡Â»Ã¦â€¹â€ Ã¥Ë†â€ Ã¤Â¸ÂºÃ§â€¹Â¬Ã§Â«â€¹Ã¥ÂÂ¯Ã©ÂªÅ’Ã¨Â¯ÂÃ§Å¡â€žÃ¥Â·Â¥Ã¤Â½Å“Ã¥Ââ€¢Ã¥â€¦Æ’Ã¦â€”Â¶Ã¯Â¼Å’Ã¨Â¯Â·Ã¤Â½Â¿Ã§â€Â¨Ã¦Â­Â¤Ã¦Å â‚¬Ã¨Æ’Â½Ã£â‚¬â€š
+
+## Ã§Â®Â¡Ã©Ââ€œÃ©ËœÂ¶Ã¦Â®Âµ
+
+1. RFC Ã¦Å½Â¥Ã¦â€Â¶
+2. DAG Ã¥Ë†â€ Ã¨Â§Â£
+3. Ã¥Ââ€¢Ã¥â€¦Æ’Ã¥Ë†â€ Ã©â€¦Â
+4. Ã¥Ââ€¢Ã¥â€¦Æ’Ã¥Â®Å¾Ã§Å½Â°
+5. Ã¥Ââ€¢Ã¥â€¦Æ’Ã©ÂªÅ’Ã¨Â¯Â
+6. Ã¥ÂË†Ã¥Â¹Â¶Ã©ËœÅ¸Ã¥Ë†â€”Ã¤Â¸Å½Ã©â€ºâ€ Ã¦Ë†Â
+7. Ã¦Å“â‚¬Ã§Â»Ë†Ã§Â³Â»Ã§Â»Å¸Ã©ÂªÅ’Ã¨Â¯Â
+
+## Ã¥Ââ€¢Ã¥â€¦Æ’Ã¨Â§â€žÃ¨Å’Æ’Ã¦Â¨Â¡Ã¦ÂÂ¿
+
+Ã¦Â¯ÂÃ¤Â¸ÂªÃ¥Â·Â¥Ã¤Â½Å“Ã¥Ââ€¢Ã¥â€¦Æ’Ã¥Âºâ€Ã¥Å’â€¦Ã¥ÂÂ«Ã¯Â¼Å¡
 
 * `id`
 * `depends_on`
@@ -31,39 +44,39 @@ origin: ECC
 * `risk_level`
 * `rollback_plan`
 
-## 复杂度层级
+## Ã¥Â¤ÂÃ¦Ââ€šÃ¥ÂºÂ¦Ã¥Â±â€šÃ§ÂºÂ§
 
-* 层级 1：独立文件编辑，确定性测试
-* 层级 2：多文件行为变更，中等集成风险
-* 层级 3：架构/认证/性能/安全性变更
+* Ã¥Â±â€šÃ§ÂºÂ§ 1Ã¯Â¼Å¡Ã§â€¹Â¬Ã§Â«â€¹Ã¦â€“â€¡Ã¤Â»Â¶Ã§Â¼â€“Ã¨Â¾â€˜Ã¯Â¼Å’Ã§Â¡Â®Ã¥Â®Å¡Ã¦â‚¬Â§Ã¦Âµâ€¹Ã¨Â¯â€¢
+* Ã¥Â±â€šÃ§ÂºÂ§ 2Ã¯Â¼Å¡Ã¥Â¤Å¡Ã¦â€“â€¡Ã¤Â»Â¶Ã¨Â¡Å’Ã¤Â¸ÂºÃ¥ÂËœÃ¦â€ºÂ´Ã¯Â¼Å’Ã¤Â¸Â­Ã§Â­â€°Ã©â€ºâ€ Ã¦Ë†ÂÃ©Â£Å½Ã©â„¢Â©
+* Ã¥Â±â€šÃ§ÂºÂ§ 3Ã¯Â¼Å¡Ã¦Å¾Â¶Ã¦Å¾â€ž/Ã¨Â®Â¤Ã¨Â¯Â/Ã¦â‚¬Â§Ã¨Æ’Â½/Ã¥Â®â€°Ã¥â€¦Â¨Ã¦â‚¬Â§Ã¥ÂËœÃ¦â€ºÂ´
 
-## 每个单元的质量管道
+## Ã¦Â¯ÂÃ¤Â¸ÂªÃ¥Ââ€¢Ã¥â€¦Æ’Ã§Å¡â€žÃ¨Â´Â¨Ã©â€¡ÂÃ§Â®Â¡Ã©Ââ€œ
 
-1. 研究
-2. 实现计划
-3. 实现
-4. 测试
-5. 审查
-6. 合并就绪报告
+1. Ã§Â â€Ã§Â©Â¶
+2. Ã¥Â®Å¾Ã§Å½Â°Ã¨Â®Â¡Ã¥Ë†â€™
+3. Ã¥Â®Å¾Ã§Å½Â°
+4. Ã¦Âµâ€¹Ã¨Â¯â€¢
+5. Ã¥Â®Â¡Ã¦Å¸Â¥
+6. Ã¥ÂË†Ã¥Â¹Â¶Ã¥Â°Â±Ã§Â»ÂªÃ¦Å Â¥Ã¥â€˜Å 
 
-## 合并队列规则
+## Ã¥ÂË†Ã¥Â¹Â¶Ã©ËœÅ¸Ã¥Ë†â€”Ã¨Â§â€žÃ¥Ë†â„¢
 
-* 永不合并存在未解决依赖项失败的单元。
-* 始终将单元分支变基到最新的集成分支上。
-* 每次队列合并后重新运行集成测试。
+* Ã¦Â°Â¸Ã¤Â¸ÂÃ¥ÂË†Ã¥Â¹Â¶Ã¥Â­ËœÃ¥Å“Â¨Ã¦Å“ÂªÃ¨Â§Â£Ã¥â€ Â³Ã¤Â¾ÂÃ¨Âµâ€“Ã©Â¡Â¹Ã¥Â¤Â±Ã¨Â´Â¥Ã§Å¡â€žÃ¥Ââ€¢Ã¥â€¦Æ’Ã£â‚¬â€š
+* Ã¥Â§â€¹Ã§Â»Ë†Ã¥Â°â€ Ã¥Ââ€¢Ã¥â€¦Æ’Ã¥Ë†â€ Ã¦â€Â¯Ã¥ÂËœÃ¥Å¸ÂºÃ¥Ë†Â°Ã¦Å“â‚¬Ã¦â€“Â°Ã§Å¡â€žÃ©â€ºâ€ Ã¦Ë†ÂÃ¥Ë†â€ Ã¦â€Â¯Ã¤Â¸Å Ã£â‚¬â€š
+* Ã¦Â¯ÂÃ¦Â¬Â¡Ã©ËœÅ¸Ã¥Ë†â€”Ã¥ÂË†Ã¥Â¹Â¶Ã¥ÂÅ½Ã©â€¡ÂÃ¦â€“Â°Ã¨Â¿ÂÃ¨Â¡Å’Ã©â€ºâ€ Ã¦Ë†ÂÃ¦Âµâ€¹Ã¨Â¯â€¢Ã£â‚¬â€š
 
-## 恢复
+## Ã¦ÂÂ¢Ã¥Â¤Â
 
-如果一个单元停滞：
+Ã¥Â¦â€šÃ¦Å¾Å“Ã¤Â¸â‚¬Ã¤Â¸ÂªÃ¥Ââ€¢Ã¥â€¦Æ’Ã¥ÂÅ“Ã¦Â»Å¾Ã¯Â¼Å¡
 
-* 从活动队列中移除
-* 快照发现结果
-* 重新生成范围缩小的单元
-* 使用更新的约束条件重试
+* Ã¤Â»Å½Ã¦Â´Â»Ã¥Å Â¨Ã©ËœÅ¸Ã¥Ë†â€”Ã¤Â¸Â­Ã§Â§Â»Ã©â„¢Â¤
+* Ã¥Â¿Â«Ã§â€¦Â§Ã¥Ââ€˜Ã§Å½Â°Ã§Â»â€œÃ¦Å¾Å“
+* Ã©â€¡ÂÃ¦â€“Â°Ã§â€Å¸Ã¦Ë†ÂÃ¨Å’Æ’Ã¥â€ºÂ´Ã§Â¼Â©Ã¥Â°ÂÃ§Å¡â€žÃ¥Ââ€¢Ã¥â€¦Æ’
+* Ã¤Â½Â¿Ã§â€Â¨Ã¦â€ºÂ´Ã¦â€“Â°Ã§Å¡â€žÃ§ÂºÂ¦Ã¦ÂÅ¸Ã¦ÂÂ¡Ã¤Â»Â¶Ã©â€¡ÂÃ¨Â¯â€¢
 
-## 输出
+## Ã¨Â¾â€œÃ¥â€¡Âº
 
-* RFC 执行日志
-* 单元记分卡
-* 依赖关系图快照
-* 集成风险摘要
+* RFC Ã¦â€°Â§Ã¨Â¡Å’Ã¦â€”Â¥Ã¥Â¿â€”
+* Ã¥Ââ€¢Ã¥â€¦Æ’Ã¨Â®Â°Ã¥Ë†â€ Ã¥ÂÂ¡
+* Ã¤Â¾ÂÃ¨Âµâ€“Ã¥â€¦Â³Ã§Â³Â»Ã¥â€ºÂ¾Ã¥Â¿Â«Ã§â€¦Â§
+* Ã©â€ºâ€ Ã¦Ë†ÂÃ©Â£Å½Ã©â„¢Â©Ã¦â€˜ËœÃ¨Â¦Â

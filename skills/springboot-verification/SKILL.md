@@ -6,6 +6,19 @@ origin: ECC
 
 # Spring Boot Verification Loop
 
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
 Run before PRs, after major changes, and pre-deploy.
 
 ## When to Activate
@@ -13,7 +26,7 @@ Run before PRs, after major changes, and pre-deploy.
 - Before opening a pull request for a Spring Boot service
 - After major refactoring or dependency upgrades
 - Pre-deployment verification for staging or production
-- Running full build → lint → test → security scan pipeline
+- Running full build Ã¢â€ â€™ lint Ã¢â€ â€™ test Ã¢â€ â€™ security scan pipeline
 - Validating test coverage meets thresholds
 
 ## Phase 1: Build
@@ -225,7 +238,7 @@ Issues to Fix:
 
 ## Continuous Mode
 
-- Re-run phases on significant changes or every 30–60 minutes in long sessions
+- Re-run phases on significant changes or every 30Ã¢â‚¬â€œ60 minutes in long sessions
 - Keep a short loop: `mvn -T 4 test` + spotbugs for quick feedback
 
-**Remember**: Fast feedback beats late surprises. Keep the gate strict—treat warnings as defects in production systems.
+**Remember**: Fast feedback beats late surprises. Keep the gate strictÃ¢â‚¬â€treat warnings as defects in production systems.

@@ -1,5 +1,18 @@
 # CLAUDE.md
 
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview
@@ -89,7 +102,7 @@ File naming: lowercase with hyphens (e.g. `python-reviewer.md`, `tdd-workflow.md
 
 ## gstack
 
-gstack is installed at `~/.claude/skills/gstack/` and provides 35 specialist skills. Use `/browse` for **all web browsing** — never use `mcp__claude-in-chrome__*` tools.
+gstack is installed at `~/.claude/skills/gstack/` and provides 35 specialist skills. Use `/browse` for **all web browsing** Ã¢â‚¬â€ never use `mcp__claude-in-chrome__*` tools.
 
 | Skill | When to Use |
 |-------|-------------|
@@ -99,16 +112,16 @@ gstack is installed at `~/.claude/skills/gstack/` and provides 35 specialist ski
 | `/plan-eng-review` | Architecture, data flow, state machines, test matrix |
 | `/plan-design-review` | Visual/UX review of plans |
 | `/plan-devex-review` | Developer experience review of plans |
-| `/review` | Pre-PR review — SQL safety, secrets, architecture, logic |
+| `/review` | Pre-PR review Ã¢â‚¬â€ SQL safety, secrets, architecture, logic |
 | `/cso` | Security audit: OWASP + STRIDE, secrets archaeology, deps |
 | `/qa` | Test a live URL in a headless browser, find + fix bugs |
 | `/qa-only` | Report-only QA pass (no auto-fix) |
-| `/browse` | All web browsing — replaces Chrome MCP tools |
+| `/browse` | All web browsing Ã¢â‚¬â€ replaces Chrome MCP tools |
 | `/investigate` | Systematic root-cause debugging |
-| `/ship` | Full ship workflow: tests → review → version bump → PR |
+| `/ship` | Full ship workflow: tests Ã¢â€ â€™ review Ã¢â€ â€™ version bump Ã¢â€ â€™ PR |
 | `/land-and-deploy` | Merge PR, wait for CI/deploy, verify production |
 | `/canary` | Post-deploy monitoring for errors/regressions |
-| `/design-review` | Visual QA — spacing, hierarchy, AI slop detection |
+| `/design-review` | Visual QA Ã¢â‚¬â€ spacing, hierarchy, AI slop detection |
 | `/design-html` | Generate production-quality HTML/CSS |
 | `/design-consultation` | Product + landscape research, propose design direction |
 | `/design-shotgun` | Generate multiple design variants for comparison |

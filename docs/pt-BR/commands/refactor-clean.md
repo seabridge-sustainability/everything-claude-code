@@ -1,10 +1,23 @@
 # Refactor Clean
 
-Identifique e remova código morto com segurança, com verificação de testes em cada passo.
+## Safety And Authorization Rule
 
-## Passo 1: Detectar Código Morto
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-Rode ferramentas de análise com base no tipo do projeto:
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+Identifique e remova cÃƒÂ³digo morto com seguranÃƒÂ§a, com verificaÃƒÂ§ÃƒÂ£o de testes em cada passo.
+
+## Passo 1: Detectar CÃƒÂ³digo Morto
+
+Rode ferramentas de anÃƒÂ¡lise com base no tipo do projeto:
 
 | Tool | What It Finds | Command |
 |------|--------------|---------|
@@ -15,14 +28,14 @@ Rode ferramentas de análise com base no tipo do projeto:
 | deadcode | Unused Go code | `deadcode ./...` |
 | cargo-udeps | Unused Rust dependencies | `cargo +nightly udeps` |
 
-Se nenhuma ferramenta estiver disponível, use Grep para encontrar exports com zero imports:
+Se nenhuma ferramenta estiver disponÃƒÂ­vel, use Grep para encontrar exports com zero imports:
 ```
 # Find exports, then check if they're imported anywhere
 ```
 
 ## Passo 2: Categorizar Achados
 
-Classifique os achados em níveis de segurança:
+Classifique os achados em nÃƒÂ­veis de seguranÃƒÂ§a:
 
 | Tier | Examples | Action |
 |------|----------|--------|
@@ -30,31 +43,31 @@ Classifique os achados em níveis de segurança:
 | **CAUTION** | Components, API routes, middleware | Verify no dynamic imports or external consumers |
 | **DANGER** | Config files, entry points, type definitions | Investigate before touching |
 
-## Passo 3: Loop de Remoção Segura
+## Passo 3: Loop de RemoÃƒÂ§ÃƒÂ£o Segura
 
 Para cada item SAFE:
 
-1. **Rode a suíte completa de testes** — Estabeleça baseline (tudo verde)
-2. **Delete o código morto** — Use a ferramenta Edit para remoção cirúrgica
-3. **Rode a suíte de testes novamente** — Verifique se nada quebrou
-4. **Se testes falharem** — Reverta imediatamente com `git checkout -- <file>` e pule este item
-5. **Se testes passarem** — Vá para o próximo item
+1. **Rode a suÃƒÂ­te completa de testes** Ã¢â‚¬â€ EstabeleÃƒÂ§a baseline (tudo verde)
+2. **Delete o cÃƒÂ³digo morto** Ã¢â‚¬â€ Use a ferramenta Edit para remoÃƒÂ§ÃƒÂ£o cirÃƒÂºrgica
+3. **Rode a suÃƒÂ­te de testes novamente** Ã¢â‚¬â€ Verifique se nada quebrou
+4. **Se testes falharem** Ã¢â‚¬â€ Reverta imediatamente com `git checkout -- <file>` e pule este item
+5. **Se testes passarem** Ã¢â‚¬â€ VÃƒÂ¡ para o prÃƒÂ³ximo item
 
 ## Passo 4: Tratar Itens CAUTION
 
 Antes de deletar itens CAUTION:
-- Procure imports dinâmicos: `import()`, `require()`, `__import__`
-- Procure referências em string: nomes de rota, nomes de componente em configs
-- Verifique se é exportado por API pública de pacote
-- Verifique ausência de consumidores externos (dependents, se publicado)
+- Procure imports dinÃƒÂ¢micos: `import()`, `require()`, `__import__`
+- Procure referÃƒÂªncias em string: nomes de rota, nomes de componente em configs
+- Verifique se ÃƒÂ© exportado por API pÃƒÂºblica de pacote
+- Verifique ausÃƒÂªncia de consumidores externos (dependents, se publicado)
 
 ## Passo 5: Consolidar Duplicatas
 
-Depois de remover código morto, procure:
-- Funções quase duplicadas (>80% similares) — mesclar em uma
-- Definições de tipo redundantes — consolidar
-- Funções wrapper sem valor — inline
-- Re-exports sem propósito — remover indireção
+Depois de remover cÃƒÂ³digo morto, procure:
+- FunÃƒÂ§ÃƒÂµes quase duplicadas (>80% similares) Ã¢â‚¬â€ mesclar em uma
+- DefiniÃƒÂ§ÃƒÂµes de tipo redundantes Ã¢â‚¬â€ consolidar
+- FunÃƒÂ§ÃƒÂµes wrapper sem valor Ã¢â‚¬â€ inline
+- Re-exports sem propÃƒÂ³sito Ã¢â‚¬â€ remover indireÃƒÂ§ÃƒÂ£o
 
 ## Passo 6: Resumo
 
@@ -62,19 +75,19 @@ Reporte resultados:
 
 ```
 Dead Code Cleanup
-──────────────────────────────
+Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 Deleted:   12 unused functions
            3 unused files
            5 unused dependencies
 Skipped:   2 items (tests failed)
 Saved:     ~450 lines removed
-──────────────────────────────
+Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 All tests passing PASS:
 ```
 
 ## Regras
 
 - **Nunca delete sem rodar testes antes**
-- **Uma remoção por vez** — Mudanças atômicas facilitam rollback
-- **Se houver dúvida, pule** — Melhor manter código morto do que quebrar produção
-- **Não refatore durante limpeza** — Separe responsabilidades (limpar primeiro, refatorar depois)
+- **Uma remoÃƒÂ§ÃƒÂ£o por vez** Ã¢â‚¬â€ MudanÃƒÂ§as atÃƒÂ´micas facilitam rollback
+- **Se houver dÃƒÂºvida, pule** Ã¢â‚¬â€ Melhor manter cÃƒÂ³digo morto do que quebrar produÃƒÂ§ÃƒÂ£o
+- **NÃƒÂ£o refatore durante limpeza** Ã¢â‚¬â€ Separe responsabilidades (limpar primeiro, refatorar depois)

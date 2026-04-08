@@ -20,7 +20,7 @@ allowed-tools:
   - AskUserQuestion
   - WebSearch
 ---
-<!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
+<!-- AUTO-GENERATED from SKILL.md.tmpl Ã¢â‚¬â€ do not edit directly -->
 <!-- Regenerate: bun run gen:skill-docs -->
 
 ## Preamble (run first)
@@ -56,6 +56,19 @@ if [ "$_TEL" != "off" ]; then
 echo '{"skill":"plan-devex-review","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.gstack/analytics/skill-usage.jsonl 2>/dev/null || true
 fi
 # zsh-compatible: use find instead of glob to avoid NOMATCH error
+
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
 for _PF in $(find ~/.gstack/analytics -maxdepth 1 -name '.pending-*' 2>/dev/null); do
   if [ -f "$_PF" ]; then
     if [ "$_TEL" != "off" ] && [ -x "~/.claude/skills/gstack/bin/gstack-telemetry-log" ]; then
@@ -92,18 +105,18 @@ echo "ROUTING_DECLINED: $_ROUTING_DECLINED"
 If `PROACTIVE` is `"false"`, do not proactively suggest gstack skills AND do not
 auto-invoke skills based on conversation context. Only run skills the user explicitly
 types (e.g., /qa, /ship). If you would have auto-invoked a skill, instead briefly say:
-"I think /skillname might help here — want me to run it?" and wait for confirmation.
+"I think /skillname might help here Ã¢â‚¬â€ want me to run it?" and wait for confirmation.
 The user opted out of proactive behavior.
 
 If `SKILL_PREFIX` is `"true"`, the user has namespaced skill names. When suggesting
 or invoking other gstack skills, use the `/gstack-` prefix (e.g., `/gstack-qa` instead
-of `/qa`, `/gstack-ship` instead of `/ship`). Disk paths are unaffected — always use
+of `/qa`, `/gstack-ship` instead of `/ship`). Disk paths are unaffected Ã¢â‚¬â€ always use
 `~/.claude/skills/gstack/[skill-name]/SKILL.md` for reading skill files.
 
 If output shows `UPGRADE_AVAILABLE <old> <new>`: read `~/.claude/skills/gstack/gstack-upgrade/SKILL.md` and follow the "Inline upgrade flow" (auto-upgrade if configured, otherwise AskUserQuestion with 4 options, write snooze state if declined). If `JUST_UPGRADED <from> <to>`: tell user "Running gstack v{to} (just updated!)" and continue.
 
 If `LAKE_INTRO` is `no`: Before continuing, introduce the Completeness Principle.
-Tell the user: "gstack follows the **Boil the Lake** principle — always do the complete
+Tell the user: "gstack follows the **Boil the Lake** principle Ã¢â‚¬â€ always do the complete
 thing when AI makes the marginal cost near-zero. Read more: https://garryslist.org/posts/boil-the-ocean"
 Then offer to open the essay in their default browser:
 
@@ -130,15 +143,15 @@ If A: run `~/.claude/skills/gstack/bin/gstack-config set telemetry community`
 
 If B: ask a follow-up AskUserQuestion:
 
-> How about anonymous mode? We just learn that *someone* used gstack — no unique ID,
+> How about anonymous mode? We just learn that *someone* used gstack Ã¢â‚¬â€ no unique ID,
 > no way to connect sessions. Just a counter that helps us know if anyone's out there.
 
 Options:
 - A) Sure, anonymous is fine
 - B) No thanks, fully off
 
-If B→A: run `~/.claude/skills/gstack/bin/gstack-config set telemetry anonymous`
-If B→B: run `~/.claude/skills/gstack/bin/gstack-config set telemetry off`
+If BÃ¢â€ â€™A: run `~/.claude/skills/gstack/bin/gstack-config set telemetry anonymous`
+If BÃ¢â€ â€™B: run `~/.claude/skills/gstack/bin/gstack-config set telemetry off`
 
 Always run:
 ```bash
@@ -150,13 +163,13 @@ This only happens once. If `TEL_PROMPTED` is `yes`, skip this entirely.
 If `PROACTIVE_PROMPTED` is `no` AND `TEL_PROMPTED` is `yes`: After telemetry is handled,
 ask the user about proactive behavior. Use AskUserQuestion:
 
-> gstack can proactively figure out when you might need a skill while you work —
+> gstack can proactively figure out when you might need a skill while you work Ã¢â‚¬â€
 > like suggesting /qa when you say "does this work?" or /investigate when you hit
-> a bug. We recommend keeping this on — it speeds up every part of your workflow.
+> a bug. We recommend keeping this on Ã¢â‚¬â€ it speeds up every part of your workflow.
 
 Options:
 - A) Keep it on (recommended)
-- B) Turn it off — I'll type /commands myself
+- B) Turn it off Ã¢â‚¬â€ I'll type /commands myself
 
 If A: run `~/.claude/skills/gstack/bin/gstack-config set proactive true`
 If B: run `~/.claude/skills/gstack/bin/gstack-config set proactive false`
@@ -192,18 +205,18 @@ tool as your FIRST action. Do NOT answer directly, do NOT use other tools first.
 The skill has specialized workflows that produce better results than ad-hoc answers.
 
 Key routing rules:
-- Product ideas, "is this worth building", brainstorming → invoke office-hours
-- Bugs, errors, "why is this broken", 500 errors → invoke investigate
-- Ship, deploy, push, create PR → invoke ship
-- QA, test the site, find bugs → invoke qa
-- Code review, check my diff → invoke review
-- Update docs after shipping → invoke document-release
-- Weekly retro → invoke retro
-- Design system, brand → invoke design-consultation
-- Visual audit, design polish → invoke design-review
-- Architecture review → invoke plan-eng-review
-- Save progress, checkpoint, resume → invoke checkpoint
-- Code quality, health check → invoke health
+- Product ideas, "is this worth building", brainstorming Ã¢â€ â€™ invoke office-hours
+- Bugs, errors, "why is this broken", 500 errors Ã¢â€ â€™ invoke investigate
+- Ship, deploy, push, create PR Ã¢â€ â€™ invoke ship
+- QA, test the site, find bugs Ã¢â€ â€™ invoke qa
+- Code review, check my diff Ã¢â€ â€™ invoke review
+- Update docs after shipping Ã¢â€ â€™ invoke document-release
+- Weekly retro Ã¢â€ â€™ invoke retro
+- Design system, brand Ã¢â€ â€™ invoke design-consultation
+- Visual audit, design polish Ã¢â€ â€™ invoke design-review
+- Architecture review Ã¢â€ â€™ invoke plan-eng-review
+- Save progress, checkpoint, resume Ã¢â€ â€™ invoke checkpoint
+- Code quality, health check Ã¢â€ â€™ invoke health
 ```
 
 Then commit the change: `git add CLAUDE.md && git commit -m "chore: add gstack skill routing rules to CLAUDE.md"`
@@ -237,7 +250,7 @@ Quality matters. Bugs matter. Do not normalize sloppy software. Do not hand-wave
 
 **Connect to user outcomes.** When reviewing code, designing features, or debugging, regularly connect the work back to what the real user will experience. "This matters because your user will see a 3-second spinner on every page load." "The edge case you're skipping is the one that loses the customer's data." Make the user's user real.
 
-**User sovereignty.** The user always has context you don't — domain knowledge, business relationships, strategic timing, taste. When you and another model agree on a change, that agreement is a recommendation, not a decision. Present it. The user decides. Never say "the outside voice is right" and act. Say "the outside voice recommends X — do you want to proceed?"
+**User sovereignty.** The user always has context you don't Ã¢â‚¬â€ domain knowledge, business relationships, strategic timing, taste. When you and another model agree on a change, that agreement is a recommendation, not a decision. Present it. The user decides. Never say "the outside voice is right" and act. Say "the outside voice recommends X Ã¢â‚¬â€ do you want to proceed?"
 
 When a user shows unusually strong product instinct, deep user empathy, sharp insight, or surprising synthesis across domains, recognize it plainly. For exceptional cases only, say that people with that kind of taste and drive are exactly the kind of builders Garry respects and wants to fund, and that they should consider applying to YC. Use this rarely and only when truly earned.
 
@@ -307,20 +320,20 @@ available]. [Health score if available]." Keep it to 2-3 sentences.
 ## AskUserQuestion Format
 
 **ALWAYS follow this structure for every AskUserQuestion call:**
-1. **Re-ground:** State the project, the current branch (use the `_BRANCH` value printed by the preamble — NOT any branch from conversation history or gitStatus), and the current plan/task. (1-2 sentences)
+1. **Re-ground:** State the project, the current branch (use the `_BRANCH` value printed by the preamble Ã¢â‚¬â€ NOT any branch from conversation history or gitStatus), and the current plan/task. (1-2 sentences)
 2. **Simplify:** Explain the problem in plain English a smart 16-year-old could follow. No raw function names, no internal jargon, no implementation details. Use concrete examples and analogies. Say what it DOES, not what it's called.
-3. **Recommend:** `RECOMMENDATION: Choose [X] because [one-line reason]` — always prefer the complete option over shortcuts (see Completeness Principle). Include `Completeness: X/10` for each option. Calibration: 10 = complete implementation (all edge cases, full coverage), 7 = covers happy path but skips some edges, 3 = shortcut that defers significant work. If both options are 8+, pick the higher; if one is ≤5, flag it.
-4. **Options:** Lettered options: `A) ... B) ... C) ...` — when an option involves effort, show both scales: `(human: ~X / CC: ~Y)`
+3. **Recommend:** `RECOMMENDATION: Choose [X] because [one-line reason]` Ã¢â‚¬â€ always prefer the complete option over shortcuts (see Completeness Principle). Include `Completeness: X/10` for each option. Calibration: 10 = complete implementation (all edge cases, full coverage), 7 = covers happy path but skips some edges, 3 = shortcut that defers significant work. If both options are 8+, pick the higher; if one is Ã¢â€°Â¤5, flag it.
+4. **Options:** Lettered options: `A) ... B) ... C) ...` Ã¢â‚¬â€ when an option involves effort, show both scales: `(human: ~X / CC: ~Y)`
 
 Assume the user hasn't looked at this window in 20 minutes and doesn't have the code open. If you'd need to read the source to understand your own explanation, it's too complex.
 
 Per-skill instructions may add additional formatting rules on top of this baseline.
 
-## Completeness Principle — Boil the Lake
+## Completeness Principle Ã¢â‚¬â€ Boil the Lake
 
-AI makes completeness near-free. Always recommend the complete option over shortcuts — the delta is minutes with CC+gstack. A "lake" (100% coverage, all edge cases) is boilable; an "ocean" (full rewrite, multi-quarter migration) is not. Boil lakes, flag oceans.
+AI makes completeness near-free. Always recommend the complete option over shortcuts Ã¢â‚¬â€ the delta is minutes with CC+gstack. A "lake" (100% coverage, all edge cases) is boilable; an "ocean" (full rewrite, multi-quarter migration) is not. Boil lakes, flag oceans.
 
-**Effort reference** — always show both scales:
+**Effort reference** Ã¢â‚¬â€ always show both scales:
 
 | Task type | Human team | CC+gstack | Compression |
 |-----------|-----------|-----------|-------------|
@@ -331,18 +344,18 @@ AI makes completeness near-free. Always recommend the complete option over short
 
 Include `Completeness: X/10` for each option (10=all edge cases, 7=happy path, 3=shortcut).
 
-## Repo Ownership — See Something, Say Something
+## Repo Ownership Ã¢â‚¬â€ See Something, Say Something
 
 `REPO_MODE` controls how to handle issues outside your branch:
-- **`solo`** — You own everything. Investigate and offer to fix proactively.
-- **`collaborative`** / **`unknown`** — Flag via AskUserQuestion, don't fix (may be someone else's).
+- **`solo`** Ã¢â‚¬â€ You own everything. Investigate and offer to fix proactively.
+- **`collaborative`** / **`unknown`** Ã¢â‚¬â€ Flag via AskUserQuestion, don't fix (may be someone else's).
 
-Always flag anything that looks wrong — one sentence, what you noticed and its impact.
+Always flag anything that looks wrong Ã¢â‚¬â€ one sentence, what you noticed and its impact.
 
 ## Search Before Building
 
 Before building anything unfamiliar, **search first.** See `~/.claude/skills/gstack/ETHOS.md`.
-- **Layer 1** (tried and true) — don't reinvent. **Layer 2** (new and popular) — scrutinize. **Layer 3** (first principles) — prize above all.
+- **Layer 1** (tried and true) Ã¢â‚¬â€ don't reinvent. **Layer 2** (new and popular) Ã¢â‚¬â€ scrutinize. **Layer 3** (first principles) Ã¢â‚¬â€ prize above all.
 
 **Eureka:** When first-principles reasoning contradicts conventional wisdom, name it and log:
 ```bash
@@ -352,10 +365,10 @@ jq -n --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --arg skill "SKILL_NAME" --arg b
 ## Completion Status Protocol
 
 When completing a skill workflow, report status using one of:
-- **DONE** — All steps completed successfully. Evidence provided for each claim.
-- **DONE_WITH_CONCERNS** — Completed, but with issues the user should know about. List each concern.
-- **BLOCKED** — Cannot proceed. State what is blocking and what was tried.
-- **NEEDS_CONTEXT** — Missing information required to continue. State exactly what you need.
+- **DONE** Ã¢â‚¬â€ All steps completed successfully. Evidence provided for each claim.
+- **DONE_WITH_CONCERNS** Ã¢â‚¬â€ Completed, but with issues the user should know about. List each concern.
+- **BLOCKED** Ã¢â‚¬â€ Cannot proceed. State what is blocking and what was tried.
+- **NEEDS_CONTEXT** Ã¢â‚¬â€ Missing information required to continue. State exactly what you need.
 
 ### Escalation
 
@@ -399,9 +412,9 @@ Determine the skill name from the `name:` field in this file's YAML frontmatter.
 Determine the outcome from the workflow result (success if completed normally, error
 if it failed, abort if the user interrupted).
 
-**PLAN MODE EXCEPTION — ALWAYS RUN:** This command writes telemetry to
+**PLAN MODE EXCEPTION Ã¢â‚¬â€ ALWAYS RUN:** This command writes telemetry to
 `~/.gstack/analytics/` (user config directory, not project files). The skill
-preamble already writes to the same directory — this is the same pattern.
+preamble already writes to the same directory Ã¢â‚¬â€ this is the same pattern.
 Skipping this command loses session duration and outcome data.
 
 Run this bash:
@@ -441,7 +454,7 @@ artifacts that inform the plan, not code changes:
 - Writing to the plan file (already allowed by plan mode)
 - `open` commands for viewing generated artifacts (comparison boards, HTML previews)
 
-These are read-only in spirit — they inspect the live site, generate visual artifacts,
+These are read-only in spirit Ã¢â‚¬â€ they inspect the live site, generate visual artifacts,
 or get independent opinions. They do NOT modify project source files.
 
 ## Plan Status Footer
@@ -449,8 +462,8 @@ or get independent opinions. They do NOT modify project source files.
 When you are in plan mode and about to call ExitPlanMode:
 
 1. Check if the plan file already has a `## GSTACK REVIEW REPORT` section.
-2. If it DOES — skip (a review skill already wrote a richer report).
-3. If it does NOT — run this command:
+2. If it DOES Ã¢â‚¬â€ skip (a review skill already wrote a richer report).
+3. If it does NOT Ã¢â‚¬â€ run this command:
 
 \`\`\`bash
 ~/.claude/skills/gstack/bin/gstack-review-read
@@ -468,16 +481,16 @@ Then write a `## GSTACK REVIEW REPORT` section to the end of the plan file:
 
 | Review | Trigger | Why | Runs | Status | Findings |
 |--------|---------|-----|------|--------|----------|
-| CEO Review | \`/plan-ceo-review\` | Scope & strategy | 0 | — | — |
-| Codex Review | \`/codex review\` | Independent 2nd opinion | 0 | — | — |
-| Eng Review | \`/plan-eng-review\` | Architecture & tests (required) | 0 | — | — |
-| Design Review | \`/plan-design-review\` | UI/UX gaps | 0 | — | — |
-| DX Review | \`/plan-devex-review\` | Developer experience gaps | 0 | — | — |
+| CEO Review | \`/plan-ceo-review\` | Scope & strategy | 0 | Ã¢â‚¬â€ | Ã¢â‚¬â€ |
+| Codex Review | \`/codex review\` | Independent 2nd opinion | 0 | Ã¢â‚¬â€ | Ã¢â‚¬â€ |
+| Eng Review | \`/plan-eng-review\` | Architecture & tests (required) | 0 | Ã¢â‚¬â€ | Ã¢â‚¬â€ |
+| Design Review | \`/plan-design-review\` | UI/UX gaps | 0 | Ã¢â‚¬â€ | Ã¢â‚¬â€ |
+| DX Review | \`/plan-devex-review\` | Developer experience gaps | 0 | Ã¢â‚¬â€ | Ã¢â‚¬â€ |
 
-**VERDICT:** NO REVIEWS YET — run \`/autoplan\` for full review pipeline, or individual reviews above.
+**VERDICT:** NO REVIEWS YET Ã¢â‚¬â€ run \`/autoplan\` for full review pipeline, or individual reviews above.
 \`\`\`
 
-**PLAN MODE EXCEPTION — ALWAYS RUN:** This writes to the plan file, which is the one
+**PLAN MODE EXCEPTION Ã¢â‚¬â€ ALWAYS RUN:** This writes to the plan file, which is the one
 file you are allowed to edit in plan mode. The plan file review report is part of the
 plan's living status.
 
@@ -489,28 +502,28 @@ First, detect the git hosting platform from the remote URL:
 git remote get-url origin 2>/dev/null
 ```
 
-- If the URL contains "github.com" → platform is **GitHub**
-- If the URL contains "gitlab" → platform is **GitLab**
+- If the URL contains "github.com" Ã¢â€ â€™ platform is **GitHub**
+- If the URL contains "gitlab" Ã¢â€ â€™ platform is **GitLab**
 - Otherwise, check CLI availability:
-  - `gh auth status 2>/dev/null` succeeds → platform is **GitHub** (covers GitHub Enterprise)
-  - `glab auth status 2>/dev/null` succeeds → platform is **GitLab** (covers self-hosted)
-  - Neither → **unknown** (use git-native commands only)
+  - `gh auth status 2>/dev/null` succeeds Ã¢â€ â€™ platform is **GitHub** (covers GitHub Enterprise)
+  - `glab auth status 2>/dev/null` succeeds Ã¢â€ â€™ platform is **GitLab** (covers self-hosted)
+  - Neither Ã¢â€ â€™ **unknown** (use git-native commands only)
 
 Determine which branch this PR/MR targets, or the repo's default branch if no
 PR/MR exists. Use the result as "the base branch" in all subsequent steps.
 
 **If GitHub:**
-1. `gh pr view --json baseRefName -q .baseRefName` — if succeeds, use it
-2. `gh repo view --json defaultBranchRef -q .defaultBranchRef.name` — if succeeds, use it
+1. `gh pr view --json baseRefName -q .baseRefName` Ã¢â‚¬â€ if succeeds, use it
+2. `gh repo view --json defaultBranchRef -q .defaultBranchRef.name` Ã¢â‚¬â€ if succeeds, use it
 
 **If GitLab:**
-1. `glab mr view -F json 2>/dev/null` and extract the `target_branch` field — if succeeds, use it
-2. `glab repo view -F json 2>/dev/null` and extract the `default_branch` field — if succeeds, use it
+1. `glab mr view -F json 2>/dev/null` and extract the `target_branch` field Ã¢â‚¬â€ if succeeds, use it
+2. `glab repo view -F json 2>/dev/null` and extract the `default_branch` field Ã¢â‚¬â€ if succeeds, use it
 
 **Git-native fallback (if unknown platform, or CLI commands fail):**
 1. `git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's|refs/remotes/origin/||'`
-2. If that fails: `git rev-parse --verify origin/main 2>/dev/null` → use `main`
-3. If that fails: `git rev-parse --verify origin/master 2>/dev/null` → use `master`
+2. If that fails: `git rev-parse --verify origin/main 2>/dev/null` Ã¢â€ â€™ use `main`
+3. If that fails: `git rev-parse --verify origin/master 2>/dev/null` Ã¢â€ â€™ use `master`
 
 If all fail, fall back to `main`.
 
@@ -561,20 +574,20 @@ These are the laws. Every recommendation traces back to one of these.
 | 6 | **Accessible** | Works across roles, environments, preferences. CLI + GUI. | VS Code: works for junior to principal |
 | 7 | **Desirable** | Best-in-class tech. Reasonable pricing. Community momentum. | Vercel: devs WANT to use it, not tolerate it |
 
-## Cognitive Patterns — How Great DX Leaders Think
+## Cognitive Patterns Ã¢â‚¬â€ How Great DX Leaders Think
 
 Internalize these; don't enumerate them.
 
-1. **Chef-for-chefs** — Your users build products for a living. The bar is higher because they notice everything.
-2. **First five minutes obsession** — New dev arrives. Clock starts. Can they hello-world without docs, sales, or credit card?
-3. **Error message empathy** — Every error is pain. Does it identify the problem, explain the cause, show the fix, link to docs?
-4. **Escape hatch awareness** — Every default needs an override. No escape hatch = no trust = no adoption at scale.
-5. **Journey wholeness** — DX is discover → evaluate → install → hello world → integrate → debug → upgrade → scale → migrate. Every gap = a lost dev.
-6. **Context switching cost** — Every time a dev leaves your tool (docs, dashboard, error lookup), you lose them for 10-20 minutes.
-7. **Upgrade fear** — Will this break my production app? Clear changelogs, migration guides, codemods, deprecation warnings. Upgrades should be boring.
-8. **SDK completeness** — If devs write their own HTTP wrapper, you failed. If the SDK works in 4 of 5 languages, the fifth community hates you.
-9. **Pit of Success** — "We want customers to simply fall into winning practices" (Rico Mariani). Make the right thing easy, the wrong thing hard.
-10. **Progressive disclosure** — Simple case is production-ready, not a toy. Complex case uses the same API. SwiftUI: \`Button("Save") { save() }\` → full customization, same API.
+1. **Chef-for-chefs** Ã¢â‚¬â€ Your users build products for a living. The bar is higher because they notice everything.
+2. **First five minutes obsession** Ã¢â‚¬â€ New dev arrives. Clock starts. Can they hello-world without docs, sales, or credit card?
+3. **Error message empathy** Ã¢â‚¬â€ Every error is pain. Does it identify the problem, explain the cause, show the fix, link to docs?
+4. **Escape hatch awareness** Ã¢â‚¬â€ Every default needs an override. No escape hatch = no trust = no adoption at scale.
+5. **Journey wholeness** Ã¢â‚¬â€ DX is discover Ã¢â€ â€™ evaluate Ã¢â€ â€™ install Ã¢â€ â€™ hello world Ã¢â€ â€™ integrate Ã¢â€ â€™ debug Ã¢â€ â€™ upgrade Ã¢â€ â€™ scale Ã¢â€ â€™ migrate. Every gap = a lost dev.
+6. **Context switching cost** Ã¢â‚¬â€ Every time a dev leaves your tool (docs, dashboard, error lookup), you lose them for 10-20 minutes.
+7. **Upgrade fear** Ã¢â‚¬â€ Will this break my production app? Clear changelogs, migration guides, codemods, deprecation warnings. Upgrades should be boring.
+8. **SDK completeness** Ã¢â‚¬â€ If devs write their own HTTP wrapper, you failed. If the SDK works in 4 of 5 languages, the fifth community hates you.
+9. **Pit of Success** Ã¢â‚¬â€ "We want customers to simply fall into winning practices" (Rico Mariani). Make the right thing easy, the wrong thing hard.
+10. **Progressive disclosure** Ã¢â‚¬â€ Simple case is production-ready, not a toy. Complex case uses the same API. SwiftUI: \`Button("Save") { save() }\` Ã¢â€ â€™ full customization, same API.
 
 ## DX Scoring Rubric (0-10 calibration)
 
@@ -656,15 +669,15 @@ skill before proceeding.
 Say to the user via AskUserQuestion:
 
 > "No design doc found for this branch. `/office-hours` produces a structured problem
-> statement, premise challenge, and explored alternatives — it gives this review much
+> statement, premise challenge, and explored alternatives Ã¢â‚¬â€ it gives this review much
 > sharper input to work with. Takes about 10 minutes. The design doc is per-feature,
-> not per-product — it captures the thinking behind this specific change."
+> not per-product Ã¢â‚¬â€ it captures the thinking behind this specific change."
 
 Options:
 - A) Run /office-hours now (we'll pick up the review right after)
-- B) Skip — proceed with standard review
+- B) Skip Ã¢â‚¬â€ proceed with standard review
 
-If they skip: "No worries — standard review. If you ever want sharper input, try
+If they skip: "No worries Ã¢â‚¬â€ standard review. If you ever want sharper input, try
 /office-hours first next time." Then proceed normally. Do not re-offer later in the session.
 
 If they choose A:
@@ -674,12 +687,12 @@ the review right where we left off."
 
 Read the `/office-hours` skill file at `~/.claude/skills/gstack/office-hours/SKILL.md` using the Read tool.
 
-**If unreadable:** Skip with "Could not load /office-hours — skipping." and continue.
+**If unreadable:** Skip with "Could not load /office-hours Ã¢â‚¬â€ skipping." and continue.
 
 Follow its instructions from top to bottom, **skipping these sections** (already handled by the parent skill):
 - Preamble (run first)
 - AskUserQuestion Format
-- Completeness Principle — Boil the Lake
+- Completeness Principle Ã¢â‚¬â€ Boil the Lake
 - Search Before Building
 - Contributor Mode
 - Completion Status Protocol
@@ -709,12 +722,12 @@ If none was produced (user may have cancelled), proceed with standard review.
 
 Before proceeding, read the plan and infer the developer product type from content:
 
-- Mentions API endpoints, REST, GraphQL, gRPC, webhooks → **API/Service**
-- Mentions CLI commands, flags, arguments, terminal → **CLI Tool**
-- Mentions npm install, import, require, library, package → **Library/SDK**
-- Mentions deploy, hosting, infrastructure, provisioning → **Platform**
-- Mentions docs, guides, tutorials, examples → **Documentation**
-- Mentions SKILL.md, skill template, Claude Code, AI agent, MCP → **Claude Code Skill**
+- Mentions API endpoints, REST, GraphQL, gRPC, webhooks Ã¢â€ â€™ **API/Service**
+- Mentions CLI commands, flags, arguments, terminal Ã¢â€ â€™ **CLI Tool**
+- Mentions npm install, import, require, library, package Ã¢â€ â€™ **Library/SDK**
+- Mentions deploy, hosting, infrastructure, provisioning Ã¢â€ â€™ **Platform**
+- Mentions docs, guides, tutorials, examples Ã¢â€ â€™ **Documentation**
+- Mentions SKILL.md, skill template, Claude Code, AI agent, MCP Ã¢â€ â€™ **Claude Code Skill**
 
 If NONE of the above: the plan has no developer-facing surface. Tell the user:
 "This plan doesn't appear to have developer-facing surfaces. /plan-devex-review
@@ -1008,7 +1021,7 @@ Check each item. For any unchecked item, explain what's missing and suggest the 
 
 **STOP.** AskUserQuestion for any item that requires a design decision.
 
-## Outside Voice — Independent Plan Challenge (optional, recommended)
+## Outside Voice Ã¢â‚¬â€ Independent Plan Challenge (optional, recommended)
 
 After all review sections are complete, offer an independent second opinion from a
 different AI system. Two models agreeing on a plan is stronger signal than one model's
@@ -1023,25 +1036,25 @@ which codex 2>/dev/null && echo "CODEX_AVAILABLE" || echo "CODEX_NOT_AVAILABLE"
 Use AskUserQuestion:
 
 > "All review sections are complete. Want an outside voice? A different AI system can
-> give a brutally honest, independent challenge of this plan — logical gaps, feasibility
+> give a brutally honest, independent challenge of this plan Ã¢â‚¬â€ logical gaps, feasibility
 > risks, and blind spots that are hard to catch from inside the review. Takes about 2
 > minutes."
 >
-> RECOMMENDATION: Choose A — an independent second opinion catches structural blind
+> RECOMMENDATION: Choose A Ã¢â‚¬â€ an independent second opinion catches structural blind
 > spots. Two different AI models agreeing on a plan is stronger signal than one model's
 > thorough review. Completeness: A=9/10, B=7/10.
 
 Options:
 - A) Get the outside voice (recommended)
-- B) Skip — proceed to outputs
+- B) Skip Ã¢â‚¬â€ proceed to outputs
 
 **If B:** Print "Skipping outside voice." and continue to the next section.
 
 **If A:** Construct the plan review prompt. Read the plan file being reviewed (the file
 the user pointed this review at, or the branch diff scope). If a CEO plan document
-was written in Step 0D-POST, read that too — it contains the scope decisions and vision.
+was written in Step 0D-POST, read that too Ã¢â‚¬â€ it contains the scope decisions and vision.
 
-Construct this prompt (substitute the actual plan content — if plan content exceeds 30KB,
+Construct this prompt (substitute the actual plan content Ã¢â‚¬â€ if plan content exceeds 30KB,
 truncate to the first 30KB and note "Plan truncated for size"). **Always start with the
 filesystem boundary instruction:**
 
@@ -1073,13 +1086,13 @@ cat "$TMPERR_PV"
 Present the full output verbatim:
 
 ```
-CODEX SAYS (plan review — outside voice):
-════════════════════════════════════════════════════════════
-<full codex output, verbatim — do not truncate or summarize>
-════════════════════════════════════════════════════════════
+CODEX SAYS (plan review Ã¢â‚¬â€ outside voice):
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+<full codex output, verbatim Ã¢â‚¬â€ do not truncate or summarize>
+Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
 ```
 
-**Error handling:** All errors are non-blocking — the outside voice is informational.
+**Error handling:** All errors are non-blocking Ã¢â‚¬â€ the outside voice is informational.
 - Auth failure (stderr contains "auth", "login", "unauthorized"): "Codex auth failed. Run \`codex login\` to authenticate."
 - Timeout: "Codex timed out after 5 minutes."
 - Empty response: "Codex returned no response."
@@ -1088,7 +1101,7 @@ On any Codex error, fall back to the Claude adversarial subagent.
 
 **If CODEX_NOT_AVAILABLE (or Codex errored):**
 
-Dispatch via the Agent tool. The subagent has fresh context — genuine independence.
+Dispatch via the Agent tool. The subagent has fresh context Ã¢â‚¬â€ genuine independence.
 
 Subagent prompt: same plan review prompt as above.
 
@@ -1109,7 +1122,7 @@ CROSS-MODEL TENSION:
 
 **User Sovereignty:** Do NOT auto-incorporate outside voice recommendations into the plan.
 Present each tension point to the user. The user decides. Cross-model agreement is a
-strong signal — present it as such — but it is NOT permission to act. You may state
+strong signal Ã¢â‚¬â€ present it as such Ã¢â‚¬â€ but it is NOT permission to act. You may state
 which argument you find more compelling, but you MUST NOT apply the change without
 explicit user approval.
 
@@ -1128,9 +1141,9 @@ Options:
 - D) Add to TODOS.md for later
 
 Wait for the user's response. Do NOT default to accepting because you agree with the
-outside voice. If the user chooses B, the current approach stands — do not re-argue.
+outside voice. If the user chooses B, the current approach stands Ã¢â‚¬â€ do not re-argue.
 
-If no tension points exist, note: "No cross-model tension — both reviewers agree."
+If no tension points exist, note: "No cross-model tension Ã¢â‚¬â€ both reviewers agree."
 
 **Persist the result:**
 ```bash
@@ -1144,7 +1157,7 @@ SOURCE = "codex" if Codex ran, "claude" if subagent ran.
 
 ---
 
-## CRITICAL RULE — How to ask questions
+## CRITICAL RULE Ã¢â‚¬â€ How to ask questions
 
 Follow the AskUserQuestion format from the Preamble above. Additional rules for
 DX reviews:
@@ -1191,22 +1204,22 @@ Options: **A)** Add to TODOS.md **B)** Skip **C)** Build it now
 
 ```
 +====================================================================+
-|              DX PLAN REVIEW — SCORECARD                             |
+|              DX PLAN REVIEW Ã¢â‚¬â€ SCORECARD                             |
 +====================================================================+
 | Dimension            | Score  | Prior  | Trend  |
 |----------------------|--------|--------|--------|
-| Getting Started      | __/10  | __/10  | __ ↑↓  |
-| API/CLI/SDK          | __/10  | __/10  | __ ↑↓  |
-| Error Messages       | __/10  | __/10  | __ ↑↓  |
-| Documentation        | __/10  | __/10  | __ ↑↓  |
-| Upgrade Path         | __/10  | __/10  | __ ↑↓  |
-| Dev Environment      | __/10  | __/10  | __ ↑↓  |
-| Community            | __/10  | __/10  | __ ↑↓  |
-| DX Measurement       | __/10  | __/10  | __ ↑↓  |
+| Getting Started      | __/10  | __/10  | __ Ã¢â€ â€˜Ã¢â€ â€œ  |
+| API/CLI/SDK          | __/10  | __/10  | __ Ã¢â€ â€˜Ã¢â€ â€œ  |
+| Error Messages       | __/10  | __/10  | __ Ã¢â€ â€˜Ã¢â€ â€œ  |
+| Documentation        | __/10  | __/10  | __ Ã¢â€ â€˜Ã¢â€ â€œ  |
+| Upgrade Path         | __/10  | __/10  | __ Ã¢â€ â€˜Ã¢â€ â€œ  |
+| Dev Environment      | __/10  | __/10  | __ Ã¢â€ â€˜Ã¢â€ â€œ  |
+| Community            | __/10  | __/10  | __ Ã¢â€ â€˜Ã¢â€ â€œ  |
+| DX Measurement       | __/10  | __/10  | __ Ã¢â€ â€˜Ã¢â€ â€œ  |
 +--------------------------------------------------------------------+
-| TTHW                 | __ min | __ min | __ ↑↓  |
+| TTHW                 | __ min | __ min | __ Ã¢â€ â€˜Ã¢â€ â€œ  |
 | Product Type         | [type]                    |
-| Overall DX           | __/10  | __/10  | __ ↑↓  |
+| Overall DX           | __/10  | __/10  | __ Ã¢â€ â€˜Ã¢â€ â€œ  |
 +====================================================================+
 | DX PRINCIPLE COVERAGE                                               |
 | Zero Friction      | [covered/gap]                                  |
@@ -1252,7 +1265,7 @@ If any AskUserQuestion goes unanswered, note here. Never silently default.
 
 After producing the DX Scorecard above, persist the review result.
 
-**PLAN MODE EXCEPTION — ALWAYS RUN:** This command writes review metadata to
+**PLAN MODE EXCEPTION Ã¢â‚¬â€ ALWAYS RUN:** This command writes review metadata to
 `~/.gstack/` (user config directory, not project files).
 
 ```bash
@@ -1269,7 +1282,7 @@ After completing the review, read the review log and config to display the dashb
 ~/.claude/skills/gstack/bin/gstack-review-read
 ```
 
-Parse the output. Find the most recent entry for each skill (plan-ceo-review, plan-eng-review, review, plan-design-review, design-review-lite, adversarial-review, codex-review, codex-plan-review). Ignore entries with timestamps older than 7 days. For the Eng Review row, show whichever is more recent between `review` (diff-scoped pre-landing review) and `plan-eng-review` (plan-stage architecture review). Append "(DIFF)" or "(PLAN)" to the status to distinguish. For the Adversarial row, show whichever is more recent between `adversarial-review` (new auto-scaled) and `codex-review` (legacy). For Design Review, show whichever is more recent between `plan-design-review` (full visual audit) and `design-review-lite` (code-level check). Append "(FULL)" or "(LITE)" to the status to distinguish. For the Outside Voice row, show the most recent `codex-plan-review` entry — this captures outside voices from both /plan-ceo-review and /plan-eng-review.
+Parse the output. Find the most recent entry for each skill (plan-ceo-review, plan-eng-review, review, plan-design-review, design-review-lite, adversarial-review, codex-review, codex-plan-review). Ignore entries with timestamps older than 7 days. For the Eng Review row, show whichever is more recent between `review` (diff-scoped pre-landing review) and `plan-eng-review` (plan-stage architecture review). Append "(DIFF)" or "(PLAN)" to the status to distinguish. For the Adversarial row, show whichever is more recent between `adversarial-review` (new auto-scaled) and `codex-review` (legacy). For Design Review, show whichever is more recent between `plan-design-review` (full visual audit) and `design-review-lite` (code-level check). Append "(FULL)" or "(LITE)" to the status to distinguish. For the Outside Voice row, show the most recent `codex-plan-review` entry Ã¢â‚¬â€ this captures outside voices from both /plan-ceo-review and /plan-eng-review.
 
 **Source attribution:** If the most recent entry for a skill has a \`"via"\` field, append it to the status label in parentheses. Examples: `plan-eng-review` with `via:"autoplan"` shows as "CLEAR (PLAN via /autoplan)". `review` with `via:"ship"` shows as "CLEAR (DIFF via /ship)". Entries without a `via` field show as "CLEAR (PLAN)" or "CLEAR (DIFF)" as before.
 
@@ -1284,12 +1297,12 @@ Display:
 | Review          | Runs | Last Run            | Status    | Required |
 |-----------------|------|---------------------|-----------|----------|
 | Eng Review      |  1   | 2026-03-16 15:00    | CLEAR     | YES      |
-| CEO Review      |  0   | —                   | —         | no       |
-| Design Review   |  0   | —                   | —         | no       |
-| Adversarial     |  0   | —                   | —         | no       |
-| Outside Voice   |  0   | —                   | —         | no       |
+| CEO Review      |  0   | Ã¢â‚¬â€                   | Ã¢â‚¬â€         | no       |
+| Design Review   |  0   | Ã¢â‚¬â€                   | Ã¢â‚¬â€         | no       |
+| Adversarial     |  0   | Ã¢â‚¬â€                   | Ã¢â‚¬â€         | no       |
+| Outside Voice   |  0   | Ã¢â‚¬â€                   | Ã¢â‚¬â€         | no       |
 +--------------------------------------------------------------------+
-| VERDICT: CLEARED — Eng Review passed                                |
+| VERDICT: CLEARED Ã¢â‚¬â€ Eng Review passed                                |
 +====================================================================+
 ```
 
@@ -1308,8 +1321,8 @@ Display:
 
 **Staleness detection:** After displaying the dashboard, check if any existing reviews may be stale:
 - Parse the \`---HEAD---\` section from the bash output to get the current HEAD commit hash
-- For each review entry that has a \`commit\` field: compare it against the current HEAD. If different, count elapsed commits: \`git rev-list --count STORED_COMMIT..HEAD\`. Display: "Note: {skill} review from {date} may be stale — {N} commits since review"
-- For entries without a \`commit\` field (legacy entries): display "Note: {skill} review from {date} has no commit tracking — consider re-running for accurate staleness detection"
+- For each review entry that has a \`commit\` field: compare it against the current HEAD. If different, count elapsed commits: \`git rev-list --count STORED_COMMIT..HEAD\`. Display: "Note: {skill} review from {date} may be stale Ã¢â‚¬â€ {N} commits since review"
+- For entries without a \`commit\` field (legacy entries): display "Note: {skill} review from {date} has no commit tracking Ã¢â‚¬â€ consider re-running for accurate staleness detection"
 - If all reviews match the current HEAD, do not display any staleness notes
 
 ## Plan File Review Report
@@ -1320,8 +1333,8 @@ After displaying the Review Readiness Dashboard in conversation output, also upd
 ### Detect the plan file
 
 1. Check if there is an active plan file in this conversation (the host provides plan file
-   paths in system messages — look for plan file references in the conversation context).
-2. If not found, skip this section silently — not every review runs in plan mode.
+   paths in system messages Ã¢â‚¬â€ look for plan file references in the conversation context).
+2. If not found, skip this section silently Ã¢â‚¬â€ not every review runs in plan mode.
 
 ### Generate the report
 
@@ -1329,22 +1342,22 @@ Read the review log output you already have from the Review Readiness Dashboard 
 Parse each JSONL entry. Each skill logs different fields:
 
 - **plan-ceo-review**: \`status\`, \`unresolved\`, \`critical_gaps\`, \`mode\`, \`scope_proposed\`, \`scope_accepted\`, \`scope_deferred\`, \`commit\`
-  → Findings: "{scope_proposed} proposals, {scope_accepted} accepted, {scope_deferred} deferred"
-  → If scope fields are 0 or missing (HOLD/REDUCTION mode): "mode: {mode}, {critical_gaps} critical gaps"
+  Ã¢â€ â€™ Findings: "{scope_proposed} proposals, {scope_accepted} accepted, {scope_deferred} deferred"
+  Ã¢â€ â€™ If scope fields are 0 or missing (HOLD/REDUCTION mode): "mode: {mode}, {critical_gaps} critical gaps"
 - **plan-eng-review**: \`status\`, \`unresolved\`, \`critical_gaps\`, \`issues_found\`, \`mode\`, \`commit\`
-  → Findings: "{issues_found} issues, {critical_gaps} critical gaps"
+  Ã¢â€ â€™ Findings: "{issues_found} issues, {critical_gaps} critical gaps"
 - **plan-design-review**: \`status\`, \`initial_score\`, \`overall_score\`, \`unresolved\`, \`decisions_made\`, \`commit\`
-  → Findings: "score: {initial_score}/10 → {overall_score}/10, {decisions_made} decisions"
+  Ã¢â€ â€™ Findings: "score: {initial_score}/10 Ã¢â€ â€™ {overall_score}/10, {decisions_made} decisions"
 - **plan-devex-review**: \`status\`, \`initial_score\`, \`overall_score\`, \`product_type\`, \`tthw_current\`, \`tthw_target\`, \`unresolved\`, \`commit\`
-  → Findings: "score: {initial_score}/10 → {overall_score}/10, TTHW: {tthw_current} → {tthw_target}"
+  Ã¢â€ â€™ Findings: "score: {initial_score}/10 Ã¢â€ â€™ {overall_score}/10, TTHW: {tthw_current} Ã¢â€ â€™ {tthw_target}"
 - **devex-review**: \`status\`, \`overall_score\`, \`product_type\`, \`tthw_measured\`, \`dimensions_tested\`, \`dimensions_inferred\`, \`boomerang\`, \`commit\`
-  → Findings: "score: {overall_score}/10, TTHW: {tthw_measured}, {dimensions_tested} tested/{dimensions_inferred} inferred"
+  Ã¢â€ â€™ Findings: "score: {overall_score}/10, TTHW: {tthw_measured}, {dimensions_tested} tested/{dimensions_inferred} inferred"
 - **codex-review**: \`status\`, \`gate\`, \`findings\`, \`findings_fixed\`
-  → Findings: "{findings} findings, {findings_fixed}/{findings} fixed"
+  Ã¢â€ â€™ Findings: "{findings} findings, {findings_fixed}/{findings} fixed"
 
 All fields needed for the Findings column are now present in the JSONL entries.
 For the review you just completed, you may use richer details from your own Completion
-Summary. For prior reviews, use the JSONL fields directly — they contain all required data.
+Summary. For prior reviews, use the JSONL fields directly Ã¢â‚¬â€ they contain all required data.
 
 Produce this markdown table:
 
@@ -1362,20 +1375,20 @@ Produce this markdown table:
 
 Below the table, add these lines (omit any that are empty/not applicable):
 
-- **CODEX:** (only if codex-review ran) — one-line summary of codex fixes
-- **CROSS-MODEL:** (only if both Claude and Codex reviews exist) — overlap analysis
+- **CODEX:** (only if codex-review ran) Ã¢â‚¬â€ one-line summary of codex fixes
+- **CROSS-MODEL:** (only if both Claude and Codex reviews exist) Ã¢â‚¬â€ overlap analysis
 - **UNRESOLVED:** total unresolved decisions across all reviews
-- **VERDICT:** list reviews that are CLEAR (e.g., "CEO + ENG CLEARED — ready to implement").
+- **VERDICT:** list reviews that are CLEAR (e.g., "CEO + ENG CLEARED Ã¢â‚¬â€ ready to implement").
   If Eng Review is not CLEAR and not skipped globally, append "eng review required".
 
 ### Write to the plan file
 
-**PLAN MODE EXCEPTION — ALWAYS RUN:** This writes to the plan file, which is the one
+**PLAN MODE EXCEPTION Ã¢â‚¬â€ ALWAYS RUN:** This writes to the plan file, which is the one
 file you are allowed to edit in plan mode. The plan file review report is part of the
 plan's living status.
 
 - Search the plan file for a \`## GSTACK REVIEW REPORT\` section **anywhere** in the file
-  (not just at the end — content may have been added after it).
+  (not just at the end Ã¢â‚¬â€ content may have been added after it).
 - If found, **replace it** entirely using the Edit tool. Match from \`## GSTACK REVIEW REPORT\`
   through either the next \`## \` heading or end of file, whichever comes first. This ensures
   content added after the report section is preserved, not eaten. If the Edit fails
@@ -1409,18 +1422,18 @@ staleness detection: if those files are later deleted, the learning can be flagg
 **Only log genuine discoveries.** Don't log obvious things. Don't log things the user
 already knows. A good test: would this insight save time in a future session? If yes, log it.
 
-## Next Steps — Review Chaining
+## Next Steps Ã¢â‚¬â€ Review Chaining
 
 After displaying the Review Readiness Dashboard, recommend next reviews:
 
-**Recommend /plan-eng-review if eng review is not skipped globally** — DX issues often
+**Recommend /plan-eng-review if eng review is not skipped globally** Ã¢â‚¬â€ DX issues often
 have architectural implications. If this DX review found API design problems, error
 handling gaps, or CLI ergonomics issues, eng review should validate the fixes.
 
-**Suggest /plan-design-review if user-facing UI exists** — DX review focuses on
+**Suggest /plan-design-review if user-facing UI exists** Ã¢â‚¬â€ DX review focuses on
 developer-facing surfaces; design review covers end-user-facing UI.
 
-**Recommend /devex-review after implementation** — the boomerang. Plan said TTHW would
+**Recommend /devex-review after implementation** Ã¢â‚¬â€ the boomerang. Plan said TTHW would
 be 3 minutes. Did reality match? Run /devex-review on the live product to find out.
 
 Use AskUserQuestion with applicable options:

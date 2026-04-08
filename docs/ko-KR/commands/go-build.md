@@ -1,55 +1,68 @@
 ---
-description: Go build 에러, go vet 경고, 린터 이슈를 점진적으로 수정합니다. 최소한의 정밀한 수정을 위해 go-build-resolver 에이전트를 호출합니다.
+description: Go build Ã¬â€”ÂÃ«Å¸Â¬, go vet ÃªÂ²Â½ÃªÂ³Â , Ã«Â¦Â°Ã­â€žÂ° Ã¬ÂÂ´Ã¬Å Ë†Ã«Â¥Â¼ Ã¬Â ÂÃ¬Â§â€žÃ¬Â ÂÃ¬Å“Â¼Ã«Â¡Å“ Ã¬Ë†ËœÃ¬Â â€¢Ã­â€¢Â©Ã«â€¹Ë†Ã«â€¹Â¤. Ã¬ÂµÅ“Ã¬â€ Å’Ã­â€¢Å“Ã¬ÂËœ Ã¬Â â€¢Ã«Â°â‚¬Ã­â€¢Å“ Ã¬Ë†ËœÃ¬Â â€¢Ã¬Ââ€ž Ã¬Å“â€žÃ­â€¢Â´ go-build-resolver Ã¬â€”ÂÃ¬ÂÂ´Ã¬Â â€žÃ­Å Â¸Ã«Â¥Â¼ Ã­ËœÂ¸Ã¬Â¶Å“Ã­â€¢Â©Ã«â€¹Ë†Ã«â€¹Â¤.
 ---
 
 # Go Build and Fix
 
-이 커맨드는 **go-build-resolver** 에이전트를 호출하여 최소한의 변경으로 Go build 에러를 점진적으로 수정합니다.
+## Safety And Authorization Rule
 
-## 이 커맨드가 하는 것
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-1. **진단 실행**: `go build`, `go vet`, `staticcheck` 실행
-2. **에러 분석**: 파일별로 그룹화하고 심각도순 정렬
-3. **점진적 수정**: 한 번에 하나의 에러씩
-4. **각 수정 검증**: 각 변경 후 build 재실행
-5. **요약 보고**: 수정된 것과 남은 것 표시
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-## 사용 시점
 
-`/go-build`를 사용해야 할 때:
-- `go build ./...`가 에러로 실패할 때
-- `go vet ./...`가 이슈를 보고할 때
-- `golangci-lint run`이 경고를 보여줄 때
-- 모듈 의존성이 깨졌을 때
-- 변경사항을 pull한 후 build가 깨졌을 때
+Ã¬ÂÂ´ Ã¬Â»Â¤Ã«Â§Â¨Ã«â€œÅ“Ã«Å â€ **go-build-resolver** Ã¬â€”ÂÃ¬ÂÂ´Ã¬Â â€žÃ­Å Â¸Ã«Â¥Â¼ Ã­ËœÂ¸Ã¬Â¶Å“Ã­â€¢ËœÃ¬â€”Â¬ Ã¬ÂµÅ“Ã¬â€ Å’Ã­â€¢Å“Ã¬ÂËœ Ã«Â³â‚¬ÃªÂ²Â½Ã¬Å“Â¼Ã«Â¡Å“ Go build Ã¬â€”ÂÃ«Å¸Â¬Ã«Â¥Â¼ Ã¬Â ÂÃ¬Â§â€žÃ¬Â ÂÃ¬Å“Â¼Ã«Â¡Å“ Ã¬Ë†ËœÃ¬Â â€¢Ã­â€¢Â©Ã«â€¹Ë†Ã«â€¹Â¤.
 
-## 실행되는 진단 커맨드
+## Ã¬ÂÂ´ Ã¬Â»Â¤Ã«Â§Â¨Ã«â€œÅ“ÃªÂ°â‚¬ Ã­â€¢ËœÃ«Å â€ ÃªÂ²Æ’
+
+1. **Ã¬Â§â€žÃ«â€¹Â¨ Ã¬â€¹Â¤Ã­â€“â€°**: `go build`, `go vet`, `staticcheck` Ã¬â€¹Â¤Ã­â€“â€°
+2. **Ã¬â€”ÂÃ«Å¸Â¬ Ã«Â¶â€žÃ¬â€žÂ**: Ã­Å’Å’Ã¬ÂÂ¼Ã«Â³â€žÃ«Â¡Å“ ÃªÂ·Â¸Ã«Â£Â¹Ã­â„¢â€Ã­â€¢ËœÃªÂ³Â  Ã¬â€¹Â¬ÃªÂ°ÂÃ«Ââ€žÃ¬Ë†Å“ Ã¬Â â€¢Ã«Â Â¬
+3. **Ã¬Â ÂÃ¬Â§â€žÃ¬Â Â Ã¬Ë†ËœÃ¬Â â€¢**: Ã­â€¢Å“ Ã«Â²Ë†Ã¬â€”Â Ã­â€¢ËœÃ«â€šËœÃ¬ÂËœ Ã¬â€”ÂÃ«Å¸Â¬Ã¬â€Â©
+4. **ÃªÂ°Â Ã¬Ë†ËœÃ¬Â â€¢ ÃªÂ²â‚¬Ã¬Â¦Â**: ÃªÂ°Â Ã«Â³â‚¬ÃªÂ²Â½ Ã­â€ºâ€ž build Ã¬Å¾Â¬Ã¬â€¹Â¤Ã­â€“â€°
+5. **Ã¬Å¡â€Ã¬â€¢Â½ Ã«Â³Â´ÃªÂ³Â **: Ã¬Ë†ËœÃ¬Â â€¢Ã«ÂÅ“ ÃªÂ²Æ’ÃªÂ³Â¼ Ã«â€šÂ¨Ã¬Ââ‚¬ ÃªÂ²Æ’ Ã­â€˜Å“Ã¬â€¹Å“
+
+## Ã¬â€šÂ¬Ã¬Å¡Â© Ã¬â€¹Å“Ã¬Â Â
+
+`/go-build`Ã«Â¥Â¼ Ã¬â€šÂ¬Ã¬Å¡Â©Ã­â€¢Â´Ã¬â€¢Â¼ Ã­â€¢Â  Ã«â€¢Å’:
+- `go build ./...`ÃªÂ°â‚¬ Ã¬â€”ÂÃ«Å¸Â¬Ã«Â¡Å“ Ã¬â€¹Â¤Ã­Å’Â¨Ã­â€¢Â  Ã«â€¢Å’
+- `go vet ./...`ÃªÂ°â‚¬ Ã¬ÂÂ´Ã¬Å Ë†Ã«Â¥Â¼ Ã«Â³Â´ÃªÂ³Â Ã­â€¢Â  Ã«â€¢Å’
+- `golangci-lint run`Ã¬ÂÂ´ ÃªÂ²Â½ÃªÂ³Â Ã«Â¥Â¼ Ã«Â³Â´Ã¬â€”Â¬Ã¬Â¤â€ž Ã«â€¢Å’
+- Ã«ÂªÂ¨Ã«â€œË† Ã¬ÂËœÃ¬Â¡Â´Ã¬â€žÂ±Ã¬ÂÂ´ ÃªÂ¹Â¨Ã¬Â¡Å’Ã¬Ââ€ž Ã«â€¢Å’
+- Ã«Â³â‚¬ÃªÂ²Â½Ã¬â€šÂ¬Ã­â€¢Â­Ã¬Ââ€ž pullÃ­â€¢Å“ Ã­â€ºâ€ž buildÃªÂ°â‚¬ ÃªÂ¹Â¨Ã¬Â¡Å’Ã¬Ââ€ž Ã«â€¢Å’
+
+## Ã¬â€¹Â¤Ã­â€“â€°Ã«ÂËœÃ«Å â€ Ã¬Â§â€žÃ«â€¹Â¨ Ã¬Â»Â¤Ã«Â§Â¨Ã«â€œÅ“
 
 ```bash
-# 기본 build 확인
+# ÃªÂ¸Â°Ã«Â³Â¸ build Ã­â„¢â€¢Ã¬ÂÂ¸
 go build ./...
 
-# 정적 분석
+# Ã¬Â â€¢Ã¬Â Â Ã«Â¶â€žÃ¬â€žÂ
 go vet ./...
 
-# 확장 린팅 (사용 가능한 경우)
+# Ã­â„¢â€¢Ã¬Å¾Â¥ Ã«Â¦Â°Ã­Å’â€¦ (Ã¬â€šÂ¬Ã¬Å¡Â© ÃªÂ°â‚¬Ã«Å Â¥Ã­â€¢Å“ ÃªÂ²Â½Ã¬Å¡Â°)
 staticcheck ./...
 golangci-lint run
 
-# 모듈 이슈
+# Ã«ÂªÂ¨Ã«â€œË† Ã¬ÂÂ´Ã¬Å Ë†
 go mod verify
 go mod tidy -v
 ```
 
-## 예시 세션
+## Ã¬ËœË†Ã¬â€¹Å“ Ã¬â€žÂ¸Ã¬â€¦Ëœ
 
 ````text
 User: /go-build
 
 Agent:
-# Go Build 해결
+# Go Build Ã­â€¢Â´ÃªÂ²Â°
 
-## 초기 진단
+## Ã¬Â´Ë†ÃªÂ¸Â° Ã¬Â§â€žÃ«â€¹Â¨
 
 ```bash
 $ go build ./...
@@ -58,51 +71,51 @@ internal/handler/api.go:42:9: cannot use x (type string) as type int
 internal/handler/api.go:58:2: missing return at end of function
 ```
 
-발견된 에러: 3개
+Ã«Â°Å“ÃªÂ²Â¬Ã«ÂÅ“ Ã¬â€”ÂÃ«Å¸Â¬: 3ÃªÂ°Å“
 
-## 수정 1: 정의되지 않은 식별자
+## Ã¬Ë†ËœÃ¬Â â€¢ 1: Ã¬Â â€¢Ã¬ÂËœÃ«ÂËœÃ¬Â§â‚¬ Ã¬â€¢Å Ã¬Ââ‚¬ Ã¬â€¹ÂÃ«Â³â€žÃ¬Å¾Â
 
-파일: internal/service/user.go:25
-에러: undefined: UserRepository
-원인: import 누락
+Ã­Å’Å’Ã¬ÂÂ¼: internal/service/user.go:25
+Ã¬â€”ÂÃ«Å¸Â¬: undefined: UserRepository
+Ã¬â€ºÂÃ¬ÂÂ¸: import Ã«Ë†â€žÃ«ÂÂ½
 
 ```go
-// import 추가
+// import Ã¬Â¶â€ÃªÂ°â‚¬
 import "project/internal/repository"
 
-// 변경 전
+// Ã«Â³â‚¬ÃªÂ²Â½ Ã¬Â â€ž
 var repo UserRepository
-// 변경 후
+// Ã«Â³â‚¬ÃªÂ²Â½ Ã­â€ºâ€ž
 var repo repository.UserRepository
 ```
 
 ```bash
 $ go build ./...
-# 2개 에러 남음
+# 2ÃªÂ°Å“ Ã¬â€”ÂÃ«Å¸Â¬ Ã«â€šÂ¨Ã¬ÂÅ’
 ```
 
-## 수정 2: 타입 불일치
+## Ã¬Ë†ËœÃ¬Â â€¢ 2: Ã­Æ’â‚¬Ã¬Å¾â€¦ Ã«Â¶Ë†Ã¬ÂÂ¼Ã¬Â¹Ëœ
 
-파일: internal/handler/api.go:42
-에러: cannot use x (type string) as type int
+Ã­Å’Å’Ã¬ÂÂ¼: internal/handler/api.go:42
+Ã¬â€”ÂÃ«Å¸Â¬: cannot use x (type string) as type int
 
 ```go
-// 변경 전
+// Ã«Â³â‚¬ÃªÂ²Â½ Ã¬Â â€ž
 count := params.Get("count")
-// 변경 후
+// Ã«Â³â‚¬ÃªÂ²Â½ Ã­â€ºâ€ž
 countStr := params.Get("count")
 count, _ := strconv.Atoi(countStr)
 ```
 
 ```bash
 $ go build ./...
-# 1개 에러 남음
+# 1ÃªÂ°Å“ Ã¬â€”ÂÃ«Å¸Â¬ Ã«â€šÂ¨Ã¬ÂÅ’
 ```
 
-## 수정 3: 누락된 return
+## Ã¬Ë†ËœÃ¬Â â€¢ 3: Ã«Ë†â€žÃ«ÂÂ½Ã«ÂÅ“ return
 
-파일: internal/handler/api.go:58
-에러: missing return at end of function
+Ã­Å’Å’Ã¬ÂÂ¼: internal/handler/api.go:58
+Ã¬â€”ÂÃ«Å¸Â¬: missing return at end of function
 
 ```go
 func GetUser(id string) (*User, error) {
@@ -110,74 +123,74 @@ func GetUser(id string) (*User, error) {
         return nil, ErrInvalidID
     }
     user := findUser(id)
-    // 누락된 return 추가
+    // Ã«Ë†â€žÃ«ÂÂ½Ã«ÂÅ“ return Ã¬Â¶â€ÃªÂ°â‚¬
     return user, nil
 }
 ```
 
 ```bash
 $ go build ./...
-# Build 성공!
+# Build Ã¬â€žÂ±ÃªÂ³Âµ!
 ```
 
-## 최종 검증
+## Ã¬ÂµÅ“Ã¬Â¢â€¦ ÃªÂ²â‚¬Ã¬Â¦Â
 
 ```bash
 $ go vet ./...
-# 이슈 없음
+# Ã¬ÂÂ´Ã¬Å Ë† Ã¬â€”â€ Ã¬ÂÅ’
 
 $ go test ./...
 ok      project/internal/service   0.015s
 ok      project/internal/handler   0.023s
 ```
 
-## 요약
+## Ã¬Å¡â€Ã¬â€¢Â½
 
-| 항목 | 수량 |
+| Ã­â€¢Â­Ã«ÂªÂ© | Ã¬Ë†ËœÃ«Å¸â€° |
 |------|------|
-| 수정된 Build 에러 | 3 |
-| 수정된 Vet 경고 | 0 |
-| 수정된 파일 | 2 |
-| 남은 이슈 | 0 |
+| Ã¬Ë†ËœÃ¬Â â€¢Ã«ÂÅ“ Build Ã¬â€”ÂÃ«Å¸Â¬ | 3 |
+| Ã¬Ë†ËœÃ¬Â â€¢Ã«ÂÅ“ Vet ÃªÂ²Â½ÃªÂ³Â  | 0 |
+| Ã¬Ë†ËœÃ¬Â â€¢Ã«ÂÅ“ Ã­Å’Å’Ã¬ÂÂ¼ | 2 |
+| Ã«â€šÂ¨Ã¬Ââ‚¬ Ã¬ÂÂ´Ã¬Å Ë† | 0 |
 
-Build 상태: PASS: 성공
+Build Ã¬Æ’ÂÃ­Æ’Å“: PASS: Ã¬â€žÂ±ÃªÂ³Âµ
 ````
 
-## 자주 발생하는 에러
+## Ã¬Å¾ÂÃ¬Â£Â¼ Ã«Â°Å“Ã¬Æ’ÂÃ­â€¢ËœÃ«Å â€ Ã¬â€”ÂÃ«Å¸Â¬
 
-| 에러 | 일반적인 수정 방법 |
+| Ã¬â€”ÂÃ«Å¸Â¬ | Ã¬ÂÂ¼Ã«Â°ËœÃ¬Â ÂÃ¬ÂÂ¸ Ã¬Ë†ËœÃ¬Â â€¢ Ã«Â°Â©Ã«Â²â€¢ |
 |------|-------------------|
-| `undefined: X` | import 추가 또는 오타 수정 |
-| `cannot use X as Y` | 타입 변환 또는 할당 수정 |
-| `missing return` | return 문 추가 |
-| `X does not implement Y` | 누락된 메서드 추가 |
-| `import cycle` | 패키지 구조 재구성 |
-| `declared but not used` | 변수 제거 또는 사용 |
-| `cannot find package` | `go get` 또는 `go mod tidy` |
+| `undefined: X` | import Ã¬Â¶â€ÃªÂ°â‚¬ Ã«ËœÂÃ«Å â€ Ã¬ËœÂ¤Ã­Æ’â‚¬ Ã¬Ë†ËœÃ¬Â â€¢ |
+| `cannot use X as Y` | Ã­Æ’â‚¬Ã¬Å¾â€¦ Ã«Â³â‚¬Ã­â„¢Ëœ Ã«ËœÂÃ«Å â€ Ã­â€¢Â Ã«â€¹Â¹ Ã¬Ë†ËœÃ¬Â â€¢ |
+| `missing return` | return Ã«Â¬Â¸ Ã¬Â¶â€ÃªÂ°â‚¬ |
+| `X does not implement Y` | Ã«Ë†â€žÃ«ÂÂ½Ã«ÂÅ“ Ã«Â©â€Ã¬â€žÅ“Ã«â€œÅ“ Ã¬Â¶â€ÃªÂ°â‚¬ |
+| `import cycle` | Ã­Å’Â¨Ã­â€šÂ¤Ã¬Â§â‚¬ ÃªÂµÂ¬Ã¬Â¡Â° Ã¬Å¾Â¬ÃªÂµÂ¬Ã¬â€žÂ± |
+| `declared but not used` | Ã«Â³â‚¬Ã¬Ë†Ëœ Ã¬Â Å“ÃªÂ±Â° Ã«ËœÂÃ«Å â€ Ã¬â€šÂ¬Ã¬Å¡Â© |
+| `cannot find package` | `go get` Ã«ËœÂÃ«Å â€ `go mod tidy` |
 
-## 수정 전략
+## Ã¬Ë†ËœÃ¬Â â€¢ Ã¬Â â€žÃ«Å¾Âµ
 
-1. **Build 에러 먼저** - 코드가 컴파일되어야 함
-2. **Vet 경고 두 번째** - 의심스러운 구조 수정
-3. **Lint 경고 세 번째** - 스타일과 모범 사례
-4. **한 번에 하나씩** - 각 변경 검증
-5. **최소한의 변경** - 리팩토링이 아닌 수정만
+1. **Build Ã¬â€”ÂÃ«Å¸Â¬ Ã«Â¨Â¼Ã¬Â â‚¬** - Ã¬Â½â€Ã«â€œÅ“ÃªÂ°â‚¬ Ã¬Â»Â´Ã­Å’Å’Ã¬ÂÂ¼Ã«ÂËœÃ¬â€“Â´Ã¬â€¢Â¼ Ã­â€¢Â¨
+2. **Vet ÃªÂ²Â½ÃªÂ³Â  Ã«â€˜Â Ã«Â²Ë†Ã¬Â§Â¸** - Ã¬ÂËœÃ¬â€¹Â¬Ã¬Å Â¤Ã«Å¸Â¬Ã¬Å¡Â´ ÃªÂµÂ¬Ã¬Â¡Â° Ã¬Ë†ËœÃ¬Â â€¢
+3. **Lint ÃªÂ²Â½ÃªÂ³Â  Ã¬â€žÂ¸ Ã«Â²Ë†Ã¬Â§Â¸** - Ã¬Å Â¤Ã­Æ’â‚¬Ã¬ÂÂ¼ÃªÂ³Â¼ Ã«ÂªÂ¨Ã«Â²â€ Ã¬â€šÂ¬Ã«Â¡â‚¬
+4. **Ã­â€¢Å“ Ã«Â²Ë†Ã¬â€”Â Ã­â€¢ËœÃ«â€šËœÃ¬â€Â©** - ÃªÂ°Â Ã«Â³â‚¬ÃªÂ²Â½ ÃªÂ²â‚¬Ã¬Â¦Â
+5. **Ã¬ÂµÅ“Ã¬â€ Å’Ã­â€¢Å“Ã¬ÂËœ Ã«Â³â‚¬ÃªÂ²Â½** - Ã«Â¦Â¬Ã­Å’Â©Ã­â€ Â Ã«Â§ÂÃ¬ÂÂ´ Ã¬â€¢â€žÃ«â€¹Å’ Ã¬Ë†ËœÃ¬Â â€¢Ã«Â§Å’
 
-## 중단 조건
+## Ã¬Â¤â€˜Ã«â€¹Â¨ Ã¬Â¡Â°ÃªÂ±Â´
 
-에이전트가 중단하고 보고하는 경우:
-- 3번 시도 후에도 같은 에러가 지속
-- 수정이 더 많은 에러를 발생시킴
-- 아키텍처 변경이 필요한 경우
-- 외부 의존성이 누락된 경우
+Ã¬â€”ÂÃ¬ÂÂ´Ã¬Â â€žÃ­Å Â¸ÃªÂ°â‚¬ Ã¬Â¤â€˜Ã«â€¹Â¨Ã­â€¢ËœÃªÂ³Â  Ã«Â³Â´ÃªÂ³Â Ã­â€¢ËœÃ«Å â€ ÃªÂ²Â½Ã¬Å¡Â°:
+- 3Ã«Â²Ë† Ã¬â€¹Å“Ã«Ââ€ž Ã­â€ºâ€žÃ¬â€”ÂÃ«Ââ€ž ÃªÂ°â„¢Ã¬Ââ‚¬ Ã¬â€”ÂÃ«Å¸Â¬ÃªÂ°â‚¬ Ã¬Â§â‚¬Ã¬â€ Â
+- Ã¬Ë†ËœÃ¬Â â€¢Ã¬ÂÂ´ Ã«Ââ€ Ã«Â§Å½Ã¬Ââ‚¬ Ã¬â€”ÂÃ«Å¸Â¬Ã«Â¥Â¼ Ã«Â°Å“Ã¬Æ’ÂÃ¬â€¹Å“Ã­â€šÂ´
+- Ã¬â€¢â€žÃ­â€šÂ¤Ã­â€¦ÂÃ¬Â²Ëœ Ã«Â³â‚¬ÃªÂ²Â½Ã¬ÂÂ´ Ã­â€¢â€žÃ¬Å¡â€Ã­â€¢Å“ ÃªÂ²Â½Ã¬Å¡Â°
+- Ã¬â„¢Â¸Ã«Â¶â‚¬ Ã¬ÂËœÃ¬Â¡Â´Ã¬â€žÂ±Ã¬ÂÂ´ Ã«Ë†â€žÃ«ÂÂ½Ã«ÂÅ“ ÃªÂ²Â½Ã¬Å¡Â°
 
-## 관련 커맨드
+## ÃªÂ´â‚¬Ã«Â Â¨ Ã¬Â»Â¤Ã«Â§Â¨Ã«â€œÅ“
 
-- `/go-test` - build 성공 후 테스트 실행
-- `/go-review` - 코드 품질 리뷰
-- `/verify` - 전체 검증 루프
+- `/go-test` - build Ã¬â€žÂ±ÃªÂ³Âµ Ã­â€ºâ€ž Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸ Ã¬â€¹Â¤Ã­â€“â€°
+- `/go-review` - Ã¬Â½â€Ã«â€œÅ“ Ã­â€™Ë†Ã¬Â§Ë† Ã«Â¦Â¬Ã«Â·Â°
+- `/verify` - Ã¬Â â€žÃ¬Â²Â´ ÃªÂ²â‚¬Ã¬Â¦Â Ã«Â£Â¨Ã­â€â€ž
 
-## 관련 항목
+## ÃªÂ´â‚¬Ã«Â Â¨ Ã­â€¢Â­Ã«ÂªÂ©
 
-- 에이전트: `agents/go-build-resolver.md`
-- 스킬: `skills/golang-patterns/`
+- Ã¬â€”ÂÃ¬ÂÂ´Ã¬Â â€žÃ­Å Â¸: `agents/go-build-resolver.md`
+- Ã¬Å Â¤Ã­â€šÂ¬: `skills/golang-patterns/`

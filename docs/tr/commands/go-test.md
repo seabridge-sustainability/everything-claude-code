@@ -1,60 +1,73 @@
 ---
-description: Go için TDD iş akışını zorlar. Önce table-driven testler yaz, sonra uygula. go test -cover ile %80+ kapsama doğrula.
+description: Go iÃƒÂ§in TDD iÃ…Å¸ akÃ„Â±Ã…Å¸Ã„Â±nÃ„Â± zorlar. Ãƒâ€“nce table-driven testler yaz, sonra uygula. go test -cover ile %80+ kapsama doÃ„Å¸rula.
 ---
 
 # Go TDD Komutu
 
-Bu komut, idiomatic Go test desenlerini kullanarak Go kodu için test odaklı geliştirme metodolojisini zorlar.
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+Bu komut, idiomatic Go test desenlerini kullanarak Go kodu iÃƒÂ§in test odaklÃ„Â± geliÃ…Å¸tirme metodolojisini zorlar.
 
 ## Bu Komut Ne Yapar
 
-1. **Tipleri/Interface'leri Tanımla**: Önce fonksiyon imzalarını tasarla
-2. **Table-Driven Testler Yaz**: Kapsamlı test senaryoları oluştur (RED)
-3. **Testleri Çalıştır**: Testlerin doğru sebepten başarısız olduğunu doğrula
-4. **Kodu Uygula**: Geçmek için minimal kod yaz (GREEN)
-5. **Refactor Et**: Testleri yeşil tutarken iyileştir
-6. **Kapsama Kontrol Et**: %80+ kapsama sağla
+1. **Tipleri/Interface'leri TanÃ„Â±mla**: Ãƒâ€“nce fonksiyon imzalarÃ„Â±nÃ„Â± tasarla
+2. **Table-Driven Testler Yaz**: KapsamlÃ„Â± test senaryolarÃ„Â± oluÃ…Å¸tur (RED)
+3. **Testleri Ãƒâ€¡alÃ„Â±Ã…Å¸tÃ„Â±r**: Testlerin doÃ„Å¸ru sebepten baÃ…Å¸arÃ„Â±sÃ„Â±z olduÃ„Å¸unu doÃ„Å¸rula
+4. **Kodu Uygula**: GeÃƒÂ§mek iÃƒÂ§in minimal kod yaz (GREEN)
+5. **Refactor Et**: Testleri yeÃ…Å¸il tutarken iyileÃ…Å¸tir
+6. **Kapsama Kontrol Et**: %80+ kapsama saÃ„Å¸la
 
-## Ne Zaman Kullanılır
+## Ne Zaman KullanÃ„Â±lÃ„Â±r
 
-`/go-test` komutunu şu durumlarda kullanın:
-- Yeni Go fonksiyonları uygularken
+`/go-test` komutunu Ã…Å¸u durumlarda kullanÃ„Â±n:
+- Yeni Go fonksiyonlarÃ„Â± uygularken
 - Mevcut koda test kapsama eklerken
-- Hataları düzeltirken (önce başarısız test yaz)
-- Kritik iş mantığı oluştururken
-- Go'da TDD iş akışını öğrenirken
+- HatalarÃ„Â± dÃƒÂ¼zeltirken (ÃƒÂ¶nce baÃ…Å¸arÃ„Â±sÃ„Â±z test yaz)
+- Kritik iÃ…Å¸ mantÃ„Â±Ã„Å¸Ã„Â± oluÃ…Å¸tururken
+- Go'da TDD iÃ…Å¸ akÃ„Â±Ã…Å¸Ã„Â±nÃ„Â± ÃƒÂ¶Ã„Å¸renirken
 
-## TDD Döngüsü
+## TDD DÃƒÂ¶ngÃƒÂ¼sÃƒÂ¼
 
 ```
-RED     → Başarısız table-driven test yaz
-GREEN   → Geçmek için minimal kod uygula
-REFACTOR → Kodu iyileştir, testler yeşil kalsın
-TEKRARLA → Sonraki test senaryosu
+RED     Ã¢â€ â€™ BaÃ…Å¸arÃ„Â±sÃ„Â±z table-driven test yaz
+GREEN   Ã¢â€ â€™ GeÃƒÂ§mek iÃƒÂ§in minimal kod uygula
+REFACTOR Ã¢â€ â€™ Kodu iyileÃ…Å¸tir, testler yeÃ…Å¸il kalsÃ„Â±n
+TEKRARLA Ã¢â€ â€™ Sonraki test senaryosu
 ```
 
-## Örnek Oturum
+## Ãƒâ€“rnek Oturum
 
 ````
-Kullanıcı: /go-test E-posta adreslerini doğrulamak için bir fonksiyona ihtiyacım var
+KullanÃ„Â±cÃ„Â±: /go-test E-posta adreslerini doÃ„Å¸rulamak iÃƒÂ§in bir fonksiyona ihtiyacÃ„Â±m var
 
 Agent:
-# TDD Oturumu: E-posta Doğrulayıcı
+# TDD Oturumu: E-posta DoÃ„Å¸rulayÃ„Â±cÃ„Â±
 
-## Adım 1: Interface Tanımla
+## AdÃ„Â±m 1: Interface TanÃ„Â±mla
 
 ```go
 // validator/email.go
 package validator
 
-// ValidateEmail verilen string'in geçerli bir e-posta adresi olup olmadığını kontrol eder.
-// Geçerliyse nil, aksi takdirde sorunu açıklayan hata döndürür.
+// ValidateEmail verilen string'in geÃƒÂ§erli bir e-posta adresi olup olmadÃ„Â±Ã„Å¸Ã„Â±nÃ„Â± kontrol eder.
+// GeÃƒÂ§erliyse nil, aksi takdirde sorunu aÃƒÂ§Ã„Â±klayan hata dÃƒÂ¶ndÃƒÂ¼rÃƒÂ¼r.
 func ValidateEmail(email string) error {
     panic("not implemented")
 }
 ```
 
-## Adım 2: Table-Driven Testler Yaz (RED)
+## AdÃ„Â±m 2: Table-Driven Testler Yaz (RED)
 
 ```go
 // validator/email_test.go
@@ -70,19 +83,19 @@ func TestValidateEmail(t *testing.T) {
         email   string
         wantErr bool
     }{
-        // Geçerli e-postalar
+        // GeÃƒÂ§erli e-postalar
         {"basit e-posta", "user@example.com", false},
         {"subdomain ile", "user@mail.example.com", false},
-        {"artı ile", "user+tag@example.com", false},
+        {"artÃ„Â± ile", "user+tag@example.com", false},
         {"noktalar ile", "first.last@example.com", false},
 
-        // Geçersiz e-postalar
-        {"boş string", "", true},
-        {"at işareti yok", "userexample.com", true},
+        // GeÃƒÂ§ersiz e-postalar
+        {"boÃ…Å¸ string", "", true},
+        {"at iÃ…Å¸areti yok", "userexample.com", true},
         {"domain yok", "user@", true},
-        {"local kısım yok", "@example.com", true},
-        {"çift at", "user@@example.com", true},
-        {"boşluklar", "user @example.com", true},
+        {"local kÃ„Â±sÃ„Â±m yok", "@example.com", true},
+        {"ÃƒÂ§ift at", "user@@example.com", true},
+        {"boÃ…Å¸luklar", "user @example.com", true},
         {"tld yok", "user@example", true},
     }
 
@@ -100,7 +113,7 @@ func TestValidateEmail(t *testing.T) {
 }
 ```
 
-## Adım 3: Testleri Çalıştır - Başarısızlığı Doğrula
+## AdÃ„Â±m 3: Testleri Ãƒâ€¡alÃ„Â±Ã…Å¸tÃ„Â±r - BaÃ…Å¸arÃ„Â±sÃ„Â±zlÃ„Â±Ã„Å¸Ã„Â± DoÃ„Å¸rula
 
 ```bash
 $ go test ./validator/...
@@ -112,9 +125,9 @@ $ go test ./validator/...
 FAIL
 ```
 
-✓ Testler beklendiği gibi başarısız (panic).
+Ã¢Å“â€œ Testler beklendiÃ„Å¸i gibi baÃ…Å¸arÃ„Â±sÃ„Â±z (panic).
 
-## Adım 4: Minimal Kod Uygula (GREEN)
+## AdÃ„Â±m 4: Minimal Kod Uygula (GREEN)
 
 ```go
 // validator/email.go
@@ -128,8 +141,8 @@ import (
 var emailRegex = regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
 
 var (
-    ErrEmailEmpty   = errors.New("e-posta boş olamaz")
-    ErrEmailInvalid = errors.New("e-posta formatı geçersiz")
+    ErrEmailEmpty   = errors.New("e-posta boÃ…Å¸ olamaz")
+    ErrEmailInvalid = errors.New("e-posta formatÃ„Â± geÃƒÂ§ersiz")
 )
 
 func ValidateEmail(email string) error {
@@ -143,7 +156,7 @@ func ValidateEmail(email string) error {
 }
 ```
 
-## Adım 5: Testleri Çalıştır - Başarıyı Doğrula
+## AdÃ„Â±m 5: Testleri Ãƒâ€¡alÃ„Â±Ã…Å¸tÃ„Â±r - BaÃ…Å¸arÃ„Â±yÃ„Â± DoÃ„Å¸rula
 
 ```bash
 $ go test ./validator/...
@@ -152,9 +165,9 @@ PASS
 ok      project/validator    0.003s
 ```
 
-✓ Tüm testler geçiyor!
+Ã¢Å“â€œ TÃƒÂ¼m testler geÃƒÂ§iyor!
 
-## Adım 6: Kapsama Kontrol Et
+## AdÃ„Â±m 6: Kapsama Kontrol Et
 
 ```bash
 $ go test -cover ./validator/...
@@ -164,9 +177,9 @@ coverage: 100.0% of statements
 ok      project/validator    0.003s
 ```
 
-✓ Kapsama: 100%
+Ã¢Å“â€œ Kapsama: 100%
 
-## TDD Tamamlandı!
+## TDD TamamlandÃ„Â±!
 ````
 
 ## Test Desenleri
@@ -197,12 +210,12 @@ for _, tt := range tests {
     tt := tt // Yakala
     t.Run(tt.name, func(t *testing.T) {
         t.Parallel()
-        // test gövdesi
+        // test gÃƒÂ¶vdesi
     })
 }
 ```
 
-### Test Yardımcıları
+### Test YardÃ„Â±mcÃ„Â±larÃ„Â±
 ```go
 func setupTestDB(t *testing.T) *sql.DB {
     t.Helper()
@@ -212,7 +225,7 @@ func setupTestDB(t *testing.T) *sql.DB {
 }
 ```
 
-## Kapsama Komutları
+## Kapsama KomutlarÃ„Â±
 
 ```bash
 # Basit kapsama
@@ -221,10 +234,10 @@ go test -cover ./...
 # Kapsama profili
 go test -coverprofile=coverage.out ./...
 
-# Tarayıcıda görüntüle
+# TarayÃ„Â±cÃ„Â±da gÃƒÂ¶rÃƒÂ¼ntÃƒÂ¼le
 go tool cover -html=coverage.out
 
-# Fonksiyona göre kapsama
+# Fonksiyona gÃƒÂ¶re kapsama
 go tool cover -func=coverage.out
 
 # Race tespiti ile
@@ -233,36 +246,36 @@ go test -race -cover ./...
 
 ## Kapsama Hedefleri
 
-| Kod Türü | Hedef |
+| Kod TÃƒÂ¼rÃƒÂ¼ | Hedef |
 |-----------|--------|
-| Kritik iş mantığı | 100% |
+| Kritik iÃ…Å¸ mantÃ„Â±Ã„Å¸Ã„Â± | 100% |
 | Public API'ler | 90%+ |
 | Genel kod | 80%+ |
-| Oluşturulan kod | Hariç tut |
+| OluÃ…Å¸turulan kod | HariÃƒÂ§ tut |
 
-## TDD En İyi Uygulamaları
+## TDD En Ã„Â°yi UygulamalarÃ„Â±
 
 **YAPIN:**
-- Herhangi bir uygulamadan ÖNCE test yaz
-- Her değişiklikten sonra testleri çalıştır
-- Kapsamlı kapsama için table-driven testler kullan
-- Uygulama detaylarını değil, davranışı test et
-- Edge case'leri dahil et (boş, nil, maksimum değerler)
+- Herhangi bir uygulamadan Ãƒâ€“NCE test yaz
+- Her deÃ„Å¸iÃ…Å¸iklikten sonra testleri ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
+- KapsamlÃ„Â± kapsama iÃƒÂ§in table-driven testler kullan
+- Uygulama detaylarÃ„Â±nÃ„Â± deÃ„Å¸il, davranÃ„Â±Ã…Å¸Ã„Â± test et
+- Edge case'leri dahil et (boÃ…Å¸, nil, maksimum deÃ„Å¸erler)
 
 **YAPMAYIN:**
-- Testlerden önce uygulama yazma
-- RED aşamasını atlama
-- Private fonksiyonları doğrudan test etme
+- Testlerden ÃƒÂ¶nce uygulama yazma
+- RED aÃ…Å¸amasÃ„Â±nÃ„Â± atlama
+- Private fonksiyonlarÃ„Â± doÃ„Å¸rudan test etme
 - Testlerde `time.Sleep` kullanma
-- Dengesiz testleri görmezden gelme
+- Dengesiz testleri gÃƒÂ¶rmezden gelme
 
-## İlgili Komutlar
+## Ã„Â°lgili Komutlar
 
-- `/go-build` - Build hatalarını düzelt
+- `/go-build` - Build hatalarÃ„Â±nÃ„Â± dÃƒÂ¼zelt
 - `/go-review` - Uygulamadan sonra kodu incele
-- `/verify` - Tam doğrulama döngüsünü çalıştır
+- `/verify` - Tam doÃ„Å¸rulama dÃƒÂ¶ngÃƒÂ¼sÃƒÂ¼nÃƒÂ¼ ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
 
-## İlgili
+## Ã„Â°lgili
 
 - Skill: `skills/golang-testing/`
 - Skill: `skills/tdd-workflow/`

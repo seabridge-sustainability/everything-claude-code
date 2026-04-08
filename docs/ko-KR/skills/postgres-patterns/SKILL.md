@@ -1,66 +1,79 @@
 ---
 name: postgres-patterns
-description: 쿼리 최적화, 스키마 설계, 인덱싱, 보안을 위한 PostgreSQL 데이터베이스 패턴. Supabase 모범 사례 기반.
+description: Ã¬Â¿Â¼Ã«Â¦Â¬ Ã¬ÂµÅ“Ã¬Â ÂÃ­â„¢â€, Ã¬Å Â¤Ã­â€šÂ¤Ã«Â§Ë† Ã¬â€žÂ¤ÃªÂ³â€ž, Ã¬ÂÂ¸Ã«ÂÂ±Ã¬â€¹Â±, Ã«Â³Â´Ã¬â€¢Ë†Ã¬Ââ€ž Ã¬Å“â€žÃ­â€¢Å“ PostgreSQL Ã«ÂÂ°Ã¬ÂÂ´Ã­â€žÂ°Ã«Â²Â Ã¬ÂÂ´Ã¬Å Â¤ Ã­Å’Â¨Ã­â€žÂ´. Supabase Ã«ÂªÂ¨Ã«Â²â€ Ã¬â€šÂ¬Ã«Â¡â‚¬ ÃªÂ¸Â°Ã«Â°Ëœ.
 origin: ECC
 ---
 
-# PostgreSQL 패턴
+# PostgreSQL Ã­Å’Â¨Ã­â€žÂ´
 
-PostgreSQL 모범 사례 빠른 참조. 자세한 가이드는 `database-reviewer` 에이전트를 사용하세요.
+## Safety And Authorization Rule
 
-## 활성화 시점
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-- SQL 쿼리 또는 마이그레이션을 작성할 때
-- 데이터베이스 스키마를 설계할 때
-- 느린 쿼리를 문제 해결할 때
-- Row Level Security를 구현할 때
-- 커넥션 풀링을 설정할 때
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-## 빠른 참조
 
-### 인덱스 치트 시트
+PostgreSQL Ã«ÂªÂ¨Ã«Â²â€ Ã¬â€šÂ¬Ã«Â¡â‚¬ Ã«Â¹Â Ã«Â¥Â¸ Ã¬Â°Â¸Ã¬Â¡Â°. Ã¬Å¾ÂÃ¬â€žÂ¸Ã­â€¢Å“ ÃªÂ°â‚¬Ã¬ÂÂ´Ã«â€œÅ“Ã«Å â€ `database-reviewer` Ã¬â€”ÂÃ¬ÂÂ´Ã¬Â â€žÃ­Å Â¸Ã«Â¥Â¼ Ã¬â€šÂ¬Ã¬Å¡Â©Ã­â€¢ËœÃ¬â€žÂ¸Ã¬Å¡â€.
 
-| 쿼리 패턴 | 인덱스 유형 | 예시 |
+## Ã­â„¢Å“Ã¬â€žÂ±Ã­â„¢â€ Ã¬â€¹Å“Ã¬Â Â
+
+- SQL Ã¬Â¿Â¼Ã«Â¦Â¬ Ã«ËœÂÃ«Å â€ Ã«Â§Ë†Ã¬ÂÂ´ÃªÂ·Â¸Ã«Â Ë†Ã¬ÂÂ´Ã¬â€¦ËœÃ¬Ââ€ž Ã¬Å¾â€˜Ã¬â€žÂ±Ã­â€¢Â  Ã«â€¢Å’
+- Ã«ÂÂ°Ã¬ÂÂ´Ã­â€žÂ°Ã«Â²Â Ã¬ÂÂ´Ã¬Å Â¤ Ã¬Å Â¤Ã­â€šÂ¤Ã«Â§Ë†Ã«Â¥Â¼ Ã¬â€žÂ¤ÃªÂ³â€žÃ­â€¢Â  Ã«â€¢Å’
+- Ã«Å ÂÃ«Â¦Â° Ã¬Â¿Â¼Ã«Â¦Â¬Ã«Â¥Â¼ Ã«Â¬Â¸Ã¬Â Å“ Ã­â€¢Â´ÃªÂ²Â°Ã­â€¢Â  Ã«â€¢Å’
+- Row Level SecurityÃ«Â¥Â¼ ÃªÂµÂ¬Ã­Ëœâ€žÃ­â€¢Â  Ã«â€¢Å’
+- Ã¬Â»Â¤Ã«â€žÂ¥Ã¬â€¦Ëœ Ã­â€™â‚¬Ã«Â§ÂÃ¬Ââ€ž Ã¬â€žÂ¤Ã¬Â â€¢Ã­â€¢Â  Ã«â€¢Å’
+
+## Ã«Â¹Â Ã«Â¥Â¸ Ã¬Â°Â¸Ã¬Â¡Â°
+
+### Ã¬ÂÂ¸Ã«ÂÂ±Ã¬Å Â¤ Ã¬Â¹ËœÃ­Å Â¸ Ã¬â€¹Å“Ã­Å Â¸
+
+| Ã¬Â¿Â¼Ã«Â¦Â¬ Ã­Å’Â¨Ã­â€žÂ´ | Ã¬ÂÂ¸Ã«ÂÂ±Ã¬Å Â¤ Ã¬Å“Â Ã­Ëœâ€¢ | Ã¬ËœË†Ã¬â€¹Å“ |
 |--------------|------------|---------|
-| `WHERE col = value` | B-tree (기본값) | `CREATE INDEX idx ON t (col)` |
+| `WHERE col = value` | B-tree (ÃªÂ¸Â°Ã«Â³Â¸ÃªÂ°â€™) | `CREATE INDEX idx ON t (col)` |
 | `WHERE col > value` | B-tree | `CREATE INDEX idx ON t (col)` |
 | `WHERE a = x AND b > y` | Composite | `CREATE INDEX idx ON t (a, b)` |
 | `WHERE jsonb @> '{}'` | GIN | `CREATE INDEX idx ON t USING gin (col)` |
 | `WHERE tsv @@ query` | GIN | `CREATE INDEX idx ON t USING gin (col)` |
-| 시계열 범위 | BRIN | `CREATE INDEX idx ON t USING brin (col)` |
+| Ã¬â€¹Å“ÃªÂ³â€žÃ¬â€”Â´ Ã«Â²â€Ã¬Å“â€ž | BRIN | `CREATE INDEX idx ON t USING brin (col)` |
 
-### 데이터 타입 빠른 참조
+### Ã«ÂÂ°Ã¬ÂÂ´Ã­â€žÂ° Ã­Æ’â‚¬Ã¬Å¾â€¦ Ã«Â¹Â Ã«Â¥Â¸ Ã¬Â°Â¸Ã¬Â¡Â°
 
-| 사용 사례 | 올바른 타입 | 지양 |
+| Ã¬â€šÂ¬Ã¬Å¡Â© Ã¬â€šÂ¬Ã«Â¡â‚¬ | Ã¬ËœÂ¬Ã«Â°â€Ã«Â¥Â¸ Ã­Æ’â‚¬Ã¬Å¾â€¦ | Ã¬Â§â‚¬Ã¬â€“â€˜ |
 |----------|-------------|-------|
 | ID | `bigint` | `int`, random UUID |
-| 문자열 | `text` | `varchar(255)` |
-| 타임스탬프 | `timestamptz` | `timestamp` |
-| 금액 | `numeric(10,2)` | `float` |
-| 플래그 | `boolean` | `varchar`, `int` |
+| Ã«Â¬Â¸Ã¬Å¾ÂÃ¬â€”Â´ | `text` | `varchar(255)` |
+| Ã­Æ’â‚¬Ã¬Å¾â€žÃ¬Å Â¤Ã­Æ’Â¬Ã­â€â€ž | `timestamptz` | `timestamp` |
+| ÃªÂ¸Ë†Ã¬â€¢Â¡ | `numeric(10,2)` | `float` |
+| Ã­â€Å’Ã«Å¾ËœÃªÂ·Â¸ | `boolean` | `varchar`, `int` |
 
-### 일반 패턴
+### Ã¬ÂÂ¼Ã«Â°Ëœ Ã­Å’Â¨Ã­â€žÂ´
 
-**복합 인덱스 순서:**
+**Ã«Â³ÂµÃ­â€¢Â© Ã¬ÂÂ¸Ã«ÂÂ±Ã¬Å Â¤ Ã¬Ë†Å“Ã¬â€žÅ“:**
 ```sql
 -- Equality columns first, then range columns
 CREATE INDEX idx ON orders (status, created_at);
 -- Works for: WHERE status = 'pending' AND created_at > '2024-01-01'
 ```
 
-**커버링 인덱스:**
+**Ã¬Â»Â¤Ã«Â²â€žÃ«Â§Â Ã¬ÂÂ¸Ã«ÂÂ±Ã¬Å Â¤:**
 ```sql
 CREATE INDEX idx ON users (email) INCLUDE (name, created_at);
 -- Avoids table lookup for SELECT email, name, created_at
 ```
 
-**부분 인덱스:**
+**Ã«Â¶â‚¬Ã«Â¶â€ž Ã¬ÂÂ¸Ã«ÂÂ±Ã¬Å Â¤:**
 ```sql
 CREATE INDEX idx ON users (email) WHERE deleted_at IS NULL;
 -- Smaller index, only includes active users
 ```
 
-**RLS 정책 (최적화):**
+**RLS Ã¬Â â€¢Ã¬Â±â€¦ (Ã¬ÂµÅ“Ã¬Â ÂÃ­â„¢â€):**
 ```sql
 CREATE POLICY policy ON orders
   USING ((SELECT auth.uid()) = user_id);  -- Wrap in SELECT!
@@ -74,13 +87,13 @@ ON CONFLICT (user_id, key)
 DO UPDATE SET value = EXCLUDED.value;
 ```
 
-**커서 페이지네이션:**
+**Ã¬Â»Â¤Ã¬â€žÅ“ Ã­Å½ËœÃ¬ÂÂ´Ã¬Â§â‚¬Ã«â€žÂ¤Ã¬ÂÂ´Ã¬â€¦Ëœ:**
 ```sql
 SELECT * FROM products WHERE id > $last_id ORDER BY id LIMIT 20;
 -- O(1) vs OFFSET which is O(n)
 ```
 
-**큐 처리:**
+**Ã­ÂÂ Ã¬Â²ËœÃ«Â¦Â¬:**
 ```sql
 UPDATE jobs SET status = 'processing'
 WHERE id = (
@@ -90,7 +103,7 @@ WHERE id = (
 ) RETURNING *;
 ```
 
-### 안티패턴 감지
+### Ã¬â€¢Ë†Ã­â€¹Â°Ã­Å’Â¨Ã­â€žÂ´ ÃªÂ°ÂÃ¬Â§â‚¬
 
 ```sql
 -- Find unindexed foreign keys
@@ -116,7 +129,7 @@ WHERE n_dead_tup > 1000
 ORDER BY n_dead_tup DESC;
 ```
 
-### 구성 템플릿
+### ÃªÂµÂ¬Ã¬â€žÂ± Ã­â€¦Å“Ã­â€Å’Ã«Â¦Â¿
 
 ```sql
 -- Connection limits (adjust for RAM)
@@ -136,12 +149,12 @@ REVOKE ALL ON SCHEMA public FROM public;
 SELECT pg_reload_conf();
 ```
 
-## 관련 항목
+## ÃªÂ´â‚¬Ã«Â Â¨ Ã­â€¢Â­Ã«ÂªÂ©
 
-- 에이전트: `database-reviewer` - 전체 데이터베이스 리뷰 워크플로우
-- 스킬: `clickhouse-io` - ClickHouse 분석 패턴
-- 스킬: `backend-patterns` - API 및 백엔드 패턴
+- Ã¬â€”ÂÃ¬ÂÂ´Ã¬Â â€žÃ­Å Â¸: `database-reviewer` - Ã¬Â â€žÃ¬Â²Â´ Ã«ÂÂ°Ã¬ÂÂ´Ã­â€žÂ°Ã«Â²Â Ã¬ÂÂ´Ã¬Å Â¤ Ã«Â¦Â¬Ã«Â·Â° Ã¬â€ºÅ’Ã­ÂÂ¬Ã­â€Å’Ã«Â¡Å“Ã¬Å¡Â°
+- Ã¬Å Â¤Ã­â€šÂ¬: `clickhouse-io` - ClickHouse Ã«Â¶â€žÃ¬â€žÂ Ã­Å’Â¨Ã­â€žÂ´
+- Ã¬Å Â¤Ã­â€šÂ¬: `backend-patterns` - API Ã«Â°Â Ã«Â°Â±Ã¬â€”â€Ã«â€œÅ“ Ã­Å’Â¨Ã­â€žÂ´
 
 ---
 
-*Supabase Agent Skills 기반 (크레딧: Supabase 팀) (MIT License)*
+*Supabase Agent Skills ÃªÂ¸Â°Ã«Â°Ëœ (Ã­ÂÂ¬Ã«Â Ë†Ã«â€Â§: Supabase Ã­Å’â‚¬) (MIT License)*

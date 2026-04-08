@@ -1,48 +1,61 @@
 ---
-description: 为Kotlin强制执行TDD工作流程。首先编写Kotest测试，然后实施。使用Kover验证80%以上的覆盖率。
+description: Ã¤Â¸ÂºKotlinÃ¥Â¼ÂºÃ¥Ë†Â¶Ã¦â€°Â§Ã¨Â¡Å’TDDÃ¥Â·Â¥Ã¤Â½Å“Ã¦ÂµÂÃ§Â¨â€¹Ã£â‚¬â€šÃ©Â¦â€“Ã¥â€¦Ë†Ã§Â¼â€“Ã¥â€ â„¢KotestÃ¦Âµâ€¹Ã¨Â¯â€¢Ã¯Â¼Å’Ã§â€žÂ¶Ã¥ÂÅ½Ã¥Â®Å¾Ã¦â€“Â½Ã£â‚¬â€šÃ¤Â½Â¿Ã§â€Â¨KoverÃ©ÂªÅ’Ã¨Â¯Â80%Ã¤Â»Â¥Ã¤Â¸Å Ã§Å¡â€žÃ¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡Ã£â‚¬â€š
 ---
 
-# Kotlin TDD 命令
+# Kotlin TDD Ã¥â€˜Â½Ã¤Â»Â¤
 
-此命令使用 Kotest、MockK 和 Kover 为 Kotlin 代码强制执行测试驱动开发方法。
+## Safety And Authorization Rule
 
-## 此命令的作用
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-1. **定义类型/接口**：首先搭建函数签名
-2. **编写 Kotest 测试**：创建全面的测试规范（RED）
-3. **运行测试**：验证测试因正确原因而失败
-4. **实现代码**：编写最少的代码以通过测试（GREEN）
-5. **重构**：在保持测试通过的同时进行改进
-6. **检查覆盖率**：确保使用 Kover 达到 80% 以上的覆盖率
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-## 何时使用
 
-在以下情况下使用 `/kotlin-test`：
+Ã¦Â­Â¤Ã¥â€˜Â½Ã¤Â»Â¤Ã¤Â½Â¿Ã§â€Â¨ KotestÃ£â‚¬ÂMockK Ã¥â€™Å’ Kover Ã¤Â¸Âº Kotlin Ã¤Â»Â£Ã§Â ÂÃ¥Â¼ÂºÃ¥Ë†Â¶Ã¦â€°Â§Ã¨Â¡Å’Ã¦Âµâ€¹Ã¨Â¯â€¢Ã©Â©Â±Ã¥Å Â¨Ã¥Â¼â‚¬Ã¥Ââ€˜Ã¦â€“Â¹Ã¦Â³â€¢Ã£â‚¬â€š
 
-* 实现新的 Kotlin 函数或类
-* 为现有的 Kotlin 代码添加测试覆盖率
-* 修复错误（首先编写失败的测试）
-* 构建关键业务逻辑
-* 学习 Kotlin 中的 TDD 工作流程
+## Ã¦Â­Â¤Ã¥â€˜Â½Ã¤Â»Â¤Ã§Å¡â€žÃ¤Â½Å“Ã§â€Â¨
 
-## TDD 循环
+1. **Ã¥Â®Å¡Ã¤Â¹â€°Ã§Â±Â»Ã¥Å¾â€¹/Ã¦Å½Â¥Ã¥ÂÂ£**Ã¯Â¼Å¡Ã©Â¦â€“Ã¥â€¦Ë†Ã¦ÂÂ­Ã¥Â»ÂºÃ¥â€¡Â½Ã¦â€¢Â°Ã§Â­Â¾Ã¥ÂÂ
+2. **Ã§Â¼â€“Ã¥â€ â„¢ Kotest Ã¦Âµâ€¹Ã¨Â¯â€¢**Ã¯Â¼Å¡Ã¥Ë†â€ºÃ¥Â»ÂºÃ¥â€¦Â¨Ã©ÂÂ¢Ã§Å¡â€žÃ¦Âµâ€¹Ã¨Â¯â€¢Ã¨Â§â€žÃ¨Å’Æ’Ã¯Â¼Ë†REDÃ¯Â¼â€°
+3. **Ã¨Â¿ÂÃ¨Â¡Å’Ã¦Âµâ€¹Ã¨Â¯â€¢**Ã¯Â¼Å¡Ã©ÂªÅ’Ã¨Â¯ÂÃ¦Âµâ€¹Ã¨Â¯â€¢Ã¥â€ºÂ Ã¦Â­Â£Ã§Â¡Â®Ã¥Å½Å¸Ã¥â€ºÂ Ã¨â‚¬Å’Ã¥Â¤Â±Ã¨Â´Â¥
+4. **Ã¥Â®Å¾Ã§Å½Â°Ã¤Â»Â£Ã§Â Â**Ã¯Â¼Å¡Ã§Â¼â€“Ã¥â€ â„¢Ã¦Å“â‚¬Ã¥Â°â€˜Ã§Å¡â€žÃ¤Â»Â£Ã§Â ÂÃ¤Â»Â¥Ã©â‚¬Å¡Ã¨Â¿â€¡Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¯Â¼Ë†GREENÃ¯Â¼â€°
+5. **Ã©â€¡ÂÃ¦Å¾â€ž**Ã¯Â¼Å¡Ã¥Å“Â¨Ã¤Â¿ÂÃ¦Å’ÂÃ¦Âµâ€¹Ã¨Â¯â€¢Ã©â‚¬Å¡Ã¨Â¿â€¡Ã§Å¡â€žÃ¥ÂÅ’Ã¦â€”Â¶Ã¨Â¿â€ºÃ¨Â¡Å’Ã¦â€Â¹Ã¨Â¿â€º
+6. **Ã¦Â£â‚¬Ã¦Å¸Â¥Ã¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡**Ã¯Â¼Å¡Ã§Â¡Â®Ã¤Â¿ÂÃ¤Â½Â¿Ã§â€Â¨ Kover Ã¨Â¾Â¾Ã¥Ë†Â° 80% Ã¤Â»Â¥Ã¤Â¸Å Ã§Å¡â€žÃ¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡
+
+## Ã¤Â½â€¢Ã¦â€”Â¶Ã¤Â½Â¿Ã§â€Â¨
+
+Ã¥Å“Â¨Ã¤Â»Â¥Ã¤Â¸â€¹Ã¦Æ’â€¦Ã¥â€ ÂµÃ¤Â¸â€¹Ã¤Â½Â¿Ã§â€Â¨ `/kotlin-test`Ã¯Â¼Å¡
+
+* Ã¥Â®Å¾Ã§Å½Â°Ã¦â€“Â°Ã§Å¡â€ž Kotlin Ã¥â€¡Â½Ã¦â€¢Â°Ã¦Ë†â€“Ã§Â±Â»
+* Ã¤Â¸ÂºÃ§Å½Â°Ã¦Å“â€°Ã§Å¡â€ž Kotlin Ã¤Â»Â£Ã§Â ÂÃ¦Â·Â»Ã¥Å Â Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡
+* Ã¤Â¿Â®Ã¥Â¤ÂÃ©â€â„¢Ã¨Â¯Â¯Ã¯Â¼Ë†Ã©Â¦â€“Ã¥â€¦Ë†Ã§Â¼â€“Ã¥â€ â„¢Ã¥Â¤Â±Ã¨Â´Â¥Ã§Å¡â€žÃ¦Âµâ€¹Ã¨Â¯â€¢Ã¯Â¼â€°
+* Ã¦Å¾â€žÃ¥Â»ÂºÃ¥â€¦Â³Ã©â€Â®Ã¤Â¸Å¡Ã¥Å Â¡Ã©â‚¬Â»Ã¨Â¾â€˜
+* Ã¥Â­Â¦Ã¤Â¹Â  Kotlin Ã¤Â¸Â­Ã§Å¡â€ž TDD Ã¥Â·Â¥Ã¤Â½Å“Ã¦ÂµÂÃ§Â¨â€¹
+
+## TDD Ã¥Â¾ÂªÃ§Å½Â¯
 
 ```
-RED     -> 编写失败的 Kotest 测试
-GREEN   -> 实现最小化代码以通过测试
-REFACTOR -> 改进代码，测试保持通过状态
-REPEAT  -> 进入下一个测试用例
+RED     -> Ã§Â¼â€“Ã¥â€ â„¢Ã¥Â¤Â±Ã¨Â´Â¥Ã§Å¡â€ž Kotest Ã¦Âµâ€¹Ã¨Â¯â€¢
+GREEN   -> Ã¥Â®Å¾Ã§Å½Â°Ã¦Å“â‚¬Ã¥Â°ÂÃ¥Å’â€“Ã¤Â»Â£Ã§Â ÂÃ¤Â»Â¥Ã©â‚¬Å¡Ã¨Â¿â€¡Ã¦Âµâ€¹Ã¨Â¯â€¢
+REFACTOR -> Ã¦â€Â¹Ã¨Â¿â€ºÃ¤Â»Â£Ã§Â ÂÃ¯Â¼Å’Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¤Â¿ÂÃ¦Å’ÂÃ©â‚¬Å¡Ã¨Â¿â€¡Ã§Å Â¶Ã¦â‚¬Â
+REPEAT  -> Ã¨Â¿â€ºÃ¥â€¦Â¥Ã¤Â¸â€¹Ã¤Â¸â‚¬Ã¤Â¸ÂªÃ¦Âµâ€¹Ã¨Â¯â€¢Ã§â€Â¨Ã¤Â¾â€¹
 ```
 
-## 示例会话
+## Ã§Â¤ÂºÃ¤Â¾â€¹Ã¤Â¼Å¡Ã¨Â¯Â
 
 ````text
-用户：/kotlin-test 我需要一个验证用户注册请求的函数
+Ã§â€Â¨Ã¦Ë†Â·Ã¯Â¼Å¡/kotlin-test Ã¦Ë†â€˜Ã©Å“â‚¬Ã¨Â¦ÂÃ¤Â¸â‚¬Ã¤Â¸ÂªÃ©ÂªÅ’Ã¨Â¯ÂÃ§â€Â¨Ã¦Ë†Â·Ã¦Â³Â¨Ã¥â€ Å’Ã¨Â¯Â·Ã¦Â±â€šÃ§Å¡â€žÃ¥â€¡Â½Ã¦â€¢Â°
 
-代理：
-# TDD 会话：注册验证器
+Ã¤Â»Â£Ã§Ââ€ Ã¯Â¼Å¡
+# TDD Ã¤Â¼Å¡Ã¨Â¯ÂÃ¯Â¼Å¡Ã¦Â³Â¨Ã¥â€ Å’Ã©ÂªÅ’Ã¨Â¯ÂÃ¥â„¢Â¨
 
-## 第一步：定义接口
+## Ã§Â¬Â¬Ã¤Â¸â‚¬Ã¦Â­Â¥Ã¯Â¼Å¡Ã¥Â®Å¡Ã¤Â¹â€°Ã¦Å½Â¥Ã¥ÂÂ£
 
 ```kotlin
 // validator/RegistrationValidator.kt
@@ -64,7 +77,7 @@ fun validateRegistration(request: RegistrationRequest): ValidationResult {
 }
 ```
 
-## 第二步：编写 Kotest 测试（RED）
+## Ã§Â¬Â¬Ã¤ÂºÅ’Ã¦Â­Â¥Ã¯Â¼Å¡Ã§Â¼â€“Ã¥â€ â„¢ Kotest Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¯Â¼Ë†REDÃ¯Â¼â€°
 
 ```kotlin
 // validator/RegistrationValidatorTest.kt
@@ -141,7 +154,7 @@ class RegistrationValidatorTest : FunSpec({
 })
 ```
 
-## 第三步：运行测试 - 验证失败
+## Ã§Â¬Â¬Ã¤Â¸â€°Ã¦Â­Â¥Ã¯Â¼Å¡Ã¨Â¿ÂÃ¨Â¡Å’Ã¦Âµâ€¹Ã¨Â¯â€¢ - Ã©ÂªÅ’Ã¨Â¯ÂÃ¥Â¤Â±Ã¨Â´Â¥
 
 ```bash
 $ ./gradlew test
@@ -152,9 +165,9 @@ RegistrationValidatorTest > valid registration returns Valid FAILED
 FAILED (5 tests, 0 passed, 5 failed)
 ```
 
-✓ 测试按预期失败（NotImplementedError）。
+Ã¢Å“â€œ Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¦Å’â€°Ã©Â¢â€žÃ¦Å“Å¸Ã¥Â¤Â±Ã¨Â´Â¥Ã¯Â¼Ë†NotImplementedErrorÃ¯Â¼â€°Ã£â‚¬â€š
 
-## 第四步：实现最小代码（GREEN）
+## Ã§Â¬Â¬Ã¥â€ºâ€ºÃ¦Â­Â¥Ã¯Â¼Å¡Ã¥Â®Å¾Ã§Å½Â°Ã¦Å“â‚¬Ã¥Â°ÂÃ¤Â»Â£Ã§Â ÂÃ¯Â¼Ë†GREENÃ¯Â¼â€°
 
 ```kotlin
 // validator/RegistrationValidator.kt
@@ -175,7 +188,7 @@ fun validateRegistration(request: RegistrationRequest): ValidationResult {
 }
 ```
 
-## 第五步：运行测试 - 验证通过
+## Ã§Â¬Â¬Ã¤Âºâ€Ã¦Â­Â¥Ã¯Â¼Å¡Ã¨Â¿ÂÃ¨Â¡Å’Ã¦Âµâ€¹Ã¨Â¯â€¢ - Ã©ÂªÅ’Ã¨Â¯ÂÃ©â‚¬Å¡Ã¨Â¿â€¡
 
 ```bash
 $ ./gradlew test
@@ -189,9 +202,9 @@ RegistrationValidatorTest > multiple errors returns all errors PASSED
 PASSED (5 tests, 5 passed, 0 failed)
 ```
 
-✓ 所有测试通过！
+Ã¢Å“â€œ Ã¦â€°â‚¬Ã¦Å“â€°Ã¦Âµâ€¹Ã¨Â¯â€¢Ã©â‚¬Å¡Ã¨Â¿â€¡Ã¯Â¼Â
 
-## 第六步：检查覆盖率
+## Ã§Â¬Â¬Ã¥â€¦Â­Ã¦Â­Â¥Ã¯Â¼Å¡Ã¦Â£â‚¬Ã¦Å¸Â¥Ã¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡
 
 ```bash
 $ ./gradlew koverHtmlReport
@@ -199,14 +212,14 @@ $ ./gradlew koverHtmlReport
 Coverage: 100.0% of statements
 ```
 
-✓ 覆盖率：100%
+Ã¢Å“â€œ Ã¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡Ã¯Â¼Å¡100%
 
-## TDD 完成！
+## TDD Ã¥Â®Å’Ã¦Ë†ÂÃ¯Â¼Â
 ````
 
-## 测试模式
+## Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¦Â¨Â¡Ã¥Â¼Â
 
-### StringSpec（最简单）
+### StringSpecÃ¯Â¼Ë†Ã¦Å“â‚¬Ã§Â®â‚¬Ã¥Ââ€¢Ã¯Â¼â€°
 
 ```kotlin
 class CalculatorTest : StringSpec({
@@ -216,7 +229,7 @@ class CalculatorTest : StringSpec({
 })
 ```
 
-### BehaviorSpec（BDD）
+### BehaviorSpecÃ¯Â¼Ë†BDDÃ¯Â¼â€°
 
 ```kotlin
 class OrderServiceTest : BehaviorSpec({
@@ -228,7 +241,7 @@ class OrderServiceTest : BehaviorSpec({
 })
 ```
 
-### 数据驱动测试
+### Ã¦â€¢Â°Ã¦ÂÂ®Ã©Â©Â±Ã¥Å Â¨Ã¦Âµâ€¹Ã¨Â¯â€¢
 
 ```kotlin
 class ParserTest : FunSpec({
@@ -240,7 +253,7 @@ class ParserTest : FunSpec({
 })
 ```
 
-### 协程测试
+### Ã¥ÂÂÃ§Â¨â€¹Ã¦Âµâ€¹Ã¨Â¯â€¢
 
 ```kotlin
 class AsyncServiceTest : FunSpec({
@@ -253,7 +266,7 @@ class AsyncServiceTest : FunSpec({
 })
 ```
 
-## 覆盖率命令
+## Ã¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡Ã¥â€˜Â½Ã¤Â»Â¤
 
 ```bash
 # Run tests with coverage
@@ -275,41 +288,41 @@ open build/reports/kover/html/index.html
 ./gradlew test --info
 ```
 
-## 覆盖率目标
+## Ã¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡Ã§â€ºÂ®Ã¦Â â€¡
 
-| 代码类型 | 目标 |
+| Ã¤Â»Â£Ã§Â ÂÃ§Â±Â»Ã¥Å¾â€¹ | Ã§â€ºÂ®Ã¦Â â€¡ |
 |-----------|--------|
-| 关键业务逻辑 | 100% |
-| 公共 API | 90%+ |
-| 通用代码 | 80%+ |
-| 生成的代码 | 排除 |
+| Ã¥â€¦Â³Ã©â€Â®Ã¤Â¸Å¡Ã¥Å Â¡Ã©â‚¬Â»Ã¨Â¾â€˜ | 100% |
+| Ã¥â€¦Â¬Ã¥â€¦Â± API | 90%+ |
+| Ã©â‚¬Å¡Ã§â€Â¨Ã¤Â»Â£Ã§Â Â | 80%+ |
+| Ã§â€Å¸Ã¦Ë†ÂÃ§Å¡â€žÃ¤Â»Â£Ã§Â Â | Ã¦Å½â€™Ã©â„¢Â¤ |
 
-## TDD 最佳实践
+## TDD Ã¦Å“â‚¬Ã¤Â½Â³Ã¥Â®Å¾Ã¨Â·Âµ
 
-**应做：**
+**Ã¥Âºâ€Ã¥ÂÅ¡Ã¯Â¼Å¡**
 
-* 首先编写测试，在任何实现之前
-* 每次更改后运行测试
-* 使用 Kotest 匹配器进行表达性断言
-* 使用 MockK 的 `coEvery`/`coVerify` 来处理挂起函数
-* 测试行为，而非实现细节
-* 包含边界情况（空值、null、最大值）
+* Ã©Â¦â€“Ã¥â€¦Ë†Ã§Â¼â€“Ã¥â€ â„¢Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¯Â¼Å’Ã¥Å“Â¨Ã¤Â»Â»Ã¤Â½â€¢Ã¥Â®Å¾Ã§Å½Â°Ã¤Â¹â€¹Ã¥â€°Â
+* Ã¦Â¯ÂÃ¦Â¬Â¡Ã¦â€ºÂ´Ã¦â€Â¹Ã¥ÂÅ½Ã¨Â¿ÂÃ¨Â¡Å’Ã¦Âµâ€¹Ã¨Â¯â€¢
+* Ã¤Â½Â¿Ã§â€Â¨ Kotest Ã¥Å’Â¹Ã©â€¦ÂÃ¥â„¢Â¨Ã¨Â¿â€ºÃ¨Â¡Å’Ã¨Â¡Â¨Ã¨Â¾Â¾Ã¦â‚¬Â§Ã¦â€“Â­Ã¨Â¨â‚¬
+* Ã¤Â½Â¿Ã§â€Â¨ MockK Ã§Å¡â€ž `coEvery`/`coVerify` Ã¦ÂÂ¥Ã¥Â¤â€žÃ§Ââ€ Ã¦Å’â€šÃ¨ÂµÂ·Ã¥â€¡Â½Ã¦â€¢Â°
+* Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¨Â¡Å’Ã¤Â¸ÂºÃ¯Â¼Å’Ã¨â‚¬Å’Ã©ÂÅ¾Ã¥Â®Å¾Ã§Å½Â°Ã§Â»â€ Ã¨Å â€š
+* Ã¥Å’â€¦Ã¥ÂÂ«Ã¨Â¾Â¹Ã§â€¢Å’Ã¦Æ’â€¦Ã¥â€ ÂµÃ¯Â¼Ë†Ã§Â©ÂºÃ¥â‚¬Â¼Ã£â‚¬ÂnullÃ£â‚¬ÂÃ¦Å“â‚¬Ã¥Â¤Â§Ã¥â‚¬Â¼Ã¯Â¼â€°
 
-**不应做：**
+**Ã¤Â¸ÂÃ¥Âºâ€Ã¥ÂÅ¡Ã¯Â¼Å¡**
 
-* 在测试之前编写实现
-* 跳过 RED 阶段
-* 直接测试私有函数
-* 在协程测试中使用 `Thread.sleep()`
-* 忽略不稳定的测试
+* Ã¥Å“Â¨Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¤Â¹â€¹Ã¥â€°ÂÃ§Â¼â€“Ã¥â€ â„¢Ã¥Â®Å¾Ã§Å½Â°
+* Ã¨Â·Â³Ã¨Â¿â€¡ RED Ã©ËœÂ¶Ã¦Â®Âµ
+* Ã§â€ºÂ´Ã¦Å½Â¥Ã¦Âµâ€¹Ã¨Â¯â€¢Ã§Â§ÂÃ¦Å“â€°Ã¥â€¡Â½Ã¦â€¢Â°
+* Ã¥Å“Â¨Ã¥ÂÂÃ§Â¨â€¹Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¤Â¸Â­Ã¤Â½Â¿Ã§â€Â¨ `Thread.sleep()`
+* Ã¥Â¿Â½Ã§â€¢Â¥Ã¤Â¸ÂÃ§Â¨Â³Ã¥Â®Å¡Ã§Å¡â€žÃ¦Âµâ€¹Ã¨Â¯â€¢
 
-## 相关命令
+## Ã§â€ºÂ¸Ã¥â€¦Â³Ã¥â€˜Â½Ã¤Â»Â¤
 
-* `/kotlin-build` - 修复构建错误
-* `/kotlin-review` - 在实现后审查代码
-* `/verify` - 运行完整的验证循环
+* `/kotlin-build` - Ã¤Â¿Â®Ã¥Â¤ÂÃ¦Å¾â€žÃ¥Â»ÂºÃ©â€â„¢Ã¨Â¯Â¯
+* `/kotlin-review` - Ã¥Å“Â¨Ã¥Â®Å¾Ã§Å½Â°Ã¥ÂÅ½Ã¥Â®Â¡Ã¦Å¸Â¥Ã¤Â»Â£Ã§Â Â
+* `/verify` - Ã¨Â¿ÂÃ¨Â¡Å’Ã¥Â®Å’Ã¦â€¢Â´Ã§Å¡â€žÃ©ÂªÅ’Ã¨Â¯ÂÃ¥Â¾ÂªÃ§Å½Â¯
 
-## 相关
+## Ã§â€ºÂ¸Ã¥â€¦Â³
 
-* 技能：`skills/kotlin-testing/`
-* 技能：`skills/tdd-workflow/`
+* Ã¦Å â‚¬Ã¨Æ’Â½Ã¯Â¼Å¡`skills/kotlin-testing/`
+* Ã¦Å â‚¬Ã¨Æ’Â½Ã¯Â¼Å¡`skills/tdd-workflow/`

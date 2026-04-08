@@ -6,6 +6,19 @@ origin: ECC
 
 # C++ Testing (Agent Skill)
 
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
 Agent-focused testing workflow for modern C++ (C++17/20) using GoogleTest/GoogleMock with CMake/CTest.
 
 ## When to Use
@@ -26,7 +39,7 @@ Agent-focused testing workflow for modern C++ (C++17/20) using GoogleTest/Google
 
 ## Core Concepts
 
-- **TDD loop**: red → green → refactor (tests first, minimal fix, then cleanups).
+- **TDD loop**: red Ã¢â€ â€™ green Ã¢â€ â€™ refactor (tests first, minimal fix, then cleanups).
 - **Isolation**: prefer dependency injection and fakes over global state.
 - **Test layout**: `tests/unit`, `tests/integration`, `tests/testdata`.
 - **Mocks vs fakes**: mock for interactions, fake for stateful behavior.
@@ -35,7 +48,7 @@ Agent-focused testing workflow for modern C++ (C++17/20) using GoogleTest/Google
 
 ## TDD Workflow
 
-Follow the RED → GREEN → REFACTOR loop:
+Follow the RED Ã¢â€ â€™ GREEN Ã¢â€ â€™ REFACTOR loop:
 
 1. **RED**: write a failing test that captures the new behavior
 2. **GREEN**: implement the smallest change to pass
@@ -289,13 +302,13 @@ endif()
 
 ### Common Pitfalls
 
-- **Using fixed temp paths** → Generate unique temp directories per test and clean them.
-- **Relying on wall clock time** → Inject a clock or use fake time sources.
-- **Flaky concurrency tests** → Use condition variables/latches and bounded waits.
-- **Hidden global state** → Reset global state in fixtures or remove globals.
-- **Over-mocking** → Prefer fakes for stateful behavior and only mock interactions.
-- **Missing sanitizer runs** → Add ASan/UBSan/TSan builds in CI.
-- **Coverage on debug-only builds** → Ensure coverage targets use consistent flags.
+- **Using fixed temp paths** Ã¢â€ â€™ Generate unique temp directories per test and clean them.
+- **Relying on wall clock time** Ã¢â€ â€™ Inject a clock or use fake time sources.
+- **Flaky concurrency tests** Ã¢â€ â€™ Use condition variables/latches and bounded waits.
+- **Hidden global state** Ã¢â€ â€™ Reset global state in fixtures or remove globals.
+- **Over-mocking** Ã¢â€ â€™ Prefer fakes for stateful behavior and only mock interactions.
+- **Missing sanitizer runs** Ã¢â€ â€™ Add ASan/UBSan/TSan builds in CI.
+- **Coverage on debug-only builds** Ã¢â€ â€™ Ensure coverage targets use consistent flags.
 
 ## Optional Appendix: Fuzzing / Property Testing
 

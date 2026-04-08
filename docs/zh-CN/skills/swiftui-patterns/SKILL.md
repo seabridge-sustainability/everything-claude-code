@@ -1,38 +1,51 @@
 ---
 name: swiftui-patterns
-description: SwiftUI 架构模式，使用 @Observable 进行状态管理，视图组合，导航，性能优化，以及现代 iOS/macOS UI 最佳实践。
+description: SwiftUI Ã¦Å¾Â¶Ã¦Å¾â€žÃ¦Â¨Â¡Ã¥Â¼ÂÃ¯Â¼Å’Ã¤Â½Â¿Ã§â€Â¨ @Observable Ã¨Â¿â€ºÃ¨Â¡Å’Ã§Å Â¶Ã¦â‚¬ÂÃ§Â®Â¡Ã§Ââ€ Ã¯Â¼Å’Ã¨Â§â€ Ã¥â€ºÂ¾Ã§Â»â€žÃ¥ÂË†Ã¯Â¼Å’Ã¥Â¯Â¼Ã¨Ë†ÂªÃ¯Â¼Å’Ã¦â‚¬Â§Ã¨Æ’Â½Ã¤Â¼ËœÃ¥Å’â€“Ã¯Â¼Å’Ã¤Â»Â¥Ã¥ÂÅ Ã§Å½Â°Ã¤Â»Â£ iOS/macOS UI Ã¦Å“â‚¬Ã¤Â½Â³Ã¥Â®Å¾Ã¨Â·ÂµÃ£â‚¬â€š
 ---
 
-# SwiftUI 模式
+# SwiftUI Ã¦Â¨Â¡Ã¥Â¼Â
 
-适用于 Apple 平台的现代 SwiftUI 模式，用于构建声明式、高性能的用户界面。涵盖 Observation 框架、视图组合、类型安全导航和性能优化。
+## Safety And Authorization Rule
 
-## 何时激活
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-* 构建 SwiftUI 视图和管理状态时（`@State`、`@Observable`、`@Binding`）
-* 使用 `NavigationStack` 设计导航流程时
-* 构建视图模型和数据流时
-* 优化列表和复杂布局的渲染性能时
-* 在 SwiftUI 中使用环境值和依赖注入时
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-## 状态管理
 
-### 属性包装器选择
+Ã©â‚¬â€šÃ§â€Â¨Ã¤ÂºÅ½ Apple Ã¥Â¹Â³Ã¥ÂÂ°Ã§Å¡â€žÃ§Å½Â°Ã¤Â»Â£ SwiftUI Ã¦Â¨Â¡Ã¥Â¼ÂÃ¯Â¼Å’Ã§â€Â¨Ã¤ÂºÅ½Ã¦Å¾â€žÃ¥Â»ÂºÃ¥Â£Â°Ã¦ËœÅ½Ã¥Â¼ÂÃ£â‚¬ÂÃ©Â«ËœÃ¦â‚¬Â§Ã¨Æ’Â½Ã§Å¡â€žÃ§â€Â¨Ã¦Ë†Â·Ã§â€¢Å’Ã©ÂÂ¢Ã£â‚¬â€šÃ¦Â¶ÂµÃ§â€ºâ€“ Observation Ã¦Â¡â€ Ã¦Å¾Â¶Ã£â‚¬ÂÃ¨Â§â€ Ã¥â€ºÂ¾Ã§Â»â€žÃ¥ÂË†Ã£â‚¬ÂÃ§Â±Â»Ã¥Å¾â€¹Ã¥Â®â€°Ã¥â€¦Â¨Ã¥Â¯Â¼Ã¨Ë†ÂªÃ¥â€™Å’Ã¦â‚¬Â§Ã¨Æ’Â½Ã¤Â¼ËœÃ¥Å’â€“Ã£â‚¬â€š
 
-选择最适合的最简单包装器：
+## Ã¤Â½â€¢Ã¦â€”Â¶Ã¦Â¿â‚¬Ã¦Â´Â»
 
-| 包装器 | 使用场景 |
+* Ã¦Å¾â€žÃ¥Â»Âº SwiftUI Ã¨Â§â€ Ã¥â€ºÂ¾Ã¥â€™Å’Ã§Â®Â¡Ã§Ââ€ Ã§Å Â¶Ã¦â‚¬ÂÃ¦â€”Â¶Ã¯Â¼Ë†`@State`Ã£â‚¬Â`@Observable`Ã£â‚¬Â`@Binding`Ã¯Â¼â€°
+* Ã¤Â½Â¿Ã§â€Â¨ `NavigationStack` Ã¨Â®Â¾Ã¨Â®Â¡Ã¥Â¯Â¼Ã¨Ë†ÂªÃ¦ÂµÂÃ§Â¨â€¹Ã¦â€”Â¶
+* Ã¦Å¾â€žÃ¥Â»ÂºÃ¨Â§â€ Ã¥â€ºÂ¾Ã¦Â¨Â¡Ã¥Å¾â€¹Ã¥â€™Å’Ã¦â€¢Â°Ã¦ÂÂ®Ã¦ÂµÂÃ¦â€”Â¶
+* Ã¤Â¼ËœÃ¥Å’â€“Ã¥Ë†â€”Ã¨Â¡Â¨Ã¥â€™Å’Ã¥Â¤ÂÃ¦Ââ€šÃ¥Â¸Æ’Ã¥Â±â‚¬Ã§Å¡â€žÃ¦Â¸Â²Ã¦Å¸â€œÃ¦â‚¬Â§Ã¨Æ’Â½Ã¦â€”Â¶
+* Ã¥Å“Â¨ SwiftUI Ã¤Â¸Â­Ã¤Â½Â¿Ã§â€Â¨Ã§Å½Â¯Ã¥Â¢Æ’Ã¥â‚¬Â¼Ã¥â€™Å’Ã¤Â¾ÂÃ¨Âµâ€“Ã¦Â³Â¨Ã¥â€¦Â¥Ã¦â€”Â¶
+
+## Ã§Å Â¶Ã¦â‚¬ÂÃ§Â®Â¡Ã§Ââ€ 
+
+### Ã¥Â±Å¾Ã¦â‚¬Â§Ã¥Å’â€¦Ã¨Â£â€¦Ã¥â„¢Â¨Ã©â‚¬â€°Ã¦â€¹Â©
+
+Ã©â‚¬â€°Ã¦â€¹Â©Ã¦Å“â‚¬Ã©â‚¬â€šÃ¥ÂË†Ã§Å¡â€žÃ¦Å“â‚¬Ã§Â®â‚¬Ã¥Ââ€¢Ã¥Å’â€¦Ã¨Â£â€¦Ã¥â„¢Â¨Ã¯Â¼Å¡
+
+| Ã¥Å’â€¦Ã¨Â£â€¦Ã¥â„¢Â¨ | Ã¤Â½Â¿Ã§â€Â¨Ã¥Å“ÂºÃ¦â„¢Â¯ |
 |---------|----------|
-| `@State` | 视图本地的值类型（开关、表单字段、Sheet 展示） |
-| `@Binding` | 指向父视图 `@State` 的双向引用 |
-| `@Observable` 类 + `@State` | 拥有多个属性的自有模型 |
-| `@Observable` 类（无包装器） | 从父视图传递的只读引用 |
-| `@Bindable` | 指向 `@Observable` 属性的双向绑定 |
-| `@Environment` | 通过 `.environment()` 注入的共享依赖项 |
+| `@State` | Ã¨Â§â€ Ã¥â€ºÂ¾Ã¦Å“Â¬Ã¥Å“Â°Ã§Å¡â€žÃ¥â‚¬Â¼Ã§Â±Â»Ã¥Å¾â€¹Ã¯Â¼Ë†Ã¥Â¼â‚¬Ã¥â€¦Â³Ã£â‚¬ÂÃ¨Â¡Â¨Ã¥Ââ€¢Ã¥Â­â€”Ã¦Â®ÂµÃ£â‚¬ÂSheet Ã¥Â±â€¢Ã§Â¤ÂºÃ¯Â¼â€° |
+| `@Binding` | Ã¦Å’â€¡Ã¥Ââ€˜Ã§Ë†Â¶Ã¨Â§â€ Ã¥â€ºÂ¾ `@State` Ã§Å¡â€žÃ¥ÂÅ’Ã¥Ââ€˜Ã¥Â¼â€¢Ã§â€Â¨ |
+| `@Observable` Ã§Â±Â» + `@State` | Ã¦â€¹Â¥Ã¦Å“â€°Ã¥Â¤Å¡Ã¤Â¸ÂªÃ¥Â±Å¾Ã¦â‚¬Â§Ã§Å¡â€žÃ¨â€¡ÂªÃ¦Å“â€°Ã¦Â¨Â¡Ã¥Å¾â€¹ |
+| `@Observable` Ã§Â±Â»Ã¯Â¼Ë†Ã¦â€”Â Ã¥Å’â€¦Ã¨Â£â€¦Ã¥â„¢Â¨Ã¯Â¼â€° | Ã¤Â»Å½Ã§Ë†Â¶Ã¨Â§â€ Ã¥â€ºÂ¾Ã¤Â¼Â Ã©â‚¬â€™Ã§Å¡â€žÃ¥ÂÂªÃ¨Â¯Â»Ã¥Â¼â€¢Ã§â€Â¨ |
+| `@Bindable` | Ã¦Å’â€¡Ã¥Ââ€˜ `@Observable` Ã¥Â±Å¾Ã¦â‚¬Â§Ã§Å¡â€žÃ¥ÂÅ’Ã¥Ââ€˜Ã§Â»â€˜Ã¥Â®Å¡ |
+| `@Environment` | Ã©â‚¬Å¡Ã¨Â¿â€¡ `.environment()` Ã¦Â³Â¨Ã¥â€¦Â¥Ã§Å¡â€žÃ¥â€¦Â±Ã¤ÂºÂ«Ã¤Â¾ÂÃ¨Âµâ€“Ã©Â¡Â¹ |
 
 ### @Observable ViewModel
 
-使用 `@Observable`（而非 `ObservableObject`）—— 它跟踪属性级别的变更，因此 SwiftUI 只会重新渲染读取了已变更属性的视图：
+Ã¤Â½Â¿Ã§â€Â¨ `@Observable`Ã¯Â¼Ë†Ã¨â‚¬Å’Ã©ÂÅ¾ `ObservableObject`Ã¯Â¼â€°Ã¢â‚¬â€Ã¢â‚¬â€ Ã¥Â®Æ’Ã¨Â·Å¸Ã¨Â¸ÂªÃ¥Â±Å¾Ã¦â‚¬Â§Ã§ÂºÂ§Ã¥Ë†Â«Ã§Å¡â€žÃ¥ÂËœÃ¦â€ºÂ´Ã¯Â¼Å’Ã¥â€ºÂ Ã¦Â­Â¤ SwiftUI Ã¥ÂÂªÃ¤Â¼Å¡Ã©â€¡ÂÃ¦â€“Â°Ã¦Â¸Â²Ã¦Å¸â€œÃ¨Â¯Â»Ã¥Ââ€“Ã¤Âºâ€ Ã¥Â·Â²Ã¥ÂËœÃ¦â€ºÂ´Ã¥Â±Å¾Ã¦â‚¬Â§Ã§Å¡â€žÃ¨Â§â€ Ã¥â€ºÂ¾Ã¯Â¼Å¡
 
 ```swift
 @Observable
@@ -55,7 +68,7 @@ final class ItemListViewModel {
 }
 ```
 
-### 消费 ViewModel 的视图
+### Ã¦Â¶Ë†Ã¨Â´Â¹ ViewModel Ã§Å¡â€žÃ¨Â§â€ Ã¥â€ºÂ¾
 
 ```swift
 struct ItemListView: View {
@@ -76,9 +89,9 @@ struct ItemListView: View {
 }
 ```
 
-### 环境注入
+### Ã§Å½Â¯Ã¥Â¢Æ’Ã¦Â³Â¨Ã¥â€¦Â¥
 
-用 `@Environment` 替换 `@EnvironmentObject`：
+Ã§â€Â¨ `@Environment` Ã¦â€ºÂ¿Ã¦ÂÂ¢ `@EnvironmentObject`Ã¯Â¼Å¡
 
 ```swift
 // Inject
@@ -95,11 +108,11 @@ struct ProfileView: View {
 }
 ```
 
-## 视图组合
+## Ã¨Â§â€ Ã¥â€ºÂ¾Ã§Â»â€žÃ¥ÂË†
 
-### 提取子视图以限制失效
+### Ã¦ÂÂÃ¥Ââ€“Ã¥Â­ÂÃ¨Â§â€ Ã¥â€ºÂ¾Ã¤Â»Â¥Ã©â„¢ÂÃ¥Ë†Â¶Ã¥Â¤Â±Ã¦â€¢Ë†
 
-将视图拆分为小型、专注的结构体。当状态变更时，只有读取该状态的子视图会重新渲染：
+Ã¥Â°â€ Ã¨Â§â€ Ã¥â€ºÂ¾Ã¦â€¹â€ Ã¥Ë†â€ Ã¤Â¸ÂºÃ¥Â°ÂÃ¥Å¾â€¹Ã£â‚¬ÂÃ¤Â¸â€œÃ¦Â³Â¨Ã§Å¡â€žÃ§Â»â€œÃ¦Å¾â€žÃ¤Â½â€œÃ£â‚¬â€šÃ¥Â½â€œÃ§Å Â¶Ã¦â‚¬ÂÃ¥ÂËœÃ¦â€ºÂ´Ã¦â€”Â¶Ã¯Â¼Å’Ã¥ÂÂªÃ¦Å“â€°Ã¨Â¯Â»Ã¥Ââ€“Ã¨Â¯Â¥Ã§Å Â¶Ã¦â‚¬ÂÃ§Å¡â€žÃ¥Â­ÂÃ¨Â§â€ Ã¥â€ºÂ¾Ã¤Â¼Å¡Ã©â€¡ÂÃ¦â€“Â°Ã¦Â¸Â²Ã¦Å¸â€œÃ¯Â¼Å¡
 
 ```swift
 struct OrderView: View {
@@ -115,7 +128,7 @@ struct OrderView: View {
 }
 ```
 
-### 用于可复用样式的 ViewModifier
+### Ã§â€Â¨Ã¤ÂºÅ½Ã¥ÂÂ¯Ã¥Â¤ÂÃ§â€Â¨Ã¦Â Â·Ã¥Â¼ÂÃ§Å¡â€ž ViewModifier
 
 ```swift
 struct CardModifier: ViewModifier {
@@ -134,11 +147,11 @@ extension View {
 }
 ```
 
-## 导航
+## Ã¥Â¯Â¼Ã¨Ë†Âª
 
-### 类型安全的 NavigationStack
+### Ã§Â±Â»Ã¥Å¾â€¹Ã¥Â®â€°Ã¥â€¦Â¨Ã§Å¡â€ž NavigationStack
 
-使用 `NavigationStack` 与 `NavigationPath` 来实现程序化、类型安全的路由：
+Ã¤Â½Â¿Ã§â€Â¨ `NavigationStack` Ã¤Â¸Å½ `NavigationPath` Ã¦ÂÂ¥Ã¥Â®Å¾Ã§Å½Â°Ã§Â¨â€¹Ã¥ÂºÂÃ¥Å’â€“Ã£â‚¬ÂÃ§Â±Â»Ã¥Å¾â€¹Ã¥Â®â€°Ã¥â€¦Â¨Ã§Å¡â€žÃ¨Â·Â¯Ã§â€Â±Ã¯Â¼Å¡
 
 ```swift
 @Observable
@@ -179,11 +192,11 @@ struct RootView: View {
 }
 ```
 
-## 性能
+## Ã¦â‚¬Â§Ã¨Æ’Â½
 
-### 为大型集合使用惰性容器
+### Ã¤Â¸ÂºÃ¥Â¤Â§Ã¥Å¾â€¹Ã©â€ºâ€ Ã¥ÂË†Ã¤Â½Â¿Ã§â€Â¨Ã¦Æ’Â°Ã¦â‚¬Â§Ã¥Â®Â¹Ã¥â„¢Â¨
 
-`LazyVStack` 和 `LazyHStack` 仅在视图可见时才创建它们：
+`LazyVStack` Ã¥â€™Å’ `LazyHStack` Ã¤Â»â€¦Ã¥Å“Â¨Ã¨Â§â€ Ã¥â€ºÂ¾Ã¥ÂÂ¯Ã¨Â§ÂÃ¦â€”Â¶Ã¦â€°ÂÃ¥Ë†â€ºÃ¥Â»ÂºÃ¥Â®Æ’Ã¤Â»Â¬Ã¯Â¼Å¡
 
 ```swift
 ScrollView {
@@ -195,9 +208,9 @@ ScrollView {
 }
 ```
 
-### 稳定的标识符
+### Ã§Â¨Â³Ã¥Â®Å¡Ã§Å¡â€žÃ¦Â â€¡Ã¨Â¯â€ Ã§Â¬Â¦
 
-在 `ForEach` 中始终使用稳定、唯一的 ID —— 避免使用数组索引：
+Ã¥Å“Â¨ `ForEach` Ã¤Â¸Â­Ã¥Â§â€¹Ã§Â»Ë†Ã¤Â½Â¿Ã§â€Â¨Ã§Â¨Â³Ã¥Â®Å¡Ã£â‚¬ÂÃ¥â€Â¯Ã¤Â¸â‚¬Ã§Å¡â€ž ID Ã¢â‚¬â€Ã¢â‚¬â€ Ã©ÂÂ¿Ã¥â€¦ÂÃ¤Â½Â¿Ã§â€Â¨Ã¦â€¢Â°Ã§Â»â€žÃ§Â´Â¢Ã¥Â¼â€¢Ã¯Â¼Å¡
 
 ```swift
 // Use Identifiable conformance or explicit id
@@ -206,16 +219,16 @@ ForEach(items, id: \.stableID) { item in
 }
 ```
 
-### 避免在 body 中进行昂贵操作
+### Ã©ÂÂ¿Ã¥â€¦ÂÃ¥Å“Â¨ body Ã¤Â¸Â­Ã¨Â¿â€ºÃ¨Â¡Å’Ã¦Ëœâ€šÃ¨Â´ÂµÃ¦â€œÂÃ¤Â½Å“
 
-* 切勿在 `body` 内执行 I/O、网络调用或繁重计算
-* 使用 `.task {}` 处理异步工作 —— 当视图消失时它会自动取消
-* 在滚动视图中谨慎使用 `.sensoryFeedback()` 和 `.geometryGroup()`
-* 在列表中最小化使用 `.shadow()`、`.blur()` 和 `.mask()` —— 它们会触发屏幕外渲染
+* Ã¥Ë†â€¡Ã¥â€¹Â¿Ã¥Å“Â¨ `body` Ã¥â€ â€¦Ã¦â€°Â§Ã¨Â¡Å’ I/OÃ£â‚¬ÂÃ§Â½â€˜Ã§Â»Å“Ã¨Â°Æ’Ã§â€Â¨Ã¦Ë†â€“Ã§Â¹ÂÃ©â€¡ÂÃ¨Â®Â¡Ã§Â®â€”
+* Ã¤Â½Â¿Ã§â€Â¨ `.task {}` Ã¥Â¤â€žÃ§Ââ€ Ã¥Â¼â€šÃ¦Â­Â¥Ã¥Â·Â¥Ã¤Â½Å“ Ã¢â‚¬â€Ã¢â‚¬â€ Ã¥Â½â€œÃ¨Â§â€ Ã¥â€ºÂ¾Ã¦Â¶Ë†Ã¥Â¤Â±Ã¦â€”Â¶Ã¥Â®Æ’Ã¤Â¼Å¡Ã¨â€¡ÂªÃ¥Å Â¨Ã¥Ââ€“Ã¦Â¶Ë†
+* Ã¥Å“Â¨Ã¦Â»Å¡Ã¥Å Â¨Ã¨Â§â€ Ã¥â€ºÂ¾Ã¤Â¸Â­Ã¨Â°Â¨Ã¦â€¦Å½Ã¤Â½Â¿Ã§â€Â¨ `.sensoryFeedback()` Ã¥â€™Å’ `.geometryGroup()`
+* Ã¥Å“Â¨Ã¥Ë†â€”Ã¨Â¡Â¨Ã¤Â¸Â­Ã¦Å“â‚¬Ã¥Â°ÂÃ¥Å’â€“Ã¤Â½Â¿Ã§â€Â¨ `.shadow()`Ã£â‚¬Â`.blur()` Ã¥â€™Å’ `.mask()` Ã¢â‚¬â€Ã¢â‚¬â€ Ã¥Â®Æ’Ã¤Â»Â¬Ã¤Â¼Å¡Ã¨Â§Â¦Ã¥Ââ€˜Ã¥Â±ÂÃ¥Â¹â€¢Ã¥Â¤â€“Ã¦Â¸Â²Ã¦Å¸â€œ
 
-### 遵循 Equatable
+### Ã©ÂÂµÃ¥Â¾Âª Equatable
 
-对于 body 计算昂贵的视图，遵循 `Equatable` 以跳过不必要的重新渲染：
+Ã¥Â¯Â¹Ã¤ÂºÅ½ body Ã¨Â®Â¡Ã§Â®â€”Ã¦Ëœâ€šÃ¨Â´ÂµÃ§Å¡â€žÃ¨Â§â€ Ã¥â€ºÂ¾Ã¯Â¼Å’Ã©ÂÂµÃ¥Â¾Âª `Equatable` Ã¤Â»Â¥Ã¨Â·Â³Ã¨Â¿â€¡Ã¤Â¸ÂÃ¥Â¿â€¦Ã¨Â¦ÂÃ§Å¡â€žÃ©â€¡ÂÃ¦â€“Â°Ã¦Â¸Â²Ã¦Å¸â€œÃ¯Â¼Å¡
 
 ```swift
 struct ExpensiveChartView: View, Equatable {
@@ -231,9 +244,9 @@ struct ExpensiveChartView: View, Equatable {
 }
 ```
 
-## 预览
+## Ã©Â¢â€žÃ¨Â§Ë†
 
-使用 `#Preview` 宏配合内联模拟数据以进行快速迭代：
+Ã¤Â½Â¿Ã§â€Â¨ `#Preview` Ã¥Â®ÂÃ©â€¦ÂÃ¥ÂË†Ã¥â€ â€¦Ã¨Ââ€Ã¦Â¨Â¡Ã¦â€¹Å¸Ã¦â€¢Â°Ã¦ÂÂ®Ã¤Â»Â¥Ã¨Â¿â€ºÃ¨Â¡Å’Ã¥Â¿Â«Ã©â‚¬Å¸Ã¨Â¿Â­Ã¤Â»Â£Ã¯Â¼Å¡
 
 ```swift
 #Preview("Empty state") {
@@ -245,15 +258,15 @@ struct ExpensiveChartView: View, Equatable {
 }
 ```
 
-## 应避免的反模式
+## Ã¥Âºâ€Ã©ÂÂ¿Ã¥â€¦ÂÃ§Å¡â€žÃ¥ÂÂÃ¦Â¨Â¡Ã¥Â¼Â
 
-* 在新代码中使用 `ObservableObject` / `@Published` / `@StateObject` / `@EnvironmentObject` —— 迁移到 `@Observable`
-* 将异步工作直接放在 `body` 或 `init` 中 —— 使用 `.task {}` 或显式的加载方法
-* 在不拥有数据的子视图中将视图模型创建为 `@State` —— 改为从父视图传递
-* 使用 `AnyView` 类型擦除 —— 对于条件视图，优先选择 `@ViewBuilder` 或 `Group`
-* 在向 Actor 传递数据或从 Actor 接收数据时忽略 `Sendable` 要求
+* Ã¥Å“Â¨Ã¦â€“Â°Ã¤Â»Â£Ã§Â ÂÃ¤Â¸Â­Ã¤Â½Â¿Ã§â€Â¨ `ObservableObject` / `@Published` / `@StateObject` / `@EnvironmentObject` Ã¢â‚¬â€Ã¢â‚¬â€ Ã¨Â¿ÂÃ§Â§Â»Ã¥Ë†Â° `@Observable`
+* Ã¥Â°â€ Ã¥Â¼â€šÃ¦Â­Â¥Ã¥Â·Â¥Ã¤Â½Å“Ã§â€ºÂ´Ã¦Å½Â¥Ã¦â€Â¾Ã¥Å“Â¨ `body` Ã¦Ë†â€“ `init` Ã¤Â¸Â­ Ã¢â‚¬â€Ã¢â‚¬â€ Ã¤Â½Â¿Ã§â€Â¨ `.task {}` Ã¦Ë†â€“Ã¦ËœÂ¾Ã¥Â¼ÂÃ§Å¡â€žÃ¥Å Â Ã¨Â½Â½Ã¦â€“Â¹Ã¦Â³â€¢
+* Ã¥Å“Â¨Ã¤Â¸ÂÃ¦â€¹Â¥Ã¦Å“â€°Ã¦â€¢Â°Ã¦ÂÂ®Ã§Å¡â€žÃ¥Â­ÂÃ¨Â§â€ Ã¥â€ºÂ¾Ã¤Â¸Â­Ã¥Â°â€ Ã¨Â§â€ Ã¥â€ºÂ¾Ã¦Â¨Â¡Ã¥Å¾â€¹Ã¥Ë†â€ºÃ¥Â»ÂºÃ¤Â¸Âº `@State` Ã¢â‚¬â€Ã¢â‚¬â€ Ã¦â€Â¹Ã¤Â¸ÂºÃ¤Â»Å½Ã§Ë†Â¶Ã¨Â§â€ Ã¥â€ºÂ¾Ã¤Â¼Â Ã©â‚¬â€™
+* Ã¤Â½Â¿Ã§â€Â¨ `AnyView` Ã§Â±Â»Ã¥Å¾â€¹Ã¦â€œÂ¦Ã©â„¢Â¤ Ã¢â‚¬â€Ã¢â‚¬â€ Ã¥Â¯Â¹Ã¤ÂºÅ½Ã¦ÂÂ¡Ã¤Â»Â¶Ã¨Â§â€ Ã¥â€ºÂ¾Ã¯Â¼Å’Ã¤Â¼ËœÃ¥â€¦Ë†Ã©â‚¬â€°Ã¦â€¹Â© `@ViewBuilder` Ã¦Ë†â€“ `Group`
+* Ã¥Å“Â¨Ã¥Ââ€˜ Actor Ã¤Â¼Â Ã©â‚¬â€™Ã¦â€¢Â°Ã¦ÂÂ®Ã¦Ë†â€“Ã¤Â»Å½ Actor Ã¦Å½Â¥Ã¦â€Â¶Ã¦â€¢Â°Ã¦ÂÂ®Ã¦â€”Â¶Ã¥Â¿Â½Ã§â€¢Â¥ `Sendable` Ã¨Â¦ÂÃ¦Â±â€š
 
-## 参考
+## Ã¥Ââ€šÃ¨â‚¬Æ’
 
-查看技能：`swift-actor-persistence` 以了解基于 Actor 的持久化模式。
-查看技能：`swift-protocol-di-testing` 以了解基于协议的 DI 和使用 Swift Testing 进行测试。
+Ã¦Å¸Â¥Ã§Å“â€¹Ã¦Å â‚¬Ã¨Æ’Â½Ã¯Â¼Å¡`swift-actor-persistence` Ã¤Â»Â¥Ã¤Âºâ€ Ã¨Â§Â£Ã¥Å¸ÂºÃ¤ÂºÅ½ Actor Ã§Å¡â€žÃ¦Å’ÂÃ¤Â¹â€¦Ã¥Å’â€“Ã¦Â¨Â¡Ã¥Â¼ÂÃ£â‚¬â€š
+Ã¦Å¸Â¥Ã§Å“â€¹Ã¦Å â‚¬Ã¨Æ’Â½Ã¯Â¼Å¡`swift-protocol-di-testing` Ã¤Â»Â¥Ã¤Âºâ€ Ã¨Â§Â£Ã¥Å¸ÂºÃ¤ÂºÅ½Ã¥ÂÂÃ¨Â®Â®Ã§Å¡â€ž DI Ã¥â€™Å’Ã¤Â½Â¿Ã§â€Â¨ Swift Testing Ã¨Â¿â€ºÃ¨Â¡Å’Ã¦Âµâ€¹Ã¨Â¯â€¢Ã£â‚¬â€š

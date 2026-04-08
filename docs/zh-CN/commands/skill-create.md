@@ -1,14 +1,27 @@
 ---
 name: skill-create
-description: 分析本地Git历史以提取编码模式并生成SKILL.md文件。Skill Creator GitHub应用的本地版本。
+description: Ã¥Ë†â€ Ã¦Å¾ÂÃ¦Å“Â¬Ã¥Å“Â°GitÃ¥Å½â€ Ã¥ÂÂ²Ã¤Â»Â¥Ã¦ÂÂÃ¥Ââ€“Ã§Â¼â€“Ã§Â ÂÃ¦Â¨Â¡Ã¥Â¼ÂÃ¥Â¹Â¶Ã§â€Å¸Ã¦Ë†ÂSKILL.mdÃ¦â€“â€¡Ã¤Â»Â¶Ã£â‚¬â€šSkill Creator GitHubÃ¥Âºâ€Ã§â€Â¨Ã§Å¡â€žÃ¦Å“Â¬Ã¥Å“Â°Ã§â€°Ë†Ã¦Å“Â¬Ã£â‚¬â€š
 allowed_tools: ["Bash", "Read", "Write", "Grep", "Glob"]
 ---
 
-# /skill-create - 本地技能生成
+# /skill-create - Ã¦Å“Â¬Ã¥Å“Â°Ã¦Å â‚¬Ã¨Æ’Â½Ã§â€Å¸Ã¦Ë†Â
 
-分析你的仓库的 git 历史，以提取编码模式并生成 SKILL.md 文件，用于向 Claude 传授你团队的实践方法。
+## Safety And Authorization Rule
 
-## 使用方法
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+Ã¥Ë†â€ Ã¦Å¾ÂÃ¤Â½Â Ã§Å¡â€žÃ¤Â»â€œÃ¥Âºâ€œÃ§Å¡â€ž git Ã¥Å½â€ Ã¥ÂÂ²Ã¯Â¼Å’Ã¤Â»Â¥Ã¦ÂÂÃ¥Ââ€“Ã§Â¼â€“Ã§Â ÂÃ¦Â¨Â¡Ã¥Â¼ÂÃ¥Â¹Â¶Ã§â€Å¸Ã¦Ë†Â SKILL.md Ã¦â€“â€¡Ã¤Â»Â¶Ã¯Â¼Å’Ã§â€Â¨Ã¤ÂºÅ½Ã¥Ââ€˜ Claude Ã¤Â¼Â Ã¦Å½Ë†Ã¤Â½Â Ã¥â€ºÂ¢Ã©ËœÅ¸Ã§Å¡â€žÃ¥Â®Å¾Ã¨Â·ÂµÃ¦â€“Â¹Ã¦Â³â€¢Ã£â‚¬â€š
+
+## Ã¤Â½Â¿Ã§â€Â¨Ã¦â€“Â¹Ã¦Â³â€¢
 
 ```bash
 /skill-create                    # Analyze current repo
@@ -17,16 +30,16 @@ allowed_tools: ["Bash", "Read", "Write", "Grep", "Glob"]
 /skill-create --instincts        # Also generate instincts for continuous-learning-v2
 ```
 
-## 功能说明
+## Ã¥Å Å¸Ã¨Æ’Â½Ã¨Â¯Â´Ã¦ËœÅ½
 
-1. **解析 Git 历史** - 分析提交记录、文件更改和模式
-2. **检测模式** - 识别重复出现的工作流程和约定
-3. **生成 SKILL.md** - 创建有效的 Claude Code 技能文件
-4. **可选创建 Instincts** - 用于 continuous-learning-v2 系统
+1. **Ã¨Â§Â£Ã¦Å¾Â Git Ã¥Å½â€ Ã¥ÂÂ²** - Ã¥Ë†â€ Ã¦Å¾ÂÃ¦ÂÂÃ¤ÂºÂ¤Ã¨Â®Â°Ã¥Â½â€¢Ã£â‚¬ÂÃ¦â€“â€¡Ã¤Â»Â¶Ã¦â€ºÂ´Ã¦â€Â¹Ã¥â€™Å’Ã¦Â¨Â¡Ã¥Â¼Â
+2. **Ã¦Â£â‚¬Ã¦Âµâ€¹Ã¦Â¨Â¡Ã¥Â¼Â** - Ã¨Â¯â€ Ã¥Ë†Â«Ã©â€¡ÂÃ¥Â¤ÂÃ¥â€¡ÂºÃ§Å½Â°Ã§Å¡â€žÃ¥Â·Â¥Ã¤Â½Å“Ã¦ÂµÂÃ§Â¨â€¹Ã¥â€™Å’Ã§ÂºÂ¦Ã¥Â®Å¡
+3. **Ã§â€Å¸Ã¦Ë†Â SKILL.md** - Ã¥Ë†â€ºÃ¥Â»ÂºÃ¦Å“â€°Ã¦â€¢Ë†Ã§Å¡â€ž Claude Code Ã¦Å â‚¬Ã¨Æ’Â½Ã¦â€“â€¡Ã¤Â»Â¶
+4. **Ã¥ÂÂ¯Ã©â‚¬â€°Ã¥Ë†â€ºÃ¥Â»Âº Instincts** - Ã§â€Â¨Ã¤ÂºÅ½ continuous-learning-v2 Ã§Â³Â»Ã§Â»Å¸
 
-## 分析步骤
+## Ã¥Ë†â€ Ã¦Å¾ÂÃ¦Â­Â¥Ã©ÂªÂ¤
 
-### 步骤 1：收集 Git 数据
+### Ã¦Â­Â¥Ã©ÂªÂ¤ 1Ã¯Â¼Å¡Ã¦â€Â¶Ã©â€ºâ€  Git Ã¦â€¢Â°Ã¦ÂÂ®
 
 ```bash
 # Get recent commits with file changes
@@ -39,50 +52,50 @@ git log --oneline -n 200 --name-only | grep -v "^$" | grep -v "^[a-f0-9]" | sort
 git log --oneline -n 200 | cut -d' ' -f2- | head -50
 ```
 
-### 步骤 2：检测模式
+### Ã¦Â­Â¥Ã©ÂªÂ¤ 2Ã¯Â¼Å¡Ã¦Â£â‚¬Ã¦Âµâ€¹Ã¦Â¨Â¡Ã¥Â¼Â
 
-寻找以下模式类型：
+Ã¥Â¯Â»Ã¦â€°Â¾Ã¤Â»Â¥Ã¤Â¸â€¹Ã¦Â¨Â¡Ã¥Â¼ÂÃ§Â±Â»Ã¥Å¾â€¹Ã¯Â¼Å¡
 
-| 模式 | 检测方法 |
+| Ã¦Â¨Â¡Ã¥Â¼Â | Ã¦Â£â‚¬Ã¦Âµâ€¹Ã¦â€“Â¹Ã¦Â³â€¢ |
 |---------|-----------------|
-| **提交约定** | 对提交消息进行正则匹配 (feat:, fix:, chore:) |
-| **文件协同更改** | 总是同时更改的文件 |
-| **工作流序列** | 重复的文件更改模式 |
-| **架构** | 文件夹结构和命名约定 |
-| **测试模式** | 测试文件位置、命名、覆盖率 |
+| **Ã¦ÂÂÃ¤ÂºÂ¤Ã§ÂºÂ¦Ã¥Â®Å¡** | Ã¥Â¯Â¹Ã¦ÂÂÃ¤ÂºÂ¤Ã¦Â¶Ë†Ã¦ÂÂ¯Ã¨Â¿â€ºÃ¨Â¡Å’Ã¦Â­Â£Ã¥Ë†â„¢Ã¥Å’Â¹Ã©â€¦Â (feat:, fix:, chore:) |
+| **Ã¦â€“â€¡Ã¤Â»Â¶Ã¥ÂÂÃ¥ÂÅ’Ã¦â€ºÂ´Ã¦â€Â¹** | Ã¦â‚¬Â»Ã¦ËœÂ¯Ã¥ÂÅ’Ã¦â€”Â¶Ã¦â€ºÂ´Ã¦â€Â¹Ã§Å¡â€žÃ¦â€“â€¡Ã¤Â»Â¶ |
+| **Ã¥Â·Â¥Ã¤Â½Å“Ã¦ÂµÂÃ¥ÂºÂÃ¥Ë†â€”** | Ã©â€¡ÂÃ¥Â¤ÂÃ§Å¡â€žÃ¦â€“â€¡Ã¤Â»Â¶Ã¦â€ºÂ´Ã¦â€Â¹Ã¦Â¨Â¡Ã¥Â¼Â |
+| **Ã¦Å¾Â¶Ã¦Å¾â€ž** | Ã¦â€“â€¡Ã¤Â»Â¶Ã¥Â¤Â¹Ã§Â»â€œÃ¦Å¾â€žÃ¥â€™Å’Ã¥â€˜Â½Ã¥ÂÂÃ§ÂºÂ¦Ã¥Â®Å¡ |
+| **Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¦Â¨Â¡Ã¥Â¼Â** | Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¦â€“â€¡Ã¤Â»Â¶Ã¤Â½ÂÃ§Â½Â®Ã£â‚¬ÂÃ¥â€˜Â½Ã¥ÂÂÃ£â‚¬ÂÃ¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡ |
 
-### 步骤 3：生成 SKILL.md
+### Ã¦Â­Â¥Ã©ÂªÂ¤ 3Ã¯Â¼Å¡Ã§â€Å¸Ã¦Ë†Â SKILL.md
 
-输出格式：
+Ã¨Â¾â€œÃ¥â€¡ÂºÃ¦Â Â¼Ã¥Â¼ÂÃ¯Â¼Å¡
 
 ```markdown
 ---
 name: {repo-name}-patterns
-description: 从 {repo-name} 提取的编码模式
+description: Ã¤Â»Å½ {repo-name} Ã¦ÂÂÃ¥Ââ€“Ã§Å¡â€žÃ§Â¼â€“Ã§Â ÂÃ¦Â¨Â¡Ã¥Â¼Â
 version: 1.0.0
 source: local-git-analysis
 analyzed_commits: {count}
 ---
 
-# {Repo Name} 模式
+# {Repo Name} Ã¦Â¨Â¡Ã¥Â¼Â
 
-## 提交规范
+## Ã¦ÂÂÃ¤ÂºÂ¤Ã¨Â§â€žÃ¨Å’Æ’
 {detected commit message patterns}
 
-## 代码架构
+## Ã¤Â»Â£Ã§Â ÂÃ¦Å¾Â¶Ã¦Å¾â€ž
 {detected folder structure and organization}
 
-## 工作流
+## Ã¥Â·Â¥Ã¤Â½Å“Ã¦ÂµÂ
 {detected repeating file change patterns}
 
-## 测试模式
+## Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¦Â¨Â¡Ã¥Â¼Â
 {detected test conventions}
 
 ```
 
-### 步骤 4：生成 Instincts（如果使用 --instincts）
+### Ã¦Â­Â¥Ã©ÂªÂ¤ 4Ã¯Â¼Å¡Ã§â€Å¸Ã¦Ë†Â InstinctsÃ¯Â¼Ë†Ã¥Â¦â€šÃ¦Å¾Å“Ã¤Â½Â¿Ã§â€Â¨ --instinctsÃ¯Â¼â€°
 
-用于 continuous-learning-v2 集成：
+Ã§â€Â¨Ã¤ÂºÅ½ continuous-learning-v2 Ã©â€ºâ€ Ã¦Ë†ÂÃ¯Â¼Å¡
 
 ```yaml
 ---
@@ -103,9 +116,9 @@ Prefix commits with: feat:, fix:, chore:, docs:, test:, refactor:
 - {percentage}% follow conventional commit format
 ```
 
-## 示例输出
+## Ã§Â¤ÂºÃ¤Â¾â€¹Ã¨Â¾â€œÃ¥â€¡Âº
 
-在 TypeScript 项目上运行 `/skill-create` 可能会产生：
+Ã¥Å“Â¨ TypeScript Ã©Â¡Â¹Ã§â€ºÂ®Ã¤Â¸Å Ã¨Â¿ÂÃ¨Â¡Å’ `/skill-create` Ã¥ÂÂ¯Ã¨Æ’Â½Ã¤Â¼Å¡Ã¤ÂºÂ§Ã§â€Å¸Ã¯Â¼Å¡
 
 ```markdown
 ---
@@ -116,61 +129,61 @@ source: local-git-analysis
 analyzed_commits: 150
 ---
 
-# My App 模式
+# My App Ã¦Â¨Â¡Ã¥Â¼Â
 
-## 提交约定
+## Ã¦ÂÂÃ¤ÂºÂ¤Ã§ÂºÂ¦Ã¥Â®Å¡
 
-该项目使用 **约定式提交**：
-- `feat:` - 新功能
-- `fix:` - 错误修复
-- `chore:` - 维护任务
-- `docs:` - 文档更新
+Ã¨Â¯Â¥Ã©Â¡Â¹Ã§â€ºÂ®Ã¤Â½Â¿Ã§â€Â¨ **Ã§ÂºÂ¦Ã¥Â®Å¡Ã¥Â¼ÂÃ¦ÂÂÃ¤ÂºÂ¤**Ã¯Â¼Å¡
+- `feat:` - Ã¦â€“Â°Ã¥Å Å¸Ã¨Æ’Â½
+- `fix:` - Ã©â€â„¢Ã¨Â¯Â¯Ã¤Â¿Â®Ã¥Â¤Â
+- `chore:` - Ã§Â»Â´Ã¦Å Â¤Ã¤Â»Â»Ã¥Å Â¡
+- `docs:` - Ã¦â€“â€¡Ã¦Â¡Â£Ã¦â€ºÂ´Ã¦â€“Â°
 
-## 代码架构
+## Ã¤Â»Â£Ã§Â ÂÃ¦Å¾Â¶Ã¦Å¾â€ž
 
 ```
 
 src/
-├── components/     # React 组件 (PascalCase.tsx)
-├── hooks/          # 自定义钩子 (use\*.ts)
-├── utils/          # 工具函数
-├── types/          # TypeScript 类型定义
-└── services/       # API 和外部服务
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ components/     # React Ã§Â»â€žÃ¤Â»Â¶ (PascalCase.tsx)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ hooks/          # Ã¨â€¡ÂªÃ¥Â®Å¡Ã¤Â¹â€°Ã©â€™Â©Ã¥Â­Â (use\*.ts)
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ utils/          # Ã¥Â·Â¥Ã¥â€¦Â·Ã¥â€¡Â½Ã¦â€¢Â°
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ types/          # TypeScript Ã§Â±Â»Ã¥Å¾â€¹Ã¥Â®Å¡Ã¤Â¹â€°
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ services/       # API Ã¥â€™Å’Ã¥Â¤â€“Ã©Æ’Â¨Ã¦Å“ÂÃ¥Å Â¡
 
 ```
-## 工作流
+## Ã¥Â·Â¥Ã¤Â½Å“Ã¦ÂµÂ
 
-### 添加新组件
-1. 创建 `src/components/ComponentName.tsx`
-2. 在 `src/components/__tests__/ComponentName.test.tsx` 中添加测试
-3. 从 `src/components/index.ts` 导出
+### Ã¦Â·Â»Ã¥Å Â Ã¦â€“Â°Ã§Â»â€žÃ¤Â»Â¶
+1. Ã¥Ë†â€ºÃ¥Â»Âº `src/components/ComponentName.tsx`
+2. Ã¥Å“Â¨ `src/components/__tests__/ComponentName.test.tsx` Ã¤Â¸Â­Ã¦Â·Â»Ã¥Å Â Ã¦Âµâ€¹Ã¨Â¯â€¢
+3. Ã¤Â»Å½ `src/components/index.ts` Ã¥Â¯Â¼Ã¥â€¡Âº
 
-### 数据库迁移
-1. 修改 `src/db/schema.ts`
-2. 运行 `pnpm db:generate`
-3. 运行 `pnpm db:migrate`
+### Ã¦â€¢Â°Ã¦ÂÂ®Ã¥Âºâ€œÃ¨Â¿ÂÃ§Â§Â»
+1. Ã¤Â¿Â®Ã¦â€Â¹ `src/db/schema.ts`
+2. Ã¨Â¿ÂÃ¨Â¡Å’ `pnpm db:generate`
+3. Ã¨Â¿ÂÃ¨Â¡Å’ `pnpm db:migrate`
 
-## 测试模式
+## Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¦Â¨Â¡Ã¥Â¼Â
 
-- 测试文件：`__tests__/` 目录或 `.test.ts` 后缀
-- 覆盖率目标：80%+
-- 框架：Vitest
+- Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¦â€“â€¡Ã¤Â»Â¶Ã¯Â¼Å¡`__tests__/` Ã§â€ºÂ®Ã¥Â½â€¢Ã¦Ë†â€“ `.test.ts` Ã¥ÂÅ½Ã§Â¼â‚¬
+- Ã¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡Ã§â€ºÂ®Ã¦Â â€¡Ã¯Â¼Å¡80%+
+- Ã¦Â¡â€ Ã¦Å¾Â¶Ã¯Â¼Å¡Vitest
 ```
 
-## GitHub 应用集成
+## GitHub Ã¥Âºâ€Ã§â€Â¨Ã©â€ºâ€ Ã¦Ë†Â
 
-对于高级功能（10k+ 提交、团队共享、自动 PR），请使用 [Skill Creator GitHub 应用](https://github.com/apps/skill-creator)：
+Ã¥Â¯Â¹Ã¤ÂºÅ½Ã©Â«ËœÃ§ÂºÂ§Ã¥Å Å¸Ã¨Æ’Â½Ã¯Â¼Ë†10k+ Ã¦ÂÂÃ¤ÂºÂ¤Ã£â‚¬ÂÃ¥â€ºÂ¢Ã©ËœÅ¸Ã¥â€¦Â±Ã¤ÂºÂ«Ã£â‚¬ÂÃ¨â€¡ÂªÃ¥Å Â¨ PRÃ¯Â¼â€°Ã¯Â¼Å’Ã¨Â¯Â·Ã¤Â½Â¿Ã§â€Â¨ [Skill Creator GitHub Ã¥Âºâ€Ã§â€Â¨](https://github.com/apps/skill-creator)Ã¯Â¼Å¡
 
-* 安装: [github.com/apps/skill-creator](https://github.com/apps/skill-creator)
-* 在任何议题上评论 `/skill-creator analyze`
-* 接收包含生成技能的 PR
+* Ã¥Â®â€°Ã¨Â£â€¦: [github.com/apps/skill-creator](https://github.com/apps/skill-creator)
+* Ã¥Å“Â¨Ã¤Â»Â»Ã¤Â½â€¢Ã¨Â®Â®Ã©Â¢ËœÃ¤Â¸Å Ã¨Â¯â€žÃ¨Â®Âº `/skill-creator analyze`
+* Ã¦Å½Â¥Ã¦â€Â¶Ã¥Å’â€¦Ã¥ÂÂ«Ã§â€Å¸Ã¦Ë†ÂÃ¦Å â‚¬Ã¨Æ’Â½Ã§Å¡â€ž PR
 
-## 相关命令
+## Ã§â€ºÂ¸Ã¥â€¦Â³Ã¥â€˜Â½Ã¤Â»Â¤
 
-* `/instinct-import` - 导入生成的 instincts
-* `/instinct-status` - 查看已学习的 instincts
-* `/evolve` - 将 instincts 聚类为技能/代理
+* `/instinct-import` - Ã¥Â¯Â¼Ã¥â€¦Â¥Ã§â€Å¸Ã¦Ë†ÂÃ§Å¡â€ž instincts
+* `/instinct-status` - Ã¦Å¸Â¥Ã§Å“â€¹Ã¥Â·Â²Ã¥Â­Â¦Ã¤Â¹Â Ã§Å¡â€ž instincts
+* `/evolve` - Ã¥Â°â€  instincts Ã¨ÂÅ¡Ã§Â±Â»Ã¤Â¸ÂºÃ¦Å â‚¬Ã¨Æ’Â½/Ã¤Â»Â£Ã§Ââ€ 
 
 ***
 
-*属于 [Everything Claude Code](https://github.com/affaan-m/everything-claude-code)*
+*Ã¥Â±Å¾Ã¤ÂºÅ½ [Everything Claude Code](https://github.com/affaan-m/everything-claude-code)*

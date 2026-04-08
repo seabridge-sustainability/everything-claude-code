@@ -1,46 +1,59 @@
 ---
 name: continuous-agent-loop
-description: 具有质量门、评估和恢复控制的连续自主代理循环模式。
+description: Ã¥â€¦Â·Ã¦Å“â€°Ã¨Â´Â¨Ã©â€¡ÂÃ©â€”Â¨Ã£â‚¬ÂÃ¨Â¯â€žÃ¤Â¼Â°Ã¥â€™Å’Ã¦ÂÂ¢Ã¥Â¤ÂÃ¦Å½Â§Ã¥Ë†Â¶Ã§Å¡â€žÃ¨Â¿Å¾Ã§Â»Â­Ã¨â€¡ÂªÃ¤Â¸Â»Ã¤Â»Â£Ã§Ââ€ Ã¥Â¾ÂªÃ§Å½Â¯Ã¦Â¨Â¡Ã¥Â¼ÂÃ£â‚¬â€š
 origin: ECC
 ---
 
-# 持续代理循环
+# Ã¦Å’ÂÃ§Â»Â­Ã¤Â»Â£Ã§Ââ€ Ã¥Â¾ÂªÃ§Å½Â¯
 
-这是 v1.8+ 的规范循环技能名称。它在保持一个发布版本的兼容性的同时，取代了 `autonomous-loops`。
+## Safety And Authorization Rule
 
-## 循环选择流程
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+Ã¨Â¿â„¢Ã¦ËœÂ¯ v1.8+ Ã§Å¡â€žÃ¨Â§â€žÃ¨Å’Æ’Ã¥Â¾ÂªÃ§Å½Â¯Ã¦Å â‚¬Ã¨Æ’Â½Ã¥ÂÂÃ§Â§Â°Ã£â‚¬â€šÃ¥Â®Æ’Ã¥Å“Â¨Ã¤Â¿ÂÃ¦Å’ÂÃ¤Â¸â‚¬Ã¤Â¸ÂªÃ¥Ââ€˜Ã¥Â¸Æ’Ã§â€°Ë†Ã¦Å“Â¬Ã§Å¡â€žÃ¥â€¦Â¼Ã¥Â®Â¹Ã¦â‚¬Â§Ã§Å¡â€žÃ¥ÂÅ’Ã¦â€”Â¶Ã¯Â¼Å’Ã¥Ââ€“Ã¤Â»Â£Ã¤Âºâ€  `autonomous-loops`Ã£â‚¬â€š
+
+## Ã¥Â¾ÂªÃ§Å½Â¯Ã©â‚¬â€°Ã¦â€¹Â©Ã¦ÂµÂÃ§Â¨â€¹
 
 ```text
 Start
   |
-  +-- 需要严格的 CI/PR 控制？ -- yes --> continuous-pr
+  +-- Ã©Å“â‚¬Ã¨Â¦ÂÃ¤Â¸Â¥Ã¦Â Â¼Ã§Å¡â€ž CI/PR Ã¦Å½Â§Ã¥Ë†Â¶Ã¯Â¼Å¸ -- yes --> continuous-pr
   |
-  +-- 需要 RFC 分解？ -- yes --> rfc-dag
+  +-- Ã©Å“â‚¬Ã¨Â¦Â RFC Ã¥Ë†â€ Ã¨Â§Â£Ã¯Â¼Å¸ -- yes --> rfc-dag
   |
-  +-- 需要探索性并行生成？ -- yes --> infinite
+  +-- Ã©Å“â‚¬Ã¨Â¦ÂÃ¦Å½Â¢Ã§Â´Â¢Ã¦â‚¬Â§Ã¥Â¹Â¶Ã¨Â¡Å’Ã§â€Å¸Ã¦Ë†ÂÃ¯Â¼Å¸ -- yes --> infinite
   |
   +-- default --> sequential
 ```
 
-## 组合模式
+## Ã§Â»â€žÃ¥ÂË†Ã¦Â¨Â¡Ã¥Â¼Â
 
-推荐的生产栈：
+Ã¦Å½Â¨Ã¨ÂÂÃ§Å¡â€žÃ§â€Å¸Ã¤ÂºÂ§Ã¦Â Ë†Ã¯Â¼Å¡
 
-1. RFC 分解 (`ralphinho-rfc-pipeline`)
-2. 质量门 (`plankton-code-quality` + `/quality-gate`)
-3. 评估循环 (`eval-harness`)
-4. 会话持久化 (`nanoclaw-repl`)
+1. RFC Ã¥Ë†â€ Ã¨Â§Â£ (`ralphinho-rfc-pipeline`)
+2. Ã¨Â´Â¨Ã©â€¡ÂÃ©â€”Â¨ (`plankton-code-quality` + `/quality-gate`)
+3. Ã¨Â¯â€žÃ¤Â¼Â°Ã¥Â¾ÂªÃ§Å½Â¯ (`eval-harness`)
+4. Ã¤Â¼Å¡Ã¨Â¯ÂÃ¦Å’ÂÃ¤Â¹â€¦Ã¥Å’â€“ (`nanoclaw-repl`)
 
-## 故障模式
+## Ã¦â€¢â€¦Ã©Å¡Å“Ã¦Â¨Â¡Ã¥Â¼Â
 
-* 循环空转，没有可衡量的进展
-* 因相同根本原因而重复重试
-* 合并队列停滞
-* 无限制升级导致的成本漂移
+* Ã¥Â¾ÂªÃ§Å½Â¯Ã§Â©ÂºÃ¨Â½Â¬Ã¯Â¼Å’Ã¦Â²Â¡Ã¦Å“â€°Ã¥ÂÂ¯Ã¨Â¡Â¡Ã©â€¡ÂÃ§Å¡â€žÃ¨Â¿â€ºÃ¥Â±â€¢
+* Ã¥â€ºÂ Ã§â€ºÂ¸Ã¥ÂÅ’Ã¦Â Â¹Ã¦Å“Â¬Ã¥Å½Å¸Ã¥â€ºÂ Ã¨â‚¬Å’Ã©â€¡ÂÃ¥Â¤ÂÃ©â€¡ÂÃ¨Â¯â€¢
+* Ã¥ÂË†Ã¥Â¹Â¶Ã©ËœÅ¸Ã¥Ë†â€”Ã¥ÂÅ“Ã¦Â»Å¾
+* Ã¦â€”Â Ã©â„¢ÂÃ¥Ë†Â¶Ã¥Ââ€¡Ã§ÂºÂ§Ã¥Â¯Â¼Ã¨â€¡Â´Ã§Å¡â€žÃ¦Ë†ÂÃ¦Å“Â¬Ã¦Â¼â€šÃ§Â§Â»
 
-## 恢复
+## Ã¦ÂÂ¢Ã¥Â¤Â
 
-* 冻结循环
-* 运行 `/harness-audit`
-* 将范围缩小到失败单元
-* 使用明确的验收标准重放
+* Ã¥â€ Â»Ã§Â»â€œÃ¥Â¾ÂªÃ§Å½Â¯
+* Ã¨Â¿ÂÃ¨Â¡Å’ `/harness-audit`
+* Ã¥Â°â€ Ã¨Å’Æ’Ã¥â€ºÂ´Ã§Â¼Â©Ã¥Â°ÂÃ¥Ë†Â°Ã¥Â¤Â±Ã¨Â´Â¥Ã¥Ââ€¢Ã¥â€¦Æ’
+* Ã¤Â½Â¿Ã§â€Â¨Ã¦ËœÅ½Ã§Â¡Â®Ã§Å¡â€žÃ©ÂªÅ’Ã¦â€Â¶Ã¦Â â€¡Ã¥â€¡â€ Ã©â€¡ÂÃ¦â€Â¾

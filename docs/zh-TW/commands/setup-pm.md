@@ -3,40 +3,53 @@ description: Configure your preferred package manager (npm/pnpm/yarn/bun)
 disable-model-invocation: true
 ---
 
-# 套件管理器設定
+# Ã¥Â¥â€”Ã¤Â»Â¶Ã§Â®Â¡Ã§Ââ€ Ã¥â„¢Â¨Ã¨Â¨Â­Ã¥Â®Å¡
 
-為此專案或全域設定您偏好的套件管理器。
+## Safety And Authorization Rule
 
-## 使用方式
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+Ã§â€šÂºÃ¦Â­Â¤Ã¥Â°Ë†Ã¦Â¡Ë†Ã¦Ë†â€“Ã¥â€¦Â¨Ã¥Å¸Å¸Ã¨Â¨Â­Ã¥Â®Å¡Ã¦â€šÂ¨Ã¥ÂÂÃ¥Â¥Â½Ã§Å¡â€žÃ¥Â¥â€”Ã¤Â»Â¶Ã§Â®Â¡Ã§Ââ€ Ã¥â„¢Â¨Ã£â‚¬â€š
+
+## Ã¤Â½Â¿Ã§â€Â¨Ã¦â€“Â¹Ã¥Â¼Â
 
 ```bash
-# 偵測目前的套件管理器
+# Ã¥ÂÂµÃ¦Â¸Â¬Ã§â€ºÂ®Ã¥â€°ÂÃ§Å¡â€žÃ¥Â¥â€”Ã¤Â»Â¶Ã§Â®Â¡Ã§Ââ€ Ã¥â„¢Â¨
 node scripts/setup-package-manager.js --detect
 
-# 設定全域偏好
+# Ã¨Â¨Â­Ã¥Â®Å¡Ã¥â€¦Â¨Ã¥Å¸Å¸Ã¥ÂÂÃ¥Â¥Â½
 node scripts/setup-package-manager.js --global pnpm
 
-# 設定專案偏好
+# Ã¨Â¨Â­Ã¥Â®Å¡Ã¥Â°Ë†Ã¦Â¡Ë†Ã¥ÂÂÃ¥Â¥Â½
 node scripts/setup-package-manager.js --project bun
 
-# 列出可用的套件管理器
+# Ã¥Ë†â€”Ã¥â€¡ÂºÃ¥ÂÂ¯Ã§â€Â¨Ã§Å¡â€žÃ¥Â¥â€”Ã¤Â»Â¶Ã§Â®Â¡Ã§Ââ€ Ã¥â„¢Â¨
 node scripts/setup-package-manager.js --list
 ```
 
-## 偵測優先順序
+## Ã¥ÂÂµÃ¦Â¸Â¬Ã¥â€žÂªÃ¥â€¦Ë†Ã©Â â€ Ã¥ÂºÂ
 
-決定使用哪個套件管理器時，按以下順序檢查：
+Ã¦Â±ÂºÃ¥Â®Å¡Ã¤Â½Â¿Ã§â€Â¨Ã¥â€œÂªÃ¥â‚¬â€¹Ã¥Â¥â€”Ã¤Â»Â¶Ã§Â®Â¡Ã§Ââ€ Ã¥â„¢Â¨Ã¦â„¢â€šÃ¯Â¼Å’Ã¦Å’â€°Ã¤Â»Â¥Ã¤Â¸â€¹Ã©Â â€ Ã¥ÂºÂÃ¦ÂªÂ¢Ã¦Å¸Â¥Ã¯Â¼Å¡
 
-1. **環境變數**：`CLAUDE_PACKAGE_MANAGER`
-2. **專案設定**：`.claude/package-manager.json`
-3. **package.json**：`packageManager` 欄位
-4. **Lock 檔案**：是否存在 package-lock.json、yarn.lock、pnpm-lock.yaml 或 bun.lockb
-5. **全域設定**：`~/.claude/package-manager.json`
-6. **備援**：第一個可用的套件管理器（pnpm > bun > yarn > npm）
+1. **Ã§â€™Â°Ã¥Â¢Æ’Ã¨Â®Å Ã¦â€¢Â¸**Ã¯Â¼Å¡`CLAUDE_PACKAGE_MANAGER`
+2. **Ã¥Â°Ë†Ã¦Â¡Ë†Ã¨Â¨Â­Ã¥Â®Å¡**Ã¯Â¼Å¡`.claude/package-manager.json`
+3. **package.json**Ã¯Â¼Å¡`packageManager` Ã¦Â¬â€žÃ¤Â½Â
+4. **Lock Ã¦Âªâ€Ã¦Â¡Ë†**Ã¯Â¼Å¡Ã¦ËœÂ¯Ã¥ÂÂ¦Ã¥Â­ËœÃ¥Å“Â¨ package-lock.jsonÃ£â‚¬Âyarn.lockÃ£â‚¬Âpnpm-lock.yaml Ã¦Ë†â€“ bun.lockb
+5. **Ã¥â€¦Â¨Ã¥Å¸Å¸Ã¨Â¨Â­Ã¥Â®Å¡**Ã¯Â¼Å¡`~/.claude/package-manager.json`
+6. **Ã¥â€šâ„¢Ã¦ÂÂ´**Ã¯Â¼Å¡Ã§Â¬Â¬Ã¤Â¸â‚¬Ã¥â‚¬â€¹Ã¥ÂÂ¯Ã§â€Â¨Ã§Å¡â€žÃ¥Â¥â€”Ã¤Â»Â¶Ã§Â®Â¡Ã§Ââ€ Ã¥â„¢Â¨Ã¯Â¼Ë†pnpm > bun > yarn > npmÃ¯Â¼â€°
 
-## 設定檔
+## Ã¨Â¨Â­Ã¥Â®Å¡Ã¦Âªâ€
 
-### 全域設定
+### Ã¥â€¦Â¨Ã¥Å¸Å¸Ã¨Â¨Â­Ã¥Â®Å¡
 ```json
 // ~/.claude/package-manager.json
 {
@@ -44,7 +57,7 @@ node scripts/setup-package-manager.js --list
 }
 ```
 
-### 專案設定
+### Ã¥Â°Ë†Ã¦Â¡Ë†Ã¨Â¨Â­Ã¥Â®Å¡
 ```json
 // .claude/package-manager.json
 {
@@ -59,9 +72,9 @@ node scripts/setup-package-manager.js --list
 }
 ```
 
-## 環境變數
+## Ã§â€™Â°Ã¥Â¢Æ’Ã¨Â®Å Ã¦â€¢Â¸
 
-設定 `CLAUDE_PACKAGE_MANAGER` 以覆蓋所有其他偵測方法：
+Ã¨Â¨Â­Ã¥Â®Å¡ `CLAUDE_PACKAGE_MANAGER` Ã¤Â»Â¥Ã¨Â¦â€ Ã¨â€œâ€¹Ã¦â€°â‚¬Ã¦Å“â€°Ã¥â€¦Â¶Ã¤Â»â€“Ã¥ÂÂµÃ¦Â¸Â¬Ã¦â€“Â¹Ã¦Â³â€¢Ã¯Â¼Å¡
 
 ```bash
 # Windows (PowerShell)
@@ -71,9 +84,9 @@ $env:CLAUDE_PACKAGE_MANAGER = "pnpm"
 export CLAUDE_PACKAGE_MANAGER=pnpm
 ```
 
-## 執行偵測
+## Ã¥Å¸Â·Ã¨Â¡Å’Ã¥ÂÂµÃ¦Â¸Â¬
 
-要查看目前套件管理器偵測結果，執行：
+Ã¨Â¦ÂÃ¦Å¸Â¥Ã§Å“â€¹Ã§â€ºÂ®Ã¥â€°ÂÃ¥Â¥â€”Ã¤Â»Â¶Ã§Â®Â¡Ã§Ââ€ Ã¥â„¢Â¨Ã¥ÂÂµÃ¦Â¸Â¬Ã§ÂµÂÃ¦Å¾Å“Ã¯Â¼Å’Ã¥Å¸Â·Ã¨Â¡Å’Ã¯Â¼Å¡
 
 ```bash
 node scripts/setup-package-manager.js --detect

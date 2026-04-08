@@ -1,34 +1,47 @@
 ---
 name: verification-loop
-description: "Claude Code oturumları için kapsamlı doğrulama sistemi."
+description: "Claude Code oturumlarÃ„Â± iÃƒÂ§in kapsamlÃ„Â± doÃ„Å¸rulama sistemi."
 origin: ECC
 ---
 
 # Verification Loop Skill
 
-Claude Code oturumları için kapsamlı doğrulama sistemi.
+## Safety And Authorization Rule
 
-## Ne Zaman Kullanılır
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-Bu skill'i şu durumlarda çağır:
-- Bir özellik veya önemli kod değişikliği tamamladıktan sonra
-- PR oluşturmadan önce
-- Kalite kapılarının geçtiğinden emin olmak istediğinde
-- Refactoring sonrasında
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-## Doğrulama Fazları
 
-### Faz 1: Build Doğrulaması
+Claude Code oturumlarÃ„Â± iÃƒÂ§in kapsamlÃ„Â± doÃ„Å¸rulama sistemi.
+
+## Ne Zaman KullanÃ„Â±lÃ„Â±r
+
+Bu skill'i Ã…Å¸u durumlarda ÃƒÂ§aÃ„Å¸Ã„Â±r:
+- Bir ÃƒÂ¶zellik veya ÃƒÂ¶nemli kod deÃ„Å¸iÃ…Å¸ikliÃ„Å¸i tamamladÃ„Â±ktan sonra
+- PR oluÃ…Å¸turmadan ÃƒÂ¶nce
+- Kalite kapÃ„Â±larÃ„Â±nÃ„Â±n geÃƒÂ§tiÃ„Å¸inden emin olmak istediÃ„Å¸inde
+- Refactoring sonrasÃ„Â±nda
+
+## DoÃ„Å¸rulama FazlarÃ„Â±
+
+### Faz 1: Build DoÃ„Å¸rulamasÃ„Â±
 ```bash
-# Projenin build olup olmadığını kontrol et
+# Projenin build olup olmadÃ„Â±Ã„Å¸Ã„Â±nÃ„Â± kontrol et
 npm run build 2>&1 | tail -20
 # VEYA
 pnpm build 2>&1 | tail -20
 ```
 
-Build başarısız olursa, devam etmeden önce DUR ve düzelt.
+Build baÃ…Å¸arÃ„Â±sÃ„Â±z olursa, devam etmeden ÃƒÂ¶nce DUR ve dÃƒÂ¼zelt.
 
-### Faz 2: Tip Kontrolü
+### Faz 2: Tip KontrolÃƒÂ¼
 ```bash
 # TypeScript projeleri
 npx tsc --noEmit 2>&1 | head -30
@@ -37,9 +50,9 @@ npx tsc --noEmit 2>&1 | head -30
 pyright . 2>&1 | head -30
 ```
 
-Tüm tip hatalarını raporla. Devam etmeden önce kritik olanları düzelt.
+TÃƒÂ¼m tip hatalarÃ„Â±nÃ„Â± raporla. Devam etmeden ÃƒÂ¶nce kritik olanlarÃ„Â± dÃƒÂ¼zelt.
 
-### Faz 3: Lint Kontrolü
+### Faz 3: Lint KontrolÃƒÂ¼
 ```bash
 # JavaScript/TypeScript
 npm run lint 2>&1 | head -30
@@ -50,22 +63,22 @@ ruff check . 2>&1 | head -30
 
 ### Faz 4: Test Paketi
 ```bash
-# Testleri coverage ile çalıştır
+# Testleri coverage ile ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
 npm run test -- --coverage 2>&1 | tail -50
 
-# Coverage eşiğini kontrol et
+# Coverage eÃ…Å¸iÃ„Å¸ini kontrol et
 # Hedef: minimum %80
 ```
 
 Rapor:
 - Toplam testler: X
-- Geçti: X
-- Başarısız: X
+- GeÃƒÂ§ti: X
+- BaÃ…Å¸arÃ„Â±sÃ„Â±z: X
 - Coverage: %X
 
-### Faz 5: Güvenlik Taraması
+### Faz 5: GÃƒÂ¼venlik TaramasÃ„Â±
 ```bash
-# Secret'ları kontrol et
+# Secret'larÃ„Â± kontrol et
 grep -rn "sk-" --include="*.ts" --include="*.js" . 2>/dev/null | head -10
 grep -rn "api_key" --include="*.ts" --include="*.js" . 2>/dev/null | head -10
 
@@ -73,54 +86,54 @@ grep -rn "api_key" --include="*.ts" --include="*.js" . 2>/dev/null | head -10
 grep -rn "console.log" --include="*.ts" --include="*.tsx" src/ 2>/dev/null | head -10
 ```
 
-### Faz 6: Diff İncelemesi
+### Faz 6: Diff Ã„Â°ncelemesi
 ```bash
-# Neyin değiştiğini göster
+# Neyin deÃ„Å¸iÃ…Å¸tiÃ„Å¸ini gÃƒÂ¶ster
 git diff --stat
 git diff HEAD~1 --name-only
 ```
 
-Her değişen dosyayı şunlar için incele:
-- İstenmeyen değişiklikler
-- Eksik hata işleme
+Her deÃ„Å¸iÃ…Å¸en dosyayÃ„Â± Ã…Å¸unlar iÃƒÂ§in incele:
+- Ã„Â°stenmeyen deÃ„Å¸iÃ…Å¸iklikler
+- Eksik hata iÃ…Å¸leme
 - Potansiyel edge case'ler
 
-## Çıktı Formatı
+## Ãƒâ€¡Ã„Â±ktÃ„Â± FormatÃ„Â±
 
-Tüm fazları çalıştırdıktan sonra, bir doğrulama raporu üret:
+TÃƒÂ¼m fazlarÃ„Â± ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±rdÃ„Â±ktan sonra, bir doÃ„Å¸rulama raporu ÃƒÂ¼ret:
 
 ```
-DOĞRULAMA RAPORU
+DOÃ„Å¾RULAMA RAPORU
 ==================
 
 Build:     [PASS/FAIL]
 Tipler:    [PASS/FAIL] (X hata)
-Lint:      [PASS/FAIL] (X uyarı)
-Testler:   [PASS/FAIL] (X/Y geçti, %Z coverage)
-Güvenlik:  [PASS/FAIL] (X sorun)
-Diff:      [X dosya değişti]
+Lint:      [PASS/FAIL] (X uyarÃ„Â±)
+Testler:   [PASS/FAIL] (X/Y geÃƒÂ§ti, %Z coverage)
+GÃƒÂ¼venlik:  [PASS/FAIL] (X sorun)
+Diff:      [X dosya deÃ„Å¸iÃ…Å¸ti]
 
-Genel:     PR için [HAZIR/HAZIR DEĞİL]
+Genel:     PR iÃƒÂ§in [HAZIR/HAZIR DEÃ„Å¾Ã„Â°L]
 
-Düzeltilmesi Gereken Sorunlar:
+DÃƒÂ¼zeltilmesi Gereken Sorunlar:
 1. ...
 2. ...
 ```
 
-## Sürekli Mod
+## SÃƒÂ¼rekli Mod
 
-Uzun oturumlar için, her 15 dakikada bir veya major değişikliklerden sonra doğrulama çalıştır:
+Uzun oturumlar iÃƒÂ§in, her 15 dakikada bir veya major deÃ„Å¸iÃ…Å¸ikliklerden sonra doÃ„Å¸rulama ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r:
 
 ```markdown
-Mental kontrol noktası belirle:
-- Her fonksiyonu tamamladıktan sonra
+Mental kontrol noktasÃ„Â± belirle:
+- Her fonksiyonu tamamladÃ„Â±ktan sonra
 - Bir component'i bitirdikten sonra
-- Sonraki göreve geçmeden önce
+- Sonraki gÃƒÂ¶reve geÃƒÂ§meden ÃƒÂ¶nce
 
-Çalıştır: /verify
+Ãƒâ€¡alÃ„Â±Ã…Å¸tÃ„Â±r: /verify
 ```
 
 ## Hook'larla Entegrasyon
 
-Bu skill PostToolUse hook'larını tamamlar ancak daha derin doğrulama sağlar.
-Hook'lar sorunları anında yakalar; bu skill kapsamlı inceleme sağlar.
+Bu skill PostToolUse hook'larÃ„Â±nÃ„Â± tamamlar ancak daha derin doÃ„Å¸rulama saÃ„Å¸lar.
+Hook'lar sorunlarÃ„Â± anÃ„Â±nda yakalar; bu skill kapsamlÃ„Â± inceleme saÃ„Å¸lar.

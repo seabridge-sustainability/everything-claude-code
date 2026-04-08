@@ -1,28 +1,41 @@
 ---
 name: instinct-status
-description: すべての学習済みインスティンクトと信頼度レベルを表示
+description: Ã£Ââ„¢Ã£ÂÂ¹Ã£ÂÂ¦Ã£ÂÂ®Ã¥Â­Â¦Ã§Â¿â€™Ã¦Â¸Ë†Ã£ÂÂ¿Ã£â€šÂ¤Ã£Æ’Â³Ã£â€šÂ¹Ã£Æ’â€ Ã£â€šÂ£Ã£Æ’Â³Ã£â€šÂ¯Ã£Æ’Ë†Ã£ÂÂ¨Ã¤Â¿Â¡Ã©Â Â¼Ã¥ÂºÂ¦Ã£Æ’Â¬Ã£Æ’â„¢Ã£Æ’Â«Ã£â€šâ€™Ã¨Â¡Â¨Ã§Â¤Âº
 command: true
 ---
 
-# インスティンクトステータスコマンド
+# Ã£â€šÂ¤Ã£Æ’Â³Ã£â€šÂ¹Ã£Æ’â€ Ã£â€šÂ£Ã£Æ’Â³Ã£â€šÂ¯Ã£Æ’Ë†Ã£â€šÂ¹Ã£Æ’â€ Ã£Æ’Â¼Ã£â€šÂ¿Ã£â€šÂ¹Ã£â€šÂ³Ã£Æ’Å¾Ã£Æ’Â³Ã£Æ’â€°
 
-すべての学習済みインスティンクトを信頼度スコアとともに、ドメインごとにグループ化して表示します。
+## Safety And Authorization Rule
 
-## 実装
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-プラグインルートパスを使用してインスティンクトCLIを実行します:
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+Ã£Ââ„¢Ã£ÂÂ¹Ã£ÂÂ¦Ã£ÂÂ®Ã¥Â­Â¦Ã§Â¿â€™Ã¦Â¸Ë†Ã£ÂÂ¿Ã£â€šÂ¤Ã£Æ’Â³Ã£â€šÂ¹Ã£Æ’â€ Ã£â€šÂ£Ã£Æ’Â³Ã£â€šÂ¯Ã£Æ’Ë†Ã£â€šâ€™Ã¤Â¿Â¡Ã©Â Â¼Ã¥ÂºÂ¦Ã£â€šÂ¹Ã£â€šÂ³Ã£â€šÂ¢Ã£ÂÂ¨Ã£ÂÂ¨Ã£â€šâ€šÃ£ÂÂ«Ã£â‚¬ÂÃ£Æ’â€°Ã£Æ’Â¡Ã£â€šÂ¤Ã£Æ’Â³Ã£Ââ€Ã£ÂÂ¨Ã£ÂÂ«Ã£â€šÂ°Ã£Æ’Â«Ã£Æ’Â¼Ã£Æ’â€”Ã¥Å’â€“Ã£Ââ€”Ã£ÂÂ¦Ã¨Â¡Â¨Ã§Â¤ÂºÃ£Ââ€”Ã£ÂÂ¾Ã£Ââ„¢Ã£â‚¬â€š
+
+## Ã¥Â®Å¸Ã¨Â£â€¦
+
+Ã£Æ’â€”Ã£Æ’Â©Ã£â€šÂ°Ã£â€šÂ¤Ã£Æ’Â³Ã£Æ’Â«Ã£Æ’Â¼Ã£Æ’Ë†Ã£Æ’â€˜Ã£â€šÂ¹Ã£â€šâ€™Ã¤Â½Â¿Ã§â€Â¨Ã£Ââ€”Ã£ÂÂ¦Ã£â€šÂ¤Ã£Æ’Â³Ã£â€šÂ¹Ã£Æ’â€ Ã£â€šÂ£Ã£Æ’Â³Ã£â€šÂ¯Ã£Æ’Ë†CLIÃ£â€šâ€™Ã¥Â®Å¸Ã¨Â¡Å’Ã£Ââ€”Ã£ÂÂ¾Ã£Ââ„¢:
 
 ```bash
 python3 "${CLAUDE_PLUGIN_ROOT}/skills/continuous-learning-v2/scripts/instinct-cli.py" status
 ```
 
-または、`CLAUDE_PLUGIN_ROOT` が設定されていない場合（手動インストール）の場合は:
+Ã£ÂÂ¾Ã£ÂÅ¸Ã£ÂÂ¯Ã£â‚¬Â`CLAUDE_PLUGIN_ROOT` Ã£ÂÅ’Ã¨Â¨Â­Ã¥Â®Å¡Ã£Ââ€¢Ã£â€šÅ’Ã£ÂÂ¦Ã£Ââ€žÃ£ÂÂªÃ£Ââ€žÃ¥Â Â´Ã¥ÂË†Ã¯Â¼Ë†Ã¦â€°â€¹Ã¥â€¹â€¢Ã£â€šÂ¤Ã£Æ’Â³Ã£â€šÂ¹Ã£Æ’Ë†Ã£Æ’Â¼Ã£Æ’Â«Ã¯Â¼â€°Ã£ÂÂ®Ã¥Â Â´Ã¥ÂË†Ã£ÂÂ¯:
 
 ```bash
 python3 ~/.claude/skills/continuous-learning-v2/scripts/instinct-cli.py status
 ```
 
-## 使用方法
+## Ã¤Â½Â¿Ã§â€Â¨Ã¦â€“Â¹Ã¦Â³â€¢
 
 ```
 /instinct-status
@@ -30,57 +43,57 @@ python3 ~/.claude/skills/continuous-learning-v2/scripts/instinct-cli.py status
 /instinct-status --low-confidence
 ```
 
-## 実行内容
+## Ã¥Â®Å¸Ã¨Â¡Å’Ã¥â€ â€¦Ã¥Â®Â¹
 
-1. `~/.claude/homunculus/instincts/personal/` からすべてのインスティンクトファイルを読み込む
-2. `~/.claude/homunculus/instincts/inherited/` から継承されたインスティンクトを読み込む
-3. ドメインごとにグループ化し、信頼度バーとともに表示
+1. `~/.claude/homunculus/instincts/personal/` Ã£Ââ€¹Ã£â€šâ€°Ã£Ââ„¢Ã£ÂÂ¹Ã£ÂÂ¦Ã£ÂÂ®Ã£â€šÂ¤Ã£Æ’Â³Ã£â€šÂ¹Ã£Æ’â€ Ã£â€šÂ£Ã£Æ’Â³Ã£â€šÂ¯Ã£Æ’Ë†Ã£Æ’â€¢Ã£â€šÂ¡Ã£â€šÂ¤Ã£Æ’Â«Ã£â€šâ€™Ã¨ÂªÂ­Ã£ÂÂ¿Ã¨Â¾Â¼Ã£â€šâ‚¬
+2. `~/.claude/homunculus/instincts/inherited/` Ã£Ââ€¹Ã£â€šâ€°Ã§Â¶â„¢Ã¦â€°Â¿Ã£Ââ€¢Ã£â€šÅ’Ã£ÂÅ¸Ã£â€šÂ¤Ã£Æ’Â³Ã£â€šÂ¹Ã£Æ’â€ Ã£â€šÂ£Ã£Æ’Â³Ã£â€šÂ¯Ã£Æ’Ë†Ã£â€šâ€™Ã¨ÂªÂ­Ã£ÂÂ¿Ã¨Â¾Â¼Ã£â€šâ‚¬
+3. Ã£Æ’â€°Ã£Æ’Â¡Ã£â€šÂ¤Ã£Æ’Â³Ã£Ââ€Ã£ÂÂ¨Ã£ÂÂ«Ã£â€šÂ°Ã£Æ’Â«Ã£Æ’Â¼Ã£Æ’â€”Ã¥Å’â€“Ã£Ââ€”Ã£â‚¬ÂÃ¤Â¿Â¡Ã©Â Â¼Ã¥ÂºÂ¦Ã£Æ’ÂÃ£Æ’Â¼Ã£ÂÂ¨Ã£ÂÂ¨Ã£â€šâ€šÃ£ÂÂ«Ã¨Â¡Â¨Ã§Â¤Âº
 
-## 出力形式
+## Ã¥â€¡ÂºÃ¥Å â€ºÃ¥Â½Â¢Ã¥Â¼Â
 
 ```
- instinctステータス
+ instinctÃ£â€šÂ¹Ã£Æ’â€ Ã£Æ’Â¼Ã£â€šÂ¿Ã£â€šÂ¹
 ==================
 
-## コードスタイル (4 instincts)
+## Ã£â€šÂ³Ã£Æ’Â¼Ã£Æ’â€°Ã£â€šÂ¹Ã£â€šÂ¿Ã£â€šÂ¤Ã£Æ’Â« (4 instincts)
 
 ### prefer-functional-style
-トリガー: 新しい関数を書くとき
-アクション: クラスより関数型パターンを使用
-信頼度: ████████░░ 80%
-ソース: session-observation | 最終更新: 2025-01-22
+Ã£Æ’Ë†Ã£Æ’ÂªÃ£â€šÂ¬Ã£Æ’Â¼: Ã¦â€“Â°Ã£Ââ€”Ã£Ââ€žÃ©â€“Â¢Ã¦â€¢Â°Ã£â€šâ€™Ã¦â€ºÂ¸Ã£ÂÂÃ£ÂÂ¨Ã£ÂÂ
+Ã£â€šÂ¢Ã£â€šÂ¯Ã£â€šÂ·Ã£Æ’Â§Ã£Æ’Â³: Ã£â€šÂ¯Ã£Æ’Â©Ã£â€šÂ¹Ã£â€šË†Ã£â€šÅ Ã©â€“Â¢Ã¦â€¢Â°Ã¥Å¾â€¹Ã£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³Ã£â€šâ€™Ã¤Â½Â¿Ã§â€Â¨
+Ã¤Â¿Â¡Ã©Â Â¼Ã¥ÂºÂ¦: Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“â€˜Ã¢â€“â€˜ 80%
+Ã£â€šÂ½Ã£Æ’Â¼Ã£â€šÂ¹: session-observation | Ã¦Å“â‚¬Ã§Âµâ€šÃ¦â€ºÂ´Ã¦â€“Â°: 2025-01-22
 
 ### use-path-aliases
-トリガー: モジュールをインポートするとき
-アクション: 相対インポートの代わりに@/パスエイリアスを使用
-信頼度: ██████░░░░ 60%
-ソース: repo-analysis (github.com/acme/webapp)
+Ã£Æ’Ë†Ã£Æ’ÂªÃ£â€šÂ¬Ã£Æ’Â¼: Ã£Æ’Â¢Ã£â€šÂ¸Ã£Æ’Â¥Ã£Æ’Â¼Ã£Æ’Â«Ã£â€šâ€™Ã£â€šÂ¤Ã£Æ’Â³Ã£Æ’ÂÃ£Æ’Â¼Ã£Æ’Ë†Ã£Ââ„¢Ã£â€šâ€¹Ã£ÂÂ¨Ã£ÂÂ
+Ã£â€šÂ¢Ã£â€šÂ¯Ã£â€šÂ·Ã£Æ’Â§Ã£Æ’Â³: Ã§â€ºÂ¸Ã¥Â¯Â¾Ã£â€šÂ¤Ã£Æ’Â³Ã£Æ’ÂÃ£Æ’Â¼Ã£Æ’Ë†Ã£ÂÂ®Ã¤Â»Â£Ã£â€šÂÃ£â€šÅ Ã£ÂÂ«@/Ã£Æ’â€˜Ã£â€šÂ¹Ã£â€šÂ¨Ã£â€šÂ¤Ã£Æ’ÂªÃ£â€šÂ¢Ã£â€šÂ¹Ã£â€šâ€™Ã¤Â½Â¿Ã§â€Â¨
+Ã¤Â¿Â¡Ã©Â Â¼Ã¥ÂºÂ¦: Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“â€˜Ã¢â€“â€˜Ã¢â€“â€˜Ã¢â€“â€˜ 60%
+Ã£â€šÂ½Ã£Æ’Â¼Ã£â€šÂ¹: repo-analysis (github.com/acme/webapp)
 
-## テスト (2 instincts)
+## Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë† (2 instincts)
 
 ### test-first-workflow
-トリガー: 新しい機能を追加するとき
-アクション: テストを先に書き、次に実装
-信頼度: █████████░ 90%
-ソース: session-observation
+Ã£Æ’Ë†Ã£Æ’ÂªÃ£â€šÂ¬Ã£Æ’Â¼: Ã¦â€“Â°Ã£Ââ€”Ã£Ââ€žÃ¦Â©Å¸Ã¨Æ’Â½Ã£â€šâ€™Ã¨Â¿Â½Ã¥Å Â Ã£Ââ„¢Ã£â€šâ€¹Ã£ÂÂ¨Ã£ÂÂ
+Ã£â€šÂ¢Ã£â€šÂ¯Ã£â€šÂ·Ã£Æ’Â§Ã£Æ’Â³: Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â€šâ€™Ã¥â€¦Ë†Ã£ÂÂ«Ã¦â€ºÂ¸Ã£ÂÂÃ£â‚¬ÂÃ¦Â¬Â¡Ã£ÂÂ«Ã¥Â®Å¸Ã¨Â£â€¦
+Ã¤Â¿Â¡Ã©Â Â¼Ã¥ÂºÂ¦: Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“â€˜ 90%
+Ã£â€šÂ½Ã£Æ’Â¼Ã£â€šÂ¹: session-observation
 
-## ワークフロー (3 instincts)
+## Ã£Æ’Â¯Ã£Æ’Â¼Ã£â€šÂ¯Ã£Æ’â€¢Ã£Æ’Â­Ã£Æ’Â¼ (3 instincts)
 
 ### grep-before-edit
-トリガー: コードを変更するとき
-アクション: Grepで検索、Readで確認、次にEdit
-信頼度: ███████░░░ 70%
-ソース: session-observation
+Ã£Æ’Ë†Ã£Æ’ÂªÃ£â€šÂ¬Ã£Æ’Â¼: Ã£â€šÂ³Ã£Æ’Â¼Ã£Æ’â€°Ã£â€šâ€™Ã¥Â¤â€°Ã¦â€ºÂ´Ã£Ââ„¢Ã£â€šâ€¹Ã£ÂÂ¨Ã£ÂÂ
+Ã£â€šÂ¢Ã£â€šÂ¯Ã£â€šÂ·Ã£Æ’Â§Ã£Æ’Â³: GrepÃ£ÂÂ§Ã¦Â¤Å“Ã§Â´Â¢Ã£â‚¬ÂReadÃ£ÂÂ§Ã§Â¢ÂºÃ¨ÂªÂÃ£â‚¬ÂÃ¦Â¬Â¡Ã£ÂÂ«Edit
+Ã¤Â¿Â¡Ã©Â Â¼Ã¥ÂºÂ¦: Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“â€˜Ã¢â€“â€˜Ã¢â€“â€˜ 70%
+Ã£â€šÂ½Ã£Æ’Â¼Ã£â€šÂ¹: session-observation
 
 ---
-合計: 9 instincts (4個人, 5継承)
-オブザーバー: 実行中 (最終分析: 5分前)
+Ã¥ÂË†Ã¨Â¨Ë†: 9 instincts (4Ã¥â‚¬â€¹Ã¤ÂºÂº, 5Ã§Â¶â„¢Ã¦â€°Â¿)
+Ã£â€šÂªÃ£Æ’â€“Ã£â€šÂ¶Ã£Æ’Â¼Ã£Æ’ÂÃ£Æ’Â¼: Ã¥Â®Å¸Ã¨Â¡Å’Ã¤Â¸Â­ (Ã¦Å“â‚¬Ã§Âµâ€šÃ¥Ë†â€ Ã¦Å¾Â: 5Ã¥Ë†â€ Ã¥â€°Â)
 ```
 
-## フラグ
+## Ã£Æ’â€¢Ã£Æ’Â©Ã£â€šÂ°
 
-- `--domain <name>`: ドメインでフィルタリング（code-style、testing、gitなど）
-- `--low-confidence`: 信頼度 < 0.5のインスティンクトのみを表示
-- `--high-confidence`: 信頼度 >= 0.7のインスティンクトのみを表示
-- `--source <type>`: ソースでフィルタリング（session-observation、repo-analysis、inherited）
-- `--json`: プログラムで使用するためにJSON形式で出力
+- `--domain <name>`: Ã£Æ’â€°Ã£Æ’Â¡Ã£â€šÂ¤Ã£Æ’Â³Ã£ÂÂ§Ã£Æ’â€¢Ã£â€šÂ£Ã£Æ’Â«Ã£â€šÂ¿Ã£Æ’ÂªÃ£Æ’Â³Ã£â€šÂ°Ã¯Â¼Ë†code-styleÃ£â‚¬ÂtestingÃ£â‚¬ÂgitÃ£ÂÂªÃ£ÂÂ©Ã¯Â¼â€°
+- `--low-confidence`: Ã¤Â¿Â¡Ã©Â Â¼Ã¥ÂºÂ¦ < 0.5Ã£ÂÂ®Ã£â€šÂ¤Ã£Æ’Â³Ã£â€šÂ¹Ã£Æ’â€ Ã£â€šÂ£Ã£Æ’Â³Ã£â€šÂ¯Ã£Æ’Ë†Ã£ÂÂ®Ã£ÂÂ¿Ã£â€šâ€™Ã¨Â¡Â¨Ã§Â¤Âº
+- `--high-confidence`: Ã¤Â¿Â¡Ã©Â Â¼Ã¥ÂºÂ¦ >= 0.7Ã£ÂÂ®Ã£â€šÂ¤Ã£Æ’Â³Ã£â€šÂ¹Ã£Æ’â€ Ã£â€šÂ£Ã£Æ’Â³Ã£â€šÂ¯Ã£Æ’Ë†Ã£ÂÂ®Ã£ÂÂ¿Ã£â€šâ€™Ã¨Â¡Â¨Ã§Â¤Âº
+- `--source <type>`: Ã£â€šÂ½Ã£Æ’Â¼Ã£â€šÂ¹Ã£ÂÂ§Ã£Æ’â€¢Ã£â€šÂ£Ã£Æ’Â«Ã£â€šÂ¿Ã£Æ’ÂªÃ£Æ’Â³Ã£â€šÂ°Ã¯Â¼Ë†session-observationÃ£â‚¬Ârepo-analysisÃ£â‚¬ÂinheritedÃ¯Â¼â€°
+- `--json`: Ã£Æ’â€”Ã£Æ’Â­Ã£â€šÂ°Ã£Æ’Â©Ã£Æ’Â Ã£ÂÂ§Ã¤Â½Â¿Ã§â€Â¨Ã£Ââ„¢Ã£â€šâ€¹Ã£ÂÅ¸Ã£â€šÂÃ£ÂÂ«JSONÃ¥Â½Â¢Ã¥Â¼ÂÃ£ÂÂ§Ã¥â€¡ÂºÃ¥Å â€º

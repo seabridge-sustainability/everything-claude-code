@@ -3,29 +3,42 @@ paths:
   - "**/*.java"
 ---
 
-# Java 编码风格
+# Java Ã§Â¼â€“Ã§Â ÂÃ©Â£Å½Ã¦Â Â¼
 
-> 本文档基于 [common/coding-style.md](../common/coding-style.md)，补充了 Java 特有的内容。
+## Safety And Authorization Rule
 
-## 格式
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-* 使用 **google-java-format** 或 **Checkstyle**（Google 或 Sun 风格）进行强制规范
-* 每个文件只包含一个顶层的公共类型
-* 保持一致的缩进：2 或 4 个空格（遵循项目标准）
-* 成员顺序：常量、字段、构造函数、公共方法、受保护方法、私有方法
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-## 不可变性
 
-* 对于值类型，优先使用 `record`（Java 16+）
-* 默认将字段标记为 `final` —— 仅在需要时才使用可变状态
-* 从公共 API 返回防御性副本：`List.copyOf()`、`Map.copyOf()`、`Set.copyOf()`
-* 写时复制：返回新实例，而不是修改现有实例
+> Ã¦Å“Â¬Ã¦â€“â€¡Ã¦Â¡Â£Ã¥Å¸ÂºÃ¤ÂºÅ½ [common/coding-style.md](../common/coding-style.md)Ã¯Â¼Å’Ã¨Â¡Â¥Ã¥â€¦â€¦Ã¤Âºâ€  Java Ã§â€°Â¹Ã¦Å“â€°Ã§Å¡â€žÃ¥â€ â€¦Ã¥Â®Â¹Ã£â‚¬â€š
+
+## Ã¦Â Â¼Ã¥Â¼Â
+
+* Ã¤Â½Â¿Ã§â€Â¨ **google-java-format** Ã¦Ë†â€“ **Checkstyle**Ã¯Â¼Ë†Google Ã¦Ë†â€“ Sun Ã©Â£Å½Ã¦Â Â¼Ã¯Â¼â€°Ã¨Â¿â€ºÃ¨Â¡Å’Ã¥Â¼ÂºÃ¥Ë†Â¶Ã¨Â§â€žÃ¨Å’Æ’
+* Ã¦Â¯ÂÃ¤Â¸ÂªÃ¦â€“â€¡Ã¤Â»Â¶Ã¥ÂÂªÃ¥Å’â€¦Ã¥ÂÂ«Ã¤Â¸â‚¬Ã¤Â¸ÂªÃ©Â¡Â¶Ã¥Â±â€šÃ§Å¡â€žÃ¥â€¦Â¬Ã¥â€¦Â±Ã§Â±Â»Ã¥Å¾â€¹
+* Ã¤Â¿ÂÃ¦Å’ÂÃ¤Â¸â‚¬Ã¨â€¡Â´Ã§Å¡â€žÃ§Â¼Â©Ã¨Â¿â€ºÃ¯Â¼Å¡2 Ã¦Ë†â€“ 4 Ã¤Â¸ÂªÃ§Â©ÂºÃ¦Â Â¼Ã¯Â¼Ë†Ã©ÂÂµÃ¥Â¾ÂªÃ©Â¡Â¹Ã§â€ºÂ®Ã¦Â â€¡Ã¥â€¡â€ Ã¯Â¼â€°
+* Ã¦Ë†ÂÃ¥â€˜ËœÃ©Â¡ÂºÃ¥ÂºÂÃ¯Â¼Å¡Ã¥Â¸Â¸Ã©â€¡ÂÃ£â‚¬ÂÃ¥Â­â€”Ã¦Â®ÂµÃ£â‚¬ÂÃ¦Å¾â€žÃ©â‚¬Â Ã¥â€¡Â½Ã¦â€¢Â°Ã£â‚¬ÂÃ¥â€¦Â¬Ã¥â€¦Â±Ã¦â€“Â¹Ã¦Â³â€¢Ã£â‚¬ÂÃ¥Ââ€”Ã¤Â¿ÂÃ¦Å Â¤Ã¦â€“Â¹Ã¦Â³â€¢Ã£â‚¬ÂÃ§Â§ÂÃ¦Å“â€°Ã¦â€“Â¹Ã¦Â³â€¢
+
+## Ã¤Â¸ÂÃ¥ÂÂ¯Ã¥ÂËœÃ¦â‚¬Â§
+
+* Ã¥Â¯Â¹Ã¤ÂºÅ½Ã¥â‚¬Â¼Ã§Â±Â»Ã¥Å¾â€¹Ã¯Â¼Å’Ã¤Â¼ËœÃ¥â€¦Ë†Ã¤Â½Â¿Ã§â€Â¨ `record`Ã¯Â¼Ë†Java 16+Ã¯Â¼â€°
+* Ã©Â»ËœÃ¨Â®Â¤Ã¥Â°â€ Ã¥Â­â€”Ã¦Â®ÂµÃ¦Â â€¡Ã¨Â®Â°Ã¤Â¸Âº `final` Ã¢â‚¬â€Ã¢â‚¬â€ Ã¤Â»â€¦Ã¥Å“Â¨Ã©Å“â‚¬Ã¨Â¦ÂÃ¦â€”Â¶Ã¦â€°ÂÃ¤Â½Â¿Ã§â€Â¨Ã¥ÂÂ¯Ã¥ÂËœÃ§Å Â¶Ã¦â‚¬Â
+* Ã¤Â»Å½Ã¥â€¦Â¬Ã¥â€¦Â± API Ã¨Â¿â€Ã¥â€ºÅ¾Ã©ËœÂ²Ã¥Â¾Â¡Ã¦â‚¬Â§Ã¥â€°Â¯Ã¦Å“Â¬Ã¯Â¼Å¡`List.copyOf()`Ã£â‚¬Â`Map.copyOf()`Ã£â‚¬Â`Set.copyOf()`
+* Ã¥â€ â„¢Ã¦â€”Â¶Ã¥Â¤ÂÃ¥Ë†Â¶Ã¯Â¼Å¡Ã¨Â¿â€Ã¥â€ºÅ¾Ã¦â€“Â°Ã¥Â®Å¾Ã¤Â¾â€¹Ã¯Â¼Å’Ã¨â‚¬Å’Ã¤Â¸ÂÃ¦ËœÂ¯Ã¤Â¿Â®Ã¦â€Â¹Ã§Å½Â°Ã¦Å“â€°Ã¥Â®Å¾Ã¤Â¾â€¹
 
 ```java
-// GOOD — immutable value type
+// GOOD Ã¢â‚¬â€ immutable value type
 public record OrderSummary(Long id, String customerName, BigDecimal total) {}
 
-// GOOD — final fields, no setters
+// GOOD Ã¢â‚¬â€ final fields, no setters
 public class Order {
     private final Long id;
     private final List<LineItem> items;
@@ -36,25 +49,25 @@ public class Order {
 }
 ```
 
-## 命名
+## Ã¥â€˜Â½Ã¥ÂÂ
 
-遵循标准的 Java 命名约定：
+Ã©ÂÂµÃ¥Â¾ÂªÃ¦Â â€¡Ã¥â€¡â€ Ã§Å¡â€ž Java Ã¥â€˜Â½Ã¥ÂÂÃ§ÂºÂ¦Ã¥Â®Å¡Ã¯Â¼Å¡
 
-* `PascalCase` 用于类、接口、记录、枚举
-* `camelCase` 用于方法、字段、参数、局部变量
-* `SCREAMING_SNAKE_CASE` 用于 `static final` 常量
-* 包名：全小写，使用反向域名（`com.example.app.service`）
+* `PascalCase` Ã§â€Â¨Ã¤ÂºÅ½Ã§Â±Â»Ã£â‚¬ÂÃ¦Å½Â¥Ã¥ÂÂ£Ã£â‚¬ÂÃ¨Â®Â°Ã¥Â½â€¢Ã£â‚¬ÂÃ¦Å¾Å¡Ã¤Â¸Â¾
+* `camelCase` Ã§â€Â¨Ã¤ÂºÅ½Ã¦â€“Â¹Ã¦Â³â€¢Ã£â‚¬ÂÃ¥Â­â€”Ã¦Â®ÂµÃ£â‚¬ÂÃ¥Ââ€šÃ¦â€¢Â°Ã£â‚¬ÂÃ¥Â±â‚¬Ã©Æ’Â¨Ã¥ÂËœÃ©â€¡Â
+* `SCREAMING_SNAKE_CASE` Ã§â€Â¨Ã¤ÂºÅ½ `static final` Ã¥Â¸Â¸Ã©â€¡Â
+* Ã¥Å’â€¦Ã¥ÂÂÃ¯Â¼Å¡Ã¥â€¦Â¨Ã¥Â°ÂÃ¥â€ â„¢Ã¯Â¼Å’Ã¤Â½Â¿Ã§â€Â¨Ã¥ÂÂÃ¥Ââ€˜Ã¥Å¸Å¸Ã¥ÂÂÃ¯Â¼Ë†`com.example.app.service`Ã¯Â¼â€°
 
-## 现代 Java 特性
+## Ã§Å½Â°Ã¤Â»Â£ Java Ã§â€°Â¹Ã¦â‚¬Â§
 
-在能提高代码清晰度的地方使用现代语言特性：
+Ã¥Å“Â¨Ã¨Æ’Â½Ã¦ÂÂÃ©Â«ËœÃ¤Â»Â£Ã§Â ÂÃ¦Â¸â€¦Ã¦â„¢Â°Ã¥ÂºÂ¦Ã§Å¡â€žÃ¥Å“Â°Ã¦â€“Â¹Ã¤Â½Â¿Ã§â€Â¨Ã§Å½Â°Ã¤Â»Â£Ã¨Â¯Â­Ã¨Â¨â‚¬Ã§â€°Â¹Ã¦â‚¬Â§Ã¯Â¼Å¡
 
-* **记录** 用于 DTO 和值类型（Java 16+）
-* **密封类** 用于封闭的类型层次结构（Java 17+）
-* 使用 `instanceof` 进行**模式匹配** —— 避免显式类型转换（Java 16+）
-* **文本块** 用于多行字符串 —— SQL、JSON 模板（Java 15+）
-* 使用箭头语法的**Switch 表达式**（Java 14+）
-* **Switch 中的模式匹配** —— 用于处理密封类型的穷举情况（Java 21+）
+* **Ã¨Â®Â°Ã¥Â½â€¢** Ã§â€Â¨Ã¤ÂºÅ½ DTO Ã¥â€™Å’Ã¥â‚¬Â¼Ã§Â±Â»Ã¥Å¾â€¹Ã¯Â¼Ë†Java 16+Ã¯Â¼â€°
+* **Ã¥Â¯â€ Ã¥Â°ÂÃ§Â±Â»** Ã§â€Â¨Ã¤ÂºÅ½Ã¥Â°ÂÃ©â€”Â­Ã§Å¡â€žÃ§Â±Â»Ã¥Å¾â€¹Ã¥Â±â€šÃ¦Â¬Â¡Ã§Â»â€œÃ¦Å¾â€žÃ¯Â¼Ë†Java 17+Ã¯Â¼â€°
+* Ã¤Â½Â¿Ã§â€Â¨ `instanceof` Ã¨Â¿â€ºÃ¨Â¡Å’**Ã¦Â¨Â¡Ã¥Â¼ÂÃ¥Å’Â¹Ã©â€¦Â** Ã¢â‚¬â€Ã¢â‚¬â€ Ã©ÂÂ¿Ã¥â€¦ÂÃ¦ËœÂ¾Ã¥Â¼ÂÃ§Â±Â»Ã¥Å¾â€¹Ã¨Â½Â¬Ã¦ÂÂ¢Ã¯Â¼Ë†Java 16+Ã¯Â¼â€°
+* **Ã¦â€“â€¡Ã¦Å“Â¬Ã¥Ââ€”** Ã§â€Â¨Ã¤ÂºÅ½Ã¥Â¤Å¡Ã¨Â¡Å’Ã¥Â­â€”Ã§Â¬Â¦Ã¤Â¸Â² Ã¢â‚¬â€Ã¢â‚¬â€ SQLÃ£â‚¬ÂJSON Ã¦Â¨Â¡Ã¦ÂÂ¿Ã¯Â¼Ë†Java 15+Ã¯Â¼â€°
+* Ã¤Â½Â¿Ã§â€Â¨Ã§Â®Â­Ã¥Â¤Â´Ã¨Â¯Â­Ã¦Â³â€¢Ã§Å¡â€ž**Switch Ã¨Â¡Â¨Ã¨Â¾Â¾Ã¥Â¼Â**Ã¯Â¼Ë†Java 14+Ã¯Â¼â€°
+* **Switch Ã¤Â¸Â­Ã§Å¡â€žÃ¦Â¨Â¡Ã¥Â¼ÂÃ¥Å’Â¹Ã©â€¦Â** Ã¢â‚¬â€Ã¢â‚¬â€ Ã§â€Â¨Ã¤ÂºÅ½Ã¥Â¤â€žÃ§Ââ€ Ã¥Â¯â€ Ã¥Â°ÂÃ§Â±Â»Ã¥Å¾â€¹Ã§Å¡â€žÃ§Â©Â·Ã¤Â¸Â¾Ã¦Æ’â€¦Ã¥â€ ÂµÃ¯Â¼Ë†Java 21+Ã¯Â¼â€°
 
 ```java
 // Pattern matching instanceof
@@ -73,11 +86,11 @@ String label = switch (status) {
 };
 ```
 
-## Optional 的使用
+## Optional Ã§Å¡â€žÃ¤Â½Â¿Ã§â€Â¨
 
-* 从可能没有结果的查找方法中返回 `Optional<T>`
-* 使用 `map()`、`flatMap()`、`orElseThrow()` —— 绝不直接调用 `get()` 而不先检查 `isPresent()`
-* 绝不将 `Optional` 用作字段类型或方法参数
+* Ã¤Â»Å½Ã¥ÂÂ¯Ã¨Æ’Â½Ã¦Â²Â¡Ã¦Å“â€°Ã§Â»â€œÃ¦Å¾Å“Ã§Å¡â€žÃ¦Å¸Â¥Ã¦â€°Â¾Ã¦â€“Â¹Ã¦Â³â€¢Ã¤Â¸Â­Ã¨Â¿â€Ã¥â€ºÅ¾ `Optional<T>`
+* Ã¤Â½Â¿Ã§â€Â¨ `map()`Ã£â‚¬Â`flatMap()`Ã£â‚¬Â`orElseThrow()` Ã¢â‚¬â€Ã¢â‚¬â€ Ã§Â»ÂÃ¤Â¸ÂÃ§â€ºÂ´Ã¦Å½Â¥Ã¨Â°Æ’Ã§â€Â¨ `get()` Ã¨â‚¬Å’Ã¤Â¸ÂÃ¥â€¦Ë†Ã¦Â£â‚¬Ã¦Å¸Â¥ `isPresent()`
+* Ã§Â»ÂÃ¤Â¸ÂÃ¥Â°â€  `Optional` Ã§â€Â¨Ã¤Â½Å“Ã¥Â­â€”Ã¦Â®ÂµÃ§Â±Â»Ã¥Å¾â€¹Ã¦Ë†â€“Ã¦â€“Â¹Ã¦Â³â€¢Ã¥Ââ€šÃ¦â€¢Â°
 
 ```java
 // GOOD
@@ -85,16 +98,16 @@ return repository.findById(id)
     .map(ResponseDto::from)
     .orElseThrow(() -> new OrderNotFoundException(id));
 
-// BAD — Optional as parameter
+// BAD Ã¢â‚¬â€ Optional as parameter
 public void process(Optional<String> name) {}
 ```
 
-## 错误处理
+## Ã©â€â„¢Ã¨Â¯Â¯Ã¥Â¤â€žÃ§Ââ€ 
 
-* 对于领域错误，优先使用非受检异常
-* 创建扩展自 `RuntimeException` 的领域特定异常
-* 避免宽泛的 `catch (Exception e)`，除非在最顶层的处理器中
-* 在异常消息中包含上下文信息
+* Ã¥Â¯Â¹Ã¤ÂºÅ½Ã©Â¢â€ Ã¥Å¸Å¸Ã©â€â„¢Ã¨Â¯Â¯Ã¯Â¼Å’Ã¤Â¼ËœÃ¥â€¦Ë†Ã¤Â½Â¿Ã§â€Â¨Ã©ÂÅ¾Ã¥Ââ€”Ã¦Â£â‚¬Ã¥Â¼â€šÃ¥Â¸Â¸
+* Ã¥Ë†â€ºÃ¥Â»ÂºÃ¦â€°Â©Ã¥Â±â€¢Ã¨â€¡Âª `RuntimeException` Ã§Å¡â€žÃ©Â¢â€ Ã¥Å¸Å¸Ã§â€°Â¹Ã¥Â®Å¡Ã¥Â¼â€šÃ¥Â¸Â¸
+* Ã©ÂÂ¿Ã¥â€¦ÂÃ¥Â®Â½Ã¦Â³â€ºÃ§Å¡â€ž `catch (Exception e)`Ã¯Â¼Å’Ã©â„¢Â¤Ã©ÂÅ¾Ã¥Å“Â¨Ã¦Å“â‚¬Ã©Â¡Â¶Ã¥Â±â€šÃ§Å¡â€žÃ¥Â¤â€žÃ§Ââ€ Ã¥â„¢Â¨Ã¤Â¸Â­
+* Ã¥Å“Â¨Ã¥Â¼â€šÃ¥Â¸Â¸Ã¦Â¶Ë†Ã¦ÂÂ¯Ã¤Â¸Â­Ã¥Å’â€¦Ã¥ÂÂ«Ã¤Â¸Å Ã¤Â¸â€¹Ã¦â€“â€¡Ã¤Â¿Â¡Ã¦ÂÂ¯
 
 ```java
 public class OrderNotFoundException extends RuntimeException {
@@ -104,14 +117,14 @@ public class OrderNotFoundException extends RuntimeException {
 }
 ```
 
-## 流
+## Ã¦ÂµÂ
 
-* 使用流进行转换；保持流水线简短（最多 3-4 个操作）
-* 在可读性好的情况下，优先使用方法引用：`.map(Order::getTotal)`
-* 避免在流操作中产生副作用
-* 对于复杂逻辑，优先使用循环而不是难以理解的流流水线
+* Ã¤Â½Â¿Ã§â€Â¨Ã¦ÂµÂÃ¨Â¿â€ºÃ¨Â¡Å’Ã¨Â½Â¬Ã¦ÂÂ¢Ã¯Â¼â€ºÃ¤Â¿ÂÃ¦Å’ÂÃ¦ÂµÂÃ¦Â°Â´Ã§ÂºÂ¿Ã§Â®â‚¬Ã§Å¸Â­Ã¯Â¼Ë†Ã¦Å“â‚¬Ã¥Â¤Å¡ 3-4 Ã¤Â¸ÂªÃ¦â€œÂÃ¤Â½Å“Ã¯Â¼â€°
+* Ã¥Å“Â¨Ã¥ÂÂ¯Ã¨Â¯Â»Ã¦â‚¬Â§Ã¥Â¥Â½Ã§Å¡â€žÃ¦Æ’â€¦Ã¥â€ ÂµÃ¤Â¸â€¹Ã¯Â¼Å’Ã¤Â¼ËœÃ¥â€¦Ë†Ã¤Â½Â¿Ã§â€Â¨Ã¦â€“Â¹Ã¦Â³â€¢Ã¥Â¼â€¢Ã§â€Â¨Ã¯Â¼Å¡`.map(Order::getTotal)`
+* Ã©ÂÂ¿Ã¥â€¦ÂÃ¥Å“Â¨Ã¦ÂµÂÃ¦â€œÂÃ¤Â½Å“Ã¤Â¸Â­Ã¤ÂºÂ§Ã§â€Å¸Ã¥â€°Â¯Ã¤Â½Å“Ã§â€Â¨
+* Ã¥Â¯Â¹Ã¤ÂºÅ½Ã¥Â¤ÂÃ¦Ââ€šÃ©â‚¬Â»Ã¨Â¾â€˜Ã¯Â¼Å’Ã¤Â¼ËœÃ¥â€¦Ë†Ã¤Â½Â¿Ã§â€Â¨Ã¥Â¾ÂªÃ§Å½Â¯Ã¨â‚¬Å’Ã¤Â¸ÂÃ¦ËœÂ¯Ã©Å¡Â¾Ã¤Â»Â¥Ã§Ââ€ Ã¨Â§Â£Ã§Å¡â€žÃ¦ÂµÂÃ¦ÂµÂÃ¦Â°Â´Ã§ÂºÂ¿
 
-## 参考
+## Ã¥Ââ€šÃ¨â‚¬Æ’
 
-完整编码标准及示例，请参阅技能：`java-coding-standards`。
-JPA/Hibernate 实体设计模式，请参阅技能：`jpa-patterns`。
+Ã¥Â®Å’Ã¦â€¢Â´Ã§Â¼â€“Ã§Â ÂÃ¦Â â€¡Ã¥â€¡â€ Ã¥ÂÅ Ã§Â¤ÂºÃ¤Â¾â€¹Ã¯Â¼Å’Ã¨Â¯Â·Ã¥Ââ€šÃ©Ëœâ€¦Ã¦Å â‚¬Ã¨Æ’Â½Ã¯Â¼Å¡`java-coding-standards`Ã£â‚¬â€š
+JPA/Hibernate Ã¥Â®Å¾Ã¤Â½â€œÃ¨Â®Â¾Ã¨Â®Â¡Ã¦Â¨Â¡Ã¥Â¼ÂÃ¯Â¼Å’Ã¨Â¯Â·Ã¥Ââ€šÃ©Ëœâ€¦Ã¦Å â‚¬Ã¨Æ’Â½Ã¯Â¼Å¡`jpa-patterns`Ã£â‚¬â€š

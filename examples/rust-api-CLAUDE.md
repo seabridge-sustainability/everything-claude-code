@@ -1,4 +1,17 @@
-# Rust API Service — Project CLAUDE.md
+# Rust API Service Ã¢â‚¬â€ Project CLAUDE.md
+
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
 
 > Real-world example for a Rust API service with Axum, PostgreSQL, and Docker.
 > Copy this to your project root and customize for your service.
@@ -7,25 +20,25 @@
 
 **Stack:** Rust 1.78+, Axum (web framework), SQLx (async database), PostgreSQL, Tokio (async runtime), Docker
 
-**Architecture:** Layered architecture with handler → service → repository separation. Axum for HTTP, SQLx for type-checked SQL at compile time, Tower middleware for cross-cutting concerns.
+**Architecture:** Layered architecture with handler Ã¢â€ â€™ service Ã¢â€ â€™ repository separation. Axum for HTTP, SQLx for type-checked SQL at compile time, Tower middleware for cross-cutting concerns.
 
 ## Critical Rules
 
 ### Rust Conventions
 
 - Use `thiserror` for library errors, `anyhow` only in binary crates or tests
-- No `.unwrap()` or `.expect()` in production code — propagate errors with `?`
+- No `.unwrap()` or `.expect()` in production code Ã¢â‚¬â€ propagate errors with `?`
 - Prefer `&str` over `String` in function parameters; return `String` when ownership transfers
-- Use `clippy` with `#![deny(clippy::all, clippy::pedantic)]` — fix all warnings
+- Use `clippy` with `#![deny(clippy::all, clippy::pedantic)]` Ã¢â‚¬â€ fix all warnings
 - Derive `Debug` on all public types; derive `Clone`, `PartialEq` only when needed
 - No `unsafe` blocks unless justified with a `// SAFETY:` comment
 
 ### Database
 
-- All queries use SQLx `query!` or `query_as!` macros — compile-time verified against the schema
-- Migrations in `migrations/` using `sqlx migrate` — never alter the database directly
-- Use `sqlx::Pool<Postgres>` as shared state — never create connections per request
-- All queries use parameterized placeholders (`$1`, `$2`) — never string formatting
+- All queries use SQLx `query!` or `query_as!` macros Ã¢â‚¬â€ compile-time verified against the schema
+- Migrations in `migrations/` using `sqlx migrate` Ã¢â‚¬â€ never alter the database directly
+- Use `sqlx::Pool<Postgres>` as shared state Ã¢â‚¬â€ never create connections per request
+- All queries use parameterized placeholders (`$1`, `$2`) Ã¢â‚¬â€ never string formatting
 
 ```rust
 // BAD: String interpolation (SQL injection risk)
@@ -40,8 +53,8 @@ let user = sqlx::query_as!(User, "SELECT * FROM users WHERE id = $1", id)
 ### Error Handling
 
 - Define a domain error enum per module with `thiserror`
-- Map errors to HTTP responses via `IntoResponse` — never expose internal details
-- Use `tracing` for structured logging — never `println!` or `eprintln!`
+- Map errors to HTTP responses via `IntoResponse` Ã¢â‚¬â€ never expose internal details
+- Use `tracing` for structured logging Ã¢â‚¬â€ never `println!` or `eprintln!`
 
 ```rust
 use thiserror::Error;
@@ -84,7 +97,7 @@ impl IntoResponse for AppError {
 ### Code Style
 
 - Max line length: 100 characters (enforced by rustfmt)
-- Group imports: `std`, external crates, `crate`/`super` — separated by blank lines
+- Group imports: `std`, external crates, `crate`/`super` Ã¢â‚¬â€ separated by blank lines
 - Modules: one file per module, `mod.rs` only for re-exports
 - Types: PascalCase, functions/variables: snake_case, constants: UPPER_SNAKE_CASE
 
@@ -100,7 +113,7 @@ src/
     auth.rs            # JWT extraction and validation
     logging.rs         # Request/response tracing
   handlers/
-    mod.rs             # Route handlers (thin — delegate to services)
+    mod.rs             # Route handlers (thin Ã¢â‚¬â€ delegate to services)
     users.rs
     orders.rs
   services/

@@ -1,6 +1,19 @@
-# Atualizar Documentação
+# Atualizar DocumentaÃƒÂ§ÃƒÂ£o
 
-Sincronize a documentação com o codebase, gerando a partir de arquivos fonte da verdade.
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+Sincronize a documentaÃƒÂ§ÃƒÂ£o com o codebase, gerando a partir de arquivos fonte da verdade.
 
 ## Passo 1: Identificar Fontes da Verdade
 
@@ -12,11 +25,11 @@ Sincronize a documentação com o codebase, gerando a partir de arquivos fonte d
 | Source code exports | Public API documentation |
 | `Dockerfile` / `docker-compose.yml` | Infrastructure setup docs |
 
-## Passo 2: Gerar Referência de Scripts
+## Passo 2: Gerar ReferÃƒÂªncia de Scripts
 
 1. Leia `package.json` (ou `Makefile`, `Cargo.toml`, `pyproject.toml`)
-2. Extraia todos os scripts/comandos com suas descrições
-3. Gere uma tabela de referência:
+2. Extraia todos os scripts/comandos com suas descriÃƒÂ§ÃƒÂµes
+3. Gere uma tabela de referÃƒÂªncia:
 
 ```markdown
 | Command | Description |
@@ -26,12 +39,12 @@ Sincronize a documentação com o codebase, gerando a partir de arquivos fonte d
 | `npm test` | Run test suite with coverage |
 ```
 
-## Passo 3: Gerar Documentação de Ambiente
+## Passo 3: Gerar DocumentaÃƒÂ§ÃƒÂ£o de Ambiente
 
 1. Leia `.env.example` (ou `.env.template`, `.env.sample`)
-2. Extraia todas as variáveis e seus propósitos
+2. Extraia todas as variÃƒÂ¡veis e seus propÃƒÂ³sitos
 3. Categorize como required vs optional
-4. Documente formato esperado e valores válidos
+4. Documente formato esperado e valores vÃƒÂ¡lidos
 
 ```markdown
 | Variable | Required | Description | Example |
@@ -40,45 +53,45 @@ Sincronize a documentação com o codebase, gerando a partir de arquivos fonte d
 | `LOG_LEVEL` | No | Logging verbosity (default: info) | `debug`, `info`, `warn`, `error` |
 ```
 
-## Passo 4: Atualizar Guia de Contribuição
+## Passo 4: Atualizar Guia de ContribuiÃƒÂ§ÃƒÂ£o
 
 Gere ou atualize `docs/CONTRIBUTING.md` com:
-- Setup do ambiente de desenvolvimento (pré-requisitos, passos de instalação)
-- Scripts disponíveis e seus propósitos
+- Setup do ambiente de desenvolvimento (prÃƒÂ©-requisitos, passos de instalaÃƒÂ§ÃƒÂ£o)
+- Scripts disponÃƒÂ­veis e seus propÃƒÂ³sitos
 - Procedimentos de teste (como rodar, como escrever novos testes)
-- Enforcement de estilo de código (linter, formatter, hooks pre-commit)
-- Checklist de submissão de PR
+- Enforcement de estilo de cÃƒÂ³digo (linter, formatter, hooks pre-commit)
+- Checklist de submissÃƒÂ£o de PR
 
 ## Passo 5: Atualizar Runbook
 
 Gere ou atualize `docs/RUNBOOK.md` com:
 - Procedimentos de deploy (passo a passo)
 - Endpoints de health check e monitoramento
-- Problemas comuns e suas correções
+- Problemas comuns e suas correÃƒÂ§ÃƒÂµes
 - Procedimentos de rollback
 - Caminhos de alerta e escalonamento
 
-## Passo 6: Checagem de Obsolescência
+## Passo 6: Checagem de ObsolescÃƒÂªncia
 
-1. Encontre arquivos de documentação sem modificação há 90+ dias
-2. Cruze com mudanças recentes no código-fonte
-3. Sinalize docs potencialmente desatualizadas para revisão manual
+1. Encontre arquivos de documentaÃƒÂ§ÃƒÂ£o sem modificaÃƒÂ§ÃƒÂ£o hÃƒÂ¡ 90+ dias
+2. Cruze com mudanÃƒÂ§as recentes no cÃƒÂ³digo-fonte
+3. Sinalize docs potencialmente desatualizadas para revisÃƒÂ£o manual
 
 ## Passo 7: Mostrar Resumo
 
 ```
 Documentation Update
-──────────────────────────────
+Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 Updated:  docs/CONTRIBUTING.md (scripts table)
 Updated:  docs/ENV.md (3 new variables)
 Flagged:  docs/DEPLOY.md (142 days stale)
 Skipped:  docs/API.md (no changes detected)
-──────────────────────────────
+Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 ```
 
 ## Regras
 
-- **Fonte única da verdade**: Sempre gere a partir do código, nunca edite manualmente seções geradas
-- **Preserve seções manuais**: Atualize apenas seções geradas; mantenha prosa escrita manualmente intacta
-- **Marque conteúdo gerado**: Use marcadores `<!-- AUTO-GENERATED -->` ao redor das seções geradas
-- **Não crie docs sem solicitação**: Só crie novos arquivos de docs se o comando solicitar explicitamente
+- **Fonte ÃƒÂºnica da verdade**: Sempre gere a partir do cÃƒÂ³digo, nunca edite manualmente seÃƒÂ§ÃƒÂµes geradas
+- **Preserve seÃƒÂ§ÃƒÂµes manuais**: Atualize apenas seÃƒÂ§ÃƒÂµes geradas; mantenha prosa escrita manualmente intacta
+- **Marque conteÃƒÂºdo gerado**: Use marcadores `<!-- AUTO-GENERATED -->` ao redor das seÃƒÂ§ÃƒÂµes geradas
+- **NÃƒÂ£o crie docs sem solicitaÃƒÂ§ÃƒÂ£o**: SÃƒÂ³ crie novos arquivos de docs se o comando solicitar explicitamente

@@ -1,43 +1,56 @@
-# 赞助 ECC
+# Ã¨ÂµÅ¾Ã¥Å Â© ECC
 
-ECC 作为一个开源智能体性能测试系统，在 Claude Code、Cursor、OpenCode 和 Codex 应用程序/CLI 中得到维护。
+## Safety And Authorization Rule
 
-## 为何赞助
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-赞助直接资助以下方面：
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-* 更快的错误修复和发布周期
-* 跨测试平台的平台一致性工作
-* 为社区免费提供的公共文档、技能和可靠性工具
 
-## 赞助层级
+ECC Ã¤Â½Å“Ã¤Â¸ÂºÃ¤Â¸â‚¬Ã¤Â¸ÂªÃ¥Â¼â‚¬Ã¦ÂºÂÃ¦â„¢ÂºÃ¨Æ’Â½Ã¤Â½â€œÃ¦â‚¬Â§Ã¨Æ’Â½Ã¦Âµâ€¹Ã¨Â¯â€¢Ã§Â³Â»Ã§Â»Å¸Ã¯Â¼Å’Ã¥Å“Â¨ Claude CodeÃ£â‚¬ÂCursorÃ£â‚¬ÂOpenCode Ã¥â€™Å’ Codex Ã¥Âºâ€Ã§â€Â¨Ã§Â¨â€¹Ã¥ÂºÂ/CLI Ã¤Â¸Â­Ã¥Â¾â€”Ã¥Ë†Â°Ã§Â»Â´Ã¦Å Â¤Ã£â‚¬â€š
 
-这些是实用的起点，可以根据合作范围进行调整。
+## Ã¤Â¸ÂºÃ¤Â½â€¢Ã¨ÂµÅ¾Ã¥Å Â©
 
-| 层级 | 价格 | 最适合 | 包含内容 |
+Ã¨ÂµÅ¾Ã¥Å Â©Ã§â€ºÂ´Ã¦Å½Â¥Ã¨Âµâ€žÃ¥Å Â©Ã¤Â»Â¥Ã¤Â¸â€¹Ã¦â€“Â¹Ã©ÂÂ¢Ã¯Â¼Å¡
+
+* Ã¦â€ºÂ´Ã¥Â¿Â«Ã§Å¡â€žÃ©â€â„¢Ã¨Â¯Â¯Ã¤Â¿Â®Ã¥Â¤ÂÃ¥â€™Å’Ã¥Ââ€˜Ã¥Â¸Æ’Ã¥â€˜Â¨Ã¦Å“Å¸
+* Ã¨Â·Â¨Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¥Â¹Â³Ã¥ÂÂ°Ã§Å¡â€žÃ¥Â¹Â³Ã¥ÂÂ°Ã¤Â¸â‚¬Ã¨â€¡Â´Ã¦â‚¬Â§Ã¥Â·Â¥Ã¤Â½Å“
+* Ã¤Â¸ÂºÃ§Â¤Â¾Ã¥Å’ÂºÃ¥â€¦ÂÃ¨Â´Â¹Ã¦ÂÂÃ¤Â¾â€ºÃ§Å¡â€žÃ¥â€¦Â¬Ã¥â€¦Â±Ã¦â€“â€¡Ã¦Â¡Â£Ã£â‚¬ÂÃ¦Å â‚¬Ã¨Æ’Â½Ã¥â€™Å’Ã¥ÂÂ¯Ã©ÂÂ Ã¦â‚¬Â§Ã¥Â·Â¥Ã¥â€¦Â·
+
+## Ã¨ÂµÅ¾Ã¥Å Â©Ã¥Â±â€šÃ§ÂºÂ§
+
+Ã¨Â¿â„¢Ã¤Âºâ€ºÃ¦ËœÂ¯Ã¥Â®Å¾Ã§â€Â¨Ã§Å¡â€žÃ¨ÂµÂ·Ã§â€šÂ¹Ã¯Â¼Å’Ã¥ÂÂ¯Ã¤Â»Â¥Ã¦Â Â¹Ã¦ÂÂ®Ã¥ÂË†Ã¤Â½Å“Ã¨Å’Æ’Ã¥â€ºÂ´Ã¨Â¿â€ºÃ¨Â¡Å’Ã¨Â°Æ’Ã¦â€¢Â´Ã£â‚¬â€š
+
+| Ã¥Â±â€šÃ§ÂºÂ§ | Ã¤Â»Â·Ã¦Â Â¼ | Ã¦Å“â‚¬Ã©â‚¬â€šÃ¥ÂË† | Ã¥Å’â€¦Ã¥ÂÂ«Ã¥â€ â€¦Ã¥Â®Â¹ |
 |------|-------|----------|----------|
-| 试点合作伙伴 | $200/月 | 首次赞助合作 | 月度指标更新、路线图预览、优先维护者反馈 |
-| 成长合作伙伴 | $500/月 | 积极采用 ECC 的团队 | 试点权益 + 月度办公时间同步 + 工作流集成指导 |
-| 战略合作伙伴 | $1,000+/月 | 平台/生态系统合作伙伴 | 成长权益 + 协调发布支持 + 更深入的维护者协作 |
+| Ã¨Â¯â€¢Ã§â€šÂ¹Ã¥ÂË†Ã¤Â½Å“Ã¤Â¼â„¢Ã¤Â¼Â´ | $200/Ã¦Å“Ë† | Ã©Â¦â€“Ã¦Â¬Â¡Ã¨ÂµÅ¾Ã¥Å Â©Ã¥ÂË†Ã¤Â½Å“ | Ã¦Å“Ë†Ã¥ÂºÂ¦Ã¦Å’â€¡Ã¦Â â€¡Ã¦â€ºÂ´Ã¦â€“Â°Ã£â‚¬ÂÃ¨Â·Â¯Ã§ÂºÂ¿Ã¥â€ºÂ¾Ã©Â¢â€žÃ¨Â§Ë†Ã£â‚¬ÂÃ¤Â¼ËœÃ¥â€¦Ë†Ã§Â»Â´Ã¦Å Â¤Ã¨â‚¬â€¦Ã¥ÂÂÃ©Â¦Ë† |
+| Ã¦Ë†ÂÃ©â€¢Â¿Ã¥ÂË†Ã¤Â½Å“Ã¤Â¼â„¢Ã¤Â¼Â´ | $500/Ã¦Å“Ë† | Ã§Â§Â¯Ã¦Å¾ÂÃ©â€¡â€¡Ã§â€Â¨ ECC Ã§Å¡â€žÃ¥â€ºÂ¢Ã©ËœÅ¸ | Ã¨Â¯â€¢Ã§â€šÂ¹Ã¦ÂÆ’Ã§â€ºÅ  + Ã¦Å“Ë†Ã¥ÂºÂ¦Ã¥Å Å¾Ã¥â€¦Â¬Ã¦â€”Â¶Ã©â€”Â´Ã¥ÂÅ’Ã¦Â­Â¥ + Ã¥Â·Â¥Ã¤Â½Å“Ã¦ÂµÂÃ©â€ºâ€ Ã¦Ë†ÂÃ¦Å’â€¡Ã¥Â¯Â¼ |
+| Ã¦Ë†ËœÃ§â€¢Â¥Ã¥ÂË†Ã¤Â½Å“Ã¤Â¼â„¢Ã¤Â¼Â´ | $1,000+/Ã¦Å“Ë† | Ã¥Â¹Â³Ã¥ÂÂ°/Ã§â€Å¸Ã¦â‚¬ÂÃ§Â³Â»Ã§Â»Å¸Ã¥ÂË†Ã¤Â½Å“Ã¤Â¼â„¢Ã¤Â¼Â´ | Ã¦Ë†ÂÃ©â€¢Â¿Ã¦ÂÆ’Ã§â€ºÅ  + Ã¥ÂÂÃ¨Â°Æ’Ã¥Ââ€˜Ã¥Â¸Æ’Ã¦â€Â¯Ã¦Å’Â + Ã¦â€ºÂ´Ã¦Â·Â±Ã¥â€¦Â¥Ã§Å¡â€žÃ§Â»Â´Ã¦Å Â¤Ã¨â‚¬â€¦Ã¥ÂÂÃ¤Â½Å“ |
 
-## 赞助报告
+## Ã¨ÂµÅ¾Ã¥Å Â©Ã¦Å Â¥Ã¥â€˜Å 
 
-每月分享的指标可能包括：
+Ã¦Â¯ÂÃ¦Å“Ë†Ã¥Ë†â€ Ã¤ÂºÂ«Ã§Å¡â€žÃ¦Å’â€¡Ã¦Â â€¡Ã¥ÂÂ¯Ã¨Æ’Â½Ã¥Å’â€¦Ã¦â€¹Â¬Ã¯Â¼Å¡
 
-* npm 下载量（`ecc-universal`、`ecc-agentshield`）
-* 仓库采用情况（星标、分叉、贡献者）
-* GitHub 应用安装趋势
-* 发布节奏和可靠性里程碑
+* npm Ã¤Â¸â€¹Ã¨Â½Â½Ã©â€¡ÂÃ¯Â¼Ë†`ecc-universal`Ã£â‚¬Â`ecc-agentshield`Ã¯Â¼â€°
+* Ã¤Â»â€œÃ¥Âºâ€œÃ©â€¡â€¡Ã§â€Â¨Ã¦Æ’â€¦Ã¥â€ ÂµÃ¯Â¼Ë†Ã¦ËœÅ¸Ã¦Â â€¡Ã£â‚¬ÂÃ¥Ë†â€ Ã¥Ââ€°Ã£â‚¬ÂÃ¨Â´Â¡Ã§Å’Â®Ã¨â‚¬â€¦Ã¯Â¼â€°
+* GitHub Ã¥Âºâ€Ã§â€Â¨Ã¥Â®â€°Ã¨Â£â€¦Ã¨Â¶â€¹Ã¥Å Â¿
+* Ã¥Ââ€˜Ã¥Â¸Æ’Ã¨Å â€šÃ¥Â¥ÂÃ¥â€™Å’Ã¥ÂÂ¯Ã©ÂÂ Ã¦â‚¬Â§Ã©â€¡Å’Ã§Â¨â€¹Ã§Â¢â€˜
 
-有关确切的命令片段和可重复的拉取流程，请参阅 [`docs/business/metrics-and-sponsorship.md`](../business/metrics-and-sponsorship.md)。
+Ã¦Å“â€°Ã¥â€¦Â³Ã§Â¡Â®Ã¥Ë†â€¡Ã§Å¡â€žÃ¥â€˜Â½Ã¤Â»Â¤Ã§â€°â€¡Ã¦Â®ÂµÃ¥â€™Å’Ã¥ÂÂ¯Ã©â€¡ÂÃ¥Â¤ÂÃ§Å¡â€žÃ¦â€¹â€°Ã¥Ââ€“Ã¦ÂµÂÃ§Â¨â€¹Ã¯Â¼Å’Ã¨Â¯Â·Ã¥Ââ€šÃ©Ëœâ€¦ [`docs/business/metrics-and-sponsorship.md`](../business/metrics-and-sponsorship.md)Ã£â‚¬â€š
 
-## 期望与范围
+## Ã¦Å“Å¸Ã¦Å“â€ºÃ¤Â¸Å½Ã¨Å’Æ’Ã¥â€ºÂ´
 
-* 赞助支持维护和加速；不会转移项目所有权。
-* 功能请求根据赞助层级、生态系统影响和维护风险进行优先级排序。
-* 安全性和可靠性修复优先于全新功能。
+* Ã¨ÂµÅ¾Ã¥Å Â©Ã¦â€Â¯Ã¦Å’ÂÃ§Â»Â´Ã¦Å Â¤Ã¥â€™Å’Ã¥Å Â Ã©â‚¬Å¸Ã¯Â¼â€ºÃ¤Â¸ÂÃ¤Â¼Å¡Ã¨Â½Â¬Ã§Â§Â»Ã©Â¡Â¹Ã§â€ºÂ®Ã¦â€°â‚¬Ã¦Å“â€°Ã¦ÂÆ’Ã£â‚¬â€š
+* Ã¥Å Å¸Ã¨Æ’Â½Ã¨Â¯Â·Ã¦Â±â€šÃ¦Â Â¹Ã¦ÂÂ®Ã¨ÂµÅ¾Ã¥Å Â©Ã¥Â±â€šÃ§ÂºÂ§Ã£â‚¬ÂÃ§â€Å¸Ã¦â‚¬ÂÃ§Â³Â»Ã§Â»Å¸Ã¥Â½Â±Ã¥â€œÂÃ¥â€™Å’Ã§Â»Â´Ã¦Å Â¤Ã©Â£Å½Ã©â„¢Â©Ã¨Â¿â€ºÃ¨Â¡Å’Ã¤Â¼ËœÃ¥â€¦Ë†Ã§ÂºÂ§Ã¦Å½â€™Ã¥ÂºÂÃ£â‚¬â€š
+* Ã¥Â®â€°Ã¥â€¦Â¨Ã¦â‚¬Â§Ã¥â€™Å’Ã¥ÂÂ¯Ã©ÂÂ Ã¦â‚¬Â§Ã¤Â¿Â®Ã¥Â¤ÂÃ¤Â¼ËœÃ¥â€¦Ë†Ã¤ÂºÅ½Ã¥â€¦Â¨Ã¦â€“Â°Ã¥Å Å¸Ã¨Æ’Â½Ã£â‚¬â€š
 
-## 在此赞助
+## Ã¥Å“Â¨Ã¦Â­Â¤Ã¨ÂµÅ¾Ã¥Å Â©
 
 * GitHub Sponsors: <https://github.com/sponsors/affaan-m>
-* 项目网站: <https://ecc.tools>
+* Ã©Â¡Â¹Ã§â€ºÂ®Ã§Â½â€˜Ã§Â«â„¢: <https://ecc.tools>

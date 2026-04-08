@@ -1,25 +1,38 @@
 ---
 name: python-patterns
-description: Pythonic 惯用法、PEP 8 标准、类型提示以及构建稳健、高效且可维护的 Python 应用程序的最佳实践。
+description: Pythonic Ã¦Æ’Â¯Ã§â€Â¨Ã¦Â³â€¢Ã£â‚¬ÂPEP 8 Ã¦Â â€¡Ã¥â€¡â€ Ã£â‚¬ÂÃ§Â±Â»Ã¥Å¾â€¹Ã¦ÂÂÃ§Â¤ÂºÃ¤Â»Â¥Ã¥ÂÅ Ã¦Å¾â€žÃ¥Â»ÂºÃ§Â¨Â³Ã¥ÂÂ¥Ã£â‚¬ÂÃ©Â«ËœÃ¦â€¢Ë†Ã¤Â¸â€Ã¥ÂÂ¯Ã§Â»Â´Ã¦Å Â¤Ã§Å¡â€ž Python Ã¥Âºâ€Ã§â€Â¨Ã§Â¨â€¹Ã¥ÂºÂÃ§Å¡â€žÃ¦Å“â‚¬Ã¤Â½Â³Ã¥Â®Å¾Ã¨Â·ÂµÃ£â‚¬â€š
 origin: ECC
 ---
 
-# Python 开发模式
+# Python Ã¥Â¼â‚¬Ã¥Ââ€˜Ã¦Â¨Â¡Ã¥Â¼Â
 
-用于构建健壮、高效和可维护应用程序的惯用 Python 模式与最佳实践。
+## Safety And Authorization Rule
 
-## 何时激活
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-* 编写新的 Python 代码
-* 审查 Python 代码
-* 重构现有的 Python 代码
-* 设计 Python 包/模块
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-## 核心原则
 
-### 1. 可读性很重要
+Ã§â€Â¨Ã¤ÂºÅ½Ã¦Å¾â€žÃ¥Â»ÂºÃ¥ÂÂ¥Ã¥Â£Â®Ã£â‚¬ÂÃ©Â«ËœÃ¦â€¢Ë†Ã¥â€™Å’Ã¥ÂÂ¯Ã§Â»Â´Ã¦Å Â¤Ã¥Âºâ€Ã§â€Â¨Ã§Â¨â€¹Ã¥ÂºÂÃ§Å¡â€žÃ¦Æ’Â¯Ã§â€Â¨ Python Ã¦Â¨Â¡Ã¥Â¼ÂÃ¤Â¸Å½Ã¦Å“â‚¬Ã¤Â½Â³Ã¥Â®Å¾Ã¨Â·ÂµÃ£â‚¬â€š
 
-Python 优先考虑可读性。代码应该清晰且易于理解。
+## Ã¤Â½â€¢Ã¦â€”Â¶Ã¦Â¿â‚¬Ã¦Â´Â»
+
+* Ã§Â¼â€“Ã¥â€ â„¢Ã¦â€“Â°Ã§Å¡â€ž Python Ã¤Â»Â£Ã§Â Â
+* Ã¥Â®Â¡Ã¦Å¸Â¥ Python Ã¤Â»Â£Ã§Â Â
+* Ã©â€¡ÂÃ¦Å¾â€žÃ§Å½Â°Ã¦Å“â€°Ã§Å¡â€ž Python Ã¤Â»Â£Ã§Â Â
+* Ã¨Â®Â¾Ã¨Â®Â¡ Python Ã¥Å’â€¦/Ã¦Â¨Â¡Ã¥Ââ€”
+
+## Ã¦Â Â¸Ã¥Â¿Æ’Ã¥Å½Å¸Ã¥Ë†â„¢
+
+### 1. Ã¥ÂÂ¯Ã¨Â¯Â»Ã¦â‚¬Â§Ã¥Â¾Ë†Ã©â€¡ÂÃ¨Â¦Â
+
+Python Ã¤Â¼ËœÃ¥â€¦Ë†Ã¨â‚¬Æ’Ã¨â„¢â€˜Ã¥ÂÂ¯Ã¨Â¯Â»Ã¦â‚¬Â§Ã£â‚¬â€šÃ¤Â»Â£Ã§Â ÂÃ¥Âºâ€Ã¨Â¯Â¥Ã¦Â¸â€¦Ã¦â„¢Â°Ã¤Â¸â€Ã¦Ëœâ€œÃ¤ÂºÅ½Ã§Ââ€ Ã¨Â§Â£Ã£â‚¬â€š
 
 ```python
 # Good: Clear and readable
@@ -33,9 +46,9 @@ def get_active_users(u):
     return [x for x in u if x.a]
 ```
 
-### 2. 显式优于隐式
+### 2. Ã¦ËœÂ¾Ã¥Â¼ÂÃ¤Â¼ËœÃ¤ÂºÅ½Ã©Å¡ÂÃ¥Â¼Â
 
-避免魔法；清晰说明你的代码在做什么。
+Ã©ÂÂ¿Ã¥â€¦ÂÃ©Â­â€Ã¦Â³â€¢Ã¯Â¼â€ºÃ¦Â¸â€¦Ã¦â„¢Â°Ã¨Â¯Â´Ã¦ËœÅ½Ã¤Â½Â Ã§Å¡â€žÃ¤Â»Â£Ã§Â ÂÃ¥Å“Â¨Ã¥ÂÅ¡Ã¤Â»â‚¬Ã¤Â¹Ë†Ã£â‚¬â€š
 
 ```python
 # Good: Explicit configuration
@@ -51,9 +64,9 @@ import some_module
 some_module.setup()  # What does this do?
 ```
 
-### 3. EAFP - 请求宽恕比请求许可更容易
+### 3. EAFP - Ã¨Â¯Â·Ã¦Â±â€šÃ¥Â®Â½Ã¦Ââ€¢Ã¦Â¯â€Ã¨Â¯Â·Ã¦Â±â€šÃ¨Â®Â¸Ã¥ÂÂ¯Ã¦â€ºÂ´Ã¥Â®Â¹Ã¦Ëœâ€œ
 
-Python 倾向于使用异常处理而非检查条件。
+Python Ã¥â‚¬Â¾Ã¥Ââ€˜Ã¤ÂºÅ½Ã¤Â½Â¿Ã§â€Â¨Ã¥Â¼â€šÃ¥Â¸Â¸Ã¥Â¤â€žÃ§Ââ€ Ã¨â‚¬Å’Ã©ÂÅ¾Ã¦Â£â‚¬Ã¦Å¸Â¥Ã¦ÂÂ¡Ã¤Â»Â¶Ã£â‚¬â€š
 
 ```python
 # Good: EAFP style
@@ -71,9 +84,9 @@ def get_value(dictionary: dict, key: str) -> Any:
         return default_value
 ```
 
-## 类型提示
+## Ã§Â±Â»Ã¥Å¾â€¹Ã¦ÂÂÃ§Â¤Âº
 
-### 基本类型注解
+### Ã¥Å¸ÂºÃ¦Å“Â¬Ã§Â±Â»Ã¥Å¾â€¹Ã¦Â³Â¨Ã¨Â§Â£
 
 ```python
 from typing import Optional, List, Dict, Any
@@ -89,7 +102,7 @@ def process_user(
     return User(user_id, data)
 ```
 
-### 现代类型提示（Python 3.9+）
+### Ã§Å½Â°Ã¤Â»Â£Ã§Â±Â»Ã¥Å¾â€¹Ã¦ÂÂÃ§Â¤ÂºÃ¯Â¼Ë†Python 3.9+Ã¯Â¼â€°
 
 ```python
 # Python 3.9+ - Use built-in types
@@ -103,7 +116,7 @@ def process_items(items: List[str]) -> Dict[str, int]:
     return {item: len(item) for item in items}
 ```
 
-### 类型别名和 TypeVar
+### Ã§Â±Â»Ã¥Å¾â€¹Ã¥Ë†Â«Ã¥ÂÂÃ¥â€™Å’ TypeVar
 
 ```python
 from typing import TypeVar, Union
@@ -122,7 +135,7 @@ def first(items: list[T]) -> T | None:
     return items[0] if items else None
 ```
 
-### 基于协议的鸭子类型
+### Ã¥Å¸ÂºÃ¤ÂºÅ½Ã¥ÂÂÃ¨Â®Â®Ã§Å¡â€žÃ©Â¸Â­Ã¥Â­ÂÃ§Â±Â»Ã¥Å¾â€¹
 
 ```python
 from typing import Protocol
@@ -136,9 +149,9 @@ def render_all(items: list[Renderable]) -> str:
     return "\n".join(item.render() for item in items)
 ```
 
-## 错误处理模式
+## Ã©â€â„¢Ã¨Â¯Â¯Ã¥Â¤â€žÃ§Ââ€ Ã¦Â¨Â¡Ã¥Â¼Â
 
-### 特定异常处理
+### Ã§â€°Â¹Ã¥Â®Å¡Ã¥Â¼â€šÃ¥Â¸Â¸Ã¥Â¤â€žÃ§Ââ€ 
 
 ```python
 # Good: Catch specific exceptions
@@ -160,7 +173,7 @@ def load_config(path: str) -> Config:
         return None  # Silent failure!
 ```
 
-### 异常链
+### Ã¥Â¼â€šÃ¥Â¸Â¸Ã©â€œÂ¾
 
 ```python
 def process_data(data: str) -> Result:
@@ -171,7 +184,7 @@ def process_data(data: str) -> Result:
         raise ValueError(f"Failed to parse data: {data}") from e
 ```
 
-### 自定义异常层次结构
+### Ã¨â€¡ÂªÃ¥Â®Å¡Ã¤Â¹â€°Ã¥Â¼â€šÃ¥Â¸Â¸Ã¥Â±â€šÃ¦Â¬Â¡Ã§Â»â€œÃ¦Å¾â€ž
 
 ```python
 class AppError(Exception):
@@ -194,9 +207,9 @@ def get_user(user_id: str) -> User:
     return user
 ```
 
-## 上下文管理器
+## Ã¤Â¸Å Ã¤Â¸â€¹Ã¦â€“â€¡Ã§Â®Â¡Ã§Ââ€ Ã¥â„¢Â¨
 
-### 资源管理
+### Ã¨Âµâ€žÃ¦ÂºÂÃ§Â®Â¡Ã§Ââ€ 
 
 ```python
 # Good: Using context managers
@@ -213,7 +226,7 @@ def process_file(path: str) -> str:
         f.close()
 ```
 
-### 自定义上下文管理器
+### Ã¨â€¡ÂªÃ¥Â®Å¡Ã¤Â¹â€°Ã¤Â¸Å Ã¤Â¸â€¹Ã¦â€“â€¡Ã§Â®Â¡Ã§Ââ€ Ã¥â„¢Â¨
 
 ```python
 from contextlib import contextmanager
@@ -231,7 +244,7 @@ with timer("data processing"):
     process_large_dataset()
 ```
 
-### 上下文管理器类
+### Ã¤Â¸Å Ã¤Â¸â€¹Ã¦â€“â€¡Ã§Â®Â¡Ã§Ââ€ Ã¥â„¢Â¨Ã§Â±Â»
 
 ```python
 class DatabaseTransaction:
@@ -255,9 +268,9 @@ with DatabaseTransaction(conn):
     conn.create_profile(user.id, profile_data)
 ```
 
-## 推导式和生成器
+## Ã¦Å½Â¨Ã¥Â¯Â¼Ã¥Â¼ÂÃ¥â€™Å’Ã§â€Å¸Ã¦Ë†ÂÃ¥â„¢Â¨
 
-### 列表推导式
+### Ã¥Ë†â€”Ã¨Â¡Â¨Ã¦Å½Â¨Ã¥Â¯Â¼Ã¥Â¼Â
 
 ```python
 # Good: List comprehension for simple transformations
@@ -282,7 +295,7 @@ def filter_and_transform(items: Iterable[int]) -> list[int]:
     return result
 ```
 
-### 生成器表达式
+### Ã§â€Å¸Ã¦Ë†ÂÃ¥â„¢Â¨Ã¨Â¡Â¨Ã¨Â¾Â¾Ã¥Â¼Â
 
 ```python
 # Good: Generator for lazy evaluation
@@ -292,7 +305,7 @@ total = sum(x * x for x in range(1_000_000))
 total = sum([x * x for x in range(1_000_000)])
 ```
 
-### 生成器函数
+### Ã§â€Å¸Ã¦Ë†ÂÃ¥â„¢Â¨Ã¥â€¡Â½Ã¦â€¢Â°
 
 ```python
 def read_large_file(path: str) -> Iterator[str]:
@@ -306,9 +319,9 @@ for line in read_large_file("huge.txt"):
     process(line)
 ```
 
-## 数据类和命名元组
+## Ã¦â€¢Â°Ã¦ÂÂ®Ã§Â±Â»Ã¥â€™Å’Ã¥â€˜Â½Ã¥ÂÂÃ¥â€¦Æ’Ã§Â»â€ž
 
-### 数据类
+### Ã¦â€¢Â°Ã¦ÂÂ®Ã§Â±Â»
 
 ```python
 from dataclasses import dataclass, field
@@ -331,7 +344,7 @@ user = User(
 )
 ```
 
-### 带验证的数据类
+### Ã¥Â¸Â¦Ã©ÂªÅ’Ã¨Â¯ÂÃ§Å¡â€žÃ¦â€¢Â°Ã¦ÂÂ®Ã§Â±Â»
 
 ```python
 @dataclass
@@ -348,7 +361,7 @@ class User:
             raise ValueError(f"Invalid age: {self.age}")
 ```
 
-### 命名元组
+### Ã¥â€˜Â½Ã¥ÂÂÃ¥â€¦Æ’Ã§Â»â€ž
 
 ```python
 from typing import NamedTuple
@@ -367,9 +380,9 @@ p2 = Point(3, 4)
 print(p1.distance(p2))  # 5.0
 ```
 
-## 装饰器
+## Ã¨Â£â€¦Ã©Â¥Â°Ã¥â„¢Â¨
 
-### 函数装饰器
+### Ã¥â€¡Â½Ã¦â€¢Â°Ã¨Â£â€¦Ã©Â¥Â°Ã¥â„¢Â¨
 
 ```python
 import functools
@@ -393,7 +406,7 @@ def slow_function():
 # slow_function() prints: slow_function took 1.0012s
 ```
 
-### 参数化装饰器
+### Ã¥Ââ€šÃ¦â€¢Â°Ã¥Å’â€“Ã¨Â£â€¦Ã©Â¥Â°Ã¥â„¢Â¨
 
 ```python
 def repeat(times: int):
@@ -415,7 +428,7 @@ def greet(name: str) -> str:
 # greet("Alice") returns ["Hello, Alice!", "Hello, Alice!", "Hello, Alice!"]
 ```
 
-### 基于类的装饰器
+### Ã¥Å¸ÂºÃ¤ÂºÅ½Ã§Â±Â»Ã§Å¡â€žÃ¨Â£â€¦Ã©Â¥Â°Ã¥â„¢Â¨
 
 ```python
 class CountCalls:
@@ -437,9 +450,9 @@ def process():
 # Each call to process() prints the call count
 ```
 
-## 并发模式
+## Ã¥Â¹Â¶Ã¥Ââ€˜Ã¦Â¨Â¡Ã¥Â¼Â
 
-### 用于 I/O 密集型任务的线程
+### Ã§â€Â¨Ã¤ÂºÅ½ I/O Ã¥Â¯â€ Ã©â€ºâ€ Ã¥Å¾â€¹Ã¤Â»Â»Ã¥Å Â¡Ã§Å¡â€žÃ§ÂºÂ¿Ã§Â¨â€¹
 
 ```python
 import concurrent.futures
@@ -465,7 +478,7 @@ def fetch_all_urls(urls: list[str]) -> dict[str, str]:
     return results
 ```
 
-### 用于 CPU 密集型任务的多进程
+### Ã§â€Â¨Ã¤ÂºÅ½ CPU Ã¥Â¯â€ Ã©â€ºâ€ Ã¥Å¾â€¹Ã¤Â»Â»Ã¥Å Â¡Ã§Å¡â€žÃ¥Â¤Å¡Ã¨Â¿â€ºÃ§Â¨â€¹
 
 ```python
 def process_data(data: list[int]) -> int:
@@ -479,7 +492,7 @@ def process_all(datasets: list[list[int]]) -> list[int]:
     return results
 ```
 
-### 用于并发 I/O 的异步/等待
+### Ã§â€Â¨Ã¤ÂºÅ½Ã¥Â¹Â¶Ã¥Ââ€˜ I/O Ã§Å¡â€žÃ¥Â¼â€šÃ¦Â­Â¥/Ã§Â­â€°Ã¥Â¾â€¦
 
 ```python
 import asyncio
@@ -498,36 +511,36 @@ async def fetch_all(urls: list[str]) -> dict[str, str]:
     return dict(zip(urls, results))
 ```
 
-## 包组织
+## Ã¥Å’â€¦Ã§Â»â€žÃ§Â»â€¡
 
-### 标准项目布局
+### Ã¦Â â€¡Ã¥â€¡â€ Ã©Â¡Â¹Ã§â€ºÂ®Ã¥Â¸Æ’Ã¥Â±â‚¬
 
 ```
 myproject/
-├── src/
-│   └── mypackage/
-│       ├── __init__.py
-│       ├── main.py
-│       ├── api/
-│       │   ├── __init__.py
-│       │   └── routes.py
-│       ├── models/
-│       │   ├── __init__.py
-│       │   └── user.py
-│       └── utils/
-│           ├── __init__.py
-│           └── helpers.py
-├── tests/
-│   ├── __init__.py
-│   ├── conftest.py
-│   ├── test_api.py
-│   └── test_models.py
-├── pyproject.toml
-├── README.md
-└── .gitignore
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ src/
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ mypackage/
+Ã¢â€â€š       Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ __init__.py
+Ã¢â€â€š       Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ main.py
+Ã¢â€â€š       Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ api/
+Ã¢â€â€š       Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ __init__.py
+Ã¢â€â€š       Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ routes.py
+Ã¢â€â€š       Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ models/
+Ã¢â€â€š       Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ __init__.py
+Ã¢â€â€š       Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ user.py
+Ã¢â€â€š       Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ utils/
+Ã¢â€â€š           Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ __init__.py
+Ã¢â€â€š           Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ helpers.py
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ tests/
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ __init__.py
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ conftest.py
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ test_api.py
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ test_models.py
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ pyproject.toml
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ README.md
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ .gitignore
 ```
 
-### 导入约定
+### Ã¥Â¯Â¼Ã¥â€¦Â¥Ã§ÂºÂ¦Ã¥Â®Å¡
 
 ```python
 # Good: Import order - stdlib, third-party, local
@@ -545,7 +558,7 @@ from mypackage.utils import format_name
 # pip install isort
 ```
 
-### **init**.py 用于包导出
+### **init**.py Ã§â€Â¨Ã¤ÂºÅ½Ã¥Å’â€¦Ã¥Â¯Â¼Ã¥â€¡Âº
 
 ```python
 # mypackage/__init__.py
@@ -560,9 +573,9 @@ from mypackage.utils import format_name
 __all__ = ["User", "Post", "format_name"]
 ```
 
-## 内存和性能
+## Ã¥â€ â€¦Ã¥Â­ËœÃ¥â€™Å’Ã¦â‚¬Â§Ã¨Æ’Â½
 
-### 使用 **slots** 提高内存效率
+### Ã¤Â½Â¿Ã§â€Â¨ **slots** Ã¦ÂÂÃ©Â«ËœÃ¥â€ â€¦Ã¥Â­ËœÃ¦â€¢Ë†Ã§Å½â€¡
 
 ```python
 # Bad: Regular class uses __dict__ (more memory)
@@ -580,7 +593,7 @@ class Point:
         self.y = y
 ```
 
-### 生成器用于大数据
+### Ã§â€Å¸Ã¦Ë†ÂÃ¥â„¢Â¨Ã§â€Â¨Ã¤ÂºÅ½Ã¥Â¤Â§Ã¦â€¢Â°Ã¦ÂÂ®
 
 ```python
 # Bad: Returns full list in memory
@@ -595,10 +608,10 @@ def read_lines(path: str) -> Iterator[str]:
             yield line.strip()
 ```
 
-### 避免在循环中进行字符串拼接
+### Ã©ÂÂ¿Ã¥â€¦ÂÃ¥Å“Â¨Ã¥Â¾ÂªÃ§Å½Â¯Ã¤Â¸Â­Ã¨Â¿â€ºÃ¨Â¡Å’Ã¥Â­â€”Ã§Â¬Â¦Ã¤Â¸Â²Ã¦â€¹Â¼Ã¦Å½Â¥
 
 ```python
-# Bad: O(n²) due to string immutability
+# Bad: O(nÃ‚Â²) due to string immutability
 result = ""
 for item in items:
     result += str(item)
@@ -615,9 +628,9 @@ for item in items:
 result = buffer.getvalue()
 ```
 
-## Python 工具集成
+## Python Ã¥Â·Â¥Ã¥â€¦Â·Ã©â€ºâ€ Ã¦Ë†Â
 
-### 基本命令
+### Ã¥Å¸ÂºÃ¦Å“Â¬Ã¥â€˜Â½Ã¤Â»Â¤
 
 ```bash
 # Code formatting
@@ -642,7 +655,7 @@ pip-audit
 safety check
 ```
 
-### pyproject.toml 配置
+### pyproject.toml Ã©â€¦ÂÃ§Â½Â®
 
 ```toml
 [project]
@@ -682,22 +695,22 @@ testpaths = ["tests"]
 addopts = "--cov=mypackage --cov-report=term-missing"
 ```
 
-## 快速参考：Python 惯用法
+## Ã¥Â¿Â«Ã©â‚¬Å¸Ã¥Ââ€šÃ¨â‚¬Æ’Ã¯Â¼Å¡Python Ã¦Æ’Â¯Ã§â€Â¨Ã¦Â³â€¢
 
-| 惯用法 | 描述 |
+| Ã¦Æ’Â¯Ã§â€Â¨Ã¦Â³â€¢ | Ã¦ÂÂÃ¨Â¿Â° |
 |-------|-------------|
-| EAFP | 请求宽恕比请求许可更容易 |
-| 上下文管理器 | 使用 `with` 进行资源管理 |
-| 列表推导式 | 用于简单的转换 |
-| 生成器 | 用于惰性求值和大数据集 |
-| 类型提示 | 注解函数签名 |
-| 数据类 | 用于具有自动生成方法的数据容器 |
-| `__slots__` | 用于内存优化 |
-| f-strings | 用于字符串格式化（Python 3.6+） |
-| `pathlib.Path` | 用于路径操作（Python 3.4+） |
-| `enumerate` | 用于循环中的索引-元素对 |
+| EAFP | Ã¨Â¯Â·Ã¦Â±â€šÃ¥Â®Â½Ã¦Ââ€¢Ã¦Â¯â€Ã¨Â¯Â·Ã¦Â±â€šÃ¨Â®Â¸Ã¥ÂÂ¯Ã¦â€ºÂ´Ã¥Â®Â¹Ã¦Ëœâ€œ |
+| Ã¤Â¸Å Ã¤Â¸â€¹Ã¦â€“â€¡Ã§Â®Â¡Ã§Ââ€ Ã¥â„¢Â¨ | Ã¤Â½Â¿Ã§â€Â¨ `with` Ã¨Â¿â€ºÃ¨Â¡Å’Ã¨Âµâ€žÃ¦ÂºÂÃ§Â®Â¡Ã§Ââ€  |
+| Ã¥Ë†â€”Ã¨Â¡Â¨Ã¦Å½Â¨Ã¥Â¯Â¼Ã¥Â¼Â | Ã§â€Â¨Ã¤ÂºÅ½Ã§Â®â‚¬Ã¥Ââ€¢Ã§Å¡â€žÃ¨Â½Â¬Ã¦ÂÂ¢ |
+| Ã§â€Å¸Ã¦Ë†ÂÃ¥â„¢Â¨ | Ã§â€Â¨Ã¤ÂºÅ½Ã¦Æ’Â°Ã¦â‚¬Â§Ã¦Â±â€šÃ¥â‚¬Â¼Ã¥â€™Å’Ã¥Â¤Â§Ã¦â€¢Â°Ã¦ÂÂ®Ã©â€ºâ€  |
+| Ã§Â±Â»Ã¥Å¾â€¹Ã¦ÂÂÃ§Â¤Âº | Ã¦Â³Â¨Ã¨Â§Â£Ã¥â€¡Â½Ã¦â€¢Â°Ã§Â­Â¾Ã¥ÂÂ |
+| Ã¦â€¢Â°Ã¦ÂÂ®Ã§Â±Â» | Ã§â€Â¨Ã¤ÂºÅ½Ã¥â€¦Â·Ã¦Å“â€°Ã¨â€¡ÂªÃ¥Å Â¨Ã§â€Å¸Ã¦Ë†ÂÃ¦â€“Â¹Ã¦Â³â€¢Ã§Å¡â€žÃ¦â€¢Â°Ã¦ÂÂ®Ã¥Â®Â¹Ã¥â„¢Â¨ |
+| `__slots__` | Ã§â€Â¨Ã¤ÂºÅ½Ã¥â€ â€¦Ã¥Â­ËœÃ¤Â¼ËœÃ¥Å’â€“ |
+| f-strings | Ã§â€Â¨Ã¤ÂºÅ½Ã¥Â­â€”Ã§Â¬Â¦Ã¤Â¸Â²Ã¦Â Â¼Ã¥Â¼ÂÃ¥Å’â€“Ã¯Â¼Ë†Python 3.6+Ã¯Â¼â€° |
+| `pathlib.Path` | Ã§â€Â¨Ã¤ÂºÅ½Ã¨Â·Â¯Ã¥Â¾â€žÃ¦â€œÂÃ¤Â½Å“Ã¯Â¼Ë†Python 3.4+Ã¯Â¼â€° |
+| `enumerate` | Ã§â€Â¨Ã¤ÂºÅ½Ã¥Â¾ÂªÃ§Å½Â¯Ã¤Â¸Â­Ã§Å¡â€žÃ§Â´Â¢Ã¥Â¼â€¢-Ã¥â€¦Æ’Ã§Â´Â Ã¥Â¯Â¹ |
 
-## 要避免的反模式
+## Ã¨Â¦ÂÃ©ÂÂ¿Ã¥â€¦ÂÃ§Å¡â€žÃ¥ÂÂÃ¦Â¨Â¡Ã¥Â¼Â
 
 ```python
 # Bad: Mutable default arguments
@@ -747,4 +760,4 @@ except SpecificError as e:
     logger.error(f"Operation failed: {e}")
 ```
 
-**记住**：Python 代码应该具有可读性、显式性，并遵循最小意外原则。如有疑问，优先考虑清晰性而非巧妙性。
+**Ã¨Â®Â°Ã¤Â½Â**Ã¯Â¼Å¡Python Ã¤Â»Â£Ã§Â ÂÃ¥Âºâ€Ã¨Â¯Â¥Ã¥â€¦Â·Ã¦Å“â€°Ã¥ÂÂ¯Ã¨Â¯Â»Ã¦â‚¬Â§Ã£â‚¬ÂÃ¦ËœÂ¾Ã¥Â¼ÂÃ¦â‚¬Â§Ã¯Â¼Å’Ã¥Â¹Â¶Ã©ÂÂµÃ¥Â¾ÂªÃ¦Å“â‚¬Ã¥Â°ÂÃ¦â€žÂÃ¥Â¤â€“Ã¥Å½Å¸Ã¥Ë†â„¢Ã£â‚¬â€šÃ¥Â¦â€šÃ¦Å“â€°Ã§â€“â€˜Ã©â€”Â®Ã¯Â¼Å’Ã¤Â¼ËœÃ¥â€¦Ë†Ã¨â‚¬Æ’Ã¨â„¢â€˜Ã¦Â¸â€¦Ã¦â„¢Â°Ã¦â‚¬Â§Ã¨â‚¬Å’Ã©ÂÅ¾Ã¥Â·Â§Ã¥Â¦â„¢Ã¦â‚¬Â§Ã£â‚¬â€š

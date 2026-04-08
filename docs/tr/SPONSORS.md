@@ -1,59 +1,72 @@
 # Sponsorlar
 
-Bu projeye sponsor olan herkese teşekkürler! Desteğiniz ECC ekosisteminin büyümesini sağlıyor.
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+Bu projeye sponsor olan herkese teÃ…Å¸ekkÃƒÂ¼rler! DesteÃ„Å¸iniz ECC ekosisteminin bÃƒÂ¼yÃƒÂ¼mesini saÃ„Å¸lÃ„Â±yor.
 
 ## Kurumsal Sponsorlar
 
-*Burada yer almak için [Kurumsal sponsor](https://github.com/sponsors/affaan-m) olun*
+*Burada yer almak iÃƒÂ§in [Kurumsal sponsor](https://github.com/sponsors/affaan-m) olun*
 
-## İşletme Sponsorları
+## Ã„Â°Ã…Å¸letme SponsorlarÃ„Â±
 
-*Burada yer almak için [İşletme sponsoru](https://github.com/sponsors/affaan-m) olun*
+*Burada yer almak iÃƒÂ§in [Ã„Â°Ã…Å¸letme sponsoru](https://github.com/sponsors/affaan-m) olun*
 
-## Takım Sponsorları
+## TakÃ„Â±m SponsorlarÃ„Â±
 
-*Burada yer almak için [Takım sponsoru](https://github.com/sponsors/affaan-m) olun*
+*Burada yer almak iÃƒÂ§in [TakÃ„Â±m sponsoru](https://github.com/sponsors/affaan-m) olun*
 
 ## Bireysel Sponsorlar
 
-*Burada listelenmek için [sponsor](https://github.com/sponsors/affaan-m) olun*
+*Burada listelenmek iÃƒÂ§in [sponsor](https://github.com/sponsors/affaan-m) olun*
 
 ---
 
-## Neden Sponsor Olmalı?
+## Neden Sponsor OlmalÃ„Â±?
 
-Sponsorluğunuz şunlara yardımcı olur:
+SponsorluÃ„Å¸unuz Ã…Å¸unlara yardÃ„Â±mcÃ„Â± olur:
 
-- **Daha hızlı teslimat** — Araçlar ve özellikler geliştirmeye daha fazla zaman ayrılması
-- **Ücretsiz kalmasını sağlama** — Premium özellikler herkes için ücretsiz katmanı finanse eder
-- **Daha iyi destek** — Sponsorlar öncelikli yanıtlar alır
-- **Yol haritasını şekillendirme** — Pro+ sponsorlar özelliklere oy verir
+- **Daha hÃ„Â±zlÃ„Â± teslimat** Ã¢â‚¬â€ AraÃƒÂ§lar ve ÃƒÂ¶zellikler geliÃ…Å¸tirmeye daha fazla zaman ayrÃ„Â±lmasÃ„Â±
+- **ÃƒÅ“cretsiz kalmasÃ„Â±nÃ„Â± saÃ„Å¸lama** Ã¢â‚¬â€ Premium ÃƒÂ¶zellikler herkes iÃƒÂ§in ÃƒÂ¼cretsiz katmanÃ„Â± finanse eder
+- **Daha iyi destek** Ã¢â‚¬â€ Sponsorlar ÃƒÂ¶ncelikli yanÃ„Â±tlar alÃ„Â±r
+- **Yol haritasÃ„Â±nÃ„Â± Ã…Å¸ekillendirme** Ã¢â‚¬â€ Pro+ sponsorlar ÃƒÂ¶zelliklere oy verir
 
-## Sponsor Hazırlık Sinyalleri
+## Sponsor HazÃ„Â±rlÃ„Â±k Sinyalleri
 
-Sponsor konuşmalarında bu kanıt noktalarını kullanın:
+Sponsor konuÃ…Å¸malarÃ„Â±nda bu kanÃ„Â±t noktalarÃ„Â±nÃ„Â± kullanÃ„Â±n:
 
-- `ecc-universal` ve `ecc-agentshield` için canlı npm kurulum/indirme metrikleri
-- Marketplace kurulumları aracılığıyla GitHub App dağıtımı
-- Genel benimseme sinyalleri: yıldızlar, fork'lar, katkıda bulunanlar, sürüm ritmi
-- Harness'lar arası destek: Claude Code, Cursor, OpenCode, Codex app/CLI
+- `ecc-universal` ve `ecc-agentshield` iÃƒÂ§in canlÃ„Â± npm kurulum/indirme metrikleri
+- Marketplace kurulumlarÃ„Â± aracÃ„Â±lÃ„Â±Ã„Å¸Ã„Â±yla GitHub App daÃ„Å¸Ã„Â±tÃ„Â±mÃ„Â±
+- Genel benimseme sinyalleri: yÃ„Â±ldÃ„Â±zlar, fork'lar, katkÃ„Â±da bulunanlar, sÃƒÂ¼rÃƒÂ¼m ritmi
+- Harness'lar arasÃ„Â± destek: Claude Code, Cursor, OpenCode, Codex app/CLI
 
-Kopyala/yapıştır metrik çekme iş akışı için [`docs/business/metrics-and-sponsorship.md`](../business/metrics-and-sponsorship.md) dosyasına bakın.
+Kopyala/yapÃ„Â±Ã…Å¸tÃ„Â±r metrik ÃƒÂ§ekme iÃ…Å¸ akÃ„Â±Ã…Å¸Ã„Â± iÃƒÂ§in [`docs/business/metrics-and-sponsorship.md`](../business/metrics-and-sponsorship.md) dosyasÃ„Â±na bakÃ„Â±n.
 
 ## Sponsor Seviyeleri
 
 | Seviye | Fiyat | Avantajlar |
 |------|-------|----------|
-| Supporter | $5/ay | README'de isim, erken erişim |
-| Builder | $10/ay | Premium araç erişimi |
-| Pro | $25/ay | Öncelikli destek, ofis saatleri |
-| Team | $100/ay | 5 koltuk, takım yapılandırmaları |
-| Harness Partner | $200/ay | Aylık yol haritası senkronizasyonu, öncelikli bakımcı geri bildirimi, sürüm notlarında bahis |
-| Business | $500/ay | 25 koltuk, danışmanlık kredisi |
-| Enterprise | $2K/ay | Sınırsız koltuk, özel araçlar |
+| Supporter | $5/ay | README'de isim, erken eriÃ…Å¸im |
+| Builder | $10/ay | Premium araÃƒÂ§ eriÃ…Å¸imi |
+| Pro | $25/ay | Ãƒâ€“ncelikli destek, ofis saatleri |
+| Team | $100/ay | 5 koltuk, takÃ„Â±m yapÃ„Â±landÃ„Â±rmalarÃ„Â± |
+| Harness Partner | $200/ay | AylÃ„Â±k yol haritasÃ„Â± senkronizasyonu, ÃƒÂ¶ncelikli bakÃ„Â±mcÃ„Â± geri bildirimi, sÃƒÂ¼rÃƒÂ¼m notlarÃ„Â±nda bahis |
+| Business | $500/ay | 25 koltuk, danÃ„Â±Ã…Å¸manlÃ„Â±k kredisi |
+| Enterprise | $2K/ay | SÃ„Â±nÃ„Â±rsÃ„Â±z koltuk, ÃƒÂ¶zel araÃƒÂ§lar |
 
-[**Sponsor Olun →**](https://github.com/sponsors/affaan-m)
+[**Sponsor Olun Ã¢â€ â€™**](https://github.com/sponsors/affaan-m)
 
 ---
 
-*Otomatik güncellenir. Son senkronizasyon: Şubat 2026*
+*Otomatik gÃƒÂ¼ncellenir. Son senkronizasyon: Ã…Å¾ubat 2026*

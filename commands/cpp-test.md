@@ -4,6 +4,19 @@ description: Enforce TDD workflow for C++. Write GoogleTest tests first, then im
 
 # C++ TDD Command
 
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
 This command enforces test-driven development methodology for C++ code using GoogleTest/GoogleMock with CMake/CTest.
 
 ## What This Command Does
@@ -27,10 +40,10 @@ Use `/cpp-test` when:
 ## TDD Cycle
 
 ```
-RED     → Write failing GoogleTest test
-GREEN   → Implement minimal code to pass
-REFACTOR → Improve code, tests stay green
-REPEAT  → Next test case
+RED     Ã¢â€ â€™ Write failing GoogleTest test
+GREEN   Ã¢â€ â€™ Implement minimal code to pass
+REFACTOR Ã¢â€ â€™ Improve code, tests stay green
+REPEAT  Ã¢â€ â€™ Next test case
 ```
 
 ## Example Session
@@ -107,7 +120,7 @@ $ cmake --build build && ctest --test-dir build --output-on-failure
 FAIL
 ```
 
-✓ Tests fail as expected (unimplemented).
+Ã¢Å“â€œ Tests fail as expected (unimplemented).
 
 ## Step 4: Implement Minimal Code (GREEN)
 
@@ -138,7 +151,7 @@ $ cmake --build build && ctest --test-dir build --output-on-failure
 100% tests passed.
 ```
 
-✓ All tests passing!
+Ã¢Å“â€œ All tests passing!
 
 ## Step 6: Check Coverage
 
@@ -151,7 +164,7 @@ $ lcov --list coverage.info
 validator/email.cpp     | 100%
 ```
 
-✓ Coverage: 100%
+Ã¢Å“â€œ Coverage: 100%
 
 ## TDD Complete!
 ````

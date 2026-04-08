@@ -2,80 +2,93 @@
 description: Fix Go build errors, go vet warnings, and linter issues incrementally. Invokes the go-build-resolver agent for minimal, surgical fixes.
 ---
 
-# Go 建置與修復
+# Go Ã¥Â»ÂºÃ§Â½Â®Ã¨Ë†â€¡Ã¤Â¿Â®Ã¥Â¾Â©
 
-此指令呼叫 **go-build-resolver** Agent，以最小變更增量修復 Go 建置錯誤。
+## Safety And Authorization Rule
 
-## 此指令的功能
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-1. **執行診斷**：執行 `go build`、`go vet`、`staticcheck`
-2. **解析錯誤**：依檔案分組並依嚴重性排序
-3. **增量修復**：一次一個錯誤
-4. **驗證每次修復**：每次變更後重新執行建置
-5. **報告摘要**：顯示已修復和剩餘的問題
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-## 何時使用
 
-在以下情況使用 `/go-build`：
-- `go build ./...` 失敗並出現錯誤
-- `go vet ./...` 報告問題
-- `golangci-lint run` 顯示警告
-- 模組相依性損壞
-- 拉取破壞建置的變更後
+Ã¦Â­Â¤Ã¦Å’â€¡Ã¤Â»Â¤Ã¥â€˜Â¼Ã¥ÂÂ« **go-build-resolver** AgentÃ¯Â¼Å’Ã¤Â»Â¥Ã¦Å“â‚¬Ã¥Â°ÂÃ¨Â®Å Ã¦â€ºÂ´Ã¥Â¢Å¾Ã©â€¡ÂÃ¤Â¿Â®Ã¥Â¾Â© Go Ã¥Â»ÂºÃ§Â½Â®Ã©Å’Â¯Ã¨ÂªÂ¤Ã£â‚¬â€š
 
-## 執行的診斷指令
+## Ã¦Â­Â¤Ã¦Å’â€¡Ã¤Â»Â¤Ã§Å¡â€žÃ¥Å Å¸Ã¨Æ’Â½
+
+1. **Ã¥Å¸Â·Ã¨Â¡Å’Ã¨Â¨ÂºÃ¦â€“Â·**Ã¯Â¼Å¡Ã¥Å¸Â·Ã¨Â¡Å’ `go build`Ã£â‚¬Â`go vet`Ã£â‚¬Â`staticcheck`
+2. **Ã¨Â§Â£Ã¦Å¾ÂÃ©Å’Â¯Ã¨ÂªÂ¤**Ã¯Â¼Å¡Ã¤Â¾ÂÃ¦Âªâ€Ã¦Â¡Ë†Ã¥Ë†â€ Ã§Âµâ€žÃ¤Â¸Â¦Ã¤Â¾ÂÃ¥Å¡Â´Ã©â€¡ÂÃ¦â‚¬Â§Ã¦Å½â€™Ã¥ÂºÂ
+3. **Ã¥Â¢Å¾Ã©â€¡ÂÃ¤Â¿Â®Ã¥Â¾Â©**Ã¯Â¼Å¡Ã¤Â¸â‚¬Ã¦Â¬Â¡Ã¤Â¸â‚¬Ã¥â‚¬â€¹Ã©Å’Â¯Ã¨ÂªÂ¤
+4. **Ã©Â©â€”Ã¨Â­â€°Ã¦Â¯ÂÃ¦Â¬Â¡Ã¤Â¿Â®Ã¥Â¾Â©**Ã¯Â¼Å¡Ã¦Â¯ÂÃ¦Â¬Â¡Ã¨Â®Å Ã¦â€ºÂ´Ã¥Â¾Å’Ã©â€¡ÂÃ¦â€“Â°Ã¥Å¸Â·Ã¨Â¡Å’Ã¥Â»ÂºÃ§Â½Â®
+5. **Ã¥Â Â±Ã¥â€˜Å Ã¦â€˜ËœÃ¨Â¦Â**Ã¯Â¼Å¡Ã©Â¡Â¯Ã§Â¤ÂºÃ¥Â·Â²Ã¤Â¿Â®Ã¥Â¾Â©Ã¥â€™Å’Ã¥â€°Â©Ã©Â¤ËœÃ§Å¡â€žÃ¥â€¢ÂÃ©Â¡Å’
+
+## Ã¤Â½â€¢Ã¦â„¢â€šÃ¤Â½Â¿Ã§â€Â¨
+
+Ã¥Å“Â¨Ã¤Â»Â¥Ã¤Â¸â€¹Ã¦Æ’â€¦Ã¦Â³ÂÃ¤Â½Â¿Ã§â€Â¨ `/go-build`Ã¯Â¼Å¡
+- `go build ./...` Ã¥Â¤Â±Ã¦â€¢â€”Ã¤Â¸Â¦Ã¥â€¡ÂºÃ§ÂÂ¾Ã©Å’Â¯Ã¨ÂªÂ¤
+- `go vet ./...` Ã¥Â Â±Ã¥â€˜Å Ã¥â€¢ÂÃ©Â¡Å’
+- `golangci-lint run` Ã©Â¡Â¯Ã§Â¤ÂºÃ¨Â­Â¦Ã¥â€˜Å 
+- Ã¦Â¨Â¡Ã§Âµâ€žÃ§â€ºÂ¸Ã¤Â¾ÂÃ¦â‚¬Â§Ã¦ÂÂÃ¥Â£Å¾
+- Ã¦â€¹â€°Ã¥Ââ€“Ã§Â Â´Ã¥Â£Å¾Ã¥Â»ÂºÃ§Â½Â®Ã§Å¡â€žÃ¨Â®Å Ã¦â€ºÂ´Ã¥Â¾Å’
+
+## Ã¥Å¸Â·Ã¨Â¡Å’Ã§Å¡â€žÃ¨Â¨ÂºÃ¦â€“Â·Ã¦Å’â€¡Ã¤Â»Â¤
 
 ```bash
-# 主要建置檢查
+# Ã¤Â¸Â»Ã¨Â¦ÂÃ¥Â»ÂºÃ§Â½Â®Ã¦ÂªÂ¢Ã¦Å¸Â¥
 go build ./...
 
-# 靜態分析
+# Ã©ÂÅ“Ã¦â€¦â€¹Ã¥Ë†â€ Ã¦Å¾Â
 go vet ./...
 
-# 擴展 linting（如果可用）
+# Ã¦â€œÂ´Ã¥Â±â€¢ lintingÃ¯Â¼Ë†Ã¥Â¦â€šÃ¦Å¾Å“Ã¥ÂÂ¯Ã§â€Â¨Ã¯Â¼â€°
 staticcheck ./...
 golangci-lint run
 
-# 模組問題
+# Ã¦Â¨Â¡Ã§Âµâ€žÃ¥â€¢ÂÃ©Â¡Å’
 go mod verify
 go mod tidy -v
 ```
 
-## 常見修復的錯誤
+## Ã¥Â¸Â¸Ã¨Â¦â€¹Ã¤Â¿Â®Ã¥Â¾Â©Ã§Å¡â€žÃ©Å’Â¯Ã¨ÂªÂ¤
 
-| 錯誤 | 典型修復 |
+| Ã©Å’Â¯Ã¨ÂªÂ¤ | Ã¥â€¦Â¸Ã¥Å¾â€¹Ã¤Â¿Â®Ã¥Â¾Â© |
 |------|----------|
-| `undefined: X` | 新增 import 或修正打字錯誤 |
-| `cannot use X as Y` | 型別轉換或修正賦值 |
-| `missing return` | 新增 return 陳述式 |
-| `X does not implement Y` | 新增缺少的方法 |
-| `import cycle` | 重組套件 |
-| `declared but not used` | 移除或使用變數 |
-| `cannot find package` | `go get` 或 `go mod tidy` |
+| `undefined: X` | Ã¦â€“Â°Ã¥Â¢Å¾ import Ã¦Ë†â€“Ã¤Â¿Â®Ã¦Â­Â£Ã¦â€°â€œÃ¥Â­â€”Ã©Å’Â¯Ã¨ÂªÂ¤ |
+| `cannot use X as Y` | Ã¥Å¾â€¹Ã¥Ë†Â¥Ã¨Â½â€°Ã¦Ââ€ºÃ¦Ë†â€“Ã¤Â¿Â®Ã¦Â­Â£Ã¨Â³Â¦Ã¥â‚¬Â¼ |
+| `missing return` | Ã¦â€“Â°Ã¥Â¢Å¾ return Ã©â„¢Â³Ã¨Â¿Â°Ã¥Â¼Â |
+| `X does not implement Y` | Ã¦â€“Â°Ã¥Â¢Å¾Ã§Â¼ÂºÃ¥Â°â€˜Ã§Å¡â€žÃ¦â€“Â¹Ã¦Â³â€¢ |
+| `import cycle` | Ã©â€¡ÂÃ§Âµâ€žÃ¥Â¥â€”Ã¤Â»Â¶ |
+| `declared but not used` | Ã§Â§Â»Ã©â„¢Â¤Ã¦Ë†â€“Ã¤Â½Â¿Ã§â€Â¨Ã¨Â®Å Ã¦â€¢Â¸ |
+| `cannot find package` | `go get` Ã¦Ë†â€“ `go mod tidy` |
 
-## 修復策略
+## Ã¤Â¿Â®Ã¥Â¾Â©Ã§Â­â€“Ã§â€¢Â¥
 
-1. **建置錯誤優先** - 程式碼必須編譯
-2. **Vet 警告次之** - 修復可疑構造
-3. **Lint 警告第三** - 風格和最佳實務
-4. **一次一個修復** - 驗證每次變更
-5. **最小變更** - 不要重構，只修復
+1. **Ã¥Â»ÂºÃ§Â½Â®Ã©Å’Â¯Ã¨ÂªÂ¤Ã¥â€žÂªÃ¥â€¦Ë†** - Ã§Â¨â€¹Ã¥Â¼ÂÃ§Â¢Â¼Ã¥Â¿â€¦Ã©Â Ë†Ã§Â·Â¨Ã¨Â­Â¯
+2. **Vet Ã¨Â­Â¦Ã¥â€˜Å Ã¦Â¬Â¡Ã¤Â¹â€¹** - Ã¤Â¿Â®Ã¥Â¾Â©Ã¥ÂÂ¯Ã§â€“â€˜Ã¦Â§â€¹Ã©â‚¬Â 
+3. **Lint Ã¨Â­Â¦Ã¥â€˜Å Ã§Â¬Â¬Ã¤Â¸â€°** - Ã©Â¢Â¨Ã¦Â Â¼Ã¥â€™Å’Ã¦Å“â‚¬Ã¤Â½Â³Ã¥Â¯Â¦Ã¥â€¹â„¢
+4. **Ã¤Â¸â‚¬Ã¦Â¬Â¡Ã¤Â¸â‚¬Ã¥â‚¬â€¹Ã¤Â¿Â®Ã¥Â¾Â©** - Ã©Â©â€”Ã¨Â­â€°Ã¦Â¯ÂÃ¦Â¬Â¡Ã¨Â®Å Ã¦â€ºÂ´
+5. **Ã¦Å“â‚¬Ã¥Â°ÂÃ¨Â®Å Ã¦â€ºÂ´** - Ã¤Â¸ÂÃ¨Â¦ÂÃ©â€¡ÂÃ¦Â§â€¹Ã¯Â¼Å’Ã¥ÂÂªÃ¤Â¿Â®Ã¥Â¾Â©
 
-## 停止條件
+## Ã¥ÂÅ“Ã¦Â­Â¢Ã¦Â¢ÂÃ¤Â»Â¶
 
-Agent 會在以下情況停止並報告：
-- 3 次嘗試後同樣錯誤仍存在
-- 修復引入更多錯誤
-- 需要架構變更
-- 缺少外部相依性
+Agent Ã¦Å“Æ’Ã¥Å“Â¨Ã¤Â»Â¥Ã¤Â¸â€¹Ã¦Æ’â€¦Ã¦Â³ÂÃ¥ÂÅ“Ã¦Â­Â¢Ã¤Â¸Â¦Ã¥Â Â±Ã¥â€˜Å Ã¯Â¼Å¡
+- 3 Ã¦Â¬Â¡Ã¥Ëœâ€”Ã¨Â©Â¦Ã¥Â¾Å’Ã¥ÂÅ’Ã¦Â¨Â£Ã©Å’Â¯Ã¨ÂªÂ¤Ã¤Â»ÂÃ¥Â­ËœÃ¥Å“Â¨
+- Ã¤Â¿Â®Ã¥Â¾Â©Ã¥Â¼â€¢Ã¥â€¦Â¥Ã¦â€ºÂ´Ã¥Â¤Å¡Ã©Å’Â¯Ã¨ÂªÂ¤
+- Ã©Å“â‚¬Ã¨Â¦ÂÃ¦Å¾Â¶Ã¦Â§â€¹Ã¨Â®Å Ã¦â€ºÂ´
+- Ã§Â¼ÂºÃ¥Â°â€˜Ã¥Â¤â€“Ã©Æ’Â¨Ã§â€ºÂ¸Ã¤Â¾ÂÃ¦â‚¬Â§
 
-## 相關指令
+## Ã§â€ºÂ¸Ã©â€”Å“Ã¦Å’â€¡Ã¤Â»Â¤
 
-- `/go-test` - 建置成功後執行測試
-- `/go-review` - 審查程式碼品質
-- `/verify` - 完整驗證迴圈
+- `/go-test` - Ã¥Â»ÂºÃ§Â½Â®Ã¦Ë†ÂÃ¥Å Å¸Ã¥Â¾Å’Ã¥Å¸Â·Ã¨Â¡Å’Ã¦Â¸Â¬Ã¨Â©Â¦
+- `/go-review` - Ã¥Â¯Â©Ã¦Å¸Â¥Ã§Â¨â€¹Ã¥Â¼ÂÃ§Â¢Â¼Ã¥â€œÂÃ¨Â³Âª
+- `/verify` - Ã¥Â®Å’Ã¦â€¢Â´Ã©Â©â€”Ã¨Â­â€°Ã¨Â¿Â´Ã¥Å“Ë†
 
-## 相關
+## Ã§â€ºÂ¸Ã©â€”Å“
 
-- Agent：`agents/go-build-resolver.md`
-- 技能：`skills/golang-patterns/`
+- AgentÃ¯Â¼Å¡`agents/go-build-resolver.md`
+- Ã¦Å â‚¬Ã¨Æ’Â½Ã¯Â¼Å¡`skills/golang-patterns/`

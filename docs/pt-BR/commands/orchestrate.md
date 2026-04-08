@@ -1,8 +1,21 @@
 ---
-description: Orientação de orquestração sequencial e tmux/worktree para fluxos multiagente.
+description: OrientaÃƒÂ§ÃƒÂ£o de orquestraÃƒÂ§ÃƒÂ£o sequencial e tmux/worktree para fluxos multiagente.
 ---
 
 # Comando Orchestrate
+
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
 
 Fluxo sequencial de agentes para tarefas complexas.
 
@@ -13,37 +26,37 @@ Fluxo sequencial de agentes para tarefas complexas.
 ## Tipos de Workflow
 
 ### feature
-Workflow completo de implementação de feature:
+Workflow completo de implementaÃƒÂ§ÃƒÂ£o de feature:
 ```
 planner -> tdd-guide -> code-reviewer -> security-reviewer
 ```
 
 ### bugfix
-Workflow de investigação e correção de bug:
+Workflow de investigaÃƒÂ§ÃƒÂ£o e correÃƒÂ§ÃƒÂ£o de bug:
 ```
 planner -> tdd-guide -> code-reviewer
 ```
 
 ### refactor
-Workflow de refatoração segura:
+Workflow de refatoraÃƒÂ§ÃƒÂ£o segura:
 ```
 architect -> code-reviewer -> tdd-guide
 ```
 
 ### security
-Revisão focada em segurança:
+RevisÃƒÂ£o focada em seguranÃƒÂ§a:
 ```
 security-reviewer -> code-reviewer -> architect
 ```
 
-## Padrão de Execução
+## PadrÃƒÂ£o de ExecuÃƒÂ§ÃƒÂ£o
 
 Para cada agente no workflow:
 
 1. **Invoque o agente** com contexto do agente anterior
-2. **Colete saída** como documento estruturado de handoff
-3. **Passe para o próximo agente** na cadeia
-4. **Agregue resultados** em um relatório final
+2. **Colete saÃƒÂ­da** como documento estruturado de handoff
+3. **Passe para o prÃƒÂ³ximo agente** na cadeia
+4. **Agregue resultados** em um relatÃƒÂ³rio final
 
 ## Formato do Documento de Handoff
 
@@ -78,29 +91,29 @@ Executa:
 
 1. **Planner Agent**
    - Analisa requisitos
-   - Cria plano de implementação
-   - Identifica dependências
-   - Saída: `HANDOFF: planner -> tdd-guide`
+   - Cria plano de implementaÃƒÂ§ÃƒÂ£o
+   - Identifica dependÃƒÂªncias
+   - SaÃƒÂ­da: `HANDOFF: planner -> tdd-guide`
 
 2. **TDD Guide Agent**
-   - Lê handoff do planner
+   - LÃƒÂª handoff do planner
    - Escreve testes primeiro
    - Implementa para passar testes
-   - Saída: `HANDOFF: tdd-guide -> code-reviewer`
+   - SaÃƒÂ­da: `HANDOFF: tdd-guide -> code-reviewer`
 
 3. **Code Reviewer Agent**
-   - Revisa implementação
+   - Revisa implementaÃƒÂ§ÃƒÂ£o
    - Verifica problemas
    - Sugere melhorias
-   - Saída: `HANDOFF: code-reviewer -> security-reviewer`
+   - SaÃƒÂ­da: `HANDOFF: code-reviewer -> security-reviewer`
 
 4. **Security Reviewer Agent**
-   - Auditoria de segurança
-   - Verificação de vulnerabilidades
-   - Aprovação final
-   - Saída: Relatório Final
+   - Auditoria de seguranÃƒÂ§a
+   - VerificaÃƒÂ§ÃƒÂ£o de vulnerabilidades
+   - AprovaÃƒÂ§ÃƒÂ£o final
+   - SaÃƒÂ­da: RelatÃƒÂ³rio Final
 
-## Formato do Relatório Final
+## Formato do RelatÃƒÂ³rio Final
 
 ```
 ORCHESTRATION REPORT
@@ -137,23 +150,23 @@ RECOMMENDATION
 [SHIP / NEEDS WORK / BLOCKED]
 ```
 
-## Execução Paralela
+## ExecuÃƒÂ§ÃƒÂ£o Paralela
 
-Para verificações independentes, rode agentes em paralelo:
+Para verificaÃƒÂ§ÃƒÂµes independentes, rode agentes em paralelo:
 
 ```markdown
 ### Fase Paralela
 Executar simultaneamente:
 - code-reviewer (qualidade)
-- security-reviewer (segurança)
+- security-reviewer (seguranÃƒÂ§a)
 - architect (design)
 
 ### Mesclar Resultados
-Combinar saídas em um único relatório
+Combinar saÃƒÂ­das em um ÃƒÂºnico relatÃƒÂ³rio
 
-Para workers externos em tmux panes com git worktrees separados, use `node scripts/orchestrate-worktrees.js plan.json --execute`. O padrão embutido de orquestração permanece no processo atual; o helper é para sessões longas ou cross-harness.
+Para workers externos em tmux panes com git worktrees separados, use `node scripts/orchestrate-worktrees.js plan.json --execute`. O padrÃƒÂ£o embutido de orquestraÃƒÂ§ÃƒÂ£o permanece no processo atual; o helper ÃƒÂ© para sessÃƒÂµes longas ou cross-harness.
 
-Quando os workers precisarem enxergar arquivos locais sujos ou não rastreados do checkout principal, adicione `seedPaths` ao arquivo de plano. O ECC faz overlay apenas desses caminhos selecionados em cada worktree do worker após `git worktree add`, mantendo o branch isolado e ainda expondo scripts, planos ou docs em andamento.
+Quando os workers precisarem enxergar arquivos locais sujos ou nÃƒÂ£o rastreados do checkout principal, adicione `seedPaths` ao arquivo de plano. O ECC faz overlay apenas desses caminhos selecionados em cada worktree do worker apÃƒÂ³s `git worktree add`, mantendo o branch isolado e ainda expondo scripts, planos ou docs em andamento.
 
 ```json
 {
@@ -169,17 +182,17 @@ Quando os workers precisarem enxergar arquivos locais sujos ou não rastreados d
 }
 ```
 
-Para exportar um snapshot do control plane para uma sessão tmux/worktree ao vivo, rode:
+Para exportar um snapshot do control plane para uma sessÃƒÂ£o tmux/worktree ao vivo, rode:
 
 ```bash
 node scripts/orchestration-status.js .claude/plan/workflow-visual-proof.json
 ```
 
-O snapshot inclui atividade da sessão, metadados de pane do tmux, estado dos workers, objetivos, overlays semeados e resumos recentes de handoff em formato JSON.
+O snapshot inclui atividade da sessÃƒÂ£o, metadados de pane do tmux, estado dos workers, objetivos, overlays semeados e resumos recentes de handoff em formato JSON.
 
 ## Handoff de Command Center do Operador
 
-Quando o workflow atravessar múltiplas sessões, worktrees ou panes tmux, acrescente um bloco de control plane ao handoff final:
+Quando o workflow atravessar mÃƒÂºltiplas sessÃƒÂµes, worktrees ou panes tmux, acrescente um bloco de control plane ao handoff final:
 
 ```markdown
 CONTROL PLANE
@@ -204,16 +217,16 @@ Telemetry:
 - policy events raised by hooks or reviewers
 ```
 
-Isso mantém planner, implementador, revisor e loop workers legíveis pela superfície de operação.
+Isso mantÃƒÂ©m planner, implementador, revisor e loop workers legÃƒÂ­veis pela superfÃƒÂ­cie de operaÃƒÂ§ÃƒÂ£o.
 
 ## Argumentos
 
 $ARGUMENTS:
 - `feature <description>` - Workflow completo de feature
-- `bugfix <description>` - Workflow de correção de bug
-- `refactor <description>` - Workflow de refatoração
-- `security <description>` - Workflow de revisão de segurança
-- `custom <agents> <description>` - Sequência customizada de agentes
+- `bugfix <description>` - Workflow de correÃƒÂ§ÃƒÂ£o de bug
+- `refactor <description>` - Workflow de refatoraÃƒÂ§ÃƒÂ£o
+- `security <description>` - Workflow de revisÃƒÂ£o de seguranÃƒÂ§a
+- `custom <agents> <description>` - SequÃƒÂªncia customizada de agentes
 
 ## Exemplo de Workflow Customizado
 
@@ -226,5 +239,5 @@ $ARGUMENTS:
 1. **Comece com planner** para features complexas
 2. **Sempre inclua code-reviewer** antes do merge
 3. **Use security-reviewer** para auth/pagamento/PII
-4. **Mantenha handoffs concisos** - foque no que o próximo agente precisa
-5. **Rode verificação** entre agentes quando necessário
+4. **Mantenha handoffs concisos** - foque no que o prÃƒÂ³ximo agente precisa
+5. **Rode verificaÃƒÂ§ÃƒÂ£o** entre agentes quando necessÃƒÂ¡rio

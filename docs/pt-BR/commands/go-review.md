@@ -1,55 +1,68 @@
 ---
-description: Revisão completa de código Go para padrões idiomáticos, segurança de concorrência, tratamento de erro e segurança. Invoca o agente go-reviewer.
+description: RevisÃƒÂ£o completa de cÃƒÂ³digo Go para padrÃƒÂµes idiomÃƒÂ¡ticos, seguranÃƒÂ§a de concorrÃƒÂªncia, tratamento de erro e seguranÃƒÂ§a. Invoca o agente go-reviewer.
 ---
 
 # Code Review Go
 
-Este comando invoca o agente **go-reviewer** para revisão abrangente e específica de Go.
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+Este comando invoca o agente **go-reviewer** para revisÃƒÂ£o abrangente e especÃƒÂ­fica de Go.
 
 ## O Que Este Comando Faz
 
-1. **Identificar Mudanças Go**: Encontra arquivos `.go` modificados via `git diff`
-2. **Rodar Análise Estática**: Executa `go vet`, `staticcheck` e `golangci-lint`
-3. **Varredura de Segurança**: Verifica SQL injection, command injection e race conditions
-4. **Revisão de Concorrência**: Analisa segurança de goroutines, uso de channels e padrões com mutex
-5. **Checagem de Go Idiomático**: Verifica se o código segue convenções e boas práticas de Go
-6. **Gerar Relatório**: Categoriza problemas por severidade
+1. **Identificar MudanÃƒÂ§as Go**: Encontra arquivos `.go` modificados via `git diff`
+2. **Rodar AnÃƒÂ¡lise EstÃƒÂ¡tica**: Executa `go vet`, `staticcheck` e `golangci-lint`
+3. **Varredura de SeguranÃƒÂ§a**: Verifica SQL injection, command injection e race conditions
+4. **RevisÃƒÂ£o de ConcorrÃƒÂªncia**: Analisa seguranÃƒÂ§a de goroutines, uso de channels e padrÃƒÂµes com mutex
+5. **Checagem de Go IdiomÃƒÂ¡tico**: Verifica se o cÃƒÂ³digo segue convenÃƒÂ§ÃƒÂµes e boas prÃƒÂ¡ticas de Go
+6. **Gerar RelatÃƒÂ³rio**: Categoriza problemas por severidade
 
 ## Quando Usar
 
 Use `/go-review` quando:
-- Após escrever ou modificar código Go
-- Antes de commitar mudanças Go
-- Ao revisar pull requests com código Go
+- ApÃƒÂ³s escrever ou modificar cÃƒÂ³digo Go
+- Antes de commitar mudanÃƒÂ§as Go
+- Ao revisar pull requests com cÃƒÂ³digo Go
 - Ao entrar em um novo codebase Go
-- Ao aprender padrões idiomáticos Go
+- Ao aprender padrÃƒÂµes idiomÃƒÂ¡ticos Go
 
-## Categorias de Revisão
+## Categorias de RevisÃƒÂ£o
 
-### CRITICAL (Obrigatório Corrigir)
+### CRITICAL (ObrigatÃƒÂ³rio Corrigir)
 - Vulnerabilidades de SQL/Command injection
-- Race conditions sem sincronização
+- Race conditions sem sincronizaÃƒÂ§ÃƒÂ£o
 - Vazamento de goroutine
 - Credenciais hardcoded
 - Uso inseguro de ponteiros
-- Erros ignorados em caminhos críticos
+- Erros ignorados em caminhos crÃƒÂ­ticos
 
 ### HIGH (Deve Corrigir)
 - Falta de wrapping de erro com contexto
 - Panic em vez de retorno de erro
-- Context não propagado
-- Canais não bufferizados causando deadlock
-- Erros de interface não satisfeita
-- Falta de proteção com mutex
+- Context nÃƒÂ£o propagado
+- Canais nÃƒÂ£o bufferizados causando deadlock
+- Erros de interface nÃƒÂ£o satisfeita
+- Falta de proteÃƒÂ§ÃƒÂ£o com mutex
 
 ### MEDIUM (Considere)
-- Padrões não idiomáticos
-- Falta de comentários godoc em exports
-- Concatenação de string ineficiente
-- Slice sem pré-alocação
-- Table-driven tests não usados
+- PadrÃƒÂµes nÃƒÂ£o idiomÃƒÂ¡ticos
+- Falta de comentÃƒÂ¡rios godoc em exports
+- ConcatenaÃƒÂ§ÃƒÂ£o de string ineficiente
+- Slice sem prÃƒÂ©-alocaÃƒÂ§ÃƒÂ£o
+- Table-driven tests nÃƒÂ£o usados
 
-## Checagens Automáticas Executadas
+## Checagens AutomÃƒÂ¡ticas Executadas
 
 ```bash
 # Static analysis
@@ -79,8 +92,8 @@ Agent:
 - internal/service/auth.go (modified)
 
 ## Static Analysis Results
-✓ go vet: No issues
-✓ staticcheck: No issues
+Ã¢Å“â€œ go vet: No issues
+Ã¢Å“â€œ staticcheck: No issues
 
 ## Issues Found
 
@@ -127,19 +140,19 @@ return fmt.Errorf("get user %s: %w", userID, err)
 Recommendation: FAIL: Block merge until CRITICAL issue is fixed
 ```
 
-## Critérios de Aprovação
+## CritÃƒÂ©rios de AprovaÃƒÂ§ÃƒÂ£o
 
-| Status | Condição |
+| Status | CondiÃƒÂ§ÃƒÂ£o |
 |--------|----------|
-| PASS: Aprovado | Sem problemas CRÍTICO ou ALTO |
-| WARNING: Aviso | Apenas problemas MÉDIOS (merge com cautela) |
-| FAIL: Bloqueado | Problemas CRÍTICO ou ALTO encontrados |
-## Integração com Outros Comandos
+| PASS: Aprovado | Sem problemas CRÃƒÂTICO ou ALTO |
+| WARNING: Aviso | Apenas problemas MÃƒâ€°DIOS (merge com cautela) |
+| FAIL: Bloqueado | Problemas CRÃƒÂTICO ou ALTO encontrados |
+## IntegraÃƒÂ§ÃƒÂ£o com Outros Comandos
 
 - Use `/go-test` primeiro para garantir que os testes passam
 - Use `/go-build` se houver erros de build
 - Use `/go-review` antes de commitar
-- Use `/code-review` para preocupações não específicas de Go
+- Use `/code-review` para preocupaÃƒÂ§ÃƒÂµes nÃƒÂ£o especÃƒÂ­ficas de Go
 
 ## Relacionado
 

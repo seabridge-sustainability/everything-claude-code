@@ -1,42 +1,55 @@
 ---
 name: checkpoint
-description: 워크플로우에서 checkpoint를 생성, 검증, 조회 또는 정리합니다.
+description: Ã¬â€ºÅ’Ã­ÂÂ¬Ã­â€Å’Ã«Â¡Å“Ã¬Å¡Â°Ã¬â€”ÂÃ¬â€žÅ“ checkpointÃ«Â¥Â¼ Ã¬Æ’ÂÃ¬â€žÂ±, ÃªÂ²â‚¬Ã¬Â¦Â, Ã¬Â¡Â°Ã­Å¡Å’ Ã«ËœÂÃ«Å â€ Ã¬Â â€¢Ã«Â¦Â¬Ã­â€¢Â©Ã«â€¹Ë†Ã«â€¹Â¤.
 ---
 
-# Checkpoint 명령어
+# Checkpoint Ã«Âªâ€¦Ã«Â Â¹Ã¬â€“Â´
 
-워크플로우에서 checkpoint를 생성하거나 검증합니다.
+## Safety And Authorization Rule
 
-## 사용법
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+Ã¬â€ºÅ’Ã­ÂÂ¬Ã­â€Å’Ã«Â¡Å“Ã¬Å¡Â°Ã¬â€”ÂÃ¬â€žÅ“ checkpointÃ«Â¥Â¼ Ã¬Æ’ÂÃ¬â€žÂ±Ã­â€¢ËœÃªÂ±Â°Ã«â€šËœ ÃªÂ²â‚¬Ã¬Â¦ÂÃ­â€¢Â©Ã«â€¹Ë†Ã«â€¹Â¤.
+
+## Ã¬â€šÂ¬Ã¬Å¡Â©Ã«Â²â€¢
 
 `/checkpoint [create|verify|list|clear] [name]`
 
-## Checkpoint 생성
+## Checkpoint Ã¬Æ’ÂÃ¬â€žÂ±
 
-Checkpoint를 생성할 때:
+CheckpointÃ«Â¥Â¼ Ã¬Æ’ÂÃ¬â€žÂ±Ã­â€¢Â  Ã«â€¢Å’:
 
-1. `/verify quick`를 실행하여 현재 상태가 깨끗한지 확인합니다
-2. Checkpoint 이름으로 git stash 또는 commit을 생성합니다
-3. `.claude/checkpoints.log`에 checkpoint를 기록합니다:
+1. `/verify quick`Ã«Â¥Â¼ Ã¬â€¹Â¤Ã­â€“â€°Ã­â€¢ËœÃ¬â€”Â¬ Ã­Ëœâ€žÃ¬Å¾Â¬ Ã¬Æ’ÂÃ­Æ’Å“ÃªÂ°â‚¬ ÃªÂ¹Â¨Ã«Ââ€”Ã­â€¢Å“Ã¬Â§â‚¬ Ã­â„¢â€¢Ã¬ÂÂ¸Ã­â€¢Â©Ã«â€¹Ë†Ã«â€¹Â¤
+2. Checkpoint Ã¬ÂÂ´Ã«Â¦â€žÃ¬Å“Â¼Ã«Â¡Å“ git stash Ã«ËœÂÃ«Å â€ commitÃ¬Ââ€ž Ã¬Æ’ÂÃ¬â€žÂ±Ã­â€¢Â©Ã«â€¹Ë†Ã«â€¹Â¤
+3. `.claude/checkpoints.log`Ã¬â€”Â checkpointÃ«Â¥Â¼ ÃªÂ¸Â°Ã«Â¡ÂÃ­â€¢Â©Ã«â€¹Ë†Ã«â€¹Â¤:
 
 ```bash
 echo "$(date +%Y-%m-%d-%H:%M) | $CHECKPOINT_NAME | $(git rev-parse --short HEAD)" >> .claude/checkpoints.log
 ```
 
-4. Checkpoint 생성 완료를 보고합니다
+4. Checkpoint Ã¬Æ’ÂÃ¬â€žÂ± Ã¬â„¢â€žÃ«Â£Å’Ã«Â¥Â¼ Ã«Â³Â´ÃªÂ³Â Ã­â€¢Â©Ã«â€¹Ë†Ã«â€¹Â¤
 
-## Checkpoint 검증
+## Checkpoint ÃªÂ²â‚¬Ã¬Â¦Â
 
-Checkpoint와 대조하여 검증할 때:
+CheckpointÃ¬â„¢â‚¬ Ã«Å’â‚¬Ã¬Â¡Â°Ã­â€¢ËœÃ¬â€”Â¬ ÃªÂ²â‚¬Ã¬Â¦ÂÃ­â€¢Â  Ã«â€¢Å’:
 
-1. 로그에서 checkpoint를 읽습니다
-2. 현재 상태를 checkpoint와 비교합니다:
-   - Checkpoint 이후 추가된 파일
-   - Checkpoint 이후 수정된 파일
-   - 현재와 당시의 테스트 통과율
-   - 현재와 당시의 커버리지
+1. Ã«Â¡Å“ÃªÂ·Â¸Ã¬â€”ÂÃ¬â€žÅ“ checkpointÃ«Â¥Â¼ Ã¬ÂÂ½Ã¬Å ÂµÃ«â€¹Ë†Ã«â€¹Â¤
+2. Ã­Ëœâ€žÃ¬Å¾Â¬ Ã¬Æ’ÂÃ­Æ’Å“Ã«Â¥Â¼ checkpointÃ¬â„¢â‚¬ Ã«Â¹â€žÃªÂµÂÃ­â€¢Â©Ã«â€¹Ë†Ã«â€¹Â¤:
+   - Checkpoint Ã¬ÂÂ´Ã­â€ºâ€ž Ã¬Â¶â€ÃªÂ°â‚¬Ã«ÂÅ“ Ã­Å’Å’Ã¬ÂÂ¼
+   - Checkpoint Ã¬ÂÂ´Ã­â€ºâ€ž Ã¬Ë†ËœÃ¬Â â€¢Ã«ÂÅ“ Ã­Å’Å’Ã¬ÂÂ¼
+   - Ã­Ëœâ€žÃ¬Å¾Â¬Ã¬â„¢â‚¬ Ã«â€¹Â¹Ã¬â€¹Å“Ã¬ÂËœ Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸ Ã­â€ ÂµÃªÂ³Â¼Ã¬Å“Â¨
+   - Ã­Ëœâ€žÃ¬Å¾Â¬Ã¬â„¢â‚¬ Ã«â€¹Â¹Ã¬â€¹Å“Ã¬ÂËœ Ã¬Â»Â¤Ã«Â²â€žÃ«Â¦Â¬Ã¬Â§â‚¬
 
-3. 보고:
+3. Ã«Â³Â´ÃªÂ³Â :
 ```
 CHECKPOINT COMPARISON: $NAME
 ============================
@@ -46,34 +59,34 @@ Coverage: +X% / -Y%
 Build: [PASS/FAIL]
 ```
 
-## Checkpoint 목록
+## Checkpoint Ã«ÂªÂ©Ã«Â¡Â
 
-모든 checkpoint를 다음 정보와 함께 표시합니다:
-- 이름
-- 타임스탬프
+Ã«ÂªÂ¨Ã«â€œÂ  checkpointÃ«Â¥Â¼ Ã«â€¹Â¤Ã¬ÂÅ’ Ã¬Â â€¢Ã«Â³Â´Ã¬â„¢â‚¬ Ã­â€¢Â¨ÃªÂ»Ëœ Ã­â€˜Å“Ã¬â€¹Å“Ã­â€¢Â©Ã«â€¹Ë†Ã«â€¹Â¤:
+- Ã¬ÂÂ´Ã«Â¦â€ž
+- Ã­Æ’â‚¬Ã¬Å¾â€žÃ¬Å Â¤Ã­Æ’Â¬Ã­â€â€ž
 - Git SHA
-- 상태 (current, behind, ahead)
+- Ã¬Æ’ÂÃ­Æ’Å“ (current, behind, ahead)
 
-## 워크플로우
+## Ã¬â€ºÅ’Ã­ÂÂ¬Ã­â€Å’Ã«Â¡Å“Ã¬Å¡Â°
 
-일반적인 checkpoint 흐름:
+Ã¬ÂÂ¼Ã«Â°ËœÃ¬Â ÂÃ¬ÂÂ¸ checkpoint Ã­ÂÂÃ«Â¦â€ž:
 
 ```
-[시작] --> /checkpoint create "feature-start"
+[Ã¬â€¹Å“Ã¬Å¾â€˜] --> /checkpoint create "feature-start"
    |
-[구현] --> /checkpoint create "core-done"
+[ÃªÂµÂ¬Ã­Ëœâ€ž] --> /checkpoint create "core-done"
    |
-[테스트] --> /checkpoint verify "core-done"
+[Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸] --> /checkpoint verify "core-done"
    |
-[리팩토링] --> /checkpoint create "refactor-done"
+[Ã«Â¦Â¬Ã­Å’Â©Ã­â€ Â Ã«Â§Â] --> /checkpoint create "refactor-done"
    |
 [PR] --> /checkpoint verify "feature-start"
 ```
 
-## 인자
+## Ã¬ÂÂ¸Ã¬Å¾Â
 
 $ARGUMENTS:
-- `create <name>` - 이름이 지정된 checkpoint를 생성합니다
-- `verify <name>` - 이름이 지정된 checkpoint와 검증합니다
-- `list` - 모든 checkpoint를 표시합니다
-- `clear` - 이전 checkpoint를 제거합니다 (최근 5개만 유지)
+- `create <name>` - Ã¬ÂÂ´Ã«Â¦â€žÃ¬ÂÂ´ Ã¬Â§â‚¬Ã¬Â â€¢Ã«ÂÅ“ checkpointÃ«Â¥Â¼ Ã¬Æ’ÂÃ¬â€žÂ±Ã­â€¢Â©Ã«â€¹Ë†Ã«â€¹Â¤
+- `verify <name>` - Ã¬ÂÂ´Ã«Â¦â€žÃ¬ÂÂ´ Ã¬Â§â‚¬Ã¬Â â€¢Ã«ÂÅ“ checkpointÃ¬â„¢â‚¬ ÃªÂ²â‚¬Ã¬Â¦ÂÃ­â€¢Â©Ã«â€¹Ë†Ã«â€¹Â¤
+- `list` - Ã«ÂªÂ¨Ã«â€œÂ  checkpointÃ«Â¥Â¼ Ã­â€˜Å“Ã¬â€¹Å“Ã­â€¢Â©Ã«â€¹Ë†Ã«â€¹Â¤
+- `clear` - Ã¬ÂÂ´Ã¬Â â€ž checkpointÃ«Â¥Â¼ Ã¬Â Å“ÃªÂ±Â°Ã­â€¢Â©Ã«â€¹Ë†Ã«â€¹Â¤ (Ã¬ÂµÅ“ÃªÂ·Â¼ 5ÃªÂ°Å“Ã«Â§Å’ Ã¬Å“Â Ã¬Â§â‚¬)

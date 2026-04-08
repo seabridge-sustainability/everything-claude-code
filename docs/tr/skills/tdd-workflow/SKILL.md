@@ -1,157 +1,170 @@
 ---
 name: tdd-workflow
-description: Yeni özellikler yazarken, hata düzeltirken veya kod refactor ederken bu skill'i kullanın. Unit, integration ve E2E testlerini içeren %80+ kapsam ile test güdümlü geliştirmeyi zorlar.
+description: Yeni ÃƒÂ¶zellikler yazarken, hata dÃƒÂ¼zeltirken veya kod refactor ederken bu skill'i kullanÃ„Â±n. Unit, integration ve E2E testlerini iÃƒÂ§eren %80+ kapsam ile test gÃƒÂ¼dÃƒÂ¼mlÃƒÂ¼ geliÃ…Å¸tirmeyi zorlar.
 origin: ECC
 ---
 
-# Test Güdümlü Geliştirme İş Akışı
+# Test GÃƒÂ¼dÃƒÂ¼mlÃƒÂ¼ GeliÃ…Å¸tirme Ã„Â°Ã…Å¸ AkÃ„Â±Ã…Å¸Ã„Â±
 
-Bu skill tüm kod geliştirmenin kapsamlı test kapsamı ile TDD ilkelerini takip etmesini sağlar.
+## Safety And Authorization Rule
 
-## Ne Zaman Aktifleştirmelisiniz
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-- Yeni özellikler veya fonksiyonellik yazarken
-- Hataları veya sorunları düzeltirken
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+Bu skill tÃƒÂ¼m kod geliÃ…Å¸tirmenin kapsamlÃ„Â± test kapsamÃ„Â± ile TDD ilkelerini takip etmesini saÃ„Å¸lar.
+
+## Ne Zaman AktifleÃ…Å¸tirmelisiniz
+
+- Yeni ÃƒÂ¶zellikler veya fonksiyonellik yazarken
+- HatalarÃ„Â± veya sorunlarÃ„Â± dÃƒÂ¼zeltirken
 - Mevcut kodu refactor ederken
 - API endpoint'leri eklerken
-- Yeni bileşenler oluştururken
+- Yeni bileÃ…Å¸enler oluÃ…Å¸tururken
 
-## Temel İlkeler
+## Temel Ã„Â°lkeler
 
-### 1. Koddan ÖNCE Testler
-HER ZAMAN önce testleri yazın, sonra testleri geçmesi için kod uygulayın.
+### 1. Koddan Ãƒâ€“NCE Testler
+HER ZAMAN ÃƒÂ¶nce testleri yazÃ„Â±n, sonra testleri geÃƒÂ§mesi iÃƒÂ§in kod uygulayÃ„Â±n.
 
 ### 2. Kapsam Gereksinimleri
 - Minimum %80 kapsam (unit + integration + E2E)
-- Tüm uç durumlar kapsanmış
-- Hata senaryoları test edilmiş
-- Sınır koşulları doğrulanmış
+- TÃƒÂ¼m uÃƒÂ§ durumlar kapsanmÃ„Â±Ã…Å¸
+- Hata senaryolarÃ„Â± test edilmiÃ…Å¸
+- SÃ„Â±nÃ„Â±r koÃ…Å¸ullarÃ„Â± doÃ„Å¸rulanmÃ„Â±Ã…Å¸
 
 ### 3. Test Tipleri
 
 #### Unit Testler
-- Bireysel fonksiyonlar ve yardımcı araçlar
-- Bileşen mantığı
+- Bireysel fonksiyonlar ve yardÃ„Â±mcÃ„Â± araÃƒÂ§lar
+- BileÃ…Å¸en mantÃ„Â±Ã„Å¸Ã„Â±
 - Pure fonksiyonlar
-- Yardımcılar ve utilities
+- YardÃ„Â±mcÃ„Â±lar ve utilities
 
 #### Integration Testler
 - API endpoint'leri
-- Veritabanı operasyonları
-- Service etkileşimleri
-- Harici API çağrıları
+- VeritabanÃ„Â± operasyonlarÃ„Â±
+- Service etkileÃ…Å¸imleri
+- Harici API ÃƒÂ§aÃ„Å¸rÃ„Â±larÃ„Â±
 
 #### E2E Testler (Playwright)
-- Kritik kullanıcı akışları
-- Tam iş akışları
-- Tarayıcı otomasyonu
-- UI etkileşimleri
+- Kritik kullanÃ„Â±cÃ„Â± akÃ„Â±Ã…Å¸larÃ„Â±
+- Tam iÃ…Å¸ akÃ„Â±Ã…Å¸larÃ„Â±
+- TarayÃ„Â±cÃ„Â± otomasyonu
+- UI etkileÃ…Å¸imleri
 
-## TDD İş Akışı Adımları
+## TDD Ã„Â°Ã…Å¸ AkÃ„Â±Ã…Å¸Ã„Â± AdÃ„Â±mlarÃ„Â±
 
-### Adım 1: Kullanıcı Hikayeleri Yazın
+### AdÃ„Â±m 1: KullanÃ„Â±cÃ„Â± Hikayeleri YazÃ„Â±n
 ```
-[Rol] olarak, [eylem] yapmak istiyorum, böylece [fayda] elde ederim
+[Rol] olarak, [eylem] yapmak istiyorum, bÃƒÂ¶ylece [fayda] elde ederim
 
-Örnek:
-Kullanıcı olarak, marketleri semantik olarak aramak istiyorum,
-böylece tam anahtar kelimeler olmasa bile ilgili marketleri bulabilirim.
+Ãƒâ€“rnek:
+KullanÃ„Â±cÃ„Â± olarak, marketleri semantik olarak aramak istiyorum,
+bÃƒÂ¶ylece tam anahtar kelimeler olmasa bile ilgili marketleri bulabilirim.
 ```
 
-### Adım 2: Test Senaryoları Oluşturun
-Her kullanıcı hikayesi için kapsamlı test senaryoları oluşturun:
+### AdÃ„Â±m 2: Test SenaryolarÃ„Â± OluÃ…Å¸turun
+Her kullanÃ„Â±cÃ„Â± hikayesi iÃƒÂ§in kapsamlÃ„Â± test senaryolarÃ„Â± oluÃ…Å¸turun:
 
 ```typescript
 describe('Semantik Arama', () => {
-  it('sorgu için ilgili marketleri döndürür', async () => {
+  it('sorgu iÃƒÂ§in ilgili marketleri dÃƒÂ¶ndÃƒÂ¼rÃƒÂ¼r', async () => {
     // Test implementasyonu
   })
 
-  it('boş sorguyu zarif şekilde işler', async () => {
-    // Uç durumu test et
+  it('boÃ…Å¸ sorguyu zarif Ã…Å¸ekilde iÃ…Å¸ler', async () => {
+    // UÃƒÂ§ durumu test et
   })
 
-  it('Redis kullanılamazsa substring aramaya geri döner', async () => {
-    // Fallback davranışını test et
+  it('Redis kullanÃ„Â±lamazsa substring aramaya geri dÃƒÂ¶ner', async () => {
+    // Fallback davranÃ„Â±Ã…Å¸Ã„Â±nÃ„Â± test et
   })
 
-  it('sonuçları benzerlik skoruna göre sıralar', async () => {
-    // Sıralama mantığını test et
+  it('sonuÃƒÂ§larÃ„Â± benzerlik skoruna gÃƒÂ¶re sÃ„Â±ralar', async () => {
+    // SÃ„Â±ralama mantÃ„Â±Ã„Å¸Ã„Â±nÃ„Â± test et
   })
 })
 ```
 
-### Adım 3: Testleri Çalıştırın (Başarısız Olmalı)
+### AdÃ„Â±m 3: Testleri Ãƒâ€¡alÃ„Â±Ã…Å¸tÃ„Â±rÃ„Â±n (BaÃ…Å¸arÃ„Â±sÃ„Â±z OlmalÃ„Â±)
 ```bash
 npm test
-# Testler başarısız olmalı - henüz implement etmedik
+# Testler baÃ…Å¸arÃ„Â±sÃ„Â±z olmalÃ„Â± - henÃƒÂ¼z implement etmedik
 ```
 
-### Adım 4: Kod Uygulayın
-Testleri geçmesi için minimal kod yazın:
+### AdÃ„Â±m 4: Kod UygulayÃ„Â±n
+Testleri geÃƒÂ§mesi iÃƒÂ§in minimal kod yazÃ„Â±n:
 
 ```typescript
-// Testler tarafından yönlendirilen implementasyon
+// Testler tarafÃ„Â±ndan yÃƒÂ¶nlendirilen implementasyon
 export async function searchMarkets(query: string) {
   // Implementasyon buraya
 }
 ```
 
-### Adım 5: Testleri Tekrar Çalıştırın
+### AdÃ„Â±m 5: Testleri Tekrar Ãƒâ€¡alÃ„Â±Ã…Å¸tÃ„Â±rÃ„Â±n
 ```bash
 npm test
-# Testler artık geçmeli
+# Testler artÃ„Â±k geÃƒÂ§meli
 ```
 
-### Adım 6: Refactor Edin
-Testleri yeşil tutarken kod kalitesini iyileştirin:
-- Tekrarı kaldırın
-- İsimlendirmeyi iyileştirin
-- Performansı optimize edin
-- Okunabilirliği artırın
+### AdÃ„Â±m 6: Refactor Edin
+Testleri yeÃ…Å¸il tutarken kod kalitesini iyileÃ…Å¸tirin:
+- TekrarÃ„Â± kaldÃ„Â±rÃ„Â±n
+- Ã„Â°simlendirmeyi iyileÃ…Å¸tirin
+- PerformansÃ„Â± optimize edin
+- OkunabilirliÃ„Å¸i artÃ„Â±rÃ„Â±n
 
-### Adım 7: Kapsamı Doğrulayın
+### AdÃ„Â±m 7: KapsamÃ„Â± DoÃ„Å¸rulayÃ„Â±n
 ```bash
 npm run test:coverage
-# %80+ kapsam sağlandığını doğrula
+# %80+ kapsam saÃ„Å¸landÃ„Â±Ã„Å¸Ã„Â±nÃ„Â± doÃ„Å¸rula
 ```
 
-## Test Kalıpları
+## Test KalÃ„Â±plarÃ„Â±
 
-### Unit Test Kalıbı (Jest/Vitest)
+### Unit Test KalÃ„Â±bÃ„Â± (Jest/Vitest)
 ```typescript
 import { render, screen, fireEvent } from '@testing-library/react'
 import { Button } from './Button'
 
-describe('Button Bileşeni', () => {
-  it('doğru metinle render eder', () => {
-    render(<Button>Tıkla</Button>)
-    expect(screen.getByText('Tıkla')).toBeInTheDocument()
+describe('Button BileÃ…Å¸eni', () => {
+  it('doÃ„Å¸ru metinle render eder', () => {
+    render(<Button>TÃ„Â±kla</Button>)
+    expect(screen.getByText('TÃ„Â±kla')).toBeInTheDocument()
   })
 
-  it('tıklandığında onClick\'i çağırır', () => {
+  it('tÃ„Â±klandÃ„Â±Ã„Å¸Ã„Â±nda onClick\'i ÃƒÂ§aÃ„Å¸Ã„Â±rÃ„Â±r', () => {
     const handleClick = jest.fn()
-    render(<Button onClick={handleClick}>Tıkla</Button>)
+    render(<Button onClick={handleClick}>TÃ„Â±kla</Button>)
 
     fireEvent.click(screen.getByRole('button'))
 
     expect(handleClick).toHaveBeenCalledTimes(1)
   })
 
-  it('disabled prop true olduğunda devre dışı kalır', () => {
-    render(<Button disabled>Tıkla</Button>)
+  it('disabled prop true olduÃ„Å¸unda devre dÃ„Â±Ã…Å¸Ã„Â± kalÃ„Â±r', () => {
+    render(<Button disabled>TÃ„Â±kla</Button>)
     expect(screen.getByRole('button')).toBeDisabled()
   })
 })
 ```
 
-### API Integration Test Kalıbı
+### API Integration Test KalÃ„Â±bÃ„Â±
 ```typescript
 import { NextRequest } from 'next/server'
 import { GET } from './route'
 
 describe('GET /api/markets', () => {
-  it('marketleri başarıyla döndürür', async () => {
+  it('marketleri baÃ…Å¸arÃ„Â±yla dÃƒÂ¶ndÃƒÂ¼rÃƒÂ¼r', async () => {
     const request = new NextRequest('http://localhost/api/markets')
     const response = await GET(request)
     const data = await response.json()
@@ -168,63 +181,63 @@ describe('GET /api/markets', () => {
     expect(response.status).toBe(400)
   })
 
-  it('veritabanı hatalarını zarif şekilde işler', async () => {
-    // Veritabanı başarısızlığını mock'la
+  it('veritabanÃ„Â± hatalarÃ„Â±nÃ„Â± zarif Ã…Å¸ekilde iÃ…Å¸ler', async () => {
+    // VeritabanÃ„Â± baÃ…Å¸arÃ„Â±sÃ„Â±zlÃ„Â±Ã„Å¸Ã„Â±nÃ„Â± mock'la
     const request = new NextRequest('http://localhost/api/markets')
-    // Hata işlemeyi test et
+    // Hata iÃ…Å¸lemeyi test et
   })
 })
 ```
 
-### E2E Test Kalıbı (Playwright)
+### E2E Test KalÃ„Â±bÃ„Â± (Playwright)
 ```typescript
 import { test, expect } from '@playwright/test'
 
-test('kullanıcı marketleri arayabilir ve filtreleyebilir', async ({ page }) => {
-  // Markets sayfasına git
+test('kullanÃ„Â±cÃ„Â± marketleri arayabilir ve filtreleyebilir', async ({ page }) => {
+  // Markets sayfasÃ„Â±na git
   await page.goto('/')
   await page.click('a[href="/markets"]')
 
-  // Sayfanın yüklendiğini doğrula
+  // SayfanÃ„Â±n yÃƒÂ¼klendiÃ„Å¸ini doÃ„Å¸rula
   await expect(page.locator('h1')).toContainText('Markets')
 
   // Marketleri ara
   await page.fill('input[placeholder="Marketleri ara"]', 'election')
 
-  // Debounce ve sonuçları bekle
+  // Debounce ve sonuÃƒÂ§larÃ„Â± bekle
   await page.waitForTimeout(600)
 
-  // Arama sonuçlarının gösterildiğini doğrula
+  // Arama sonuÃƒÂ§larÃ„Â±nÃ„Â±n gÃƒÂ¶sterildiÃ„Å¸ini doÃ„Å¸rula
   const results = page.locator('[data-testid="market-card"]')
   await expect(results).toHaveCount(5, { timeout: 5000 })
 
-  // Sonuçların arama terimini içerdiğini doğrula
+  // SonuÃƒÂ§larÃ„Â±n arama terimini iÃƒÂ§erdiÃ„Å¸ini doÃ„Å¸rula
   const firstResult = results.first()
   await expect(firstResult).toContainText('election', { ignoreCase: true })
 
-  // Duruma göre filtrele
+  // Duruma gÃƒÂ¶re filtrele
   await page.click('button:has-text("Aktif")')
 
-  // Filtrelenmiş sonuçları doğrula
+  // FiltrelenmiÃ…Å¸ sonuÃƒÂ§larÃ„Â± doÃ„Å¸rula
   await expect(results).toHaveCount(3)
 })
 
-test('kullanıcı yeni market oluşturabilir', async ({ page }) => {
-  // Önce login ol
+test('kullanÃ„Â±cÃ„Â± yeni market oluÃ…Å¸turabilir', async ({ page }) => {
+  // Ãƒâ€“nce login ol
   await page.goto('/creator-dashboard')
 
-  // Market oluşturma formunu doldur
+  // Market oluÃ…Å¸turma formunu doldur
   await page.fill('input[name="name"]', 'Test Market')
-  await page.fill('textarea[name="description"]', 'Test açıklama')
+  await page.fill('textarea[name="description"]', 'Test aÃƒÂ§Ã„Â±klama')
   await page.fill('input[name="endDate"]', '2025-12-31')
 
-  // Formu gönder
+  // Formu gÃƒÂ¶nder
   await page.click('button[type="submit"]')
 
-  // Başarı mesajını doğrula
-  await expect(page.locator('text=Market başarıyla oluşturuldu')).toBeVisible()
+  // BaÃ…Å¸arÃ„Â± mesajÃ„Â±nÃ„Â± doÃ„Å¸rula
+  await expect(page.locator('text=Market baÃ…Å¸arÃ„Â±yla oluÃ…Å¸turuldu')).toBeVisible()
 
-  // Market sayfasına yönlendirmeyi doğrula
+  // Market sayfasÃ„Â±na yÃƒÂ¶nlendirmeyi doÃ„Å¸rula
   await expect(page).toHaveURL(/\/markets\/test-market/)
 })
 ```
@@ -233,23 +246,23 @@ test('kullanıcı yeni market oluşturabilir', async ({ page }) => {
 
 ```
 src/
-├── components/
-│   ├── Button/
-│   │   ├── Button.tsx
-│   │   ├── Button.test.tsx          # Unit testler
-│   │   └── Button.stories.tsx       # Storybook
-│   └── MarketCard/
-│       ├── MarketCard.tsx
-│       └── MarketCard.test.tsx
-├── app/
-│   └── api/
-│       └── markets/
-│           ├── route.ts
-│           └── route.test.ts         # Integration testler
-└── e2e/
-    ├── markets.spec.ts               # E2E testler
-    ├── trading.spec.ts
-    └── auth.spec.ts
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ components/
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Button/
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Button.tsx
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Button.test.tsx          # Unit testler
+Ã¢â€â€š   Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Button.stories.tsx       # Storybook
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ MarketCard/
+Ã¢â€â€š       Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ MarketCard.tsx
+Ã¢â€â€š       Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ MarketCard.test.tsx
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ app/
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ api/
+Ã¢â€â€š       Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ markets/
+Ã¢â€â€š           Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ route.ts
+Ã¢â€â€š           Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ route.test.ts         # Integration testler
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ e2e/
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ markets.spec.ts               # E2E testler
+    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ trading.spec.ts
+    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ auth.spec.ts
 ```
 
 ## Harici Servisleri Mock'lama
@@ -289,14 +302,14 @@ jest.mock('@/lib/openai', () => ({
 }))
 ```
 
-## Test Kapsamı Doğrulama
+## Test KapsamÃ„Â± DoÃ„Å¸rulama
 
-### Kapsam Raporu Çalıştır
+### Kapsam Raporu Ãƒâ€¡alÃ„Â±Ã…Å¸tÃ„Â±r
 ```bash
 npm run test:coverage
 ```
 
-### Kapsam Eşikleri
+### Kapsam EÃ…Å¸ikleri
 ```json
 {
   "jest": {
@@ -312,65 +325,65 @@ npm run test:coverage
 }
 ```
 
-## Kaçınılması Gereken Yaygın Test Hataları
+## KaÃƒÂ§Ã„Â±nÃ„Â±lmasÃ„Â± Gereken YaygÃ„Â±n Test HatalarÃ„Â±
 
-### FAIL: YANLIŞ: Implementasyon Detaylarını Test Etme
+### FAIL: YANLIÃ…Å¾: Implementasyon DetaylarÃ„Â±nÃ„Â± Test Etme
 ```typescript
-// İç state'i test etme
+// Ã„Â°ÃƒÂ§ state'i test etme
 expect(component.state.count).toBe(5)
 ```
 
-### PASS: DOĞRU: Kullanıcı Tarafından Görünen Davranışı Test Et
+### PASS: DOÃ„Å¾RU: KullanÃ„Â±cÃ„Â± TarafÃ„Â±ndan GÃƒÂ¶rÃƒÂ¼nen DavranÃ„Â±Ã…Å¸Ã„Â± Test Et
 ```typescript
-// Kullanıcıların gördüğünü test et
-expect(screen.getByText('Sayı: 5')).toBeInTheDocument()
+// KullanÃ„Â±cÃ„Â±larÃ„Â±n gÃƒÂ¶rdÃƒÂ¼Ã„Å¸ÃƒÂ¼nÃƒÂ¼ test et
+expect(screen.getByText('SayÃ„Â±: 5')).toBeInTheDocument()
 ```
 
-### FAIL: YANLIŞ: Kırılgan Selector'lar
+### FAIL: YANLIÃ…Å¾: KÃ„Â±rÃ„Â±lgan Selector'lar
 ```typescript
 // Kolayca bozulur
 await page.click('.css-class-xyz')
 ```
 
-### PASS: DOĞRU: Semantik Selector'lar
+### PASS: DOÃ„Å¾RU: Semantik Selector'lar
 ```typescript
-// Değişikliklere karşı dayanıklı
-await page.click('button:has-text("Gönder")')
+// DeÃ„Å¸iÃ…Å¸ikliklere karÃ…Å¸Ã„Â± dayanÃ„Â±klÃ„Â±
+await page.click('button:has-text("GÃƒÂ¶nder")')
 await page.click('[data-testid="submit-button"]')
 ```
 
-### FAIL: YANLIŞ: Test İzolasyonu Yok
+### FAIL: YANLIÃ…Å¾: Test Ã„Â°zolasyonu Yok
 ```typescript
-// Testler birbirine bağımlı
-test('kullanıcı oluşturur', () => { /* ... */ })
-test('aynı kullanıcıyı günceller', () => { /* önceki teste bağımlı */ })
+// Testler birbirine baÃ„Å¸Ã„Â±mlÃ„Â±
+test('kullanÃ„Â±cÃ„Â± oluÃ…Å¸turur', () => { /* ... */ })
+test('aynÃ„Â± kullanÃ„Â±cÃ„Â±yÃ„Â± gÃƒÂ¼nceller', () => { /* ÃƒÂ¶nceki teste baÃ„Å¸Ã„Â±mlÃ„Â± */ })
 ```
 
-### PASS: DOĞRU: Bağımsız Testler
+### PASS: DOÃ„Å¾RU: BaÃ„Å¸Ã„Â±msÃ„Â±z Testler
 ```typescript
-// Her test kendi verisini hazırlar
-test('kullanıcı oluşturur', () => {
+// Her test kendi verisini hazÃ„Â±rlar
+test('kullanÃ„Â±cÃ„Â± oluÃ…Å¸turur', () => {
   const user = createTestUser()
-  // Test mantığı
+  // Test mantÃ„Â±Ã„Å¸Ã„Â±
 })
 
-test('kullanıcı günceller', () => {
+test('kullanÃ„Â±cÃ„Â± gÃƒÂ¼nceller', () => {
   const user = createTestUser()
-  // Güncelleme mantığı
+  // GÃƒÂ¼ncelleme mantÃ„Â±Ã„Å¸Ã„Â±
 })
 ```
 
-## Sürekli Test
+## SÃƒÂ¼rekli Test
 
-### Geliştirme Sırasında Watch Modu
+### GeliÃ…Å¸tirme SÃ„Â±rasÃ„Â±nda Watch Modu
 ```bash
 npm test -- --watch
-# Dosya değişikliklerinde testler otomatik çalışır
+# Dosya deÃ„Å¸iÃ…Å¸ikliklerinde testler otomatik ÃƒÂ§alÃ„Â±Ã…Å¸Ã„Â±r
 ```
 
 ### Pre-Commit Hook
 ```bash
-# Her commit öncesi çalışır
+# Her commit ÃƒÂ¶ncesi ÃƒÂ§alÃ„Â±Ã…Å¸Ã„Â±r
 npm test && npm run lint
 ```
 
@@ -383,28 +396,28 @@ npm test && npm run lint
   uses: codecov/codecov-action@v3
 ```
 
-## En İyi Uygulamalar
+## En Ã„Â°yi Uygulamalar
 
-1. **Önce Testleri Yaz** - Her zaman TDD
-2. **Test Başına Bir Assert** - Tek davranışa odaklan
-3. **Açıklayıcı Test İsimleri** - Neyin test edildiğini açıkla
-4. **Arrange-Act-Assert** - Net test yapısı
-5. **Harici Bağımlılıkları Mock'la** - Unit testleri izole et
-6. **Uç Durumları Test Et** - Null, undefined, boş, büyük
-7. **Hata Yollarını Test Et** - Sadece happy path değil
-8. **Testleri Hızlı Tut** - Unit testler < 50ms her biri
+1. **Ãƒâ€“nce Testleri Yaz** - Her zaman TDD
+2. **Test BaÃ…Å¸Ã„Â±na Bir Assert** - Tek davranÃ„Â±Ã…Å¸a odaklan
+3. **AÃƒÂ§Ã„Â±klayÃ„Â±cÃ„Â± Test Ã„Â°simleri** - Neyin test edildiÃ„Å¸ini aÃƒÂ§Ã„Â±kla
+4. **Arrange-Act-Assert** - Net test yapÃ„Â±sÃ„Â±
+5. **Harici BaÃ„Å¸Ã„Â±mlÃ„Â±lÃ„Â±klarÃ„Â± Mock'la** - Unit testleri izole et
+6. **UÃƒÂ§ DurumlarÃ„Â± Test Et** - Null, undefined, boÃ…Å¸, bÃƒÂ¼yÃƒÂ¼k
+7. **Hata YollarÃ„Â±nÃ„Â± Test Et** - Sadece happy path deÃ„Å¸il
+8. **Testleri HÃ„Â±zlÃ„Â± Tut** - Unit testler < 50ms her biri
 9. **Testlerden Sonra Temizle** - Yan etki yok
-10. **Kapsam Raporlarını İncele** - Boşlukları tespit et
+10. **Kapsam RaporlarÃ„Â±nÃ„Â± Ã„Â°ncele** - BoÃ…Å¸luklarÃ„Â± tespit et
 
-## Başarı Metrikleri
+## BaÃ…Å¸arÃ„Â± Metrikleri
 
-- %80+ kod kapsamı sağlanmış
-- Tüm testler geçiyor (yeşil)
-- Atlanmış veya devre dışı test yok
-- Hızlı test yürütme (< 30s unit testler için)
-- E2E testler kritik kullanıcı akışlarını kapsıyor
-- Testler production'dan önce hataları yakalar
+- %80+ kod kapsamÃ„Â± saÃ„Å¸lanmÃ„Â±Ã…Å¸
+- TÃƒÂ¼m testler geÃƒÂ§iyor (yeÃ…Å¸il)
+- AtlanmÃ„Â±Ã…Å¸ veya devre dÃ„Â±Ã…Å¸Ã„Â± test yok
+- HÃ„Â±zlÃ„Â± test yÃƒÂ¼rÃƒÂ¼tme (< 30s unit testler iÃƒÂ§in)
+- E2E testler kritik kullanÃ„Â±cÃ„Â± akÃ„Â±Ã…Å¸larÃ„Â±nÃ„Â± kapsÃ„Â±yor
+- Testler production'dan ÃƒÂ¶nce hatalarÃ„Â± yakalar
 
 ---
 
-**Unutmayın**: Testler opsiyonel değildir. Güvenli refactoring, hızlı geliştirme ve production güvenilirliği sağlayan güvenlik ağıdırlar.
+**UnutmayÃ„Â±n**: Testler opsiyonel deÃ„Å¸ildir. GÃƒÂ¼venli refactoring, hÃ„Â±zlÃ„Â± geliÃ…Å¸tirme ve production gÃƒÂ¼venilirliÃ„Å¸i saÃ„Å¸layan gÃƒÂ¼venlik aÃ„Å¸Ã„Â±dÃ„Â±rlar.

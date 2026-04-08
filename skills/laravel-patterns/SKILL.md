@@ -6,6 +6,19 @@ origin: ECC
 
 # Laravel Development Patterns
 
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
 Production-grade Laravel architecture patterns for scalable, maintainable applications.
 
 ## When to Use
@@ -34,33 +47,33 @@ Use a conventional Laravel layout with clear layer boundaries (HTTP, services/ac
 
 ```
 app/
-├── Actions/            # Single-purpose use cases
-├── Console/
-├── Events/
-├── Exceptions/
-├── Http/
-│   ├── Controllers/
-│   ├── Middleware/
-│   ├── Requests/       # Form request validation
-│   └── Resources/      # API resources
-├── Jobs/
-├── Models/
-├── Policies/
-├── Providers/
-├── Services/           # Coordinating domain services
-└── Support/
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Actions/            # Single-purpose use cases
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Console/
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Events/
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Exceptions/
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Http/
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Controllers/
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Middleware/
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Requests/       # Form request validation
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Resources/      # API resources
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Jobs/
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Models/
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Policies/
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Providers/
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Services/           # Coordinating domain services
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Support/
 config/
 database/
-├── factories/
-├── migrations/
-└── seeders/
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ factories/
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ migrations/
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ seeders/
 resources/
-├── views/
-└── lang/
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ views/
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ lang/
 routes/
-├── api.php
-├── web.php
-└── console.php
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ api.php
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ web.php
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ console.php
 ```
 
 ### Controllers -> Services -> Actions

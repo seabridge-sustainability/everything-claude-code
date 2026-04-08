@@ -1,52 +1,65 @@
 ---
 name: enterprise-agent-ops
-description: 通过可观测性、安全边界和生命周期管理来操作长期运行的代理工作负载。
+description: Ã©â‚¬Å¡Ã¨Â¿â€¡Ã¥ÂÂ¯Ã¨Â§â€šÃ¦Âµâ€¹Ã¦â‚¬Â§Ã£â‚¬ÂÃ¥Â®â€°Ã¥â€¦Â¨Ã¨Â¾Â¹Ã§â€¢Å’Ã¥â€™Å’Ã§â€Å¸Ã¥â€˜Â½Ã¥â€˜Â¨Ã¦Å“Å¸Ã§Â®Â¡Ã§Ââ€ Ã¦ÂÂ¥Ã¦â€œÂÃ¤Â½Å“Ã©â€¢Â¿Ã¦Å“Å¸Ã¨Â¿ÂÃ¨Â¡Å’Ã§Å¡â€žÃ¤Â»Â£Ã§Ââ€ Ã¥Â·Â¥Ã¤Â½Å“Ã¨Â´Å¸Ã¨Â½Â½Ã£â‚¬â€š
 origin: ECC
 ---
 
-# 企业级智能体运维
+# Ã¤Â¼ÂÃ¤Â¸Å¡Ã§ÂºÂ§Ã¦â„¢ÂºÃ¨Æ’Â½Ã¤Â½â€œÃ¨Â¿ÂÃ§Â»Â´
 
-使用此技能用于需要超越单次 CLI 会话操作控制的云托管或持续运行的智能体系统。
+## Safety And Authorization Rule
 
-## 运维领域
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-1. 运行时生命周期（启动、暂停、停止、重启）
-2. 可观测性（日志、指标、追踪）
-3. 安全控制（作用域、权限、紧急停止开关）
-4. 变更管理（发布、回滚、审计）
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-## 基线控制
 
-* 不可变的部署工件
-* 最小权限凭证
-* 环境级别的密钥注入
-* 硬性超时和重试预算
-* 高风险操作的审计日志
+Ã¤Â½Â¿Ã§â€Â¨Ã¦Â­Â¤Ã¦Å â‚¬Ã¨Æ’Â½Ã§â€Â¨Ã¤ÂºÅ½Ã©Å“â‚¬Ã¨Â¦ÂÃ¨Â¶â€¦Ã¨Â¶Å Ã¥Ââ€¢Ã¦Â¬Â¡ CLI Ã¤Â¼Å¡Ã¨Â¯ÂÃ¦â€œÂÃ¤Â½Å“Ã¦Å½Â§Ã¥Ë†Â¶Ã§Å¡â€žÃ¤Âºâ€˜Ã¦â€°ËœÃ§Â®Â¡Ã¦Ë†â€“Ã¦Å’ÂÃ§Â»Â­Ã¨Â¿ÂÃ¨Â¡Å’Ã§Å¡â€žÃ¦â„¢ÂºÃ¨Æ’Â½Ã¤Â½â€œÃ§Â³Â»Ã§Â»Å¸Ã£â‚¬â€š
 
-## 需跟踪的指标
+## Ã¨Â¿ÂÃ§Â»Â´Ã©Â¢â€ Ã¥Å¸Å¸
 
-* 成功率
-* 每项任务的平均重试次数
-* 恢复时间
-* 每项成功任务的成本
-* 故障类别分布
+1. Ã¨Â¿ÂÃ¨Â¡Å’Ã¦â€”Â¶Ã§â€Å¸Ã¥â€˜Â½Ã¥â€˜Â¨Ã¦Å“Å¸Ã¯Â¼Ë†Ã¥ÂÂ¯Ã¥Å Â¨Ã£â‚¬ÂÃ¦Å¡â€šÃ¥ÂÅ“Ã£â‚¬ÂÃ¥ÂÅ“Ã¦Â­Â¢Ã£â‚¬ÂÃ©â€¡ÂÃ¥ÂÂ¯Ã¯Â¼â€°
+2. Ã¥ÂÂ¯Ã¨Â§â€šÃ¦Âµâ€¹Ã¦â‚¬Â§Ã¯Â¼Ë†Ã¦â€”Â¥Ã¥Â¿â€”Ã£â‚¬ÂÃ¦Å’â€¡Ã¦Â â€¡Ã£â‚¬ÂÃ¨Â¿Â½Ã¨Â¸ÂªÃ¯Â¼â€°
+3. Ã¥Â®â€°Ã¥â€¦Â¨Ã¦Å½Â§Ã¥Ë†Â¶Ã¯Â¼Ë†Ã¤Â½Å“Ã§â€Â¨Ã¥Å¸Å¸Ã£â‚¬ÂÃ¦ÂÆ’Ã©â„¢ÂÃ£â‚¬ÂÃ§Â´Â§Ã¦â‚¬Â¥Ã¥ÂÅ“Ã¦Â­Â¢Ã¥Â¼â‚¬Ã¥â€¦Â³Ã¯Â¼â€°
+4. Ã¥ÂËœÃ¦â€ºÂ´Ã§Â®Â¡Ã§Ââ€ Ã¯Â¼Ë†Ã¥Ââ€˜Ã¥Â¸Æ’Ã£â‚¬ÂÃ¥â€ºÅ¾Ã¦Â»Å¡Ã£â‚¬ÂÃ¥Â®Â¡Ã¨Â®Â¡Ã¯Â¼â€°
 
-## 事故处理模式
+## Ã¥Å¸ÂºÃ§ÂºÂ¿Ã¦Å½Â§Ã¥Ë†Â¶
 
-当故障激增时：
+* Ã¤Â¸ÂÃ¥ÂÂ¯Ã¥ÂËœÃ§Å¡â€žÃ©Æ’Â¨Ã§Â½Â²Ã¥Â·Â¥Ã¤Â»Â¶
+* Ã¦Å“â‚¬Ã¥Â°ÂÃ¦ÂÆ’Ã©â„¢ÂÃ¥â€¡Â­Ã¨Â¯Â
+* Ã§Å½Â¯Ã¥Â¢Æ’Ã§ÂºÂ§Ã¥Ë†Â«Ã§Å¡â€žÃ¥Â¯â€ Ã©â€™Â¥Ã¦Â³Â¨Ã¥â€¦Â¥
+* Ã§Â¡Â¬Ã¦â‚¬Â§Ã¨Â¶â€¦Ã¦â€”Â¶Ã¥â€™Å’Ã©â€¡ÂÃ¨Â¯â€¢Ã©Â¢â€žÃ§Â®â€”
+* Ã©Â«ËœÃ©Â£Å½Ã©â„¢Â©Ã¦â€œÂÃ¤Â½Å“Ã§Å¡â€žÃ¥Â®Â¡Ã¨Â®Â¡Ã¦â€”Â¥Ã¥Â¿â€”
 
-1. 冻结新发布
-2. 捕获代表性追踪数据
-3. 隔离故障路径
-4. 应用最小的安全变更进行修补
-5. 运行回归测试 + 安全检查
-6. 逐步恢复
+## Ã©Å“â‚¬Ã¨Â·Å¸Ã¨Â¸ÂªÃ§Å¡â€žÃ¦Å’â€¡Ã¦Â â€¡
 
-## 部署集成
+* Ã¦Ë†ÂÃ¥Å Å¸Ã§Å½â€¡
+* Ã¦Â¯ÂÃ©Â¡Â¹Ã¤Â»Â»Ã¥Å Â¡Ã§Å¡â€žÃ¥Â¹Â³Ã¥Ââ€¡Ã©â€¡ÂÃ¨Â¯â€¢Ã¦Â¬Â¡Ã¦â€¢Â°
+* Ã¦ÂÂ¢Ã¥Â¤ÂÃ¦â€”Â¶Ã©â€”Â´
+* Ã¦Â¯ÂÃ©Â¡Â¹Ã¦Ë†ÂÃ¥Å Å¸Ã¤Â»Â»Ã¥Å Â¡Ã§Å¡â€žÃ¦Ë†ÂÃ¦Å“Â¬
+* Ã¦â€¢â€¦Ã©Å¡Å“Ã§Â±Â»Ã¥Ë†Â«Ã¥Ë†â€ Ã¥Â¸Æ’
 
-此技能可与以下工具配合使用：
+## Ã¤Âºâ€¹Ã¦â€¢â€¦Ã¥Â¤â€žÃ§Ââ€ Ã¦Â¨Â¡Ã¥Â¼Â
 
-* PM2 工作流
-* systemd 服务
-* 容器编排器
-* CI/CD 门控
+Ã¥Â½â€œÃ¦â€¢â€¦Ã©Å¡Å“Ã¦Â¿â‚¬Ã¥Â¢Å¾Ã¦â€”Â¶Ã¯Â¼Å¡
+
+1. Ã¥â€ Â»Ã§Â»â€œÃ¦â€“Â°Ã¥Ââ€˜Ã¥Â¸Æ’
+2. Ã¦Ââ€¢Ã¨Å½Â·Ã¤Â»Â£Ã¨Â¡Â¨Ã¦â‚¬Â§Ã¨Â¿Â½Ã¨Â¸ÂªÃ¦â€¢Â°Ã¦ÂÂ®
+3. Ã©Å¡â€Ã§Â¦Â»Ã¦â€¢â€¦Ã©Å¡Å“Ã¨Â·Â¯Ã¥Â¾â€ž
+4. Ã¥Âºâ€Ã§â€Â¨Ã¦Å“â‚¬Ã¥Â°ÂÃ§Å¡â€žÃ¥Â®â€°Ã¥â€¦Â¨Ã¥ÂËœÃ¦â€ºÂ´Ã¨Â¿â€ºÃ¨Â¡Å’Ã¤Â¿Â®Ã¨Â¡Â¥
+5. Ã¨Â¿ÂÃ¨Â¡Å’Ã¥â€ºÅ¾Ã¥Â½â€™Ã¦Âµâ€¹Ã¨Â¯â€¢ + Ã¥Â®â€°Ã¥â€¦Â¨Ã¦Â£â‚¬Ã¦Å¸Â¥
+6. Ã©â‚¬ÂÃ¦Â­Â¥Ã¦ÂÂ¢Ã¥Â¤Â
+
+## Ã©Æ’Â¨Ã§Â½Â²Ã©â€ºâ€ Ã¦Ë†Â
+
+Ã¦Â­Â¤Ã¦Å â‚¬Ã¨Æ’Â½Ã¥ÂÂ¯Ã¤Â¸Å½Ã¤Â»Â¥Ã¤Â¸â€¹Ã¥Â·Â¥Ã¥â€¦Â·Ã©â€¦ÂÃ¥ÂË†Ã¤Â½Â¿Ã§â€Â¨Ã¯Â¼Å¡
+
+* PM2 Ã¥Â·Â¥Ã¤Â½Å“Ã¦ÂµÂ
+* systemd Ã¦Å“ÂÃ¥Å Â¡
+* Ã¥Â®Â¹Ã¥â„¢Â¨Ã§Â¼â€“Ã¦Å½â€™Ã¥â„¢Â¨
+* CI/CD Ã©â€”Â¨Ã¦Å½Â§

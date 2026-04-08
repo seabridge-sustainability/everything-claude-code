@@ -1,37 +1,50 @@
 ---
-description: Reafirme requisitos, avalie riscos e crie plano de implementação passo a passo. ESPERE confirmação do usuário ANTES de tocar em qualquer código.
+description: Reafirme requisitos, avalie riscos e crie plano de implementaÃƒÂ§ÃƒÂ£o passo a passo. ESPERE confirmaÃƒÂ§ÃƒÂ£o do usuÃƒÂ¡rio ANTES de tocar em qualquer cÃƒÂ³digo.
 ---
 
 # Comando Plan
 
-Este comando invoca o agente **planner** para criar um plano abrangente de implementação antes de escrever qualquer código.
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+Este comando invoca o agente **planner** para criar um plano abrangente de implementaÃƒÂ§ÃƒÂ£o antes de escrever qualquer cÃƒÂ³digo.
 
 ## O Que Este Comando Faz
 
-1. **Reafirmar Requisitos** - Esclarecer o que precisa ser construído
+1. **Reafirmar Requisitos** - Esclarecer o que precisa ser construÃƒÂ­do
 2. **Identificar Riscos** - Levantar problemas e bloqueios potenciais
-3. **Criar Plano em Etapas** - Quebrar implementação em fases
-4. **Aguardar Confirmação** - DEVE receber aprovação do usuário antes de prosseguir
+3. **Criar Plano em Etapas** - Quebrar implementaÃƒÂ§ÃƒÂ£o em fases
+4. **Aguardar ConfirmaÃƒÂ§ÃƒÂ£o** - DEVE receber aprovaÃƒÂ§ÃƒÂ£o do usuÃƒÂ¡rio antes de prosseguir
 
 ## Quando Usar
 
 Use `/plan` quando:
 - Estiver iniciando uma nova feature
-- For fazer mudanças arquiteturais significativas
-- Estiver trabalhando em refatoração complexa
-- Múltiplos arquivos/componentes serão afetados
-- Requisitos estiverem pouco claros ou ambíguos
+- For fazer mudanÃƒÂ§as arquiteturais significativas
+- Estiver trabalhando em refatoraÃƒÂ§ÃƒÂ£o complexa
+- MÃƒÂºltiplos arquivos/componentes serÃƒÂ£o afetados
+- Requisitos estiverem pouco claros ou ambÃƒÂ­guos
 
 ## Como Funciona
 
 O agente planner vai:
 
 1. **Analisar o pedido** e reafirmar os requisitos de forma clara
-2. **Quebrar em fases** com etapas específicas e acionáveis
-3. **Identificar dependências** entre componentes
-4. **Avaliar riscos** e possíveis bloqueios
+2. **Quebrar em fases** com etapas especÃƒÂ­ficas e acionÃƒÂ¡veis
+3. **Identificar dependÃƒÂªncias** entre componentes
+4. **Avaliar riscos** e possÃƒÂ­veis bloqueios
 5. **Estimar complexidade** (High/Medium/Low)
-6. **Apresentar o plano** e AGUARDAR sua confirmação explícita
+6. **Apresentar o plano** e AGUARDAR sua confirmaÃƒÂ§ÃƒÂ£o explÃƒÂ­cita
 
 ## Exemplo de Uso
 
@@ -93,21 +106,21 @@ Agent (planner):
 
 ## Notas Importantes
 
-**CRITICAL**: O agente planner **NÃO** vai escrever código até você confirmar explicitamente o plano com "yes", "proceed" ou resposta afirmativa similar.
+**CRITICAL**: O agente planner **NÃƒÆ’O** vai escrever cÃƒÂ³digo atÃƒÂ© vocÃƒÂª confirmar explicitamente o plano com "yes", "proceed" ou resposta afirmativa similar.
 
-Se quiser mudanças, responda com:
-- "modificar: [suas alterações]"
+Se quiser mudanÃƒÂ§as, responda com:
+- "modificar: [suas alteraÃƒÂ§ÃƒÂµes]"
 - "abordagem diferente: [alternativa]"
 - "pular fase 2 e fazer fase 3 primeiro"
 
-Após planejar:
+ApÃƒÂ³s planejar:
 - Use `/tdd` para implementar com test-driven development
 - Use `/build-fix` se ocorrerem erros de build
-- Use `/code-review` para revisar a implementação concluída
+- Use `/code-review` para revisar a implementaÃƒÂ§ÃƒÂ£o concluÃƒÂ­da
 
 ## Agentes Relacionados
 
 Este comando invoca o agente `planner` fornecido pelo ECC.
 
-Para instalações manuais, o arquivo fonte fica em:
+Para instalaÃƒÂ§ÃƒÂµes manuais, o arquivo fonte fica em:
 `agents/planner.md`

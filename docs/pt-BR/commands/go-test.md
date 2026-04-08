@@ -1,39 +1,52 @@
 ---
-description: Impõe fluxo de TDD para Go. Escreva table-driven tests primeiro e depois implemente. Verifique cobertura de 80%+ com go test -cover.
+description: ImpÃƒÂµe fluxo de TDD para Go. Escreva table-driven tests primeiro e depois implemente. Verifique cobertura de 80%+ com go test -cover.
 ---
 
 # Comando TDD Go
 
-Este comando impõe a metodologia de desenvolvimento orientado a testes para código Go usando padrões idiomáticos de teste em Go.
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+Este comando impÃƒÂµe a metodologia de desenvolvimento orientado a testes para cÃƒÂ³digo Go usando padrÃƒÂµes idiomÃƒÂ¡ticos de teste em Go.
 
 ## O Que Este Comando Faz
 
-1. **Definir Tipos/Interfaces**: Estrutura assinaturas de função primeiro
+1. **Definir Tipos/Interfaces**: Estrutura assinaturas de funÃƒÂ§ÃƒÂ£o primeiro
 2. **Escrever Table-Driven Tests**: Criar casos de teste abrangentes (RED)
 3. **Rodar Testes**: Verificar que os testes falham pelo motivo certo
-4. **Implementar Código**: Escrever código mínimo para passar (GREEN)
+4. **Implementar CÃƒÂ³digo**: Escrever cÃƒÂ³digo mÃƒÂ­nimo para passar (GREEN)
 5. **Refatorar**: Melhorar mantendo testes verdes
 6. **Checar Cobertura**: Garantir 80%+ de cobertura
 
 ## Quando Usar
 
 Use `/go-test` quando:
-- Implementar novas funções Go
-- Adicionar cobertura de testes a código existente
+- Implementar novas funÃƒÂ§ÃƒÂµes Go
+- Adicionar cobertura de testes a cÃƒÂ³digo existente
 - Corrigir bugs (escreva primeiro o teste que falha)
-- Construir lógica de negócio crítica
+- Construir lÃƒÂ³gica de negÃƒÂ³cio crÃƒÂ­tica
 - Aprender fluxo TDD em Go
 
 ## Ciclo TDD
 
 ```
-RED     → Write failing table-driven test
-GREEN   → Implement minimal code to pass
-REFACTOR → Improve code, tests stay green
-REPEAT  → Next test case
+RED     Ã¢â€ â€™ Write failing table-driven test
+GREEN   Ã¢â€ â€™ Implement minimal code to pass
+REFACTOR Ã¢â€ â€™ Improve code, tests stay green
+REPEAT  Ã¢â€ â€™ Next test case
 ```
 
-## Exemplo de Sessão
+## Exemplo de SessÃƒÂ£o
 
 ````
 User: /go-test I need a function to validate email addresses
@@ -112,7 +125,7 @@ $ go test ./validator/...
 FAIL
 ```
 
-✓ Tests fail as expected (panic).
+Ã¢Å“â€œ Tests fail as expected (panic).
 
 ## Step 4: Implement Minimal Code (GREEN)
 
@@ -152,7 +165,7 @@ PASS
 ok      project/validator    0.003s
 ```
 
-✓ All tests passing!
+Ã¢Å“â€œ All tests passing!
 
 ## Step 6: Check Coverage
 
@@ -164,12 +177,12 @@ coverage: 100.0% of statements
 ok      project/validator    0.003s
 ```
 
-✓ Coverage: 100%
+Ã¢Å“â€œ Coverage: 100%
 
 ## TDD Complete!
 ````
 
-## Padrões de Teste
+## PadrÃƒÂµes de Teste
 
 ### Table-Driven Tests
 ```go
@@ -240,27 +253,27 @@ go test -race -cover ./...
 | General code | 80%+ |
 | Generated code | Exclude |
 
-## Boas Práticas de TDD
+## Boas PrÃƒÂ¡ticas de TDD
 
 **DO:**
-- Escreva teste PRIMEIRO, antes de qualquer implementação
-- Rode testes após cada mudança
+- Escreva teste PRIMEIRO, antes de qualquer implementaÃƒÂ§ÃƒÂ£o
+- Rode testes apÃƒÂ³s cada mudanÃƒÂ§a
 - Use table-driven tests para cobertura abrangente
-- Teste comportamento, não detalhes de implementação
+- Teste comportamento, nÃƒÂ£o detalhes de implementaÃƒÂ§ÃƒÂ£o
 - Inclua casos de borda (empty, nil, max values)
 
 **DON'T:**
-- Escrever implementação antes dos testes
+- Escrever implementaÃƒÂ§ÃƒÂ£o antes dos testes
 - Pular a fase RED
-- Testar funções privadas diretamente
+- Testar funÃƒÂ§ÃƒÂµes privadas diretamente
 - Usar `time.Sleep` em testes
 - Ignorar testes flaky
 
 ## Comandos Relacionados
 
 - `/go-build` - Corrigir erros de build
-- `/go-review` - Revisar código após implementação
-- `/verify` - Rodar loop completo de verificação
+- `/go-review` - Revisar cÃƒÂ³digo apÃƒÂ³s implementaÃƒÂ§ÃƒÂ£o
+- `/verify` - Rodar loop completo de verificaÃƒÂ§ÃƒÂ£o
 
 ## Relacionado
 

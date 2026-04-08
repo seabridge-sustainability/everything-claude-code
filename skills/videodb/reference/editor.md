@@ -1,6 +1,19 @@
 # Timeline Editing Guide
 
-VideoDB provides a non-destructive timeline editor for composing videos from multiple assets, adding text and image overlays, mixing audio tracks, and trimming clips — all server-side without re-encoding or local tools. Use this for trimming, combining clips, overlaying audio/music on video, adding subtitles, and layering text or images.
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+VideoDB provides a non-destructive timeline editor for composing videos from multiple assets, adding text and image overlays, mixing audio tracks, and trimming clips Ã¢â‚¬â€ all server-side without re-encoding or local tools. Use this for trimming, combining clips, overlaying audio/music on video, adding subtitles, and layering text or images.
 
 ## Prerequisites
 
@@ -54,7 +67,7 @@ stream_url = timeline.generate_stream()
 Use `start` and `end` on a `VideoAsset` to extract a portion:
 
 ```python
-# Take only seconds 10–30 from the source video
+# Take only seconds 10Ã¢â‚¬â€œ30 from the source video
 clip = VideoAsset(asset_id=video.id, start=10, end=30)
 timeline.add_inline(clip)
 ```
@@ -99,7 +112,7 @@ timeline.add_overlay(0, title)
 | `fontsize` | `int` | `24` | Font size in pixels |
 | `fontcolor` | `str` | `"black"` | CSS colour name or hex |
 | `fontcolor_expr` | `str` | `""` | Dynamic font colour expression |
-| `alpha` | `float` | `1.0` | Text opacity (0.0–1.0) |
+| `alpha` | `float` | `1.0` | Text opacity (0.0Ã¢â‚¬â€œ1.0) |
 | `font` | `str` | `"Sans"` | Font family |
 | `box` | `bool` | `True` | Enable background box |
 | `boxcolor` | `str` | `"white"` | Background box colour |
@@ -339,7 +352,7 @@ timeline = Timeline(conn)
 # Main video track
 timeline.add_inline(VideoAsset(asset_id=main_video.id))
 
-# Background music — disable_other_tracks=False to mix with video audio
+# Background music Ã¢â‚¬â€ disable_other_tracks=False to mix with video audio
 timeline.add_overlay(
     0,
     AudioAsset(asset_id=music.id, disable_other_tracks=False, fade_in_duration=3),

@@ -1,6 +1,19 @@
 # Skill Deep Dives
 
-Detailed guides for every gstack skill — philosophy, workflow, and examples.
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+Detailed guides for every gstack skill Ã¢â‚¬â€ philosophy, workflow, and examples.
 
 | Skill | Your specialist | What they do |
 |-------|----------------|--------------|
@@ -25,7 +38,7 @@ Detailed guides for every gstack skill — philosophy, workflow, and examples.
 | [`/retro`](#retro) | **Eng Manager** | Team-aware weekly retro. Per-person breakdowns, shipping streaks, test health trends, growth opportunities. |
 | [`/browse`](#browse) | **QA Engineer** | Give the agent eyes. Real Chromium browser, real clicks, real screenshots. ~100ms per command. |
 | [`/setup-browser-cookies`](#setup-browser-cookies) | **Session Manager** | Import cookies from your real browser (Chrome, Arc, Brave, Edge) into the headless session. Test authenticated pages. |
-| [`/autoplan`](#autoplan) | **Review Pipeline** | One command, fully reviewed plan. Runs CEO → design → eng review automatically with encoded decision principles. Surfaces only taste decisions for your approval. |
+| [`/autoplan`](#autoplan) | **Review Pipeline** | One command, fully reviewed plan. Runs CEO Ã¢â€ â€™ design Ã¢â€ â€™ eng review automatically with encoded decision principles. Surfaces only taste decisions for your approval. |
 | [`/learn`](#learn) | **Memory** | Manage what gstack learned across sessions. Review, search, prune, and export project-specific patterns and preferences. |
 | | | |
 | **Multi-AI** | | |
@@ -46,30 +59,30 @@ Detailed guides for every gstack skill — philosophy, workflow, and examples.
 
 This is where every project should start.
 
-Before you plan, before you review, before you write code — sit down with a YC-style partner and think about what you're actually building. Not what you think you're building. What you're *actually* building.
+Before you plan, before you review, before you write code Ã¢â‚¬â€ sit down with a YC-style partner and think about what you're actually building. Not what you think you're building. What you're *actually* building.
 
 ### The reframe
 
-Here's what happened on a real project. The user said: "I want to build a daily briefing app for my calendar." Reasonable request. Then it asked about the pain — specific examples, not hypotheticals. They described an assistant missing things, calendar items across multiple Google accounts with stale info, prep docs that were AI slop, events with wrong locations that took forever to track down.
+Here's what happened on a real project. The user said: "I want to build a daily briefing app for my calendar." Reasonable request. Then it asked about the pain Ã¢â‚¬â€ specific examples, not hypotheticals. They described an assistant missing things, calendar items across multiple Google accounts with stale info, prep docs that were AI slop, events with wrong locations that took forever to track down.
 
 It came back with: *"I'm going to push back on the framing, because I think you've outgrown it. You said 'daily briefing app for multi-Google-Calendar management.' But what you actually described is a personal chief of staff AI."*
 
 Then it extracted five capabilities the user didn't realize they were describing:
 
 1. **Watches your calendar** across all accounts and detects stale info, missing locations, permission gaps
-2. **Generates real prep work** — not logistics summaries, but *the intellectual work* of preparing for a board meeting, a podcast, a fundraiser
-3. **Manages your CRM** — who are you meeting, what's the relationship, what do they want, what's the history
-4. **Prioritizes your time** — flags when prep needs to start early, blocks time proactively, ranks events by importance
-5. **Trades money for leverage** — actively looks for ways to delegate or automate
+2. **Generates real prep work** Ã¢â‚¬â€ not logistics summaries, but *the intellectual work* of preparing for a board meeting, a podcast, a fundraiser
+3. **Manages your CRM** Ã¢â‚¬â€ who are you meeting, what's the relationship, what do they want, what's the history
+4. **Prioritizes your time** Ã¢â‚¬â€ flags when prep needs to start early, blocks time proactively, ranks events by importance
+5. **Trades money for leverage** Ã¢â‚¬â€ actively looks for ways to delegate or automate
 
-That reframe changed the entire project. They were about to build a calendar app. Now they're building something ten times more valuable — because the skill listened to their pain instead of their feature request.
+That reframe changed the entire project. They were about to build a calendar app. Now they're building something ten times more valuable Ã¢â‚¬â€ because the skill listened to their pain instead of their feature request.
 
 ### Premise challenge
 
-After the reframe, it presents premises for you to validate. Not "does this sound good?" — actual falsifiable claims about the product:
+After the reframe, it presents premises for you to validate. Not "does this sound good?" Ã¢â‚¬â€ actual falsifiable claims about the product:
 
 1. The calendar is the anchor data source, but the value is in the intelligence layer on top
-2. The assistant doesn't get replaced — they get superpowered
+2. The assistant doesn't get replaced Ã¢â‚¬â€ they get superpowered
 3. The narrowest wedge is a daily briefing that actually works
 4. CRM integration is a must-have, not a nice-to-have
 
@@ -79,23 +92,23 @@ You agree, disagree, or adjust. Every premise you accept becomes load-bearing in
 
 Then it generates 2-3 concrete implementation approaches with honest effort estimates:
 
-- **Approach A: Daily Briefing First** — narrowest wedge, ships tomorrow, M effort (human: ~3 weeks / CC: ~2 days)
-- **Approach B: CRM-First** — build the relationship graph first, L effort (human: ~6 weeks / CC: ~4 days)
-- **Approach C: Full Vision** — everything at once, XL effort (human: ~3 months / CC: ~1.5 weeks)
+- **Approach A: Daily Briefing First** Ã¢â‚¬â€ narrowest wedge, ships tomorrow, M effort (human: ~3 weeks / CC: ~2 days)
+- **Approach B: CRM-First** Ã¢â‚¬â€ build the relationship graph first, L effort (human: ~6 weeks / CC: ~4 days)
+- **Approach C: Full Vision** Ã¢â‚¬â€ everything at once, XL effort (human: ~3 months / CC: ~1.5 weeks)
 
 Recommends A because you learn from real usage. CRM data comes naturally in week two.
 
 ### Two modes
 
-**Startup mode** — for founders and intrapreneurs building a business. You get six forcing questions distilled from how YC partners evaluate products: demand reality, status quo, desperate specificity, narrowest wedge, observation & surprise, and future-fit. These questions are uncomfortable on purpose. If you can't name a specific human who needs your product, that's the most important thing to learn before writing any code.
+**Startup mode** Ã¢â‚¬â€ for founders and intrapreneurs building a business. You get six forcing questions distilled from how YC partners evaluate products: demand reality, status quo, desperate specificity, narrowest wedge, observation & surprise, and future-fit. These questions are uncomfortable on purpose. If you can't name a specific human who needs your product, that's the most important thing to learn before writing any code.
 
-**Builder mode** — for hackathons, side projects, open source, learning, and having fun. You get an enthusiastic collaborator who helps you find the coolest version of your idea. What would make someone say "whoa"? What's the fastest path to something you can share? The questions are generative, not interrogative.
+**Builder mode** Ã¢â‚¬â€ for hackathons, side projects, open source, learning, and having fun. You get an enthusiastic collaborator who helps you find the coolest version of your idea. What would make someone say "whoa"? What's the fastest path to something you can share? The questions are generative, not interrogative.
 
 ### The design doc
 
-Both modes end with a design doc written to `~/.gstack/projects/` — and that doc feeds directly into `/plan-ceo-review` and `/plan-eng-review`. The full lifecycle is now: `office-hours → plan → implement → review → QA → ship → retro`.
+Both modes end with a design doc written to `~/.gstack/projects/` Ã¢â‚¬â€ and that doc feeds directly into `/plan-ceo-review` and `/plan-eng-review`. The full lifecycle is now: `office-hours Ã¢â€ â€™ plan Ã¢â€ â€™ implement Ã¢â€ â€™ review Ã¢â€ â€™ QA Ã¢â€ â€™ ship Ã¢â€ â€™ retro`.
 
-After the design doc is approved, `/office-hours` reflects on what it noticed about how you think — not generic praise, but specific callbacks to things you said during the session. The observations appear in the design doc too, so you re-encounter them when you re-read later.
+After the design doc is approved, `/office-hours` reflects on what it noticed about how you think Ã¢â‚¬â€ not generic praise, but specific callbacks to things you said during the session. The observations appear in the design doc too, so you re-encounter them when you re-read later.
 
 ---
 
@@ -142,10 +155,10 @@ It asks, **"what is the 10-star product hiding inside this request?"**
 
 ### Four modes
 
-- **SCOPE EXPANSION** — dream big. The agent proposes the ambitious version. Every expansion is presented as an individual decision you opt into. Recommends enthusiastically.
-- **SELECTIVE EXPANSION** — hold your current scope as the baseline, but see what else is possible. The agent surfaces opportunities one by one with neutral recommendations — you cherry-pick the ones worth doing.
-- **HOLD SCOPE** — maximum rigor on the existing plan. No expansions surfaced.
-- **SCOPE REDUCTION** — find the minimum viable version. Cut everything else.
+- **SCOPE EXPANSION** Ã¢â‚¬â€ dream big. The agent proposes the ambitious version. Every expansion is presented as an individual decision you opt into. Recommends enthusiastically.
+- **SELECTIVE EXPANSION** Ã¢â‚¬â€ hold your current scope as the baseline, but see what else is possible. The agent surfaces opportunities one by one with neutral recommendations Ã¢â‚¬â€ you cherry-pick the ones worth doing.
+- **HOLD SCOPE** Ã¢â‚¬â€ maximum rigor on the existing plan. No expansions surfaced.
+- **SCOPE REDUCTION** Ã¢â‚¬â€ find the minimum viable version. Cut everything else.
 
 Visions and decisions are persisted to `~/.gstack/projects/` so they survive beyond the conversation. Exceptional visions can be promoted to `docs/designs/` in your repo for the team.
 
@@ -199,7 +212,7 @@ Now I want the model to answer questions like:
 * How do we prevent duplicate jobs?
 * What gets persisted when, and what can be safely recomputed?
 
-And this is where I want diagrams — architecture diagrams, state models, data-flow diagrams, test matrices. Diagrams force hidden assumptions into the open. They make hand-wavy planning much harder.
+And this is where I want diagrams Ã¢â‚¬â€ architecture diagrams, state models, data-flow diagrams, test matrices. Diagrams force hidden assumptions into the open. They make hand-wavy planning much harder.
 
 That is `/plan-eng-review`.
 
@@ -218,29 +231,29 @@ Every review (CEO, Eng, Design) logs its result. At the end of each review, you 
 |-----------------|------|---------------------|-----------|----------|
 | Eng Review      |  1   | 2026-03-16 15:00    | CLEAR     | YES      |
 | CEO Review      |  1   | 2026-03-16 14:30    | CLEAR     | no       |
-| Design Review   |  0   | —                   | —         | no       |
+| Design Review   |  0   | Ã¢â‚¬â€                   | Ã¢â‚¬â€         | no       |
 +--------------------------------------------------------------------+
-| VERDICT: CLEARED — Eng Review passed                                |
+| VERDICT: CLEARED Ã¢â‚¬â€ Eng Review passed                                |
 +====================================================================+
 ```
 
-Eng Review is the only required gate (disable with `gstack-config set skip_eng_review true`). CEO and Design are informational — recommended for product and UI changes respectively.
+Eng Review is the only required gate (disable with `gstack-config set skip_eng_review true`). CEO and Design are informational Ã¢â‚¬â€ recommended for product and UI changes respectively.
 
 ### Plan-to-QA flow
 
-When `/plan-eng-review` finishes the test review section, it writes a test plan artifact to `~/.gstack/projects/`. When you later run `/qa`, it picks up that test plan automatically — your engineering review feeds directly into QA testing with no manual copy-paste.
+When `/plan-eng-review` finishes the test review section, it writes a test plan artifact to `~/.gstack/projects/`. When you later run `/qa`, it picks up that test plan automatically Ã¢â‚¬â€ your engineering review feeds directly into QA testing with no manual copy-paste.
 
 ---
 
 ## `/plan-design-review`
 
-This is my **senior designer reviewing your plan** — before you write a single line of code.
+This is my **senior designer reviewing your plan** Ã¢â‚¬â€ before you write a single line of code.
 
-Most plans describe what the backend does but never specify what the user actually sees. Empty states? Error states? Loading states? Mobile layout? AI slop risk? These decisions get deferred to "figure it out during implementation" — and then an engineer ships "No items found." as the empty state because nobody specified anything better.
+Most plans describe what the backend does but never specify what the user actually sees. Empty states? Error states? Loading states? Mobile layout? AI slop risk? These decisions get deferred to "figure it out during implementation" Ã¢â‚¬â€ and then an engineer ships "No items found." as the empty state because nobody specified anything better.
 
 `/plan-design-review` catches all of this during planning, when it's cheap to fix.
 
-It works like `/plan-ceo-review` and `/plan-eng-review` — interactive, one issue at a time, with the **STOP + AskUserQuestion** pattern. It rates each design dimension 0-10, explains what a 10 looks like, then edits the plan to get there. The rating drives the work: rate low = lots of fixes, rate high = quick pass.
+It works like `/plan-ceo-review` and `/plan-eng-review` Ã¢â‚¬â€ interactive, one issue at a time, with the **STOP + AskUserQuestion** pattern. It rates each design dimension 0-10, explains what a 10 looks like, then edits the plan to get there. The rating drives the work: rate low = lots of fixes, rate high = quick pass.
 
 Seven passes over the plan: information architecture, interaction state coverage, user journey, AI slop risk, design system alignment, responsive/accessibility, and unresolved design decisions. For each pass, it finds gaps and either fixes them directly (obvious ones) or asks you to make a design choice (genuine tradeoffs).
 
@@ -252,27 +265,27 @@ You:   /plan-design-review
 Claude: Initial Design Rating: 4/10
 
         "This plan describes a user dashboard but never specifies
-         what the user sees first. It says 'cards with icons' —
+         what the user sees first. It says 'cards with icons' Ã¢â‚¬â€
          which looks like every SaaS template. It mentions zero
          loading states, zero empty states, and no mobile behavior."
 
         Pass 1 (Info Architecture): 3/10
         "A 10 would define primary/secondary/tertiary content
          hierarchy for every screen."
-        → Added information hierarchy section to plan
+        Ã¢â€ â€™ Added information hierarchy section to plan
 
         Pass 2 (Interaction States): 2/10
         "The plan has 4 UI features but specifies 0 out of 20
-         interaction states (4 features × 5 states each)."
-        → Added interaction state table to plan
+         interaction states (4 features Ãƒâ€” 5 states each)."
+        Ã¢â€ â€™ Added interaction state table to plan
 
         Pass 4 (AI Slop): 4/10
         "The plan says 'clean, modern UI with cards and icons'
          and 'hero section with gradient'. These are the top 2
          AI-generated-looking patterns."
-        → Rewrote UI descriptions with specific, intentional alternatives
+        Ã¢â€ â€™ Rewrote UI descriptions with specific, intentional alternatives
 
-        Overall: 4/10 → 8/10 after fixes
+        Overall: 4/10 Ã¢â€ â€™ 8/10 after fixes
         "Plan is design-complete. Run /design-review after
          implementation for visual QA."
 ```
@@ -285,19 +298,19 @@ When you re-run it, sections already at 8+ get a quick pass. Sections below 8 ge
 
 This is my **design partner mode**.
 
-`/plan-design-review` audits a site that already exists. `/design-consultation` is for when you have nothing yet — no design system, no font choices, no color palette. You are starting from zero and you want a senior designer to sit down with you and build the whole visual identity together.
+`/plan-design-review` audits a site that already exists. `/design-consultation` is for when you have nothing yet Ã¢â‚¬â€ no design system, no font choices, no color palette. You are starting from zero and you want a senior designer to sit down with you and build the whole visual identity together.
 
-It is a conversation, not a form. The agent asks about your product, your users, and your audience. It thinks about what your product needs to communicate — trust, speed, craft, warmth, whatever fits — and works backward from that to concrete choices. Then it proposes a complete, coherent design system: aesthetic direction, typography (3+ fonts with specific roles), color palette with hex values, spacing scale, layout approach, and motion strategy. Every recommendation comes with a rationale. Every choice reinforces every other choice.
+It is a conversation, not a form. The agent asks about your product, your users, and your audience. It thinks about what your product needs to communicate Ã¢â‚¬â€ trust, speed, craft, warmth, whatever fits Ã¢â‚¬â€ and works backward from that to concrete choices. Then it proposes a complete, coherent design system: aesthetic direction, typography (3+ fonts with specific roles), color palette with hex values, spacing scale, layout approach, and motion strategy. Every recommendation comes with a rationale. Every choice reinforces every other choice.
 
-But coherence is table stakes. Every dev tool dashboard looks the same — clean sans-serif, muted grays, a blue accent. They are all coherent. They are all forgettable. The difference between a product that looks "nice" and one that people actually recognize is the **deliberate creative risks**: the unexpected serif for headings, the bold accent nobody else in your category uses, the tighter spacing that makes your data feel authoritative instead of airy.
+But coherence is table stakes. Every dev tool dashboard looks the same Ã¢â‚¬â€ clean sans-serif, muted grays, a blue accent. They are all coherent. They are all forgettable. The difference between a product that looks "nice" and one that people actually recognize is the **deliberate creative risks**: the unexpected serif for headings, the bold accent nobody else in your category uses, the tighter spacing that makes your data feel authoritative instead of airy.
 
-That is what `/design-consultation` is really about. It does not just propose a safe system. It proposes safe choices AND risks — and tells you which is which. "Here are the choices that keep you literate in your category. And here is where I think you should break from convention, and why." You pick which risks to take. The agent checks that the whole system still coheres either way.
+That is what `/design-consultation` is really about. It does not just propose a safe system. It proposes safe choices AND risks Ã¢â‚¬â€ and tells you which is which. "Here are the choices that keep you literate in your category. And here is where I think you should break from convention, and why." You pick which risks to take. The agent checks that the whole system still coheres either way.
 
-If you want, the agent will research what's already out there in your space — take screenshots of real sites, analyze their fonts and colors and spacing — so you can see the landscape before you make choices. This is not about copying. It is about getting in the ballpark so you know what the conventions are, and then deciding which ones are worth breaking.
+If you want, the agent will research what's already out there in your space Ã¢â‚¬â€ take screenshots of real sites, analyze their fonts and colors and spacing Ã¢â‚¬â€ so you can see the landscape before you make choices. This is not about copying. It is about getting in the ballpark so you know what the conventions are, and then deciding which ones are worth breaking.
 
-After you agree on the system, it generates an interactive HTML preview page — not just swatches and font samples, but realistic product pages. If you are building a dashboard, you see a dashboard with a sidebar, data tables, and stat cards. If you are building a marketing site, you see a hero section with real copy and a CTA. Everything rendered in your design system, with your product name, in light and dark mode. You see what your product could feel like before a single line of production code is written.
+After you agree on the system, it generates an interactive HTML preview page Ã¢â‚¬â€ not just swatches and font samples, but realistic product pages. If you are building a dashboard, you see a dashboard with a sidebar, data tables, and stat cards. If you are building a marketing site, you see a hero section with real copy and a CTA. Everything rendered in your design system, with your product name, in light and dark mode. You see what your product could feel like before a single line of production code is written.
 
-Then it writes `DESIGN.md` to your repo root — your project's design source of truth — and updates `CLAUDE.md` so every future Claude Code session respects the system. From that point on, `/design-review` can audit against it, and any agent working on your frontend knows the rules.
+Then it writes `DESIGN.md` to your repo root Ã¢â‚¬â€ your project's design source of truth Ã¢â‚¬â€ and updates `CLAUDE.md` so every future Claude Code session respects the system. From that point on, `/design-review` can audit against it, and any agent working on your frontend knows the rules.
 
 ### Example
 
@@ -306,39 +319,39 @@ You:   /design-consultation
 
 Claude: From the README, this looks like a developer analytics dashboard
         for engineering teams. Sound right? Tell me about the feeling
-        you want — and would you like me to look at what's out there
+        you want Ã¢â‚¬â€ and would you like me to look at what's out there
         first so we can see the landscape?
 
 You:    Yes, it's for eng managers. Show me what's out there.
 
-Claude: [browses Linear, Vercel, Datadog, Posthog — takes screenshots]
+Claude: [browses Linear, Vercel, Datadog, Posthog Ã¢â‚¬â€ takes screenshots]
 
         Here's the landscape. They all converge on clean sans-serifs
         and muted blue-gray palettes. Linear stands out with dark-first
         and tight spacing. The rest feel interchangeable.
 
-        Here's my proposal — and where I'd play it safe vs. take risks:
+        Here's my proposal Ã¢â‚¬â€ and where I'd play it safe vs. take risks:
 
-        AESTHETIC: Industrial/Utilitarian — data-first, every pixel earns its place
+        AESTHETIC: Industrial/Utilitarian Ã¢â‚¬â€ data-first, every pixel earns its place
         TYPOGRAPHY: Geist (body + UI), Instrument Serif (display), JetBrains Mono (data)
-        COLOR: Restrained — slate neutrals, single teal accent (#0D9488)
+        COLOR: Restrained Ã¢â‚¬â€ slate neutrals, single teal accent (#0D9488)
         SPACING: 4px base, compact density
         LAYOUT: Grid-disciplined, 12-column
-        MOTION: Minimal-functional — only transitions that aid comprehension
+        MOTION: Minimal-functional Ã¢â‚¬â€ only transitions that aid comprehension
 
         SAFE CHOICES (match category expectations):
-          Geist for body — your users already know this font from Vercel
-          Slate neutrals — warm grays feel right for data-heavy UIs
-          Grid-disciplined layout — dashboards need predictable alignment
+          Geist for body Ã¢â‚¬â€ your users already know this font from Vercel
+          Slate neutrals Ã¢â‚¬â€ warm grays feel right for data-heavy UIs
+          Grid-disciplined layout Ã¢â‚¬â€ dashboards need predictable alignment
 
         RISKS (where you'd stand out):
-          Instrument Serif for display headings — nobody in dev tools
+          Instrument Serif for display headings Ã¢â‚¬â€ nobody in dev tools
             uses a serif. It creates instant hierarchy contrast and
             signals "we care about craft" in a space full of sans-serifs.
-          Single teal accent instead of blue — everyone else in this space uses blue.
+          Single teal accent instead of blue Ã¢â‚¬â€ everyone else in this space uses blue.
             Teal is close enough to feel trustworthy, different enough
             to be recognizable.
-          4px compact density — tighter than Linear, says "we respect
+          4px compact density Ã¢â‚¬â€ tighter than Linear, says "we respect
             your screen real estate."
 
         The safe choices keep you literate. The risks are where your
@@ -350,7 +363,7 @@ Claude: Preview opened in your browser.
         [/tmp/design-consultation-preview-1710000000.html]
 
         The page shows a realistic dashboard: sidebar nav, header with
-        avatar, stat cards, data table — all in your design system.
+        avatar, stat cards, data table Ã¢â‚¬â€ all in your design system.
         Instrument Serif at hero scale, Geist in body text, JetBrains
         Mono in the data table. Teal accent on buttons and active states.
         Light and dark mode toggle in the corner.
@@ -374,7 +387,7 @@ This is my **designer who codes mode**.
 
 It runs an 80-item visual audit on your live site, then enters a fix loop: for each design finding, it locates the source file, makes the minimal CSS/styling change, commits with `style(design): FINDING-NNN`, re-navigates to verify, and takes before/after screenshots. One commit per fix, fully bisectable.
 
-The self-regulation heuristic is tuned for design work — CSS-only changes get a free pass (they are inherently safe and reversible), but changes to component JSX/TSX files count against the risk budget. Hard cap at 30 fixes. If the risk score exceeds 20%, it stops and asks.
+The self-regulation heuristic is tuned for design work Ã¢â‚¬â€ CSS-only changes get a free pass (they are inherently safe and reversible), but changes to component JSX/TSX files count against the risk budget. Hard cap at 30 fixes. If the risk score exceeds 20%, it stops and asks.
 
 ### Example
 
@@ -387,18 +400,18 @@ Claude: [Runs full 80-item visual audit on the live site]
 
         Fixing 9 design issues...
 
-        style(design): FINDING-001 — replace 3-column icon grid with asymmetric layout
-        style(design): FINDING-002 — add heading scale 48/32/24/18/16
-        style(design): FINDING-003 — remove gradient hero, use bold typography
-        style(design): FINDING-004 — add second font for headings
-        style(design): FINDING-005 — vary border-radius by element role
-        style(design): FINDING-006 — left-align body text, reserve center for headings
-        style(design): FINDING-007 — add hover/focus states to all interactive elements
-        style(design): FINDING-008 — add prefers-reduced-motion media query
-        style(design): FINDING-009 — set max content width to 680px for body text
+        style(design): FINDING-001 Ã¢â‚¬â€ replace 3-column icon grid with asymmetric layout
+        style(design): FINDING-002 Ã¢â‚¬â€ add heading scale 48/32/24/18/16
+        style(design): FINDING-003 Ã¢â‚¬â€ remove gradient hero, use bold typography
+        style(design): FINDING-004 Ã¢â‚¬â€ add second font for headings
+        style(design): FINDING-005 Ã¢â‚¬â€ vary border-radius by element role
+        style(design): FINDING-006 Ã¢â‚¬â€ left-align body text, reserve center for headings
+        style(design): FINDING-007 Ã¢â‚¬â€ add hover/focus states to all interactive elements
+        style(design): FINDING-008 Ã¢â‚¬â€ add prefers-reduced-motion media query
+        style(design): FINDING-009 Ã¢â‚¬â€ set max content width to 680px for body text
 
         Final audit:
-        Design Score: C → B+  |  AI Slop Score: D → A
+        Design Score: C Ã¢â€ â€™ B+  |  AI Slop Score: D Ã¢â€ â€™ A
         9 fixes applied (8 verified, 1 best-effort). 3 deferred.
 
         [Report with before/after screenshots saved to .gstack/design-reports/]
@@ -434,7 +447,7 @@ The skill remembers your preferences across sessions. If you consistently prefer
 ### Example
 
 ```
-You:   /design-shotgun — hero section for a developer tools landing page
+You:   /design-shotgun Ã¢â‚¬â€ hero section for a developer tools landing page
 
 Claude: [Generates 3 variants]
         Variant A: Bold typography, dark background, code snippet hero
@@ -492,10 +505,10 @@ If your project uses React, Svelte, or Vue (detected from `package.json`), the s
 You:   /design-html
 
 Claude: Found approved mockup: variant-A.png (hero section)
-        Design type: simple layout → using prepare() + layout()
+        Design type: simple layout Ã¢â€ â€™ using prepare() + layout()
 
         [Generates HTML with Pretext, opens live-reload server]
-        [Screenshots at 375px, 768px, 1440px — all verified]
+        [Screenshots at 375px, 768px, 1440px Ã¢â‚¬â€ all verified]
 
         The HTML is live at localhost:3456. Resize your browser.
         Text reflows dynamically. What needs to change?
@@ -533,11 +546,11 @@ This is a structural audit, not a style nitpick pass. I want the model to look f
 * broken invariants
 * bad retry logic
 * tests that pass while missing the real failure mode
-* forgotten enum handlers — add a new status or type constant, and `/review` traces it through every switch statement and allowlist in your codebase, not just the files you changed
+* forgotten enum handlers Ã¢â‚¬â€ add a new status or type constant, and `/review` traces it through every switch statement and allowlist in your codebase, not just the files you changed
 
 ### Fix-First
 
-Findings get action, not just listed. Obvious mechanical fixes (dead code, stale comments, N+1 queries) are applied automatically — you see `[AUTO-FIXED] file:line Problem → what was done` for each one. Genuinely ambiguous issues (security, race conditions, design decisions) get surfaced for your call.
+Findings get action, not just listed. Obvious mechanical fixes (dead code, stale comments, N+1 queries) are applied automatically Ã¢â‚¬â€ you see `[AUTO-FIXED] file:line Problem Ã¢â€ â€™ what was done` for each one. Genuinely ambiguous issues (security, race conditions, design decisions) get surfaced for your call.
 
 ### Completeness gaps
 
@@ -578,14 +591,14 @@ This is my **QA lead mode**.
 
 `/browse` gives the agent eyes. `/qa` gives it a testing methodology.
 
-The most common use case: you're on a feature branch, you just finished coding, and you want to verify everything works. Just say `/qa` — it reads your git diff, identifies which pages and routes your changes affect, spins up the browser, and tests each one. No URL required. No manual test plan.
+The most common use case: you're on a feature branch, you just finished coding, and you want to verify everything works. Just say `/qa` Ã¢â‚¬â€ it reads your git diff, identifies which pages and routes your changes affect, spins up the browser, and tests each one. No URL required. No manual test plan.
 
 Four modes:
 
-- **Diff-aware** (automatic on feature branches) — reads `git diff main`, identifies affected pages, tests them specifically
-- **Full** — systematic exploration of the entire app. 5-15 minutes. Documents 5-10 well-evidenced issues.
-- **Quick** (`--quick`) — 30-second smoke test. Homepage + top 5 nav targets.
-- **Regression** (`--regression baseline.json`) — run full mode, then diff against a previous baseline.
+- **Diff-aware** (automatic on feature branches) Ã¢â‚¬â€ reads `git diff main`, identifies affected pages, tests them specifically
+- **Full** Ã¢â‚¬â€ systematic exploration of the entire app. 5-15 minutes. Documents 5-10 well-evidenced issues.
+- **Quick** (`--quick`) Ã¢â‚¬â€ 30-second smoke test. Homepage + top 5 nav targets.
+- **Regression** (`--regression baseline.json`) Ã¢â‚¬â€ run full mode, then diff against a previous baseline.
 
 ### Automatic regression tests
 
@@ -598,7 +611,7 @@ You:   /qa https://staging.myapp.com
 
 Claude: [Explores 12 pages, fills 3 forms, tests 2 flows]
 
-        QA Report: staging.myapp.com — Health Score: 72/100
+        QA Report: staging.myapp.com Ã¢â‚¬â€ Health Score: 72/100
 
         Top 3 Issues:
         1. CRITICAL: Checkout form submits with empty required fields
@@ -624,15 +637,15 @@ This is where the model should stop behaving like a brainstorm partner and start
 
 ### Test bootstrap
 
-If your project doesn't have a test framework, `/ship` sets one up — detects your runtime, researches the best framework, installs it, writes 3-5 real tests for your actual code, sets up CI/CD (GitHub Actions), and creates TESTING.md. 100% test coverage is the goal — tests make vibe coding safe instead of yolo coding.
+If your project doesn't have a test framework, `/ship` sets one up Ã¢â‚¬â€ detects your runtime, researches the best framework, installs it, writes 3-5 real tests for your actual code, sets up CI/CD (GitHub Actions), and creates TESTING.md. 100% test coverage is the goal Ã¢â‚¬â€ tests make vibe coding safe instead of yolo coding.
 
 ### Coverage audit
 
-Every `/ship` run builds a code path map from your diff, searches for corresponding tests, and produces an ASCII coverage diagram with quality stars. Gaps get tests auto-generated. Your PR body shows the coverage: `Tests: 42 → 47 (+5 new)`.
+Every `/ship` run builds a code path map from your diff, searches for corresponding tests, and produces an ASCII coverage diagram with quality stars. Gaps get tests auto-generated. Your PR body shows the coverage: `Tests: 42 Ã¢â€ â€™ 47 (+5 new)`.
 
 ### Review gate
 
-`/ship` checks the [Review Readiness Dashboard](#review-readiness-dashboard) before creating the PR. If the Eng Review is missing, it asks — but won't block you. Decisions are saved per-branch so you're never re-asked.
+`/ship` checks the [Review Readiness Dashboard](#review-readiness-dashboard) before creating the PR. If the Eng Review is missing, it asks Ã¢â‚¬â€ but won't block you. Decisions are saved per-branch so you're never re-asked.
 
 A lot of branches die when the interesting work is done and only the boring release work is left. Humans procrastinate that part. AI should not.
 
@@ -659,8 +672,8 @@ You:   /land-and-deploy
 
 Claude: Merging PR #42...
         CI: 3/3 checks passed
-        Deploy: Fly.io — deploying v2.1.0...
-        Health check: https://myapp.fly.dev/health → 200 OK
+        Deploy: Fly.io Ã¢â‚¬â€ deploying v2.1.0...
+        Health check: https://myapp.fly.dev/health Ã¢â€ â€™ 200 OK
         Canary: 5 pages checked, 0 console errors, p95 < 800ms
 
         Production verified. v2.1.0 is live.
@@ -681,9 +694,9 @@ You:   /canary https://myapp.com
 
 Claude: Monitoring 8 pages every 2 minutes...
 
-        Cycle 1: ✓ All pages healthy. p95: 340ms. 0 console errors.
-        Cycle 2: ✓ All pages healthy. p95: 380ms. 0 console errors.
-        Cycle 3: ⚠ /dashboard — new console error: "TypeError: Cannot read
+        Cycle 1: Ã¢Å“â€œ All pages healthy. p95: 340ms. 0 console errors.
+        Cycle 2: Ã¢Å“â€œ All pages healthy. p95: 380ms. 0 console errors.
+        Cycle 3: Ã¢Å¡Â  /dashboard Ã¢â‚¬â€ new console error: "TypeError: Cannot read
                    property 'map' of undefined" at dashboard.js:142
                  Screenshot saved.
 
@@ -739,7 +752,7 @@ Claude: Running OWASP Top 10 + STRIDE security audit...
 
 This is my **technical writer mode**.
 
-After `/ship` creates the PR but before it merges, `/document-release` reads every documentation file in the project and cross-references it against the diff. It updates file paths, command lists, project structure trees, and anything else that drifted. Risky or subjective changes get surfaced as questions — everything else is handled automatically.
+After `/ship` creates the PR but before it merges, `/document-release` reads every documentation file in the project and cross-references it against the diff. It updates file paths, command lists, project structure trees, and anything else that drifted. Risky or subjective changes get surfaced as questions Ã¢â‚¬â€ everything else is handled automatically.
 
 ```
 You:   /document-release
@@ -748,7 +761,7 @@ Claude: Analyzing 21 files changed across 3 commits. Found 8 documentation files
 
         README.md: updated skill count from 9 to 10, added new skill to table
         CLAUDE.md: added new directory to project structure
-        CONTRIBUTING.md: current — no changes needed
+        CONTRIBUTING.md: current Ã¢â‚¬â€ no changes needed
         TODOS.md: marked 2 items complete, added 1 new item
 
         All docs updated and committed. PR body updated with doc diff.
@@ -762,7 +775,7 @@ It also polishes CHANGELOG voice (without ever overwriting entries), cleans up c
 
 This is my **engineering manager mode**.
 
-At the end of the week I want to know what actually happened. Not vibes — data. `/retro` analyzes commit history, work patterns, and shipping velocity and writes a candid retrospective.
+At the end of the week I want to know what actually happened. Not vibes Ã¢â‚¬â€ data. `/retro` analyzes commit history, work patterns, and shipping velocity and writes a candid retrospective.
 
 It is team-aware. It identifies who is running the command, gives you the deepest treatment on your own work, then breaks down every contributor with specific praise and growth opportunities. It computes metrics like commits, LOC, test ratio, PR sizes, and fix ratio. It detects coding sessions from commit timestamps, finds hotspot files, tracks shipping streaks, and identifies the biggest ship of the week.
 
@@ -784,12 +797,12 @@ Claude: Week of Mar 1: 47 commits (3 contributors), 3.2k LOC, 38% tests, 12 PRs,
         ## Team Breakdown
 
         ### Alice
-        12 commits focused on app/services/. Every PR under 200 LOC — disciplined.
-        Opportunity: test ratio at 12% — worth investing before payment gets more complex.
+        12 commits focused on app/services/. Every PR under 200 LOC Ã¢â‚¬â€ disciplined.
+        Opportunity: test ratio at 12% Ã¢â‚¬â€ worth investing before payment gets more complex.
 
         ### Bob
-        3 commits — fixed the N+1 query on dashboard. Small but high-impact.
-        Opportunity: only 1 active day this week — check if blocked on anything.
+        3 commits Ã¢â‚¬â€ fixed the N+1 query on dashboard. Small but high-impact.
+        Opportunity: only 1 active day this week Ã¢â‚¬â€ check if blocked on anything.
 
         [Top 3 team wins, 3 things to improve, 3 habits for next week]
 ```
@@ -804,12 +817,12 @@ This is my **QA engineer mode**.
 
 `/browse` is the skill that closes the loop. Before it, the agent could think and code but was still half blind. It had to guess about UI state, auth flows, redirects, console errors, empty states, and broken layouts. Now it can just go look.
 
-It is a compiled binary that talks to a persistent Chromium daemon — built on [Playwright](https://playwright.dev/) by Microsoft. First call starts the browser (~3s). Every call after that: ~100-200ms. The browser stays running between commands, so cookies, tabs, and localStorage carry over.
+It is a compiled binary that talks to a persistent Chromium daemon Ã¢â‚¬â€ built on [Playwright](https://playwright.dev/) by Microsoft. First call starts the browser (~3s). Every call after that: ~100-200ms. The browser stays running between commands, so cookies, tabs, and localStorage carry over.
 
 ### Example
 
 ```
-You:   /browse staging.myapp.com — log in, test the signup flow, and check
+You:   /browse staging.myapp.com Ã¢â‚¬â€ log in, test the signup flow, and check
        every page I changed in this branch
 
 Claude: [18 tool calls, ~60 seconds]
@@ -832,7 +845,7 @@ Claude: [18 tool calls, ~60 seconds]
         Dashboard loads. No console errors. Charts render with sample data.
 
         All 4 pages load correctly. No console errors. No broken layouts.
-        Signup → onboarding → dashboard flow works end to end.
+        Signup Ã¢â€ â€™ onboarding Ã¢â€ â€™ dashboard flow works end to end.
 ```
 
 18 tool calls, about a minute. Full QA pass. No browser opened.
@@ -842,7 +855,7 @@ Claude: [18 tool calls, ~60 seconds]
 
 ### Browser handoff
 
-When the headless browser gets stuck — CAPTCHA, MFA, complex auth — hand off to the user:
+When the headless browser gets stuck Ã¢â‚¬â€ CAPTCHA, MFA, complex auth Ã¢â‚¬â€ hand off to the user:
 
 ```
 Claude: I'm stuck on a CAPTCHA at the login page. Opening a visible
@@ -863,7 +876,7 @@ Claude: > browse resume
 
 The browser preserves all state (cookies, localStorage, tabs) across the handoff. After `resume`, the agent gets a fresh snapshot of wherever you left off. If the browse tool fails 3 times in a row, it automatically suggests using `handoff`.
 
-**Security note:** `/browse` runs a persistent Chromium session. Cookies, localStorage, and session state carry over between commands. Do not use it against sensitive production environments unless you intend to — it is a real browser with real state. The session auto-shuts down after 30 minutes of idle time.
+**Security note:** `/browse` runs a persistent Chromium session. Cookies, localStorage, and session state carry over between commands. Do not use it against sensitive production environments unless you intend to Ã¢â‚¬â€ it is a real browser with real state. The session auto-shuts down after 30 minutes of idle time.
 
 For the full command reference, see [BROWSER.md](../BROWSER.md).
 
@@ -875,12 +888,12 @@ This is my **session manager mode**.
 
 Before `/qa` or `/browse` can test authenticated pages, they need cookies. Instead of manually logging in through the headless browser every time, `/setup-browser-cookies` imports your real sessions directly from your daily browser.
 
-It auto-detects installed Chromium browsers (Comet, Chrome, Arc, Brave, Edge), decrypts cookies via the macOS Keychain, and loads them into the Playwright session. An interactive picker UI lets you choose exactly which domains to import — no cookie values are ever displayed.
+It auto-detects installed Chromium browsers (Comet, Chrome, Arc, Brave, Edge), decrypts cookies via the macOS Keychain, and loads them into the Playwright session. An interactive picker UI lets you choose exactly which domains to import Ã¢â‚¬â€ no cookie values are ever displayed.
 
 ```
 You:   /setup-browser-cookies
 
-Claude: Cookie picker opened — select the domains you want to import
+Claude: Cookie picker opened Ã¢â‚¬â€ select the domains you want to import
         in your browser, then tell me when you're done.
 
         [You pick github.com, myapp.com in the browser UI]
@@ -906,7 +919,7 @@ This is my **review autopilot mode**.
 
 Running `/plan-ceo-review`, then `/plan-design-review`, then `/plan-eng-review` individually means answering 15-30 intermediate questions. Each question is valuable, but sometimes you want the gauntlet to run without stopping for every decision.
 
-`/autoplan` reads all three review skills from disk and runs them sequentially: CEO → Design → Eng. It makes decisions automatically using six encoded principles (prefer completeness, match existing patterns, choose reversible options, prefer the option the user chose for similar past decisions, defer ambiguous items, and escalate security). Taste decisions (close approaches, borderline scope expansions, cross-model disagreements) get saved and presented at a final approval gate.
+`/autoplan` reads all three review skills from disk and runs them sequentially: CEO Ã¢â€ â€™ Design Ã¢â€ â€™ Eng. It makes decisions automatically using six encoded principles (prefer completeness, match existing patterns, choose reversible options, prefer the option the user chose for similar past decisions, defer ambiguous items, and escalate security). Taste decisions (close approaches, borderline scope expansions, cross-model disagreements) get saved and presented at a final approval gate.
 
 One command, fully reviewed plan out.
 
@@ -918,7 +931,7 @@ Claude: Running CEO review... [4 scope decisions auto-resolved]
         Running eng review... [2 architecture decisions auto-resolved]
 
         TASTE DECISIONS (need your input):
-        1. Scope: Codex suggested adding search — borderline expansion. Add?
+        1. Scope: Codex suggested adding search Ã¢â‚¬â€ borderline expansion. Add?
         2. Design: Two approaches scored within 1 point. Which feels right?
 
         [Shows both options with context]
@@ -949,7 +962,7 @@ Claude: 23 learnings for this project (14 high confidence, 6 medium, 3 low)
         - [8/10] All DB queries go through repository pattern, never direct
 
         3 potentially stale (referenced files deleted):
-        - "auth middleware uses JWT" — auth/middleware.ts was deleted
+        - "auth middleware uses JWT" Ã¢â‚¬â€ auth/middleware.ts was deleted
         [Prune these? Y/N]
 ```
 
@@ -985,7 +998,7 @@ You:   /setup-deploy
 
 Claude: Detected: Fly.io (fly.toml found)
         Production URL: https://myapp.fly.dev
-        Health check: /health → expects 200
+        Health check: /health Ã¢â€ â€™ expects 200
         Deploy command: fly deploy
         Status command: fly status
 
@@ -998,15 +1011,15 @@ Claude: Detected: Fly.io (fly.toml found)
 
 This is my **second opinion mode**.
 
-When `/review` catches bugs from Claude's perspective, `/codex` brings a completely different AI — OpenAI's Codex CLI — to review the same diff. Different training, different blind spots, different strengths. The overlap tells you what's definitely real. The unique findings from each are where you find the bugs neither would catch alone.
+When `/review` catches bugs from Claude's perspective, `/codex` brings a completely different AI Ã¢â‚¬â€ OpenAI's Codex CLI Ã¢â‚¬â€ to review the same diff. Different training, different blind spots, different strengths. The overlap tells you what's definitely real. The unique findings from each are where you find the bugs neither would catch alone.
 
 ### Three modes
 
-**Review** — run `codex review` against the current diff. Codex reads every changed file, classifies findings by severity (P1 critical, P2 high, P3 medium), and returns a PASS/FAIL verdict. Any P1 finding = FAIL. The review is fully independent — Codex doesn't see Claude's review.
+**Review** Ã¢â‚¬â€ run `codex review` against the current diff. Codex reads every changed file, classifies findings by severity (P1 critical, P2 high, P3 medium), and returns a PASS/FAIL verdict. Any P1 finding = FAIL. The review is fully independent Ã¢â‚¬â€ Codex doesn't see Claude's review.
 
-**Challenge** — adversarial mode. Codex actively tries to break your code. It looks for edge cases, race conditions, security holes, and assumptions that would fail under load. Uses maximum reasoning effort (`xhigh`). Think of it as a penetration test for your logic.
+**Challenge** Ã¢â‚¬â€ adversarial mode. Codex actively tries to break your code. It looks for edge cases, race conditions, security holes, and assumptions that would fail under load. Uses maximum reasoning effort (`xhigh`). Think of it as a penetration test for your logic.
 
-**Consult** — open conversation with session continuity. Ask Codex anything about the codebase. Follow-up questions reuse the same session, so context carries over. Great for "am I thinking about this correctly?" moments.
+**Consult** Ã¢â‚¬â€ open conversation with session continuity. Ask Codex anything about the codebase. Follow-up questions reuse the same session, so context carries over. Great for "am I thinking about this correctly?" moments.
 
 ### Cross-model analysis
 
@@ -1018,7 +1031,7 @@ You:   /codex review
 Claude: Running independent Codex review...
 
         CODEX REVIEW: PASS (3 findings)
-        [P2] Race condition in payment handler — concurrent charges
+        [P2] Race condition in payment handler Ã¢â‚¬â€ concurrent charges
              can double-debit without advisory lock
         [P3] Missing null check on user.email before downcase
         [P3] Token comparison not using constant-time compare
@@ -1033,21 +1046,21 @@ Claude: Running independent Codex review...
 
 ## Safety & Guardrails
 
-Four skills that add safety rails to any Claude Code session. They work via Claude Code's PreToolUse hooks — transparent, session-scoped, no configuration files.
+Four skills that add safety rails to any Claude Code session. They work via Claude Code's PreToolUse hooks Ã¢â‚¬â€ transparent, session-scoped, no configuration files.
 
 ### `/careful`
 
 Say "be careful" or run `/careful` when you're working near production, running destructive commands, or just want a safety net. Every Bash command gets checked against known-dangerous patterns:
 
-- `rm -rf` / `rm -r` — recursive delete
-- `DROP TABLE` / `DROP DATABASE` / `TRUNCATE` — data loss
-- `git push --force` / `git push -f` — history rewrite
-- `git reset --hard` — discard commits
-- `git checkout .` / `git restore .` — discard uncommitted work
-- `kubectl delete` — production resource deletion
-- `docker rm -f` / `docker system prune` — container/image loss
+- `rm -rf` / `rm -r` Ã¢â‚¬â€ recursive delete
+- `DROP TABLE` / `DROP DATABASE` / `TRUNCATE` Ã¢â‚¬â€ data loss
+- `git push --force` / `git push -f` Ã¢â‚¬â€ history rewrite
+- `git reset --hard` Ã¢â‚¬â€ discard commits
+- `git checkout .` / `git restore .` Ã¢â‚¬â€ discard uncommitted work
+- `kubectl delete` Ã¢â‚¬â€ production resource deletion
+- `docker rm -f` / `docker system prune` Ã¢â‚¬â€ container/image loss
 
-Common build artifact cleanups (`rm -rf node_modules`, `dist`, `.next`, `__pycache__`, `build`, `coverage`) are whitelisted — no false alarms on routine operations.
+Common build artifact cleanups (`rm -rf node_modules`, `dist`, `.next`, `__pycache__`, `build`, `coverage`) are whitelisted Ã¢â‚¬â€ no false alarms on routine operations.
 
 You can override any warning. The guardrails are accident prevention, not access control.
 
@@ -1055,7 +1068,7 @@ You can override any warning. The guardrails are accident prevention, not access
 
 Restrict all file edits to a single directory. When you're debugging a billing bug, you don't want Claude accidentally "fixing" unrelated code in `src/auth/`. `/freeze src/billing` blocks all Edit and Write operations outside that path.
 
-`/investigate` activates this automatically — it detects the module being debugged and freezes edits to that directory.
+`/investigate` activates this automatically Ã¢â‚¬â€ it detects the module being debugged and freezes edits to that directory.
 
 ```
 You:   /freeze src/billing
@@ -1064,19 +1077,19 @@ Claude: Edits restricted to src/billing/. Run /unfreeze to remove.
 
         [Later, Claude tries to edit src/auth/middleware.ts]
 
-Claude: BLOCKED — Edit outside freeze boundary (src/billing/).
+Claude: BLOCKED Ã¢â‚¬â€ Edit outside freeze boundary (src/billing/).
         Skipping this change.
 ```
 
-Note: this blocks Edit and Write tools only. Bash commands like `sed` can still modify files outside the boundary — it's accident prevention, not a security sandbox.
+Note: this blocks Edit and Write tools only. Bash commands like `sed` can still modify files outside the boundary Ã¢â‚¬â€ it's accident prevention, not a security sandbox.
 
 ### `/guard`
 
-Full safety mode — combines `/careful` + `/freeze` in one command. Destructive command warnings plus directory-scoped edits. Use when touching prod or debugging live systems.
+Full safety mode Ã¢â‚¬â€ combines `/careful` + `/freeze` in one command. Destructive command warnings plus directory-scoped edits. Use when touching prod or debugging live systems.
 
 ### `/unfreeze`
 
-Remove the `/freeze` boundary, allowing edits everywhere again. The hooks stay registered for the session — they just allow everything. Run `/freeze` again to set a new boundary.
+Remove the `/freeze` boundary, allowing edits everywhere again. The hooks stay registered for the session Ã¢â‚¬â€ they just allow everything. Run `/freeze` again to set a new boundary.
 
 ---
 
@@ -1100,33 +1113,33 @@ Claude: Current version: 0.7.4
         Upgraded to 0.8.2. Both global and project installs synced.
 ```
 
-Set `auto_upgrade: true` in `~/.gstack/config.yaml` to skip the prompt entirely — gstack upgrades silently at the start of each session when a new version is available.
+Set `auto_upgrade: true` in `~/.gstack/config.yaml` to skip the prompt entirely Ã¢â‚¬â€ gstack upgrades silently at the start of each session when a new version is available.
 
 ---
 
 ## Greptile integration
 
-[Greptile](https://greptile.com) is a YC company that reviews your PRs automatically. It catches real bugs — race conditions, security issues, things that pass CI and blow up in production. It has genuinely saved my ass more than once. I love these guys.
+[Greptile](https://greptile.com) is a YC company that reviews your PRs automatically. It catches real bugs Ã¢â‚¬â€ race conditions, security issues, things that pass CI and blow up in production. It has genuinely saved my ass more than once. I love these guys.
 
 ### Setup
 
-Install Greptile on your GitHub repo at [greptile.com](https://greptile.com) — it takes about 30 seconds. Once it's reviewing your PRs, gstack picks up its comments automatically. No additional configuration.
+Install Greptile on your GitHub repo at [greptile.com](https://greptile.com) Ã¢â‚¬â€ it takes about 30 seconds. Once it's reviewing your PRs, gstack picks up its comments automatically. No additional configuration.
 
 ### How it works
 
-The problem with any automated reviewer is triage. Greptile is good, but not every comment is a real issue. Some are false positives. Some flag things you already fixed three commits ago. Without a triage layer, the comments pile up and you start ignoring them — which defeats the purpose.
+The problem with any automated reviewer is triage. Greptile is good, but not every comment is a real issue. Some are false positives. Some flag things you already fixed three commits ago. Without a triage layer, the comments pile up and you start ignoring them Ã¢â‚¬â€ which defeats the purpose.
 
 gstack solves this. `/review` and `/ship` are now Greptile-aware. They read Greptile's comments, classify each one, and take action:
 
 - **Valid issues** get added to the critical findings and fixed before shipping
 - **Already-fixed issues** get an auto-reply acknowledging the catch
-- **False positives** get pushed back — you confirm, and a reply goes out explaining why it's wrong
+- **False positives** get pushed back Ã¢â‚¬â€ you confirm, and a reply goes out explaining why it's wrong
 
 The result is a two-layer review: Greptile catches things asynchronously on the PR, then `/review` and `/ship` triage those findings as part of the normal workflow. Nothing falls through the cracks.
 
 ### Learning from history
 
-Every false positive you confirm gets saved to `~/.gstack/greptile-history.md`. Future runs auto-skip known FP patterns for your codebase. And `/retro` tracks Greptile's batting average over time — so you can see whether the signal-to-noise ratio is improving.
+Every false positive you confirm gets saved to `~/.gstack/greptile-history.md`. Future runs auto-skip known FP patterns for your codebase. And `/retro` tracks Greptile's batting average over time Ã¢â‚¬â€ so you can see whether the signal-to-noise ratio is improving.
 
 ### Example
 
@@ -1137,15 +1150,15 @@ Claude: [syncs main, runs tests, pre-landing review...]
 
         Greptile found 3 comments on this PR:
 
-        [VALID] app/services/payment_service.rb:47 — Race condition:
+        [VALID] app/services/payment_service.rb:47 Ã¢â‚¬â€ Race condition:
         concurrent charges can double-debit. Recommend DB-level advisory
         lock around the charge block.
 
-        [ALREADY FIXED] app/models/user.rb:12 — Missing null check
+        [ALREADY FIXED] app/models/user.rb:12 Ã¢â‚¬â€ Missing null check
         on email before downcase.
-        → Already fixed in commit abc1234. Auto-replying.
+        Ã¢â€ â€™ Already fixed in commit abc1234. Auto-replying.
 
-        [FALSE POSITIVE] lib/auth.rb:88 — "Token comparison should
+        [FALSE POSITIVE] lib/auth.rb:88 Ã¢â‚¬â€ "Token comparison should
         use constant-time comparison." We already use
         ActiveSupport::SecurityUtils.secure_compare here.
 

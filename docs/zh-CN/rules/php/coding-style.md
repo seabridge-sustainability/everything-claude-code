@@ -4,38 +4,51 @@ paths:
   - "**/composer.json"
 ---
 
-# PHP 编码风格
+# PHP Ã§Â¼â€“Ã§Â ÂÃ©Â£Å½Ã¦Â Â¼
 
-> 此文件在 [common/coding-style.md](../common/coding-style.md) 的基础上扩展了 PHP 相关内容。
+## Safety And Authorization Rule
 
-## 标准
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-* 遵循 **PSR-12** 的格式化和命名约定。
-* 在应用程序代码中优先使用 `declare(strict_types=1);`。
-* 在所有新代码允许的地方使用标量类型提示、返回类型和类型化属性。
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-## 不可变性
 
-* 对于跨越服务边界的数据，优先使用不可变的 DTO 和值对象。
-* 在可能的情况下，对请求/响应负载使用 `readonly` 属性或不可变构造函数。
-* 对于简单的映射使用数组；将业务关键的结构提升为显式类。
+> Ã¦Â­Â¤Ã¦â€“â€¡Ã¤Â»Â¶Ã¥Å“Â¨ [common/coding-style.md](../common/coding-style.md) Ã§Å¡â€žÃ¥Å¸ÂºÃ§Â¡â‚¬Ã¤Â¸Å Ã¦â€°Â©Ã¥Â±â€¢Ã¤Âºâ€  PHP Ã§â€ºÂ¸Ã¥â€¦Â³Ã¥â€ â€¦Ã¥Â®Â¹Ã£â‚¬â€š
 
-## 格式化
+## Ã¦Â â€¡Ã¥â€¡â€ 
 
-* 使用 **PHP-CS-Fixer** 或 **Laravel Pint** 进行格式化。
-* 使用 **PHPStan** 或 **Psalm** 进行静态分析。
-* 将 Composer 脚本纳入版本控制，以便在本地和 CI 中运行相同的命令。
+* Ã©ÂÂµÃ¥Â¾Âª **PSR-12** Ã§Å¡â€žÃ¦Â Â¼Ã¥Â¼ÂÃ¥Å’â€“Ã¥â€™Å’Ã¥â€˜Â½Ã¥ÂÂÃ§ÂºÂ¦Ã¥Â®Å¡Ã£â‚¬â€š
+* Ã¥Å“Â¨Ã¥Âºâ€Ã§â€Â¨Ã§Â¨â€¹Ã¥ÂºÂÃ¤Â»Â£Ã§Â ÂÃ¤Â¸Â­Ã¤Â¼ËœÃ¥â€¦Ë†Ã¤Â½Â¿Ã§â€Â¨ `declare(strict_types=1);`Ã£â‚¬â€š
+* Ã¥Å“Â¨Ã¦â€°â‚¬Ã¦Å“â€°Ã¦â€“Â°Ã¤Â»Â£Ã§Â ÂÃ¥â€¦ÂÃ¨Â®Â¸Ã§Å¡â€žÃ¥Å“Â°Ã¦â€“Â¹Ã¤Â½Â¿Ã§â€Â¨Ã¦Â â€¡Ã©â€¡ÂÃ§Â±Â»Ã¥Å¾â€¹Ã¦ÂÂÃ§Â¤ÂºÃ£â‚¬ÂÃ¨Â¿â€Ã¥â€ºÅ¾Ã§Â±Â»Ã¥Å¾â€¹Ã¥â€™Å’Ã§Â±Â»Ã¥Å¾â€¹Ã¥Å’â€“Ã¥Â±Å¾Ã¦â‚¬Â§Ã£â‚¬â€š
 
-## 导入
+## Ã¤Â¸ÂÃ¥ÂÂ¯Ã¥ÂËœÃ¦â‚¬Â§
 
-* 为所有引用的类、接口和特征添加 `use` 语句。
-* 避免依赖全局命名空间，除非项目明确偏好使用完全限定名称。
+* Ã¥Â¯Â¹Ã¤ÂºÅ½Ã¨Â·Â¨Ã¨Â¶Å Ã¦Å“ÂÃ¥Å Â¡Ã¨Â¾Â¹Ã§â€¢Å’Ã§Å¡â€žÃ¦â€¢Â°Ã¦ÂÂ®Ã¯Â¼Å’Ã¤Â¼ËœÃ¥â€¦Ë†Ã¤Â½Â¿Ã§â€Â¨Ã¤Â¸ÂÃ¥ÂÂ¯Ã¥ÂËœÃ§Å¡â€ž DTO Ã¥â€™Å’Ã¥â‚¬Â¼Ã¥Â¯Â¹Ã¨Â±Â¡Ã£â‚¬â€š
+* Ã¥Å“Â¨Ã¥ÂÂ¯Ã¨Æ’Â½Ã§Å¡â€žÃ¦Æ’â€¦Ã¥â€ ÂµÃ¤Â¸â€¹Ã¯Â¼Å’Ã¥Â¯Â¹Ã¨Â¯Â·Ã¦Â±â€š/Ã¥â€œÂÃ¥Âºâ€Ã¨Â´Å¸Ã¨Â½Â½Ã¤Â½Â¿Ã§â€Â¨ `readonly` Ã¥Â±Å¾Ã¦â‚¬Â§Ã¦Ë†â€“Ã¤Â¸ÂÃ¥ÂÂ¯Ã¥ÂËœÃ¦Å¾â€žÃ©â‚¬Â Ã¥â€¡Â½Ã¦â€¢Â°Ã£â‚¬â€š
+* Ã¥Â¯Â¹Ã¤ÂºÅ½Ã§Â®â‚¬Ã¥Ââ€¢Ã§Å¡â€žÃ¦ËœÂ Ã¥Â°â€žÃ¤Â½Â¿Ã§â€Â¨Ã¦â€¢Â°Ã§Â»â€žÃ¯Â¼â€ºÃ¥Â°â€ Ã¤Â¸Å¡Ã¥Å Â¡Ã¥â€¦Â³Ã©â€Â®Ã§Å¡â€žÃ§Â»â€œÃ¦Å¾â€žÃ¦ÂÂÃ¥Ââ€¡Ã¤Â¸ÂºÃ¦ËœÂ¾Ã¥Â¼ÂÃ§Â±Â»Ã£â‚¬â€š
 
-## 错误处理
+## Ã¦Â Â¼Ã¥Â¼ÂÃ¥Å’â€“
 
-* 对于异常状态抛出异常；避免在新代码中返回 `false`/`null` 作为隐藏的错误通道。
-* 在框架/请求输入到达领域逻辑之前，将其转换为经过验证的 DTO。
+* Ã¤Â½Â¿Ã§â€Â¨ **PHP-CS-Fixer** Ã¦Ë†â€“ **Laravel Pint** Ã¨Â¿â€ºÃ¨Â¡Å’Ã¦Â Â¼Ã¥Â¼ÂÃ¥Å’â€“Ã£â‚¬â€š
+* Ã¤Â½Â¿Ã§â€Â¨ **PHPStan** Ã¦Ë†â€“ **Psalm** Ã¨Â¿â€ºÃ¨Â¡Å’Ã©Ââ„¢Ã¦â‚¬ÂÃ¥Ë†â€ Ã¦Å¾ÂÃ£â‚¬â€š
+* Ã¥Â°â€  Composer Ã¨â€žÅ¡Ã¦Å“Â¬Ã§ÂºÂ³Ã¥â€¦Â¥Ã§â€°Ë†Ã¦Å“Â¬Ã¦Å½Â§Ã¥Ë†Â¶Ã¯Â¼Å’Ã¤Â»Â¥Ã¤Â¾Â¿Ã¥Å“Â¨Ã¦Å“Â¬Ã¥Å“Â°Ã¥â€™Å’ CI Ã¤Â¸Â­Ã¨Â¿ÂÃ¨Â¡Å’Ã§â€ºÂ¸Ã¥ÂÅ’Ã§Å¡â€žÃ¥â€˜Â½Ã¤Â»Â¤Ã£â‚¬â€š
 
-## 参考
+## Ã¥Â¯Â¼Ã¥â€¦Â¥
 
-有关更广泛的服务/仓库分层指导，请参阅技能：`backend-patterns`。
+* Ã¤Â¸ÂºÃ¦â€°â‚¬Ã¦Å“â€°Ã¥Â¼â€¢Ã§â€Â¨Ã§Å¡â€žÃ§Â±Â»Ã£â‚¬ÂÃ¦Å½Â¥Ã¥ÂÂ£Ã¥â€™Å’Ã§â€°Â¹Ã¥Â¾ÂÃ¦Â·Â»Ã¥Å Â  `use` Ã¨Â¯Â­Ã¥ÂÂ¥Ã£â‚¬â€š
+* Ã©ÂÂ¿Ã¥â€¦ÂÃ¤Â¾ÂÃ¨Âµâ€“Ã¥â€¦Â¨Ã¥Â±â‚¬Ã¥â€˜Â½Ã¥ÂÂÃ§Â©ÂºÃ©â€”Â´Ã¯Â¼Å’Ã©â„¢Â¤Ã©ÂÅ¾Ã©Â¡Â¹Ã§â€ºÂ®Ã¦ËœÅ½Ã§Â¡Â®Ã¥ÂÂÃ¥Â¥Â½Ã¤Â½Â¿Ã§â€Â¨Ã¥Â®Å’Ã¥â€¦Â¨Ã©â„¢ÂÃ¥Â®Å¡Ã¥ÂÂÃ§Â§Â°Ã£â‚¬â€š
+
+## Ã©â€â„¢Ã¨Â¯Â¯Ã¥Â¤â€žÃ§Ââ€ 
+
+* Ã¥Â¯Â¹Ã¤ÂºÅ½Ã¥Â¼â€šÃ¥Â¸Â¸Ã§Å Â¶Ã¦â‚¬ÂÃ¦Å â€ºÃ¥â€¡ÂºÃ¥Â¼â€šÃ¥Â¸Â¸Ã¯Â¼â€ºÃ©ÂÂ¿Ã¥â€¦ÂÃ¥Å“Â¨Ã¦â€“Â°Ã¤Â»Â£Ã§Â ÂÃ¤Â¸Â­Ã¨Â¿â€Ã¥â€ºÅ¾ `false`/`null` Ã¤Â½Å“Ã¤Â¸ÂºÃ©Å¡ÂÃ¨â€”ÂÃ§Å¡â€žÃ©â€â„¢Ã¨Â¯Â¯Ã©â‚¬Å¡Ã©Ââ€œÃ£â‚¬â€š
+* Ã¥Å“Â¨Ã¦Â¡â€ Ã¦Å¾Â¶/Ã¨Â¯Â·Ã¦Â±â€šÃ¨Â¾â€œÃ¥â€¦Â¥Ã¥Ë†Â°Ã¨Â¾Â¾Ã©Â¢â€ Ã¥Å¸Å¸Ã©â‚¬Â»Ã¨Â¾â€˜Ã¤Â¹â€¹Ã¥â€°ÂÃ¯Â¼Å’Ã¥Â°â€ Ã¥â€¦Â¶Ã¨Â½Â¬Ã¦ÂÂ¢Ã¤Â¸ÂºÃ§Â»ÂÃ¨Â¿â€¡Ã©ÂªÅ’Ã¨Â¯ÂÃ§Å¡â€ž DTOÃ£â‚¬â€š
+
+## Ã¥Ââ€šÃ¨â‚¬Æ’
+
+Ã¦Å“â€°Ã¥â€¦Â³Ã¦â€ºÂ´Ã¥Â¹Â¿Ã¦Â³â€ºÃ§Å¡â€žÃ¦Å“ÂÃ¥Å Â¡/Ã¤Â»â€œÃ¥Âºâ€œÃ¥Ë†â€ Ã¥Â±â€šÃ¦Å’â€¡Ã¥Â¯Â¼Ã¯Â¼Å’Ã¨Â¯Â·Ã¥Ââ€šÃ©Ëœâ€¦Ã¦Å â‚¬Ã¨Æ’Â½Ã¯Â¼Å¡`backend-patterns`Ã£â‚¬â€š

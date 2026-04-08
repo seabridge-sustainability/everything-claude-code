@@ -6,12 +6,25 @@ origin: ECC
 
 # AI Regression Testing
 
-Testing patterns specifically designed for AI-assisted development, where the same model writes code and reviews it — creating systematic blind spots that only automated tests can catch.
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+Testing patterns specifically designed for AI-assisted development, where the same model writes code and reviews it Ã¢â‚¬â€ creating systematic blind spots that only automated tests can catch.
 
 ## When to Activate
 
 - AI agent (Claude Code, Cursor, Codex) has modified API routes or backend logic
-- A bug was found and fixed — need to prevent re-introduction
+- A bug was found and fixed Ã¢â‚¬â€ need to prevent re-introduction
 - Project has a sandbox/mock mode that can be leveraged for DB-free testing
 - Running `/bug-check` or similar review commands after code changes
 - Multiple code paths exist (sandbox vs production, feature flags, etc.)
@@ -21,23 +34,23 @@ Testing patterns specifically designed for AI-assisted development, where the sa
 When an AI writes code and then reviews its own work, it carries the same assumptions into both steps. This creates a predictable failure pattern:
 
 ```
-AI writes fix → AI reviews fix → AI says "looks correct" → Bug still exists
+AI writes fix Ã¢â€ â€™ AI reviews fix Ã¢â€ â€™ AI says "looks correct" Ã¢â€ â€™ Bug still exists
 ```
 
 **Real-world example** (observed in production):
 
 ```
 Fix 1: Added notification_settings to API response
-  → Forgot to add it to the SELECT query
-  → AI reviewed and missed it (same blind spot)
+  Ã¢â€ â€™ Forgot to add it to the SELECT query
+  Ã¢â€ â€™ AI reviewed and missed it (same blind spot)
 
 Fix 2: Added it to SELECT query
-  → TypeScript build error (column not in generated types)
-  → AI reviewed Fix 1 but didn't catch the SELECT issue
+  Ã¢â€ â€™ TypeScript build error (column not in generated types)
+  Ã¢â€ â€™ AI reviewed Fix 1 but didn't catch the SELECT issue
 
 Fix 3: Changed to SELECT *
-  → Fixed production path, forgot sandbox path
-  → AI reviewed and missed it AGAIN (4th occurrence)
+  Ã¢â€ â€™ Fixed production path, forgot sandbox path
+  Ã¢â€ â€™ AI reviewed and missed it AGAIN (4th occurrence)
 
 Fix 4: Test caught it instantly on first run PASS:
 ```
@@ -72,7 +85,7 @@ export default defineConfig({
 
 ```typescript
 // __tests__/setup.ts
-// Force sandbox mode — no database needed
+// Force sandbox mode Ã¢â‚¬â€ no database needed
 process.env.SANDBOX_MODE = "true";
 process.env.NEXT_PUBLIC_SUPABASE_URL = "";
 process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = "";
@@ -130,7 +143,7 @@ import { describe, it, expect } from "vitest";
 import { createTestRequest, parseResponse } from "../../helpers";
 import { GET, PATCH } from "@/app/api/user/profile/route";
 
-// Define the contract — what fields MUST be in the response
+// Define the contract Ã¢â‚¬â€ what fields MUST be in the response
 const REQUIRED_FIELDS = [
   "id",
   "email",
@@ -139,7 +152,7 @@ const REQUIRED_FIELDS = [
   "role",
   "created_at",
   "avatar_url",
-  "notification_settings",  // ← Added after bug found it missing
+  "notification_settings",  // Ã¢â€ Â Added after bug found it missing
 ];
 
 describe("GET /api/user/profile", () => {
@@ -154,7 +167,7 @@ describe("GET /api/user/profile", () => {
     }
   });
 
-  // Regression test — this exact bug was introduced by AI 4 times
+  // Regression test Ã¢â‚¬â€ this exact bug was introduced by AI 4 times
   it("notification_settings is not undefined (BUG-R1 regression)", async () => {
     const req = createTestRequest("/api/user/profile");
     const res = await GET(req);
@@ -207,8 +220,8 @@ Run these commands FIRST before any code review:
     npm run test       # Vitest test suite
     npm run build      # TypeScript type check + build
 
-- If tests fail → report as highest priority bug
-- If build fails → report type errors as highest priority
+- If tests fail Ã¢â€ â€™ report as highest priority bug
+- If build fails Ã¢â€ â€™ report type errors as highest priority
 - Only proceed to Step 2 if both pass
 
 ## Step 2: Code Review (AI review)
@@ -225,21 +238,21 @@ Run these commands FIRST before any code review:
 ### The Workflow
 
 ```
-User: "バグチェックして" (or "/bug-check")
-  │
-  ├─ Step 1: npm run test
-  │   ├─ FAIL → Bug found mechanically (no AI judgment needed)
-  │   └─ PASS → Continue
-  │
-  ├─ Step 2: npm run build
-  │   ├─ FAIL → Type error found mechanically
-  │   └─ PASS → Continue
-  │
-  ├─ Step 3: AI code review (with known blind spots in mind)
-  │   └─ Findings reported
-  │
-  └─ Step 4: For each fix, write a regression test
-      └─ Next bug-check catches if fix breaks
+User: "Ã£Æ’ÂÃ£â€šÂ°Ã£Æ’ÂÃ£â€šÂ§Ã£Æ’Æ’Ã£â€šÂ¯Ã£Ââ€”Ã£ÂÂ¦" (or "/bug-check")
+  Ã¢â€â€š
+  Ã¢â€Å“Ã¢â€â‚¬ Step 1: npm run test
+  Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬ FAIL Ã¢â€ â€™ Bug found mechanically (no AI judgment needed)
+  Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬ PASS Ã¢â€ â€™ Continue
+  Ã¢â€â€š
+  Ã¢â€Å“Ã¢â€â‚¬ Step 2: npm run build
+  Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬ FAIL Ã¢â€ â€™ Type error found mechanically
+  Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬ PASS Ã¢â€ â€™ Continue
+  Ã¢â€â€š
+  Ã¢â€Å“Ã¢â€â‚¬ Step 3: AI code review (with known blind spots in mind)
+  Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬ Findings reported
+  Ã¢â€â€š
+  Ã¢â€â€Ã¢â€â‚¬ Step 4: For each fix, write a regression test
+      Ã¢â€â€Ã¢â€â‚¬ Next bug-check catches if fix breaks
 ```
 
 ## Common AI Regression Patterns
@@ -289,7 +302,7 @@ const { data } = await supabase
   .single();
 
 return { data: { ...data, notification_settings: data.notification_settings } };
-// → notification_settings is always undefined
+// Ã¢â€ â€™ notification_settings is always undefined
 
 // PASS: Use SELECT * or explicitly include new columns
 const { data } = await supabase
@@ -300,7 +313,7 @@ const { data } = await supabase
 
 ### Pattern 3: Error State Leakage
 
-**Frequency**: Moderate — when adding error handling to existing components
+**Frequency**: Moderate Ã¢â‚¬â€ when adding error handling to existing components
 
 ```typescript
 // FAIL: Error state set but old data not cleared
@@ -335,7 +348,7 @@ const handleRemove = async (id: string) => {
     if (!res.ok) throw new Error("API error");
   } catch {
     setItems(prevItems);  // Rollback
-    alert("削除に失敗しました");
+    alert("Ã¥â€°Å Ã©â„¢Â¤Ã£ÂÂ«Ã¥Â¤Â±Ã¦â€¢â€”Ã£Ââ€”Ã£ÂÂ¾Ã£Ââ€”Ã£ÂÅ¸");
   }
 };
 ```
@@ -345,10 +358,10 @@ const handleRemove = async (id: string) => {
 Don't aim for 100% coverage. Instead:
 
 ```
-Bug found in /api/user/profile     → Write test for profile API
-Bug found in /api/user/messages    → Write test for messages API
-Bug found in /api/user/favorites   → Write test for favorites API
-No bug in /api/user/notifications  → Don't write test (yet)
+Bug found in /api/user/profile     Ã¢â€ â€™ Write test for profile API
+Bug found in /api/user/messages    Ã¢â€ â€™ Write test for messages API
+Bug found in /api/user/favorites   Ã¢â€ â€™ Write test for favorites API
+No bug in /api/user/notifications  Ã¢â€ â€™ Don't write test (yet)
 ```
 
 **Why this works with AI development:**
@@ -356,7 +369,7 @@ No bug in /api/user/notifications  → Don't write test (yet)
 1. AI tends to make the **same category of mistake** repeatedly
 2. Bugs cluster in complex areas (auth, multi-path logic, state management)
 3. Once tested, that exact regression **cannot happen again**
-4. Test count grows organically with bug fixes — no wasted effort
+4. Test count grows organically with bug fixes Ã¢â‚¬â€ no wasted effort
 
 ## Quick Reference
 
@@ -382,4 +395,4 @@ No bug in /api/user/notifications  → Don't write test (yet)
 - Trust AI self-review as a substitute for automated tests
 - Skip sandbox path testing because "it's just mock data"
 - Write integration tests when unit tests suffice
-- Aim for coverage percentage — aim for regression prevention
+- Aim for coverage percentage Ã¢â‚¬â€ aim for regression prevention

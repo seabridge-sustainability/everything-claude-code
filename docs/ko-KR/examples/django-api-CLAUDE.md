@@ -1,54 +1,67 @@
-# Django REST API — 프로젝트 CLAUDE.md
+# Django REST API Ã¢â‚¬â€ Ã­â€â€žÃ«Â¡Å“Ã¬Â ÂÃ­Å Â¸ CLAUDE.md
 
-> PostgreSQL과 Celery를 사용하는 Django REST Framework API의 실전 예시입니다.
-> 프로젝트 루트에 복사하여 서비스에 맞게 커스터마이즈하세요.
+## Safety And Authorization Rule
 
-## 프로젝트 개요
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-**기술 스택:** Python 3.12+, Django 5.x, Django REST Framework, PostgreSQL, Celery + Redis, pytest, Docker Compose
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-**아키텍처:** 비즈니스 도메인별 앱으로 구성된 도메인 주도 설계. API 레이어에 DRF, 비동기 작업에 Celery, 테스트에 pytest 사용. 모든 엔드포인트는 JSON을 반환하며 템플릿 렌더링은 없음.
 
-## 필수 규칙
+> PostgreSQLÃªÂ³Â¼ CeleryÃ«Â¥Â¼ Ã¬â€šÂ¬Ã¬Å¡Â©Ã­â€¢ËœÃ«Å â€ Django REST Framework APIÃ¬ÂËœ Ã¬â€¹Â¤Ã¬Â â€ž Ã¬ËœË†Ã¬â€¹Å“Ã¬Å¾â€¦Ã«â€¹Ë†Ã«â€¹Â¤.
+> Ã­â€â€žÃ«Â¡Å“Ã¬Â ÂÃ­Å Â¸ Ã«Â£Â¨Ã­Å Â¸Ã¬â€”Â Ã«Â³ÂµÃ¬â€šÂ¬Ã­â€¢ËœÃ¬â€”Â¬ Ã¬â€žÅ“Ã«Â¹â€žÃ¬Å Â¤Ã¬â€”Â Ã«Â§Å¾ÃªÂ²Å’ Ã¬Â»Â¤Ã¬Å Â¤Ã­â€žÂ°Ã«Â§Ë†Ã¬ÂÂ´Ã¬Â¦Ë†Ã­â€¢ËœÃ¬â€žÂ¸Ã¬Å¡â€.
 
-### Python 규칙
+## Ã­â€â€žÃ«Â¡Å“Ã¬Â ÂÃ­Å Â¸ ÃªÂ°Å“Ã¬Å¡â€
 
-- 모든 함수 시그니처에 type hints 사용 — `from __future__ import annotations` 사용
-- `print()` 문 사용 금지 — `logging.getLogger(__name__)` 사용
-- 문자열 포매팅은 f-strings 사용, `%`나 `.format()`은 사용 금지
-- 파일 작업에 `os.path` 대신 `pathlib.Path` 사용
-- isort로 import 정렬: stdlib, third-party, local 순서 (ruff에 의해 강제)
+**ÃªÂ¸Â°Ã¬Ë†Â  Ã¬Å Â¤Ã­Æ’Â:** Python 3.12+, Django 5.x, Django REST Framework, PostgreSQL, Celery + Redis, pytest, Docker Compose
 
-### 데이터베이스
+**Ã¬â€¢â€žÃ­â€šÂ¤Ã­â€¦ÂÃ¬Â²Ëœ:** Ã«Â¹â€žÃ¬Â¦Ë†Ã«â€¹Ë†Ã¬Å Â¤ Ã«Ââ€žÃ«Â©â€Ã¬ÂÂ¸Ã«Â³â€ž Ã¬â€¢Â±Ã¬Å“Â¼Ã«Â¡Å“ ÃªÂµÂ¬Ã¬â€žÂ±Ã«ÂÅ“ Ã«Ââ€žÃ«Â©â€Ã¬ÂÂ¸ Ã¬Â£Â¼Ã«Ââ€ž Ã¬â€žÂ¤ÃªÂ³â€ž. API Ã«Â Ë†Ã¬ÂÂ´Ã¬â€“Â´Ã¬â€”Â DRF, Ã«Â¹â€žÃ«Ââ„¢ÃªÂ¸Â° Ã¬Å¾â€˜Ã¬â€”â€¦Ã¬â€”Â Celery, Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸Ã¬â€”Â pytest Ã¬â€šÂ¬Ã¬Å¡Â©. Ã«ÂªÂ¨Ã«â€œÂ  Ã¬â€”â€Ã«â€œÅ“Ã­ÂÂ¬Ã¬ÂÂ¸Ã­Å Â¸Ã«Å â€ JSONÃ¬Ââ€ž Ã«Â°ËœÃ­â„¢ËœÃ­â€¢ËœÃ«Â©Â° Ã­â€¦Å“Ã­â€Å’Ã«Â¦Â¿ Ã«Â Å’Ã«Ââ€Ã«Â§ÂÃ¬Ââ‚¬ Ã¬â€”â€ Ã¬ÂÅ’.
 
-- 모든 쿼리는 Django ORM 사용 — raw SQL은 `.raw()`와 parameterized 쿼리로만 사용
-- 마이그레이션은 git에 커밋 — 프로덕션에서 `--fake` 사용 금지
-- N+1 쿼리 방지를 위해 `select_related()`와 `prefetch_related()` 사용
-- 모든 모델에 `created_at`과 `updated_at` 자동 필드 필수
-- `filter()`, `order_by()`, 또는 `WHERE` 절에 사용되는 모든 필드에 인덱스 추가
+## Ã­â€¢â€žÃ¬Ë†Ëœ ÃªÂ·Å“Ã¬Â¹â„¢
+
+### Python ÃªÂ·Å“Ã¬Â¹â„¢
+
+- Ã«ÂªÂ¨Ã«â€œÂ  Ã­â€¢Â¨Ã¬Ë†Ëœ Ã¬â€¹Å“ÃªÂ·Â¸Ã«â€¹Ë†Ã¬Â²ËœÃ¬â€”Â type hints Ã¬â€šÂ¬Ã¬Å¡Â© Ã¢â‚¬â€ `from __future__ import annotations` Ã¬â€šÂ¬Ã¬Å¡Â©
+- `print()` Ã«Â¬Â¸ Ã¬â€šÂ¬Ã¬Å¡Â© ÃªÂ¸Ë†Ã¬Â§â‚¬ Ã¢â‚¬â€ `logging.getLogger(__name__)` Ã¬â€šÂ¬Ã¬Å¡Â©
+- Ã«Â¬Â¸Ã¬Å¾ÂÃ¬â€”Â´ Ã­ÂÂ¬Ã«Â§Â¤Ã­Å’â€¦Ã¬Ââ‚¬ f-strings Ã¬â€šÂ¬Ã¬Å¡Â©, `%`Ã«â€šËœ `.format()`Ã¬Ââ‚¬ Ã¬â€šÂ¬Ã¬Å¡Â© ÃªÂ¸Ë†Ã¬Â§â‚¬
+- Ã­Å’Å’Ã¬ÂÂ¼ Ã¬Å¾â€˜Ã¬â€”â€¦Ã¬â€”Â `os.path` Ã«Å’â‚¬Ã¬â€¹Â  `pathlib.Path` Ã¬â€šÂ¬Ã¬Å¡Â©
+- isortÃ«Â¡Å“ import Ã¬Â â€¢Ã«Â Â¬: stdlib, third-party, local Ã¬Ë†Å“Ã¬â€žÅ“ (ruffÃ¬â€”Â Ã¬ÂËœÃ­â€¢Â´ ÃªÂ°â€¢Ã¬Â Å“)
+
+### Ã«ÂÂ°Ã¬ÂÂ´Ã­â€žÂ°Ã«Â²Â Ã¬ÂÂ´Ã¬Å Â¤
+
+- Ã«ÂªÂ¨Ã«â€œÂ  Ã¬Â¿Â¼Ã«Â¦Â¬Ã«Å â€ Django ORM Ã¬â€šÂ¬Ã¬Å¡Â© Ã¢â‚¬â€ raw SQLÃ¬Ââ‚¬ `.raw()`Ã¬â„¢â‚¬ parameterized Ã¬Â¿Â¼Ã«Â¦Â¬Ã«Â¡Å“Ã«Â§Å’ Ã¬â€šÂ¬Ã¬Å¡Â©
+- Ã«Â§Ë†Ã¬ÂÂ´ÃªÂ·Â¸Ã«Â Ë†Ã¬ÂÂ´Ã¬â€¦ËœÃ¬Ââ‚¬ gitÃ¬â€”Â Ã¬Â»Â¤Ã«Â°â€¹ Ã¢â‚¬â€ Ã­â€â€žÃ«Â¡Å“Ã«Ââ€¢Ã¬â€¦ËœÃ¬â€”ÂÃ¬â€žÅ“ `--fake` Ã¬â€šÂ¬Ã¬Å¡Â© ÃªÂ¸Ë†Ã¬Â§â‚¬
+- N+1 Ã¬Â¿Â¼Ã«Â¦Â¬ Ã«Â°Â©Ã¬Â§â‚¬Ã«Â¥Â¼ Ã¬Å“â€žÃ­â€¢Â´ `select_related()`Ã¬â„¢â‚¬ `prefetch_related()` Ã¬â€šÂ¬Ã¬Å¡Â©
+- Ã«ÂªÂ¨Ã«â€œÂ  Ã«ÂªÂ¨Ã«ÂÂ¸Ã¬â€”Â `created_at`ÃªÂ³Â¼ `updated_at` Ã¬Å¾ÂÃ«Ââ„¢ Ã­â€¢â€žÃ«â€œÅ“ Ã­â€¢â€žÃ¬Ë†Ëœ
+- `filter()`, `order_by()`, Ã«ËœÂÃ«Å â€ `WHERE` Ã¬Â Ë†Ã¬â€”Â Ã¬â€šÂ¬Ã¬Å¡Â©Ã«ÂËœÃ«Å â€ Ã«ÂªÂ¨Ã«â€œÂ  Ã­â€¢â€žÃ«â€œÅ“Ã¬â€”Â Ã¬ÂÂ¸Ã«ÂÂ±Ã¬Å Â¤ Ã¬Â¶â€ÃªÂ°â‚¬
 
 ```python
-# 나쁜 예: N+1 쿼리
+# Ã«â€šËœÃ¬ÂÅ“ Ã¬ËœË†: N+1 Ã¬Â¿Â¼Ã«Â¦Â¬
 orders = Order.objects.all()
 for order in orders:
-    print(order.customer.name)  # 각 주문마다 DB를 조회함
+    print(order.customer.name)  # ÃªÂ°Â Ã¬Â£Â¼Ã«Â¬Â¸Ã«Â§Ë†Ã«â€¹Â¤ DBÃ«Â¥Â¼ Ã¬Â¡Â°Ã­Å¡Å’Ã­â€¢Â¨
 
-# 좋은 예: join을 사용한 단일 쿼리
+# Ã¬Â¢â€¹Ã¬Ââ‚¬ Ã¬ËœË†: joinÃ¬Ââ€ž Ã¬â€šÂ¬Ã¬Å¡Â©Ã­â€¢Å“ Ã«â€¹Â¨Ã¬ÂÂ¼ Ã¬Â¿Â¼Ã«Â¦Â¬
 orders = Order.objects.select_related("customer").all()
 ```
 
-### 인증
+### Ã¬ÂÂ¸Ã¬Â¦Â
 
-- `djangorestframework-simplejwt`를 통한 JWT — access token (15분) + refresh token (7일)
-- 모든 뷰에 permission 클래스 지정 — 기본값에 의존하지 않기
-- `IsAuthenticated`를 기본으로, 객체 수준 접근에는 커스텀 permission 추가
-- 로그아웃을 위한 token blacklisting 활성화
+- `djangorestframework-simplejwt`Ã«Â¥Â¼ Ã­â€ ÂµÃ­â€¢Å“ JWT Ã¢â‚¬â€ access token (15Ã«Â¶â€ž) + refresh token (7Ã¬ÂÂ¼)
+- Ã«ÂªÂ¨Ã«â€œÂ  Ã«Â·Â°Ã¬â€”Â permission Ã­ÂÂ´Ã«Å¾ËœÃ¬Å Â¤ Ã¬Â§â‚¬Ã¬Â â€¢ Ã¢â‚¬â€ ÃªÂ¸Â°Ã«Â³Â¸ÃªÂ°â€™Ã¬â€”Â Ã¬ÂËœÃ¬Â¡Â´Ã­â€¢ËœÃ¬Â§â‚¬ Ã¬â€¢Å ÃªÂ¸Â°
+- `IsAuthenticated`Ã«Â¥Â¼ ÃªÂ¸Â°Ã«Â³Â¸Ã¬Å“Â¼Ã«Â¡Å“, ÃªÂ°ÂÃ¬Â²Â´ Ã¬Ë†ËœÃ¬Â¤â‚¬ Ã¬Â â€˜ÃªÂ·Â¼Ã¬â€”ÂÃ«Å â€ Ã¬Â»Â¤Ã¬Å Â¤Ã­â€¦â‚¬ permission Ã¬Â¶â€ÃªÂ°â‚¬
+- Ã«Â¡Å“ÃªÂ·Â¸Ã¬â€¢â€žÃ¬â€ºÆ’Ã¬Ââ€ž Ã¬Å“â€žÃ­â€¢Å“ token blacklisting Ã­â„¢Å“Ã¬â€žÂ±Ã­â„¢â€
 
 ### Serializers
 
-- 간단한 CRUD에는 `ModelSerializer`, 복잡한 유효성 검증에는 `Serializer` 사용
-- 입력/출력 형태가 다를 때는 읽기와 쓰기 serializer를 분리
-- 유효성 검증은 serializer 레벨에서 — 뷰는 얇게 유지
+- ÃªÂ°â€žÃ«â€¹Â¨Ã­â€¢Å“ CRUDÃ¬â€”ÂÃ«Å â€ `ModelSerializer`, Ã«Â³ÂµÃ¬Å¾Â¡Ã­â€¢Å“ Ã¬Å“Â Ã­Å¡Â¨Ã¬â€žÂ± ÃªÂ²â‚¬Ã¬Â¦ÂÃ¬â€”ÂÃ«Å â€ `Serializer` Ã¬â€šÂ¬Ã¬Å¡Â©
+- Ã¬Å¾â€¦Ã«Â Â¥/Ã¬Â¶Å“Ã«Â Â¥ Ã­Ëœâ€¢Ã­Æ’Å“ÃªÂ°â‚¬ Ã«â€¹Â¤Ã«Â¥Â¼ Ã«â€¢Å’Ã«Å â€ Ã¬ÂÂ½ÃªÂ¸Â°Ã¬â„¢â‚¬ Ã¬â€œÂ°ÃªÂ¸Â° serializerÃ«Â¥Â¼ Ã«Â¶â€žÃ«Â¦Â¬
+- Ã¬Å“Â Ã­Å¡Â¨Ã¬â€žÂ± ÃªÂ²â‚¬Ã¬Â¦ÂÃ¬Ââ‚¬ serializer Ã«Â Ë†Ã«Â²Â¨Ã¬â€”ÂÃ¬â€žÅ“ Ã¢â‚¬â€ Ã«Â·Â°Ã«Å â€ Ã¬â€“â€¡ÃªÂ²Å’ Ã¬Å“Â Ã¬Â§â‚¬
 
 ```python
 class CreateOrderSerializer(serializers.Serializer):
@@ -69,11 +82,11 @@ class OrderDetailSerializer(serializers.ModelSerializer):
         fields = ["id", "customer", "product", "quantity", "total", "status", "created_at"]
 ```
 
-### 오류 처리
+### Ã¬ËœÂ¤Ã«Â¥Ëœ Ã¬Â²ËœÃ«Â¦Â¬
 
-- 일관된 오류 응답을 위해 DRF exception handler 사용
-- 비즈니스 로직용 커스텀 예외는 `core/exceptions.py`에 정의
-- 클라이언트에 내부 오류 세부 정보를 노출하지 않기
+- Ã¬ÂÂ¼ÃªÂ´â‚¬Ã«ÂÅ“ Ã¬ËœÂ¤Ã«Â¥Ëœ Ã¬Ââ€˜Ã«â€¹ÂµÃ¬Ââ€ž Ã¬Å“â€žÃ­â€¢Â´ DRF exception handler Ã¬â€šÂ¬Ã¬Å¡Â©
+- Ã«Â¹â€žÃ¬Â¦Ë†Ã«â€¹Ë†Ã¬Å Â¤ Ã«Â¡Å“Ã¬Â§ÂÃ¬Å¡Â© Ã¬Â»Â¤Ã¬Å Â¤Ã­â€¦â‚¬ Ã¬ËœË†Ã¬â„¢Â¸Ã«Å â€ `core/exceptions.py`Ã¬â€”Â Ã¬Â â€¢Ã¬ÂËœ
+- Ã­ÂÂ´Ã«ÂÂ¼Ã¬ÂÂ´Ã¬â€“Â¸Ã­Å Â¸Ã¬â€”Â Ã«â€šÂ´Ã«Â¶â‚¬ Ã¬ËœÂ¤Ã«Â¥Ëœ Ã¬â€žÂ¸Ã«Â¶â‚¬ Ã¬Â â€¢Ã«Â³Â´Ã«Â¥Â¼ Ã«â€¦Â¸Ã¬Â¶Å“Ã­â€¢ËœÃ¬Â§â‚¬ Ã¬â€¢Å ÃªÂ¸Â°
 
 ```python
 # core/exceptions.py
@@ -85,63 +98,63 @@ class InsufficientStockError(APIException):
     default_code = "insufficient_stock"
 ```
 
-### 코드 스타일
+### Ã¬Â½â€Ã«â€œÅ“ Ã¬Å Â¤Ã­Æ’â‚¬Ã¬ÂÂ¼
 
-- 코드나 주석에 이모지 사용 금지
-- 최대 줄 길이: 120자 (ruff에 의해 강제)
-- 클래스: PascalCase, 함수/변수: snake_case, 상수: UPPER_SNAKE_CASE
-- 뷰는 얇게 유지 — 비즈니스 로직은 서비스 함수나 모델 메서드에 배치
+- Ã¬Â½â€Ã«â€œÅ“Ã«â€šËœ Ã¬Â£Â¼Ã¬â€žÂÃ¬â€”Â Ã¬ÂÂ´Ã«ÂªÂ¨Ã¬Â§â‚¬ Ã¬â€šÂ¬Ã¬Å¡Â© ÃªÂ¸Ë†Ã¬Â§â‚¬
+- Ã¬ÂµÅ“Ã«Å’â‚¬ Ã¬Â¤â€ž ÃªÂ¸Â¸Ã¬ÂÂ´: 120Ã¬Å¾Â (ruffÃ¬â€”Â Ã¬ÂËœÃ­â€¢Â´ ÃªÂ°â€¢Ã¬Â Å“)
+- Ã­ÂÂ´Ã«Å¾ËœÃ¬Å Â¤: PascalCase, Ã­â€¢Â¨Ã¬Ë†Ëœ/Ã«Â³â‚¬Ã¬Ë†Ëœ: snake_case, Ã¬Æ’ÂÃ¬Ë†Ëœ: UPPER_SNAKE_CASE
+- Ã«Â·Â°Ã«Å â€ Ã¬â€“â€¡ÃªÂ²Å’ Ã¬Å“Â Ã¬Â§â‚¬ Ã¢â‚¬â€ Ã«Â¹â€žÃ¬Â¦Ë†Ã«â€¹Ë†Ã¬Å Â¤ Ã«Â¡Å“Ã¬Â§ÂÃ¬Ââ‚¬ Ã¬â€žÅ“Ã«Â¹â€žÃ¬Å Â¤ Ã­â€¢Â¨Ã¬Ë†ËœÃ«â€šËœ Ã«ÂªÂ¨Ã«ÂÂ¸ Ã«Â©â€Ã¬â€žÅ“Ã«â€œÅ“Ã¬â€”Â Ã«Â°Â°Ã¬Â¹Ëœ
 
-## 파일 구조
+## Ã­Å’Å’Ã¬ÂÂ¼ ÃªÂµÂ¬Ã¬Â¡Â°
 
 ```
 config/
   settings/
-    base.py              # 공유 설정
-    local.py             # 개발 환경 오버라이드 (DEBUG=True)
-    production.py        # 프로덕션 설정
-  urls.py                # 루트 URL 설정
-  celery.py              # Celery 앱 설정
+    base.py              # ÃªÂ³ÂµÃ¬Å“Â  Ã¬â€žÂ¤Ã¬Â â€¢
+    local.py             # ÃªÂ°Å“Ã«Â°Å“ Ã­â„¢ËœÃªÂ²Â½ Ã¬ËœÂ¤Ã«Â²â€žÃ«ÂÂ¼Ã¬ÂÂ´Ã«â€œÅ“ (DEBUG=True)
+    production.py        # Ã­â€â€žÃ«Â¡Å“Ã«Ââ€¢Ã¬â€¦Ëœ Ã¬â€žÂ¤Ã¬Â â€¢
+  urls.py                # Ã«Â£Â¨Ã­Å Â¸ URL Ã¬â€žÂ¤Ã¬Â â€¢
+  celery.py              # Celery Ã¬â€¢Â± Ã¬â€žÂ¤Ã¬Â â€¢
 apps/
-  accounts/              # 사용자 인증, 회원가입, 프로필
+  accounts/              # Ã¬â€šÂ¬Ã¬Å¡Â©Ã¬Å¾Â Ã¬ÂÂ¸Ã¬Â¦Â, Ã­Å¡Å’Ã¬â€ºÂÃªÂ°â‚¬Ã¬Å¾â€¦, Ã­â€â€žÃ«Â¡Å“Ã­â€¢â€ž
     models.py
     serializers.py
     views.py
-    services.py          # 비즈니스 로직
+    services.py          # Ã«Â¹â€žÃ¬Â¦Ë†Ã«â€¹Ë†Ã¬Å Â¤ Ã«Â¡Å“Ã¬Â§Â
     tests/
       test_views.py
       test_services.py
-      factories.py       # Factory Boy 팩토리
-  orders/                # 주문 관리
+      factories.py       # Factory Boy Ã­Å’Â©Ã­â€ Â Ã«Â¦Â¬
+  orders/                # Ã¬Â£Â¼Ã«Â¬Â¸ ÃªÂ´â‚¬Ã«Â¦Â¬
     models.py
     serializers.py
     views.py
     services.py
-    tasks.py             # Celery 작업
+    tasks.py             # Celery Ã¬Å¾â€˜Ã¬â€”â€¦
     tests/
-  products/              # 상품 카탈로그
+  products/              # Ã¬Æ’ÂÃ­â€™Ë† Ã¬Â¹Â´Ã­Æ’Ë†Ã«Â¡Å“ÃªÂ·Â¸
     models.py
     serializers.py
     views.py
     tests/
 core/
-  exceptions.py          # 커스텀 API 예외
-  permissions.py         # 공유 permission 클래스
-  pagination.py          # 커스텀 페이지네이션
-  middleware.py          # 요청 로깅, 타이밍
+  exceptions.py          # Ã¬Â»Â¤Ã¬Å Â¤Ã­â€¦â‚¬ API Ã¬ËœË†Ã¬â„¢Â¸
+  permissions.py         # ÃªÂ³ÂµÃ¬Å“Â  permission Ã­ÂÂ´Ã«Å¾ËœÃ¬Å Â¤
+  pagination.py          # Ã¬Â»Â¤Ã¬Å Â¤Ã­â€¦â‚¬ Ã­Å½ËœÃ¬ÂÂ´Ã¬Â§â‚¬Ã«â€žÂ¤Ã¬ÂÂ´Ã¬â€¦Ëœ
+  middleware.py          # Ã¬Å¡â€Ã¬Â²Â­ Ã«Â¡Å“ÃªÂ¹â€¦, Ã­Æ’â‚¬Ã¬ÂÂ´Ã«Â°Â
   tests/
 ```
 
-## 주요 패턴
+## Ã¬Â£Â¼Ã¬Å¡â€ Ã­Å’Â¨Ã­â€žÂ´
 
-### Service 레이어
+### Service Ã«Â Ë†Ã¬ÂÂ´Ã¬â€“Â´
 
 ```python
 # apps/orders/services.py
 from django.db import transaction
 
 def create_order(*, customer, product_id: uuid.UUID, quantity: int) -> Order:
-    """재고 검증과 결제 보류를 포함한 주문 생성."""
+    """Ã¬Å¾Â¬ÃªÂ³Â  ÃªÂ²â‚¬Ã¬Â¦ÂÃªÂ³Â¼ ÃªÂ²Â°Ã¬Â Å“ Ã«Â³Â´Ã«Â¥ËœÃ«Â¥Â¼ Ã­ÂÂ¬Ã­â€¢Â¨Ã­â€¢Å“ Ã¬Â£Â¼Ã«Â¬Â¸ Ã¬Æ’ÂÃ¬â€žÂ±."""
     with transaction.atomic():
         product = Product.objects.select_for_update().get(id=product_id)
 
@@ -157,12 +170,12 @@ def create_order(*, customer, product_id: uuid.UUID, quantity: int) -> Order:
         product.stock -= quantity
         product.save(update_fields=["stock", "updated_at"])
 
-    # 비동기: 주문 확인 이메일 발송
+    # Ã«Â¹â€žÃ«Ââ„¢ÃªÂ¸Â°: Ã¬Â£Â¼Ã«Â¬Â¸ Ã­â„¢â€¢Ã¬ÂÂ¸ Ã¬ÂÂ´Ã«Â©â€Ã¬ÂÂ¼ Ã«Â°Å“Ã¬â€ Â¡
     send_order_confirmation.delay(order.id)
     return order
 ```
 
-### View 패턴
+### View Ã­Å’Â¨Ã­â€žÂ´
 
 ```python
 # apps/orders/views.py
@@ -192,7 +205,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         serializer.instance = order
 ```
 
-### 테스트 패턴 (pytest + Factory Boy)
+### Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸ Ã­Å’Â¨Ã­â€žÂ´ (pytest + Factory Boy)
 
 ```python
 # apps/orders/tests/factories.py
@@ -243,7 +256,7 @@ class TestCreateOrder:
         assert response.status_code == 401
 ```
 
-## 환경 변수
+## Ã­â„¢ËœÃªÂ²Â½ Ã«Â³â‚¬Ã¬Ë†Ëœ
 
 ```bash
 # Django
@@ -251,58 +264,58 @@ SECRET_KEY=
 DEBUG=False
 ALLOWED_HOSTS=api.example.com
 
-# 데이터베이스
+# Ã«ÂÂ°Ã¬ÂÂ´Ã­â€žÂ°Ã«Â²Â Ã¬ÂÂ´Ã¬Å Â¤
 DATABASE_URL=postgres://user:pass@localhost:5432/myapp
 
-# Redis (Celery broker + 캐시)
+# Redis (Celery broker + Ã¬ÂºÂÃ¬â€¹Å“)
 REDIS_URL=redis://localhost:6379/0
 
 # JWT
-JWT_ACCESS_TOKEN_LIFETIME=15       # 분
-JWT_REFRESH_TOKEN_LIFETIME=10080   # 분 (7일)
+JWT_ACCESS_TOKEN_LIFETIME=15       # Ã«Â¶â€ž
+JWT_REFRESH_TOKEN_LIFETIME=10080   # Ã«Â¶â€ž (7Ã¬ÂÂ¼)
 
-# 이메일
+# Ã¬ÂÂ´Ã«Â©â€Ã¬ÂÂ¼
 EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
 EMAIL_HOST=smtp.example.com
 ```
 
-## 테스트 전략
+## Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸ Ã¬Â â€žÃ«Å¾Âµ
 
 ```bash
-# 전체 테스트 실행
+# Ã¬Â â€žÃ¬Â²Â´ Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸ Ã¬â€¹Â¤Ã­â€“â€°
 pytest --cov=apps --cov-report=term-missing
 
-# 특정 앱 테스트 실행
+# Ã­Å Â¹Ã¬Â â€¢ Ã¬â€¢Â± Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸ Ã¬â€¹Â¤Ã­â€“â€°
 pytest apps/orders/tests/ -v
 
-# 병렬 실행
+# Ã«Â³â€˜Ã«Â Â¬ Ã¬â€¹Â¤Ã­â€“â€°
 pytest -n auto
 
-# 마지막 실행에서 실패한 테스트만 실행
+# Ã«Â§Ë†Ã¬Â§â‚¬Ã«Â§â€° Ã¬â€¹Â¤Ã­â€“â€°Ã¬â€”ÂÃ¬â€žÅ“ Ã¬â€¹Â¤Ã­Å’Â¨Ã­â€¢Å“ Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸Ã«Â§Å’ Ã¬â€¹Â¤Ã­â€“â€°
 pytest --lf
 ```
 
-## ECC 워크플로우
+## ECC Ã¬â€ºÅ’Ã­ÂÂ¬Ã­â€Å’Ã«Â¡Å“Ã¬Å¡Â°
 
 ```bash
-# 계획 수립
+# ÃªÂ³â€žÃ­Å¡Â Ã¬Ë†ËœÃ«Â¦Â½
 /plan "Add order refund system with Stripe integration"
 
-# TDD로 개발
-/tdd                    # pytest 기반 TDD 워크플로우
+# TDDÃ«Â¡Å“ ÃªÂ°Å“Ã«Â°Å“
+/tdd                    # pytest ÃªÂ¸Â°Ã«Â°Ëœ TDD Ã¬â€ºÅ’Ã­ÂÂ¬Ã­â€Å’Ã«Â¡Å“Ã¬Å¡Â°
 
-# 리뷰
-/python-review          # Python 전용 코드 리뷰
-/security-scan          # Django 보안 감사
-/code-review            # 일반 품질 검사
+# Ã«Â¦Â¬Ã«Â·Â°
+/python-review          # Python Ã¬Â â€žÃ¬Å¡Â© Ã¬Â½â€Ã«â€œÅ“ Ã«Â¦Â¬Ã«Â·Â°
+/security-scan          # Django Ã«Â³Â´Ã¬â€¢Ë† ÃªÂ°ÂÃ¬â€šÂ¬
+/code-review            # Ã¬ÂÂ¼Ã«Â°Ëœ Ã­â€™Ë†Ã¬Â§Ë† ÃªÂ²â‚¬Ã¬â€šÂ¬
 
-# 검증
-/verify                 # 빌드, 린트, 테스트, 보안 스캔
+# ÃªÂ²â‚¬Ã¬Â¦Â
+/verify                 # Ã«Â¹Å’Ã«â€œÅ“, Ã«Â¦Â°Ã­Å Â¸, Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸, Ã«Â³Â´Ã¬â€¢Ë† Ã¬Å Â¤Ã¬Âºâ€
 ```
 
-## Git 워크플로우
+## Git Ã¬â€ºÅ’Ã­ÂÂ¬Ã­â€Å’Ã«Â¡Å“Ã¬Å¡Â°
 
-- `feat:` 새 기능, `fix:` 버그 수정, `refactor:` 코드 변경
-- `main`에서 feature 브랜치 생성, PR 필수
-- CI: ruff (린트 + 포맷), mypy (타입), pytest (테스트), safety (의존성 검사)
-- 배포: Docker 이미지, Kubernetes 또는 Railway로 관리
+- `feat:` Ã¬Æ’Ë† ÃªÂ¸Â°Ã«Å Â¥, `fix:` Ã«Â²â€žÃªÂ·Â¸ Ã¬Ë†ËœÃ¬Â â€¢, `refactor:` Ã¬Â½â€Ã«â€œÅ“ Ã«Â³â‚¬ÃªÂ²Â½
+- `main`Ã¬â€”ÂÃ¬â€žÅ“ feature Ã«Â¸Å’Ã«Å¾Å“Ã¬Â¹Ëœ Ã¬Æ’ÂÃ¬â€žÂ±, PR Ã­â€¢â€žÃ¬Ë†Ëœ
+- CI: ruff (Ã«Â¦Â°Ã­Å Â¸ + Ã­ÂÂ¬Ã«Â§Â·), mypy (Ã­Æ’â‚¬Ã¬Å¾â€¦), pytest (Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸), safety (Ã¬ÂËœÃ¬Â¡Â´Ã¬â€žÂ± ÃªÂ²â‚¬Ã¬â€šÂ¬)
+- Ã«Â°Â°Ã­ÂÂ¬: Docker Ã¬ÂÂ´Ã«Â¯Â¸Ã¬Â§â‚¬, Kubernetes Ã«ËœÂÃ«Å â€ RailwayÃ«Â¡Å“ ÃªÂ´â‚¬Ã«Â¦Â¬

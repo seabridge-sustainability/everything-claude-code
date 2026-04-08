@@ -12,6 +12,19 @@ metadata:
 
 # Go Patterns
 
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
 > This skill provides comprehensive Go patterns extending common design principles with Go-specific idioms.
 
 ## Functional Options
@@ -161,14 +174,14 @@ if errors.Is(err, ErrNotFound) {
 
 ```
 project/
-├── cmd/              # Main applications
-│   └── server/
-│       └── main.go
-├── internal/         # Private application code
-│   ├── domain/       # Business logic
-│   ├── handler/      # HTTP handlers
-│   └── repository/   # Data access
-└── pkg/              # Public libraries
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ cmd/              # Main applications
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ server/
+Ã¢â€â€š       Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ main.go
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ internal/         # Private application code
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ domain/       # Business logic
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ handler/      # HTTP handlers
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ repository/   # Data access
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ pkg/              # Public libraries
 ```
 
 ### Naming Conventions

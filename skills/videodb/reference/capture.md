@@ -1,5 +1,18 @@
 # Capture Guide
 
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
 ## Overview
 
 VideoDB Capture enables real-time screen and audio recording with AI processing. Desktop capture currently supports **macOS** only.
@@ -44,7 +57,7 @@ No webhooks or polling required. WebSocket delivers all events including session
     - Trigger alerts when specific keywords appear in `transcript`
     - Track application usage from screen descriptions
 
-11. **Stop capture** when done — send SIGTERM to the capture process. It should call `client.stop_capture()` and `client.shutdown()` in its signal handler.
+11. **Stop capture** when done Ã¢â‚¬â€ send SIGTERM to the capture process. It should call `client.stop_capture()` and `client.shutdown()` in its signal handler.
 
 12. **Wait for export** by reading events until you see `capture_session.exported`. This event contains `exported_video_id`, `stream_url`, and `player_url`. This may take several seconds after stopping capture.
 
@@ -56,9 +69,9 @@ No webhooks or polling required. WebSocket delivers all events including session
 
 Proper shutdown order is important to ensure all events are captured:
 
-1. **Stop the capture session** — `client.stop_capture()` then `client.shutdown()`
-2. **Wait for export event** — poll `/tmp/videodb_events.jsonl` for `capture_session.exported`
-3. **Stop the WebSocket listener** — `kill $(cat /tmp/videodb_ws_pid)`
+1. **Stop the capture session** Ã¢â‚¬â€ `client.stop_capture()` then `client.shutdown()`
+2. **Wait for export event** Ã¢â‚¬â€ poll `/tmp/videodb_events.jsonl` for `capture_session.exported`
+3. **Stop the WebSocket listener** Ã¢â‚¬â€ `kill $(cat /tmp/videodb_ws_pid)`
 
 Do NOT kill the WebSocket listener before receiving the export event, or you will miss the final video URLs.
 

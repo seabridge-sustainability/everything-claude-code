@@ -1,4 +1,17 @@
-# Go Microservice — Project CLAUDE.md
+# Go Microservice Ã¢â‚¬â€ Project CLAUDE.md
+
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
 
 > Real-world example for a Go microservice with PostgreSQL, gRPC, and Docker.
 > Copy this to your project root and customize for your service.
@@ -14,33 +27,33 @@
 ### Go Conventions
 
 - Follow Effective Go and the Go Code Review Comments guide
-- Use `errors.New` / `fmt.Errorf` with `%w` for wrapping — never string matching on errors
-- No `init()` functions — explicit initialization in `main()` or constructors
-- No global mutable state — pass dependencies via constructors
+- Use `errors.New` / `fmt.Errorf` with `%w` for wrapping Ã¢â‚¬â€ never string matching on errors
+- No `init()` functions Ã¢â‚¬â€ explicit initialization in `main()` or constructors
+- No global mutable state Ã¢â‚¬â€ pass dependencies via constructors
 - Context must be the first parameter and propagated through all layers
 
 ### Database
 
-- All queries in `queries/` as plain SQL — sqlc generates type-safe Go code
-- Migrations in `migrations/` using golang-migrate — never alter the database directly
+- All queries in `queries/` as plain SQL Ã¢â‚¬â€ sqlc generates type-safe Go code
+- Migrations in `migrations/` using golang-migrate Ã¢â‚¬â€ never alter the database directly
 - Use transactions for multi-step operations via `pgx.Tx`
-- All queries must use parameterized placeholders (`$1`, `$2`) — never string formatting
+- All queries must use parameterized placeholders (`$1`, `$2`) Ã¢â‚¬â€ never string formatting
 
 ### Error Handling
 
-- Return errors, don't panic — panics are only for truly unrecoverable situations
+- Return errors, don't panic Ã¢â‚¬â€ panics are only for truly unrecoverable situations
 - Wrap errors with context: `fmt.Errorf("creating user: %w", err)`
 - Define sentinel errors in `domain/errors.go` for business logic
 - Map domain errors to gRPC status codes in the handler layer
 
 ```go
-// Domain layer — sentinel errors
+// Domain layer Ã¢â‚¬â€ sentinel errors
 var (
     ErrUserNotFound  = errors.New("user not found")
     ErrEmailTaken    = errors.New("email already registered")
 )
 
-// Handler layer — map to gRPC status
+// Handler layer Ã¢â‚¬â€ map to gRPC status
 func toGRPCError(err error) error {
     switch {
     case errors.Is(err, domain.ErrUserNotFound):
@@ -57,7 +70,7 @@ func toGRPCError(err error) error {
 
 - No emojis in code or comments
 - Exported types and functions must have doc comments
-- Keep functions under 50 lines — extract helpers
+- Keep functions under 50 lines Ã¢â‚¬â€ extract helpers
 - Use table-driven tests for all logic with multiple cases
 - Prefer `struct{}` for signal channels, not `bool`
 

@@ -1,29 +1,42 @@
 ---
 name: frontend-patterns
-description: React, Next.js, state yönetimi, performans optimizasyonu ve UI en iyi uygulamaları için frontend geliştirme kalıpları.
+description: React, Next.js, state yÃƒÂ¶netimi, performans optimizasyonu ve UI en iyi uygulamalarÃ„Â± iÃƒÂ§in frontend geliÃ…Å¸tirme kalÃ„Â±plarÃ„Â±.
 origin: ECC
 ---
 
-# Frontend Geliştirme Kalıpları
+# Frontend GeliÃ…Å¸tirme KalÃ„Â±plarÃ„Â±
 
-React, Next.js ve performanslı kullanıcı arayüzleri için modern frontend kalıpları.
+## Safety And Authorization Rule
 
-## Ne Zaman Aktifleştirmelisiniz
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-- React bileşenleri oluştururken (composition, props, rendering)
-- State yönetirken (useState, useReducer, Zustand, Context)
-- Veri çekme implementasyonu (SWR, React Query, server components)
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+React, Next.js ve performanslÃ„Â± kullanÃ„Â±cÃ„Â± arayÃƒÂ¼zleri iÃƒÂ§in modern frontend kalÃ„Â±plarÃ„Â±.
+
+## Ne Zaman AktifleÃ…Å¸tirmelisiniz
+
+- React bileÃ…Å¸enleri oluÃ…Å¸tururken (composition, props, rendering)
+- State yÃƒÂ¶netirken (useState, useReducer, Zustand, Context)
+- Veri ÃƒÂ§ekme implementasyonu (SWR, React Query, server components)
 - Performans optimize ederken (memoization, virtualization, code splitting)
-- Formlarla çalışırken (validation, controlled inputs, Zod schemas)
-- Client-side routing ve navigasyon işlerken
-- Erişilebilir, responsive UI kalıpları oluştururken
+- Formlarla ÃƒÂ§alÃ„Â±Ã…Å¸Ã„Â±rken (validation, controlled inputs, Zod schemas)
+- Client-side routing ve navigasyon iÃ…Å¸lerken
+- EriÃ…Å¸ilebilir, responsive UI kalÃ„Â±plarÃ„Â± oluÃ…Å¸tururken
 
-## Bileşen Kalıpları
+## BileÃ…Å¸en KalÃ„Â±plarÃ„Â±
 
-### Kalıtım Yerine Composition
+### KalÃ„Â±tÃ„Â±m Yerine Composition
 
 ```typescript
-// PASS: İYİ: Bileşen composition
+// PASS: Ã„Â°YÃ„Â°: BileÃ…Å¸en composition
 interface CardProps {
   children: React.ReactNode
   variant?: 'default' | 'outlined'
@@ -41,10 +54,10 @@ export function CardBody({ children }: { children: React.ReactNode }) {
   return <div className="card-body">{children}</div>
 }
 
-// Kullanım
+// KullanÃ„Â±m
 <Card>
-  <CardHeader>Başlık</CardHeader>
-  <CardBody>İçerik</CardBody>
+  <CardHeader>BaÃ…Å¸lÃ„Â±k</CardHeader>
+  <CardBody>Ã„Â°ÃƒÂ§erik</CardBody>
 </Card>
 ```
 
@@ -89,16 +102,16 @@ export function Tab({ id, children }: { id: string, children: React.ReactNode })
   )
 }
 
-// Kullanım
+// KullanÃ„Â±m
 <Tabs defaultTab="overview">
   <TabList>
-    <Tab id="overview">Genel Bakış</Tab>
+    <Tab id="overview">Genel BakÃ„Â±Ã…Å¸</Tab>
     <Tab id="details">Detaylar</Tab>
   </TabList>
 </Tabs>
 ```
 
-### Render Props Kalıbı
+### Render Props KalÃ„Â±bÃ„Â±
 
 ```typescript
 interface DataLoaderProps<T> {
@@ -122,7 +135,7 @@ export function DataLoader<T>({ url, children }: DataLoaderProps<T>) {
   return <>{children(data, loading, error)}</>
 }
 
-// Kullanım
+// KullanÃ„Â±m
 <DataLoader<Market[]> url="/api/markets">
   {(markets, loading, error) => {
     if (loading) return <Spinner />
@@ -132,9 +145,9 @@ export function DataLoader<T>({ url, children }: DataLoaderProps<T>) {
 </DataLoader>
 ```
 
-## Özel Hook Kalıpları
+## Ãƒâ€“zel Hook KalÃ„Â±plarÃ„Â±
 
-### State Yönetimi Hook'u
+### State YÃƒÂ¶netimi Hook'u
 
 ```typescript
 export function useToggle(initialValue = false): [boolean, () => void] {
@@ -147,11 +160,11 @@ export function useToggle(initialValue = false): [boolean, () => void] {
   return [value, toggle]
 }
 
-// Kullanım
+// KullanÃ„Â±m
 const [isOpen, toggleOpen] = useToggle()
 ```
 
-### Async Veri Çekme Hook'u
+### Async Veri Ãƒâ€¡ekme Hook'u
 
 ```typescript
 interface UseQueryOptions<T> {
@@ -195,13 +208,13 @@ export function useQuery<T>(
   return { data, error, loading, refetch }
 }
 
-// Kullanım
+// KullanÃ„Â±m
 const { data: markets, loading, error, refetch } = useQuery(
   'markets',
   () => fetch('/api/markets').then(r => r.json()),
   {
     onSuccess: data => console.log('Getirilen', data.length, 'market'),
-    onError: err => console.error('Başarısız:', err)
+    onError: err => console.error('BaÃ…Å¸arÃ„Â±sÃ„Â±z:', err)
   }
 )
 ```
@@ -223,7 +236,7 @@ export function useDebounce<T>(value: T, delay: number): T {
   return debouncedValue
 }
 
-// Kullanım
+// KullanÃ„Â±m
 const [searchQuery, setSearchQuery] = useState('')
 const debouncedQuery = useDebounce(searchQuery, 500)
 
@@ -234,9 +247,9 @@ useEffect(() => {
 }, [debouncedQuery])
 ```
 
-## State Yönetimi Kalıpları
+## State YÃƒÂ¶netimi KalÃ„Â±plarÃ„Â±
 
-### Context + Reducer Kalıbı
+### Context + Reducer KalÃ„Â±bÃ„Â±
 
 ```typescript
 interface State {
@@ -294,17 +307,17 @@ export function useMarkets() {
 ### Memoization
 
 ```typescript
-// PASS: Pahalı hesaplamalar için useMemo
+// PASS: PahalÃ„Â± hesaplamalar iÃƒÂ§in useMemo
 const sortedMarkets = useMemo(() => {
   return markets.sort((a, b) => b.volume - a.volume)
 }, [markets])
 
-// PASS: Alt bileşenlere geçirilen fonksiyonlar için useCallback
+// PASS: Alt bileÃ…Å¸enlere geÃƒÂ§irilen fonksiyonlar iÃƒÂ§in useCallback
 const handleSearch = useCallback((query: string) => {
   setSearchQuery(query)
 }, [])
 
-// PASS: Pure bileşenler için React.memo
+// PASS: Pure bileÃ…Å¸enler iÃƒÂ§in React.memo
 export const MarketCard = React.memo<MarketCardProps>(({ market }) => {
   return (
     <div className="market-card">
@@ -320,7 +333,7 @@ export const MarketCard = React.memo<MarketCardProps>(({ market }) => {
 ```typescript
 import { lazy, Suspense } from 'react'
 
-// PASS: Ağır bileşenleri lazy yükle
+// PASS: AÃ„Å¸Ã„Â±r bileÃ…Å¸enleri lazy yÃƒÂ¼kle
 const HeavyChart = lazy(() => import('./HeavyChart'))
 const ThreeJsBackground = lazy(() => import('./ThreeJsBackground'))
 
@@ -339,7 +352,7 @@ export function Dashboard() {
 }
 ```
 
-### Uzun Listeler için Virtualization
+### Uzun Listeler iÃƒÂ§in Virtualization
 
 ```typescript
 import { useVirtualizer } from '@tanstack/react-virtual'
@@ -350,8 +363,8 @@ export function VirtualMarketList({ markets }: { markets: Market[] }) {
   const virtualizer = useVirtualizer({
     count: markets.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 100,  // Tahmini satır yüksekliği
-    overscan: 5  // Ekstra render edilecek öğeler
+    estimateSize: () => 100,  // Tahmini satÃ„Â±r yÃƒÂ¼ksekliÃ„Å¸i
+    overscan: 5  // Ekstra render edilecek ÃƒÂ¶Ã„Å¸eler
   })
 
   return (
@@ -383,9 +396,9 @@ export function VirtualMarketList({ markets }: { markets: Market[] }) {
 }
 ```
 
-## Form İşleme Kalıpları
+## Form Ã„Â°Ã…Å¸leme KalÃ„Â±plarÃ„Â±
 
-### Doğrulamalı Controlled Form
+### DoÃ„Å¸rulamalÃ„Â± Controlled Form
 
 ```typescript
 interface FormData {
@@ -413,17 +426,17 @@ export function CreateMarketForm() {
     const newErrors: FormErrors = {}
 
     if (!formData.name.trim()) {
-      newErrors.name = 'İsim gereklidir'
+      newErrors.name = 'Ã„Â°sim gereklidir'
     } else if (formData.name.length > 200) {
-      newErrors.name = 'İsim 200 karakterden az olmalıdır'
+      newErrors.name = 'Ã„Â°sim 200 karakterden az olmalÃ„Â±dÃ„Â±r'
     }
 
     if (!formData.description.trim()) {
-      newErrors.description = 'Açıklama gereklidir'
+      newErrors.description = 'AÃƒÂ§Ã„Â±klama gereklidir'
     }
 
     if (!formData.endDate) {
-      newErrors.endDate = 'Bitiş tarihi gereklidir'
+      newErrors.endDate = 'BitiÃ…Å¸ tarihi gereklidir'
     }
 
     setErrors(newErrors)
@@ -437,9 +450,9 @@ export function CreateMarketForm() {
 
     try {
       await createMarket(formData)
-      // Başarı işleme
+      // BaÃ…Å¸arÃ„Â± iÃ…Å¸leme
     } catch (error) {
-      // Hata işleme
+      // Hata iÃ…Å¸leme
     }
   }
 
@@ -452,15 +465,15 @@ export function CreateMarketForm() {
       />
       {errors.name && <span className="error">{errors.name}</span>}
 
-      {/* Diğer alanlar */}
+      {/* DiÃ„Å¸er alanlar */}
 
-      <button type="submit">Market Oluştur</button>
+      <button type="submit">Market OluÃ…Å¸tur</button>
     </form>
   )
 }
 ```
 
-## Error Boundary Kalıbı
+## Error Boundary KalÃ„Â±bÃ„Â±
 
 ```typescript
 interface ErrorBoundaryState {
@@ -489,7 +502,7 @@ export class ErrorBoundary extends React.Component<
     if (this.state.hasError) {
       return (
         <div className="error-fallback">
-          <h2>Bir şeyler yanlış gitti</h2>
+          <h2>Bir Ã…Å¸eyler yanlÃ„Â±Ã…Å¸ gitti</h2>
           <p>{this.state.error?.message}</p>
           <button onClick={() => this.setState({ hasError: false })}>
             Tekrar dene
@@ -502,20 +515,20 @@ export class ErrorBoundary extends React.Component<
   }
 }
 
-// Kullanım
+// KullanÃ„Â±m
 <ErrorBoundary>
   <App />
 </ErrorBoundary>
 ```
 
-## Animasyon Kalıpları
+## Animasyon KalÃ„Â±plarÃ„Â±
 
-### Framer Motion Animasyonları
+### Framer Motion AnimasyonlarÃ„Â±
 
 ```typescript
 import { motion, AnimatePresence } from 'framer-motion'
 
-// PASS: Liste animasyonları
+// PASS: Liste animasyonlarÃ„Â±
 export function AnimatedMarketList({ markets }: { markets: Market[] }) {
   return (
     <AnimatePresence>
@@ -534,7 +547,7 @@ export function AnimatedMarketList({ markets }: { markets: Market[] }) {
   )
 }
 
-// PASS: Modal animasyonları
+// PASS: Modal animasyonlarÃ„Â±
 export function Modal({ isOpen, onClose, children }: ModalProps) {
   return (
     <AnimatePresence>
@@ -562,7 +575,7 @@ export function Modal({ isOpen, onClose, children }: ModalProps) {
 }
 ```
 
-## Erişilebilirlik Kalıpları
+## EriÃ…Å¸ilebilirlik KalÃ„Â±plarÃ„Â±
 
 ### Klavye Navigasyonu
 
@@ -605,7 +618,7 @@ export function Dropdown({ options, onSelect }: DropdownProps) {
 }
 ```
 
-### Focus Yönetimi
+### Focus YÃƒÂ¶netimi
 
 ```typescript
 export function Modal({ isOpen, onClose, children }: ModalProps) {
@@ -614,13 +627,13 @@ export function Modal({ isOpen, onClose, children }: ModalProps) {
 
   useEffect(() => {
     if (isOpen) {
-      // Şu anki focus'lanmış elementi kaydet
+      // Ã…Å¾u anki focus'lanmÃ„Â±Ã…Å¸ elementi kaydet
       previousFocusRef.current = document.activeElement as HTMLElement
 
       // Modal'a focus yap
       modalRef.current?.focus()
     } else {
-      // Kapatırken focus'u geri yükle
+      // KapatÃ„Â±rken focus'u geri yÃƒÂ¼kle
       previousFocusRef.current?.focus()
     }
   }, [isOpen])
@@ -639,4 +652,4 @@ export function Modal({ isOpen, onClose, children }: ModalProps) {
 }
 ```
 
-**Unutmayın**: Modern frontend kalıpları sürdürülebilir, performanslı kullanıcı arayüzleri sağlar. Proje karmaşıklığınıza uyan kalıpları seçin.
+**UnutmayÃ„Â±n**: Modern frontend kalÃ„Â±plarÃ„Â± sÃƒÂ¼rdÃƒÂ¼rÃƒÂ¼lebilir, performanslÃ„Â± kullanÃ„Â±cÃ„Â± arayÃƒÂ¼zleri saÃ„Å¸lar. Proje karmaÃ…Å¸Ã„Â±klÃ„Â±Ã„Å¸Ã„Â±nÃ„Â±za uyan kalÃ„Â±plarÃ„Â± seÃƒÂ§in.

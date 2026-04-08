@@ -4,7 +4,20 @@ description: Save current session state to a dated file in ~/.claude/session-dat
 
 # Save Session Command
 
-Capture everything that happened in this session — what was built, what worked, what failed, what's left — and write it to a dated file so the next session can pick up exactly where this one left off.
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+Capture everything that happened in this session Ã¢â‚¬â€ what was built, what worked, what failed, what's left Ã¢â‚¬â€ and write it to a dated file so the next session can pick up exactly where this one left off.
 
 ## When to Use
 
@@ -49,7 +62,7 @@ The legacy filename `YYYY-MM-DD-session.tmp` is still valid, but new session fil
 
 ### Step 4: Populate the file with all sections below
 
-Write every section honestly. Do not skip sections — write "Nothing yet" or "N/A" if a section genuinely has no content. An incomplete file is worse than an honest empty section.
+Write every section honestly. Do not skip sections Ã¢â‚¬â€ write "Nothing yet" or "N/A" if a section genuinely has no content. An incomplete file is worse than an honest empty section.
 
 ### Step 5: Show the file to the user
 
@@ -88,13 +101,13 @@ Include: what it does, why it's needed, how it fits into the larger system.]
 ## What WORKED (with evidence)
 
 [List only things that are confirmed working. For each item include WHY you
-know it works — test passed, ran in browser, Postman returned 200, etc.
+know it works Ã¢â‚¬â€ test passed, ran in browser, Postman returned 200, etc.
 Without evidence, move it to "Not Tried Yet" instead.]
 
-- **[thing that works]** — confirmed by: [specific evidence]
-- **[thing that works]** — confirmed by: [specific evidence]
+- **[thing that works]** Ã¢â‚¬â€ confirmed by: [specific evidence]
+- **[thing that works]** Ã¢â‚¬â€ confirmed by: [specific evidence]
 
-If nothing is confirmed working yet: "Nothing confirmed working yet — all approaches still in progress or untested."
+If nothing is confirmed working yet: "Nothing confirmed working yet Ã¢â‚¬â€ all approaches still in progress or untested."
 
 ---
 
@@ -104,8 +117,8 @@ If nothing is confirmed working yet: "Nothing confirmed working yet — all appr
 For each failure write the EXACT reason so the next session doesn't retry it.
 Be specific: "threw X error because Y" is useful. "didn't work" is not.]
 
-- **[approach tried]** — failed because: [exact reason / error message]
-- **[approach tried]** — failed because: [exact reason / error message]
+- **[approach tried]** Ã¢â‚¬â€ failed because: [exact reason / error message]
+- **[approach tried]** Ã¢â‚¬â€ failed because: [exact reason / error message]
 
 If nothing failed: "No failed approaches yet."
 
@@ -144,7 +157,7 @@ If no files were touched: "No files modified this session."
 [Architecture choices, tradeoffs accepted, approaches chosen and why.
 These prevent the next session from relitigating settled decisions.]
 
-- **[decision]** — reason: [why this was chosen over alternatives]
+- **[decision]** Ã¢â‚¬â€ reason: [why this was chosen over alternatives]
 
 If no significant decisions: "No major decisions made this session."
 
@@ -166,14 +179,14 @@ If none: "No active blockers."
 [If known: The single most important thing to do when resuming. Be precise
 enough that resuming requires zero thinking about where to start.]
 
-[If not known: "Next step not determined — review 'What Has NOT Been Tried Yet'
+[If not known: "Next step not determined Ã¢â‚¬â€ review 'What Has NOT Been Tried Yet'
 and 'Blockers' sections to decide on direction before starting."]
 
 ---
 
 ## Environment & Setup Notes
 
-[Only fill this if relevant — commands needed to run the project, env vars
+[Only fill this if relevant Ã¢â‚¬â€ commands needed to run the project, env vars
 required, services that need to be running, etc. Skip if standard setup.]
 
 [If none: omit this section entirely.]
@@ -204,20 +217,20 @@ refreshes without exposing the token to JavaScript.
 
 ## What WORKED (with evidence)
 
-- **`/api/auth/register` endpoint** — confirmed by: Postman POST returns 200 with user
+- **`/api/auth/register` endpoint** Ã¢â‚¬â€ confirmed by: Postman POST returns 200 with user
   object, row visible in Supabase dashboard, bcrypt hash stored correctly
-- **JWT generation in `lib/auth.ts`** — confirmed by: unit test passes
+- **JWT generation in `lib/auth.ts`** Ã¢â‚¬â€ confirmed by: unit test passes
   (`npm test -- auth.test.ts`), decoded token at jwt.io shows correct payload
-- **Password hashing** — confirmed by: `bcrypt.compare()` returns true in test
+- **Password hashing** Ã¢â‚¬â€ confirmed by: `bcrypt.compare()` returns true in test
 
 ---
 
 ## What Did NOT Work (and why)
 
-- **Next-Auth library** — failed because: conflicts with our custom Prisma adapter,
+- **Next-Auth library** Ã¢â‚¬â€ failed because: conflicts with our custom Prisma adapter,
   threw "Cannot use adapter with credentials provider in this configuration" on every
-  request. Not worth debugging — too opinionated for our setup.
-- **Storing JWT in localStorage** — failed because: SSR renders happen before
+  request. Not worth debugging Ã¢â‚¬â€ too opinionated for our setup.
+- **Storing JWT in localStorage** Ã¢â‚¬â€ failed because: SSR renders happen before
   localStorage is available, caused React hydration mismatch error on every page load.
   This approach is fundamentally incompatible with Next.js SSR.
 
@@ -245,8 +258,8 @@ refreshes without exposing the token to JavaScript.
 
 ## Decisions Made
 
-- **httpOnly cookie over localStorage** — reason: prevents XSS token theft, works with SSR
-- **Custom auth over Next-Auth** — reason: Next-Auth conflicts with our Prisma setup, not worth the fight
+- **httpOnly cookie over localStorage** Ã¢â‚¬â€ reason: prevents XSS token theft, works with SSR
+- **Custom auth over Next-Auth** Ã¢â‚¬â€ reason: Next-Auth conflicts with our Prisma setup, not worth the fight
 
 ---
 
@@ -260,15 +273,15 @@ refreshes without exposing the token to JavaScript.
 
 In `app/api/auth/login/route.ts`, after generating the JWT, set it as an httpOnly
 cookie using `cookies().set('token', jwt, { httpOnly: true, secure: true, sameSite: 'strict' })`.
-Then test with Postman — the response should include a `Set-Cookie` header.
+Then test with Postman Ã¢â‚¬â€ the response should include a `Set-Cookie` header.
 ```
 
 ---
 
 ## Notes
 
-- Each session gets its own file — never append to a previous session's file
-- The "What Did NOT Work" section is the most critical — future sessions will blindly retry failed approaches without it
+- Each session gets its own file Ã¢â‚¬â€ never append to a previous session's file
+- The "What Did NOT Work" section is the most critical Ã¢â‚¬â€ future sessions will blindly retry failed approaches without it
 - If the user asks to save mid-session (not just at the end), save what's known so far and mark in-progress items clearly
 - The file is meant to be read by Claude at the start of the next session via `/resume-session`
 - Use the canonical global session store: `~/.claude/session-data/`

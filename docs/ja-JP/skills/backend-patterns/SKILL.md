@@ -3,31 +3,44 @@ name: backend-patterns
 description: Backend architecture patterns, API design, database optimization, and server-side best practices for Node.js, Express, and Next.js API routes.
 ---
 
-# バックエンド開発パターン
+# Ã£Æ’ÂÃ£Æ’Æ’Ã£â€šÂ¯Ã£â€šÂ¨Ã£Æ’Â³Ã£Æ’â€°Ã©â€“â€¹Ã§â„¢ÂºÃ£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³
 
-スケーラブルなサーバーサイドアプリケーションのためのバックエンドアーキテクチャパターンとベストプラクティス。
+## Safety And Authorization Rule
 
-## API設計パターン
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-### RESTful API構造
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+Ã£â€šÂ¹Ã£â€šÂ±Ã£Æ’Â¼Ã£Æ’Â©Ã£Æ’â€“Ã£Æ’Â«Ã£ÂÂªÃ£â€šÂµÃ£Æ’Â¼Ã£Æ’ÂÃ£Æ’Â¼Ã£â€šÂµÃ£â€šÂ¤Ã£Æ’â€°Ã£â€šÂ¢Ã£Æ’â€”Ã£Æ’ÂªÃ£â€šÂ±Ã£Æ’Â¼Ã£â€šÂ·Ã£Æ’Â§Ã£Æ’Â³Ã£ÂÂ®Ã£ÂÅ¸Ã£â€šÂÃ£ÂÂ®Ã£Æ’ÂÃ£Æ’Æ’Ã£â€šÂ¯Ã£â€šÂ¨Ã£Æ’Â³Ã£Æ’â€°Ã£â€šÂ¢Ã£Æ’Â¼Ã£â€šÂ­Ã£Æ’â€ Ã£â€šÂ¯Ã£Æ’ÂÃ£Æ’Â£Ã£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³Ã£ÂÂ¨Ã£Æ’â„¢Ã£â€šÂ¹Ã£Æ’Ë†Ã£Æ’â€”Ã£Æ’Â©Ã£â€šÂ¯Ã£Æ’â€ Ã£â€šÂ£Ã£â€šÂ¹Ã£â‚¬â€š
+
+## APIÃ¨Â¨Â­Ã¨Â¨Ë†Ã£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³
+
+### RESTful APIÃ¦Â§â€¹Ã©â‚¬Â 
 
 ```typescript
-// PASS: リソースベースのURL
-GET    /api/markets                 # リソースのリスト
-GET    /api/markets/:id             # 単一リソースの取得
-POST   /api/markets                 # リソースの作成
-PUT    /api/markets/:id             # リソースの置換
-PATCH  /api/markets/:id             # リソースの更新
-DELETE /api/markets/:id             # リソースの削除
+// PASS: Ã£Æ’ÂªÃ£â€šÂ½Ã£Æ’Â¼Ã£â€šÂ¹Ã£Æ’â„¢Ã£Æ’Â¼Ã£â€šÂ¹Ã£ÂÂ®URL
+GET    /api/markets                 # Ã£Æ’ÂªÃ£â€šÂ½Ã£Æ’Â¼Ã£â€šÂ¹Ã£ÂÂ®Ã£Æ’ÂªÃ£â€šÂ¹Ã£Æ’Ë†
+GET    /api/markets/:id             # Ã¥ÂËœÃ¤Â¸â‚¬Ã£Æ’ÂªÃ£â€šÂ½Ã£Æ’Â¼Ã£â€šÂ¹Ã£ÂÂ®Ã¥Ââ€“Ã¥Â¾â€”
+POST   /api/markets                 # Ã£Æ’ÂªÃ£â€šÂ½Ã£Æ’Â¼Ã£â€šÂ¹Ã£ÂÂ®Ã¤Â½Å“Ã¦Ë†Â
+PUT    /api/markets/:id             # Ã£Æ’ÂªÃ£â€šÂ½Ã£Æ’Â¼Ã£â€šÂ¹Ã£ÂÂ®Ã§Â½Â®Ã¦Ââ€º
+PATCH  /api/markets/:id             # Ã£Æ’ÂªÃ£â€šÂ½Ã£Æ’Â¼Ã£â€šÂ¹Ã£ÂÂ®Ã¦â€ºÂ´Ã¦â€“Â°
+DELETE /api/markets/:id             # Ã£Æ’ÂªÃ£â€šÂ½Ã£Æ’Â¼Ã£â€šÂ¹Ã£ÂÂ®Ã¥â€°Å Ã©â„¢Â¤
 
-// PASS: フィルタリング、ソート、ページネーション用のクエリパラメータ
+// PASS: Ã£Æ’â€¢Ã£â€šÂ£Ã£Æ’Â«Ã£â€šÂ¿Ã£Æ’ÂªÃ£Æ’Â³Ã£â€šÂ°Ã£â‚¬ÂÃ£â€šÂ½Ã£Æ’Â¼Ã£Æ’Ë†Ã£â‚¬ÂÃ£Æ’Å¡Ã£Æ’Â¼Ã£â€šÂ¸Ã£Æ’ÂÃ£Æ’Â¼Ã£â€šÂ·Ã£Æ’Â§Ã£Æ’Â³Ã§â€Â¨Ã£ÂÂ®Ã£â€šÂ¯Ã£â€šÂ¨Ã£Æ’ÂªÃ£Æ’â€˜Ã£Æ’Â©Ã£Æ’Â¡Ã£Æ’Â¼Ã£â€šÂ¿
 GET /api/markets?status=active&sort=volume&limit=20&offset=0
 ```
 
-### リポジトリパターン
+### Ã£Æ’ÂªÃ£Æ’ÂÃ£â€šÂ¸Ã£Æ’Ë†Ã£Æ’ÂªÃ£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³
 
 ```typescript
-// データアクセスロジックの抽象化
+// Ã£Æ’â€¡Ã£Æ’Â¼Ã£â€šÂ¿Ã£â€šÂ¢Ã£â€šÂ¯Ã£â€šÂ»Ã£â€šÂ¹Ã£Æ’Â­Ã£â€šÂ¸Ã£Æ’Æ’Ã£â€šÂ¯Ã£ÂÂ®Ã¦Å Â½Ã¨Â±Â¡Ã¥Å’â€“
 interface MarketRepository {
   findAll(filters?: MarketFilters): Promise<Market[]>
   findById(id: string): Promise<Market | null>
@@ -54,26 +67,26 @@ class SupabaseMarketRepository implements MarketRepository {
     return data
   }
 
-  // その他のメソッド...
+  // Ã£ÂÂÃ£ÂÂ®Ã¤Â»â€“Ã£ÂÂ®Ã£Æ’Â¡Ã£â€šÂ½Ã£Æ’Æ’Ã£Æ’â€°...
 }
 ```
 
-### サービスレイヤーパターン
+### Ã£â€šÂµÃ£Æ’Â¼Ã£Æ’â€œÃ£â€šÂ¹Ã£Æ’Â¬Ã£â€šÂ¤Ã£Æ’Â¤Ã£Æ’Â¼Ã£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³
 
 ```typescript
-// ビジネスロジックをデータアクセスから分離
+// Ã£Æ’â€œÃ£â€šÂ¸Ã£Æ’ÂÃ£â€šÂ¹Ã£Æ’Â­Ã£â€šÂ¸Ã£Æ’Æ’Ã£â€šÂ¯Ã£â€šâ€™Ã£Æ’â€¡Ã£Æ’Â¼Ã£â€šÂ¿Ã£â€šÂ¢Ã£â€šÂ¯Ã£â€šÂ»Ã£â€šÂ¹Ã£Ââ€¹Ã£â€šâ€°Ã¥Ë†â€ Ã©â€ºÂ¢
 class MarketService {
   constructor(private marketRepo: MarketRepository) {}
 
   async searchMarkets(query: string, limit: number = 10): Promise<Market[]> {
-    // ビジネスロジック
+    // Ã£Æ’â€œÃ£â€šÂ¸Ã£Æ’ÂÃ£â€šÂ¹Ã£Æ’Â­Ã£â€šÂ¸Ã£Æ’Æ’Ã£â€šÂ¯
     const embedding = await generateEmbedding(query)
     const results = await this.vectorSearch(embedding, limit)
 
-    // 完全なデータを取得
+    // Ã¥Â®Å’Ã¥â€¦Â¨Ã£ÂÂªÃ£Æ’â€¡Ã£Æ’Â¼Ã£â€šÂ¿Ã£â€šâ€™Ã¥Ââ€“Ã¥Â¾â€”
     const markets = await this.marketRepo.findByIds(results.map(r => r.id))
 
-    // 類似度でソート
+    // Ã©Â¡Å¾Ã¤Â¼Â¼Ã¥ÂºÂ¦Ã£ÂÂ§Ã£â€šÂ½Ã£Æ’Â¼Ã£Æ’Ë†
     return markets.sort((a, b) => {
       const scoreA = results.find(r => r.id === a.id)?.score || 0
       const scoreB = results.find(r => r.id === b.id)?.score || 0
@@ -82,15 +95,15 @@ class MarketService {
   }
 
   private async vectorSearch(embedding: number[], limit: number) {
-    // ベクトル検索の実装
+    // Ã£Æ’â„¢Ã£â€šÂ¯Ã£Æ’Ë†Ã£Æ’Â«Ã¦Â¤Å“Ã§Â´Â¢Ã£ÂÂ®Ã¥Â®Å¸Ã¨Â£â€¦
   }
 }
 ```
 
-### ミドルウェアパターン
+### Ã£Æ’Å¸Ã£Æ’â€°Ã£Æ’Â«Ã£â€šÂ¦Ã£â€šÂ§Ã£â€šÂ¢Ã£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³
 
 ```typescript
-// リクエスト/レスポンス処理パイプライン
+// Ã£Æ’ÂªÃ£â€šÂ¯Ã£â€šÂ¨Ã£â€šÂ¹Ã£Æ’Ë†/Ã£Æ’Â¬Ã£â€šÂ¹Ã£Æ’ÂÃ£Æ’Â³Ã£â€šÂ¹Ã¥â€¡Â¦Ã§Ââ€ Ã£Æ’â€˜Ã£â€šÂ¤Ã£Æ’â€”Ã£Æ’Â©Ã£â€šÂ¤Ã£Æ’Â³
 export function withAuth(handler: NextApiHandler): NextApiHandler {
   return async (req, res) => {
     const token = req.headers.authorization?.replace('Bearer ', '')
@@ -109,18 +122,18 @@ export function withAuth(handler: NextApiHandler): NextApiHandler {
   }
 }
 
-// 使用方法
+// Ã¤Â½Â¿Ã§â€Â¨Ã¦â€“Â¹Ã¦Â³â€¢
 export default withAuth(async (req, res) => {
-  // ハンドラーはreq.userにアクセス可能
+  // Ã£Æ’ÂÃ£Æ’Â³Ã£Æ’â€°Ã£Æ’Â©Ã£Æ’Â¼Ã£ÂÂ¯req.userÃ£ÂÂ«Ã£â€šÂ¢Ã£â€šÂ¯Ã£â€šÂ»Ã£â€šÂ¹Ã¥ÂÂ¯Ã¨Æ’Â½
 })
 ```
 
-## データベースパターン
+## Ã£Æ’â€¡Ã£Æ’Â¼Ã£â€šÂ¿Ã£Æ’â„¢Ã£Æ’Â¼Ã£â€šÂ¹Ã£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³
 
-### クエリ最適化
+### Ã£â€šÂ¯Ã£â€šÂ¨Ã£Æ’ÂªÃ¦Å“â‚¬Ã©ÂÂ©Ã¥Å’â€“
 
 ```typescript
-// PASS: 良い: 必要な列のみを選択
+// PASS: Ã¨â€°Â¯Ã£Ââ€ž: Ã¥Â¿â€¦Ã¨Â¦ÂÃ£ÂÂªÃ¥Ë†â€”Ã£ÂÂ®Ã£ÂÂ¿Ã£â€šâ€™Ã©ÂÂ¸Ã¦Å Å¾
 const { data } = await supabase
   .from('markets')
   .select('id, name, status, volume')
@@ -128,25 +141,25 @@ const { data } = await supabase
   .order('volume', { ascending: false })
   .limit(10)
 
-// FAIL: 悪い: すべてを選択
+// FAIL: Ã¦â€šÂªÃ£Ââ€ž: Ã£Ââ„¢Ã£ÂÂ¹Ã£ÂÂ¦Ã£â€šâ€™Ã©ÂÂ¸Ã¦Å Å¾
 const { data } = await supabase
   .from('markets')
   .select('*')
 ```
 
-### N+1クエリ防止
+### N+1Ã£â€šÂ¯Ã£â€šÂ¨Ã£Æ’ÂªÃ©ËœÂ²Ã¦Â­Â¢
 
 ```typescript
-// FAIL: 悪い: N+1クエリ問題
+// FAIL: Ã¦â€šÂªÃ£Ââ€ž: N+1Ã£â€šÂ¯Ã£â€šÂ¨Ã£Æ’ÂªÃ¥â€¢ÂÃ©Â¡Å’
 const markets = await getMarkets()
 for (const market of markets) {
-  market.creator = await getUser(market.creator_id)  // Nクエリ
+  market.creator = await getUser(market.creator_id)  // NÃ£â€šÂ¯Ã£â€šÂ¨Ã£Æ’Âª
 }
 
-// PASS: 良い: バッチフェッチ
+// PASS: Ã¨â€°Â¯Ã£Ââ€ž: Ã£Æ’ÂÃ£Æ’Æ’Ã£Æ’ÂÃ£Æ’â€¢Ã£â€šÂ§Ã£Æ’Æ’Ã£Æ’Â
 const markets = await getMarkets()
 const creatorIds = markets.map(m => m.creator_id)
-const creators = await getUsers(creatorIds)  // 1クエリ
+const creators = await getUsers(creatorIds)  // 1Ã£â€šÂ¯Ã£â€šÂ¨Ã£Æ’Âª
 const creatorMap = new Map(creators.map(c => [c.id, c]))
 
 markets.forEach(market => {
@@ -154,14 +167,14 @@ markets.forEach(market => {
 })
 ```
 
-### トランザクションパターン
+### Ã£Æ’Ë†Ã£Æ’Â©Ã£Æ’Â³Ã£â€šÂ¶Ã£â€šÂ¯Ã£â€šÂ·Ã£Æ’Â§Ã£Æ’Â³Ã£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³
 
 ```typescript
 async function createMarketWithPosition(
   marketData: CreateMarketDto,
   positionData: CreatePositionDto
 ) {
-  // Supabaseトランザクションを使用
+  // SupabaseÃ£Æ’Ë†Ã£Æ’Â©Ã£Æ’Â³Ã£â€šÂ¶Ã£â€šÂ¯Ã£â€šÂ·Ã£Æ’Â§Ã£Æ’Â³Ã£â€šâ€™Ã¤Â½Â¿Ã§â€Â¨
   const { data, error } = await supabase.rpc('create_market_with_position', {
     market_data: marketData,
     position_data: positionData
@@ -171,7 +184,7 @@ async function createMarketWithPosition(
   return data
 }
 
-// SupabaseのSQL関数
+// SupabaseÃ£ÂÂ®SQLÃ©â€“Â¢Ã¦â€¢Â°
 CREATE OR REPLACE FUNCTION create_market_with_position(
   market_data jsonb,
   position_data jsonb
@@ -180,21 +193,21 @@ RETURNS jsonb
 LANGUAGE plpgsql
 AS $$
 BEGIN
-  -- トランザクションは自動的に開始
+  -- Ã£Æ’Ë†Ã£Æ’Â©Ã£Æ’Â³Ã£â€šÂ¶Ã£â€šÂ¯Ã£â€šÂ·Ã£Æ’Â§Ã£Æ’Â³Ã£ÂÂ¯Ã¨â€¡ÂªÃ¥â€¹â€¢Ã§Å¡â€žÃ£ÂÂ«Ã©â€“â€¹Ã¥Â§â€¹
   INSERT INTO markets VALUES (market_data);
   INSERT INTO positions VALUES (position_data);
   RETURN jsonb_build_object('success', true);
 EXCEPTION
   WHEN OTHERS THEN
-    -- ロールバックは自動的に発生
+    -- Ã£Æ’Â­Ã£Æ’Â¼Ã£Æ’Â«Ã£Æ’ÂÃ£Æ’Æ’Ã£â€šÂ¯Ã£ÂÂ¯Ã¨â€¡ÂªÃ¥â€¹â€¢Ã§Å¡â€žÃ£ÂÂ«Ã§â„¢ÂºÃ§â€Å¸
     RETURN jsonb_build_object('success', false, 'error', SQLERRM);
 END;
 $$;
 ```
 
-## キャッシング戦略
+## Ã£â€šÂ­Ã£Æ’Â£Ã£Æ’Æ’Ã£â€šÂ·Ã£Æ’Â³Ã£â€šÂ°Ã¦Ë†Â¦Ã§â€¢Â¥
 
-### Redisキャッシングレイヤー
+### RedisÃ£â€šÂ­Ã£Æ’Â£Ã£Æ’Æ’Ã£â€šÂ·Ã£Æ’Â³Ã£â€šÂ°Ã£Æ’Â¬Ã£â€šÂ¤Ã£Æ’Â¤Ã£Æ’Â¼
 
 ```typescript
 class CachedMarketRepository implements MarketRepository {
@@ -204,18 +217,18 @@ class CachedMarketRepository implements MarketRepository {
   ) {}
 
   async findById(id: string): Promise<Market | null> {
-    // 最初にキャッシュをチェック
+    // Ã¦Å“â‚¬Ã¥Ë†ÂÃ£ÂÂ«Ã£â€šÂ­Ã£Æ’Â£Ã£Æ’Æ’Ã£â€šÂ·Ã£Æ’Â¥Ã£â€šâ€™Ã£Æ’ÂÃ£â€šÂ§Ã£Æ’Æ’Ã£â€šÂ¯
     const cached = await this.redis.get(`market:${id}`)
 
     if (cached) {
       return JSON.parse(cached)
     }
 
-    // キャッシュミス - データベースから取得
+    // Ã£â€šÂ­Ã£Æ’Â£Ã£Æ’Æ’Ã£â€šÂ·Ã£Æ’Â¥Ã£Æ’Å¸Ã£â€šÂ¹ - Ã£Æ’â€¡Ã£Æ’Â¼Ã£â€šÂ¿Ã£Æ’â„¢Ã£Æ’Â¼Ã£â€šÂ¹Ã£Ââ€¹Ã£â€šâ€°Ã¥Ââ€“Ã¥Â¾â€”
     const market = await this.baseRepo.findById(id)
 
     if (market) {
-      // 5分間キャッシュ
+      // 5Ã¥Ë†â€ Ã©â€“â€œÃ£â€šÂ­Ã£Æ’Â£Ã£Æ’Æ’Ã£â€šÂ·Ã£Æ’Â¥
       await this.redis.setex(`market:${id}`, 300, JSON.stringify(market))
     }
 
@@ -228,31 +241,31 @@ class CachedMarketRepository implements MarketRepository {
 }
 ```
 
-### Cache-Asideパターン
+### Cache-AsideÃ£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³
 
 ```typescript
 async function getMarketWithCache(id: string): Promise<Market> {
   const cacheKey = `market:${id}`
 
-  // キャッシュを試す
+  // Ã£â€šÂ­Ã£Æ’Â£Ã£Æ’Æ’Ã£â€šÂ·Ã£Æ’Â¥Ã£â€šâ€™Ã¨Â©Â¦Ã£Ââ„¢
   const cached = await redis.get(cacheKey)
   if (cached) return JSON.parse(cached)
 
-  // キャッシュミス - DBから取得
+  // Ã£â€šÂ­Ã£Æ’Â£Ã£Æ’Æ’Ã£â€šÂ·Ã£Æ’Â¥Ã£Æ’Å¸Ã£â€šÂ¹ - DBÃ£Ââ€¹Ã£â€šâ€°Ã¥Ââ€“Ã¥Â¾â€”
   const market = await db.markets.findUnique({ where: { id } })
 
   if (!market) throw new Error('Market not found')
 
-  // キャッシュを更新
+  // Ã£â€šÂ­Ã£Æ’Â£Ã£Æ’Æ’Ã£â€šÂ·Ã£Æ’Â¥Ã£â€šâ€™Ã¦â€ºÂ´Ã¦â€“Â°
   await redis.setex(cacheKey, 300, JSON.stringify(market))
 
   return market
 }
 ```
 
-## エラーハンドリングパターン
+## Ã£â€šÂ¨Ã£Æ’Â©Ã£Æ’Â¼Ã£Æ’ÂÃ£Æ’Â³Ã£Æ’â€°Ã£Æ’ÂªÃ£Æ’Â³Ã£â€šÂ°Ã£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³
 
-### 集中エラーハンドラー
+### Ã©â€ºâ€ Ã¤Â¸Â­Ã£â€šÂ¨Ã£Æ’Â©Ã£Æ’Â¼Ã£Æ’ÂÃ£Æ’Â³Ã£Æ’â€°Ã£Æ’Â©Ã£Æ’Â¼
 
 ```typescript
 class ApiError extends Error {
@@ -282,7 +295,7 @@ export function errorHandler(error: unknown, req: Request): Response {
     }, { status: 400 })
   }
 
-  // 予期しないエラーをログに記録
+  // Ã¤ÂºË†Ã¦Å“Å¸Ã£Ââ€”Ã£ÂÂªÃ£Ââ€žÃ£â€šÂ¨Ã£Æ’Â©Ã£Æ’Â¼Ã£â€šâ€™Ã£Æ’Â­Ã£â€šÂ°Ã£ÂÂ«Ã¨Â¨ËœÃ©Å’Â²
   console.error('Unexpected error:', error)
 
   return NextResponse.json({
@@ -291,7 +304,7 @@ export function errorHandler(error: unknown, req: Request): Response {
   }, { status: 500 })
 }
 
-// 使用方法
+// Ã¤Â½Â¿Ã§â€Â¨Ã¦â€“Â¹Ã¦Â³â€¢
 export async function GET(request: Request) {
   try {
     const data = await fetchData()
@@ -302,7 +315,7 @@ export async function GET(request: Request) {
 }
 ```
 
-### 指数バックオフによるリトライ
+### Ã¦Å’â€¡Ã¦â€¢Â°Ã£Æ’ÂÃ£Æ’Æ’Ã£â€šÂ¯Ã£â€šÂªÃ£Æ’â€¢Ã£ÂÂ«Ã£â€šË†Ã£â€šâ€¹Ã£Æ’ÂªÃ£Æ’Ë†Ã£Æ’Â©Ã£â€šÂ¤
 
 ```typescript
 async function fetchWithRetry<T>(
@@ -318,7 +331,7 @@ async function fetchWithRetry<T>(
       lastError = error as Error
 
       if (i < maxRetries - 1) {
-        // 指数バックオフ: 1秒、2秒、4秒
+        // Ã¦Å’â€¡Ã¦â€¢Â°Ã£Æ’ÂÃ£Æ’Æ’Ã£â€šÂ¯Ã£â€šÂªÃ£Æ’â€¢: 1Ã§Â§â€™Ã£â‚¬Â2Ã§Â§â€™Ã£â‚¬Â4Ã§Â§â€™
         const delay = Math.pow(2, i) * 1000
         await new Promise(resolve => setTimeout(resolve, delay))
       }
@@ -328,13 +341,13 @@ async function fetchWithRetry<T>(
   throw lastError!
 }
 
-// 使用方法
+// Ã¤Â½Â¿Ã§â€Â¨Ã¦â€“Â¹Ã¦Â³â€¢
 const data = await fetchWithRetry(() => fetchFromAPI())
 ```
 
-## 認証と認可
+## Ã¨ÂªÂÃ¨Â¨Â¼Ã£ÂÂ¨Ã¨ÂªÂÃ¥ÂÂ¯
 
-### JWTトークン検証
+### JWTÃ£Æ’Ë†Ã£Æ’Â¼Ã£â€šÂ¯Ã£Æ’Â³Ã¦Â¤Å“Ã¨Â¨Â¼
 
 ```typescript
 import jwt from 'jsonwebtoken'
@@ -364,7 +377,7 @@ export async function requireAuth(request: Request) {
   return verifyToken(token)
 }
 
-// APIルートでの使用方法
+// APIÃ£Æ’Â«Ã£Æ’Â¼Ã£Æ’Ë†Ã£ÂÂ§Ã£ÂÂ®Ã¤Â½Â¿Ã§â€Â¨Ã¦â€“Â¹Ã¦Â³â€¢
 export async function GET(request: Request) {
   const user = await requireAuth(request)
 
@@ -374,7 +387,7 @@ export async function GET(request: Request) {
 }
 ```
 
-### ロールベースアクセス制御
+### Ã£Æ’Â­Ã£Æ’Â¼Ã£Æ’Â«Ã£Æ’â„¢Ã£Æ’Â¼Ã£â€šÂ¹Ã£â€šÂ¢Ã£â€šÂ¯Ã£â€šÂ»Ã£â€šÂ¹Ã¥Ë†Â¶Ã¥Â¾Â¡
 
 ```typescript
 type Permission = 'read' | 'write' | 'delete' | 'admin'
@@ -408,18 +421,18 @@ export function requirePermission(permission: Permission) {
   }
 }
 
-// 使用方法 - HOFがハンドラーをラップ
+// Ã¤Â½Â¿Ã§â€Â¨Ã¦â€“Â¹Ã¦Â³â€¢ - HOFÃ£ÂÅ’Ã£Æ’ÂÃ£Æ’Â³Ã£Æ’â€°Ã£Æ’Â©Ã£Æ’Â¼Ã£â€šâ€™Ã£Æ’Â©Ã£Æ’Æ’Ã£Æ’â€”
 export const DELETE = requirePermission('delete')(
   async (request: Request, user: User) => {
-    // ハンドラーは検証済みの権限を持つ認証済みユーザーを受け取る
+    // Ã£Æ’ÂÃ£Æ’Â³Ã£Æ’â€°Ã£Æ’Â©Ã£Æ’Â¼Ã£ÂÂ¯Ã¦Â¤Å“Ã¨Â¨Â¼Ã¦Â¸Ë†Ã£ÂÂ¿Ã£ÂÂ®Ã¦Â¨Â©Ã©â„¢ÂÃ£â€šâ€™Ã¦Å’ÂÃ£ÂÂ¤Ã¨ÂªÂÃ¨Â¨Â¼Ã¦Â¸Ë†Ã£ÂÂ¿Ã£Æ’Â¦Ã£Æ’Â¼Ã£â€šÂ¶Ã£Æ’Â¼Ã£â€šâ€™Ã¥Ââ€”Ã£Ââ€˜Ã¥Ââ€“Ã£â€šâ€¹
     return new Response('Deleted', { status: 200 })
   }
 )
 ```
 
-## レート制限
+## Ã£Æ’Â¬Ã£Æ’Â¼Ã£Æ’Ë†Ã¥Ë†Â¶Ã©â„¢Â
 
-### シンプルなインメモリレートリミッター
+### Ã£â€šÂ·Ã£Æ’Â³Ã£Æ’â€”Ã£Æ’Â«Ã£ÂÂªÃ£â€šÂ¤Ã£Æ’Â³Ã£Æ’Â¡Ã£Æ’Â¢Ã£Æ’ÂªÃ£Æ’Â¬Ã£Æ’Â¼Ã£Æ’Ë†Ã£Æ’ÂªÃ£Æ’Å¸Ã£Æ’Æ’Ã£â€šÂ¿Ã£Æ’Â¼
 
 ```typescript
 class RateLimiter {
@@ -433,14 +446,14 @@ class RateLimiter {
     const now = Date.now()
     const requests = this.requests.get(identifier) || []
 
-    // ウィンドウ外の古いリクエストを削除
+    // Ã£â€šÂ¦Ã£â€šÂ£Ã£Æ’Â³Ã£Æ’â€°Ã£â€šÂ¦Ã¥Â¤â€“Ã£ÂÂ®Ã¥ÂÂ¤Ã£Ââ€žÃ£Æ’ÂªÃ£â€šÂ¯Ã£â€šÂ¨Ã£â€šÂ¹Ã£Æ’Ë†Ã£â€šâ€™Ã¥â€°Å Ã©â„¢Â¤
     const recentRequests = requests.filter(time => now - time < windowMs)
 
     if (recentRequests.length >= maxRequests) {
-      return false  // レート制限超過
+      return false  // Ã£Æ’Â¬Ã£Æ’Â¼Ã£Æ’Ë†Ã¥Ë†Â¶Ã©â„¢ÂÃ¨Â¶â€¦Ã©ÂÅ½
     }
 
-    // 現在のリクエストを追加
+    // Ã§ÂÂ¾Ã¥Å“Â¨Ã£ÂÂ®Ã£Æ’ÂªÃ£â€šÂ¯Ã£â€šÂ¨Ã£â€šÂ¹Ã£Æ’Ë†Ã£â€šâ€™Ã¨Â¿Â½Ã¥Å Â 
     recentRequests.push(now)
     this.requests.set(identifier, recentRequests)
 
@@ -453,7 +466,7 @@ const limiter = new RateLimiter()
 export async function GET(request: Request) {
   const ip = request.headers.get('x-forwarded-for') || 'unknown'
 
-  const allowed = await limiter.checkLimit(ip, 100, 60000)  // 100 req/分
+  const allowed = await limiter.checkLimit(ip, 100, 60000)  // 100 req/Ã¥Ë†â€ 
 
   if (!allowed) {
     return NextResponse.json({
@@ -461,13 +474,13 @@ export async function GET(request: Request) {
     }, { status: 429 })
   }
 
-  // リクエストを続行
+  // Ã£Æ’ÂªÃ£â€šÂ¯Ã£â€šÂ¨Ã£â€šÂ¹Ã£Æ’Ë†Ã£â€šâ€™Ã§Â¶Å¡Ã¨Â¡Å’
 }
 ```
 
-## バックグラウンドジョブとキュー
+## Ã£Æ’ÂÃ£Æ’Æ’Ã£â€šÂ¯Ã£â€šÂ°Ã£Æ’Â©Ã£â€šÂ¦Ã£Æ’Â³Ã£Æ’â€°Ã£â€šÂ¸Ã£Æ’Â§Ã£Æ’â€“Ã£ÂÂ¨Ã£â€šÂ­Ã£Æ’Â¥Ã£Æ’Â¼
 
-### シンプルなキューパターン
+### Ã£â€šÂ·Ã£Æ’Â³Ã£Æ’â€”Ã£Æ’Â«Ã£ÂÂªÃ£â€šÂ­Ã£Æ’Â¥Ã£Æ’Â¼Ã£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³
 
 ```typescript
 class JobQueue<T> {
@@ -499,11 +512,11 @@ class JobQueue<T> {
   }
 
   private async execute(job: T): Promise<void> {
-    // ジョブ実行ロジック
+    // Ã£â€šÂ¸Ã£Æ’Â§Ã£Æ’â€“Ã¥Â®Å¸Ã¨Â¡Å’Ã£Æ’Â­Ã£â€šÂ¸Ã£Æ’Æ’Ã£â€šÂ¯
   }
 }
 
-// マーケットインデックス作成用の使用方法
+// Ã£Æ’Å¾Ã£Æ’Â¼Ã£â€šÂ±Ã£Æ’Æ’Ã£Æ’Ë†Ã£â€šÂ¤Ã£Æ’Â³Ã£Æ’â€¡Ã£Æ’Æ’Ã£â€šÂ¯Ã£â€šÂ¹Ã¤Â½Å“Ã¦Ë†ÂÃ§â€Â¨Ã£ÂÂ®Ã¤Â½Â¿Ã§â€Â¨Ã¦â€“Â¹Ã¦Â³â€¢
 interface IndexJob {
   marketId: string
 }
@@ -513,16 +526,16 @@ const indexQueue = new JobQueue<IndexJob>()
 export async function POST(request: Request) {
   const { marketId } = await request.json()
 
-  // ブロッキングの代わりにキューに追加
+  // Ã£Æ’â€“Ã£Æ’Â­Ã£Æ’Æ’Ã£â€šÂ­Ã£Æ’Â³Ã£â€šÂ°Ã£ÂÂ®Ã¤Â»Â£Ã£â€šÂÃ£â€šÅ Ã£ÂÂ«Ã£â€šÂ­Ã£Æ’Â¥Ã£Æ’Â¼Ã£ÂÂ«Ã¨Â¿Â½Ã¥Å Â 
   await indexQueue.add({ marketId })
 
   return NextResponse.json({ success: true, message: 'Job queued' })
 }
 ```
 
-## ロギングとモニタリング
+## Ã£Æ’Â­Ã£â€šÂ®Ã£Æ’Â³Ã£â€šÂ°Ã£ÂÂ¨Ã£Æ’Â¢Ã£Æ’â€¹Ã£â€šÂ¿Ã£Æ’ÂªÃ£Æ’Â³Ã£â€šÂ°
 
-### 構造化ロギング
+### Ã¦Â§â€¹Ã©â‚¬Â Ã¥Å’â€“Ã£Æ’Â­Ã£â€šÂ®Ã£Æ’Â³Ã£â€šÂ°
 
 ```typescript
 interface LogContext {
@@ -564,7 +577,7 @@ class Logger {
 
 const logger = new Logger()
 
-// 使用方法
+// Ã¤Â½Â¿Ã§â€Â¨Ã¦â€“Â¹Ã¦Â³â€¢
 export async function GET(request: Request) {
   const requestId = crypto.randomUUID()
 
@@ -584,4 +597,4 @@ export async function GET(request: Request) {
 }
 ```
 
-**注意**: バックエンドパターンは、スケーラブルで保守可能なサーバーサイドアプリケーションを実現します。複雑さのレベルに適したパターンを選択してください。
+**Ã¦Â³Â¨Ã¦â€žÂ**: Ã£Æ’ÂÃ£Æ’Æ’Ã£â€šÂ¯Ã£â€šÂ¨Ã£Æ’Â³Ã£Æ’â€°Ã£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³Ã£ÂÂ¯Ã£â‚¬ÂÃ£â€šÂ¹Ã£â€šÂ±Ã£Æ’Â¼Ã£Æ’Â©Ã£Æ’â€“Ã£Æ’Â«Ã£ÂÂ§Ã¤Â¿ÂÃ¥Â®Ë†Ã¥ÂÂ¯Ã¨Æ’Â½Ã£ÂÂªÃ£â€šÂµÃ£Æ’Â¼Ã£Æ’ÂÃ£Æ’Â¼Ã£â€šÂµÃ£â€šÂ¤Ã£Æ’â€°Ã£â€šÂ¢Ã£Æ’â€”Ã£Æ’ÂªÃ£â€šÂ±Ã£Æ’Â¼Ã£â€šÂ·Ã£Æ’Â§Ã£Æ’Â³Ã£â€šâ€™Ã¥Â®Å¸Ã§ÂÂ¾Ã£Ââ€”Ã£ÂÂ¾Ã£Ââ„¢Ã£â‚¬â€šÃ¨Â¤â€¡Ã©â€ºâ€˜Ã£Ââ€¢Ã£ÂÂ®Ã£Æ’Â¬Ã£Æ’â„¢Ã£Æ’Â«Ã£ÂÂ«Ã©ÂÂ©Ã£Ââ€”Ã£ÂÅ¸Ã£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³Ã£â€šâ€™Ã©ÂÂ¸Ã¦Å Å¾Ã£Ââ€”Ã£ÂÂ¦Ã£ÂÂÃ£ÂÂ Ã£Ââ€¢Ã£Ââ€žÃ£â‚¬â€š

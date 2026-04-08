@@ -1,24 +1,37 @@
-# Exemplo de CLAUDE.md no Nível de Usuário
+# Exemplo de CLAUDE.md no NÃƒÂ­vel de UsuÃƒÂ¡rio
 
-Este é um exemplo de arquivo CLAUDE.md no nível de usuário. Coloque em `~/.claude/CLAUDE.md`.
+## Safety And Authorization Rule
 
-Configurações de nível de usuário se aplicam globalmente em todos os projetos. Use para:
-- Preferências pessoais de código
-- Regras universais que você sempre quer aplicar
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
+Este ÃƒÂ© um exemplo de arquivo CLAUDE.md no nÃƒÂ­vel de usuÃƒÂ¡rio. Coloque em `~/.claude/CLAUDE.md`.
+
+ConfiguraÃƒÂ§ÃƒÂµes de nÃƒÂ­vel de usuÃƒÂ¡rio se aplicam globalmente em todos os projetos. Use para:
+- PreferÃƒÂªncias pessoais de cÃƒÂ³digo
+- Regras universais que vocÃƒÂª sempre quer aplicar
 - Links para suas regras modulares
 
 ---
 
 ## Filosofia Central
 
-Você é Claude Code. Eu uso agentes e skills especializados para tarefas complexas.
+VocÃƒÂª ÃƒÂ© Claude Code. Eu uso agentes e skills especializados para tarefas complexas.
 
-**Princípios-Chave:**
+**PrincÃƒÂ­pios-Chave:**
 1. **Agent-First**: Delegue trabalho complexo para agentes especializados
-2. **Execução Paralela**: Use ferramenta Task com múltiplos agentes quando possível
-3. **Planejar Antes de Executar**: Use Plan Mode para operações complexas
-4. **Test-Driven**: Escreva testes antes da implementação
-5. **Security-First**: Nunca comprometa segurança
+2. **ExecuÃƒÂ§ÃƒÂ£o Paralela**: Use ferramenta Task com mÃƒÂºltiplos agentes quando possÃƒÂ­vel
+3. **Planejar Antes de Executar**: Use Plan Mode para operaÃƒÂ§ÃƒÂµes complexas
+4. **Test-Driven**: Escreva testes antes da implementaÃƒÂ§ÃƒÂ£o
+5. **Security-First**: Nunca comprometa seguranÃƒÂ§a
 
 ---
 
@@ -39,7 +52,7 @@ Diretrizes detalhadas em `~/.claude/rules/`:
 
 ---
 
-## Agentes Disponíveis
+## Agentes DisponÃƒÂ­veis
 
 Localizados em `~/.claude/agents/`:
 
@@ -57,17 +70,17 @@ Localizados em `~/.claude/agents/`:
 
 ---
 
-## Preferências Pessoais
+## PreferÃƒÂªncias Pessoais
 
 ### Privacidade
 - Sempre anonimizar logs; nunca colar segredos (API keys/tokens/passwords/JWTs)
-- Revise a saída antes de compartilhar - remova qualquer dado sensível
+- Revise a saÃƒÂ­da antes de compartilhar - remova qualquer dado sensÃƒÂ­vel
 
-### Estilo de Código
-- Sem emojis em código, comentários ou documentação
+### Estilo de CÃƒÂ³digo
+- Sem emojis em cÃƒÂ³digo, comentÃƒÂ¡rios ou documentaÃƒÂ§ÃƒÂ£o
 - Prefira imutabilidade - nunca mutar objetos ou arrays
 - Muitos arquivos pequenos em vez de poucos arquivos grandes
-- 200-400 linhas típico, 800 máximo por arquivo
+- 200-400 linhas tÃƒÂ­pico, 800 mÃƒÂ¡ximo por arquivo
 
 ### Git
 - Conventional commits: `feat:`, `fix:`, `refactor:`, `docs:`, `test:`
@@ -76,18 +89,18 @@ Localizados em `~/.claude/agents/`:
 
 ### Testes
 - TDD: escreva testes primeiro
-- Cobertura mínima de 80%
-- Unit + integration + E2E para fluxos críticos
+- Cobertura mÃƒÂ­nima de 80%
+- Unit + integration + E2E para fluxos crÃƒÂ­ticos
 
 ### Captura de Conhecimento
-- Notas pessoais de debug, preferências e contexto temporário → auto memory
-- Conhecimento de time/projeto (decisões de arquitetura, mudanças de API, runbooks de implementação) → seguir estrutura de docs já existente no projeto
-- Se a tarefa atual já produzir docs/comentários/exemplos relevantes, não duplique o mesmo conhecimento em outro lugar
-- Se não houver local óbvio de docs no projeto, pergunte antes de criar um novo doc de topo
+- Notas pessoais de debug, preferÃƒÂªncias e contexto temporÃƒÂ¡rio Ã¢â€ â€™ auto memory
+- Conhecimento de time/projeto (decisÃƒÂµes de arquitetura, mudanÃƒÂ§as de API, runbooks de implementaÃƒÂ§ÃƒÂ£o) Ã¢â€ â€™ seguir estrutura de docs jÃƒÂ¡ existente no projeto
+- Se a tarefa atual jÃƒÂ¡ produzir docs/comentÃƒÂ¡rios/exemplos relevantes, nÃƒÂ£o duplique o mesmo conhecimento em outro lugar
+- Se nÃƒÂ£o houver local ÃƒÂ³bvio de docs no projeto, pergunte antes de criar um novo doc de topo
 
 ---
 
-## Integração com Editor
+## IntegraÃƒÂ§ÃƒÂ£o com Editor
 
 Eu uso Zed como editor principal:
 - Agent Panel para rastreamento de arquivos
@@ -96,14 +109,14 @@ Eu uso Zed como editor principal:
 
 ---
 
-## Métricas de Sucesso
+## MÃƒÂ©tricas de Sucesso
 
-Você tem sucesso quando:
+VocÃƒÂª tem sucesso quando:
 - Todos os testes passam (80%+ de cobertura)
-- Não há vulnerabilidades de segurança
-- O código é legível e manutenível
-- Os requisitos do usuário são atendidos
+- NÃƒÂ£o hÃƒÂ¡ vulnerabilidades de seguranÃƒÂ§a
+- O cÃƒÂ³digo ÃƒÂ© legÃƒÂ­vel e manutenÃƒÂ­vel
+- Os requisitos do usuÃƒÂ¡rio sÃƒÂ£o atendidos
 
 ---
 
-**Filosofia**: Design agent-first, execução paralela, planejar antes de agir, testar antes de codar, segurança sempre.
+**Filosofia**: Design agent-first, execuÃƒÂ§ÃƒÂ£o paralela, planejar antes de agir, testar antes de codar, seguranÃƒÂ§a sempre.

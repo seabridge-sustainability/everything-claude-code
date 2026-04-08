@@ -1,5 +1,18 @@
 # Greptile Comment Triage
 
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
+
 Shared reference for fetching, filtering, and classifying Greptile review comments on GitHub PRs. Both `/review` (Step 2.5) and `/ship` (Step 3.75) reference this document.
 
 ---
@@ -13,7 +26,7 @@ REPO=$(gh repo view --json nameWithOwner --jq '.nameWithOwner' 2>/dev/null)
 PR_NUMBER=$(gh pr view --json number --jq '.number' 2>/dev/null)
 ```
 
-**If either fails or is empty:** Skip Greptile triage silently. This integration is additive — the workflow works without it.
+**If either fails or is empty:** Skip Greptile triage silently. This integration is additive Ã¢â‚¬â€ the workflow works without it.
 
 ```bash
 # Fetch line-level review comments AND top-level PR comments in parallel
@@ -54,7 +67,7 @@ Match each fetched comment against entries where:
 
 Skip matched comments as **SUPPRESSED**.
 
-If the history file doesn't exist or has unparseable lines, skip those lines and continue — never fail on a malformed history file.
+If the history file doesn't exist or has unparseable lines, skip those lines and continue Ã¢â‚¬â€ never fail on a malformed history file.
 
 ---
 
@@ -62,14 +75,14 @@ If the history file doesn't exist or has unparseable lines, skip those lines and
 
 For each non-suppressed comment:
 
-1. **Line-level comments:** Read the file at the indicated `path:line` and surrounding context (±10 lines)
+1. **Line-level comments:** Read the file at the indicated `path:line` and surrounding context (Ã‚Â±10 lines)
 2. **Top-level comments:** Read the full comment body
 3. Cross-reference the comment against the full diff (`git diff origin/main`) and the review checklist
 4. Classify:
-   - **VALID & ACTIONABLE** — a real bug, race condition, security issue, or correctness problem that exists in the current code
-   - **VALID BUT ALREADY FIXED** — a real issue that was addressed in a subsequent commit on the branch. Identify the fixing commit SHA.
-   - **FALSE POSITIVE** — the comment misunderstands the code, flags something handled elsewhere, or is stylistic noise
-   - **SUPPRESSED** — already filtered in the suppressions check above
+   - **VALID & ACTIONABLE** Ã¢â‚¬â€ a real bug, race condition, security issue, or correctness problem that exists in the current code
+   - **VALID BUT ALREADY FIXED** Ã¢â‚¬â€ a real issue that was addressed in a subsequent commit on the branch. Identify the fixing commit SHA.
+   - **FALSE POSITIVE** Ã¢â‚¬â€ the comment misunderstands the code, flags something handled elsewhere, or is stylistic noise
+   - **SUPPRESSED** Ã¢â‚¬â€ already filtered in the suppressions check above
 
 ---
 
@@ -95,9 +108,9 @@ gh api repos/$REPO/issues/$PR_NUMBER/comments \
 
 ## Reply Templates
 
-Use these templates for every Greptile reply. Always include concrete evidence — never post vague replies.
+Use these templates for every Greptile reply. Always include concrete evidence Ã¢â‚¬â€ never post vague replies.
 
-### Tier 1 (First response) — Friendly, evidence-included
+### Tier 1 (First response) Ã¢â‚¬â€ Friendly, evidence-included
 
 **For FIXES (user chose to fix the issue):**
 
@@ -132,7 +145,7 @@ Use these templates for every Greptile reply. Always include concrete evidence �
 **Suggested re-rank:** This appears to be a `<style|noise|misread>` issue, not a `<what Greptile called it>`. Consider lowering severity.
 ```
 
-### Tier 2 (Greptile re-flags after prior reply) — Firm, overwhelming evidence
+### Tier 2 (Greptile re-flags after prior reply) Ã¢â‚¬â€ Firm, overwhelming evidence
 
 Use Tier 2 when escalation detection (below) identifies a prior GStack reply on the same thread. Include maximum evidence to close the discussion.
 
@@ -148,7 +161,7 @@ Use Tier 2 when escalation detection (below) identifies a prior GStack reply on 
 2. <commit SHA where it was addressed, if applicable>
 3. <architecture rationale or design decision, if applicable>
 
-**Suggested re-rank:** Please recalibrate — this is a `<actual category>` issue, not `<claimed category>`. [Link to specific file change permalink if helpful]
+**Suggested re-rank:** Please recalibrate Ã¢â‚¬â€ this is a `<actual category>` issue, not `<claimed category>`. [Link to specific file change permalink if helpful]
 ```
 
 ---
@@ -175,7 +188,7 @@ When classifying comments, also assess whether Greptile's implied severity match
 
 - If Greptile flags something as a **security/correctness/race-condition** issue but it's actually a **style/performance** nit: include `**Suggested re-rank:**` in the reply requesting the category be corrected.
 - If Greptile flags a low-severity style issue as if it were critical: push back in the reply.
-- Always be specific about why the re-ranking is warranted — cite code and line numbers, not opinions.
+- Always be specific about why the re-ranking is warranted Ã¢â‚¬â€ cite code and line numbers, not opinions.
 
 ---
 

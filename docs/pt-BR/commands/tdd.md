@@ -1,8 +1,21 @@
 ---
-description: Impõe fluxo de desenvolvimento orientado a testes. Estruture interfaces, gere testes PRIMEIRO e depois implemente código mínimo para passar. Garanta cobertura de 80%+.
+description: ImpÃƒÂµe fluxo de desenvolvimento orientado a testes. Estruture interfaces, gere testes PRIMEIRO e depois implemente cÃƒÂ³digo mÃƒÂ­nimo para passar. Garanta cobertura de 80%+.
 ---
 
 # Comando TDD
+
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
 
 Este comando invoca o agente **tdd-guide** para impor a metodologia de desenvolvimento orientado a testes.
 
@@ -10,35 +23,35 @@ Este comando invoca o agente **tdd-guide** para impor a metodologia de desenvolv
 
 1. **Estruturar Interfaces** - Definir tipos/interfaces primeiro
 2. **Gerar Testes Primeiro** - Escrever testes que falham (RED)
-3. **Implementar Código Mínimo** - Escrever apenas o suficiente para passar (GREEN)
-4. **Refatorar** - Melhorar o código mantendo testes verdes (REFACTOR)
+3. **Implementar CÃƒÂ³digo MÃƒÂ­nimo** - Escrever apenas o suficiente para passar (GREEN)
+4. **Refatorar** - Melhorar o cÃƒÂ³digo mantendo testes verdes (REFACTOR)
 5. **Verificar Cobertura** - Garantir cobertura de testes de 80%+
 
 ## Quando Usar
 
 Use `/tdd` quando:
 - Implementar novas features
-- Adicionar novas funções/componentes
+- Adicionar novas funÃƒÂ§ÃƒÂµes/componentes
 - Corrigir bugs (escrever primeiro teste que reproduz o bug)
-- Refatorar código existente
-- Construir lógica de negócio crítica
+- Refatorar cÃƒÂ³digo existente
+- Construir lÃƒÂ³gica de negÃƒÂ³cio crÃƒÂ­tica
 
 ## Como Funciona
 
 O agente tdd-guide vai:
 
-1. **Definir interfaces** para entradas/saídas
-2. **Escrever testes que vão FALHAR** (porque o código ainda não existe)
+1. **Definir interfaces** para entradas/saÃƒÂ­das
+2. **Escrever testes que vÃƒÂ£o FALHAR** (porque o cÃƒÂ³digo ainda nÃƒÂ£o existe)
 3. **Rodar testes** e verificar que falham pelo motivo correto
-4. **Escrever implementação mínima** para fazer testes passarem
+4. **Escrever implementaÃƒÂ§ÃƒÂ£o mÃƒÂ­nima** para fazer testes passarem
 5. **Rodar testes** e verificar que passam
-6. **Refatorar** código mantendo testes verdes
+6. **Refatorar** cÃƒÂ³digo mantendo testes verdes
 7. **Checar cobertura** e adicionar mais testes se estiver abaixo de 80%
 
 ## Ciclo TDD
 
 ```
-RED → GREEN → REFACTOR → REPEAT
+RED Ã¢â€ â€™ GREEN Ã¢â€ â€™ REFACTOR Ã¢â€ â€™ REPEAT
 
 RED:      Write a failing test
 GREEN:    Write minimal code to pass
@@ -49,10 +62,10 @@ REPEAT:   Next feature/scenario
 ## Exemplo de Uso
 
 ```
-Usuário: /tdd Preciso de uma função para calcular a pontuação de liquidez do mercado
+UsuÃƒÂ¡rio: /tdd Preciso de uma funÃƒÂ§ÃƒÂ£o para calcular a pontuaÃƒÂ§ÃƒÂ£o de liquidez do mercado
 
 Agent (tdd-guide):
-# Sessão TDD: Calculadora de Pontuação de Liquidez de Mercado
+# SessÃƒÂ£o TDD: Calculadora de PontuaÃƒÂ§ÃƒÂ£o de Liquidez de Mercado
 
 ## Etapa 1: Definir Interface (SCAFFOLD)
 
@@ -127,15 +140,15 @@ describe('calculateLiquidityScore', () => {
 npm test lib/liquidity.test.ts
 
 FAIL lib/liquidity.test.ts
-  ✕ should return high score for liquid market (2 ms)
+  Ã¢Å“â€¢ should return high score for liquid market (2 ms)
     Error: Not implemented
 
 1 test failed, 0 passed
 ```
 
-PASS: Os testes falharam conforme o esperado. Pronto para implementação.
+PASS: Os testes falharam conforme o esperado. Pronto para implementaÃƒÂ§ÃƒÂ£o.
 
-## Etapa 4: Implementar o código mínimo (VERDE)
+## Etapa 4: Implementar o cÃƒÂ³digo mÃƒÂ­nimo (VERDE)
 
 ```typescript
 // lib/liquidity.ts
@@ -172,9 +185,9 @@ export function calculateLiquidityScore(market: MarketData): number {
 npm test lib/liquidity.test.ts
 
 PASS lib/liquidity.test.ts
-  ✓ should return high score for liquid market (3 ms)
-  ✓ should return low score for illiquid market (2 ms)
-  ✓ should handle edge case: zero volume (1 ms)
+  Ã¢Å“â€œ should return high score for liquid market (3 ms)
+  Ã¢Å“â€œ should return low score for illiquid market (2 ms)
+  Ã¢Å“â€œ should handle edge case: zero volume (1 ms)
 
 3 tests passed
 ```
@@ -223,20 +236,20 @@ export function calculateLiquidityScore(market: MarketData): number {
 }
 ```
 
-## Etapa 7: Verificar se os testes ainda são aprovados
+## Etapa 7: Verificar se os testes ainda sÃƒÂ£o aprovados
 
 ```bash
 npm test lib/liquidity.test.ts
 
 PASS lib/liquidity.test.ts
-  ✓ should return high score for liquid market (3 ms)
-  ✓ should return low score for illiquid market (2 ms)
-  ✓ should handle edge case: zero volume (1 ms)
+  Ã¢Å“â€œ should return high score for liquid market (3 ms)
+  Ã¢Å“â€œ should return low score for illiquid market (2 ms)
+  Ã¢Å“â€œ should handle edge case: zero volume (1 ms)
 
 3 tests passed
 ```
 
-PASS: Refatoração concluída, testes ainda passando!
+PASS: RefatoraÃƒÂ§ÃƒÂ£o concluÃƒÂ­da, testes ainda passando!
 
 ## Etapa 8: Verificar a cobertura
 
@@ -250,79 +263,79 @@ liquidity.ts   |   100   |   100    |   100   |   100
 Coverage: 100% PASS: (Target: 80%)
 ```
 
-PASS: TDD sessão completa!
+PASS: TDD sessÃƒÂ£o completa!
 ```
 
-## Boas Práticas de TDD
+## Boas PrÃƒÂ¡ticas de TDD
 
 **Fazer:**
-- PASS: Escreva o teste PRIMEIRO, antes da implementação
+- PASS: Escreva o teste PRIMEIRO, antes da implementaÃƒÂ§ÃƒÂ£o
 - PASS: Rode testes e confirme que FALHAM antes de implementar
-- PASS: Escreva código mínimo para fazer passar
-- PASS: Refatore só depois que os testes estiverem verdes
-- PASS: Adicione casos de borda e cenários de erro
-- PASS: Mire 80%+ de cobertura (100% para código crítico)
+- PASS: Escreva cÃƒÂ³digo mÃƒÂ­nimo para fazer passar
+- PASS: Refatore sÃƒÂ³ depois que os testes estiverem verdes
+- PASS: Adicione casos de borda e cenÃƒÂ¡rios de erro
+- PASS: Mire 80%+ de cobertura (100% para cÃƒÂ³digo crÃƒÂ­tico)
 
-**Não fazer:**
-- FAIL: Escrever implementação antes de testes
-- FAIL: Pular execução de testes após cada mudança
-- FAIL: Escrever código demais de uma vez
+**NÃƒÂ£o fazer:**
+- FAIL: Escrever implementaÃƒÂ§ÃƒÂ£o antes de testes
+- FAIL: Pular execuÃƒÂ§ÃƒÂ£o de testes apÃƒÂ³s cada mudanÃƒÂ§a
+- FAIL: Escrever cÃƒÂ³digo demais de uma vez
 - FAIL: Ignorar testes falhando
-- FAIL: Testar detalhes de implementação (teste comportamento)
-- FAIL: Fazer mock de tudo (prefira testes de integração)
+- FAIL: Testar detalhes de implementaÃƒÂ§ÃƒÂ£o (teste comportamento)
+- FAIL: Fazer mock de tudo (prefira testes de integraÃƒÂ§ÃƒÂ£o)
 
 ## Tipos de Teste a Incluir
 
-**Testes Unitários** (nível de função):
-- Cenários happy path
-- Casos de borda (vazio, null, valores máximos)
-- Condições de erro
+**Testes UnitÃƒÂ¡rios** (nÃƒÂ­vel de funÃƒÂ§ÃƒÂ£o):
+- CenÃƒÂ¡rios happy path
+- Casos de borda (vazio, null, valores mÃƒÂ¡ximos)
+- CondiÃƒÂ§ÃƒÂµes de erro
 - Valores de fronteira
 
-**Testes de Integração** (nível de componente):
+**Testes de IntegraÃƒÂ§ÃƒÂ£o** (nÃƒÂ­vel de componente):
 - Endpoints de API
-- Operações de banco de dados
-- Chamadas a serviços externos
+- OperaÃƒÂ§ÃƒÂµes de banco de dados
+- Chamadas a serviÃƒÂ§os externos
 - Componentes React com hooks
 
 **Testes E2E** (use comando `/e2e`):
-- Fluxos críticos de usuário
+- Fluxos crÃƒÂ­ticos de usuÃƒÂ¡rio
 - Processos multi-etapa
-- Integração full stack
+- IntegraÃƒÂ§ÃƒÂ£o full stack
 
 ## Requisitos de Cobertura
 
-- **Mínimo de 80%** para todo o código
-- **100% obrigatório** para:
-  - Cálculos financeiros
-  - Lógica de autenticação
-  - Código crítico de segurança
-  - Lógica de negócio central
+- **MÃƒÂ­nimo de 80%** para todo o cÃƒÂ³digo
+- **100% obrigatÃƒÂ³rio** para:
+  - CÃƒÂ¡lculos financeiros
+  - LÃƒÂ³gica de autenticaÃƒÂ§ÃƒÂ£o
+  - CÃƒÂ³digo crÃƒÂ­tico de seguranÃƒÂ§a
+  - LÃƒÂ³gica de negÃƒÂ³cio central
 
 ## Notas Importantes
 
-**MANDATÓRIO**: Os testes devem ser escritos ANTES da implementação. O ciclo TDD é:
+**MANDATÃƒâ€œRIO**: Os testes devem ser escritos ANTES da implementaÃƒÂ§ÃƒÂ£o. O ciclo TDD ÃƒÂ©:
 
 1. **RED** - Escrever teste que falha
 2. **GREEN** - Implementar para passar
-3. **REFACTOR** - Melhorar código
+3. **REFACTOR** - Melhorar cÃƒÂ³digo
 
-Nunca pule a fase RED. Nunca escreva código antes dos testes.
+Nunca pule a fase RED. Nunca escreva cÃƒÂ³digo antes dos testes.
 
-## Integração com Outros Comandos
+## IntegraÃƒÂ§ÃƒÂ£o com Outros Comandos
 
 - Use `/plan` primeiro para entender o que construir
 - Use `/tdd` para implementar com testes
 - Use `/build-fix` se ocorrerem erros de build
-- Use `/code-review` para revisar implementação
+- Use `/code-review` para revisar implementaÃƒÂ§ÃƒÂ£o
 - Use `/test-coverage` para verificar cobertura
 
 ## Agentes Relacionados
 
 Este comando invoca o agente `tdd-guide` fornecido pelo ECC.
 
-A skill relacionada `tdd-workflow` também é distribuída com o ECC.
+A skill relacionada `tdd-workflow` tambÃƒÂ©m ÃƒÂ© distribuÃƒÂ­da com o ECC.
 
-Para instalações manuais, os arquivos fonte ficam em:
+Para instalaÃƒÂ§ÃƒÂµes manuais, os arquivos fonte ficam em:
 - `agents/tdd-guide.md`
 - `skills/tdd-workflow/SKILL.md`

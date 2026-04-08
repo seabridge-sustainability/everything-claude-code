@@ -1,25 +1,38 @@
 ---
 name: golang-patterns
-description: 用于构建健壮、高效且可维护的Go应用程序的惯用Go模式、最佳实践和约定。
+description: Ã§â€Â¨Ã¤ÂºÅ½Ã¦Å¾â€žÃ¥Â»ÂºÃ¥ÂÂ¥Ã¥Â£Â®Ã£â‚¬ÂÃ©Â«ËœÃ¦â€¢Ë†Ã¤Â¸â€Ã¥ÂÂ¯Ã§Â»Â´Ã¦Å Â¤Ã§Å¡â€žGoÃ¥Âºâ€Ã§â€Â¨Ã§Â¨â€¹Ã¥ÂºÂÃ§Å¡â€žÃ¦Æ’Â¯Ã§â€Â¨GoÃ¦Â¨Â¡Ã¥Â¼ÂÃ£â‚¬ÂÃ¦Å“â‚¬Ã¤Â½Â³Ã¥Â®Å¾Ã¨Â·ÂµÃ¥â€™Å’Ã§ÂºÂ¦Ã¥Â®Å¡Ã£â‚¬â€š
 origin: ECC
 ---
 
-# Go 开发模式
+# Go Ã¥Â¼â‚¬Ã¥Ââ€˜Ã¦Â¨Â¡Ã¥Â¼Â
 
-用于构建健壮、高效和可维护应用程序的惯用 Go 模式与最佳实践。
+## Safety And Authorization Rule
 
-## 何时激活
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-* 编写新的 Go 代码时
-* 审查 Go 代码时
-* 重构现有 Go 代码时
-* 设计 Go 包/模块时
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-## 核心原则
 
-### 1. 简洁与清晰
+Ã§â€Â¨Ã¤ÂºÅ½Ã¦Å¾â€žÃ¥Â»ÂºÃ¥ÂÂ¥Ã¥Â£Â®Ã£â‚¬ÂÃ©Â«ËœÃ¦â€¢Ë†Ã¥â€™Å’Ã¥ÂÂ¯Ã§Â»Â´Ã¦Å Â¤Ã¥Âºâ€Ã§â€Â¨Ã§Â¨â€¹Ã¥ÂºÂÃ§Å¡â€žÃ¦Æ’Â¯Ã§â€Â¨ Go Ã¦Â¨Â¡Ã¥Â¼ÂÃ¤Â¸Å½Ã¦Å“â‚¬Ã¤Â½Â³Ã¥Â®Å¾Ã¨Â·ÂµÃ£â‚¬â€š
 
-Go 推崇简洁而非精巧。代码应该显而易见且易于阅读。
+## Ã¤Â½â€¢Ã¦â€”Â¶Ã¦Â¿â‚¬Ã¦Â´Â»
+
+* Ã§Â¼â€“Ã¥â€ â„¢Ã¦â€“Â°Ã§Å¡â€ž Go Ã¤Â»Â£Ã§Â ÂÃ¦â€”Â¶
+* Ã¥Â®Â¡Ã¦Å¸Â¥ Go Ã¤Â»Â£Ã§Â ÂÃ¦â€”Â¶
+* Ã©â€¡ÂÃ¦Å¾â€žÃ§Å½Â°Ã¦Å“â€° Go Ã¤Â»Â£Ã§Â ÂÃ¦â€”Â¶
+* Ã¨Â®Â¾Ã¨Â®Â¡ Go Ã¥Å’â€¦/Ã¦Â¨Â¡Ã¥Ââ€”Ã¦â€”Â¶
+
+## Ã¦Â Â¸Ã¥Â¿Æ’Ã¥Å½Å¸Ã¥Ë†â„¢
+
+### 1. Ã§Â®â‚¬Ã¦Â´ÂÃ¤Â¸Å½Ã¦Â¸â€¦Ã¦â„¢Â°
+
+Go Ã¦Å½Â¨Ã¥Â´â€¡Ã§Â®â‚¬Ã¦Â´ÂÃ¨â‚¬Å’Ã©ÂÅ¾Ã§Â²Â¾Ã¥Â·Â§Ã£â‚¬â€šÃ¤Â»Â£Ã§Â ÂÃ¥Âºâ€Ã¨Â¯Â¥Ã¦ËœÂ¾Ã¨â‚¬Å’Ã¦Ëœâ€œÃ¨Â§ÂÃ¤Â¸â€Ã¦Ëœâ€œÃ¤ÂºÅ½Ã©Ëœâ€¦Ã¨Â¯Â»Ã£â‚¬â€š
 
 ```go
 // Good: Clear and direct
@@ -43,9 +56,9 @@ func GetUser(id string) (*User, error) {
 }
 ```
 
-### 2. 让零值变得有用
+### 2. Ã¨Â®Â©Ã©â€ºÂ¶Ã¥â‚¬Â¼Ã¥ÂËœÃ¥Â¾â€”Ã¦Å“â€°Ã§â€Â¨
 
-设计类型时，应使其零值无需初始化即可立即使用。
+Ã¨Â®Â¾Ã¨Â®Â¡Ã§Â±Â»Ã¥Å¾â€¹Ã¦â€”Â¶Ã¯Â¼Å’Ã¥Âºâ€Ã¤Â½Â¿Ã¥â€¦Â¶Ã©â€ºÂ¶Ã¥â‚¬Â¼Ã¦â€”Â Ã©Å“â‚¬Ã¥Ë†ÂÃ¥Â§â€¹Ã¥Å’â€“Ã¥ÂÂ³Ã¥ÂÂ¯Ã§Â«â€¹Ã¥ÂÂ³Ã¤Â½Â¿Ã§â€Â¨Ã£â‚¬â€š
 
 ```go
 // Good: Zero value is useful
@@ -70,9 +83,9 @@ type BadCounter struct {
 }
 ```
 
-### 3. 接受接口，返回结构体
+### 3. Ã¦Å½Â¥Ã¥Ââ€”Ã¦Å½Â¥Ã¥ÂÂ£Ã¯Â¼Å’Ã¨Â¿â€Ã¥â€ºÅ¾Ã§Â»â€œÃ¦Å¾â€žÃ¤Â½â€œ
 
-函数应该接受接口参数并返回具体类型。
+Ã¥â€¡Â½Ã¦â€¢Â°Ã¥Âºâ€Ã¨Â¯Â¥Ã¦Å½Â¥Ã¥Ââ€”Ã¦Å½Â¥Ã¥ÂÂ£Ã¥Ââ€šÃ¦â€¢Â°Ã¥Â¹Â¶Ã¨Â¿â€Ã¥â€ºÅ¾Ã¥â€¦Â·Ã¤Â½â€œÃ§Â±Â»Ã¥Å¾â€¹Ã£â‚¬â€š
 
 ```go
 // Good: Accepts interface, returns concrete type
@@ -90,9 +103,9 @@ func ProcessData(r io.Reader) (io.Reader, error) {
 }
 ```
 
-## 错误处理模式
+## Ã©â€â„¢Ã¨Â¯Â¯Ã¥Â¤â€žÃ§Ââ€ Ã¦Â¨Â¡Ã¥Â¼Â
 
-### 带上下文的错误包装
+### Ã¥Â¸Â¦Ã¤Â¸Å Ã¤Â¸â€¹Ã¦â€“â€¡Ã§Å¡â€žÃ©â€â„¢Ã¨Â¯Â¯Ã¥Å’â€¦Ã¨Â£â€¦
 
 ```go
 // Good: Wrap errors with context
@@ -111,7 +124,7 @@ func LoadConfig(path string) (*Config, error) {
 }
 ```
 
-### 自定义错误类型
+### Ã¨â€¡ÂªÃ¥Â®Å¡Ã¤Â¹â€°Ã©â€â„¢Ã¨Â¯Â¯Ã§Â±Â»Ã¥Å¾â€¹
 
 ```go
 // Define domain-specific errors
@@ -132,7 +145,7 @@ var (
 )
 ```
 
-### 使用 errors.Is 和 errors.As 检查错误
+### Ã¤Â½Â¿Ã§â€Â¨ errors.Is Ã¥â€™Å’ errors.As Ã¦Â£â‚¬Ã¦Å¸Â¥Ã©â€â„¢Ã¨Â¯Â¯
 
 ```go
 func HandleError(err error) {
@@ -155,7 +168,7 @@ func HandleError(err error) {
 }
 ```
 
-### 永不忽略错误
+### Ã¦Â°Â¸Ã¤Â¸ÂÃ¥Â¿Â½Ã§â€¢Â¥Ã©â€â„¢Ã¨Â¯Â¯
 
 ```go
 // Bad: Ignoring error with blank identifier
@@ -171,9 +184,9 @@ if err != nil {
 _ = writer.Close() // Best-effort cleanup, error logged elsewhere
 ```
 
-## 并发模式
+## Ã¥Â¹Â¶Ã¥Ââ€˜Ã¦Â¨Â¡Ã¥Â¼Â
 
-### 工作池
+### Ã¥Â·Â¥Ã¤Â½Å“Ã¦Â±Â 
 
 ```go
 func WorkerPool(jobs <-chan Job, results chan<- Result, numWorkers int) {
@@ -194,7 +207,7 @@ func WorkerPool(jobs <-chan Job, results chan<- Result, numWorkers int) {
 }
 ```
 
-### 用于取消和超时的 Context
+### Ã§â€Â¨Ã¤ÂºÅ½Ã¥Ââ€“Ã¦Â¶Ë†Ã¥â€™Å’Ã¨Â¶â€¦Ã¦â€”Â¶Ã§Å¡â€ž Context
 
 ```go
 func FetchWithTimeout(ctx context.Context, url string) ([]byte, error) {
@@ -216,7 +229,7 @@ func FetchWithTimeout(ctx context.Context, url string) ([]byte, error) {
 }
 ```
 
-### 优雅关闭
+### Ã¤Â¼ËœÃ©â€ºâ€¦Ã¥â€¦Â³Ã©â€”Â­
 
 ```go
 func GracefulShutdown(server *http.Server) {
@@ -237,7 +250,7 @@ func GracefulShutdown(server *http.Server) {
 }
 ```
 
-### 用于协调 Goroutine 的 errgroup
+### Ã§â€Â¨Ã¤ÂºÅ½Ã¥ÂÂÃ¨Â°Æ’ Goroutine Ã§Å¡â€ž errgroup
 
 ```go
 import "golang.org/x/sync/errgroup"
@@ -265,7 +278,7 @@ func FetchAll(ctx context.Context, urls []string) ([][]byte, error) {
 }
 ```
 
-### 避免 Goroutine 泄漏
+### Ã©ÂÂ¿Ã¥â€¦Â Goroutine Ã¦Â³â€žÃ¦Â¼Â
 
 ```go
 // Bad: Goroutine leak if context is cancelled
@@ -295,9 +308,9 @@ func safeFetch(ctx context.Context, url string) <-chan []byte {
 }
 ```
 
-## 接口设计
+## Ã¦Å½Â¥Ã¥ÂÂ£Ã¨Â®Â¾Ã¨Â®Â¡
 
-### 小而专注的接口
+### Ã¥Â°ÂÃ¨â‚¬Å’Ã¤Â¸â€œÃ¦Â³Â¨Ã§Å¡â€žÃ¦Å½Â¥Ã¥ÂÂ£
 
 ```go
 // Good: Single-method interfaces
@@ -321,7 +334,7 @@ type ReadWriteCloser interface {
 }
 ```
 
-### 在接口使用处定义接口
+### Ã¥Å“Â¨Ã¦Å½Â¥Ã¥ÂÂ£Ã¤Â½Â¿Ã§â€Â¨Ã¥Â¤â€žÃ¥Â®Å¡Ã¤Â¹â€°Ã¦Å½Â¥Ã¥ÂÂ£
 
 ```go
 // In the consumer package, not the provider
@@ -341,7 +354,7 @@ type Service struct {
 // It doesn't need to know about this interface
 ```
 
-### 使用类型断言实现可选行为
+### Ã¤Â½Â¿Ã§â€Â¨Ã§Â±Â»Ã¥Å¾â€¹Ã¦â€“Â­Ã¨Â¨â‚¬Ã¥Â®Å¾Ã§Å½Â°Ã¥ÂÂ¯Ã©â‚¬â€°Ã¨Â¡Å’Ã¤Â¸Âº
 
 ```go
 type Flusher interface {
@@ -361,31 +374,31 @@ func WriteAndFlush(w io.Writer, data []byte) error {
 }
 ```
 
-## 包组织
+## Ã¥Å’â€¦Ã§Â»â€žÃ§Â»â€¡
 
-### 标准项目布局
+### Ã¦Â â€¡Ã¥â€¡â€ Ã©Â¡Â¹Ã§â€ºÂ®Ã¥Â¸Æ’Ã¥Â±â‚¬
 
 ```text
 myproject/
-├── cmd/
-│   └── myapp/
-│       └── main.go           # 入口点
-├── internal/
-│   ├── handler/              # HTTP 处理器
-│   ├── service/              # 业务逻辑
-│   ├── repository/           # 数据访问
-│   └── config/               # 配置
-├── pkg/
-│   └── client/               # 公共 API 客户端
-├── api/
-│   └── v1/                   # API 定义（proto, OpenAPI）
-├── testdata/                 # 测试夹具
-├── go.mod
-├── go.sum
-└── Makefile
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ cmd/
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ myapp/
+Ã¢â€â€š       Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ main.go           # Ã¥â€¦Â¥Ã¥ÂÂ£Ã§â€šÂ¹
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ internal/
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ handler/              # HTTP Ã¥Â¤â€žÃ§Ââ€ Ã¥â„¢Â¨
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ service/              # Ã¤Â¸Å¡Ã¥Å Â¡Ã©â‚¬Â»Ã¨Â¾â€˜
+Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ repository/           # Ã¦â€¢Â°Ã¦ÂÂ®Ã¨Â®Â¿Ã©â€”Â®
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ config/               # Ã©â€¦ÂÃ§Â½Â®
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ pkg/
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ client/               # Ã¥â€¦Â¬Ã¥â€¦Â± API Ã¥Â®Â¢Ã¦Ë†Â·Ã§Â«Â¯
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ api/
+Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ v1/                   # API Ã¥Â®Å¡Ã¤Â¹â€°Ã¯Â¼Ë†proto, OpenAPIÃ¯Â¼â€°
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ testdata/                 # Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¥Â¤Â¹Ã¥â€¦Â·
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ go.mod
+Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ go.sum
+Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Makefile
 ```
 
-### 包命名
+### Ã¥Å’â€¦Ã¥â€˜Â½Ã¥ÂÂ
 
 ```go
 // Good: Short, lowercase, no underscores
@@ -399,7 +412,7 @@ package json_parser
 package userService // Redundant 'Service' suffix
 ```
 
-### 避免包级状态
+### Ã©ÂÂ¿Ã¥â€¦ÂÃ¥Å’â€¦Ã§ÂºÂ§Ã§Å Â¶Ã¦â‚¬Â
 
 ```go
 // Bad: Global mutable state
@@ -419,9 +432,9 @@ func NewServer(db *sql.DB) *Server {
 }
 ```
 
-## 结构体设计
+## Ã§Â»â€œÃ¦Å¾â€žÃ¤Â½â€œÃ¨Â®Â¾Ã¨Â®Â¡
 
-### 函数式选项模式
+### Ã¥â€¡Â½Ã¦â€¢Â°Ã¥Â¼ÂÃ©â‚¬â€°Ã©Â¡Â¹Ã¦Â¨Â¡Ã¥Â¼Â
 
 ```go
 type Server struct {
@@ -463,7 +476,7 @@ server := NewServer(":8080",
 )
 ```
 
-### 使用嵌入实现组合
+### Ã¤Â½Â¿Ã§â€Â¨Ã¥ÂµÅ’Ã¥â€¦Â¥Ã¥Â®Å¾Ã§Å½Â°Ã§Â»â€žÃ¥ÂË†
 
 ```go
 type Logger struct {
@@ -491,9 +504,9 @@ s := NewServer(":8080")
 s.Log("Starting...") // Calls embedded Logger.Log
 ```
 
-## 内存与性能
+## Ã¥â€ â€¦Ã¥Â­ËœÃ¤Â¸Å½Ã¦â‚¬Â§Ã¨Æ’Â½
 
-### 当大小已知时预分配切片
+### Ã¥Â½â€œÃ¥Â¤Â§Ã¥Â°ÂÃ¥Â·Â²Ã§Å¸Â¥Ã¦â€”Â¶Ã©Â¢â€žÃ¥Ë†â€ Ã©â€¦ÂÃ¥Ë†â€¡Ã§â€°â€¡
 
 ```go
 // Bad: Grows slice multiple times
@@ -515,7 +528,7 @@ func processItems(items []Item) []Result {
 }
 ```
 
-### 为频繁分配使用 sync.Pool
+### Ã¤Â¸ÂºÃ©Â¢â€˜Ã§Â¹ÂÃ¥Ë†â€ Ã©â€¦ÂÃ¤Â½Â¿Ã§â€Â¨ sync.Pool
 
 ```go
 var bufferPool = sync.Pool{
@@ -537,7 +550,7 @@ func ProcessRequest(data []byte) []byte {
 }
 ```
 
-### 避免在循环中进行字符串拼接
+### Ã©ÂÂ¿Ã¥â€¦ÂÃ¥Å“Â¨Ã¥Â¾ÂªÃ§Å½Â¯Ã¤Â¸Â­Ã¨Â¿â€ºÃ¨Â¡Å’Ã¥Â­â€”Ã§Â¬Â¦Ã¤Â¸Â²Ã¦â€¹Â¼Ã¦Å½Â¥
 
 ```go
 // Bad: Creates many string allocations
@@ -567,9 +580,9 @@ func join(parts []string) string {
 }
 ```
 
-## Go 工具集成
+## Go Ã¥Â·Â¥Ã¥â€¦Â·Ã©â€ºâ€ Ã¦Ë†Â
 
-### 基本命令
+### Ã¥Å¸ÂºÃ¦Å“Â¬Ã¥â€˜Â½Ã¤Â»Â¤
 
 ```bash
 # Build and run
@@ -595,7 +608,7 @@ gofmt -w .
 goimports -w .
 ```
 
-### 推荐的 Linter 配置 (.golangci.yml)
+### Ã¦Å½Â¨Ã¨ÂÂÃ§Å¡â€ž Linter Ã©â€¦ÂÃ§Â½Â® (.golangci.yml)
 
 ```yaml
 linters:
@@ -622,20 +635,20 @@ issues:
   exclude-use-default: false
 ```
 
-## 快速参考：Go 惯用法
+## Ã¥Â¿Â«Ã©â‚¬Å¸Ã¥Ââ€šÃ¨â‚¬Æ’Ã¯Â¼Å¡Go Ã¦Æ’Â¯Ã§â€Â¨Ã¦Â³â€¢
 
-| 惯用法 | 描述 |
+| Ã¦Æ’Â¯Ã§â€Â¨Ã¦Â³â€¢ | Ã¦ÂÂÃ¨Â¿Â° |
 |-------|-------------|
-| 接受接口，返回结构体 | 函数接受接口参数，返回具体类型 |
-| 错误即值 | 将错误视为一等值，而非异常 |
-| 不要通过共享内存来通信 | 使用通道在 goroutine 之间进行协调 |
-| 让零值变得有用 | 类型应无需显式初始化即可工作 |
-| 少量复制优于少量依赖 | 避免不必要的外部依赖 |
-| 清晰优于精巧 | 优先考虑可读性而非精巧性 |
-| gofmt 虽非最爱，但却是每个人的朋友 | 始终使用 gofmt/goimports 格式化代码 |
-| 提前返回 | 先处理错误，保持主逻辑路径无缩进 |
+| Ã¦Å½Â¥Ã¥Ââ€”Ã¦Å½Â¥Ã¥ÂÂ£Ã¯Â¼Å’Ã¨Â¿â€Ã¥â€ºÅ¾Ã§Â»â€œÃ¦Å¾â€žÃ¤Â½â€œ | Ã¥â€¡Â½Ã¦â€¢Â°Ã¦Å½Â¥Ã¥Ââ€”Ã¦Å½Â¥Ã¥ÂÂ£Ã¥Ââ€šÃ¦â€¢Â°Ã¯Â¼Å’Ã¨Â¿â€Ã¥â€ºÅ¾Ã¥â€¦Â·Ã¤Â½â€œÃ§Â±Â»Ã¥Å¾â€¹ |
+| Ã©â€â„¢Ã¨Â¯Â¯Ã¥ÂÂ³Ã¥â‚¬Â¼ | Ã¥Â°â€ Ã©â€â„¢Ã¨Â¯Â¯Ã¨Â§â€ Ã¤Â¸ÂºÃ¤Â¸â‚¬Ã§Â­â€°Ã¥â‚¬Â¼Ã¯Â¼Å’Ã¨â‚¬Å’Ã©ÂÅ¾Ã¥Â¼â€šÃ¥Â¸Â¸ |
+| Ã¤Â¸ÂÃ¨Â¦ÂÃ©â‚¬Å¡Ã¨Â¿â€¡Ã¥â€¦Â±Ã¤ÂºÂ«Ã¥â€ â€¦Ã¥Â­ËœÃ¦ÂÂ¥Ã©â‚¬Å¡Ã¤Â¿Â¡ | Ã¤Â½Â¿Ã§â€Â¨Ã©â‚¬Å¡Ã©Ââ€œÃ¥Å“Â¨ goroutine Ã¤Â¹â€¹Ã©â€”Â´Ã¨Â¿â€ºÃ¨Â¡Å’Ã¥ÂÂÃ¨Â°Æ’ |
+| Ã¨Â®Â©Ã©â€ºÂ¶Ã¥â‚¬Â¼Ã¥ÂËœÃ¥Â¾â€”Ã¦Å“â€°Ã§â€Â¨ | Ã§Â±Â»Ã¥Å¾â€¹Ã¥Âºâ€Ã¦â€”Â Ã©Å“â‚¬Ã¦ËœÂ¾Ã¥Â¼ÂÃ¥Ë†ÂÃ¥Â§â€¹Ã¥Å’â€“Ã¥ÂÂ³Ã¥ÂÂ¯Ã¥Â·Â¥Ã¤Â½Å“ |
+| Ã¥Â°â€˜Ã©â€¡ÂÃ¥Â¤ÂÃ¥Ë†Â¶Ã¤Â¼ËœÃ¤ÂºÅ½Ã¥Â°â€˜Ã©â€¡ÂÃ¤Â¾ÂÃ¨Âµâ€“ | Ã©ÂÂ¿Ã¥â€¦ÂÃ¤Â¸ÂÃ¥Â¿â€¦Ã¨Â¦ÂÃ§Å¡â€žÃ¥Â¤â€“Ã©Æ’Â¨Ã¤Â¾ÂÃ¨Âµâ€“ |
+| Ã¦Â¸â€¦Ã¦â„¢Â°Ã¤Â¼ËœÃ¤ÂºÅ½Ã§Â²Â¾Ã¥Â·Â§ | Ã¤Â¼ËœÃ¥â€¦Ë†Ã¨â‚¬Æ’Ã¨â„¢â€˜Ã¥ÂÂ¯Ã¨Â¯Â»Ã¦â‚¬Â§Ã¨â‚¬Å’Ã©ÂÅ¾Ã§Â²Â¾Ã¥Â·Â§Ã¦â‚¬Â§ |
+| gofmt Ã¨â„¢Â½Ã©ÂÅ¾Ã¦Å“â‚¬Ã§Ë†Â±Ã¯Â¼Å’Ã¤Â½â€ Ã¥ÂÂ´Ã¦ËœÂ¯Ã¦Â¯ÂÃ¤Â¸ÂªÃ¤ÂºÂºÃ§Å¡â€žÃ¦Å“â€¹Ã¥Ââ€¹ | Ã¥Â§â€¹Ã§Â»Ë†Ã¤Â½Â¿Ã§â€Â¨ gofmt/goimports Ã¦Â Â¼Ã¥Â¼ÂÃ¥Å’â€“Ã¤Â»Â£Ã§Â Â |
+| Ã¦ÂÂÃ¥â€°ÂÃ¨Â¿â€Ã¥â€ºÅ¾ | Ã¥â€¦Ë†Ã¥Â¤â€žÃ§Ââ€ Ã©â€â„¢Ã¨Â¯Â¯Ã¯Â¼Å’Ã¤Â¿ÂÃ¦Å’ÂÃ¤Â¸Â»Ã©â‚¬Â»Ã¨Â¾â€˜Ã¨Â·Â¯Ã¥Â¾â€žÃ¦â€”Â Ã§Â¼Â©Ã¨Â¿â€º |
 
-## 应避免的反模式
+## Ã¥Âºâ€Ã©ÂÂ¿Ã¥â€¦ÂÃ§Å¡â€žÃ¥ÂÂÃ¦Â¨Â¡Ã¥Â¼Â
 
 ```go
 // Bad: Naked returns in long functions
@@ -671,4 +684,4 @@ func (c *Counter) Increment() { c.n++ }        // Pointer receiver
 // Pick one style and be consistent
 ```
 
-**记住**：Go 代码应该以最好的方式显得“乏味”——可预测、一致且易于理解。如有疑问，保持简单。
+**Ã¨Â®Â°Ã¤Â½Â**Ã¯Â¼Å¡Go Ã¤Â»Â£Ã§Â ÂÃ¥Âºâ€Ã¨Â¯Â¥Ã¤Â»Â¥Ã¦Å“â‚¬Ã¥Â¥Â½Ã§Å¡â€žÃ¦â€“Â¹Ã¥Â¼ÂÃ¦ËœÂ¾Ã¥Â¾â€”Ã¢â‚¬Å“Ã¤Â¹ÂÃ¥â€˜Â³Ã¢â‚¬ÂÃ¢â‚¬â€Ã¢â‚¬â€Ã¥ÂÂ¯Ã©Â¢â€žÃ¦Âµâ€¹Ã£â‚¬ÂÃ¤Â¸â‚¬Ã¨â€¡Â´Ã¤Â¸â€Ã¦Ëœâ€œÃ¤ÂºÅ½Ã§Ââ€ Ã¨Â§Â£Ã£â‚¬â€šÃ¥Â¦â€šÃ¦Å“â€°Ã§â€“â€˜Ã©â€”Â®Ã¯Â¼Å’Ã¤Â¿ÂÃ¦Å’ÂÃ§Â®â‚¬Ã¥Ââ€¢Ã£â‚¬â€š

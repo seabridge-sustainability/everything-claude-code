@@ -6,18 +6,31 @@ paths:
   - "**/*.jsx"
 ---
 
-# TypeScript/JavaScript 钩子
+# TypeScript/JavaScript Ã©â€™Â©Ã¥Â­Â
 
-> 此文件扩展了 [common/hooks.md](../common/hooks.md)，并添加了 TypeScript/JavaScript 特有的内容。
+## Safety And Authorization Rule
 
-## PostToolUse 钩子
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-在 `~/.claude/settings.json` 中配置：
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-* **Prettier**：编辑后自动格式化 JS/TS 文件
-* **TypeScript 检查**：编辑 `.ts`/`.tsx` 文件后运行 `tsc`
-* **console.log 警告**：警告编辑过的文件中存在 `console.log`
 
-## Stop 钩子
+> Ã¦Â­Â¤Ã¦â€“â€¡Ã¤Â»Â¶Ã¦â€°Â©Ã¥Â±â€¢Ã¤Âºâ€  [common/hooks.md](../common/hooks.md)Ã¯Â¼Å’Ã¥Â¹Â¶Ã¦Â·Â»Ã¥Å Â Ã¤Âºâ€  TypeScript/JavaScript Ã§â€°Â¹Ã¦Å“â€°Ã§Å¡â€žÃ¥â€ â€¦Ã¥Â®Â¹Ã£â‚¬â€š
 
-* **console.log 审计**：在会话结束前，检查所有修改过的文件中是否存在 `console.log`
+## PostToolUse Ã©â€™Â©Ã¥Â­Â
+
+Ã¥Å“Â¨ `~/.claude/settings.json` Ã¤Â¸Â­Ã©â€¦ÂÃ§Â½Â®Ã¯Â¼Å¡
+
+* **Prettier**Ã¯Â¼Å¡Ã§Â¼â€“Ã¨Â¾â€˜Ã¥ÂÅ½Ã¨â€¡ÂªÃ¥Å Â¨Ã¦Â Â¼Ã¥Â¼ÂÃ¥Å’â€“ JS/TS Ã¦â€“â€¡Ã¤Â»Â¶
+* **TypeScript Ã¦Â£â‚¬Ã¦Å¸Â¥**Ã¯Â¼Å¡Ã§Â¼â€“Ã¨Â¾â€˜ `.ts`/`.tsx` Ã¦â€“â€¡Ã¤Â»Â¶Ã¥ÂÅ½Ã¨Â¿ÂÃ¨Â¡Å’ `tsc`
+* **console.log Ã¨Â­Â¦Ã¥â€˜Å **Ã¯Â¼Å¡Ã¨Â­Â¦Ã¥â€˜Å Ã§Â¼â€“Ã¨Â¾â€˜Ã¨Â¿â€¡Ã§Å¡â€žÃ¦â€“â€¡Ã¤Â»Â¶Ã¤Â¸Â­Ã¥Â­ËœÃ¥Å“Â¨ `console.log`
+
+## Stop Ã©â€™Â©Ã¥Â­Â
+
+* **console.log Ã¥Â®Â¡Ã¨Â®Â¡**Ã¯Â¼Å¡Ã¥Å“Â¨Ã¤Â¼Å¡Ã¨Â¯ÂÃ§Â»â€œÃ¦ÂÅ¸Ã¥â€°ÂÃ¯Â¼Å’Ã¦Â£â‚¬Ã¦Å¸Â¥Ã¦â€°â‚¬Ã¦Å“â€°Ã¤Â¿Â®Ã¦â€Â¹Ã¨Â¿â€¡Ã§Å¡â€žÃ¦â€“â€¡Ã¤Â»Â¶Ã¤Â¸Â­Ã¦ËœÂ¯Ã¥ÂÂ¦Ã¥Â­ËœÃ¥Å“Â¨ `console.log`

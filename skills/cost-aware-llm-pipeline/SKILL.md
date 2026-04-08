@@ -1,10 +1,23 @@
 ---
 name: cost-aware-llm-pipeline
-description: Cost optimization patterns for LLM API usage — model routing by task complexity, budget tracking, retry logic, and prompt caching.
+description: Cost optimization patterns for LLM API usage Ã¢â‚¬â€ model routing by task complexity, budget tracking, retry logic, and prompt caching.
 origin: ECC
 ---
 
 # Cost-Aware LLM Pipeline
+
+## Safety And Authorization Rule
+
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
+
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+
 
 Patterns for controlling LLM API costs while maintaining quality. Combines model routing, budget tracking, retry logic, and prompt caching into a composable pipeline.
 
@@ -43,7 +56,7 @@ def select_model(
 
 ### 2. Immutable Cost Tracking
 
-Track cumulative spend with frozen dataclasses. Each API call returns a new tracker — never mutates state.
+Track cumulative spend with frozen dataclasses. Each API call returns a new tracker Ã¢â‚¬â€ never mutates state.
 
 ```python
 from dataclasses import dataclass
@@ -99,7 +112,7 @@ def call_with_retry(func, *, max_retries: int = _MAX_RETRIES):
             if attempt == max_retries - 1:
                 raise
             time.sleep(2 ** attempt)  # Exponential backoff
-    # AuthenticationError, BadRequestError etc. → raise immediately
+    # AuthenticationError, BadRequestError etc. Ã¢â€ â€™ raise immediately
 ```
 
 ### 4. Prompt Caching
@@ -162,10 +175,10 @@ def process(text: str, config: Config, tracker: CostTracker) -> tuple[Result, Co
 ## Best Practices
 
 - **Start with the cheapest model** and only route to expensive models when complexity thresholds are met
-- **Set explicit budget limits** before processing batches — fail early rather than overspend
+- **Set explicit budget limits** before processing batches Ã¢â‚¬â€ fail early rather than overspend
 - **Log model selection decisions** so you can tune thresholds based on real data
-- **Use prompt caching** for system prompts over 1024 tokens — saves both cost and latency
-- **Never retry on authentication or validation errors** — only transient failures (network, rate limit, server error)
+- **Use prompt caching** for system prompts over 1024 tokens Ã¢â‚¬â€ saves both cost and latency
+- **Never retry on authentication or validation errors** Ã¢â‚¬â€ only transient failures (network, rate limit, server error)
 
 ## Anti-Patterns to Avoid
 

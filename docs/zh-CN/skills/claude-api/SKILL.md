@@ -1,40 +1,53 @@
 ---
 name: claude-api
-description: Anthropic Claude API 的 Python 和 TypeScript 使用模式。涵盖 Messages API、流式处理、工具使用、视觉功能、扩展思维、批量处理、提示缓存和 Claude Agent SDK。适用于使用 Claude API 或 Anthropic SDK 构建应用程序的场景。
+description: Anthropic Claude API Ã§Å¡â€ž Python Ã¥â€™Å’ TypeScript Ã¤Â½Â¿Ã§â€Â¨Ã¦Â¨Â¡Ã¥Â¼ÂÃ£â‚¬â€šÃ¦Â¶ÂµÃ§â€ºâ€“ Messages APIÃ£â‚¬ÂÃ¦ÂµÂÃ¥Â¼ÂÃ¥Â¤â€žÃ§Ââ€ Ã£â‚¬ÂÃ¥Â·Â¥Ã¥â€¦Â·Ã¤Â½Â¿Ã§â€Â¨Ã£â‚¬ÂÃ¨Â§â€ Ã¨Â§â€°Ã¥Å Å¸Ã¨Æ’Â½Ã£â‚¬ÂÃ¦â€°Â©Ã¥Â±â€¢Ã¦â‚¬ÂÃ§Â»Â´Ã£â‚¬ÂÃ¦â€°Â¹Ã©â€¡ÂÃ¥Â¤â€žÃ§Ââ€ Ã£â‚¬ÂÃ¦ÂÂÃ§Â¤ÂºÃ§Â¼â€œÃ¥Â­ËœÃ¥â€™Å’ Claude Agent SDKÃ£â‚¬â€šÃ©â‚¬â€šÃ§â€Â¨Ã¤ÂºÅ½Ã¤Â½Â¿Ã§â€Â¨ Claude API Ã¦Ë†â€“ Anthropic SDK Ã¦Å¾â€žÃ¥Â»ÂºÃ¥Âºâ€Ã§â€Â¨Ã§Â¨â€¹Ã¥ÂºÂÃ§Å¡â€žÃ¥Å“ÂºÃ¦â„¢Â¯Ã£â‚¬â€š
 origin: ECC
 ---
 
 # Claude API
 
-使用 Anthropic Claude API 和 SDK 构建应用程序。
+## Safety And Authorization Rule
 
-## 何时激活
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-* 构建调用 Claude API 的应用程序
-* 代码导入 `anthropic` (Python) 或 `@anthropic-ai/sdk` (TypeScript)
-* 用户询问 Claude API 模式、工具使用、流式传输或视觉功能
-* 使用 Claude Agent SDK 实现智能体工作流
-* 优化 API 成本、令牌使用或延迟
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-## 模型选择
 
-| 模型 | ID | 最适合 |
+Ã¤Â½Â¿Ã§â€Â¨ Anthropic Claude API Ã¥â€™Å’ SDK Ã¦Å¾â€žÃ¥Â»ÂºÃ¥Âºâ€Ã§â€Â¨Ã§Â¨â€¹Ã¥ÂºÂÃ£â‚¬â€š
+
+## Ã¤Â½â€¢Ã¦â€”Â¶Ã¦Â¿â‚¬Ã¦Â´Â»
+
+* Ã¦Å¾â€žÃ¥Â»ÂºÃ¨Â°Æ’Ã§â€Â¨ Claude API Ã§Å¡â€žÃ¥Âºâ€Ã§â€Â¨Ã§Â¨â€¹Ã¥ÂºÂ
+* Ã¤Â»Â£Ã§Â ÂÃ¥Â¯Â¼Ã¥â€¦Â¥ `anthropic` (Python) Ã¦Ë†â€“ `@anthropic-ai/sdk` (TypeScript)
+* Ã§â€Â¨Ã¦Ë†Â·Ã¨Â¯Â¢Ã©â€”Â® Claude API Ã¦Â¨Â¡Ã¥Â¼ÂÃ£â‚¬ÂÃ¥Â·Â¥Ã¥â€¦Â·Ã¤Â½Â¿Ã§â€Â¨Ã£â‚¬ÂÃ¦ÂµÂÃ¥Â¼ÂÃ¤Â¼Â Ã¨Â¾â€œÃ¦Ë†â€“Ã¨Â§â€ Ã¨Â§â€°Ã¥Å Å¸Ã¨Æ’Â½
+* Ã¤Â½Â¿Ã§â€Â¨ Claude Agent SDK Ã¥Â®Å¾Ã§Å½Â°Ã¦â„¢ÂºÃ¨Æ’Â½Ã¤Â½â€œÃ¥Â·Â¥Ã¤Â½Å“Ã¦ÂµÂ
+* Ã¤Â¼ËœÃ¥Å’â€“ API Ã¦Ë†ÂÃ¦Å“Â¬Ã£â‚¬ÂÃ¤Â»Â¤Ã§â€°Å’Ã¤Â½Â¿Ã§â€Â¨Ã¦Ë†â€“Ã¥Â»Â¶Ã¨Â¿Å¸
+
+## Ã¦Â¨Â¡Ã¥Å¾â€¹Ã©â‚¬â€°Ã¦â€¹Â©
+
+| Ã¦Â¨Â¡Ã¥Å¾â€¹ | ID | Ã¦Å“â‚¬Ã©â‚¬â€šÃ¥ÂË† |
 |-------|-----|----------|
-| Opus 4.1 | `claude-opus-4-1` | 复杂推理、架构设计、研究 |
-| Sonnet 4 | `claude-sonnet-4-0` | 平衡的编码任务，大多数开发工作 |
-| Haiku 3.5 | `claude-3-5-haiku-latest` | 快速响应、高吞吐量、成本敏感型 |
+| Opus 4.1 | `claude-opus-4-1` | Ã¥Â¤ÂÃ¦Ââ€šÃ¦Å½Â¨Ã§Ââ€ Ã£â‚¬ÂÃ¦Å¾Â¶Ã¦Å¾â€žÃ¨Â®Â¾Ã¨Â®Â¡Ã£â‚¬ÂÃ§Â â€Ã§Â©Â¶ |
+| Sonnet 4 | `claude-sonnet-4-0` | Ã¥Â¹Â³Ã¨Â¡Â¡Ã§Å¡â€žÃ§Â¼â€“Ã§Â ÂÃ¤Â»Â»Ã¥Å Â¡Ã¯Â¼Å’Ã¥Â¤Â§Ã¥Â¤Å¡Ã¦â€¢Â°Ã¥Â¼â‚¬Ã¥Ââ€˜Ã¥Â·Â¥Ã¤Â½Å“ |
+| Haiku 3.5 | `claude-3-5-haiku-latest` | Ã¥Â¿Â«Ã©â‚¬Å¸Ã¥â€œÂÃ¥Âºâ€Ã£â‚¬ÂÃ©Â«ËœÃ¥ÂÅ¾Ã¥ÂÂÃ©â€¡ÂÃ£â‚¬ÂÃ¦Ë†ÂÃ¦Å“Â¬Ã¦â€¢ÂÃ¦â€žÅ¸Ã¥Å¾â€¹ |
 
-默认使用 Sonnet 4，除非任务需要深度推理（Opus）或速度/成本优化（Haiku）。对于生产环境，优先使用固定的快照 ID 而非别名。
+Ã©Â»ËœÃ¨Â®Â¤Ã¤Â½Â¿Ã§â€Â¨ Sonnet 4Ã¯Â¼Å’Ã©â„¢Â¤Ã©ÂÅ¾Ã¤Â»Â»Ã¥Å Â¡Ã©Å“â‚¬Ã¨Â¦ÂÃ¦Â·Â±Ã¥ÂºÂ¦Ã¦Å½Â¨Ã§Ââ€ Ã¯Â¼Ë†OpusÃ¯Â¼â€°Ã¦Ë†â€“Ã©â‚¬Å¸Ã¥ÂºÂ¦/Ã¦Ë†ÂÃ¦Å“Â¬Ã¤Â¼ËœÃ¥Å’â€“Ã¯Â¼Ë†HaikuÃ¯Â¼â€°Ã£â‚¬â€šÃ¥Â¯Â¹Ã¤ÂºÅ½Ã§â€Å¸Ã¤ÂºÂ§Ã§Å½Â¯Ã¥Â¢Æ’Ã¯Â¼Å’Ã¤Â¼ËœÃ¥â€¦Ë†Ã¤Â½Â¿Ã§â€Â¨Ã¥â€ºÂºÃ¥Â®Å¡Ã§Å¡â€žÃ¥Â¿Â«Ã§â€¦Â§ ID Ã¨â‚¬Å’Ã©ÂÅ¾Ã¥Ë†Â«Ã¥ÂÂÃ£â‚¬â€š
 
 ## Python SDK
 
-### 安装
+### Ã¥Â®â€°Ã¨Â£â€¦
 
 ```bash
 pip install anthropic
 ```
 
-### 基本消息
+### Ã¥Å¸ÂºÃ¦Å“Â¬Ã¦Â¶Ë†Ã¦ÂÂ¯
 
 ```python
 import anthropic
@@ -51,7 +64,7 @@ message = client.messages.create(
 print(message.content[0].text)
 ```
 
-### 流式传输
+### Ã¦ÂµÂÃ¥Â¼ÂÃ¤Â¼Â Ã¨Â¾â€œ
 
 ```python
 with client.messages.stream(
@@ -63,7 +76,7 @@ with client.messages.stream(
         print(text, end="", flush=True)
 ```
 
-### 系统提示词
+### Ã§Â³Â»Ã§Â»Å¸Ã¦ÂÂÃ§Â¤ÂºÃ¨Â¯Â
 
 ```python
 message = client.messages.create(
@@ -76,13 +89,13 @@ message = client.messages.create(
 
 ## TypeScript SDK
 
-### 安装
+### Ã¥Â®â€°Ã¨Â£â€¦
 
 ```bash
 npm install @anthropic-ai/sdk
 ```
 
-### 基本消息
+### Ã¥Å¸ÂºÃ¦Å“Â¬Ã¦Â¶Ë†Ã¦ÂÂ¯
 
 ```typescript
 import Anthropic from "@anthropic-ai/sdk";
@@ -99,7 +112,7 @@ const message = await client.messages.create({
 console.log(message.content[0].text);
 ```
 
-### 流式传输
+### Ã¦ÂµÂÃ¥Â¼ÂÃ¤Â¼Â Ã¨Â¾â€œ
 
 ```typescript
 const stream = client.messages.stream({
@@ -115,9 +128,9 @@ for await (const event of stream) {
 }
 ```
 
-## 工具使用
+## Ã¥Â·Â¥Ã¥â€¦Â·Ã¤Â½Â¿Ã§â€Â¨
 
-定义工具并让 Claude 调用它们：
+Ã¥Â®Å¡Ã¤Â¹â€°Ã¥Â·Â¥Ã¥â€¦Â·Ã¥Â¹Â¶Ã¨Â®Â© Claude Ã¨Â°Æ’Ã§â€Â¨Ã¥Â®Æ’Ã¤Â»Â¬Ã¯Â¼Å¡
 
 ```python
 tools = [
@@ -162,9 +175,9 @@ for block in message.content:
         )
 ```
 
-## 视觉功能
+## Ã¨Â§â€ Ã¨Â§â€°Ã¥Å Å¸Ã¨Æ’Â½
 
-发送图像进行分析：
+Ã¥Ââ€˜Ã©â‚¬ÂÃ¥â€ºÂ¾Ã¥Æ’ÂÃ¨Â¿â€ºÃ¨Â¡Å’Ã¥Ë†â€ Ã¦Å¾ÂÃ¯Â¼Å¡
 
 ```python
 import base64
@@ -185,9 +198,9 @@ message = client.messages.create(
 )
 ```
 
-## 扩展思考
+## Ã¦â€°Â©Ã¥Â±â€¢Ã¦â‚¬ÂÃ¨â‚¬Æ’
 
-针对复杂推理任务：
+Ã©â€™Ë†Ã¥Â¯Â¹Ã¥Â¤ÂÃ¦Ââ€šÃ¦Å½Â¨Ã§Ââ€ Ã¤Â»Â»Ã¥Å Â¡Ã¯Â¼Å¡
 
 ```python
 message = client.messages.create(
@@ -207,9 +220,9 @@ for block in message.content:
         print(f"Answer: {block.text}")
 ```
 
-## 提示词缓存
+## Ã¦ÂÂÃ§Â¤ÂºÃ¨Â¯ÂÃ§Â¼â€œÃ¥Â­Ëœ
 
-缓存大型系统提示词或上下文以降低成本：
+Ã§Â¼â€œÃ¥Â­ËœÃ¥Â¤Â§Ã¥Å¾â€¹Ã§Â³Â»Ã§Â»Å¸Ã¦ÂÂÃ§Â¤ÂºÃ¨Â¯ÂÃ¦Ë†â€“Ã¤Â¸Å Ã¤Â¸â€¹Ã¦â€“â€¡Ã¤Â»Â¥Ã©â„¢ÂÃ¤Â½Å½Ã¦Ë†ÂÃ¦Å“Â¬Ã¯Â¼Å¡
 
 ```python
 message = client.messages.create(
@@ -225,9 +238,9 @@ print(f"Cache read: {message.usage.cache_read_input_tokens}")
 print(f"Cache creation: {message.usage.cache_creation_input_tokens}")
 ```
 
-## 批量 API
+## Ã¦â€°Â¹Ã©â€¡Â API
 
-以 50% 的成本降低异步处理大量数据：
+Ã¤Â»Â¥ 50% Ã§Å¡â€žÃ¦Ë†ÂÃ¦Å“Â¬Ã©â„¢ÂÃ¤Â½Å½Ã¥Â¼â€šÃ¦Â­Â¥Ã¥Â¤â€žÃ§Ââ€ Ã¥Â¤Â§Ã©â€¡ÂÃ¦â€¢Â°Ã¦ÂÂ®Ã¯Â¼Å¡
 
 ```python
 import time
@@ -260,10 +273,10 @@ for result in client.messages.batches.results(batch.id):
 
 ## Claude Agent SDK
 
-构建多步骤智能体：
+Ã¦Å¾â€žÃ¥Â»ÂºÃ¥Â¤Å¡Ã¦Â­Â¥Ã©ÂªÂ¤Ã¦â„¢ÂºÃ¨Æ’Â½Ã¤Â½â€œÃ¯Â¼Å¡
 
 ```python
-# Note: Agent SDK API surface may change — check official docs
+# Note: Agent SDK API surface may change Ã¢â‚¬â€ check official docs
 import anthropic
 
 # Define tools as functions
@@ -295,17 +308,17 @@ while True:
     # ... execute tools and append tool_result messages
 ```
 
-## 成本优化
+## Ã¦Ë†ÂÃ¦Å“Â¬Ã¤Â¼ËœÃ¥Å’â€“
 
-| 策略 | 节省幅度 | 使用时机 |
+| Ã§Â­â€“Ã§â€¢Â¥ | Ã¨Å â€šÃ§Å“ÂÃ¥Â¹â€¦Ã¥ÂºÂ¦ | Ã¤Â½Â¿Ã§â€Â¨Ã¦â€”Â¶Ã¦Å“Âº |
 |----------|---------|-------------|
-| 提示词缓存 | 缓存令牌成本降低高达 90% | 重复的系统提示词或上下文 |
-| 批量 API | 50% | 非时间敏感的批量处理 |
-| 使用 Haiku 而非 Sonnet | ~75% | 简单任务、分类、提取 |
-| 缩短 max\_tokens | 可变 | 已知输出较短时 |
-| 流式传输 | 无（成本相同） | 更好的用户体验，价格相同 |
+| Ã¦ÂÂÃ§Â¤ÂºÃ¨Â¯ÂÃ§Â¼â€œÃ¥Â­Ëœ | Ã§Â¼â€œÃ¥Â­ËœÃ¤Â»Â¤Ã§â€°Å’Ã¦Ë†ÂÃ¦Å“Â¬Ã©â„¢ÂÃ¤Â½Å½Ã©Â«ËœÃ¨Â¾Â¾ 90% | Ã©â€¡ÂÃ¥Â¤ÂÃ§Å¡â€žÃ§Â³Â»Ã§Â»Å¸Ã¦ÂÂÃ§Â¤ÂºÃ¨Â¯ÂÃ¦Ë†â€“Ã¤Â¸Å Ã¤Â¸â€¹Ã¦â€“â€¡ |
+| Ã¦â€°Â¹Ã©â€¡Â API | 50% | Ã©ÂÅ¾Ã¦â€”Â¶Ã©â€”Â´Ã¦â€¢ÂÃ¦â€žÅ¸Ã§Å¡â€žÃ¦â€°Â¹Ã©â€¡ÂÃ¥Â¤â€žÃ§Ââ€  |
+| Ã¤Â½Â¿Ã§â€Â¨ Haiku Ã¨â‚¬Å’Ã©ÂÅ¾ Sonnet | ~75% | Ã§Â®â‚¬Ã¥Ââ€¢Ã¤Â»Â»Ã¥Å Â¡Ã£â‚¬ÂÃ¥Ë†â€ Ã§Â±Â»Ã£â‚¬ÂÃ¦ÂÂÃ¥Ââ€“ |
+| Ã§Â¼Â©Ã§Å¸Â­ max\_tokens | Ã¥ÂÂ¯Ã¥ÂËœ | Ã¥Â·Â²Ã§Å¸Â¥Ã¨Â¾â€œÃ¥â€¡ÂºÃ¨Â¾Æ’Ã§Å¸Â­Ã¦â€”Â¶ |
+| Ã¦ÂµÂÃ¥Â¼ÂÃ¤Â¼Â Ã¨Â¾â€œ | Ã¦â€”Â Ã¯Â¼Ë†Ã¦Ë†ÂÃ¦Å“Â¬Ã§â€ºÂ¸Ã¥ÂÅ’Ã¯Â¼â€° | Ã¦â€ºÂ´Ã¥Â¥Â½Ã§Å¡â€žÃ§â€Â¨Ã¦Ë†Â·Ã¤Â½â€œÃ©ÂªÅ’Ã¯Â¼Å’Ã¤Â»Â·Ã¦Â Â¼Ã§â€ºÂ¸Ã¥ÂÅ’ |
 
-## 错误处理
+## Ã©â€â„¢Ã¨Â¯Â¯Ã¥Â¤â€žÃ§Ââ€ 
 
 ```python
 import time
@@ -324,7 +337,7 @@ except APIError as e:
     print(f"API error {e.status_code}: {e.message}")
 ```
 
-## 环境设置
+## Ã§Å½Â¯Ã¥Â¢Æ’Ã¨Â®Â¾Ã§Â½Â®
 
 ```bash
 # Required
@@ -334,4 +347,4 @@ export ANTHROPIC_API_KEY="your-api-key-here"
 export ANTHROPIC_MODEL="claude-sonnet-4-0"
 ```
 
-切勿硬编码 API 密钥。始终使用环境变量。
+Ã¥Ë†â€¡Ã¥â€¹Â¿Ã§Â¡Â¬Ã§Â¼â€“Ã§Â Â API Ã¥Â¯â€ Ã©â€™Â¥Ã£â‚¬â€šÃ¥Â§â€¹Ã§Â»Ë†Ã¤Â½Â¿Ã§â€Â¨Ã§Å½Â¯Ã¥Â¢Æ’Ã¥ÂËœÃ©â€¡ÂÃ£â‚¬â€š

@@ -1,31 +1,44 @@
-# Rust API 服务 — 项目 CLAUDE.md
+# Rust API Ã¦Å“ÂÃ¥Å Â¡ Ã¢â‚¬â€ Ã©Â¡Â¹Ã§â€ºÂ® CLAUDE.md
 
-> 使用 Axum、PostgreSQL 和 Docker 构建 Rust API 服务的真实示例。
-> 将此文件复制到您的项目根目录，并根据您的服务进行自定义。
+## Safety And Authorization Rule
 
-## 项目概述
+Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
-**技术栈：** Rust 1.78+, Axum (Web 框架), SQLx (异步数据库), PostgreSQL, Tokio (异步运行时), Docker
+1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
+2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
+3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
+4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
+5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
+6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
+7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
-**架构：** 采用分层架构，包含 handler → service → repository 分离。Axum 用于 HTTP，SQLx 用于编译时类型检查的 SQL，Tower 中间件用于横切关注点。
 
-## 关键规则
+> Ã¤Â½Â¿Ã§â€Â¨ AxumÃ£â‚¬ÂPostgreSQL Ã¥â€™Å’ Docker Ã¦Å¾â€žÃ¥Â»Âº Rust API Ã¦Å“ÂÃ¥Å Â¡Ã§Å¡â€žÃ§Å“Å¸Ã¥Â®Å¾Ã§Â¤ÂºÃ¤Â¾â€¹Ã£â‚¬â€š
+> Ã¥Â°â€ Ã¦Â­Â¤Ã¦â€“â€¡Ã¤Â»Â¶Ã¥Â¤ÂÃ¥Ë†Â¶Ã¥Ë†Â°Ã¦â€šÂ¨Ã§Å¡â€žÃ©Â¡Â¹Ã§â€ºÂ®Ã¦Â Â¹Ã§â€ºÂ®Ã¥Â½â€¢Ã¯Â¼Å’Ã¥Â¹Â¶Ã¦Â Â¹Ã¦ÂÂ®Ã¦â€šÂ¨Ã§Å¡â€žÃ¦Å“ÂÃ¥Å Â¡Ã¨Â¿â€ºÃ¨Â¡Å’Ã¨â€¡ÂªÃ¥Â®Å¡Ã¤Â¹â€°Ã£â‚¬â€š
 
-### Rust 约定
+## Ã©Â¡Â¹Ã§â€ºÂ®Ã¦Â¦â€šÃ¨Â¿Â°
 
-* 库错误使用 `thiserror`，仅在二进制 crate 或测试中使用 `anyhow`
-* 生产代码中不使用 `.unwrap()` 或 `.expect()` — 使用 `?` 传播错误
-* 函数参数中优先使用 `&str` 而非 `String`；所有权转移时返回 `String`
-* 使用 `clippy` 和 `#![deny(clippy::all, clippy::pedantic)]` — 修复所有警告
-* 在所有公共类型上派生 `Debug`；仅在需要时派生 `Clone`、`PartialEq`
-* 除非有 `// SAFETY:` 注释说明理由，否则不使用 `unsafe` 块
+**Ã¦Å â‚¬Ã¦Å“Â¯Ã¦Â Ë†Ã¯Â¼Å¡** Rust 1.78+, Axum (Web Ã¦Â¡â€ Ã¦Å¾Â¶), SQLx (Ã¥Â¼â€šÃ¦Â­Â¥Ã¦â€¢Â°Ã¦ÂÂ®Ã¥Âºâ€œ), PostgreSQL, Tokio (Ã¥Â¼â€šÃ¦Â­Â¥Ã¨Â¿ÂÃ¨Â¡Å’Ã¦â€”Â¶), Docker
 
-### 数据库
+**Ã¦Å¾Â¶Ã¦Å¾â€žÃ¯Â¼Å¡** Ã©â€¡â€¡Ã§â€Â¨Ã¥Ë†â€ Ã¥Â±â€šÃ¦Å¾Â¶Ã¦Å¾â€žÃ¯Â¼Å’Ã¥Å’â€¦Ã¥ÂÂ« handler Ã¢â€ â€™ service Ã¢â€ â€™ repository Ã¥Ë†â€ Ã§Â¦Â»Ã£â‚¬â€šAxum Ã§â€Â¨Ã¤ÂºÅ½ HTTPÃ¯Â¼Å’SQLx Ã§â€Â¨Ã¤ÂºÅ½Ã§Â¼â€“Ã¨Â¯â€˜Ã¦â€”Â¶Ã§Â±Â»Ã¥Å¾â€¹Ã¦Â£â‚¬Ã¦Å¸Â¥Ã§Å¡â€ž SQLÃ¯Â¼Å’Tower Ã¤Â¸Â­Ã©â€”Â´Ã¤Â»Â¶Ã§â€Â¨Ã¤ÂºÅ½Ã¦Â¨ÂªÃ¥Ë†â€¡Ã¥â€¦Â³Ã¦Â³Â¨Ã§â€šÂ¹Ã£â‚¬â€š
 
-* 所有查询使用 SQLx 的 `query!` 或 `query_as!` 宏 — 针对模式进行编译时验证
-* 在 `migrations/` 中使用 `sqlx migrate` 进行迁移 — 切勿直接修改数据库
-* 使用 `sqlx::Pool<Postgres>` 作为共享状态 — 切勿为每个请求创建连接
-* 所有查询使用参数化占位符 (`$1`, `$2`) — 切勿使用字符串格式化
+## Ã¥â€¦Â³Ã©â€Â®Ã¨Â§â€žÃ¥Ë†â„¢
+
+### Rust Ã§ÂºÂ¦Ã¥Â®Å¡
+
+* Ã¥Âºâ€œÃ©â€â„¢Ã¨Â¯Â¯Ã¤Â½Â¿Ã§â€Â¨ `thiserror`Ã¯Â¼Å’Ã¤Â»â€¦Ã¥Å“Â¨Ã¤ÂºÅ’Ã¨Â¿â€ºÃ¥Ë†Â¶ crate Ã¦Ë†â€“Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¤Â¸Â­Ã¤Â½Â¿Ã§â€Â¨ `anyhow`
+* Ã§â€Å¸Ã¤ÂºÂ§Ã¤Â»Â£Ã§Â ÂÃ¤Â¸Â­Ã¤Â¸ÂÃ¤Â½Â¿Ã§â€Â¨ `.unwrap()` Ã¦Ë†â€“ `.expect()` Ã¢â‚¬â€ Ã¤Â½Â¿Ã§â€Â¨ `?` Ã¤Â¼Â Ã¦â€™Â­Ã©â€â„¢Ã¨Â¯Â¯
+* Ã¥â€¡Â½Ã¦â€¢Â°Ã¥Ââ€šÃ¦â€¢Â°Ã¤Â¸Â­Ã¤Â¼ËœÃ¥â€¦Ë†Ã¤Â½Â¿Ã§â€Â¨ `&str` Ã¨â‚¬Å’Ã©ÂÅ¾ `String`Ã¯Â¼â€ºÃ¦â€°â‚¬Ã¦Å“â€°Ã¦ÂÆ’Ã¨Â½Â¬Ã§Â§Â»Ã¦â€”Â¶Ã¨Â¿â€Ã¥â€ºÅ¾ `String`
+* Ã¤Â½Â¿Ã§â€Â¨ `clippy` Ã¥â€™Å’ `#![deny(clippy::all, clippy::pedantic)]` Ã¢â‚¬â€ Ã¤Â¿Â®Ã¥Â¤ÂÃ¦â€°â‚¬Ã¦Å“â€°Ã¨Â­Â¦Ã¥â€˜Å 
+* Ã¥Å“Â¨Ã¦â€°â‚¬Ã¦Å“â€°Ã¥â€¦Â¬Ã¥â€¦Â±Ã§Â±Â»Ã¥Å¾â€¹Ã¤Â¸Å Ã¦Â´Â¾Ã§â€Å¸ `Debug`Ã¯Â¼â€ºÃ¤Â»â€¦Ã¥Å“Â¨Ã©Å“â‚¬Ã¨Â¦ÂÃ¦â€”Â¶Ã¦Â´Â¾Ã§â€Å¸ `Clone`Ã£â‚¬Â`PartialEq`
+* Ã©â„¢Â¤Ã©ÂÅ¾Ã¦Å“â€° `// SAFETY:` Ã¦Â³Â¨Ã©â€¡Å Ã¨Â¯Â´Ã¦ËœÅ½Ã§Ââ€ Ã§â€Â±Ã¯Â¼Å’Ã¥ÂÂ¦Ã¥Ë†â„¢Ã¤Â¸ÂÃ¤Â½Â¿Ã§â€Â¨ `unsafe` Ã¥Ââ€”
+
+### Ã¦â€¢Â°Ã¦ÂÂ®Ã¥Âºâ€œ
+
+* Ã¦â€°â‚¬Ã¦Å“â€°Ã¦Å¸Â¥Ã¨Â¯Â¢Ã¤Â½Â¿Ã§â€Â¨ SQLx Ã§Å¡â€ž `query!` Ã¦Ë†â€“ `query_as!` Ã¥Â®Â Ã¢â‚¬â€ Ã©â€™Ë†Ã¥Â¯Â¹Ã¦Â¨Â¡Ã¥Â¼ÂÃ¨Â¿â€ºÃ¨Â¡Å’Ã§Â¼â€“Ã¨Â¯â€˜Ã¦â€”Â¶Ã©ÂªÅ’Ã¨Â¯Â
+* Ã¥Å“Â¨ `migrations/` Ã¤Â¸Â­Ã¤Â½Â¿Ã§â€Â¨ `sqlx migrate` Ã¨Â¿â€ºÃ¨Â¡Å’Ã¨Â¿ÂÃ§Â§Â» Ã¢â‚¬â€ Ã¥Ë†â€¡Ã¥â€¹Â¿Ã§â€ºÂ´Ã¦Å½Â¥Ã¤Â¿Â®Ã¦â€Â¹Ã¦â€¢Â°Ã¦ÂÂ®Ã¥Âºâ€œ
+* Ã¤Â½Â¿Ã§â€Â¨ `sqlx::Pool<Postgres>` Ã¤Â½Å“Ã¤Â¸ÂºÃ¥â€¦Â±Ã¤ÂºÂ«Ã§Å Â¶Ã¦â‚¬Â Ã¢â‚¬â€ Ã¥Ë†â€¡Ã¥â€¹Â¿Ã¤Â¸ÂºÃ¦Â¯ÂÃ¤Â¸ÂªÃ¨Â¯Â·Ã¦Â±â€šÃ¥Ë†â€ºÃ¥Â»ÂºÃ¨Â¿Å¾Ã¦Å½Â¥
+* Ã¦â€°â‚¬Ã¦Å“â€°Ã¦Å¸Â¥Ã¨Â¯Â¢Ã¤Â½Â¿Ã§â€Â¨Ã¥Ââ€šÃ¦â€¢Â°Ã¥Å’â€“Ã¥ÂÂ Ã¤Â½ÂÃ§Â¬Â¦ (`$1`, `$2`) Ã¢â‚¬â€ Ã¥Ë†â€¡Ã¥â€¹Â¿Ã¤Â½Â¿Ã§â€Â¨Ã¥Â­â€”Ã§Â¬Â¦Ã¤Â¸Â²Ã¦Â Â¼Ã¥Â¼ÂÃ¥Å’â€“
 
 ```rust
 // BAD: String interpolation (SQL injection risk)
@@ -37,11 +50,11 @@ let user = sqlx::query_as!(User, "SELECT * FROM users WHERE id = $1", id)
     .await?;
 ```
 
-### 错误处理
+### Ã©â€â„¢Ã¨Â¯Â¯Ã¥Â¤â€žÃ§Ââ€ 
 
-* 为每个模块使用 `thiserror` 定义一个领域错误枚举
-* 通过 `IntoResponse` 将错误映射到 HTTP 响应 — 切勿暴露内部细节
-* 使用 `tracing` 进行结构化日志记录 — 切勿使用 `println!` 或 `eprintln!`
+* Ã¤Â¸ÂºÃ¦Â¯ÂÃ¤Â¸ÂªÃ¦Â¨Â¡Ã¥Ââ€”Ã¤Â½Â¿Ã§â€Â¨ `thiserror` Ã¥Â®Å¡Ã¤Â¹â€°Ã¤Â¸â‚¬Ã¤Â¸ÂªÃ©Â¢â€ Ã¥Å¸Å¸Ã©â€â„¢Ã¨Â¯Â¯Ã¦Å¾Å¡Ã¤Â¸Â¾
+* Ã©â‚¬Å¡Ã¨Â¿â€¡ `IntoResponse` Ã¥Â°â€ Ã©â€â„¢Ã¨Â¯Â¯Ã¦ËœÂ Ã¥Â°â€žÃ¥Ë†Â° HTTP Ã¥â€œÂÃ¥Âºâ€ Ã¢â‚¬â€ Ã¥Ë†â€¡Ã¥â€¹Â¿Ã¦Å¡Â´Ã©Å“Â²Ã¥â€ â€¦Ã©Æ’Â¨Ã§Â»â€ Ã¨Å â€š
+* Ã¤Â½Â¿Ã§â€Â¨ `tracing` Ã¨Â¿â€ºÃ¨Â¡Å’Ã§Â»â€œÃ¦Å¾â€žÃ¥Å’â€“Ã¦â€”Â¥Ã¥Â¿â€”Ã¨Â®Â°Ã¥Â½â€¢ Ã¢â‚¬â€ Ã¥Ë†â€¡Ã¥â€¹Â¿Ã¤Â½Â¿Ã§â€Â¨ `println!` Ã¦Ë†â€“ `eprintln!`
 
 ```rust
 use thiserror::Error;
@@ -74,59 +87,59 @@ impl IntoResponse for AppError {
 }
 ```
 
-### 测试
+### Ã¦Âµâ€¹Ã¨Â¯â€¢
 
-* 单元测试放在每个源文件内的 `#[cfg(test)]` 模块中
-* 集成测试放在 `tests/` 目录中，使用真实的 PostgreSQL (Testcontainers 或 Docker)
-* 使用 `#[sqlx::test]` 进行数据库测试，包含自动迁移和回滚
-* 使用 `mockall` 或 `wiremock` 模拟外部服务
+* Ã¥Ââ€¢Ã¥â€¦Æ’Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¦â€Â¾Ã¥Å“Â¨Ã¦Â¯ÂÃ¤Â¸ÂªÃ¦ÂºÂÃ¦â€“â€¡Ã¤Â»Â¶Ã¥â€ â€¦Ã§Å¡â€ž `#[cfg(test)]` Ã¦Â¨Â¡Ã¥Ââ€”Ã¤Â¸Â­
+* Ã©â€ºâ€ Ã¦Ë†ÂÃ¦Âµâ€¹Ã¨Â¯â€¢Ã¦â€Â¾Ã¥Å“Â¨ `tests/` Ã§â€ºÂ®Ã¥Â½â€¢Ã¤Â¸Â­Ã¯Â¼Å’Ã¤Â½Â¿Ã§â€Â¨Ã§Å“Å¸Ã¥Â®Å¾Ã§Å¡â€ž PostgreSQL (Testcontainers Ã¦Ë†â€“ Docker)
+* Ã¤Â½Â¿Ã§â€Â¨ `#[sqlx::test]` Ã¨Â¿â€ºÃ¨Â¡Å’Ã¦â€¢Â°Ã¦ÂÂ®Ã¥Âºâ€œÃ¦Âµâ€¹Ã¨Â¯â€¢Ã¯Â¼Å’Ã¥Å’â€¦Ã¥ÂÂ«Ã¨â€¡ÂªÃ¥Å Â¨Ã¨Â¿ÂÃ§Â§Â»Ã¥â€™Å’Ã¥â€ºÅ¾Ã¦Â»Å¡
+* Ã¤Â½Â¿Ã§â€Â¨ `mockall` Ã¦Ë†â€“ `wiremock` Ã¦Â¨Â¡Ã¦â€¹Å¸Ã¥Â¤â€“Ã©Æ’Â¨Ã¦Å“ÂÃ¥Å Â¡
 
-### 代码风格
+### Ã¤Â»Â£Ã§Â ÂÃ©Â£Å½Ã¦Â Â¼
 
-* 最大行长度：100 个字符（由 rustfmt 强制执行）
-* 导入分组：`std`、外部 crate、`crate`/`super` — 用空行分隔
-* 模块：每个模块一个文件，`mod.rs` 仅用于重新导出
-* 类型：PascalCase，函数/变量：snake\_case，常量：UPPER\_SNAKE\_CASE
+* Ã¦Å“â‚¬Ã¥Â¤Â§Ã¨Â¡Å’Ã©â€¢Â¿Ã¥ÂºÂ¦Ã¯Â¼Å¡100 Ã¤Â¸ÂªÃ¥Â­â€”Ã§Â¬Â¦Ã¯Â¼Ë†Ã§â€Â± rustfmt Ã¥Â¼ÂºÃ¥Ë†Â¶Ã¦â€°Â§Ã¨Â¡Å’Ã¯Â¼â€°
+* Ã¥Â¯Â¼Ã¥â€¦Â¥Ã¥Ë†â€ Ã§Â»â€žÃ¯Â¼Å¡`std`Ã£â‚¬ÂÃ¥Â¤â€“Ã©Æ’Â¨ crateÃ£â‚¬Â`crate`/`super` Ã¢â‚¬â€ Ã§â€Â¨Ã§Â©ÂºÃ¨Â¡Å’Ã¥Ë†â€ Ã©Å¡â€
+* Ã¦Â¨Â¡Ã¥Ââ€”Ã¯Â¼Å¡Ã¦Â¯ÂÃ¤Â¸ÂªÃ¦Â¨Â¡Ã¥Ââ€”Ã¤Â¸â‚¬Ã¤Â¸ÂªÃ¦â€“â€¡Ã¤Â»Â¶Ã¯Â¼Å’`mod.rs` Ã¤Â»â€¦Ã§â€Â¨Ã¤ÂºÅ½Ã©â€¡ÂÃ¦â€“Â°Ã¥Â¯Â¼Ã¥â€¡Âº
+* Ã§Â±Â»Ã¥Å¾â€¹Ã¯Â¼Å¡PascalCaseÃ¯Â¼Å’Ã¥â€¡Â½Ã¦â€¢Â°/Ã¥ÂËœÃ©â€¡ÂÃ¯Â¼Å¡snake\_caseÃ¯Â¼Å’Ã¥Â¸Â¸Ã©â€¡ÂÃ¯Â¼Å¡UPPER\_SNAKE\_CASE
 
-## 文件结构
+## Ã¦â€“â€¡Ã¤Â»Â¶Ã§Â»â€œÃ¦Å¾â€ž
 
 ```
 src/
-  main.rs              # 入口点、服务器设置、优雅关闭
-  lib.rs               # 用于集成测试的重新导出
-  config.rs            # 使用 envy 或 figment 的环境配置
-  router.rs            # 包含所有路由的 Axum 路由器
+  main.rs              # Ã¥â€¦Â¥Ã¥ÂÂ£Ã§â€šÂ¹Ã£â‚¬ÂÃ¦Å“ÂÃ¥Å Â¡Ã¥â„¢Â¨Ã¨Â®Â¾Ã§Â½Â®Ã£â‚¬ÂÃ¤Â¼ËœÃ©â€ºâ€¦Ã¥â€¦Â³Ã©â€”Â­
+  lib.rs               # Ã§â€Â¨Ã¤ÂºÅ½Ã©â€ºâ€ Ã¦Ë†ÂÃ¦Âµâ€¹Ã¨Â¯â€¢Ã§Å¡â€žÃ©â€¡ÂÃ¦â€“Â°Ã¥Â¯Â¼Ã¥â€¡Âº
+  config.rs            # Ã¤Â½Â¿Ã§â€Â¨ envy Ã¦Ë†â€“ figment Ã§Å¡â€žÃ§Å½Â¯Ã¥Â¢Æ’Ã©â€¦ÂÃ§Â½Â®
+  router.rs            # Ã¥Å’â€¦Ã¥ÂÂ«Ã¦â€°â‚¬Ã¦Å“â€°Ã¨Â·Â¯Ã§â€Â±Ã§Å¡â€ž Axum Ã¨Â·Â¯Ã§â€Â±Ã¥â„¢Â¨
   middleware/
-    auth.rs            # JWT 提取与验证
-    logging.rs         # 请求/响应追踪
+    auth.rs            # JWT Ã¦ÂÂÃ¥Ââ€“Ã¤Â¸Å½Ã©ÂªÅ’Ã¨Â¯Â
+    logging.rs         # Ã¨Â¯Â·Ã¦Â±â€š/Ã¥â€œÂÃ¥Âºâ€Ã¨Â¿Â½Ã¨Â¸Âª
   handlers/
-    mod.rs             # 路由处理器（精简版——委托给服务层）
+    mod.rs             # Ã¨Â·Â¯Ã§â€Â±Ã¥Â¤â€žÃ§Ââ€ Ã¥â„¢Â¨Ã¯Â¼Ë†Ã§Â²Â¾Ã§Â®â‚¬Ã§â€°Ë†Ã¢â‚¬â€Ã¢â‚¬â€Ã¥Â§â€Ã¦â€°ËœÃ§Â»â„¢Ã¦Å“ÂÃ¥Å Â¡Ã¥Â±â€šÃ¯Â¼â€°
     users.rs
     orders.rs
   services/
-    mod.rs             # 业务逻辑
+    mod.rs             # Ã¤Â¸Å¡Ã¥Å Â¡Ã©â‚¬Â»Ã¨Â¾â€˜
     users.rs
     orders.rs
   repositories/
-    mod.rs             # 数据库访问（SQLx 查询）
+    mod.rs             # Ã¦â€¢Â°Ã¦ÂÂ®Ã¥Âºâ€œÃ¨Â®Â¿Ã©â€”Â®Ã¯Â¼Ë†SQLx Ã¦Å¸Â¥Ã¨Â¯Â¢Ã¯Â¼â€°
     users.rs
     orders.rs
   domain/
-    mod.rs             # 领域类型、错误枚举
+    mod.rs             # Ã©Â¢â€ Ã¥Å¸Å¸Ã§Â±Â»Ã¥Å¾â€¹Ã£â‚¬ÂÃ©â€â„¢Ã¨Â¯Â¯Ã¦Å¾Å¡Ã¤Â¸Â¾
     user.rs
     order.rs
 migrations/
   001_create_users.sql
   002_create_orders.sql
 tests/
-  common/mod.rs        # 共享测试辅助工具、测试服务器设置
-  api_users.rs         # 用户端点的集成测试
-  api_orders.rs        # 订单端点的集成测试
+  common/mod.rs        # Ã¥â€¦Â±Ã¤ÂºÂ«Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¨Â¾â€¦Ã¥Å Â©Ã¥Â·Â¥Ã¥â€¦Â·Ã£â‚¬ÂÃ¦Âµâ€¹Ã¨Â¯â€¢Ã¦Å“ÂÃ¥Å Â¡Ã¥â„¢Â¨Ã¨Â®Â¾Ã§Â½Â®
+  api_users.rs         # Ã§â€Â¨Ã¦Ë†Â·Ã§Â«Â¯Ã§â€šÂ¹Ã§Å¡â€žÃ©â€ºâ€ Ã¦Ë†ÂÃ¦Âµâ€¹Ã¨Â¯â€¢
+  api_orders.rs        # Ã¨Â®Â¢Ã¥Ââ€¢Ã§Â«Â¯Ã§â€šÂ¹Ã§Å¡â€žÃ©â€ºâ€ Ã¦Ë†ÂÃ¦Âµâ€¹Ã¨Â¯â€¢
 ```
 
-## 关键模式
+## Ã¥â€¦Â³Ã©â€Â®Ã¦Â¨Â¡Ã¥Â¼Â
 
-### Handler (薄层)
+### Handler (Ã¨â€“â€žÃ¥Â±â€š)
 
 ```rust
 async fn create_user(
@@ -138,7 +151,7 @@ async fn create_user(
 }
 ```
 
-### Service (业务逻辑)
+### Service (Ã¤Â¸Å¡Ã¥Å Â¡Ã©â‚¬Â»Ã¨Â¾â€˜)
 
 ```rust
 impl UserService {
@@ -155,7 +168,7 @@ impl UserService {
 }
 ```
 
-### Repository (数据访问)
+### Repository (Ã¦â€¢Â°Ã¦ÂÂ®Ã¨Â®Â¿Ã©â€”Â®)
 
 ```rust
 impl UserRepository {
@@ -183,7 +196,7 @@ impl UserRepository {
 }
 ```
 
-### 集成测试
+### Ã©â€ºâ€ Ã¦Ë†ÂÃ¦Âµâ€¹Ã¨Â¯â€¢
 
 ```rust
 #[tokio::test]
@@ -218,7 +231,7 @@ async fn test_create_user_duplicate_email() {
 }
 ```
 
-## 环境变量
+## Ã§Å½Â¯Ã¥Â¢Æ’Ã¥ÂËœÃ©â€¡Â
 
 ```bash
 # Server
@@ -237,7 +250,7 @@ JWT_EXPIRY_HOURS=24
 CORS_ALLOWED_ORIGINS=http://localhost:3000
 ```
 
-## 测试策略
+## Ã¦Âµâ€¹Ã¨Â¯â€¢Ã§Â­â€“Ã§â€¢Â¥
 
 ```bash
 # Run all tests
@@ -260,7 +273,7 @@ cargo clippy -- -D warnings
 cargo fmt -- --check
 ```
 
-## ECC 工作流
+## ECC Ã¥Â·Â¥Ã¤Â½Å“Ã¦ÂµÂ
 
 ```bash
 # Planning
@@ -277,9 +290,9 @@ cargo fmt -- --check
 /verify                 # Build, clippy, test, security scan
 ```
 
-## Git 工作流
+## Git Ã¥Â·Â¥Ã¤Â½Å“Ã¦ÂµÂ
 
-* `feat:` 新功能，`fix:` 错误修复，`refactor:` 代码变更
-* 从 `main` 创建功能分支，需要 PR
-* CI：`cargo fmt --check`、`cargo clippy`、`cargo test`、`cargo audit`
-* 部署：使用 `scratch` 或 `distroless` 基础镜像的 Docker 多阶段构建
+* `feat:` Ã¦â€“Â°Ã¥Å Å¸Ã¨Æ’Â½Ã¯Â¼Å’`fix:` Ã©â€â„¢Ã¨Â¯Â¯Ã¤Â¿Â®Ã¥Â¤ÂÃ¯Â¼Å’`refactor:` Ã¤Â»Â£Ã§Â ÂÃ¥ÂËœÃ¦â€ºÂ´
+* Ã¤Â»Å½ `main` Ã¥Ë†â€ºÃ¥Â»ÂºÃ¥Å Å¸Ã¨Æ’Â½Ã¥Ë†â€ Ã¦â€Â¯Ã¯Â¼Å’Ã©Å“â‚¬Ã¨Â¦Â PR
+* CIÃ¯Â¼Å¡`cargo fmt --check`Ã£â‚¬Â`cargo clippy`Ã£â‚¬Â`cargo test`Ã£â‚¬Â`cargo audit`
+* Ã©Æ’Â¨Ã§Â½Â²Ã¯Â¼Å¡Ã¤Â½Â¿Ã§â€Â¨ `scratch` Ã¦Ë†â€“ `distroless` Ã¥Å¸ÂºÃ§Â¡â‚¬Ã©â€¢Å“Ã¥Æ’ÂÃ§Å¡â€ž Docker Ã¥Â¤Å¡Ã©ËœÂ¶Ã¦Â®ÂµÃ¦Å¾â€žÃ¥Â»Âº
