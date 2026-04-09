@@ -46,7 +46,17 @@
       "Bash(python3:*)",
       "Bash(pip install:*)",
       "Bash(python -m pip install motor pymongo --quiet)",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "Bash(grep -E \"log$|\\\\.log\")"
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "berry",
+    "github",
+    "context7",
+    "exa",
+    "memory",
+    "playwright",
+    "sequential-thinking"
+  ]
 }

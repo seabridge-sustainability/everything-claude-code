@@ -1,4 +1,4 @@
-# Everything Claude Code (ECC) Ã¢â‚¬â€ Agent Instructions
+﻿# Everything Claude Code (ECC) ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Agent Instructions
 
 ## Safety And Authorization Rule
 
@@ -19,11 +19,11 @@ This is a **production-ready AI coding plugin** providing 30 specialized agents,
 
 ## Core Principles
 
-1. **Agent-First** Ã¢â‚¬â€ Delegate to specialized agents for domain tasks
-2. **Test-Driven** Ã¢â‚¬â€ Write tests before implementation, 80%+ coverage required
-3. **Security-First** Ã¢â‚¬â€ Never compromise on security; validate all inputs
-4. **Immutability** Ã¢â‚¬â€ Always create new objects, never mutate existing ones
-5. **Plan Before Execute** Ã¢â‚¬â€ Plan complex features before writing code
+1. **Agent-First** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Delegate to specialized agents for domain tasks
+2. **Test-Driven** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Write tests before implementation, 80%+ coverage required
+3. **Security-First** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Never compromise on security; validate all inputs
+4. **Immutability** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Always create new objects, never mutate existing ones
+5. **Plan Before Execute** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Plan complex features before writing code
 
 ## Documentation Retrieval Order
 
@@ -70,16 +70,16 @@ When documentation is needed, follow this order:
 ## Agent Orchestration
 
 Use agents proactively without user prompt:
-- Complex feature requests Ã¢â€ â€™ **planner**
-- Code just written/modified Ã¢â€ â€™ **code-reviewer**
-- Bug fix or new feature Ã¢â€ â€™ **tdd-guide**
-- Architectural decision Ã¢â€ â€™ **architect**
-- Security-sensitive code Ã¢â€ â€™ **security-reviewer**
-- Multi-channel communication triage Ã¢â€ â€™ **chief-of-staff**
-- Autonomous loops / loop monitoring Ã¢â€ â€™ **loop-operator**
-- Harness config reliability and cost Ã¢â€ â€™ **harness-optimizer**
+- Complex feature requests ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ **planner**
+- Code just written/modified ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ **code-reviewer**
+- Bug fix or new feature ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ **tdd-guide**
+- Architectural decision ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ **architect**
+- Security-sensitive code ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ **security-reviewer**
+- Multi-channel communication triage ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ **chief-of-staff**
+- Autonomous loops / loop monitoring ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ **loop-operator**
+- Harness config reliability and cost ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ **harness-optimizer**
 
-Use parallel execution for independent operations Ã¢â‚¬â€ launch multiple agents simultaneously.
+Use parallel execution for independent operations ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â launch multiple agents simultaneously.
 
 ## Security Guidelines
 
@@ -95,7 +95,7 @@ Use parallel execution for independent operations Ã¢â‚¬â€ launch mult
 
 **Secret management:** NEVER hardcode secrets. Use environment variables or a secret manager. Validate required secrets at startup. Rotate any exposed secrets immediately.
 
-**If security issue found:** STOP Ã¢â€ â€™ use security-reviewer agent Ã¢â€ â€™ fix CRITICAL issues Ã¢â€ â€™ rotate exposed secrets Ã¢â€ â€™ review codebase for similar issues.
+**If security issue found:** STOP ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ use security-reviewer agent ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ fix CRITICAL issues ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ rotate exposed secrets ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ review codebase for similar issues.
 
 ## Coding Style
 
@@ -118,34 +118,34 @@ Use parallel execution for independent operations Ã¢â‚¬â€ launch mult
 **Minimum coverage: 80%**
 
 Test types (all required):
-1. **Unit tests** Ã¢â‚¬â€ Individual functions, utilities, components
-2. **Integration tests** Ã¢â‚¬â€ API endpoints, database operations
-3. **E2E tests** Ã¢â‚¬â€ Critical user flows
+1. **Unit tests** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Individual functions, utilities, components
+2. **Integration tests** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â API endpoints, database operations
+3. **E2E tests** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Critical user flows
 
 **TDD workflow (mandatory):**
-1. Write test first (RED) Ã¢â‚¬â€ test should FAIL
-2. Write minimal implementation (GREEN) Ã¢â‚¬â€ test should PASS
-3. Refactor (IMPROVE) Ã¢â‚¬â€ verify coverage 80%+
+1. Write test first (RED) ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â test should FAIL
+2. Write minimal implementation (GREEN) ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â test should PASS
+3. Refactor (IMPROVE) ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â verify coverage 80%+
 
-Troubleshoot failures: check test isolation Ã¢â€ â€™ verify mocks Ã¢â€ â€™ fix implementation (not tests, unless tests are wrong).
+Troubleshoot failures: check test isolation ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ verify mocks ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ fix implementation (not tests, unless tests are wrong).
 
 ## Development Workflow
 
-1. **Plan** Ã¢â‚¬â€ Use planner agent, identify dependencies and risks, break into phases
-2. **TDD** Ã¢â‚¬â€ Use tdd-guide agent, write tests first, implement, refactor
-3. **Review** Ã¢â‚¬â€ Use code-reviewer agent immediately, address CRITICAL/HIGH issues
+1. **Plan** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Use planner agent, identify dependencies and risks, break into phases
+2. **TDD** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Use tdd-guide agent, write tests first, implement, refactor
+3. **Review** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Use code-reviewer agent immediately, address CRITICAL/HIGH issues
 4. **Capture knowledge in the right place**
-   - Personal debugging notes, preferences, and temporary context Ã¢â€ â€™ auto memory
-   - Team/project knowledge (architecture decisions, API changes, runbooks) Ã¢â€ â€™ the project's existing docs structure
+   - Personal debugging notes, preferences, and temporary context ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ auto memory
+   - Team/project knowledge (architecture decisions, API changes, runbooks) ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ the project's existing docs structure
    - If the current task already produces the relevant docs or code comments, do not duplicate the same information elsewhere
    - If there is no obvious project doc location, ask before creating a new top-level file
-5. **Commit** Ã¢â‚¬â€ Conventional commits format, comprehensive PR summaries
+5. **Commit** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Conventional commits format, comprehensive PR summaries
 
 ## Git Workflow
 
-**Commit format:** `<type>: <description>` Ã¢â‚¬â€ Types: feat, fix, refactor, docs, test, chore, perf, ci
+**Commit format:** `<type>: <description>` ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Types: feat, fix, refactor, docs, test, chore, perf, ci
 
-**PR workflow:** Analyze full commit history Ã¢â€ â€™ draft comprehensive summary Ã¢â€ â€™ include test plan Ã¢â€ â€™ push with `-u` flag.
+**PR workflow:** Analyze full commit history ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ draft comprehensive summary ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ include test plan ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ push with `-u` flag.
 
 ## Architecture Patterns
 
@@ -159,19 +159,19 @@ Troubleshoot failures: check test isolation Ã¢â€ â€™ verify mocks Ã�
 
 **Context management:** Avoid last 20% of context window for large refactoring and multi-file features. Lower-sensitivity tasks (single edits, docs, simple fixes) tolerate higher utilization.
 
-**Build troubleshooting:** Use build-error-resolver agent Ã¢â€ â€™ analyze errors Ã¢â€ â€™ fix incrementally Ã¢â€ â€™ verify after each fix.
+**Build troubleshooting:** Use build-error-resolver agent ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ analyze errors ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ fix incrementally ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ verify after each fix.
 
 ## Project Structure
 
 ```
-agents/          Ã¢â‚¬â€ 30 specialized subagents
-skills/          Ã¢â‚¬â€ ~74 workflow skills and domain knowledge
-commands/        Ã¢â‚¬â€ 60 slash commands
-hooks/           Ã¢â‚¬â€ Trigger-based automations
-rules/           Ã¢â‚¬â€ Always-follow guidelines (common + per-language)
-scripts/         Ã¢â‚¬â€ Cross-platform Node.js utilities
-mcp-configs/     Ã¢â‚¬â€ 14 MCP server configurations
-tests/           Ã¢â‚¬â€ Test suite
+agents/          ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â 30 specialized subagents
+skills/          ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ~74 workflow skills and domain knowledge
+commands/        ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â 60 slash commands
+hooks/           ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Trigger-based automations
+rules/           ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Always-follow guidelines (common + per-language)
+scripts/         ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Cross-platform Node.js utilities
+mcp-configs/     ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â 14 MCP server configurations
+tests/           ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Test suite
 ```
 
 ## Success Metrics
@@ -181,3 +181,156 @@ tests/           Ã¢â‚¬â€ Test suite
 - Code is readable and maintainable
 - Performance is acceptable
 - User requirements are met
+
+## graphify
+
+This project has a graphify knowledge graph at graphify-out/.
+
+Rules:
+- Before answering architecture or codebase questions, read graphify-out/GRAPH_REPORT.md for god nodes and community structure
+- If graphify-out/wiki/index.md exists, navigate it instead of reading raw files
+- After modifying code files in this session, run `python3 -c "from graphify.watch import _rebuild_code; from pathlib import Path; _rebuild_code(Path('.'))"` to keep the graph current
+
+## paper2agent
+
+Purpose:
+- Convert a research-paper code repository into an interactive MCP-backed agent.
+
+Trigger phrases:
+- `paper2agent`
+- `academic paper to agent`
+- `build paper mcp agent`
+
+Required inputs:
+- `project_dir`
+- `github_url`
+
+Optional inputs:
+- `tutorials`
+- `api`
+- `benchmark`
+
+Run commands:
+- `powershell -ExecutionPolicy Bypass -File .\paper2agent.ps1 -ProjectDir <PROJECT_DIR> -GithubUrl <GITHUB_URL>`
+- `powershell -ExecutionPolicy Bypass -File .\paper2agent.ps1 -ProjectDir <PROJECT_DIR> -GithubUrl <GITHUB_URL> -Tutorials "<FILTER>"`
+- `powershell -ExecutionPolicy Bypass -File .\paper2agent.ps1 -ProjectDir <PROJECT_DIR> -GithubUrl <GITHUB_URL> -ApiKey <API_KEY> -Benchmark`
+
+Outputs:
+- `<project_dir>/src/<repo_name>_mcp.py`
+- `<project_dir>/src/tools/`
+- `<project_dir>/reports/`
+
+Storage path:
+- `C:\Users\adelm\SeaBridgeAI\autoresearch\Paper2Agent`
+
+## paper2agent-bench
+
+Purpose:
+- Evaluate generated paper agents with the official Paper2AgentBench datasets and scripts.
+
+Trigger phrases:
+- `paper2agent-bench`
+- `paper agent benchmark`
+- `evaluate paper mcp agent`
+
+Required inputs:
+- benchmark action: `install`, `register-mcp`, `labels`, `analyze`
+
+Run commands:
+- `powershell -ExecutionPolicy Bypass -File .\paper2agent-bench.ps1 -Action install`
+- `powershell -ExecutionPolicy Bypass -File .\paper2agent-bench.ps1 -Action register-mcp`
+- `powershell -ExecutionPolicy Bypass -File .\paper2agent-bench.ps1 -Action labels`
+- `powershell -ExecutionPolicy Bypass -File .\paper2agent-bench.ps1 -Action analyze`
+
+Outputs:
+- benchmark outputs under `eval/` and analysis summaries.
+
+Storage path:
+- `C:\Users\adelm\SeaBridgeAI\autoresearch\Paper2AgentBench`
+
+## ai-coscientist
+
+Purpose:
+- Multi-agent scientific ideation and supervision using the Swarm Corporation's AI-CoScientist framework. Generates research hypotheses, coordinates specialist agent pipelines, and synthesizes findings across ESG and sustainability domains.
+
+Trigger phrases:
+- `ai-coscientist`
+- `co-scientist`
+- `multi-agent research ideation`
+- `swarm coscientist`
+
+Required inputs:
+- Research task description (`-Task`)
+
+Optional inputs:
+- Additional environment variables for API keys (e.g., `OPENAI_API_KEY`)
+
+Run commands:
+```powershell
+# Check stack readiness first
+powershell -ExecutionPolicy Bypass -File "C:\Users\adelm\SeaBridgeAI\manageesg-backend\co-scientist-orchestrator.ps1" -Action status
+
+# Dry-run to preview command
+powershell -ExecutionPolicy Bypass -File "C:\Users\adelm\SeaBridgeAI\manageesg-backend\co-scientist-orchestrator.ps1" -Action run-coscientist -Task "Identify ESG risk factors in climate transition scenarios" -DryRun
+
+# Execute (requires explicit approval — incurs API cost)
+powershell -ExecutionPolicy Bypass -File "C:\Users\adelm\SeaBridgeAI\manageesg-backend\co-scientist-orchestrator.ps1" -Action run-coscientist -Task "Identify ESG risk factors in climate transition scenarios"
+```
+
+Outputs:
+- Research hypotheses and synthesis documents in the AI-CoScientist output directory.
+- Multi-agent conversation logs and ideation traces.
+
+Storage path:
+- Source-of-truth repo: `C:\Users\adelm\SeaBridgeAI\autoresearch\AI-CoScientist`
+- Clone: `git clone https://github.com/The-Swarm-Corporation/AI-CoScientist "C:\Users\adelm\SeaBridgeAI\autoresearch\AI-CoScientist"`
+
+Safety and cost notice:
+- Manual opt-in ONLY. Do not auto-run via hooks.
+- Requires explicit written approval from adelmar@seabridge.ai.
+- Invokes many LLM calls; may incur significant API cost.
+
+## ai-scientist
+
+Purpose:
+- Autonomous experiment generation using Sakana AI's AI-Scientist framework. Generates novel research ideas, writes experiment code, executes experiments, and produces paper-style write-ups. MUST be run in an isolated/sandboxed environment because it executes model-written code.
+
+Trigger phrases:
+- `ai-scientist`
+- `autonomous experiment`
+- `sakana scientist`
+- `automated research paper`
+
+Required inputs:
+- None required (generates ideas autonomously), but `-Idea` seed is recommended
+
+Optional inputs:
+- `-Idea <text>` — seed idea to guide experiment generation
+
+Run commands:
+```powershell
+# Check stack readiness first
+powershell -ExecutionPolicy Bypass -File "C:\Users\adelm\SeaBridgeAI\manageesg-backend\co-scientist-orchestrator.ps1" -Action status
+
+# Dry-run (always prints ISOLATION WARNING even in dry-run)
+powershell -ExecutionPolicy Bypass -File "C:\Users\adelm\SeaBridgeAI\manageesg-backend\co-scientist-orchestrator.ps1" -Action run-ai-scientist -DryRun
+
+# Execute with seed idea (ISOLATION REQUIRED — sandboxed environment only)
+powershell -ExecutionPolicy Bypass -File "C:\Users\adelm\SeaBridgeAI\manageesg-backend\co-scientist-orchestrator.ps1" -Action run-ai-scientist -Idea "Novel ESG metric combining physical risk and regulatory exposure"
+```
+
+Outputs:
+- Generated experiment code and results under AI-Scientist output directories.
+- Paper-style LaTeX write-ups of experiment findings.
+- Review scores and analysis reports.
+
+Storage path:
+- Source-of-truth repo: `C:\Users\adelm\SeaBridgeAI\autoresearch\ai-scientist`
+- Clone: `git clone https://github.com/sakanaai/ai-scientist "C:\Users\adelm\SeaBridgeAI\autoresearch\ai-scientist"`
+
+Safety and isolation notice:
+- **ISOLATION REQUIRED.** This framework generates and EXECUTES model-written code.
+- Never run on a production machine or shared infrastructure.
+- Manual opt-in ONLY. Do not auto-run via hooks.
+- Requires explicit written approval from adelmar@seabridge.ai.
+
