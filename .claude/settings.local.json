@@ -47,7 +47,10 @@
       "Bash(pip install:*)",
       "Bash(python -m pip install motor pymongo --quiet)",
       "Bash(python:*)",
-      "Bash(grep -E \"log$|\\\\.log\")"
+      "Bash(grep -E \"log$|\\\\.log\")",
+      "Bash(pip index:*)",
+      "Bash(npm install:*)",
+      "Bash(ls node_modules/mapbox-gl/*.md)"
     ]
   },
   "enabledMcpjsonServers": [
