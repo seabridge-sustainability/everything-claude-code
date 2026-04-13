@@ -149,5 +149,60 @@ Use the following skills when working on related files:
 | `README.md` | `/readme` |
 | `.github/workflows/*.yml` | `/ci-workflow` |
 | `commands/docs.md`, `agents/docs-lookup.md`, `skills/documentation-lookup/SKILL.md` | `documentation-lookup` |
+| Memory/session continuity, project recall, backend memory questions | `agent-memory` |
 
 When spawning subagents, always pass conventions from the respective skill into the agent's prompt.
+
+## Memory
+
+Purpose:
+- Use the `agent-memory` skill to distinguish session continuity, project working memory, and backend runtime memory instead of treating them as one system.
+
+Trigger phrases:
+- `memory`
+- `remember this`
+- `session memory`
+- `project memory`
+- `retrieve prior context`
+- `agent memory`
+
+Required inputs:
+- memory intent: `session`, `project`, or `runtime`
+
+Optional inputs:
+- `ide` (`claude-code` or `gemini-cli`)
+- project path
+- tenant or runtime scope
+
+Run and usage commands:
+- `npx claude-mem --help`
+- `npx claude-mem install`
+- `npx claude-mem install --ide gemini-cli`
+- `/ck:init`
+- `/ck:save`
+- `/ck:resume`
+
+Outputs:
+- retrieved context block with source attribution
+- saved session or project memory artifact
+- clear routing to the correct memory layer
+
+Storage and source of truth:
+- `claude-mem`: optional user-level plugin backend for Claude Code and Gemini CLI session continuity
+- `ck`: ECC-native per-project working context
+- `continuous-learning-v2`: reusable learned behaviors and instincts
+- `manageesg-backend` `sustainability_ai.memory`: runtime memory for deployed agents
+
+Compatibility and retrieval order:
+- Do not auto-enable `claude-mem` retrieval hooks when ECC memory hooks already inject the same kind of summary
+- Observation hooks may coexist, but one summary surface should own retrieval/injection
+- Retrieval order:
+  1. local repo docs and `AGENTS.md`/`CLAUDE.md`
+  2. ECC project memory via `ck` and `continuous-learning-v2`
+  3. `claude-mem` session observations
+  4. backend runtime memory only for application agent data flows
+
+Safety notes:
+- `claude-mem` is a supplement to ECC memory, not a replacement
+- do not duplicate the same fact into all three memory systems unless explicitly requested
+- do not treat `claude-mem` as team/project source of truth

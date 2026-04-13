@@ -191,6 +191,64 @@ Rules:
 - If graphify-out/wiki/index.md exists, navigate it instead of reading raw files
 - After modifying code files in this session, run `python3 -c "from graphify.watch import _rebuild_code; from pathlib import Path; _rebuild_code(Path('.'))"` to keep the graph current
 
+## memory
+
+Purpose:
+- Route memory requests to the right SeaBridge memory layer without duplicating facts across session memory, project memory, and backend runtime memory.
+
+Trigger phrases:
+- `memory`
+- `remember this`
+- `session memory`
+- `project memory`
+- `retrieve prior context`
+- `agent memory`
+
+Required inputs:
+- memory intent: `session`, `project`, or `runtime`
+
+Optional inputs:
+- `ide` (`claude-code` or `gemini-cli`)
+- project path
+- target repo or tenant context
+
+Run and usage commands:
+- `npx claude-mem --help` to check whether `claude-mem` is already available before proposing install
+- `npx claude-mem install` for Claude Code session memory
+- `npx claude-mem install --ide gemini-cli` for Gemini CLI session memory
+- `/ck:init`, `/ck:save`, `/ck:resume` for ECC-native project memory workflows
+
+Outputs:
+- retrieved context block
+- saved session summary or project snapshot
+- source attribution for which memory layer was used
+
+Storage and source of truth:
+- `claude-mem`: optional user-level session continuity backend for Claude Code and Gemini CLI only
+- `ck`: per-project working context
+- `continuous-learning-v2`: reusable project/operator instincts
+- `manageesg-backend` `sustainability_ai.memory`: runtime memory for deployed agents
+
+Compatibility and retrieval order:
+- Do not auto-enable `claude-mem` hooks when ECC hooks already own the same retrieval/injection event without a precedence rule
+- Observation hooks may coexist; retrieval should prefer one summary surface
+- Retrieval order:
+  1. repo-local docs and `AGENTS.md`/`CLAUDE.md`
+  2. ECC project memory via `ck` and `continuous-learning-v2`
+  3. `claude-mem` session observations
+  4. backend durable memory only for application/runtime agent flows
+
+Safety notes:
+- `claude-mem` is optional infrastructure, not repo truth
+- do not duplicate the same fact into all memory systems unless explicitly requested
+- do not wire `claude-mem` directly into backend runtime memory in this pass
+
+SeaBridge memory matrix:
+- `claude-mem`: personal/session continuity
+- `ck`: per-project working context
+- `continuous-learning-v2`: reusable learned behaviors
+- `backend memory`: tenant-scoped runtime memory in the product
+
 ## paper2agent
 
 Purpose:
@@ -333,4 +391,29 @@ Safety and isolation notice:
 - Never run on a production machine or shared infrastructure.
 - Manual opt-in ONLY. Do not auto-run via hooks.
 - Requires explicit written approval from adelmar@seabridge.ai.
+
+## rtk
+
+RTK (Rust Token Killer) v0.35.0 is installed and active. It proxies shell commands to produce compressed, LLM-optimized output, reducing token consumption by 60–90% on verbose commands.
+
+Binary: `C:\Users\adelm\.local\bin\rtk.exe`
+Config: `C:\Users\adelm\AppData\Roaming\rtk\config.toml`
+
+Usage — prefix any shell command with `rtk`:
+```
+rtk git status
+rtk git diff HEAD~1
+rtk cargo build
+```
+
+Scope: RTK only intercepts Bash/shell tool calls. It does NOT apply to built-in Read/Grep/Glob tools.
+
+Key RTK commands:
+- `rtk gain` — show token reduction statistics for the session
+- `rtk --version` — confirm binary is reachable
+
+Agent integrations:
+- Claude Code: CLAUDE.md injection (Windows — hook-based mode requires Unix)
+- Codex: `@C:\Users\adelm\.codex\RTK.md` via `~/.codex/AGENTS.md`
+- Gemini CLI: BeforeTool hook at `~/.gemini/hooks/rtk-hook-gemini.sh`
 

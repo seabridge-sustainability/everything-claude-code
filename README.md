@@ -217,8 +217,13 @@ Get up and running in under 2 minutes:
 git clone https://github.com/affaan-m/everything-claude-code.git
 cd everything-claude-code
 
-# Install dependencies (pick your package manager)
+# Install dependencies — requires Node.js ≥18 (REQUIRED step; skills won't load without it)
+# Check your version first: node --version
 npm install        # or: pnpm install | yarn install | bun install
+
+# Verify installation succeeded
+node -e "require('./node_modules/.bin/..'); console.log('✓ dependencies OK')" 2>/dev/null \
+  || ls node_modules/.bin | head -5   # should list binaries if install worked
 
 # macOS/Linux
 
