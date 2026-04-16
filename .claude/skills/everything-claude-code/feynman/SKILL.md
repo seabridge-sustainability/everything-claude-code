@@ -79,14 +79,15 @@ Skills files land in `.feynman/skills/` and can be listed with `feynman skills l
 
 ---
 
-## Integration with AI-CoScientist workflow
+## Integration with Paper2Agent workflow
 
-Feynman complements AI-CoScientist (multi-agent ideation, Swarm) and AI-Scientist
-(autonomous experiment execution). Use them together:
+Feynman feeds directly into Paper2Agent for converting key methodology papers into MCP-backed agents:
 
 1. **Feynman** — gather cited literature and state-of-the-art summaries on a topic
-2. **AI-CoScientist** — run multi-agent ideation seeded with Feynman's output
-3. **AI-Scientist** — generate and execute experiments based on ideation results (isolated env required)
+2. **Paper2Agent** — convert the most relevant paper/repo into an interactive MCP-backed agent
+
+> **Note:** AI-CoScientist (Swarm) is archived (`autoresearch/archived/AI-CoScientist/`) and
+> AI-Scientist (Sakana AI) is deleted. Neither is part of the active pipeline.
 
 ---
 

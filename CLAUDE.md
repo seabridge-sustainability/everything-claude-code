@@ -102,7 +102,7 @@ File naming: lowercase with hyphens (e.g. `python-reviewer.md`, `tdd-workflow.md
 
 ## gstack
 
-gstack is installed at `~/.claude/skills/gstack/` and provides 35 specialist skills. Use `/browse` for **all web browsing** Ã¢â‚¬â€ never use `mcp__claude-in-chrome__*` tools.
+gstack is installed at `~/.claude/skills/gstack/` and provides 35 specialist skills. Use `/browse` for **all web browsing** — never use `mcp__claude-in-chrome__*` tools.
 
 | Skill | When to Use |
 |-------|-------------|
@@ -112,16 +112,16 @@ gstack is installed at `~/.claude/skills/gstack/` and provides 35 specialist ski
 | `/plan-eng-review` | Architecture, data flow, state machines, test matrix |
 | `/plan-design-review` | Visual/UX review of plans |
 | `/plan-devex-review` | Developer experience review of plans |
-| `/review` | Pre-PR review Ã¢â‚¬â€ SQL safety, secrets, architecture, logic |
+| `/review` | Pre-PR review — SQL safety, secrets, architecture, logic |
 | `/cso` | Security audit: OWASP + STRIDE, secrets archaeology, deps |
 | `/qa` | Test a live URL in a headless browser, find + fix bugs |
 | `/qa-only` | Report-only QA pass (no auto-fix) |
-| `/browse` | All web browsing Ã¢â‚¬â€ replaces Chrome MCP tools |
+| `/browse` | All web browsing — replaces Chrome MCP tools |
 | `/investigate` | Systematic root-cause debugging |
-| `/ship` | Full ship workflow: tests Ã¢â€ â€™ review Ã¢â€ â€™ version bump Ã¢â€ â€™ PR |
+| `/ship` | Full ship workflow: tests → review → version bump → PR |
 | `/land-and-deploy` | Merge PR, wait for CI/deploy, verify production |
 | `/canary` | Post-deploy monitoring for errors/regressions |
-| `/design-review` | Visual QA Ã¢â‚¬â€ spacing, hierarchy, AI slop detection |
+| `/design-review` | Visual QA — spacing, hierarchy, AI slop detection |
 | `/design-html` | Generate production-quality HTML/CSS |
 | `/design-consultation` | Product + landscape research, propose design direction |
 | `/design-shotgun` | Generate multiple design variants for comparison |
