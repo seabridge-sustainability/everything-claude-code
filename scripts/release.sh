@@ -71,7 +71,7 @@ update_version() {
 # Update all shipped package/plugin manifests
 update_version "$ROOT_PACKAGE_JSON" "s|\"version\": *\"[^\"]*\"|\"version\": \"$VERSION\"|"
 update_version "$PLUGIN_JSON" "s|\"version\": *\"[^\"]*\"|\"version\": \"$VERSION\"|"
-update_version "$MARKETPLACE_JSON" "0,/\"version\": *\"[^\"]*\"/s|\"version\": *\"[^\"]*\"|\"version\": \"$VERSION\"|"
+perl -i -0pe "s|\"version\": *\"[^\"]*\"|\"version\": \"$VERSION\"|" "$MARKETPLACE_JSON"
 update_version "$OPENCODE_PACKAGE_JSON" "s|\"version\": *\"[^\"]*\"|\"version\": \"$VERSION\"|"
 
 # Stage, commit, tag, and push

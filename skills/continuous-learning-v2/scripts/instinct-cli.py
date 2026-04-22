@@ -246,8 +246,10 @@ def _update_registry(pid: str, pname: str, proot: str, premote: str) -> None:
         os.replace(tmp_file, REGISTRY_FILE)
     finally:
         if lock_fd is not None:
-            fcntl.flock(lock_fd, fcntl.LOCK_UN)
-            lock_fd.close()
+            try:
+                fcntl.flock(lock_fd, fcntl.LOCK_UN)
+            finally:
+                lock_fd.close()
 
 
 def load_registry() -> dict:

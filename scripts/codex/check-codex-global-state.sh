@@ -4,6 +4,11 @@ set -euo pipefail
 # ECC Codex global regression sanity check.
 # Validates that global ~/.codex state matches expected ECC integration.
 
+if ! command -v rg >/dev/null 2>&1; then
+  echo "ERROR: 'rg' (ripgrep) is required but not installed. Install it via: brew install ripgrep / apt install ripgrep" >&2
+  exit 1
+fi
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"

@@ -10,7 +10,7 @@
 # Registered via plugin hooks/hooks.json (auto-loaded when plugin is enabled).
 # Can also be registered manually in ~/.claude/settings.json.
 
-set -e
+set -eo pipefail
 
 # Hook phase from CLI argument: "pre" (PreToolUse) or "post" (PostToolUse)
 HOOK_PHASE="${1:-post}"

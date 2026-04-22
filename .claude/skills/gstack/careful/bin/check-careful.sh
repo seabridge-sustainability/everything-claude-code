@@ -29,7 +29,9 @@ CMD_LOWER=$(printf '%s' "$CMD" | tr '[:upper:]' '[:lower:]')
 if printf '%s' "$CMD" | grep -qE 'rm\s+(-[a-zA-Z]*r[a-zA-Z]*\s+|--recursive\s+)' 2>/dev/null; then
   SAFE_ONLY=true
   RM_ARGS=$(printf '%s' "$CMD" | sed -E 's/.*rm\s+(-[a-zA-Z]+\s+)*//;s/--recursive\s*//')
-  for target in $RM_ARGS; do
+  # Use read -ra to avoid glob expansion on unquoted $RM_ARGS
+  IFS=' ' read -ra RM_TARGETS <<< "$RM_ARGS"
+  for target in "${RM_TARGETS[@]}"; do
     case "$target" in
       */node_modules|node_modules|*/\.next|\.next|*/dist|dist|*/__pycache__|__pycache__|*/\.cache|\.cache|*/build|build|*/\.turbo|\.turbo|*/coverage|coverage)
         ;; # safe target
