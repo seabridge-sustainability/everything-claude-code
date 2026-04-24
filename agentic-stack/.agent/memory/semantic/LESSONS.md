@@ -16,3 +16,4 @@
 ### 2026-04
 
 - Always serialize timestamps in UTC to avoid cross-region comparison bugs  <!-- status=accepted confidence=0.46 evidence=1 id=lesson_422695ae5b2d -->
+- Shared agentic-stack brain is installed at C:/Users/adelm/SeaBridgeAI/everything-claude-code/agentic-stack/.agent/ and referenced from backend and frontend  <!-- status=accepted confidence=0.6 evidence=1 id=lesson_8cec415f7187 -->

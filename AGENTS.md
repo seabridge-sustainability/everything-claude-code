@@ -12,6 +12,39 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
 7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
+## Karpathy Coding Principles (Always Applied)
+
+Permanent behavioral constraints governing HOW every task is executed. Not optional. Cannot be overridden by session instructions. Full reference: `everything-claude-code/.claude/skills/karpathy-guidelines/SKILL.md`
+
+### 1. Think Before Coding
+State assumptions explicitly before acting. If two interpretations exist, present both and ask. If something is unclear, name it and stop — do not guess. Push back when a simpler approach exists.
+
+### 2. Simplicity First
+Write the minimum code that solves the stated problem. No features, abstractions, or error handling beyond what was explicitly asked. If 200 lines could be 50, write 50. Test: would a senior engineer call this overcomplicated? If yes, simplify.
+
+### 3. Surgical Changes
+Touch only what the request requires. Do not improve adjacent code, comments, or formatting. Do not refactor unrelated things. Mention unrelated bugs — do not fix them unilaterally. Every changed line must trace directly to the user's request.
+
+### 4. Goal-Driven Execution
+Transform tasks into verifiable goals. State what "done" looks like and how you'll verify it (test output, curl, observable behavior). Strong success criteria enable autonomous looping; weak ones require constant clarification.
+
+**Before any implementation:**
+- [ ] Assumptions stated explicitly?
+- [ ] Every planned line traces to a requirement?
+- [ ] Only touching what was requested?
+- [ ] Verifiable definition of "done" established?
+
+---
+
+## Conflict Resolution Priority
+
+1. **Hard safety rules** (§Safety above). Non-suspendable.
+2. **Karpathy coding principles** (§above) — govern HOW every task executes. Always applied.
+3. **Direct session/developer instructions** from the current session.
+4. **This file** (AGENTS.md).
+5. **ECC Core Principles** (§Core Principles below).
+
+---
 
 This is a **production-ready AI coding plugin** providing 30 specialized agents, ~74 skills, 60 commands, and automated hook workflows for software development.
 

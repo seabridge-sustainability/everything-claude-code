@@ -1423,4 +1423,40 @@ MIT - Use freely, modify as needed, contribute back if you can.
 
 ---
 
+## SeaBridgeAI Workspace Role
+
+`everything-claude-code` (ECC) is the **developer-tooling hub** for the SeaBridgeAI workspace. It does not run in production and is not imported by any backend or frontend service.
+
+### What ECC Does in the SeaBridgeAI Stack
+
+| ECC Component | What It Provides | Who Consumes It |
+|--------------|-----------------|-----------------|
+| `CLAUDE.md` | Global Claude Code session rules loaded on every `claude` invocation | Claude Code (all repos) |
+| `AGENTS.md` | Equivalent governance file for Gemini CLI and OpenAI Codex | Gemini CLI, Codex (all repos) |
+| `.claude/skills/` | Reusable implementation playbooks (`/plan`, `/ship`, `/qa`, etc.) | Claude Code sessions |
+| `.claude/agents/` | Specialized sub-agents (planner, reviewer, tdd-guide, etc.) | Claude Code sessions |
+| `.mcp.json` | MCP server registrations: Berry, GitHub, Context7, Exa, FalkorDB, Playwright, Memory | Gemini CLI when run from ECC root |
+| `references/` | Curated OSS reference clones (`awesome-llm-apps`, `agent-skills`) | Coding agents looking for patterns |
+| `agentic-stack/` | Portable agent memory layer shared across Claude Code, Codex, Gemini, Cursor | All coding agents via CLI tools |
+
+### What ECC Does NOT Do
+
+- ECC is **not imported** by `manageesg-backend` or `manageesg-frontend` at runtime.
+- ECC skills and agents are invoked interactively during development sessions only.
+- ECC does not contain application code, database models, or API endpoints.
+
+### Connectivity in the Workspace
+
+```
+everything-claude-code/  ──→  manageesg-backend/   (via CLAUDE.md, skills, agents — dev time only)
+                         ──→  manageesg-frontend/   (via CLAUDE.md, skills — dev time only)
+                         ──→  autoresearch/         (via CLAUDE.md, AGENTS.md — dev time only)
+                         ──→  climada-stack/        (via CLAUDE.md, AGENTS.md — dev time only)
+                         ──→  openseabri/           (via CLAUDE.md, AGENTS.md — dev time only)
+```
+
+No arrow goes the other way. Runtime services have zero dependency on ECC.
+
+---
+
 **Star this repo if it helps. Read both guides. Build something great.**

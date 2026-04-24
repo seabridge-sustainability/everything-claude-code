@@ -96,3 +96,9 @@ ecc2/target/
 .opencode/node_modules/
 assets/images/security/badrudi-exploit.mp4
 .gstack/
+
+# graphify outputs (added by graphify setup)
+graphify-out/cache/
+graphify-out/manifest.json
+graphify-out/cost.json
+graphify-obsidian/

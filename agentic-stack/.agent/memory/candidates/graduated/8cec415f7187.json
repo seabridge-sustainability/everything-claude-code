@@ -1,0 +1,49 @@
+{
+  "id": "8cec415f7187",
+  "key": "manual_8cec41",
+  "name": "manual_8cec41",
+  "claim": "Shared agentic-stack brain is installed at C:/Users/adelm/SeaBridgeAI/everything-claude-code/agentic-stack/.agent/ and referenced from backend and frontend",
+  "conditions": [
+    "adelm",
+    "agent",
+    "agentic-stack",
+    "backend",
+    "brain",
+    "everything-claude-code",
+    "frontend",
+    "installed",
+    "referenced",
+    "seabridgeai",
+    "shared",
+    "users"
+  ],
+  "evidence_ids": [
+    "2026-04-22T11:55:11.732518"
+  ],
+  "cluster_size": 1,
+  "canonical_salience": 8.0,
+  "staged_at": "2026-04-22T11:55:11.732518",
+  "status": "accepted",
+  "decisions": [
+    {
+      "ts": "2026-04-22T11:55:11.732518",
+      "action": "staged",
+      "reviewer": "learn"
+    },
+    {
+      "ts": "2026-04-22T11:55:11.868997",
+      "action": "graduated",
+      "reviewer": "learn.py",
+      "notes": "verification smoke test 2026-04-22 \u2014 confirms learn.py end-to-end path works on this machine",
+      "provisional": false,
+      "evidence_snapshot": [
+        "2026-04-22T11:55:11.732518"
+      ],
+      "lessons_sha": "680634f6aed9"
+    }
+  ],
+  "rejection_count": 0,
+  "accepted_at": "2026-04-22T11:55:11.868991",
+  "reviewer": "learn.py",
+  "rationale": "verification smoke test 2026-04-22 \u2014 confirms learn.py end-to-end path works on this machine"
+}

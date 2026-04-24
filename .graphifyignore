@@ -1,0 +1,33 @@
+# graphify ignore — everything-claude-code (ECC)
+
+# --- Base ---
+node_modules/
+.venv/
+venv/
+.next/
+dist/
+build/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+coverage/
+graphify-out/
+graphify-obsidian/
+
+AGENTS.md
+CLAUDE.md
+GEMINI.md
+.claude/
+.codex/
+.gemini/
+.cursor/
+
+# --- ECC-specific ---
+# references/ contains cloned upstream repos (awesome-llm-apps, agent-skills, etc.)
+# Explicitly out of scope — ingesting would balloon the graph with foreign code.
+references/
+
+# Agentic-stack episodic log — raw experience JSONL is not knowledge worth graphing
+agentic-stack/.agent/memory/episodic/
