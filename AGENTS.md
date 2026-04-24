@@ -368,3 +368,51 @@ Agent integrations:
 - Codex: `@C:\Users\adelm\.codex\RTK.md` via `~/.codex/AGENTS.md`
 - Gemini CLI: BeforeTool hook at `~/.gemini/hooks/rtk-hook-gemini.sh`
 
+
+
+---
+
+## caveman — Token Compression
+
+Caveman compresses agent output ~65–75% using terse "caveman-style" prose that preserves full technical accuracy. Auto-activates via SessionStart hook after install.
+
+**Reference:** `C:\Users\adelm\SeaBridgeAI\everything-claude-code\references\caveman\`
+
+Install (Claude Code):
+```bash
+claude plugin marketplace add JuliusBrussee/caveman && claude plugin install caveman@caveman
+```
+
+Skills:
+- `/caveman` — activate compression (intensity: `lite` / `full` / `ultra` / `wenyan`)
+- `/caveman-commit` — terse commit messages
+- `/caveman-review` — one-line code reviews
+- `/caveman-compress` — compress CLAUDE.md ~46% to save input tokens every session
+
+Codex: use `$caveman` in prompts. Gemini: `gemini extensions install caveman`.
+
+---
+
+## codeburn — Token Usage Dashboard
+
+Codeburn tracks AI coding token spend across Claude Code, Codex, Cursor, and others. Reads session data from disk — no API keys needed.
+
+**Reference:** `C:\Users\adelm\SeaBridgeAI\everything-claude-code\references\codeburn\`
+
+Install:
+```bash
+npm install -g codeburn
+# or one-shot:
+npx codeburn
+```
+
+Key commands:
+```bash
+codeburn              # interactive TUI dashboard (default: 7 days)
+codeburn today        # today's spend
+codeburn month        # this month
+codeburn optimize     # find waste patterns + copy-paste fixes
+codeburn status       # compact one-liner summary
+codeburn export       # CSV/JSON export
+```
+

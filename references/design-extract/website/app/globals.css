@@ -1,0 +1,505 @@
+/* ─────────────────────────────────────────────────────────────
+   designlang website — foundation
+   Direction: Live Design DNA. Paper-first, one accent.
+   ───────────────────────────────────────────────────────────── */
+
+:root {
+  /* Palette */
+  --paper: #f3f1ea;
+  --paper-2: #ece8dd;
+  --paper-3: #d8d3c5;
+  --ink: #0a0908;
+  --ink-2: #403c34;
+  --ink-3: #8b8778;
+  --accent: #ff4800;
+
+  /* Type */
+  --font-body: var(--font-body), -apple-system, 'Segoe UI', system-ui, sans-serif;
+  --font-mono: var(--font-mono), 'SF Mono', ui-monospace, Menlo, monospace;
+  --font-display: var(--font-display), Georgia, serif;
+
+  /* Rhythm */
+  --r1: 4px;
+  --r2: 8px;
+  --r3: 12px;
+  --r4: 16px;
+  --r5: 24px;
+  --r6: 32px;
+  --r7: 48px;
+  --r8: 64px;
+  --r9: 96px;
+  --r10: 144px;
+
+  /* Grid */
+  --page-max: 1440px;
+  --page-pad-x: clamp(20px, 4vw, 56px);
+  --col-count: 12;
+  --col-gap: 24px;
+
+  /* Hairline */
+  --hair: 1px solid var(--ink);
+  --hair-soft: 1px solid var(--ink-3);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--paper);
+  color: var(--ink);
+  color-scheme: light;
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--paper);
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+  transition: color 120ms ease, border-color 120ms ease;
+}
+
+a:hover {
+  color: var(--accent);
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+input, textarea, select {
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  outline: 0;
+}
+
+::selection {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+img, svg { display: block; max-width: 100%; }
+
+/* ── Typography ─────────────────────────────────────────────── */
+
+.display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 0.92;
+  font-variation-settings: 'opsz' 144, 'SOFT' 30;
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-feature-settings: 'zero' 1, 'ss01' 1;
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.section-label::before {
+  content: '';
+  width: 24px;
+  height: 1px;
+  background: var(--ink);
+  display: inline-block;
+  transform: translateY(-4px);
+}
+
+.prose p { max-width: 62ch; }
+.prose p + p { margin-top: 1em; }
+
+/* ── Layout primitives ──────────────────────────────────────── */
+
+.page {
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding-inline: var(--page-pad-x);
+}
+
+.stack-lg > * + * { margin-top: var(--r8); }
+.stack-md > * + * { margin-top: var(--r5); }
+.stack-sm > * + * { margin-top: var(--r3); }
+
+.grid-12 {
+  display: grid;
+  grid-template-columns: repeat(var(--col-count), minmax(0, 1fr));
+  gap: var(--col-gap);
+}
+
+/* Rule — a hairline with optional section label inline at left edge. */
+.rule {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: var(--r4);
+  padding-block: var(--r4);
+}
+
+.rule-line {
+  flex: 1 1 auto;
+  height: 1px;
+  background: var(--ink);
+}
+
+.rule-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.rule-number {
+  color: var(--ink-3);
+  margin-right: var(--r2);
+}
+
+/* Marginalia — side-column notes; collapse to block on small screens. */
+.with-margin {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(180px, 240px);
+  gap: var(--col-gap);
+  align-items: start;
+}
+
+.marginalia {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ink-2);
+  border-left: var(--hair);
+  padding-left: var(--r4);
+}
+
+.marginalia .foot { color: var(--ink-3); }
+.marginalia code { color: var(--ink); }
+
+@media (max-width: 860px) {
+  .with-margin {
+    grid-template-columns: 1fr;
+  }
+  .marginalia {
+    border-left: 0;
+    border-top: var(--hair);
+    padding-left: 0;
+    padding-top: var(--r3);
+  }
+}
+
+/* ── Controls ───────────────────────────────────────────────── */
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 22px 15px;
+  background: var(--ink);
+  color: var(--paper);
+  border: var(--hair);
+  box-shadow: 6px 6px 0 var(--accent);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.cta:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 8px 8px 0 var(--accent);
+  color: var(--paper);
+}
+
+.cta:active {
+  transform: translate(4px, 4px);
+  box-shadow: 2px 2px 0 var(--accent);
+}
+
+/* Chip — used for small tag/label pieces. */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px 4px;
+  border: var(--hair);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+/* ── Accessibility ──────────────────────────────────────────── */
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0s !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── Section scaffold ───────────────────────────────────────── */
+
+section {
+  padding-block: var(--r9);
+}
+
+section + section {
+  border-top: var(--hair);
+}
+
+section[id] {
+  scroll-margin-top: var(--r6);
+}
+
+h1, h2, h3, h4, h5, h6 { font-weight: 400; }
+
+h2.display {
+  font-size: clamp(36px, 6vw, 88px);
+}
+
+h3.display {
+  font-size: clamp(26px, 3.5vw, 48px);
+}
+
+.hero-title {
+  font-size: clamp(48px, 11vw, 200px);
+}
+
+/* ── Mobile & tablet pass ───────────────────────────────────── */
+
+@media (max-width: 860px) {
+  :root {
+    --page-pad-x: 18px;
+    --col-gap: 14px;
+  }
+
+  section {
+    padding-block: var(--r7);
+  }
+
+  .display,
+  .hero-title,
+  h1,
+  h2,
+  h3 {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    hyphens: auto;
+    letter-spacing: -0.02em;
+  }
+
+  .hero-title {
+    font-size: clamp(44px, 13vw, 96px);
+    line-height: 0.95;
+  }
+
+  h2.display {
+    font-size: clamp(32px, 8vw, 56px);
+  }
+
+  h3.display {
+    font-size: clamp(22px, 6vw, 36px);
+  }
+
+  .prose p,
+  .prose {
+    font-size: 16px !important;
+  }
+
+  /* Header nav: horizontal scroll instead of overflow. */
+  header nav {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    white-space: nowrap;
+    gap: var(--r4) !important;
+    font-size: 11px !important;
+    max-width: 60%;
+  }
+
+  header nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Hero form: stack input over button, no border on button side. */
+  #extract form {
+    flex-direction: column;
+    max-width: 100% !important;
+  }
+
+  #extract form input {
+    border-right: 0 !important;
+    border-bottom: var(--hair);
+    padding: 14px 16px !important;
+    font-size: 15px !important;
+  }
+
+  #extract form button {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  /* Tables, code blocks, long scroll strips: constrain inside page, scroll on x. */
+  pre,
+  table,
+  .scroll-x {
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  pre {
+    font-size: 12px !important;
+    padding: var(--r3) var(--r4) !important;
+  }
+
+  /* Grid-12 defaults: drop to single column on mobile unless overridden. */
+  .grid-12 {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: var(--r4) !important;
+  }
+
+  /* Min-width: 0 on every grid child so content (like a 640-unit SVG) can't
+     push a 1fr track wider than the viewport. */
+  .grid-12 > *,
+  .with-margin > *,
+  [style*='grid-template-columns'] > * {
+    min-width: 0;
+  }
+
+  /* Everything absolutely should not push the page sideways. */
+  body,
+  main.page {
+    max-width: 100vw;
+    overflow-x: clip;
+  }
+
+  /* Constrain every SVG, image, and video so fixed-width art can't spill. */
+  section svg,
+  section img,
+  section video,
+  section canvas {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Any element that opts into `.scroll-x` or `.tabstrip` scrolls horizontally
+     inside its section on narrow viewports. */
+  .scroll-x,
+  .tabstrip,
+  [role='tablist'] {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+
+  /* Token browser: let it scroll-x on tiny viewports. */
+  section [data-token-browser],
+  section [data-regions-schematic],
+  section [data-platform-code],
+  section [data-specimens-strip] {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Specimen cards / wide cards: the strip itself scrolls; cards keep their
+     design width. */
+  [data-specimens-strip] > * {
+    flex: 0 0 auto;
+  }
+
+  /* Any container with a fixed min-width: safe max-width safety net. */
+  main.page > * {
+    max-width: 100%;
+  }
+
+  /* Inline-style grid overrides — components use style={{gridTemplateColumns:…}}
+     so we match the resulting attribute and force single-column on mobile. */
+  [style*="grid-template-columns: repeat(4"],
+  [style*="grid-template-columns: repeat(3"],
+  [style*="grid-template-columns:5fr"],
+  [style*="grid-template-columns: 5fr"],
+  [style*="grid-template-columns:100px"],
+  [style*="grid-template-columns: 100px"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Specimens strip: horizontal scroll with snap. Cards stay at their
+     design-time width; the parent scrolls. */
+  [style*="scroll-snap-type"] {
+    padding-inline: 0 !important;
+  }
+
+  [style*="scroll-snap-type"] > * {
+    min-width: 80vw;
+    max-width: 92vw;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: clamp(40px, 12vw, 72px);
+  }
+
+  header nav {
+    max-width: 55%;
+    gap: 14px !important;
+    font-size: 10px !important;
+    letter-spacing: 0.08em !important;
+  }
+
+  .section-label {
+    font-size: 11px !important;
+  }
+
+  pre {
+    font-size: 11px !important;
+  }
+}
