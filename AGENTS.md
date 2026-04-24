@@ -416,3 +416,31 @@ codeburn status       # compact one-liner summary
 codeburn export       # CSV/JSON export
 ```
 
+
+---
+
+## designlang — Design Language Extraction
+
+designlang crawls any live URL with a headless browser and generates 17+ output files (Tailwind config, CSS vars, shadcn theme, Figma variables, motion tokens, brand voice, component anatomy stubs, and an AI-optimized markdown file).
+
+**Reference:** `C:\Users\adelm\SeaBridgeAI\everything-claude-code\references\design-extract\`
+
+Skill: `/extract-design <url>` (installed at `~/.claude/skills/extract-design/`)
+CLI: `npx designlang <url>` (no install required) or `designlang <url>` (global install)
+
+Key flags:
+- `--full` — multi-page crawl (auto-discovers nav pages)
+- `--out <dir>` — output directory (default: `./design-extract-output`)
+- `--dark` — also extract dark mode
+- `--screenshots` — capture component screenshots
+- `--emit-agent-rules` — writes `CLAUDE.md.fragment` rule files
+- `--smart` — LLM-assisted classifier (uses `ANTHROPIC_API_KEY`)
+
+SeaBridgeAI design token locations:
+- manageesg-frontend: `manageesg-frontend/design/`
+- openseabri: `openseabri/design/`
+
+MCP server (continuous sync):
+```bash
+npx designlang mcp --out ./design-extract-output
+```
