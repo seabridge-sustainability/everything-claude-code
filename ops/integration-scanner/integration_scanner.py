@@ -334,7 +334,7 @@ def create_brief_client(
 
 class SlackClient:
     def __init__(self, token: str | None = None, timeout: float = 10.0) -> None:
-        self._token = token or os.environ.get("SLACK_BOT_TOKEN")
+        self._token = (token or os.environ.get("SLACK_BOT_TOKEN", "")).strip()
         if not self._token:
             raise RuntimeError("SLACK_BOT_TOKEN is required unless --skip-slack is used.")
         self._client = httpx.Client(timeout=timeout)
