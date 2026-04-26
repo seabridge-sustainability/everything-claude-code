@@ -49,6 +49,48 @@ REQUIRED_FIELDS = {
 
 VALID_STATUSES = {"production", "integrated", "in_use", "active_dev", "evaluate", "watch"}
 _REPO_RE = re.compile(r"^[A-Za-z0-9_.\-]+/[A-Za-z0-9_.\-]+$")
+_GITHUB_URL_RE = re.compile(r"github\.com/([A-Za-z0-9_.\-]+/[A-Za-z0-9_.\-]+)")
+
+# ---------------------------------------------------------------------------
+# Discovery engine constants
+# ---------------------------------------------------------------------------
+
+DISCOVERY_QUERIES: dict[str, list[str]] = {
+    "github": [
+        "ESG sustainability framework python",
+        "climate risk assessment tool",
+        "TNFD disclosure nature risk",
+        "carbon accounting API",
+        "sustainability reporting CSRD",
+        "biodiversity impact assessment",
+        "water stress risk model",
+        "green building certification API",
+        "supply chain ESG scoring",
+        "GHG emissions calculation",
+        "sustainable finance taxonomy",
+        "MCP server sustainability",
+        "LangGraph agent ESG",
+        "TCFD climate scenario analysis",
+        "environmental compliance monitoring",
+    ],
+    "tavily": [
+        "new ESG sustainability data API 2026",
+        "open source climate risk modeling framework",
+        "TNFD TCFD compliance automation tool",
+        "sustainability AI agent tool release",
+        "nature-based solutions assessment dataset",
+    ],
+    "google": [
+        "ESG sustainability API launch 2026",
+        "open source climate risk model new",
+        "sustainability data platform release",
+        "environmental monitoring AI tool",
+        "green finance technology API 2026",
+    ],
+}
+DISCOVERY_GITHUB_MIN_STARS = 50
+DISCOVERY_RELEVANCE_THRESHOLD = 6.0
+DISCOVERY_AUTO_WATCH_THRESHOLD = 7.5
 
 
 @dataclass(frozen=True)
@@ -58,6 +100,28 @@ class GitHubMetadata:
     license_spdx_id: str | None
     verified_manually: bool = False
     error: str | None = None
+
+
+@dataclass(frozen=True)
+class DiscoveryResult:
+    name: str
+    repo: str | None
+    url: str
+    description: str
+    source: str  # "github", "tavily", "google"
+    stars: int | None = None
+    license_spdx_id: str | None = None
+    topics: tuple[str, ...] = ()
+    pushed_at: datetime | None = None
+
+
+@dataclass(frozen=True)
+class ScoredDiscovery:
+    discovery: DiscoveryResult
+    relevance_score: float
+    fit_category: str
+    rationale: str
+    recommended_action: str  # "integrate", "evaluate", "watch", "skip"
 
 
 class GitHubClientProtocol(Protocol):
@@ -70,6 +134,22 @@ class BriefClientProtocol(Protocol):
     def executive_summary(self, scored_integrations: list[dict[str, Any]]) -> str: ...
 
 
+class DiscoveryScorerProtocol(Protocol):
+    def score_discovery(self, discovery: DiscoveryResult, registry_names: list[str]) -> ScoredDiscovery: ...
+
+
+class GitHubSearchClientProtocol(Protocol):
+    def search_repositories(self, query: str) -> list[DiscoveryResult]: ...
+
+
+class TavilySearchClientProtocol(Protocol):
+    def search(self, query: str) -> list[DiscoveryResult]: ...
+
+
+class GoogleSearchClientProtocol(Protocol):
+    def search(self, query: str) -> list[DiscoveryResult]: ...
+
+
 class SlackClientProtocol(Protocol):
     def post_markdown(
         self,
@@ -77,6 +157,7 @@ class SlackClientProtocol(Protocol):
         title: str,
         markdown: str,
         top_items: list[dict[str, Any]],
+        discoveries: dict[str, Any] | None = None,
     ) -> None: ...
 
 
@@ -182,6 +263,48 @@ def _executive_summary_prompt(scored_integrations: list[dict[str, Any]]) -> tupl
     return system, user
 
 
+def _score_discovery_prompt(discovery: DiscoveryResult, registry_names: list[str]) -> tuple[str, str]:
+    system = (
+        "You are a principal engineer evaluating potential integrations for SeaBridgeAI "
+        "(FastAPI + MongoDB + LangGraph + MCP, ESG/sustainability/climate risk platform). "
+        "Score the discovery for relevance. Respond ONLY with valid JSON, no markdown."
+    )
+    user = (
+        f"Evaluate this discovery for SeaBridgeAI integration:\n"
+        f"Name: {discovery.name}\n"
+        f"URL: {discovery.url}\n"
+        f"Description: {discovery.description[:400]}\n"
+        f"Source: {discovery.source}\n"
+        f"Stars: {discovery.stars or 'N/A'}\n"
+        f"License: {discovery.license_spdx_id or 'Unknown'}\n"
+        f"Topics: {', '.join(discovery.topics) or 'None'}\n\n"
+        f"Already tracked: {', '.join(registry_names)}\n\n"
+        'Return JSON: {{"relevance_score": 1-10, "fit_category": '
+        '"agent_framework"|"data_layer"|"tool_registry"|"workflow_orchestration", '
+        '"rationale": "one sentence", "recommended_action": '
+        '"integrate"|"evaluate"|"watch"|"skip"}}'
+    )
+    return system, user
+
+
+def _parse_discovery_score(raw: str, discovery: DiscoveryResult) -> ScoredDiscovery:
+    try:
+        parsed = json.loads(raw)
+    except json.JSONDecodeError:
+        match = re.search(r"\{[^}]+\}", raw, re.DOTALL)
+        if match:
+            parsed = json.loads(match.group())
+        else:
+            raise
+    return ScoredDiscovery(
+        discovery=discovery,
+        relevance_score=_clamp(float(parsed.get("relevance_score", 5.0))),
+        fit_category=parsed.get("fit_category", "data_layer"),
+        rationale=parsed.get("rationale", ""),
+        recommended_action=parsed.get("recommended_action", "evaluate"),
+    )
+
+
 # ---------------------------------------------------------------------------
 # Brief clients — one per provider
 # ---------------------------------------------------------------------------
@@ -204,6 +327,10 @@ class AnthropicBriefClient:
     def executive_summary(self, scored_integrations: list[dict[str, Any]]) -> str:
         system, user = _executive_summary_prompt(scored_integrations)
         return self._message(system, user, 600)
+
+    def score_discovery(self, discovery: DiscoveryResult, registry_names: list[str]) -> ScoredDiscovery:
+        system, user = _score_discovery_prompt(discovery, registry_names)
+        return _parse_discovery_score(self._message(system, user, 300), discovery)
 
     def _message(self, system: str, user: str, max_tokens: int) -> str:
         response = self._client.messages.create(
@@ -235,6 +362,10 @@ class OpenAIBriefClient:
         system, user = _executive_summary_prompt(scored_integrations)
         return self._message(system, user, 600)
 
+    def score_discovery(self, discovery: DiscoveryResult, registry_names: list[str]) -> ScoredDiscovery:
+        system, user = _score_discovery_prompt(discovery, registry_names)
+        return _parse_discovery_score(self._message(system, user, 300), discovery)
+
     def _message(self, system: str, user: str, max_tokens: int) -> str:
         response = self._client.chat.completions.create(
             model=self._model,
@@ -260,6 +391,10 @@ class LiteLLMBriefClient:
     def executive_summary(self, scored_integrations: list[dict[str, Any]]) -> str:
         system, user = _executive_summary_prompt(scored_integrations)
         return self._message(system, user, 600)
+
+    def score_discovery(self, discovery: DiscoveryResult, registry_names: list[str]) -> ScoredDiscovery:
+        system, user = _score_discovery_prompt(discovery, registry_names)
+        return _parse_discovery_score(self._message(system, user, 300), discovery)
 
     def _message(self, system: str, user: str, max_tokens: int) -> str:
         import litellm
@@ -294,6 +429,30 @@ class DryRunBriefClient:
             f"Biggest A2A launch blocker: {blocker or 'none recorded'}. "
             "Drop the lowest-scoring watch/evaluate item until it clears technical or license risk. "
             "Focus on certification, FastMCP network boundaries, and EvidenceItem enforcement."
+        )
+
+    def score_discovery(self, discovery: DiscoveryResult, registry_names: list[str]) -> ScoredDiscovery:
+        esg_keywords = {
+            "esg", "sustainability", "climate", "carbon", "biodiversity", "nature",
+            "risk", "tcfd", "tnfd", "ghg", "emission", "renewable", "taxonomy",
+            "disclosure", "csrd", "water", "deforestation", "green", "environmental",
+        }
+        desc_lower = (discovery.description + " " + discovery.name).lower()
+        keyword_hits = sum(1 for kw in esg_keywords if kw in desc_lower)
+        base_score = min(10.0, 4.0 + keyword_hits * 0.6)
+        if discovery.stars and discovery.stars > 500:
+            base_score += 0.5
+        if discovery.license_spdx_id in ALLOWED_LICENSES:
+            base_score += 0.5
+        action = "evaluate" if base_score >= DISCOVERY_RELEVANCE_THRESHOLD else "watch"
+        if base_score >= DISCOVERY_AUTO_WATCH_THRESHOLD:
+            action = "integrate"
+        return ScoredDiscovery(
+            discovery=discovery,
+            relevance_score=round(_clamp(base_score), 1),
+            fit_category="data_layer",
+            rationale=f"Keyword match ({keyword_hits} hits). Dry-run scoring.",
+            recommended_action=action,
         )
 
 
@@ -345,6 +504,7 @@ class SlackClient:
         title: str,
         markdown: str,
         top_items: list[dict[str, Any]],
+        discoveries: dict[str, Any] | None = None,
     ) -> None:
         response = self._client.post(
             "https://slack.com/api/chat.postMessage",
@@ -355,7 +515,7 @@ class SlackClient:
             json={
                 "channel": channel,
                 "text": f"*{title}*\n\n{markdown}",
-                "blocks": _slack_blocks(title, markdown, top_items),
+                "blocks": _slack_blocks(title, markdown, top_items, discoveries),
             },
         )
         response.raise_for_status()
@@ -411,6 +571,7 @@ def run_scan(
     slack_client: SlackClientProtocol | None,
     reports_dir: Path | None,
     slack_channel: str = DEFAULT_CHANNEL,
+    discoveries: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     scored_integrations = [
         _scan_integration(item, today, github_client, brief_client) for item in registry
@@ -421,7 +582,7 @@ def run_scan(
     surfaced.sort(key=lambda item: item["action_priority"], reverse=True)
     top_3 = surfaced[:3]
 
-    result = {
+    result: dict[str, Any] = {
         "run_date": today.isoformat(),
         "total_tracked": len(scored_integrations),
         "in_production": sum(1 for item in scored_integrations if item["status"] == "production"),
@@ -435,6 +596,8 @@ def run_scan(
         "a2a_blocker": _a2a_blocker(scored_integrations),
         "drop_recommendation": _drop_recommendation(scored_integrations),
     }
+    if discoveries is not None:
+        result["discoveries"] = discoveries
 
     markdown = render_markdown(result)
     if reports_dir is not None:
@@ -445,6 +608,7 @@ def run_scan(
             title=f"Integration Scan - {today.isoformat()}",
             markdown=markdown,
             top_items=top_3,
+            discoveries=discoveries,
         )
     return result
 
@@ -486,7 +650,309 @@ def render_markdown(result: dict[str, Any]) -> str:
             f"- Blockers: {result['blockers']}",
         ]
     )
+
+    disc = result.get("discoveries")
+    if disc and disc.get("top_discoveries"):
+        lines.extend(["", "## Discoveries", ""])
+        lines.append(
+            f"Scanned {disc['total_raw']} raw results, "
+            f"{disc['unique_after_dedup']} unique after dedup, "
+            f"{disc['above_threshold']} above threshold."
+        )
+        if disc.get("auto_added", 0) > 0:
+            lines.append(
+                f"Auto-added to registry: {', '.join(disc['auto_added_names'])}."
+            )
+        lines.append("")
+        for td in disc["top_discoveries"]:
+            stars_str = f" ({td['stars']} stars)" if td.get("stars") else ""
+            lines.append(
+                f"- **{td['name']}**{stars_str} — "
+                f"score {td['relevance_score']}, {td['recommended_action']}\n"
+                f"  {td['rationale']}\n"
+                f"  Source: {td['source']} | {td.get('url', '')}"
+            )
+
     return "\n".join(lines).strip() + "\n"
+
+
+# ---------------------------------------------------------------------------
+# Discovery search clients
+# ---------------------------------------------------------------------------
+
+
+class GitHubSearchClient:
+    def __init__(self, token: str | None = None, timeout: float = 15.0) -> None:
+        headers = {
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28",
+        }
+        if token:
+            headers["Authorization"] = f"Bearer {token}"
+        self._client = httpx.Client(headers=headers, timeout=timeout, follow_redirects=True)
+        self._has_token = bool(token)
+
+    def search_repositories(self, query: str) -> list[DiscoveryResult]:
+        url = f"{GITHUB_API}/search/repositories"
+        params = {"q": query, "sort": "stars", "order": "desc", "per_page": 10}
+        for attempt in range(3):
+            response = self._client.get(url, params=params)
+            if response.status_code in {403, 429}:
+                wait = _retry_after_seconds(response, attempt)
+                logger.warning("GitHub search rate-limited, retrying in {}s", wait)
+                time.sleep(wait)
+                continue
+            response.raise_for_status()
+            break
+        else:
+            logger.warning("GitHub search exhausted retries for query: {}", query)
+            return []
+
+        results: list[DiscoveryResult] = []
+        for repo in response.json().get("items", []):
+            stars = repo.get("stargazers_count", 0)
+            if stars < DISCOVERY_GITHUB_MIN_STARS:
+                continue
+            pushed = _parse_github_datetime(repo.get("pushed_at"))
+            license_info = repo.get("license") or {}
+            results.append(
+                DiscoveryResult(
+                    name=repo.get("name", ""),
+                    repo=repo.get("full_name", ""),
+                    url=repo.get("html_url", ""),
+                    description=repo.get("description") or "",
+                    source="github",
+                    stars=stars,
+                    license_spdx_id=license_info.get("spdx_id"),
+                    topics=tuple(repo.get("topics", [])),
+                    pushed_at=pushed,
+                )
+            )
+        return results
+
+
+class TavilySearchClient:
+    def __init__(self, api_key: str | None = None, timeout: float = 30.0) -> None:
+        self._api_key = (api_key or os.environ.get("TAVILY_API_KEY", "")).strip()
+        if not self._api_key:
+            raise RuntimeError("TAVILY_API_KEY is required for Tavily discovery.")
+        self._client = httpx.Client(timeout=timeout)
+
+    def search(self, query: str) -> list[DiscoveryResult]:
+        response = self._client.post(
+            "https://api.tavily.com/search",
+            json={
+                "api_key": self._api_key,
+                "query": query,
+                "search_depth": "basic",
+                "max_results": 10,
+                "include_domains": [],
+                "exclude_domains": [],
+            },
+        )
+        response.raise_for_status()
+        results: list[DiscoveryResult] = []
+        for item in response.json().get("results", []):
+            url = item.get("url", "")
+            repo_match = _GITHUB_URL_RE.search(url)
+            results.append(
+                DiscoveryResult(
+                    name=item.get("title", "")[:120],
+                    repo=repo_match.group(1) if repo_match else None,
+                    url=url,
+                    description=item.get("content", "")[:500],
+                    source="tavily",
+                )
+            )
+        return results
+
+
+class GoogleSearchClient:
+    def __init__(
+        self,
+        api_key: str | None = None,
+        cse_id: str | None = None,
+        timeout: float = 15.0,
+    ) -> None:
+        self._api_key = (api_key or os.environ.get("GOOGLE_API_KEY", "")).strip()
+        self._cse_id = (cse_id or os.environ.get("GOOGLE_CSE_ID", "")).strip()
+        if not self._api_key or not self._cse_id:
+            raise RuntimeError("GOOGLE_API_KEY and GOOGLE_CSE_ID required for Google discovery.")
+        self._client = httpx.Client(timeout=timeout)
+
+    def search(self, query: str) -> list[DiscoveryResult]:
+        response = self._client.get(
+            "https://www.googleapis.com/customsearch/v1",
+            params={
+                "key": self._api_key,
+                "cx": self._cse_id,
+                "q": query,
+                "num": 10,
+                "dateRestrict": "m3",
+            },
+        )
+        response.raise_for_status()
+        results: list[DiscoveryResult] = []
+        for item in response.json().get("items", []):
+            url = item.get("link", "")
+            repo_match = _GITHUB_URL_RE.search(url)
+            results.append(
+                DiscoveryResult(
+                    name=item.get("title", "")[:120],
+                    repo=repo_match.group(1) if repo_match else None,
+                    url=url,
+                    description=item.get("snippet", "")[:500],
+                    source="google",
+                )
+            )
+        return results
+
+
+# ---------------------------------------------------------------------------
+# Discovery engine
+# ---------------------------------------------------------------------------
+
+
+def _deduplicate_discoveries(
+    discoveries: list[DiscoveryResult],
+    registry: list[dict[str, Any]],
+) -> list[DiscoveryResult]:
+    registry_repos = {
+        str(item["repo"]).lower()
+        for item in registry
+        if item.get("repo") and not _is_manual_repo(str(item["repo"]))
+    }
+    registry_names = {str(item["name"]).lower() for item in registry}
+
+    seen_repos: set[str] = set()
+    seen_urls: set[str] = set()
+    unique: list[DiscoveryResult] = []
+    for d in discoveries:
+        repo_key = d.repo.lower().rstrip("/") if d.repo else None
+        if repo_key and repo_key in registry_repos:
+            continue
+        if d.name.lower() in registry_names:
+            continue
+        if repo_key:
+            if repo_key in seen_repos:
+                continue
+            seen_repos.add(repo_key)
+        url_key = d.url.lower().rstrip("/")
+        if url_key in seen_urls:
+            continue
+        seen_urls.add(url_key)
+        unique.append(d)
+    return unique
+
+
+def _auto_add_to_registry(
+    scored: list[ScoredDiscovery],
+    registry_path: Path,
+    registry: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    added: list[dict[str, Any]] = []
+    for sd in scored:
+        if sd.relevance_score < DISCOVERY_AUTO_WATCH_THRESHOLD:
+            continue
+        if not sd.discovery.repo:
+            continue
+        entry = {
+            "name": sd.discovery.name,
+            "repo": sd.discovery.repo,
+            "type": "library",
+            "license": sd.discovery.license_spdx_id or "Unknown",
+            "status": "watch",
+            "fit_score": round(min(10.0, sd.relevance_score), 1),
+            "use_case": sd.rationale[:200],
+            "blocker": None,
+            "seabridge_fit": sd.fit_category,
+            "notes": f"Auto-discovered from {sd.discovery.source}. Needs manual review.",
+        }
+        registry.append(entry)
+        added.append(entry)
+
+    if added:
+        registry_path.write_text(
+            json.dumps(registry, indent=2, ensure_ascii=False) + "\n",
+            encoding="utf-8",
+        )
+        logger.info("Auto-added {} discoveries to registry", len(added))
+    return added
+
+
+def run_discovery(
+    registry: list[dict[str, Any]],
+    scorer: DiscoveryScorerProtocol,
+    github_search: GitHubSearchClientProtocol | None = None,
+    tavily_search: TavilySearchClientProtocol | None = None,
+    google_search: GoogleSearchClientProtocol | None = None,
+    sources: list[str] | None = None,
+    registry_path: Path | None = None,
+    auto_watch: bool = False,
+) -> dict[str, Any]:
+    allowed = set(sources or ["github", "tavily", "google"])
+    raw_discoveries: list[DiscoveryResult] = []
+
+    if "github" in allowed and github_search is not None:
+        for query in DISCOVERY_QUERIES["github"]:
+            try:
+                raw_discoveries.extend(github_search.search_repositories(query))
+            except Exception:
+                logger.warning("GitHub search failed for query: {}", query)
+            time.sleep(2.5 if not getattr(github_search, "_has_token", False) else 1.0)
+
+    if "tavily" in allowed and tavily_search is not None:
+        for query in DISCOVERY_QUERIES["tavily"]:
+            try:
+                raw_discoveries.extend(tavily_search.search(query))
+            except Exception:
+                logger.warning("Tavily search failed for query: {}", query)
+
+    if "google" in allowed and google_search is not None:
+        for query in DISCOVERY_QUERIES["google"]:
+            try:
+                raw_discoveries.extend(google_search.search(query))
+            except Exception:
+                logger.warning("Google search failed for query: {}", query)
+
+    unique = _deduplicate_discoveries(raw_discoveries, registry)
+    registry_names = [str(item["name"]) for item in registry]
+    scored: list[ScoredDiscovery] = []
+    for d in unique:
+        try:
+            scored.append(scorer.score_discovery(d, registry_names))
+        except Exception:
+            logger.warning("Scoring failed for discovery: {}", d.name)
+
+    scored.sort(key=lambda sd: sd.relevance_score, reverse=True)
+    above_threshold = [sd for sd in scored if sd.relevance_score >= DISCOVERY_RELEVANCE_THRESHOLD]
+
+    auto_added: list[dict[str, Any]] = []
+    if auto_watch and registry_path is not None:
+        auto_added = _auto_add_to_registry(above_threshold, registry_path, registry)
+
+    return {
+        "total_raw": len(raw_discoveries),
+        "unique_after_dedup": len(unique),
+        "scored": len(scored),
+        "above_threshold": len(above_threshold),
+        "auto_added": len(auto_added),
+        "auto_added_names": [str(e["name"]) for e in auto_added],
+        "top_discoveries": [
+            {
+                "name": sd.discovery.name,
+                "repo": sd.discovery.repo,
+                "url": sd.discovery.url,
+                "source": sd.discovery.source,
+                "stars": sd.discovery.stars,
+                "relevance_score": sd.relevance_score,
+                "fit_category": sd.fit_category,
+                "rationale": sd.rationale,
+                "recommended_action": sd.recommended_action,
+            }
+            for sd in above_threshold[:15]
+        ],
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -508,14 +974,63 @@ def main() -> None:
         help="LLM provider for briefs (default: auto-detect from env vars)",
     )
     parser.add_argument("--model", default=None, help="Override the default model for the chosen provider")
+    parser.add_argument("--discover", action="store_true", help="Run discovery engine to find new integrations")
+    parser.add_argument("--auto-watch", action="store_true", help="Auto-add high-scoring discoveries to registry")
+    parser.add_argument(
+        "--discover-sources",
+        default="github,tavily,google",
+        help="Comma-separated discovery sources (default: github,tavily,google)",
+    )
     args = parser.parse_args()
 
     registry = load_registry(args.registry)
-    github_client = GitHubClient(token=os.environ.get("GITHUB_TOKEN"))
+    github_token = os.environ.get("GITHUB_TOKEN")
+    github_client = GitHubClient(token=github_token)
     brief_client: BriefClientProtocol = (
         DryRunBriefClient() if args.dry_run else create_brief_client(args.provider, args.model)
     )
     slack_client = None if args.skip_slack else SlackClient()
+
+    discoveries = None
+    if args.discover:
+        sources = [s.strip() for s in args.discover_sources.split(",") if s.strip()]
+        scorer: DiscoveryScorerProtocol = brief_client  # type: ignore[assignment]
+
+        github_search: GitHubSearchClientProtocol | None = None
+        tavily_search: TavilySearchClientProtocol | None = None
+        google_search: GoogleSearchClientProtocol | None = None
+
+        if "github" in sources:
+            github_search = GitHubSearchClient(token=github_token)
+        if "tavily" in sources:
+            try:
+                tavily_search = TavilySearchClient()
+            except RuntimeError:
+                logger.warning("TAVILY_API_KEY not set, skipping Tavily discovery")
+        if "google" in sources:
+            try:
+                google_search = GoogleSearchClient()
+            except RuntimeError:
+                logger.warning("GOOGLE_API_KEY/GOOGLE_CSE_ID not set, skipping Google discovery")
+
+        discoveries = run_discovery(
+            registry=registry,
+            scorer=scorer,
+            github_search=github_search,
+            tavily_search=tavily_search,
+            google_search=google_search,
+            sources=sources,
+            registry_path=args.registry if args.auto_watch else None,
+            auto_watch=args.auto_watch,
+        )
+        logger.info(
+            "Discovery complete: {} raw, {} unique, {} above threshold, {} auto-added",
+            discoveries["total_raw"],
+            discoveries["unique_after_dedup"],
+            discoveries["above_threshold"],
+            discoveries["auto_added"],
+        )
+
     result = run_scan(
         registry=registry,
         today=date.today(),
@@ -524,6 +1039,7 @@ def main() -> None:
         slack_client=slack_client,
         reports_dir=args.reports_dir,
         slack_channel=args.slack_channel,
+        discoveries=discoveries,
     )
     logger.info(
         "Integration scan complete: {} tracked, top_3={}",
@@ -721,6 +1237,7 @@ def _slack_blocks(
     title: str,
     markdown: str,
     top_items: list[dict[str, Any]],
+    discoveries: dict[str, Any] | None = None,
 ) -> list[dict[str, Any]]:
     blocks: list[dict[str, Any]] = [
         {"type": "header", "text": {"type": "plain_text", "text": title[:150]}},
@@ -737,6 +1254,26 @@ def _slack_blocks(
                         f"{_truncate(str(item['action_brief']), 650)}"
                     ),
                 },
+            }
+        )
+    if discoveries and discoveries.get("top_discoveries"):
+        blocks.append({"type": "divider"})
+        blocks.append(
+            {
+                "type": "header",
+                "text": {"type": "plain_text", "text": "New Discoveries"},
+            }
+        )
+        disc_lines = []
+        for td in discoveries["top_discoveries"][:5]:
+            stars = f" ({td['stars']}★)" if td.get("stars") else ""
+            disc_lines.append(
+                f"• *{td['name']}*{stars} — score {td['relevance_score']}, _{td['recommended_action']}_"
+            )
+        blocks.append(
+            {
+                "type": "section",
+                "text": {"type": "mrkdwn", "text": "\n".join(disc_lines)},
             }
         )
     return blocks[:50]
