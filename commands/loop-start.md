@@ -24,6 +24,30 @@ Start a managed autonomous loop pattern with safety defaults.
   - `safe` (default): strict quality gates and checkpoints
   - `fast`: reduced gates for speed
 
+## Token Availability Retry
+
+When the user explicitly asks an agent to continue once tokens are available,
+use the opt-in retry wrapper instead of a blind infinite loop:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File C:\Users\adelm\SeaBridgeAI\everything-claude-code\scripts\agent-token-retry.ps1 `
+  -Name "seabridge-continue" `
+  -IntervalHours 4 `
+  -MaxHours 72 `
+  -Command 'claude -p "Continue the previous task. First read CLAUDE.md/AGENTS.md and the latest session notes, then proceed from the last safe checkpoint."'
+```
+
+Defaults:
+- retry every 4 hours
+- stop after 72 hours or 18 attempts
+- retry only token/rate/quota/capacity failures
+- stop on normal code/test failures unless `-RetryAll` is passed
+- write logs and latest state to `.ecc/loops/`
+
+Use this only after the user explicitly requests autonomous retry behavior.
+Do not use it for destructive, paid, or deployment actions unless those actions
+were separately approved.
+
 ## Flow
 
 1. Confirm repository state and branch strategy.

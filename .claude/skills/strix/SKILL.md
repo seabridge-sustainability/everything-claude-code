@@ -25,7 +25,7 @@ Strix deploys autonomous AI hacker agents that find and validate real vulnerabil
 
 - Docker Desktop **running** (required — Strix uses a sandbox container)
 - `uv` available in PATH
-- `ANTHROPIC_API_KEY` set in environment (or `.env`)
+- `ANTHROPIC_API_KEY` set in the current shell or a secret manager
 
 ---
 

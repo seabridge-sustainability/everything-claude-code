@@ -339,7 +339,7 @@ except APIError as e:
 
 ```bash
 # Required
-export ANTHROPIC_API_KEY="your-api-key-here"
+export ANTHROPIC_API_KEY="<set-in-shell-or-secret-manager>"
 
 # Optional: set default model
 export ANTHROPIC_MODEL="claude-sonnet-4-6"

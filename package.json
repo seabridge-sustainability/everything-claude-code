@@ -117,6 +117,7 @@
     "coverage": "c8 --all --include=\"scripts/**/*.js\" --check-coverage --lines 80 --functions 80 --branches 80 --statements 80 --reporter=text --reporter=lcov node tests/run-all.js"
   },
   "dependencies": {
+    "@ai-sdk/openai-compatible": "^2.0.41",
     "@iarna/toml": "^2.2.5",
     "@open-gitagent/gitagent": "^0.2.0",
     "ajv": "^8.18.0",
@@ -127,7 +128,7 @@
     "c8": "^10.1.2",
     "eslint": "^9.39.2",
     "globals": "^17.1.0",
-    "markdownlint-cli": "^0.47.0"
+    "markdownlint-cli": "^0.48.0"
   },
   "engines": {
     "node": ">=18"

@@ -51,7 +51,7 @@ app.listen(3000);
 `);
 
     // Planted vuln: .env tracked by git
-    fs.writeFileSync(path.join(csoDir, '.env'), 'DATABASE_URL=postgres://admin:secretpass@prod.db.example.com:5432/myapp\n');
+    fs.writeFileSync(path.join(csoDir, '.env'), 'DATABASE_URL=postgres://example_user:REDACTED_TEST_PASSWORD@prod.db.example.com:5432/myapp\n');
 
     run('git', ['add', '.']);
     run('git', ['commit', '-m', 'initial']);

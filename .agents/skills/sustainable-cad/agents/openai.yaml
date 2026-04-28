@@ -1,0 +1,7 @@
+interface:
+  display_name: "Sustainable CAD"
+  short_description: "Text-to-CAD generation with sustainable design constraints"
+  brand_color: "#16A34A"
+  default_prompt: "Generate a sustainable CAD model with material, lifecycle, and manufacturability constraints"
+policy:
+  allow_implicit_invocation: true

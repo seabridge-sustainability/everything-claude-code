@@ -195,7 +195,34 @@ Additional specialized skills are shipped in `skills/` but not loaded by default
 
 ## Configuration
 
-Full configuration in `opencode.json`:
+Full configuration in `opencode.json`.
+
+This SeaBridgeAI checkout is configured for NVIDIA NIM DeepSeek V4 Pro via
+OpenCode's OpenAI-compatible provider support:
+
+```json
+{
+  "model": "nvidia/deepseek-ai/deepseek-v4-pro",
+  "provider": {
+    "nvidia": {
+      "npm": "@ai-sdk/openai-compatible",
+      "options": {
+        "baseURL": "https://integrate.api.nvidia.com/v1",
+        "apiKey": "{env:NVIDIA_API_KEY}"
+      }
+    }
+  }
+}
+```
+
+Launch with the helper script if you want to load `NVIDIA_API_KEY` from the
+backend `.env` without committing or printing the key:
+
+```powershell
+.\.opencode\start-nvidia-deepseek.ps1
+```
+
+Generic ECC example:
 
 ```json
 {

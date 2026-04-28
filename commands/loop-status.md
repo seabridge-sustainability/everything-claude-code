@@ -31,6 +31,22 @@ Inspect active loop state, progress, and failure signals.
 
 When `--watch` is present, refresh status periodically and surface state changes.
 
+## Token Retry Loop Status
+
+For loops started through `scripts/agent-token-retry.ps1`, inspect:
+
+```powershell
+Get-Content .ecc\loops\agent-token-retry-latest.json
+Get-ChildItem .ecc\loops\*.log | Sort-Object LastWriteTime -Descending | Select-Object -First 5
+```
+
+Report:
+- last attempt number
+- last exit code
+- whether the failure looked like a token/rate/quota limit
+- next retry time
+- log path
+
 ## Arguments
 
 $ARGUMENTS:

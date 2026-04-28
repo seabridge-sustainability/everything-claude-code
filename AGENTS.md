@@ -38,7 +38,7 @@ Transform tasks into verifiable goals. State what "done" looks like and how you'
 
 ## Conflict Resolution Priority
 
-1. **Hard safety rules** (§Safety above). Non-suspendable.
+1. **Hard safety rules** (§Safety above) + **`manageesg-backend/AGENTS_SYSTEM.md`** Tier-1 safety (system-wide policy for all SeaBridgeAI coding agents — overrides this file for destructive actions, authorization, and cost controls). Non-suspendable.
 2. **Karpathy coding principles** (§above) — govern HOW every task executes. Always applied.
 3. **Direct session/developer instructions** from the current session.
 4. **This file** (AGENTS.md).
@@ -113,6 +113,25 @@ Use agents proactively without user prompt:
 - Harness config reliability and cost ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ **harness-optimizer**
 
 Use parallel execution for independent operations ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â launch multiple agents simultaneously.
+
+## Token Availability Retry Loops
+
+When the user explicitly asks to "continue when tokens are available" or to
+"try again every 4 hours," route the request to `loop-operator` and use the
+opt-in wrapper:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File C:\Users\adelm\SeaBridgeAI\everything-claude-code\scripts\agent-token-retry.ps1 `
+  -Name "seabridge-continue" `
+  -IntervalHours 4 `
+  -MaxHours 72 `
+  -Command 'claude -p "Continue the previous task from the last safe checkpoint. Read CLAUDE.md/AGENTS.md first."'
+```
+
+Defaults are conservative: retry every 4 hours, stop after 72 hours or 18
+attempts, retry token/rate/quota/capacity failures only, and log to
+`.ecc/loops/`. Do not start this automatically; it requires explicit user
+authorization because it can consume model/API quota.
 
 ## Security Guidelines
 

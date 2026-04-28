@@ -4,6 +4,8 @@
 
 Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
 
+> **System-wide policy:** `manageesg-backend/AGENTS_SYSTEM.md` is the governing document for all SeaBridgeAI coding agents. It defines Tier-1 safety rules, authorization gates, cost controls, and destructive-action rejections that apply unconditionally to this repo.
+
 1. Session authorization gate: at session start, request authorization through the team-approved secure channel before any write, destructive, or cost-incurring action.
 2. Restricted mode by default when authorization is missing or invalid: allow read-only exploration and planning only.
 3. Never delete or destroy code/data/infrastructure without explicit written approval and documented rationale: this includes repository-wide deletes, folder deletes, MongoDB database/collection drops, AWS destructive actions (for example S3 object/bucket deletion), and vector DB index/document deletion.
@@ -215,6 +217,25 @@ Rules:
 - Before answering architecture or codebase questions, read graphify-out/GRAPH_REPORT.md for god nodes and community structure
 - If graphify-out/wiki/index.md exists, navigate it instead of reading raw files
 - After modifying code files in this session, run `graphify update .` to keep the graph current (AST-only, no API cost)
+
+
+## Token Availability Retry Loops
+
+When Alejandro explicitly asks Claude Code or another coding agent to continue
+once tokens are available, use the ECC retry wrapper:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File C:\Users\adelm\SeaBridgeAI\everything-claude-code\scripts\agent-token-retry.ps1 `
+  -Name "seabridge-continue" `
+  -IntervalHours 4 `
+  -MaxHours 72 `
+  -Command 'claude -p "Continue the previous task from the last safe checkpoint. Read CLAUDE.md/AGENTS.md first."'
+```
+
+The wrapper retries every 4 hours by default for up to 72 hours, retries only
+token/rate/quota/capacity failures unless `-RetryAll` is passed, and writes logs
+to `.ecc/loops/`. Do not start it automatically; it is opt-in because it can use
+model quota.
 
 
 ## Token Optimization Tools
