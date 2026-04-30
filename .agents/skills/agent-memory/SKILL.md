@@ -1,6 +1,6 @@
 ---
 name: agent-memory
-description: Route session memory, project memory, and runtime agent memory without duplicating facts across claude-mem, ECC skills, and backend persistence.
+description: Route session memory, project memory, and runtime agent memory without duplicating facts across Codex memories, ECC skills, and backend persistence.
 origin: ECC
 version: 1.0.0
 ---
@@ -13,7 +13,7 @@ Use this skill when work touches memory, recall, session continuity, or durable 
 
 This skill exists to keep SeaBridgeAI's memory layers from overlapping:
 
-- `claude-mem` handles optional IDE/session continuity for Claude Code and Gemini CLI
+- Codex memories and agent-local history handle personal coding-session recall
 - `ck` and `continuous-learning-v2` handle ECC-native project memory and reusable operator patterns
 - `manageesg-backend` `sustainability_ai.memory` handles product/runtime memory for deployed agents
 
@@ -35,7 +35,7 @@ Choose the smallest memory system that matches the job:
 
 | Need | Preferred system | Why |
 |------|------------------|-----|
-| Resume personal coding context across IDE sessions | `claude-mem` | Session continuity and observation history |
+| Resume personal coding context across IDE sessions | Agent-local memory | Session continuity without repo/runtime coupling |
 | Save or resume project-specific working context | `ck` | Deterministic per-project context snapshots |
 | Learn reusable habits and conventions | `continuous-learning-v2` | Converts repeated behavior into reusable instincts |
 | Store tenant-scoped facts for deployed agents | `sustainability_ai.memory` | Runtime application memory with backend ownership |
@@ -44,13 +44,9 @@ Choose the smallest memory system that matches the job:
 
 ### 1. Session continuity
 
-Use `claude-mem` only when:
-
-- the user is working in Claude Code or Gemini CLI
-- they want prior session observations or compressed recall
-- the repo's own docs are not the correct source of truth
-
-`claude-mem` is optional infrastructure, not required project state.
+Use agent-local memory only when the user wants prior coding-session context and
+the repo's own docs are not the correct source of truth. Keep this layer
+separate from project memory and deployed runtime memory.
 
 ### 2. Project working memory
 
@@ -81,36 +77,10 @@ When answering a memory-related request, prefer this order:
 
 1. Repo-local docs, `AGENTS.md`, `CLAUDE.md`, runbooks, and code comments
 2. ECC project memory via `ck` and `continuous-learning-v2`
-3. `claude-mem` session observations when available
+3. Agent-local session memory when available
 4. Backend durable memory only for product/runtime agent data flows
 
 ## Commands And Usage
-
-### Optional `claude-mem` install
-
-Check before proposing install:
-
-```powershell
-npx claude-mem --help
-```
-
-Install for Claude Code:
-
-```powershell
-npx claude-mem install
-```
-
-Install for Gemini CLI:
-
-```powershell
-npx claude-mem install --ide gemini-cli
-```
-
-Do not vendor `claude-mem` into SeaBridge repos unless the user explicitly asks for a source clone.
-
-Reference repo:
-
-- `https://github.com/thedotmack/claude-mem`
 
 ### ECC-native project memory
 
@@ -138,29 +108,29 @@ Expected outputs from this skill:
 
 Avoid double-injection and duplicate summaries.
 
-- Do not auto-enable `claude-mem` hooks if an ECC memory hook already owns the same retrieval or injection moment without defining precedence.
-- Observation hooks may coexist.
+- Do not add memory hooks that can block prompt submission, tool execution, or session shutdown.
+- Observation hooks, if any, must be timeout-protected and fail open.
 - Retrieval and context injection should prefer one summary surface.
 
 Recommended precedence:
 
 1. repo docs and instructions
 2. ECC-native project memory
-3. `claude-mem` observation history
+3. agent-local session memory when available
 4. backend runtime memory only when the task is about application agents
 
 ## Safety Notes
 
 - Do not duplicate the same fact into all memory systems unless the user explicitly asks.
 - Do not store secrets, approval passwords, or sensitive credentials in memory tools.
-- Do not present `claude-mem` as team source of truth for architecture or policy.
-- Do not wire `claude-mem` directly into backend runtime memory in this phase.
+- Do not present session memory as team source of truth for architecture or policy.
+- Do not wire coding-session memory directly into backend runtime memory in this phase.
 
 ## SeaBridge Matrix
 
 | Layer | Primary use | Source of truth |
 |------|-------------|-----------------|
-| `claude-mem` | Personal/session continuity | User-level Claude/Gemini environment |
+| `agent-local memory` | Personal/session continuity | Current coding agent environment |
 | `ck` | Per-project working context | ECC-native project memory files |
 | `continuous-learning-v2` | Reusable learned behaviors | ECC instinct storage |
 | `backend memory` | Tenant-scoped deployed agent memory | `manageesg-backend` runtime persistence |

@@ -142,6 +142,60 @@ gstack is installed at `~/.claude/skills/gstack/` and provides 35 specialist ski
 
 ---
 
+## Vibium Secondary Browser Tooling
+
+Vibium is installed as user/ECC-level browser tooling for "second pair of eyes"
+inspection alongside Playwright. Use it for quick semantic browser exploration,
+element mapping, screenshots, and MCP-style agent browser control. Playwright
+remains canonical for repeatable SeaBridgeAI QA/regression runs.
+
+Installed surfaces:
+- Global CLI: `vibium` v26.3.18
+- ECC wrapper: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\scripts\vibium.ps1`
+- ECC skill: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\.agents\skills\vibe-check\SKILL.md`
+- Claude skill copy: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\.claude\skills\vibe-check\SKILL.md`
+
+Safe smoke check:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File C:\Users\adelm\SeaBridgeAI\everything-claude-code\scripts\vibium.ps1 --version
+```
+
+Review `vibe-check` before browser control. The skills installer flagged the
+upstream skill as high risk in Snyk, so use it deliberately and keep captures,
+cookies, storage state, and recordings out of committed source.
+
+---
+
+## Google Agent Skills
+
+Official Google Agent Skills from `google/skills` are installed into ECC for
+all supported coding-agent skill directories. Use them before web snippets or
+stale examples when work touches Google Cloud, Firebase, Gemini API on Agent
+Platform, or Google Cloud Well-Architected Framework guidance.
+
+Installed skills:
+- `gemini-api`
+- `alloydb-basics`
+- `bigquery-basics`
+- `cloud-run-basics`
+- `cloud-sql-basics`
+- `firebase-basics`
+- `gke-basics`
+- `google-cloud-recipe-onboarding`
+- `google-cloud-recipe-auth`
+- `google-cloud-recipe-networking-observability`
+- `google-cloud-waf-security`
+- `google-cloud-waf-reliability`
+- `google-cloud-waf-cost-optimization`
+
+Read the matching `SKILL.md` before implementation or deployment work. The
+installer reported Snyk high risk for `alloydb-basics` and `cloud-sql-basics`,
+medium risk for `firebase-basics`, `gemini-api`, and `gke-basics`, and low risk
+for the rest, so review skill content before use.
+
+---
+
 ## Skills
 
 Use the following skills when working on related files:
@@ -152,6 +206,8 @@ Use the following skills when working on related files:
 | `.github/workflows/*.yml` | `/ci-workflow` |
 | `commands/docs.md`, `agents/docs-lookup.md`, `skills/documentation-lookup/SKILL.md` | `documentation-lookup` |
 | Memory/session continuity, project recall, backend memory questions | `agent-memory` |
+| Secondary browser inspection alongside Playwright | `vibe-check` |
+| Google Cloud, Firebase, Gemini API, or Google Cloud WAF work | matching `google/skills` skill |
 
 When spawning subagents, always pass conventions from the respective skill into the agent's prompt.
 
@@ -177,9 +233,6 @@ Optional inputs:
 - tenant or runtime scope
 
 Run and usage commands:
-- `npx claude-mem --help`
-- `npx claude-mem install`
-- `npx claude-mem install --ide gemini-cli`
 - `/ck:init`
 - `/ck:save`
 - `/ck:resume`
@@ -190,24 +243,18 @@ Outputs:
 - clear routing to the correct memory layer
 
 Storage and source of truth:
-- `claude-mem`: optional user-level plugin backend for Claude Code and Gemini CLI session continuity
 - `ck`: ECC-native per-project working context
 - `continuous-learning-v2`: reusable learned behaviors and instincts
 - `manageesg-backend` `sustainability_ai.memory`: runtime memory for deployed agents
 
 Compatibility and retrieval order:
-- Do not auto-enable `claude-mem` retrieval hooks when ECC memory hooks already inject the same kind of summary
-- Observation hooks may coexist, but one summary surface should own retrieval/injection
 - Retrieval order:
   1. local repo docs and `AGENTS.md`/`CLAUDE.md`
   2. ECC project memory via `ck` and `continuous-learning-v2`
-  3. `claude-mem` session observations
-  4. backend runtime memory only for application agent data flows
+  3. backend runtime memory only for application agent data flows
 
 Safety notes:
-- `claude-mem` is a supplement to ECC memory, not a replacement
 - do not duplicate the same fact into all three memory systems unless explicitly requested
-- do not treat `claude-mem` as team/project source of truth
 
 ## graphify
 

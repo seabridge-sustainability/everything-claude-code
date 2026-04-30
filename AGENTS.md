@@ -133,6 +133,65 @@ attempts, retry token/rate/quota/capacity failures only, and log to
 `.ecc/loops/`. Do not start this automatically; it requires explicit user
 authorization because it can consume model/API quota.
 
+## Vibium Secondary Browser Tooling
+
+Vibium is installed as user/ECC-level browser tooling for "second pair of eyes"
+inspection alongside Playwright. Use it for quick semantic browser exploration,
+element mapping, screenshots, and MCP-style agent browser control. Do not treat
+it as the canonical QA harness; Playwright remains the default for repeatable
+SeaBridgeAI browser QA.
+
+Installed surfaces:
+- Global CLI: `vibium` v26.3.18
+- ECC wrapper: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\scripts\vibium.ps1`
+- ECC skill: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\.agents\skills\vibe-check\SKILL.md`
+- Claude skill copy: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\.claude\skills\vibe-check\SKILL.md`
+
+Safe smoke check:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File C:\Users\adelm\SeaBridgeAI\everything-claude-code\scripts\vibium.ps1 --version
+```
+
+Review the `vibe-check` skill before browser control. The skills installer
+flagged the upstream skill as high risk in Snyk, so use it deliberately and keep
+captures, cookies, storage state, and recordings out of committed source.
+
+## Google Agent Skills
+
+Official Google Agent Skills from `google/skills` are installed into ECC for
+all supported coding-agent skill directories. Use these before relying on web
+snippets or older examples when work touches Google Cloud, Firebase, Gemini API
+on Agent Platform, or Google Cloud Well-Architected Framework guidance.
+
+Installed skills:
+- `gemini-api`
+- `alloydb-basics`
+- `bigquery-basics`
+- `cloud-run-basics`
+- `cloud-sql-basics`
+- `firebase-basics`
+- `gke-basics`
+- `google-cloud-recipe-onboarding`
+- `google-cloud-recipe-auth`
+- `google-cloud-recipe-networking-observability`
+- `google-cloud-waf-security`
+- `google-cloud-waf-reliability`
+- `google-cloud-waf-cost-optimization`
+
+Source and lock:
+- Source repo: `google/skills`
+- Canonical ECC path: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\.agents\skills\`
+- Lockfile: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\skills-lock.json`
+
+Use notes:
+- Read the matching `SKILL.md` before implementation or deployment work.
+- For Google Cloud auth, IAM, deployment, or infrastructure changes, keep
+  SeaBridgeAI approval and cost controls in force.
+- The skills installer reported Snyk high risk for `alloydb-basics` and
+  `cloud-sql-basics`, medium risk for `firebase-basics`, `gemini-api`, and
+  `gke-basics`, and low risk for the rest. Review skill content before use.
+
 ## Security Guidelines
 
 **Before ANY commit:**
@@ -265,9 +324,6 @@ Optional inputs:
 - target repo or tenant context
 
 Run and usage commands:
-- `npx claude-mem --help` to check whether `claude-mem` is already available before proposing install
-- `npx claude-mem install` for Claude Code session memory
-- `npx claude-mem install --ide gemini-cli` for Gemini CLI session memory
 - `/ck:init`, `/ck:save`, `/ck:resume` for ECC-native project memory workflows
 
 Outputs:
@@ -276,27 +332,20 @@ Outputs:
 - source attribution for which memory layer was used
 
 Storage and source of truth:
-- `claude-mem`: optional user-level session continuity backend for Claude Code and Gemini CLI only
 - `ck`: per-project working context
 - `continuous-learning-v2`: reusable project/operator instincts
 - `manageesg-backend` `sustainability_ai.memory`: runtime memory for deployed agents
 
 Compatibility and retrieval order:
-- Do not auto-enable `claude-mem` hooks when ECC hooks already own the same retrieval/injection event without a precedence rule
-- Observation hooks may coexist; retrieval should prefer one summary surface
 - Retrieval order:
   1. repo-local docs and `AGENTS.md`/`CLAUDE.md`
   2. ECC project memory via `ck` and `continuous-learning-v2`
-  3. `claude-mem` session observations
-  4. backend durable memory only for application/runtime agent flows
+  3. backend durable memory only for application/runtime agent flows
 
 Safety notes:
-- `claude-mem` is optional infrastructure, not repo truth
 - do not duplicate the same fact into all memory systems unless explicitly requested
-- do not wire `claude-mem` directly into backend runtime memory in this pass
 
 SeaBridge memory matrix:
-- `claude-mem`: personal/session continuity
 - `ck`: per-project working context
 - `continuous-learning-v2`: reusable learned behaviors
 - `backend memory`: tenant-scoped runtime memory in the product

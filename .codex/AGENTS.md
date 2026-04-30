@@ -52,6 +52,44 @@ Available skills:
 - crosspost - Multi-platform content distribution
 - fal-ai-media - AI image/video/audio generation via fal.ai
 - dmux-workflows - Multi-agent orchestration with dmux
+- vibe-check - Vibium browser automation for second-pass browser inspection alongside Playwright
+- gemini-api - Google Gemini API on Agent Platform guidance
+- bigquery-basics - BigQuery datasets, tables, jobs, SQL, ML, and AI analytics
+- cloud-run-basics - Cloud Run services, jobs, and worker pools
+- firebase-basics - Firebase web/mobile app guidance
+- google-cloud-recipe-auth - Google Cloud authentication and authorization
+- google-cloud-waf-security - Google Cloud Well-Architected Framework security
+- Additional installed Google skills: alloydb-basics, cloud-sql-basics, gke-basics, google-cloud-recipe-onboarding, google-cloud-recipe-networking-observability, google-cloud-waf-reliability, google-cloud-waf-cost-optimization
+
+## Google Skills Boundary
+
+Official Google Agent Skills from `google/skills` are installed under
+`.agents/skills` and copied across supported ECC agent skill folders. Use the
+matching Google skill before implementing Google Cloud, Firebase, Gemini API, or
+Google Cloud Well-Architected Framework work. These skills do not authorize live
+cloud mutations, paid workloads, IAM changes, deployments, or secret handling;
+SeaBridgeAI approval and cost controls still apply.
+
+The installer reported Snyk high risk for `alloydb-basics` and
+`cloud-sql-basics`, medium risk for `firebase-basics`, `gemini-api`, and
+`gke-basics`, and low risk for the rest. Review the relevant `SKILL.md` before
+use.
+
+## Vibium Boundary
+
+Vibium is installed as user/ECC-level tooling, not product runtime. Use the
+`vibe-check` skill or `scripts/vibium.ps1` when the user wants a second pair of
+browser eyes in addition to Playwright. Playwright remains canonical for
+repeatable SeaBridgeAI QA/regression testing.
+
+Safe checks:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File C:\Users\adelm\SeaBridgeAI\everything-claude-code\scripts\vibium.ps1 --version
+```
+
+The skill installer flagged the upstream skill as high risk in Snyk; review the
+skill before use and keep browser captures/state out of committed source.
 
 ## Documentation Retrieval Order
 
