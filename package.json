@@ -125,6 +125,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
+    "@gsd-build/sdk": "^0.1.0",
     "c8": "^10.1.2",
     "eslint": "^9.39.2",
     "globals": "^17.1.0",

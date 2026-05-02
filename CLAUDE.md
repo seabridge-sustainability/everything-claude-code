@@ -142,6 +142,41 @@ gstack is installed at `~/.claude/skills/gstack/` and provides 35 specialist ski
 
 ---
 
+## GSD (Get Shit Done) Lifecycle
+
+GSD provides structured multi-phase planning, execution, verification, and session management via `.planning/` state directory and 13 specialized agents. All commands are user-invoked (not proactive).
+
+Setup: `scripts/setup-gsd.ps1` creates the `~/.claude/get-shit-done` junction.
+
+**Core lifecycle:** `/gsd-map-codebase` → `/gsd-discuss-phase` → `/gsd-plan-phase` → `/gsd-execute-phase` → `/gsd-verify-work`
+
+| Command | Purpose |
+|---------|---------|
+| `/gsd-map-codebase` | Parallel codebase analysis (7 structured docs) |
+| `/gsd-discuss-phase` | Adaptive questioning to gather decisions |
+| `/gsd-plan-phase` | Executable phase plans with verification loop |
+| `/gsd-execute-phase` | Wave-based parallel execution with subagents |
+| `/gsd-verify-work` | Conversational UAT validation |
+| `/gsd-progress` | Status check + route to next action (`--next`, `--do`) |
+| `/gsd-quick` | Ad-hoc tasks with GSD guarantees, skip optional agents |
+| `/gsd-ui-phase` | UI design contract (UI-SPEC.md) |
+| `/gsd-ui-review` | 6-pillar visual audit |
+| `/gsd-review` | Cross-AI peer review of phase plans |
+| `/gsd-code-review` | Phase-scoped code review (distinct from `/review`) |
+| `/gsd-secure-phase` | Verify threat mitigations |
+| `/gsd-health` | `.planning/` directory integrity (distinct from `/health`) |
+| `/gsd-forensics` | Post-mortem of failed workflows |
+| `/gsd-docs-update` | Generate/update project documentation |
+| `/gsd-pause-work` | Context handoff (`.continue-here.md`) |
+| `/gsd-resume-work` | Resume with full context restoration |
+| `/gsd-stats` | Session statistics |
+
+**Disambiguation:** `/gsd-code-review` reviews phase changes and produces REVIEW.md artifacts. `/review` (gstack) is a pre-PR diff review. `/gsd-health` checks `.planning/` integrity. `/health` (gstack) is a code quality dashboard.
+
+Skill reference: `~/.claude/skills/gsd-lifecycle/SKILL.md`
+
+---
+
 ## Vibium Secondary Browser Tooling
 
 Vibium is installed as user/ECC-level browser tooling for "second pair of eyes"
@@ -208,6 +243,7 @@ Use the following skills when working on related files:
 | Memory/session continuity, project recall, backend memory questions | `agent-memory` |
 | Secondary browser inspection alongside Playwright | `vibe-check` |
 | Google Cloud, Firebase, Gemini API, or Google Cloud WAF work | matching `google/skills` skill |
+| Design artifact generation (prototypes, decks, mobile apps, operations docs) | `open-design` |
 
 When spawning subagents, always pass conventions from the respective skill into the agent's prompt.
 
@@ -320,3 +356,33 @@ MCP server (continuous sync):
 ```bash
 npx designlang mcp --out ./design-extract-output
 ```
+
+---
+
+## Open Design — AI Design Artifact Generator
+
+Open-source alternative to Claude Design (Apache-2.0). Local-first, BYOK design
+tool that auto-detects 11 coding-agent CLIs on PATH and drives them through a
+skill-based design workflow with 31 skills and 129 design systems.
+
+**Reference:** `C:\Users\adelm\SeaBridgeAI\everything-claude-code\references\open-design\`
+
+Skill: `/open-design` (installed at `~/.claude/skills/open-design/`)
+
+Quickstart:
+```bash
+cd references/open-design
+corepack enable && pnpm install
+pnpm tools-dev run web
+```
+
+Requires Node ~24, pnpm 10.33.x. First load auto-creates `.od/` runtime folder.
+
+Key capabilities:
+- **31 skills** — prototypes (landings, dashboards, mobile, email, social), decks (magazine PPT, product walkthrough), operations (PM specs, OKRs, invoices, runbooks)
+- **129 design systems** — Linear, Stripe, Vercel, Airbnb, Tesla, Notion, Apple, Anthropic, Cursor, Supabase, Figma, and more
+- **5 visual directions** — Editorial Monocle, Modern Minimal, Warm Soft, Tech Utility, Brutalist Experimental
+- **Media generation** — gpt-image-2 for images, Seedance 2.0 for video, HyperFrames for HTML→MP4
+- **Claude Design import** — drop a Claude Design export ZIP to continue editing locally
+
+Relationship to designlang: designlang extracts tokens from existing sites (reverse-engineering); Open Design generates new artifacts from briefs (forward creation). They complement each other.

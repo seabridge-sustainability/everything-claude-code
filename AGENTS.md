@@ -100,6 +100,29 @@ When documentation is needed, follow this order:
 | pytorch-build-resolver | PyTorch runtime/CUDA/training errors | PyTorch build/training failures |
 | typescript-reviewer | TypeScript/JavaScript code review | TypeScript/JavaScript projects |
 
+## GSD (Get Shit Done) Lifecycle Agents
+
+GSD provides structured multi-phase planning, execution, verification, and session management.
+Invoked explicitly via `/gsd-<name>` commands — not proactively triggered. Skill reference: `~/.claude/skills/gsd-lifecycle/SKILL.md`.
+
+| Agent | Purpose | Spawned By |
+|-------|---------|------------|
+| gsd-codebase-mapper | Parallel codebase analysis | `/gsd-map-codebase` |
+| gsd-planner | Phase plan generation | `/gsd-plan-phase`, `/gsd-quick` |
+| gsd-plan-checker | Plan verification loop | `/gsd-plan-phase` |
+| gsd-executor | Wave-based parallel execution | `/gsd-execute-phase`, `/gsd-quick` |
+| gsd-verifier | UAT validation | `/gsd-verify-work` |
+| gsd-phase-researcher | Domain research for planning | `/gsd-plan-phase` |
+| gsd-code-reviewer | Phase-scoped code review | `/gsd-code-review` |
+| gsd-doc-writer | Documentation generation | `/gsd-docs-update` |
+| gsd-doc-verifier | Documentation accuracy check | `/gsd-docs-update --verify-only` |
+| gsd-security-auditor | Threat mitigation verification | `/gsd-secure-phase` |
+| gsd-ui-researcher | UI research for design contracts | `/gsd-ui-phase` |
+| gsd-ui-checker | UI implementation check | `/gsd-ui-review` |
+| gsd-ui-auditor | 6-pillar visual audit | `/gsd-ui-review` |
+
+**Disambiguation:** GSD agents are separate from the proactive agents below. `/gsd-code-review` (phase-scoped, produces REVIEW.md artifact) is distinct from `code-reviewer` (immediate post-edit review) and `/review` (gstack pre-PR diff review).
+
 ## Agent Orchestration
 
 Use agents proactively without user prompt:
