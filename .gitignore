@@ -114,3 +114,7 @@ references/open-design/
 configs/mcp-toolbox/tools.dev.yaml
 configs/mcp-toolbox/tools.staging.yaml
 configs/mcp-toolbox/tools.production.yaml
+
+# Local security scanner evidence can include matched secret payloads.
+docs/reports/security/agentshield/
+docs/reports/security/raw/

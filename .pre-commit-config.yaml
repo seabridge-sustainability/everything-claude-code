@@ -27,7 +27,7 @@ repos:
         pass_filenames: false
       - id: npm-audit-on-push
         name: Node.js CVE scan (npm audit)
-        entry: yarn audit --level high
+        entry: npm audit --audit-level=high
         language: system
         pass_filenames: false
         stages: [pre-push]
