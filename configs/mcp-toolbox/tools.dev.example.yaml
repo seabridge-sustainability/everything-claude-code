@@ -1,0 +1,221 @@
+# MCP Toolbox — Development Configuration Example
+# SeaBridgeAI | Local / Dev-Cluster Only
+#
+# NEVER use real credentials in this file.
+# Copy to tools.dev.yaml (gitignored) and fill in real values from your .env.
+# This file uses PLACEHOLDERS only.
+#
+# Start the server:
+#   npx @toolbox-sdk/server --config tools.dev.yaml --port 5000
+#
+# Safety contract:
+#   - Read-only users only
+#   - No DROP / DELETE / UPDATE / INSERT / ALTER / TRUNCATE
+#   - Dev or local databases only — NEVER production
+#   - Allowlisted collections/tables only
+#
+# CONFIG FORMAT: flat multi-document YAML (--- separators).
+#   Each document has a top-level "kind:" field: source | tool | toolset
+#   MongoDB source: only "uri" (no database field — specify database on each tool)
+#   MongoDB find:   filterPayload (not filter), database required on each tool
+#   MongoDB agg:    pipelinePayload + pipelineParams (not pipeline)
+#   Postgres source: host/port/user/password/database (port is a string)
+#   Postgres tool:  statement (not sql/query), authRequired: []
+#   All tools:      authRequired: [] (empty list = no auth required in dev)
+
+# ============================================================
+# SOURCES — Database connections
+# ============================================================
+
+# --- manageesg-backend: MongoDB Atlas (dev cluster) ---
+kind: source
+name: seabridgeai-mongodb-dev
+type: mongodb
+uri: "<MONGODB_DEV_URL>"
+# Note: database name goes on each tool, NOT here.
+---
+# --- openseabri: PostgreSQL (local or dev Supabase) ---
+kind: source
+name: openseabri-postgres-dev
+type: postgres
+host: "<SEABRI_DEV_DB_HOST>"
+port: "5432"
+database: "<SEABRI_DEV_DB_NAME>"
+user: "<SEABRI_TOOLBOX_RO_USER>"
+password: "<SEABRI_TOOLBOX_RO_PASS>"
+
+# ============================================================
+# TOOLS — Named operations (read-only)
+# ============================================================
+
+---
+# --- MongoDB: Sample documents from safe collections ---
+kind: tool
+name: sample-emission-factors
+type: mongodb-find
+source: seabridgeai-mongodb-dev
+authRequired: []
+description: Sample up to 5 emission factor documents for QA inspection.
+database: "<MONGODB_DEV_DB_NAME>"
+collection: emission_factors
+filterPayload: "{}"
+limit: 5
+---
+kind: tool
+name: sample-gresb-assessments
+type: mongodb-find
+source: seabridgeai-mongodb-dev
+authRequired: []
+description: Sample up to 5 GRESB assessment documents.
+database: "<MONGODB_DEV_DB_NAME>"
+collection: gresb_assessments
+filterPayload: "{}"
+limit: 5
+---
+kind: tool
+name: sample-climate-risks
+type: mongodb-find
+source: seabridgeai-mongodb-dev
+authRequired: []
+description: Sample up to 5 climate risk documents (non-PII).
+database: "<MONGODB_DEV_DB_NAME>"
+collection: risk_climate_risk
+filterPayload: "{}"
+limit: 5
+---
+kind: tool
+name: sample-materiality-assessments
+type: mongodb-find
+source: seabridgeai-mongodb-dev
+authRequired: []
+description: Sample up to 5 materiality assessment documents.
+database: "<MONGODB_DEV_DB_NAME>"
+collection: materiality_assessments
+filterPayload: "{}"
+limit: 5
+---
+kind: tool
+name: sample-agent-audits
+type: mongodb-find
+source: seabridgeai-mongodb-dev
+authRequired: []
+description: Sample up to 10 recent agent execution audit records.
+database: "<MONGODB_DEV_DB_NAME>"
+collection: agent_execution_audits
+filterPayload: "{}"
+limit: 10
+---
+# --- PostgreSQL: Schema discovery ---
+kind: tool
+name: list-openseabri-tables
+type: postgres-sql
+source: openseabri-postgres-dev
+authRequired: []
+description: List all tables in the public schema of the OpenSeaBri dev database.
+statement: |
+  SELECT table_name, table_type
+  FROM information_schema.tables
+  WHERE table_schema = 'public'
+  ORDER BY table_name;
+---
+kind: tool
+name: describe-openseabri-table
+type: postgres-sql
+source: openseabri-postgres-dev
+authRequired: []
+description: Describe columns of a given OpenSeaBri table.
+parameters:
+  - name: table_name
+    type: string
+    description: Table name to describe.
+statement: |
+  SELECT column_name, data_type, is_nullable, column_default
+  FROM information_schema.columns
+  WHERE table_schema = 'public' AND table_name = $1
+  ORDER BY ordinal_position;
+---
+kind: tool
+name: get-claim-status
+type: postgres-sql
+source: openseabri-postgres-dev
+authRequired: []
+description: Retrieve the status and workflow stage of a claim by claim_id.
+parameters:
+  - name: claim_id
+    type: string
+    description: The UUID of the claim to retrieve.
+statement: |
+  SELECT id, status, workflow_stage, created_at, updated_at
+  FROM claims
+  WHERE id = $1
+  LIMIT 1;
+---
+kind: tool
+name: list-contractor-approvals
+type: postgres-sql
+source: openseabri-postgres-dev
+authRequired: []
+description: List approved contractors (no PII — name + status only).
+statement: |
+  SELECT id, business_name, approval_status, approval_date
+  FROM contractors
+  WHERE approval_status = 'approved'
+  ORDER BY approval_date DESC
+  LIMIT 50;
+---
+kind: tool
+name: get-incident-timeline
+type: postgres-sql
+source: openseabri-postgres-dev
+authRequired: []
+description: Retrieve incident events for a given incident ID.
+parameters:
+  - name: incident_id
+    type: string
+    description: The UUID of the incident.
+statement: |
+  SELECT id, event_type, occurred_at, description
+  FROM incident_events
+  WHERE incident_id = $1
+  ORDER BY occurred_at ASC
+  LIMIT 100;
+
+# ============================================================
+# TOOLSETS — Grouped tool subsets per use case
+# ============================================================
+
+---
+# Full backend toolset for Claude Code dev work
+kind: toolset
+name: seabridgeai-backend-dev
+tools:
+  - sample-emission-factors
+  - sample-gresb-assessments
+  - sample-climate-risks
+  - sample-materiality-assessments
+  - sample-agent-audits
+---
+# OpenSeaBri workflow QA toolset
+kind: toolset
+name: openseabri-qa
+tools:
+  - list-openseabri-tables
+  - describe-openseabri-table
+  - get-claim-status
+  - list-contractor-approvals
+  - get-incident-timeline
+---
+# Combined toolset for full-stack dev inspection
+kind: toolset
+name: seabridge-dev-all
+tools:
+  - sample-emission-factors
+  - sample-gresb-assessments
+  - sample-climate-risks
+  - sample-materiality-assessments
+  - sample-agent-audits
+  - list-openseabri-tables
+  - describe-openseabri-table
+  - get-claim-status
+  - list-contractor-approvals
+  - get-incident-timeline

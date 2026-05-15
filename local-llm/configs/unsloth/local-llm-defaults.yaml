@@ -1,0 +1,30 @@
+# local-llm-defaults.yaml — Global non-secret Unsloth Studio defaults for all SeaBridgeAI repos
+# Referenced by: manageesg-backend, openseabri, autoresearch
+# Keys: stored in .env (gitignored), read from UNSLOTH_API_KEY user env var
+
+studio_port: 8888
+studio_base_url: "http://127.0.0.1:8888"
+frontend_dist: "C:\\Users\\adelm\\SeaBridgeAI\\everything-claude-code\\external\\unsloth\\studio\\frontend\\dist"
+
+models:
+  default_inference: "unsloth/Qwen3.5-4B-GGUF:Q4_K_M"
+  fast_consumer: "unsloth/gemma-4-E2B-it-GGUF:Q4_K_M"
+  extended_context: "unsloth/Qwen3-14B-GGUF:Q4_K_M"   # inference only; will OOM on fine-tune
+
+inference_defaults:
+  temperature: 0.0
+  max_tokens: 512
+  stream: false
+
+# Backend env var mapping
+env_vars:
+  enabled: LOCAL_LLM_ENABLED        # bool, default false
+  base_url: LOCAL_LLM_BASE_URL
+  api_key: LOCAL_LLM_API_KEY        # loaded from .env, never committed
+  model: LOCAL_LLM_MODEL
+
+# llm_selector.py routing
+# Set these in .env to route manageesg-backend agents to local endpoint:
+#   LLM_OPENAI_API_BASE=http://127.0.0.1:8888/v1
+#   LLM_DEFAULT_MODEL=openai/unsloth/Qwen3.5-4B-GGUF:Q4_K_M
+# These override cloud LLMs for all TaskType routing in llm_selector.py.

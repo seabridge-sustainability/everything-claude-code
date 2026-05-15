@@ -187,7 +187,7 @@ Write to `.planning/forensics/report-$(date +%Y%m%d-%H%M%S).md`:
 ### Artifact Completeness
 | Phase | PLAN | CONTEXT | RESEARCH | SUMMARY | VERIFICATION |
 |-------|------|---------|----------|---------|-------------|
-{for each phase: name | ✅/❌ per artifact}
+{for each phase: name | PASS:/FAIL: per artifact}
 
 ## Anomalies Detected
 
@@ -226,8 +226,7 @@ Display the full forensic report inline.
 ## Step 6: Offer Interactive Investigation
 
 > "Report saved to `.planning/forensics/report-{timestamp}.md`.
->
-> I can dig deeper into any finding. Want me to:
+> > I can dig deeper into any finding. Want me to:
 > - Trace a specific anomaly to its root cause?
 > - Read specific files referenced in the evidence?
 > - Check if a similar issue has been reported before?"

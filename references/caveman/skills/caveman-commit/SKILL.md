@@ -36,8 +36,8 @@ Write commit messages terse and exact. Conventional Commits format. No fluff. Wh
 ## Examples
 
 Diff: new endpoint for user profile with body explaining the why
-- ❌ "feat: add a new endpoint to get user profile information from the database"
-- ✅
+- FAIL: "feat: add a new endpoint to get user profile information from the database"
+- PASS:
   ```
   feat(api): add GET /users/:id/profile
 
@@ -48,7 +48,7 @@ Diff: new endpoint for user profile with body explaining the why
   ```
 
 Diff: breaking API change
-- ✅
+- PASS:
   ```
   feat(api)!: rename /v1/orders to /v1/checkout
 

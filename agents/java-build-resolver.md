@@ -5,6 +5,7 @@ tools: ["Read", "Write", "Edit", "Bash", "Grep", "Glob"]
 model: sonnet
 ---
 
+
 # Java Build Error Resolver
 
 ## Safety And Authorization Rule
@@ -164,3 +165,4 @@ Remaining errors: 1
 Final: `Build Status: SUCCESS/FAILED | Errors Fixed: N | Files Modified: list`
 
 For detailed Java and Spring Boot patterns, see `skill: springboot-patterns`.
+

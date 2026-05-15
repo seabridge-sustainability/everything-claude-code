@@ -13,24 +13,24 @@ function, or container on top of Google's highly scalable infrastructure. It
 abstracts away infrastructure management, providing three primary resource
 types:
 
-1.  **Services:** Responds to HTTP requests sent to a unique and stable
+1. **Services:** Responds to HTTP requests sent to a unique and stable
     endpoint, using stateless instances that autoscale based on a variety of key
     metrics, also responds to events and functions.
-2.  **Jobs:** Executes parallelizable tasks that are executed manually, or on a
+2. **Jobs:** Executes parallelizable tasks that are executed manually, or on a
     schedule, and run to completion.
-3.  **Worker pools:** Handles always-on background workloads such as pull-based
+3. **Worker pools:** Handles always-on background workloads such as pull-based
     workloads, for example, Kafka consumers, Pub/Sub pull queues, or RabbitMQ
     consumers.
 
 ## Prerequisites
 
-1.  Enable the Cloud Run Admin API and Cloud Build APIs:
+1. Enable the Cloud Run Admin API and Cloud Build APIs:
 
     ```bash
     gcloud services enable run.googleapis.com cloudbuild.googleapis.com
     ```
 
-1.  If you are under a domain restriction organization policy [restricting](https://docs.cloud.google.com/organization-policy/restrict-domains)
+1. If you are under a domain restriction organization policy [restricting](https://docs.cloud.google.com/organization-policy/restrict-domains)
    unauthenticated invocations for your project, you will need to access your
     deployed service as described under [Testing private
     services](https://docs.cloud.google.com/run/docs/triggering/https-request#testing-private).
@@ -340,32 +340,32 @@ Replace `WORKER_POOL_NAME` with the name you want for your worker pool.
 
 ### What to do if a deployment fails:
 
-1.  **IAM/Permission Error:** Read
+1. **IAM/Permission Error:** Read
     [iam-security.md](references/iam-security.md).
-2.  **Crash on Boot / Healthcheck failed:** Fetch the logs immediately using
+2. **Crash on Boot / Healthcheck failed:** Fetch the logs immediately using
     `gcloud logging read "resource.labels.service_name=SERVICE_NAME" --limit=20`
     to find the exact runtime error.
-3.  **Native Dependency Error (Node/Python):** If using `--no-build`, switch to
+3. **Native Dependency Error (Node/Python):** If using `--no-build`, switch to
     `--source .` (Buildpacks) to compile native extensions properly for Linux.
 
 ## Reference Directory
 
--   [Core Concepts](references/core-concepts.md): Services vs. Jobs vs.
+- [Core Concepts](references/core-concepts.md): Services vs. Jobs vs.
     Worker pools, resource model, and auto-scaling behavior for services.
 
--   [CLI Usage](references/cli-usage.md): Essential `gcloud run` commands for
+- [CLI Usage](references/cli-usage.md): Essential `gcloud run` commands for
     deployment and management.
 
--   [Client Libraries](references/client-library-usage.md): Using Google
+- [Client Libraries](references/client-library-usage.md): Using Google
     Cloud client libraries to interact with Cloud Run.
 
--   [MCP Usage](references/mcp-usage.md): Using the Cloud Run remote MCP
+- [MCP Usage](references/mcp-usage.md): Using the Cloud Run remote MCP
     server.
 
--   [Infrastructure as Code](references/iac-usage.md): Terraform examples for
+- [Infrastructure as Code](references/iac-usage.md): Terraform examples for
     services, jobs, worker pools, and IAM bindings.
 
--   [IAM & Security](references/iam-security.md): Roles, service identities,
+- [IAM & Security](references/iam-security.md): Roles, service identities,
     and ingress/egress controls.
 
 *If you need product information not found in these references, use the

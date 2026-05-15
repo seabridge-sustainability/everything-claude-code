@@ -252,7 +252,7 @@ RAW_SKETCHES=$(ls .planning/sketches/MANIFEST.md 2>/dev/null)
 
 If findings skills exist, read SKILL.md and reference files; extract validated patterns, landmines, constraints, design decisions. Add them to `<prior_decisions>`.
 
-If raw spikes/sketches exist but no findings skill, note: `⚠ Unpackaged spikes/sketches detected — run /gsd-spike --wrap-up or /gsd-sketch --wrap-up to make findings available.`
+If raw spikes/sketches exist but no findings skill, note: `WARNING: Unpackaged spikes/sketches detected — run /gsd-spike --wrap-up or /gsd-sketch --wrap-up to make findings available.`
 
 Build internal `<prior_decisions>` with sections for Project-Level (from PROJECT.md / REQUIREMENTS.md), From Prior Phases (per-phase decisions), and From Spike/Sketch Findings (validated patterns, landmines, design decisions).
 
@@ -330,10 +330,10 @@ We'll clarify HOW to implement this. (New capabilities belong in other phases.)
 - question: "Which areas do you want to discuss for [phase name]?"
 - options: 3-4 phase-specific gray areas, each with a concrete label (not generic), 1-2 questions in description, and code-context / prior-decision annotations:
   ```
-  ☐ Layout style — Cards vs list vs timeline?
+   Layout style — Cards vs list vs timeline?
     (You already have a Card component with shadow/rounded variants. Reusing it keeps the app consistent.)
 
-  ☐ Loading behavior — Infinite scroll or pagination?
+   Loading behavior — Infinite scroll or pagination?
     (You chose infinite scroll in Phase 4. useInfiniteQuery hook already set up.)
   ```
 
@@ -412,7 +412,7 @@ Created: .planning/phases/${PADDED_PHASE}-${SLUG}/${PADDED_PHASE}-CONTEXT.md
 
 ---
 
-## ▶ Next Up — [${PROJECT_CODE}] ${PROJECT_TITLE}
+## Next Up — [${PROJECT_CODE}] ${PROJECT_TITLE}
 
 **Phase ${PHASE}: [Name]** — [Goal from ROADMAP.md]
 

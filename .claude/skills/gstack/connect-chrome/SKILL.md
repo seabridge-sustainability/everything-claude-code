@@ -604,15 +604,13 @@ Use AskUserQuestion:
 
 > Chrome is launched with gstack control. You should see Playwright's Chromium
 > (not your regular Chrome) with a golden shimmer line at the top of the page.
->
-> The Side Panel extension should be auto-loaded. To open it:
+> > The Side Panel extension should be auto-loaded. To open it:
 > 1. Look for the **puzzle piece icon** (Extensions) in the toolbar Ã¢â‚¬â€ it may
->    already show the gstack icon if the extension loaded successfully
+> already show the gstack icon if the extension loaded successfully
 > 2. Click the **puzzle piece** Ã¢â€ â€™ find **gstack browse** Ã¢â€ â€™ click the **pin icon**
 > 3. Click the pinned **gstack icon** in the toolbar
 > 4. The Side Panel should open on the right showing a live activity feed
->
-> **Port:** 34567 (auto-detected Ã¢â‚¬â€ the extension connects automatically in the
+> > **Port:** 34567 (auto-detected Ã¢â‚¬â€ the extension connects automatically in the
 > Playwright-controlled Chrome).
 
 Options:
@@ -624,19 +622,16 @@ If B: Tell the user:
 
 > The extension is loaded into Playwright's Chromium at launch time, but
 > sometimes it doesn't appear immediately. Try these steps:
->
-> 1. Type `chrome://extensions` in the address bar
+> > 1. Type `chrome://extensions` in the address bar
 > 2. Look for **"gstack browse"** Ã¢â‚¬â€ it should be listed and enabled
 > 3. If it's there but not pinned, go back to any page, click the puzzle piece
->    icon, and pin it
+> icon, and pin it
 > 4. If it's NOT listed at all, click **"Load unpacked"** and navigate to:
->    - Press **Cmd+Shift+G** in the file picker dialog
->    - Paste this path: `{EXTENSION_PATH}` (use the path from Step 2)
->    - Click **Select**
->
-> After loading, pin it and click the icon to open the Side Panel.
->
-> If the Side Panel badge stays gray (disconnected), click the gstack icon
+> - Press **Cmd+Shift+G** in the file picker dialog
+> - Paste this path: `{EXTENSION_PATH}` (use the path from Step 2)
+> - Click **Select**
+> > After loading, pin it and click the icon to open the Side Panel.
+> > If the Side Panel badge stays gray (disconnected), click the gstack icon
 > and enter port **34567** manually.
 
 If C:
@@ -672,8 +667,7 @@ After the activity feed demo, tell the user about the sidebar chat:
 > snapshot and describe this page." A sidebar agent (a child Claude instance)
 > executes your request in the browser Ã¢â‚¬â€ you'll see the commands appear in
 > the activity feed as they happen.
->
-> The sidebar agent can navigate pages, click buttons, fill forms, and read
+> > The sidebar agent can navigate pages, click buttons, fill forms, and read
 > content. Each task gets up to 5 minutes. It runs in an isolated session, so
 > it won't interfere with this Claude Code window.
 
@@ -682,25 +676,21 @@ After the activity feed demo, tell the user about the sidebar chat:
 Tell the user:
 
 > You're all set! Here's what you can do with the connected Chrome:
->
-> **Watch Claude work in real time:**
+> > **Watch Claude work in real time:**
 > - Run any gstack skill (`/qa`, `/design-review`, `/benchmark`) and watch
->   every action happen in the visible Chrome window + Side Panel feed
+> every action happen in the visible Chrome window + Side Panel feed
 > - No cookie import needed Ã¢â‚¬â€ the Playwright browser shares its own session
->
-> **Control the browser directly:**
+> > **Control the browser directly:**
 > - **Sidebar chat** Ã¢â‚¬â€ type natural language in the Side Panel and the sidebar
->   agent executes it (e.g., "fill in the login form and submit")
+> agent executes it (e.g., "fill in the login form and submit")
 > - **Browse commands** Ã¢â‚¬â€ `$B goto <url>`, `$B click <sel>`, `$B fill <sel> <val>`,
->   `$B snapshot -i` Ã¢â‚¬â€ all visible in Chrome + Side Panel
->
-> **Window management:**
+> `$B snapshot -i` Ã¢â‚¬â€ all visible in Chrome + Side Panel
+> > **Window management:**
 > - `$B focus` Ã¢â‚¬â€ bring Chrome to the foreground anytime
 > - `$B disconnect` Ã¢â‚¬â€ close headed Chrome and return to headless mode
->
-> **What skills look like in headed mode:**
+> > **What skills look like in headed mode:**
 > - `/qa` runs its full test suite in the visible browser Ã¢â‚¬â€ you see every page
->   load, every click, every assertion
+> load, every click, every assertion
 > - `/design-review` takes screenshots in the real browser Ã¢â‚¬â€ same pixels you see
 > - `/benchmark` measures performance in the headed browser
 

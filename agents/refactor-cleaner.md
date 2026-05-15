@@ -5,6 +5,7 @@ tools: ["Read", "Write", "Edit", "Bash", "Grep", "Glob"]
 model: sonnet
 ---
 
+
 # Refactor & Dead Code Cleaner
 
 ## Safety And Authorization Rule
@@ -96,3 +97,4 @@ After each batch:
 - Build succeeds
 - No regressions
 - Bundle size reduced
+

@@ -1,0 +1,14 @@
+# gemma-sustainability-smoke.yaml — Smoke-test config for Gemma-4-2B sustainability SFT
+# Lighter than Qwen; preferred for OpenSeaBridge consumer-facing inference.
+# Duration on RTX 4090 Laptop: ~1–2 minutes for 5 examples × 1 epoch.
+
+training_model_family: "unsloth/gemma-2-2b-it"      # full-precision base for LoRA
+dataset_path: "local-llm/datasets/sustainability/smoke-test-sustainability.jsonl"
+output_dir: "./output/gemma-sustainability-smoke"
+num_train_epochs: 1
+max_seq_length: 512
+lora_rank: 16
+per_device_train_batch_size: 1
+gradient_accumulation_steps: 4
+save_strategy: "no"
+sustainability_domain: "openseabridge"

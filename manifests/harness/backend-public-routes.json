@@ -1,0 +1,32 @@
+{
+  "schema": "seabridge.harness.backend-public-routes.v1",
+  "updated_at": "2026-05-11",
+  "policy": "Only allowlist routes that are intentionally public. Auth-sensitive routes must use Depends or router-level dependencies instead of this manifest.",
+  "routes": [
+    {
+      "file": "app/api/v1/endpoints/gresb_assessment\\.py$",
+      "route_pattern": "^/gresb/callback$",
+      "reason": "OAuth callback endpoint receives provider redirects before user auth context is available."
+    },
+    {
+      "file": "app/api/v1/endpoints/share_viewer\\.py$",
+      "route_pattern": "^\\{token\\}/",
+      "reason": "Share viewer uses opaque share tokens in the path rather than authenticated user sessions."
+    },
+    {
+      "file": "seabridge-dev/api/app/routes/connectors\\.py$",
+      "route_pattern": "^(/\\{connector_id\\}|/epa_egrid/|/noaa_climate/|/utility_api/|/green_button/|/scope2/|/weather/|/arcgis/|/gis/|/climate_risk/|/utility/)",
+      "reason": "OSS connector metadata/calculator routes are intentionally public in the local OSS API surface; promote to auth if deployed with private tenant data."
+    },
+    {
+      "file": "seabridge-dev/api/app/routes/connectors\\.py$",
+      "route_pattern": "^$",
+      "reason": "OSS connector list endpoint is intentionally public metadata."
+    },
+    {
+      "file": "seabridge-dev/api/app/routes/openseabri\\.py$",
+      "route_pattern": "^/mcp/servers$",
+      "reason": "OpenSeaBri MCP server catalog is public metadata, not a tenant data mutation endpoint."
+    }
+  ]
+}

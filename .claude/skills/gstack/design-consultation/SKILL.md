@@ -729,8 +729,7 @@ If the user said no research, skip entirely and proceed to Phase 3 using your bu
 
 Use AskUserQuestion:
 > "Want outside design voices? Codex evaluates against OpenAI's design hard rules + litmus checks; Claude subagent does an independent design direction proposal."
->
-> A) Yes Ã¢â‚¬â€ run outside design voices
+> > A) Yes Ã¢â‚¬â€ run outside design voices
 > B) No Ã¢â‚¬â€ proceed without
 
 If user chooses B, skip this step and continue.

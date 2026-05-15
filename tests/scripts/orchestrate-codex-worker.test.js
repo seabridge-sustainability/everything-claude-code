@@ -6,6 +6,11 @@ const os = require('os');
 const path = require('path');
 const { spawnSync } = require('child_process');
 
+if (process.platform === 'win32') {
+  console.log('Skipping bash-dependent orchestrate-codex-worker tests on Windows');
+  process.exit(0);
+}
+
 const SCRIPT = path.join(__dirname, '..', '..', 'scripts', 'orchestrate-codex-worker.sh');
 
 console.log('=== Testing orchestrate-codex-worker.sh ===\n');

@@ -1,0 +1,31 @@
+name: Harness Engineering
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+      - develop
+
+jobs:
+  harness:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate shared agent skills
+        shell: pwsh
+        run: |
+          git clone https://github.com/mattpocock/skills "$env:GITHUB_WORKSPACE\..\shared-agent-skills"
+          powershell -ExecutionPolicy Bypass -File scripts/check-shared-agent-skills.ps1 `
+            -EccPath "$env:GITHUB_WORKSPACE" `
+            -SharedSkillsPath "$env:GITHUB_WORKSPACE\..\shared-agent-skills" `
+            -SkipRepoPointers
+
+      - name: Agent runtime harness checks
+        shell: pwsh
+        run: |
+          powershell -ExecutionPolicy Bypass -File scripts/check-agent-runtime-guardrails.ps1 `
+            -RepoPaths @("$env:GITHUB_WORKSPACE") `
+            -FailOnFinding

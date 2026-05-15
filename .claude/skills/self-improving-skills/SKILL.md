@@ -28,7 +28,7 @@ Ask the user: "Which SKILL.md file do you want to optimize? Provide the path, or
 
 Read the file with the Read tool. Extract:
 - `name` from the YAML frontmatter
-- `description` from the YAML frontmatter  
+- `description` from the YAML frontmatter
 - The full instruction body (everything after the `---` closing the frontmatter)
 
 Store these as `SKILL_NAME`, `SKILL_DESCRIPTION`, and `SKILL_BODY`.

@@ -628,7 +628,7 @@ This is the **primary mode** for developers verifying their work. When the user 
    - API endpoints Ã¢â€ â€™ test them directly with `$B js "await fetch('/api/...')"`
    - Static pages (markdown, HTML) Ã¢â€ â€™ navigate to them directly
 
-   **If no obvious pages/routes are identified from the diff:** Do not skip browser testing. The user invoked /qa because they want browser-based verification. Fall back to Quick mode Ã¢â‚¬â€ navigate to the homepage, follow the top 5 navigation targets, check console for errors, and test any interactive elements found. Backend, config, and infrastructure changes affect app behavior Ã¢â‚¬â€ always verify the app still works.
+**If no obvious pages/routes are identified from the diff:** Do not skip browser testing. The user invoked /qa because they want browser-based verification. Fall back to Quick mode Ã¢â‚¬â€ navigate to the homepage, follow the top 5 navigation targets, check console for errors, and test any interactive elements found. Backend, config, and infrastructure changes affect app behavior Ã¢â‚¬â€ always verify the app still works.
 
 3. **Detect the running app** Ã¢â‚¬â€ check common local dev ports:
    ```bash

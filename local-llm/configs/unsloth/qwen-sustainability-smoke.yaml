@@ -1,0 +1,14 @@
+# qwen-sustainability-smoke.yaml — Smoke-test config for Qwen2.5-3B sustainability SFT
+# Extends model_variables.yaml defaults; values here take precedence.
+# Duration on RTX 4090 Laptop: ~2–3 minutes for 5 examples × 1 epoch.
+
+training_model_family: "unsloth/Qwen2.5-3B"
+dataset_path: "local-llm/datasets/sustainability/smoke-test-sustainability.jsonl"
+output_dir: "./output/qwen-sustainability-smoke"
+num_train_epochs: 1
+max_seq_length: 512
+lora_rank: 16
+per_device_train_batch_size: 1
+gradient_accumulation_steps: 4
+save_strategy: "no"
+sustainability_domain: "general"

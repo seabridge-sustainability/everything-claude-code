@@ -1371,7 +1371,13 @@ function runTests() {
     const realFile = path.join(tmpDir, 'real.txt');
     fs.writeFileSync(realFile, 'content');
     const brokenLink = path.join(tmpDir, 'broken.txt');
-    fs.symlinkSync('/nonexistent/path/does/not/exist', brokenLink);
+    try {
+      fs.symlinkSync('/nonexistent/path/does/not/exist', brokenLink);
+    } catch (error) {
+      console.log(`    (skipped - symlinks not supported: ${error.code || error.message})`);
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+      return;
+    }
 
     try {
       const results = utils.findFiles(tmpDir, '*.txt');

@@ -339,17 +339,14 @@ Ou adicione diretamente ao seu `~/.claude/settings.json`:
 ```
 
 > **Nota:** O sistema de plugins do Claude Code nÃƒÂ£o suporta distribuiÃƒÂ§ÃƒÂ£o de `rules` via plugins. VocÃƒÂª precisa instalar as regras manualmente:
->
-> ```bash
+> > ```bash
 > # Clone o repositÃƒÂ³rio primeiro
 > git clone https://github.com/affaan-m/everything-claude-code.git
->
-> # OpÃƒÂ§ÃƒÂ£o A: Regras no nÃƒÂ­vel do usuÃƒÂ¡rio (aplica a todos os projetos)
+> > # OpÃƒÂ§ÃƒÂ£o A: Regras no nÃƒÂ­vel do usuÃƒÂ¡rio (aplica a todos os projetos)
 > mkdir -p ~/.claude/rules
 > cp -r everything-claude-code/rules/common/* ~/.claude/rules/
 > cp -r everything-claude-code/rules/typescript/* ~/.claude/rules/   # escolha sua stack
->
-> # OpÃƒÂ§ÃƒÂ£o B: Regras no nÃƒÂ­vel do projeto (aplica apenas ao projeto atual)
+> > # OpÃƒÂ§ÃƒÂ£o B: Regras no nÃƒÂ­vel do projeto (aplica apenas ao projeto atual)
 > mkdir -p .claude/rules
 > cp -r everything-claude-code/rules/common/* .claude/rules/
 > ```

@@ -1,4 +1,50 @@
-﻿# Everything Claude Code (ECC) ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Agent Instructions
+# Everything Claude Code (ECC) ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Agent Instructions
+
+## SeaBridgeAI Central System With Embedded Superpowers And GSD
+
+SYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1
+
+Canonical path: C:\Users\adelm\SeaBridgeAI\everything-claude-code
+
+Superpowers is embedded as an adapted local methodology through the SeaBridgeAI sea-* skills. Claude Code also has user-scope local plugin `superpowers@superpowers-dev` installed from the ECC vendor marketplace. Reference clone: C:\Users\adelm\SeaBridgeAI\everything-claude-code\vendor\superpowers. Do not add, update, remove, or reinstall Superpowers globally or through a marketplace unless explicitly approved.
+
+GSD / Get Shit Done is embedded as a controlled local reference and adapted workflow layer through `sea-gsd-controlled-execution`. Reference clone: C:\Users\adelm\SeaBridgeAI\everything-claude-code\external\get-shit-done. Do not run `npx get-shit-done-cc@latest`, install globally, enable yolo/autonomous mode, auto-commit, auto-push, or auto-create PRs unless explicitly approved.
+
+Full callable SeaBridgeAI skill catalog: sea-senior-dev-workflow, sea-brainstorming-and-spec-refinement, sea-task-orchestration, sea-test-driven-development, sea-systematic-debugging, sea-verification-before-completion, sea-code-review-response, sea-git-worktree-isolation, sea-parallel-agent-dispatch, sea-finishing-development-branch, sea-backend-api-verification, sea-frontend-design, sea-ai-data-integrity, sea-sustainability-domain-review, sea-context-hygiene, sea-cross-repo-handoff, sea-skill-creator-protocol, sea-knowledge-vault, sea-gsd-controlled-execution.
+
+Mandatory gates: local-only development unless approved; no GitHub push unless approved; no commit unless requested; no global install or marketplace install unless approved; no paid/live provider calls unless approved; no fabricated sustainability data; verify endpoint/database/source/auth/tenant behavior before frontend or product claims; verify before completion.
+
+Claude Code, Codex, Gemini, OpenCode, Cursor, GitHub Copilot CLI, and future coding agents must use the same SYSTEM_ID, canonical path, skill catalog, workflows, and checklists. Product repos should point here rather than duplicating divergent guidance.
+
+Shared engineering skill extensions live in `AGENT_SKILLS.md` and adapt
+`C:\Users\adelm\SeaBridgeAI\shared-agent-skills` without creating a parallel
+system. Active portable invocations: `#skill/grill-me`,
+`#skill/ubiquitous-language`, `#skill/improve-codebase-architecture`, or
+`Use skill: <name>`.
+## SeaBridgeAI Central Coding-Agent Layer
+
+For SeaBridgeAI work across backend, frontend, OpenSeaBri, `_upstream`, and
+future repos, load the shared entrypoint:
+`C:\Users\adelm\SeaBridgeAI\everything-claude-code\SEABRIDGE_CODING_AGENT_SYSTEM.md`
+
+Then use the relevant `repo-integrations/`, `skills/sea-*`, `.agents/skills/sea-*`,
+`workflows/`, and `checklists/` files. Keep reusable guidance here in ECC;
+product repos should only carry lightweight pointers and repo-specific overrides.
+For optional GBrain checks and code-lookup planning, use `skills/gbrain/SKILL.md`
+and `scripts/gbrain-workspace.ps1`; it is intentionally check/plan first and does
+not initialize a brain or index sources by default.
+
+Callable skill names: `sea-senior-dev-workflow`,
+`sea-brainstorming-and-spec-refinement`, `sea-task-orchestration`,
+`sea-test-driven-development`, `sea-systematic-debugging`,
+`sea-verification-before-completion`, `sea-code-review-response`,
+`sea-git-worktree-isolation`, `sea-parallel-agent-dispatch`,
+`sea-finishing-development-branch`, `sea-backend-api-verification`,
+`sea-frontend-design`, `sea-ai-data-integrity`,
+`sea-sustainability-domain-review`, `sea-context-hygiene`,
+`sea-cross-repo-handoff`, `sea-skill-creator-protocol`,
+`sea-knowledge-vault`, `sea-gsd-controlled-execution`,
+`sea-local-llm-training`.
 
 ## Safety And Authorization Rule
 
@@ -46,7 +92,7 @@ Transform tasks into verifiable goals. State what "done" looks like and how you'
 
 ---
 
-This is a **production-ready AI coding plugin** providing 30 specialized agents, ~74 skills, 60 commands, and automated hook workflows for software development.
+This is a **production-ready AI coding plugin** providing 37 specialized agents, 237+ skills, 60 commands, and automated hook workflows for software development.
 
 **Version:** 1.9.0
 
@@ -298,9 +344,9 @@ Troubleshoot failures: check test isolation ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â
 ## Project Structure
 
 ```
-agents/          ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â 30 specialized subagents
-skills/          ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ~74 workflow skills and domain knowledge
-commands/        ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â 60 slash commands
+agents/          - 37 specialized subagents
+skills/          - 237+ workflow skills and domain knowledge
+commands/        - 60 slash commands
 hooks/           ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Trigger-based automations
 rules/           ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Always-follow guidelines (common + per-language)
 scripts/         ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Cross-platform Node.js utilities
@@ -517,7 +563,7 @@ designlang crawls any live URL with a headless browser and generates 17+ output 
 **Reference:** `C:\Users\adelm\SeaBridgeAI\everything-claude-code\references\design-extract\`
 
 Skill: `/extract-design <url>` (installed at `~/.claude/skills/extract-design/`)
-CLI: `npx designlang <url>` (no install required) or `designlang <url>` (global install)
+CLI: `npx designlang <url>` (no install required) or `designlang <url>` (global install requires explicit approval)
 
 Key flags:
 - `--full` — multi-page crawl (auto-discovers nav pages)
@@ -535,3 +581,4 @@ MCP server (continuous sync):
 ```bash
 npx designlang mcp --out ./design-extract-output
 ```
+

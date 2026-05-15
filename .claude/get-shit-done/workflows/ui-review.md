@@ -140,7 +140,7 @@ Full review: {path to UI-REVIEW.md}
 
 ───────────────────────────────────────────────────────────────
 
-## ▶ Next
+## Next
 
 `/clear` then one of:
 

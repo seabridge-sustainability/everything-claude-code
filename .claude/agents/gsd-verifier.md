@@ -4,11 +4,11 @@ description: Verifies phase goal achievement through goal-backward analysis. Che
 tools: Read, Write, Bash, Grep, Glob
 color: green
 # hooks:
-#   PostToolUse:
-#     - matcher: "Write|Edit"
-#       hooks:
-#         - type: command
-#           command: "npx eslint --fix $FILE 2>/dev/null || true"
+# PostToolUse:
+# - matcher: "Write|Edit"
+# hooks:
+# - type: command
+# command: "npx eslint --fix $FILE 2>/dev/null || true"
 ---
 
 <role>
@@ -257,7 +257,7 @@ grep -r "$artifact_name" "${search_path:-src/}" --include="*.ts" --include="*.ts
 | Exists | Substantive | Wired | Status      |
 | ------ | ----------- | ----- | ----------- |
 | ✓      | ✓           | ✓     | ✓ VERIFIED  |
-| ✓      | ✓           | ✗     | ⚠️ ORPHANED |
+| ✓      | ✓           | ✗     | WARNING: ORPHANED |
 | ✓      | ✗           | -     | ✗ STUB      |
 | ✗      | -           | -     | ✗ MISSING   |
 
@@ -304,7 +304,7 @@ grep -r -A 3 "<${COMPONENT_NAME}" "${search_path:-src/}" --include="*.tsx" 2>/de
 | Data Source | Produces Real Data | Status |
 | ---------- | ------------------ | ------ |
 | DB query found | Yes | ✓ FLOWING |
-| Fetch exists, static fallback only | No | ⚠️ STATIC |
+| Fetch exists, static fallback only | No | WARNING: STATIC |
 | No data source found | N/A | ✗ DISCONNECTED |
 | Props hardcoded empty at call site | No | ✗ HOLLOW_PROP |
 
@@ -313,8 +313,8 @@ grep -r -A 3 "<${COMPONENT_NAME}" "${search_path:-src/}" --include="*.tsx" 2>/de
 | Exists | Substantive | Wired | Data Flows | Status |
 | ------ | ----------- | ----- | ---------- | ------ |
 | ✓ | ✓ | ✓ | ✓ | ✓ VERIFIED |
-| ✓ | ✓ | ✓ | ✗ | ⚠️ HOLLOW — wired but data disconnected |
-| ✓ | ✓ | ✗ | - | ⚠️ ORPHANED |
+| ✓ | ✓ | ✓ | ✗ | WARNING: HOLLOW — wired but data disconnected |
+| ✓ | ✓ | ✗ | - | WARNING: ORPHANED |
 | ✓ | ✗ | - | - | ✗ STUB |
 | ✗ | - | - | - | ✗ MISSING |
 
@@ -437,7 +437,7 @@ grep -n -B 2 -A 2 "console\.log" "$file" 2>/dev/null | grep -E "^\s*(const|funct
 
 **Stub classification:** A grep match is a STUB only when the value flows to rendering or user-visible output AND no other code path populates it with real data. A test helper, type default, or initial state that gets overwritten by a fetch/store is NOT a stub. Check for data-fetching (useEffect, fetch, query, useSWR, useQuery, subscribe) that writes to the same variable before flagging.
 
-Categorize: 🛑 Blocker (prevents goal) | ⚠️ Warning (incomplete) | ℹ️ Info (notable)
+Categorize:  Blocker (prevents goal) | WARNING: Warning (incomplete) |  Info (notable)
 
 ## Step 7b: Behavioral Spot-Checks
 

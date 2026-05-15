@@ -539,8 +539,7 @@ AskUserQuestion:
 
 > "Previous design explorations for this project:
 > - [date]: [screen] Ã¢â‚¬â€ chose variant [X], feedback: '[summary]'
->
-> A) Revisit Ã¢â‚¬â€ reopen the comparison board to adjust your choices
+> > A) Revisit Ã¢â‚¬â€ reopen the comparison board to adjust your choices
 > B) New exploration Ã¢â‚¬â€ start fresh with new or updated instructions
 > C) Something else"
 

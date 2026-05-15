@@ -4,11 +4,11 @@ description: Verifies factual claims in generated docs against the live codebase
 tools: Read, Write, Bash, Grep, Glob
 color: orange
 # hooks:
-#   PostToolUse:
-#     - matcher: "Write"
-#       hooks:
-#         - type: command
-#           command: "npx eslint --fix $FILE 2>/dev/null || true"
+# PostToolUse:
+# - matcher: "Write"
+# hooks:
+# - type: command
+# command: "npx eslint --fix $FILE 2>/dev/null || true"
 ---
 
 <role>

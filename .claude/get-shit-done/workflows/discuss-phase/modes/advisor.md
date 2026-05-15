@@ -57,7 +57,7 @@ Set `NON_TECHNICAL_OWNER = true` if ANY of the following are present:
 **Tie-breaker / precedence (when signals conflict):**
 1. An explicit `technical_background: true` (or any `explanation_depth` value
    tagged with a technical modifier such as `practical-detailed:technical`)
-   **overrides** all inferred non-technical signals — set
+**overrides** all inferred non-technical signals — set
    `NON_TECHNICAL_OWNER = false`.
 2. Otherwise, ANY single matching signal is sufficient to set
    `NON_TECHNICAL_OWNER = true` (signals are OR-aggregated, not weighted).

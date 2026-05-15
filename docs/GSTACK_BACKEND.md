@@ -13,8 +13,8 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
 
-> **gstack core:** `~/.claude/skills/gstack/`  
-> **Backend project:** `C:\Users\adelm\SeaBridgeAI\manageesg-backend`  
+> **gstack core:** `~/.claude/skills/gstack/`
+> **Backend project:** `C:\Users\adelm\SeaBridgeAI\manageesg-backend`
 > **Runtime state (per-session):** `manageesg-backend/.gstack/browse.json` (auto-written by daemon, gitignored)
 
 This document maps every gstack skill to its concrete use in the SeaBridgeAI backend.
@@ -27,9 +27,9 @@ Use it as the decision guide for _which_ skill to reach for at each stage of bac
 gstack resolves its binary and skill root with this priority order (from `SKILL.md` preamble):
 
 ```
-1.  <repo-root>/.agents/skills/gstack/   Ã¢â€ Â project-local override (not used here)
-2.  ~/.codex/skills/gstack/              Ã¢â€ Â Codex install path
-3.  ~/.claude/skills/gstack/             Ã¢â€ Â Claude Code install path  Ã¢Å“â€¦ (active)
+1. <repo-root>/.agents/skills/gstack/   Ã¢â€ Â project-local override (not used here)
+2. ~/.codex/skills/gstack/              Ã¢â€ Â Codex install path
+3. ~/.claude/skills/gstack/             Ã¢â€ Â Claude Code install path  Ã¢Å“â€¦ (active)
 ```
 
 The backend project registers `.gstack/` as the daemon state directory.

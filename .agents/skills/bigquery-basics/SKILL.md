@@ -19,17 +19,17 @@ intelligence capabilities.
 
 ## Setup and Basic Usage
 
-1.  **Enable the BigQuery API:**
+1. **Enable the BigQuery API:**
     ```bash
     gcloud services enable bigquery.googleapis.com
     ```
 
-2.  **Create a Dataset:**
+2. **Create a Dataset:**
     ```bash
     bq mk --dataset --location=US my_dataset
     ```
 
-3.  **Create a Table:**
+3. **Create a Table:**
 
     Create a file named `schema.json` with your table schema:
 
@@ -54,7 +54,7 @@ intelligence capabilities.
     bq mk --table my_dataset.mytable schema.json
     ```
 
-4.  **Run a Query:**
+4. **Run a Query:**
     ```bash
     bq query --use_legacy_sql=false \
     'SELECT name FROM `bigquery-public-data.usa_names.usa_1910_2013` \

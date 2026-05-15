@@ -1,0 +1,33 @@
+repos:
+  # ── Secrets scanning ──────────────────────────────────────────────────────────
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        name: Detect secrets
+        args: ['--baseline', '.secrets.baseline']
+        exclude: >
+          (?x)^(
+            node_modules/|\.git/|dist/|build/|
+            .*\.lock$|.*\.min\.js$
+          )
+
+  # ── Local SeaBridgeAI harness hooks ──────────────────────────────────────────
+  - repo: local
+    hooks:
+      - id: seabridge-harness-agent-runtime
+        name: SeaBridgeAI harness agent-runtime guardrails
+        entry: powershell -ExecutionPolicy Bypass -File scripts/check-agent-runtime-guardrails.ps1
+        language: system
+        pass_filenames: false
+      - id: seabridge-shared-agent-skills
+        name: SeaBridgeAI shared agent skills validation
+        entry: powershell -ExecutionPolicy Bypass -File scripts/check-shared-agent-skills.ps1
+        language: system
+        pass_filenames: false
+      - id: npm-audit-on-push
+        name: Node.js CVE scan (npm audit)
+        entry: yarn audit --level high
+        language: system
+        pass_filenames: false
+        stages: [pre-push]

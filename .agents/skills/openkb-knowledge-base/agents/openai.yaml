@@ -1,0 +1,7 @@
+interface:
+  display_name: "OpenKB Knowledge Base"
+  short_description: "Compiled wiki knowledge bases with OpenKB and PageIndex"
+  brand_color: "#2563EB"
+  default_prompt: "Use OpenKB to safely create, update, query, or lint a compiled wiki-style document knowledge base."
+policy:
+  allow_implicit_invocation: true

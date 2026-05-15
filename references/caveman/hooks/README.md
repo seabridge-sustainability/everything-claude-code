@@ -82,7 +82,7 @@ Badge examples:
 ## How It Works
 
 ```
-SessionStart hook ──writes "full"──▶ ~/.claude/.caveman-active ◀──writes mode── UserPromptSubmit hook
+SessionStart hook ──writes "full"── ~/.claude/.caveman-active ──writes mode── UserPromptSubmit hook
                                               │
                                            reads
                                               ▼

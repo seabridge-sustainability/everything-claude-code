@@ -73,7 +73,7 @@ CI bot commits as `github-actions[bot]`. After PR merge, wait for workflow befor
 Three hooks in `hooks/` plus a `caveman-config.js` shared module and a `package.json` CommonJS marker. Communicate via flag file at `$CLAUDE_CONFIG_DIR/.caveman-active` (falls back to `~/.claude/.caveman-active`).
 
 ```
-SessionStart hook ──writes "full"──▶ $CLAUDE_CONFIG_DIR/.caveman-active ◀──writes mode── UserPromptSubmit hook
+SessionStart hook ──writes "full"── $CLAUDE_CONFIG_DIR/.caveman-active ──writes mode── UserPromptSubmit hook
                                                        │
                                                     reads
                                                        ▼

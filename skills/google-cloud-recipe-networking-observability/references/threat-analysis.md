@@ -3,7 +3,7 @@
 Use Firewall Threat Logs and Cloud IDS logs to identify, analyze, and
 troubleshoot security incidents in your VPC network.
 
-## 🤖 Agent / Gemini CLI Instructions (MCP)
+## Agent / Gemini CLI Instructions (MCP)
 
 Agents should use [Cloud Logging MCP](mcp-usage.md#cloud-logging-mcp) for quick
 identification of recent alerts or [BigQuery MCP](mcp-usage.md#bigquery-mcp) for
@@ -139,13 +139,13 @@ LIMIT 10
 
 ### Key Fields (Cloud Logging Filter Names)
 
--   **jsonPayload.threatDetails.threat**: Human-readable name of the threat.
--   **jsonPayload.threatDetails.severity**: Severity level (CRITICAL, HIGH,
+- **jsonPayload.threatDetails.threat**: Human-readable name of the threat.
+- **jsonPayload.threatDetails.severity**: Severity level (CRITICAL, HIGH,
     MEDIUM, LOW, INFORMATIONAL).
--   **jsonPayload.threatDetails.category**: The category of threat.
--   **jsonPayload.action**: Action taken (for example, "ALLOW", "DENY",
+- **jsonPayload.threatDetails.category**: The category of threat.
+- **jsonPayload.action**: Action taken (for example, "ALLOW", "DENY",
     "ALERT").
--   **jsonPayload.connection.clientIp**: The true source IP.
--   **jsonPayload.connection.serverIp**: The destination IP.
--   **jsonPayload.threatDetails.cves**: List of CVE IDs.
--   **jsonPayload.threatDetails.description**: Attack payload details.
+- **jsonPayload.connection.clientIp**: The true source IP.
+- **jsonPayload.connection.serverIp**: The destination IP.
+- **jsonPayload.threatDetails.cves**: List of CVE IDs.
+- **jsonPayload.threatDetails.description**: Attack payload details.

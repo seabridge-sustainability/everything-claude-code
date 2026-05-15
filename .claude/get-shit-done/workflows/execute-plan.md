@@ -44,7 +44,7 @@ PHASE=$(echo "$PLAN_PATH" | grep -oE '[0-9]+(\.[0-9]+)?-[0-9]+')
 ```
 
 <if mode="yolo">
-Auto-approve: `⚡ Execute {phase}-{plan}-PLAN.md [Plan X of Y for Phase Z]` → parse_segments.
+Auto-approve: ` Execute {phase}-{plan}-PLAN.md [Plan X of Y for Phase Z]` → parse_segments.
 </if>
 
 <if mode="interactive" OR="custom with gates.execute_next_plan true">
@@ -129,7 +129,7 @@ Pattern B only (verify-only checkpoints). Skip for A/C.
    - Append `## Self-Check: PASSED` or `## Self-Check: FAILED` to SUMMARY
    Then commit (no narrative between Write and commit).
 
-   **Known Claude Code bug (classifyHandoffIfNeeded):** If any segment agent reports "failed" with `classifyHandoffIfNeeded is not defined`, this is a Claude Code runtime bug — not a real failure. Run spot-checks; if they pass, treat as successful.
+**Known Claude Code bug (classifyHandoffIfNeeded):** If any segment agent reports "failed" with `classifyHandoffIfNeeded is not defined`, this is a Claude Code runtime bug — not a real failure. Run spot-checks; if they pass, treat as successful.
 
 
 
@@ -484,7 +484,7 @@ gsd-sdk query commit "" --files .planning/codebase/*.md --amend
 </step>
 
 <step name="offer_next">
-If `USER_SETUP_CREATED=true`: display `⚠️ USER SETUP REQUIRED` with path + env/config tasks at TOP.
+If `USER_SETUP_CREATED=true`: display `WARNING: USER SETUP REQUIRED` with path + env/config tasks at TOP.
 
 ```bash
 (ls -1 .planning/phases/[current-phase-dir]/*-PLAN.md 2>/dev/null || true) | wc -l

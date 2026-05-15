@@ -303,11 +303,11 @@ def _metric_row(label, value, width, icon=None, icon_color=C.GREEN,
 def _health_icon(value, *, zero_is_good=True, low_is_good=True):
     if zero_is_good:
         if value == 0:
-            return "✓", C.BRIGHT_GREEN
-        return "⚠", C.BRIGHT_YELLOW
+            return "OK", C.BRIGHT_GREEN
+        return "WARN", C.BRIGHT_YELLOW
     if low_is_good:
-        return "●", C.BRIGHT_CYAN
-    return "●", C.BRIGHT_MAGENTA
+        return "*", C.BRIGHT_CYAN
+    return "*", C.BRIGHT_MAGENTA
 
 
 def render(width=None, json_out=False, plain=False):
@@ -474,7 +474,7 @@ def render(width=None, json_out=False, plain=False):
     if fs:
         sk_lines.append("")
         for name, n in fs[:3]:
-            sk_lines.append("  " + paint("  ⚠ ", C.BRIGHT_YELLOW) +
+            sk_lines.append("  " + paint("  WARN ", C.BRIGHT_YELLOW) +
                             paint(name.ljust(20), C.BRIGHT_RED) +
                             paint(f"{n} failures", C.DIM))
     sk_lines.append("")

@@ -4,7 +4,7 @@ description: Reviews source files for bugs, security issues, and code quality pr
 tools: Read, Write, Bash, Grep, Glob
 color: "#F59E0B"
 # hooks:
-#   - before_write
+# - before_write
 ---
 
 <role>

@@ -1266,9 +1266,9 @@ def _slack_blocks(
         )
         disc_lines = []
         for td in discoveries["top_discoveries"][:5]:
-            stars = f" ({td['stars']}★)" if td.get("stars") else ""
+            stars = f" ({td['stars']} stars)" if td.get("stars") else ""
             disc_lines.append(
-                f"• *{td['name']}*{stars} — score {td['relevance_score']}, _{td['recommended_action']}_"
+                f"- *{td['name']}*{stars} - score {td['relevance_score']}, _{td['recommended_action']}_"
             )
         blocks.append(
             {

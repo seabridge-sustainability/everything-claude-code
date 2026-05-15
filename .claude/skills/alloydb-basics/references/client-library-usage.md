@@ -14,13 +14,13 @@ operational overhead of managing the Auth Proxy as a separate binary.
 
 ### Python
 
--   **Installation:**
+- **Installation:**
 
   ```bash
   pip install "google-cloud-alloydb-connector[pg8000]" sqlalchemy
   ```
 
--   **Usage Example:**
+- **Usage Example:**
 
   ```python
   import sqlalchemy
@@ -47,7 +47,7 @@ operational overhead of managing the Auth Proxy as a separate binary.
 
 ### Java
 
--   **Maven Dependency:**
+- **Maven Dependency:**
 
   ```xml
   <dependency>
@@ -64,7 +64,7 @@ operational overhead of managing the Auth Proxy as a separate binary.
   </dependency>
   ```
 
--   **Configuring a Connection Pool:**
+- **Configuring a Connection Pool:**
 
     We recommend using HikariCP for connection pooling. To use HikariCP with the
     Java Connector, you will need to set the usual properties (e.g., JDBC URL,
@@ -123,13 +123,13 @@ operational overhead of managing the Auth Proxy as a separate binary.
 
 ### Go
 
--   **Installation:**
+- **Installation:**
 
   ```bash
   go get cloud.google.com/go/alloydbconn
   ```
 
--   **Usage Example:**
+- **Usage Example:**
 
   ```go
   package main
@@ -177,11 +177,11 @@ operational overhead of managing the Auth Proxy as a separate binary.
 
 Since AlloyDB is PostgreSQL-compatible, you can also use standard drivers:
 
--   **Python:** `psycopg2`, `asyncpg`, `pg8000`
+- **Python:** `psycopg2`, `asyncpg`, `pg8000`
 
--   **Java:** `PostgreSQL JDBC Driver`
+- **Java:** `PostgreSQL JDBC Driver`
 
--   **Go:** `lib/pq`, `jackc/pgx`
+- **Go:** `lib/pq`, `jackc/pgx`
 
 For more details, see: [AlloyDB
 Connectors](https://cloud.google.com/alloydb/docs/connect-external).

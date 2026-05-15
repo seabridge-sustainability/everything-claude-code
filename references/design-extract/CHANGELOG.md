@@ -43,7 +43,7 @@ breaking changes along the way.
 
 ### Added
 
-- **`src/extractors/dark-mode-pair.js`** — pure function that maps light ↔ dark pairs for primary/secondary/accent/background/text roles and every CSS variable that actually differs between themes. Emits a drop-in Tailwind `darkMode: 'class'` config plus an audit (tokens missing from either pass).
+- **`src/extractors/dark-mode-pair.js`** — pure function that maps light  dark pairs for primary/secondary/accent/background/text roles and every CSS variable that actually differs between themes. Emits a drop-in Tailwind `darkMode: 'class'` config plus an audit (tokens missing from either pass).
 - **`src/extractors/responsive-screenshots.js`** — full-page PNGs at mobile / tablet / desktop / wide × (light, dark). Writes to `screenshots/responsive/<breakpoint>-<scheme>.png` with an index.
 - New flag `--responsive-shots`. Auto-on with `--full`.
 - New outputs: `*-dark-mode.json`, `*-responsive.json`.

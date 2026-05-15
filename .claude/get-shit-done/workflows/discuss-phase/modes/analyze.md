@@ -23,7 +23,7 @@ a brief **trade-off analysis** for the decision:
 | JWT (stateless) | Scalable, no server state | Token size, revocation complexity |
 | OAuth 2.0 + PKCE | Industry standard for SPAs | More setup, redirect flow UX |
 
-💡 Recommended: OAuth 2.0 + PKCE — your app has social login in requirements (REQ-04) and this aligns with the existing NextAuth setup in `src/lib/auth.ts`.
+ Recommended: OAuth 2.0 + PKCE — your app has social login in requirements (REQ-04) and this aligns with the existing NextAuth setup in `src/lib/auth.ts`.
 
 How should users authenticate?
 ```

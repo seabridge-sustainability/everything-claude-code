@@ -1,8 +1,8 @@
 # Hermes Agent adapter
 
 [Hermes Agent](https://github.com/nousresearch/hermes-agent) by Nous
-Research is an open-source agent with its own persistent memory layer
-and agentskills.io-compatible skill support. Our adapter layers the
+Research is an open-source agent with its own built-in state files and
+agentskills.io-compatible skill support. Our adapter layers the
 portable `.agent/` brain on top so you keep one knowledge base even if
 you later swap harnesses.
 

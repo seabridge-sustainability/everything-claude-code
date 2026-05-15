@@ -248,7 +248,7 @@ Otherwise use AskUserQuestion:
 
 If "Continue without context": Proceed to step 5.
 If "Run discuss-phase first":
-  **IMPORTANT:** Do NOT invoke discuss-phase as a nested Skill/Task call — AskUserQuestion
+**IMPORTANT:** Do NOT invoke discuss-phase as a nested Skill/Task call — AskUserQuestion
   does not work correctly in nested subcontexts (#1009). Instead, display the command
   and exit so the user runs it as a top-level command:
   ```
@@ -256,7 +256,7 @@ If "Run discuss-phase first":
 
   /gsd-discuss-phase {X} ${GSD_WS}
   ```
-  **Exit the plan-phase workflow. Do not continue.**
+**Exit the plan-phase workflow. Do not continue.**
 
 ## 4.5. Check AI-SPEC
 
@@ -509,8 +509,8 @@ Continue to step 6.
 Output this markdown directly (not as a code block):
 
 ```
-## ⚠ UI-SPEC.md missing for Phase {N}
-▶ Recommended next step:
+## WARNING: UI-SPEC.md missing for Phase {N}
+ Recommended next step:
 `/gsd-ui-phase {N} ${GSD_WS}` — generate UI design contract before planning
 ───────────────────────────────────────────────
 Also available:
@@ -861,7 +861,7 @@ PLAN.md files:
 Task(
   prompt="{same planning_context as step 8, plus:}
 
-  **Chunked mode: outline-only.**
+**Chunked mode: outline-only.**
   Do NOT write any PLAN.md files in this Task.
   Write only: {PHASE_DIR}/{PADDED_PHASE}-PLAN-OUTLINE.md
 
@@ -906,7 +906,7 @@ For each plan entry extracted from `PLAN-OUTLINE.md`:
    Task(
      prompt="{same planning_context as step 8, plus:}
 
-     **Chunked mode: single-plan.**
+**Chunked mode: single-plan.**
      Write exactly ONE plan file: {PHASE_DIR}/{plan_id}-PLAN.md
      Plan to write: {plan_id} — {objective}
      Wave: {wave} | Depends on: {depends_on}
@@ -935,14 +935,14 @@ to step 9.
 
 - **`## PLANNING COMPLETE`:** Display plan count. If `--skip-verify` or `plan_checker_enabled` is false (from init): skip to step 13. Otherwise: step 10.
 - **`## PHASE SPLIT RECOMMENDED`:** The planner determined the phase exceeds the context budget for full-fidelity implementation of all source items. Handle in step 9b.
-- **`## ⚠ Source Audit: Unplanned Items Found`:** The planner's multi-source coverage audit found items from REQUIREMENTS.md, RESEARCH.md, ROADMAP goal, or CONTEXT.md decisions that are not covered by any plan. Handle in step 9c.
+- **`## WARNING: Source Audit: Unplanned Items Found`:** The planner's multi-source coverage audit found items from REQUIREMENTS.md, RESEARCH.md, ROADMAP goal, or CONTEXT.md decisions that are not covered by any plan. Handle in step 9c.
 - **`## CHECKPOINT REACHED`:** Present to user, get response, spawn continuation (step 12)
 - **`## PLANNING INCONCLUSIVE`:** Show attempts, offer: Add context / Retry / Manual
 - **Empty / truncated / no recognized marker:** → Filesystem fallback (step 9a).
 
 ## 9a. Filesystem Fallback (Planner)
 
-**Triggered when:** Task() returns but the return contains no recognized marker (`## PLANNING COMPLETE`, `## PHASE SPLIT RECOMMENDED`, `## ⚠ Source Audit`, `## CHECKPOINT REACHED`, `## PLANNING INCONCLUSIVE`).
+**Triggered when:** Task() returns but the return contains no recognized marker (`## PLANNING COMPLETE`, `## PHASE SPLIT RECOMMENDED`, `## WARNING: Source Audit`, `## CHECKPOINT REACHED`, `## PLANNING INCONCLUSIVE`).
 
 ```bash
 DISK_PLANS=$(ls "${PHASE_DIR}"/*-PLAN.md 2>/dev/null | wc -l | tr -d ' ')
@@ -1002,7 +1002,7 @@ Use AskUserQuestion with these 3 options.
 
 ## 9c. Handle Source Audit Gaps
 
-When the planner returns `## ⚠ Source Audit: Unplanned Items Found`, it means items from REQUIREMENTS.md, RESEARCH.md, ROADMAP goal, or CONTEXT.md decisions have no corresponding plan.
+When the planner returns `## WARNING: Source Audit: Unplanned Items Found`, it means items from REQUIREMENTS.md, RESEARCH.md, ROADMAP goal, or CONTEXT.md decisions have no corresponding plan.
 
 **Extract from planner return:**
 - Each unplanned item with its source artifact and section
@@ -1011,7 +1011,7 @@ When the planner returns `## ⚠ Source Audit: Unplanned Items Found`, it means 
 **Present each gap to user.** For each unplanned item:
 
 ```
-## ⚠ Unplanned: {item description}
+## WARNING: Unplanned: {item description}
 
 Source: {RESEARCH.md / REQUIREMENTS.md / ROADMAP goal / CONTEXT.md}
 Details: {why the planner flagged this}
@@ -1142,14 +1142,14 @@ Display: `Revision iteration {N}/3 -- {blocker_count} blockers, {warning_count} 
 **Stall detection:** If `issue_count >= prev_issue_count`:
   Display: `Revision loop stalled — issue count not decreasing ({issue_count} issues remain after {N} iterations)`
 
-  **If `stall_reentry_count < 2`:**
+**If `stall_reentry_count < 2`:**
     Ask user:
       Question: "Issues remain after {N} revision attempts with no progress. Proceed with current output?"
       Options: "Proceed anyway" | "Adjust approach"
     If "Proceed anyway": accept current plans and continue to step 13.
     If "Adjust approach": increment `stall_reentry_count`, open freeform discussion, then re-enter step 8 (full replanning). Note: re-entry resets `iteration_count` and `prev_issue_count` but `stall_reentry_count` persists across re-entries and is capped at 2.
 
-  **If `stall_reentry_count >= 2`:**
+**If `stall_reentry_count >= 2`:**
     Display: `Stall persists after 2 re-planning attempts. The following issues could not be resolved automatically:`
     List the remaining issues from the checker.
     Suggest: "Consider resolving these issues manually or running `/gsd-debug` to investigate root causes."
@@ -1210,7 +1210,7 @@ Offer: 1) Force proceed, 2) Provide guidance and retry, 3) Abandon
 
 **Prerequisites:** `workflow.plan_bounce_script` must be set to a valid script path. If bounce is activated but no script is configured, display warning and skip:
 ```
-⚠ Plan bounce activated but no script configured.
+WARNING: Plan bounce activated but no script configured.
 Set workflow.plan_bounce_script to the path of your refinement script.
 Skipping bounce step.
 ```
@@ -1246,19 +1246,19 @@ cp "${PLAN_FILE}" "${PLAN_FILE%.md}.pre-bounce.md"
 3. **Validate bounced plan — YAML frontmatter integrity:**
 After the script returns, check that the bounced file still has valid YAML frontmatter (opening and closing `---` delimiters with parseable content between them). If the bounced plan breaks YAML frontmatter validation, restore the original from the pre-bounce.md backup and continue to the next plan:
 ```
-⚠ Bounced plan ${PLAN_FILE} has broken YAML frontmatter — restoring original from pre-bounce backup.
+WARNING: Bounced plan ${PLAN_FILE} has broken YAML frontmatter — restoring original from pre-bounce backup.
 ```
 
 4. **Handle script failure:** If the bounce script exits non-zero, restore the original plan from the pre-bounce.md backup and continue to the next plan:
 ```
-⚠ Bounce script failed for ${PLAN_FILE} (exit code ${EXIT_CODE}) — restoring original from pre-bounce backup.
+WARNING: Bounce script failed for ${PLAN_FILE} (exit code ${EXIT_CODE}) — restoring original from pre-bounce backup.
 ```
 
 **After all plans are bounced:**
 
 5. **Re-run plan checker on bounced plans:** Spawn gsd-plan-checker (same as step 10) on all modified plans. If a bounced plan fails the checker, restore original from its pre-bounce.md backup:
 ```
-⚠ Bounced plan ${PLAN_FILE} failed checker validation — restoring original from pre-bounce backup.
+WARNING: Bounced plan ${PLAN_FILE} failed checker validation — restoring original from pre-bounce backup.
 ```
 
 6. **Commit surviving bounced plans:** If at least one plan survived both the frontmatter validation and the checker re-run, commit the changes:
@@ -1305,7 +1305,7 @@ If all requirements covered and no dropped features:
 
 If gaps found:
 ```
-## ⚠ Requirements Coverage Gap
+## WARNING: Requirements Coverage Gap
 
 {M} of {N} phase requirements are not assigned to any plan:
 
@@ -1460,7 +1460,7 @@ sort within source):**
 | CONTEXT.md | D-01 | ✓ Covered |
 | CONTEXT.md | D-02 | ✗ Not covered |
 
-⚠ N items not covered by any plan
+WARNING: N items not covered by any plan
 ```
 
 **Skip-gracefully behavior:**
@@ -1560,7 +1560,7 @@ Verification: {Passed | Passed with override | Skipped}
 
 ───────────────────────────────────────────────────────────────
 
-## ▶ Next Up — [${PROJECT_CODE}] ${PROJECT_TITLE}
+## Next Up — [${PROJECT_CODE}] ${PROJECT_TITLE}
 
 **Execute Phase {X}** — run all {N} plans
 

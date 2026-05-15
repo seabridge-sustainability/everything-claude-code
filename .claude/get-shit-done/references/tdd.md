@@ -301,7 +301,7 @@ TDD Plans: {count} | Gate violations: {count}
 | {id} |  ✓  |   ✗   |    —     | FAIL   |
 
 {If violations exist:}
-⚠ Gate violations are advisory — review before advancing.
+WARNING: Gate violations are advisory — review before advancing.
 ```
 
 ### What the Review Checks

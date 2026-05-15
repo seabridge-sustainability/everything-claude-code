@@ -31,7 +31,7 @@ Recommend the best model tier for the current task by complexity, cost, and infr
 
 ### Local (via llama.cpp Ã¢â‚¬â€ $0, requires local server)
 
-See `/local-inference` skill to set up the server.
+See `skills/sea-local-llm-training/` and `docs/local-llm/` to set up the server.
 
 | Tier | Model | VRAM | When to use |
 |------|-------|------|-------------|
@@ -82,5 +82,5 @@ curl -s http://localhost:8080/v1/models | jq '.data[].id'
 curl -s http://localhost:4000/health | jq '.status'
 
 # If not running:
-# /local-inference   Ã¢â€ Â start the full local AI stack
+# Use `docs/local-llm/` for the full local AI stack startup path.
 ```

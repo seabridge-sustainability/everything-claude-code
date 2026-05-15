@@ -108,7 +108,7 @@ bin/dev-setup
 vim review/SKILL.md
 
 # 3. Test it in Claude Code Ã¢â‚¬â€ changes are live
-#    > /review
+# > /review
 
 # 4. Editing browse source? Rebuild the binary
 bun run build
@@ -427,7 +427,7 @@ skills (setup discovers them), or code-only changes (no on-disk state).
    the VERSION file for the release that needs the fix.
 2. Make it executable: `chmod +x gstack-upgrade/migrations/v{VERSION}.sh`
 3. The script must be **idempotent** (safe to run multiple times) and
-   **non-fatal** (failures are logged but don't block the upgrade).
+**non-fatal** (failures are logged but don't block the upgrade).
 4. Include a comment block at the top explaining what changed, why the
    migration is needed, and which users are affected.
 

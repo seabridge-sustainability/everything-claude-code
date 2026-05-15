@@ -4,11 +4,11 @@ description: Researches how to implement a phase before planning. Produces RESEA
 tools: Read, Write, Bash, Grep, Glob, WebSearch, WebFetch, mcp__context7__*, mcp__firecrawl__*, mcp__exa__*
 color: cyan
 # hooks:
-#   PostToolUse:
-#     - matcher: "Write|Edit"
-#       hooks:
-#         - type: command
-#           command: "npx eslint --fix $FILE 2>/dev/null || true"
+# PostToolUse:
+# - matcher: "Write|Edit"
+# hooks:
+# - type: command
+# command: "npx eslint --fix $FILE 2>/dev/null || true"
 ---
 
 <role>
@@ -436,7 +436,7 @@ Verified patterns from official sources:
 ### Phase Requirements → Test Map
 | Req ID | Behavior | Test Type | Automated Command | File Exists? |
 |--------|----------|-----------|-------------------|-------------|
-| REQ-XX | {behavior} | unit | `pytest tests/test_{module}.py::test_{name} -x` | ✅ / ❌ Wave 0 |
+| REQ-XX | {behavior} | unit | `pytest tests/test_{module}.py::test_{name} -x` | PASS: / FAIL: Wave 0 |
 
 ### Sampling Rate
 - **Per task commit:** `{quick run command}`
@@ -750,7 +750,7 @@ This section is REQUIRED when IDs are provided. The planner uses it to map requi
 
 Write to: `$PHASE_DIR/$PADDED_PHASE-RESEARCH.md`
 
-⚠️ `commit_docs` controls git only, NOT file writing. Always write first.
+WARNING: `commit_docs` controls git only, NOT file writing. Always write first.
 
 ## Step 7: Commit Research (optional)
 

@@ -224,8 +224,7 @@ Wave 3 runs after Waves 1 and 2. Pauses at checkpoint, orchestrator presents to 
 # - This plan imports types from prior plan
 # - Prior plan made decision affecting this plan
 # - Prior plan's output is input to this plan
-#
-# Independent plans need NO prior SUMMARY references.
+# # Independent plans need NO prior SUMMARY references.
 # Do NOT reflexively chain: 02 refs 01, 03 refs 02...
 
 @src/relevant/source.ts

@@ -876,8 +876,7 @@ Note which direction was approved. This becomes the visual reference for all sub
 
 Use AskUserQuestion:
 > "Want outside design voices before the detailed review? Codex evaluates against OpenAI's design hard rules + litmus checks; Claude subagent does an independent completeness review."
->
-> A) Yes Ã¢â‚¬â€ run outside design voices
+> > A) Yes Ã¢â‚¬â€ run outside design voices
 > B) No Ã¢â‚¬â€ proceed without
 
 If user chooses B, skip this step and continue.

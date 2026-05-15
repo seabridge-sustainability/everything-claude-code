@@ -21,7 +21,7 @@ Use for major workflow transitions.
 - `EXECUTING WAVE {N}`
 - `VERIFYING`
 - `PHASE {N} COMPLETE ✓`
-- `MILESTONE COMPLETE 🎉`
+- `MILESTONE COMPLETE `
 
 ---
 
@@ -55,9 +55,9 @@ User action required. 62-character width.
 ✗  Failed / Missing / Blocked
 ◆  In Progress
 ○  Pending
-⚡ Auto-approved
-⚠  Warning
-🎉 Milestone complete (only in banner)
+ Auto-approved
+WARNING:  Warning
+ Milestone complete (only in banner)
 ```
 
 ---
@@ -104,7 +104,7 @@ Always at end of major completions.
 ```
 ───────────────────────────────────────────────────────────────
 
-## ▶ Next Up
+## Next Up
 
 **{Identifier}: {Name}** — {one-line description}
 
@@ -154,7 +154,7 @@ Always at end of major completions.
 - Varying box/banner widths
 - Mixing banner styles (`===`, `---`, `***`)
 - Skipping `GSD ►` prefix in banners
-- Random emoji (`🚀`, `✨`, `💫`)
+- Random emoji (``, ``, ``)
 - Missing Next Up block after completions
 
 </ui_patterns>

@@ -2,6 +2,16 @@
 
 # Everything Claude Code
 
+## SeaBridgeAI Central Coding-Agent Layer
+
+SeaBridgeAI shared coding-agent policy now lives here:
+`SEABRIDGE_CODING_AGENT_SYSTEM.md`.
+
+Use `repo-integrations/`, `skills/sea-*`, `.agents/skills/sea-*`, `workflows/`,
+and `checklists/` for cross-repo backend, frontend, AI, sustainability-domain,
+QA, and handoff work. Product repos should point back here instead of copying
+the full instructions.
+
 ## Safety And Authorization Rule
 
 Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
@@ -268,21 +278,17 @@ For manual install instructions see the README in the `rules/` folder. When copy
 /plugin list everything-claude-code@everything-claude-code
 ```
 
-**That's it!** You now have access to 30 agents, 136 skills, and 60 commands.
+**That's it!** You now have access to 37 agents, 237 skills, and 60 commands.
 
 ### Multi-model commands require additional setup
 
 > WARNING: `multi-*` commands are **not** covered by the base plugin/rules install above.
->
-> To use `/multi-plan`, `/multi-execute`, `/multi-backend`, `/multi-frontend`, and `/multi-workflow`, you must also install the `ccg-workflow` runtime.
->
-> Initialize it with `npx ccg-workflow`.
->
-> That runtime provides the external dependencies these commands expect, including:
+> > To use `/multi-plan`, `/multi-execute`, `/multi-backend`, `/multi-frontend`, and `/multi-workflow`, you must also install the `ccg-workflow` runtime.
+> > Initialize it with `npx ccg-workflow`.
+> > That runtime provides the external dependencies these commands expect, including:
 > - `~/.claude/bin/codeagent-wrapper`
 > - `~/.claude/.ccg/prompts/*`
->
-> Without `ccg-workflow`, these `multi-*` commands will not run correctly.
+> > Without `ccg-workflow`, these `multi-*` commands will not run correctly.
 
 ---
 
@@ -677,20 +683,17 @@ Or add directly to your `~/.claude/settings.json`:
 This gives you instant access to all commands, agents, skills, and hooks.
 
 > **Note:** The Claude Code plugin system does not support distributing `rules` via plugins ([upstream limitation](https://code.claude.com/docs/en/plugins-reference)). You need to install rules manually:
->
-> ```bash
+> > ```bash
 > # Clone the repo first
 > git clone https://github.com/affaan-m/everything-claude-code.git
->
-> # Option A: User-level rules (applies to all projects)
+> > # Option A: User-level rules (applies to all projects)
 > mkdir -p ~/.claude/rules
 > cp -r everything-claude-code/rules/common ~/.claude/rules/
 > cp -r everything-claude-code/rules/typescript ~/.claude/rules/   # pick your stack
 > cp -r everything-claude-code/rules/python ~/.claude/rules/
 > cp -r everything-claude-code/rules/golang ~/.claude/rules/
 > cp -r everything-claude-code/rules/php ~/.claude/rules/
->
-> # Option B: Project-level rules (applies to current project only)
+> > # Option B: Project-level rules (applies to current project only)
 > mkdir -p .claude/rules
 > cp -r everything-claude-code/rules/common .claude/rules/
 > cp -r everything-claude-code/rules/typescript .claude/rules/     # pick your stack
@@ -1157,9 +1160,9 @@ The configuration is automatically detected from `.opencode/opencode.json`.
 
 | Feature | Claude Code | OpenCode | Status |
 |---------|-------------|----------|--------|
-| Agents | PASS: 30 agents | PASS: 12 agents | **Claude Code leads** |
+| Agents | PASS: 37 agents | PASS: 12 agents | **Claude Code leads** |
 | Commands | PASS: 60 commands | PASS: 31 commands | **Claude Code leads** |
-| Skills | PASS: 136 skills | PASS: 37 skills | **Claude Code leads** |
+| Skills | PASS: 237 skills | PASS: 37 skills | **Claude Code leads** |
 | Hooks | PASS: 8 event types | PASS: 11 events | **OpenCode has more!** |
 | Rules | PASS: 29 rules | PASS: 13 instructions | **Claude Code leads** |
 | MCP Servers | PASS: 14 servers | PASS: Full | **Full parity** |

@@ -16,7 +16,7 @@ The following table describes the predefined roles available for AlloyDB:
 
 ## Secure Connectivity
 
-1.  **Network Security:**
+1. **Network Security:**
     -   **Private IP:** Keeps traffic internal to Google Cloud.
         -   **Private Service Connect (PSC):** Recommended for new
             configurations. Offers enhanced security, better IP management, and
@@ -29,14 +29,14 @@ The following table describes the predefined roles available for AlloyDB:
     -   **VPC Service Controls (VPC-SC):** Define security perimeters around
         your AlloyDB instances to prevent data exfiltration.
 
-1.  **Encryption:**
+1. **Encryption:**
     -   **In Transit:** TLS encryption is enforced by default for all
         connections.
     -   **At Rest:** Data is always encrypted, using Google-managed keys by
         default. Customer-Managed Encryption Keys (CMEK) are supported for
         greater control.
 
-1.  **Authentication & Authorization:**
+1. **Authentication & Authorization:**
     -   **IAM Authentication:** **Recommended.** Uses Google Cloud Identity and
         Access Management (IAM) principals (users/service accounts) and
         short-lived OAuth tokens. Centralizes access control and avoids database
@@ -48,7 +48,7 @@ The following table describes the predefined roles available for AlloyDB:
         statements manage permissions within the database, regardless of the
         authentication method.
 
-1.  **Connection Methods:**
+1. **Connection Methods:**
     -   **Direct Connection:** Standard PostgreSQL connection.
     -   **AlloyDB Connectors (Auth Proxy & Language Libraries):** **Highly
         Recommended for security.**
@@ -63,16 +63,16 @@ The following table describes the predefined roles available for AlloyDB:
 
 **Key Recommendations for Agents:**
 
--   **Prioritize Private IP:** Guide users to use Private IP (especially PSC)
+- **Prioritize Private IP:** Guide users to use Private IP (especially PSC)
     over Public IP whenever their application is within GCP.
--   **Push AlloyDB Connectors:** Strongly recommend AlloyDB Connectors (Auth
+- **Push AlloyDB Connectors:** Strongly recommend AlloyDB Connectors (Auth
     Proxy or language libraries) because they enhance security through IAM
     connection authorization and mTLS, especially crucial for Public IP.
--   **IAM Authentication is Preferred:** Encourages centralized management and
+- **IAM Authentication is Preferred:** Encourages centralized management and
     token-based auth.
--   **Secure Public IP:** If Public IP is necessary, stress the absolute need
+- **Secure Public IP:** If Public IP is necessary, stress the absolute need
     for tightly restricted Authorized Networks.
--   **Leverage Cloud Security Tools:** Remind users to use VPC-SC and Security
+- **Leverage Cloud Security Tools:** Remind users to use VPC-SC and Security
     Command Center for monitoring and policy enforcement.
 
 ## Data Security

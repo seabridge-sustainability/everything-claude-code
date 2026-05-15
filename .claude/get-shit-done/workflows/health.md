@@ -212,7 +212,7 @@ TASKS_DIR="$HOME/.claude/tasks"
 if [ -d "$TASKS_DIR" ]; then
   STALE_COUNT=$( (find "$TASKS_DIR" -maxdepth 1 -type d -mtime +1 2>/dev/null || true) | wc -l )
   if [ "$STALE_COUNT" -gt 0 ]; then
-    echo "⚠️  Found $STALE_COUNT stale task directories in ~/.claude/tasks/"
+    echo "WARNING:  Found $STALE_COUNT stale task directories in ~/.claude/tasks/"
     echo "   These are leftover from crashed subagent sessions."
     echo "   Run: rm -rf ~/.claude/tasks/*  (safe — only affects dead sessions)"
   fi

@@ -109,6 +109,8 @@
     "context-hub:validate": "node scripts/context-hub.js validate",
     "context-hub:build": "node scripts/context-hub.js build",
     "harness:audit": "node scripts/harness-audit.js",
+    "harness:check": "powershell -ExecutionPolicy Bypass -File scripts/check-harness.ps1",
+    "harness:agents": "powershell -ExecutionPolicy Bypass -File scripts/check-agent-runtime-guardrails.ps1",
     "claw": "node scripts/claw.js",
     "orchestrate:status": "node scripts/orchestration-status.js",
     "orchestrate:worker": "bash scripts/orchestrate-codex-worker.sh",
@@ -122,6 +124,11 @@
     "@open-gitagent/gitagent": "^0.2.0",
     "ajv": "^8.18.0",
     "sql.js": "^1.14.1"
+  },
+  "overrides": {
+    "@anthropic-ai/sdk": "^0.95.0",
+    "fast-uri": ">=3.1.2",
+    "hono": ">=4.12.18"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",

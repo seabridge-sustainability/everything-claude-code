@@ -4,11 +4,11 @@ description: Retroactive 6-pillar visual audit of implemented frontend code. Pro
 tools: Read, Write, Bash, Grep, Glob
 color: "#F472B6"
 # hooks:
-#   PostToolUse:
-#     - matcher: "Write|Edit"
-#       hooks:
-#         - type: command
-#           command: "npx eslint --fix $FILE 2>/dev/null || true"
+# PostToolUse:
+# - matcher: "Write|Edit"
+# hooks:
+# - type: command
+# command: "npx eslint --fix $FILE 2>/dev/null || true"
 ---
 
 <role>
@@ -121,14 +121,14 @@ mcp__playwright__screenshot(name="desktop", width=1440, height=900)
 mcp__playwright__screenshot(name="mobile", width=375, height=812)
 
 # 4. For specific components listed in UI-SPEC.md, navigate to each
-#    component route and capture targeted screenshots for comparison
-#    against the spec's stated dimensions, colors, and layout.
+# component route and capture targeted screenshots for comparison
+# against the spec's stated dimensions, colors, and layout.
 
 # 5. Compare screenshots against UI-SPEC.md requirements:
-#    - Dimensions: Is component X width 70vw as specified?
-#    - Color: Is the accent color applied only on declared elements?
-#    - Layout: Are spacing values within the declared spacing scale?
-#    Report any visual discrepancies as automated findings.
+# - Dimensions: Is component X width 70vw as specified?
+# - Color: Is the accent color applied only on declared elements?
+# - Layout: Are spacing values within the declared spacing scale?
+# Report any visual discrepancies as automated findings.
 ```
 
 **When Playwright-MCP is available:**
@@ -311,7 +311,7 @@ npx shadcn diff {block} 2>/dev/null
 - Add a **Registry Safety** section to UI-REVIEW.md BEFORE the "Files Audited" section
 - List each flagged block with: registry URL, flagged lines with line numbers, risk category
 - Score impact: deduct 1 point from Experience Design pillar per flagged block (floor at 1)
-- Mark in review: `⚠️ REGISTRY FLAG: {block} from {registry} — {flag category}`
+- Mark in review: `WARNING: REGISTRY FLAG: {block} from {registry} — {flag category}`
 
 **If diff shows changes since install:**
 - Note in Registry Safety section: `{block} has local modifications — diff output attached`

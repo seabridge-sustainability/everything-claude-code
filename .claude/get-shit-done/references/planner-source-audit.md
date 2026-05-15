@@ -13,7 +13,7 @@ GOAL      | —       | {phase goal from ROADMAP.md}  | 01-03 | COVERED   |
 REQ       | REQ-14  | OAuth login with Google + GH | 02    | COVERED   |
 REQ       | REQ-22  | Email verification flow      | 03    | COVERED   |
 RESEARCH  | —       | Rate limiting on auth routes | 01    | COVERED   |
-RESEARCH  | —       | Refresh token rotation       | NONE  | ⚠ MISSING | No plan covers this
+RESEARCH  | —       | Refresh token rotation       | NONE  | WARNING: MISSING | No plan covers this
 CONTEXT   | D-01    | Use jose library for JWT     | 02    | COVERED   |
 CONTEXT   | D-04    | 15min access / 7day refresh  | 02    | COVERED   |
 ```
@@ -34,10 +34,10 @@ Do not flag these as MISSING:
 
 ### Handling MISSING Items
 
-If ANY row is `⚠ MISSING`, do NOT finalize the plan set silently. Return to the orchestrator:
+If ANY row is `WARNING: MISSING`, do NOT finalize the plan set silently. Return to the orchestrator:
 
 ```
-## ⚠ Source Audit: Unplanned Items Found
+## WARNING: Source Audit: Unplanned Items Found
 
 The following items from source artifacts have no corresponding plan:
 

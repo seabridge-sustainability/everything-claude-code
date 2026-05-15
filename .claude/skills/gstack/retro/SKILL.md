@@ -605,8 +605,8 @@ Run ALL of these git commands in parallel (they are independent):
 git log origin/<default> --since="<window>" --format="%H|%aN|%ae|%ai|%s" --shortstat
 
 # 2. Per-commit test vs total LOC breakdown with author
-#    Each commit block starts with COMMIT:<hash>|<author>, followed by numstat lines.
-#    Separate test files (matching test/|spec/|__tests__/) from production files.
+# Each commit block starts with COMMIT:<hash>|<author>, followed by numstat lines.
+# Separate test files (matching test/|spec/|__tests__/) from production files.
 git log origin/<default> --since="<window>" --format="COMMIT:%H|%aN" --numstat
 
 # 3. Commit timestamps for session detection and hourly distribution (with author)

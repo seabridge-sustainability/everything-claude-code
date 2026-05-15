@@ -323,9 +323,9 @@ proving it's writable). But a try/catch with a 500 response would be cleaner.
 
 ```
 1-6.  Same as above
-7.  User clicks "Totally different" chiclet
-8.  User clicks Regenerate
-9.  Board JS POSTs to /api/feedback
+7. User clicks "Totally different" chiclet
+8. User clicks Regenerate
+9. Board JS POSTs to /api/feedback
     Body: {"regenerated":true,"regenerateAction":"different","preferred":"","ratings":{},...}
 10. Server writes feedback-pending.json to disk
 11. Server state Ã¢â€ â€™ "regenerating"

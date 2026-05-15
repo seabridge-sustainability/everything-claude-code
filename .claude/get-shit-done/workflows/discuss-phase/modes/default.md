@@ -24,7 +24,7 @@ Example with research enabled:
 ```text
 Let's talk about [Authentication Strategy].
 
-📊 Best practices research:
+ Best practices research:
 • OAuth 2.0 + PKCE is the current standard for SPAs (replaces implicit flow)
 • Session tokens with httpOnly cookies preferred over localStorage for XSS protection
 • Consider passkey/WebAuthn support — adoption is accelerating in 2025-2026

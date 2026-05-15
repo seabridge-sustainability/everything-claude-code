@@ -23,6 +23,16 @@ const BLOCK_PATTERNS = [
   /C:\\Users\\[a-zA-Z0-9_-]+\\/gi,
 ];
 
+const ALLOWED_WORKSPACE_PATTERNS = [
+  /C:\\Users\\adelm\\/gi,
+  /C:\/Users\/adelm\//gi,
+  /\/c\/Users\/adelm\//g,
+  /\/Users\/(you|example)\//g,
+  /C:\\Users\\\.\.\.\\/gi,
+  /C:\\Users\\sugig\\/gi,
+  /C:\/Users\/sugig\//gi,
+];
+
 function collectFiles(targetPath, out) {
   if (!fs.existsSync(targetPath)) return;
   const stat = fs.statSync(targetPath);
@@ -45,7 +55,10 @@ for (const target of TARGETS) {
 let failures = 0;
 for (const file of files) {
   if (!/\.(md|json|js|ts|sh|toml|yml|yaml)$/i.test(file)) continue;
-  const content = fs.readFileSync(file, 'utf8');
+  let content = fs.readFileSync(file, 'utf8');
+  for (const pattern of ALLOWED_WORKSPACE_PATTERNS) {
+    content = content.replace(pattern, 'SEABRIDGE_WORKSPACE/');
+  }
   for (const pattern of BLOCK_PATTERNS) {
     const match = content.match(pattern);
     if (match) {

@@ -126,7 +126,7 @@ If `$VALIDATE_MODE` only:
 
 ```bash
 if ! command -v gsd-sdk &>/dev/null; then
-  echo "⚠ gsd-sdk not found in PATH — /gsd-quick requires it."
+  echo "WARNING: gsd-sdk not found in PATH — /gsd-quick requires it."
   echo ""
   echo "Install the GSD SDK:"
   echo "  npm install -g @gsd-build/sdk"
@@ -639,7 +639,7 @@ if [ "${USE_WORKTREES}" != "false" ]; then
     git add "${QUICK_DIR}/${quick_id}-PLAN.md"
     # No-op skip if nothing actually staged (idempotent re-runs).
     if git diff --cached --quiet -- "${QUICK_DIR}/${quick_id}-PLAN.md"; then
-      echo "ℹ Pre-dispatch PLAN.md commit skipped (no staged changes)"
+      echo " Pre-dispatch PLAN.md commit skipped (no staged changes)"
     else
       # Run hooks normally (#2924). If a project opts out via
       # workflow.worktree_skip_hooks=true, honor that opt-in only.
@@ -798,7 +798,7 @@ After executor returns:
        fi
 
        git merge "$WT_BRANCH" --no-ff --no-edit -m "chore: merge quick task worktree ($WT_BRANCH)" 2>&1 || {
-         echo "⚠ Merge conflict from worktree $WT_BRANCH — resolve manually"
+         echo "WARNING: Merge conflict from worktree $WT_BRANCH — resolve manually"
          echo "  STATE.md backup:   $STATE_BACKUP"
          echo "  ROADMAP.md backup: $ROADMAP_BACKUP"
          echo "  Restore with: cp \$STATE_BACKUP .planning/STATE.md && cp \$ROADMAP_BACKUP .planning/ROADMAP.md"
@@ -838,21 +838,21 @@ After executor returns:
          if [ ! -f "$REL_PATH" ] || ! cmp -s "$SUMMARY" "$REL_PATH"; then
            mkdir -p "$(dirname "$REL_PATH")"
            cp "$SUMMARY" "$REL_PATH"
-           echo "⚠ Rescued $REL_PATH from worktree before removal"
+           echo "WARNING: Rescued $REL_PATH from worktree before removal"
          fi
        done < <(find "$WT/.planning" -name "*SUMMARY.md" 2>/dev/null)
 
        if ! git worktree remove "$WT" --force; then
          WT_NAME=$(basename "$WT")
          if [ -f ".git/worktrees/${WT_NAME}/locked" ]; then
-           echo "⚠ Worktree $WT is locked — attempting to unlock and retry"
+           echo "WARNING: Worktree $WT is locked — attempting to unlock and retry"
            git worktree unlock "$WT" 2>/dev/null || true
            if ! git worktree remove "$WT" --force; then
-             echo "⚠ Residual worktree at $WT — manual cleanup required after session exits:"
+             echo "WARNING: Residual worktree at $WT — manual cleanup required after session exits:"
              echo "    git worktree unlock \"$WT\" && git worktree remove \"$WT\" --force && git branch -D \"$WT_BRANCH\""
            fi
          else
-           echo "⚠ Residual worktree at $WT (remove failed) — investigate manually"
+           echo "WARNING: Residual worktree at $WT (remove failed) — investigate manually"
          fi
        fi
        git branch -D "$WT_BRANCH" 2>/dev/null || true

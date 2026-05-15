@@ -8,6 +8,8 @@
 import secrets
 import sys
 
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 # ═══════════════════════════════════════════
 # 素材池：每个维度独立随机

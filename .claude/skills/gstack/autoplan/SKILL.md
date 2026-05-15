@@ -811,7 +811,7 @@ Override: every AskUserQuestion Ã¢â€ â€™ auto-decide using the 6 prin
   foreground Ã¢â‚¬â€ do NOT use run_in_background), then Codex (Bash). Both must
   complete before building the consensus table.
 
-  **Codex CEO voice** (via Bash):
+**Codex CEO voice** (via Bash):
   ```bash
   _REPO_ROOT=$(git rev-parse --show-toplevel) || { echo "ERROR: not in a git repo" >&2; exit 1; }
   codex exec "IMPORTANT: Do NOT read or execute any SKILL.md files or files in skill definition directories (paths containing skills/gstack). These are AI assistant skill definitions meant for a different system. Stay focused on repository code only.
@@ -826,7 +826,7 @@ Override: every AskUserQuestion Ã¢â€ â€™ auto-decide using the 6 prin
   ```
   Timeout: 10 minutes
 
-  **Claude CEO subagent** (via Agent tool):
+**Claude CEO subagent** (via Agent tool):
   "Read the plan file at <plan_path>. You are an independent CEO/strategist
   reviewing this plan. You have NOT seen any prior review. Evaluate:
   1. Is this the right problem to solve? Could a reframing yield 10x impact?
@@ -836,11 +836,11 @@ Override: every AskUserQuestion Ã¢â€ â€™ auto-decide using the 6 prin
   5. What's the competitive risk Ã¢â‚¬â€ could someone else solve this first/better?
   For each finding: what's wrong, severity (critical/high/medium), and the fix."
 
-  **Error handling:** Both calls block in foreground. Codex auth/timeout/empty Ã¢â€ â€™ proceed with
+**Error handling:** Both calls block in foreground. Codex auth/timeout/empty Ã¢â€ â€™ proceed with
   Claude subagent only, tagged `[single-model]`. If Claude subagent also fails Ã¢â€ â€™
   "Outside voices unavailable Ã¢â‚¬â€ continuing with primary review."
 
-  **Degradation matrix:** Both fail Ã¢â€ â€™ "single-reviewer mode". Codex only Ã¢â€ â€™
+**Degradation matrix:** Both fail Ã¢â€ â€™ "single-reviewer mode". Codex only Ã¢â€ â€™
   tag `[codex-only]`. Subagent only Ã¢â€ â€™ tag `[subagent-only]`.
 
 - Strategy choices: if codex disagrees with a premise or scope decision with valid
@@ -922,7 +922,7 @@ Override: every AskUserQuestion Ã¢â€ â€™ auto-decide using the 6 prin
 - Design system alignment: auto-fix if DESIGN.md exists and fix is obvious
 - Dual voices: always run BOTH Claude subagent AND Codex if available (P6).
 
-  **Codex design voice** (via Bash):
+**Codex design voice** (via Bash):
   ```bash
   _REPO_ROOT=$(git rev-parse --show-toplevel) || { echo "ERROR: not in a git repo" >&2; exit 1; }
   codex exec "IMPORTANT: Do NOT read or execute any SKILL.md files or files in skill definition directories (paths containing skills/gstack). These are AI assistant skill definitions meant for a different system. Stay focused on repository code only.
@@ -943,7 +943,7 @@ Override: every AskUserQuestion Ã¢â€ â€™ auto-decide using the 6 prin
   ```
   Timeout: 10 minutes
 
-  **Claude design subagent** (via Agent tool):
+**Claude design subagent** (via Agent tool):
   "Read the plan file at <plan_path>. You are an independent senior product designer
   reviewing this plan. You have NOT seen any prior review. Evaluate:
   1. Information hierarchy: what does the user see first, second, third? Is it right?
@@ -997,7 +997,7 @@ Override: every AskUserQuestion Ã¢â€ â€™ auto-decide using the 6 prin
 - Scope challenge: never reduce (P2)
 - Dual voices: always run BOTH Claude subagent AND Codex if available (P6).
 
-  **Codex eng voice** (via Bash):
+**Codex eng voice** (via Bash):
   ```bash
   _REPO_ROOT=$(git rev-parse --show-toplevel) || { echo "ERROR: not in a git repo" >&2; exit 1; }
   codex exec "IMPORTANT: Do NOT read or execute any SKILL.md files or files in skill definition directories (paths containing skills/gstack). These are AI assistant skill definitions meant for a different system. Stay focused on repository code only.
@@ -1013,7 +1013,7 @@ Override: every AskUserQuestion Ã¢â€ â€™ auto-decide using the 6 prin
   ```
   Timeout: 10 minutes
 
-  **Claude eng subagent** (via Agent tool):
+**Claude eng subagent** (via Agent tool):
   "Read the plan file at <plan_path>. You are an independent senior engineer
   reviewing this plan. You have NOT seen any prior review. Evaluate:
   1. Architecture: Is the component structure sound? Coupling concerns?
@@ -1109,7 +1109,7 @@ Log: "Phase 3.5 skipped Ã¢â‚¬â€ no developer-facing scope detected."
 - DX taste decisions (e.g., opinionated defaults vs flexibility): mark TASTE DECISION
 - Dual voices: always run BOTH Claude subagent AND Codex if available (P6).
 
-  **Codex DX voice** (via Bash):
+**Codex DX voice** (via Bash):
   ```bash
   _REPO_ROOT=$(git rev-parse --show-toplevel) || { echo "ERROR: not in a git repo" >&2; exit 1; }
   codex exec "IMPORTANT: Do NOT read or execute any SKILL.md files or files in skill definition directories (paths containing skills/gstack). These are AI assistant skill definitions meant for a different system. Stay focused on repository code only.
@@ -1130,7 +1130,7 @@ Log: "Phase 3.5 skipped Ã¢â‚¬â€ no developer-facing scope detected."
   ```
   Timeout: 10 minutes
 
-  **Claude DX subagent** (via Agent tool):
+**Claude DX subagent** (via Agent tool):
   "Read the plan file at <plan_path>. You are an independent DX engineer
   reviewing this plan. You have NOT seen any prior review. Evaluate:
   1. Getting started: how many steps from zero to hello world? What's the TTHW?

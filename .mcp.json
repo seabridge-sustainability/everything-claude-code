@@ -64,6 +64,23 @@
         "@modelcontextprotocol/server-sequential-thinking"
       ]
     },
+    "gitnexus": {
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "gitnexus@latest", "mcp"],
+      "cwd": "C:/Users/adelm/SeaBridgeAI/everything-claude-code"
+    },
+    "gbrain": {
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "C:/Users/adelm/SeaBridgeAI/everything-claude-code/scripts/gbrain.ps1",
+        "serve"
+      ],
+      "description": "Optional local GBrain stdio MCP server for SeaBridgeAI coding-agent memory and code lookup"
+    },
     "falkordb": {
       "command": "cmd",
       "args": [

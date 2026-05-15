@@ -421,7 +421,7 @@ SECURITY_FILE=$(ls "${PHASE_DIR}"/*-SECURITY.md 2>/dev/null | head -1)
 
 If `SECURITY_CFG` is `true` AND `SECURITY_FILE` is empty:
 ```
-⚠ Security enforcement enabled — /gsd-secure-phase {phase} has not run.
+WARNING: Security enforcement enabled — /gsd-secure-phase {phase} has not run.
 Run before advancing to the next phase.
 
 All tests passed. Ready to continue.
@@ -434,7 +434,7 @@ All tests passed. Ready to continue.
 
 If `SECURITY_CFG` is `true` AND `SECURITY_FILE` exists: check frontmatter `threats_open`. If > 0:
 ```
-⚠ Security gate: {threats_open} threats open
+WARNING: Security gate: {threats_open} threats open
   /gsd-secure-phase {phase} — resolve before advancing
 ```
 
@@ -610,7 +610,7 @@ On return:
 </step>
 
 <step name="revision_loop">
-**Iterate planner ↔ checker until plans pass (max 3):**
+**Iterate planner  checker until plans pass (max 3):**
 
 **If iteration_count < 3:**
 
@@ -684,7 +684,7 @@ Plans verified and ready for execution.
 
 ───────────────────────────────────────────────────────────────
 
-## ▶ Next Up — [${PROJECT_CODE}] ${PROJECT_TITLE}
+## Next Up — [${PROJECT_CODE}] ${PROJECT_TITLE}
 
 **Execute fixes** — run fix plans
 

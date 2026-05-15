@@ -1,0 +1,252 @@
+﻿[
+    {
+        "rule":  "frontend.button-accessibility-review",
+        "severity":  "low",
+        "file":  "C:\\Users\\adelm\\SeaBridgeAI\\manageesg-frontend\\src\\components\\views\\nature-risk\\DeepDiveModal.tsx",
+        "line":  1609,
+        "route":  null,
+        "message":  "Button may lack accessible text/label; lower-confidence review finding.",
+        "fingerprint":  "frontend.button-accessibility-review|C:/Users/adelm/SeaBridgeAI/manageesg-frontend/src/components/views/nature-risk/DeepDiveModal.tsx|1609|Button may lack accessible text/label; lower-confidence review finding.",
+        "baseline":  false
+    },
+    {
+        "rule":  "frontend.button-accessibility-review",
+        "severity":  "low",
+        "file":  "C:\\Users\\adelm\\SeaBridgeAI\\manageesg-frontend\\src\\components\\views\\nature-risk\\DeepDiveModal.tsx",
+        "line":  1707,
+        "route":  null,
+        "message":  "Button may lack accessible text/label; lower-confidence review finding.",
+        "fingerprint":  "frontend.button-accessibility-review|C:/Users/adelm/SeaBridgeAI/manageesg-frontend/src/components/views/nature-risk/DeepDiveModal.tsx|1707|Button may lack accessible text/label; lower-confidence review finding.",
+        "baseline":  false
+    },
+    {
+        "rule":  "frontend.button-accessibility-review",
+        "severity":  "low",
+        "file":  "C:\\Users\\adelm\\SeaBridgeAI\\manageesg-frontend\\src\\components\\views\\nature-risk\\GeographicMapAssessmentLocation.tsx",
+        "line":  609,
+        "route":  null,
+        "message":  "Button may lack accessible text/label; lower-confidence review finding.",
+        "fingerprint":  "frontend.button-accessibility-review|C:/Users/adelm/SeaBridgeAI/manageesg-frontend/src/components/views/nature-risk/GeographicMapAssessmentLocation.tsx|609|Button may lack accessible text/label; lower-confidence review finding.",
+        "baseline":  false
+    },
+    {
+        "rule":  "frontend.raw-fetch-boundary",
+        "severity":  "low",
+        "file":  "C:\\Users\\adelm\\SeaBridgeAI\\manageesg-frontend\\src\\components\\views\\nature-risk\\MapBox.tsx",
+        "line":  278,
+        "route":  null,
+        "message":  "Raw fetch in UI tree; prefer typed API client with timeout/error normalization.",
+        "fingerprint":  "frontend.raw-fetch-boundary|C:/Users/adelm/SeaBridgeAI/manageesg-frontend/src/components/views/nature-risk/MapBox.tsx|278|Raw fetch in UI tree; prefer typed API client with timeout/error normalization.",
+        "baseline":  false
+    },
+    {
+        "rule":  "frontend.button-accessibility-review",
+        "severity":  "low",
+        "file":  "C:\\Users\\adelm\\SeaBridgeAI\\manageesg-frontend\\src\\components\\views\\nature-risk\\TwoStepFormModal.tsx",
+        "line":  1368,
+        "route":  null,
+        "message":  "Button may lack accessible text/label; lower-confidence review finding.",
+        "fingerprint":  "frontend.button-accessibility-review|C:/Users/adelm/SeaBridgeAI/manageesg-frontend/src/components/views/nature-risk/TwoStepFormModal.tsx|1368|Button may lack accessible text/label; lower-confidence review finding.",
+        "baseline":  false
+    },
+    {
+        "rule":  "frontend.button-accessibility-review",
+        "severity":  "low",
+        "file":  "C:\\Users\\adelm\\SeaBridgeAI\\manageesg-frontend\\src\\components\\views\\nature-risk\\TwoStepFormModal.tsx",
+        "line":  1409,
+        "route":  null,
+        "message":  "Button may lack accessible text/label; lower-confidence review finding.",
+        "fingerprint":  "frontend.button-accessibility-review|C:/Users/adelm/SeaBridgeAI/manageesg-frontend/src/components/views/nature-risk/TwoStepFormModal.tsx|1409|Button may lack accessible text/label; lower-confidence review finding.",
+        "baseline":  false
+    },
+    {
+        "rule":  "frontend.button-accessibility-review",
+        "severity":  "low",
+        "file":  "C:\\Users\\adelm\\SeaBridgeAI\\manageesg-frontend\\src\\components\\views\\nature-risk\\TwoStepFormModal.tsx",
+        "line":  1691,
+        "route":  null,
+        "message":  "Button may lack accessible text/label; lower-confidence review finding.",
+        "fingerprint":  "frontend.button-accessibility-review|C:/Users/adelm/SeaBridgeAI/manageesg-frontend/src/components/views/nature-risk/TwoStepFormModal.tsx|1691|Button may lack accessible text/label; lower-confidence review finding.",
+        "baseline":  false
+    },
+    {
+        "rule":  "frontend.button-accessibility-review",
+        "severity":  "low",
+        "file":  "C:\\Users\\adelm\\SeaBridgeAI\\manageesg-frontend\\src\\components\\views\\nature-risk\\TwoStepFormModal.tsx",
+        "line":  1710,
+        "route":  null,
+        "message":  "Button may lack accessible text/label; lower-confidence review finding.",
+        "fingerprint":  "frontend.button-accessibility-review|C:/Users/adelm/SeaBridgeAI/manageesg-frontend/src/components/views/nature-risk/TwoStepFormModal.tsx|1710|Button may lack accessible text/label; lower-confidence review finding.",
+        "baseline":  false
+    },
+    {
+        "rule":  "frontend.button-accessibility-review",
+        "severity":  "low",
+        "file":  "C:\\Users\\adelm\\SeaBridgeAI\\manageesg-frontend\\src\\components\\views\\nature-risk\\TwoStepFormModal.tsx",
+        "line":  1726,
+        "route":  null,
+        "message":  "Button may lack accessible text/label; lower-confidence review finding.",
+        "fingerprint":  "frontend.button-accessibility-review|C:/Users/adelm/SeaBridgeAI/manageesg-frontend/src/components/views/nature-risk/TwoStepFormModal.tsx|1726|Button may lack accessible text/label; lower-confidence review finding.",
+        "baseline":  false
+    },
+    {
+        "rule":  "frontend.button-accessibility-review",
+        "severity":  "low",
+        "file":  "C:\\Users\\adelm\\SeaBridgeAI\\manageesg-frontend\\src\\components\\views\\risk-management\\climate-risk\\predictive\\digital-twin\\Forge3DSimulationViewer.tsx",
+        "line":  284,
+        "route":  null,
+        "message":  "Button may lack accessible text/label; lower-confidence review finding.",
+        "fingerprint":  "frontend.button-accessibility-review|C:/Users/adelm/SeaBridgeAI/manageesg-frontend/src/components/views/risk-management/climate-risk/predictive/digital-twin/Forge3DSimulationViewer.tsx|284|Button may lack accessible text/label; lower-confidence review finding.",
+        "baseline":  false
+    },
+    {
+        "rule":  "frontend.button-accessibility-review",
+        "severity":  "low",
+        "file":  "C:\\Users\\adelm\\SeaBridgeAI\\manageesg-frontend\\src\\components\\views\\risk-management\\climate-risk\\predictive\\HazardCard.tsx",
+        "line":  104,
+        "route":  null,
+        "message":  "Button may lack accessible text/label; lower-confidence review finding.",
+        "fingerprint":  "frontend.button-accessibility-review|C:/Users/adelm/SeaBridgeAI/manageesg-frontend/src/components/views/risk-management/climate-risk/predictive/HazardCard.tsx|104|Button may lack accessible text/label; lower-confidence review finding.",
+        "baseline":  false
+    },
+    {
+        "rule":  "frontend.button-accessibility-review",
+        "severity":  "low",
+        "file":  "C:\\Users\\adelm\\SeaBridgeAI\\manageesg-frontend\\src\\components\\views\\risk-management\\climate-risk\\predictive\\PhysicalRiskAgentPanel.tsx",
+        "line":  603,
+        "route":  null,
+        "message":  "Button may lack accessible text/label; lower-confidence review finding.",
+        "fingerprint":  "frontend.button-accessibility-review|C:/Users/adelm/SeaBridgeAI/manageesg-frontend/src/components/views/risk-management/climate-risk/predictive/PhysicalRiskAgentPanel.tsx|603|Button may lack accessible text/label; lower-confidence review finding.",
+        "baseline":  false
+    },
+    {
+        "rule":  "frontend.button-accessibility-review",
+        "severity":  "low",
+        "file":  "C:\\Users\\adelm\\SeaBridgeAI\\manageesg-frontend\\src\\components\\views\\risk-management\\climate-risk\\PortfolioRiskMap.tsx",
+        "line":  339,
+        "route":  null,
+        "message":  "Button may lack accessible text/label; lower-confidence review finding.",
+        "fingerprint":  "frontend.button-accessibility-review|C:/Users/adelm/SeaBridgeAI/manageesg-frontend/src/components/views/risk-management/climate-risk/PortfolioRiskMap.tsx|339|Button may lack accessible text/label; lower-confidence review finding.",
+        "baseline":  false
+    },
+    {
+        "rule":  "frontend.button-accessibility-review",
+        "severity":  "low",
+        "file":  "C:\\Users\\adelm\\SeaBridgeAI\\manageesg-frontend\\src\\components\\views\\risk-management\\climate-risk\\PredictiveAnalysisSection.tsx",
+        "line":  1423,
+        "route":  null,
+        "message":  "Button may lack accessible text/label; lower-confidence review finding.",
+        "fingerprint":  "frontend.button-accessibility-review|C:/Users/adelm/SeaBridgeAI/manageesg-frontend/src/components/views/risk-management/climate-risk/PredictiveAnalysisSection.tsx|1423|Button may lack accessible text/label; lower-confidence review finding.",
+        "baseline":  false
+    },
+    {
+        "rule":  "frontend.button-accessibility-review",
+        "severity":  "low",
+        "file":  "C:\\Users\\adelm\\SeaBridgeAI\\manageesg-frontend\\src\\components\\views\\risk-management\\climate-risk\\PredictiveAnalysisSection.tsx",
+        "line":  1433,
+        "route":  null,
+        "message":  "Button may lack accessible text/label; lower-confidence review finding.",
+        "fingerprint":  "frontend.button-accessibility-review|C:/Users/adelm/SeaBridgeAI/manageesg-frontend/src/components/views/risk-management/climate-risk/PredictiveAnalysisSection.tsx|1433|Button may lack accessible text/label; lower-confidence review finding.",
+        "baseline":  false
+    },
+    {
+        "rule":  "frontend.button-accessibility-review",
+        "severity":  "low",
+        "file":  "C:\\Users\\adelm\\SeaBridgeAI\\manageesg-frontend\\src\\components\\views\\risk-management\\climate-risk\\PredictiveAnalysisSection.tsx",
+        "line":  1447,
+        "route":  null,
+        "message":  "Button may lack accessible text/label; lower-confidence review finding.",
+        "fingerprint":  "frontend.button-accessibility-review|C:/Users/adelm/SeaBridgeAI/manageesg-frontend/src/components/views/risk-management/climate-risk/PredictiveAnalysisSection.tsx|1447|Button may lack accessible text/label; lower-confidence review finding.",
+        "baseline":  false
+    },
+    {
+        "rule":  "frontend.button-accessibility-review",
+        "severity":  "low",
+        "file":  "C:\\Users\\adelm\\SeaBridgeAI\\manageesg-frontend\\src\\components\\views\\risk-management\\climate-risk\\PredictiveAnalysisSection.tsx",
+        "line":  1463,
+        "route":  null,
+        "message":  "Button may lack accessible text/label; lower-confidence review finding.",
+        "fingerprint":  "frontend.button-accessibility-review|C:/Users/adelm/SeaBridgeAI/manageesg-frontend/src/components/views/risk-management/climate-risk/PredictiveAnalysisSection.tsx|1463|Button may lack accessible text/label; lower-confidence review finding.",
+        "baseline":  false
+    },
+    {
+        "rule":  "frontend.button-accessibility-review",
+        "severity":  "low",
+        "file":  "C:\\Users\\adelm\\SeaBridgeAI\\manageesg-frontend\\src\\components\\views\\risk-management\\climate-risk\\PredictiveAnalysisSection.tsx",
+        "line":  1552,
+        "route":  null,
+        "message":  "Button may lack accessible text/label; lower-confidence review finding.",
+        "fingerprint":  "frontend.button-accessibility-review|C:/Users/adelm/SeaBridgeAI/manageesg-frontend/src/components/views/risk-management/climate-risk/PredictiveAnalysisSection.tsx|1552|Button may lack accessible text/label; lower-confidence review finding.",
+        "baseline":  false
+    },
+    {
+        "rule":  "frontend.button-accessibility-review",
+        "severity":  "low",
+        "file":  "C:\\Users\\adelm\\SeaBridgeAI\\manageesg-frontend\\src\\components\\views\\risk-management\\climate-risk\\PredictiveAnalysisSection.tsx",
+        "line":  1563,
+        "route":  null,
+        "message":  "Button may lack accessible text/label; lower-confidence review finding.",
+        "fingerprint":  "frontend.button-accessibility-review|C:/Users/adelm/SeaBridgeAI/manageesg-frontend/src/components/views/risk-management/climate-risk/PredictiveAnalysisSection.tsx|1563|Button may lack accessible text/label; lower-confidence review finding.",
+        "baseline":  false
+    },
+    {
+        "rule":  "frontend.button-accessibility-review",
+        "severity":  "low",
+        "file":  "C:\\Users\\adelm\\SeaBridgeAI\\manageesg-frontend\\src\\components\\views\\risk-management\\climate-risk\\PredictiveAnalysisSection.tsx",
+        "line":  1575,
+        "route":  null,
+        "message":  "Button may lack accessible text/label; lower-confidence review finding.",
+        "fingerprint":  "frontend.button-accessibility-review|C:/Users/adelm/SeaBridgeAI/manageesg-frontend/src/components/views/risk-management/climate-risk/PredictiveAnalysisSection.tsx|1575|Button may lack accessible text/label; lower-confidence review finding.",
+        "baseline":  false
+    },
+    {
+        "rule":  "frontend.button-accessibility-review",
+        "severity":  "low",
+        "file":  "C:\\Users\\adelm\\SeaBridgeAI\\manageesg-frontend\\src\\components\\views\\risk-management\\climate-risk\\PredictiveAnalysisSection.tsx",
+        "line":  1588,
+        "route":  null,
+        "message":  "Button may lack accessible text/label; lower-confidence review finding.",
+        "fingerprint":  "frontend.button-accessibility-review|C:/Users/adelm/SeaBridgeAI/manageesg-frontend/src/components/views/risk-management/climate-risk/PredictiveAnalysisSection.tsx|1588|Button may lack accessible text/label; lower-confidence review finding.",
+        "baseline":  false
+    },
+    {
+        "rule":  "frontend.button-accessibility-review",
+        "severity":  "low",
+        "file":  "C:\\Users\\adelm\\SeaBridgeAI\\manageesg-frontend\\src\\components\\views\\risk-management\\climate-risk\\PredictiveAnalysisSection.tsx",
+        "line":  1972,
+        "route":  null,
+        "message":  "Button may lack accessible text/label; lower-confidence review finding.",
+        "fingerprint":  "frontend.button-accessibility-review|C:/Users/adelm/SeaBridgeAI/manageesg-frontend/src/components/views/risk-management/climate-risk/PredictiveAnalysisSection.tsx|1972|Button may lack accessible text/label; lower-confidence review finding.",
+        "baseline":  false
+    },
+    {
+        "rule":  "frontend.raw-fetch-boundary",
+        "severity":  "low",
+        "file":  "C:\\Users\\adelm\\SeaBridgeAI\\manageesg-frontend\\src\\components\\views\\risk-management\\climate-risk\\PropertyRiskMap.tsx",
+        "line":  156,
+        "route":  null,
+        "message":  "Raw fetch in UI tree; prefer typed API client with timeout/error normalization.",
+        "fingerprint":  "frontend.raw-fetch-boundary|C:/Users/adelm/SeaBridgeAI/manageesg-frontend/src/components/views/risk-management/climate-risk/PropertyRiskMap.tsx|156|Raw fetch in UI tree; prefer typed API client with timeout/error normalization.",
+        "baseline":  false
+    },
+    {
+        "rule":  "frontend.button-accessibility-review",
+        "severity":  "low",
+        "file":  "C:\\Users\\adelm\\SeaBridgeAI\\manageesg-frontend\\src\\components\\views\\risk-management\\climate-risk\\PropertyRiskMap.tsx",
+        "line":  355,
+        "route":  null,
+        "message":  "Button may lack accessible text/label; lower-confidence review finding.",
+        "fingerprint":  "frontend.button-accessibility-review|C:/Users/adelm/SeaBridgeAI/manageesg-frontend/src/components/views/risk-management/climate-risk/PropertyRiskMap.tsx|355|Button may lack accessible text/label; lower-confidence review finding.",
+        "baseline":  false
+    },
+    {
+        "rule":  "frontend.button-accessibility-review",
+        "severity":  "low",
+        "file":  "C:\\Users\\adelm\\SeaBridgeAI\\manageesg-frontend\\src\\components\\views\\risk-management\\climate-risk\\PropertyRiskMap.tsx",
+        "line":  524,
+        "route":  null,
+        "message":  "Button may lack accessible text/label; lower-confidence review finding.",
+        "fingerprint":  "frontend.button-accessibility-review|C:/Users/adelm/SeaBridgeAI/manageesg-frontend/src/components/views/risk-management/climate-risk/PropertyRiskMap.tsx|524|Button may lack accessible text/label; lower-confidence review finding.",
+        "baseline":  false
+    }
+]

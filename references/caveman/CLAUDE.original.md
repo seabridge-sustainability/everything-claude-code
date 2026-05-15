@@ -72,7 +72,7 @@ The CI bot commits as `github-actions[bot]`. After a PR merges, wait for this wo
 Three hooks ship in `hooks/`. They communicate via a flag file at `~/.claude/.caveman-active`.
 
 ```
-SessionStart hook ──writes "full"──▶ ~/.claude/.caveman-active ◀──writes mode── UserPromptSubmit hook
+SessionStart hook ──writes "full"── ~/.claude/.caveman-active ──writes mode── UserPromptSubmit hook
                                                │
                                             reads
                                                ▼

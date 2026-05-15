@@ -23,6 +23,7 @@ function test(name, fn) {
 const repoRoot = path.join(__dirname, '..');
 const configPath = path.join(repoRoot, '.codex', 'config.toml');
 const config = fs.readFileSync(configPath, 'utf8');
+const topLevelConfig = config.slice(0, config.search(/^\s*\[/m));
 const codexAgentsDir = path.join(repoRoot, '.codex', 'agents');
 
 function escapeRegExp(value) {
@@ -46,7 +47,7 @@ let failed = 0;
 
 if (
   test('reference config does not pin a top-level model', () => {
-    assert.ok(!/^model\s*=/m.test(config), 'Expected `.codex/config.toml` to inherit the CLI default model');
+    assert.ok(!/^model\s*=/m.test(topLevelConfig), 'Expected `.codex/config.toml` to inherit the CLI default model');
   })
 )
   passed++;
@@ -55,7 +56,7 @@ else failed++;
 if (
   test('reference config does not pin a top-level model provider', () => {
     assert.ok(
-      !/^model_provider\s*=/m.test(config),
+      !/^model_provider\s*=/m.test(topLevelConfig),
       'Expected `.codex/config.toml` to inherit the CLI default provider',
     );
   })

@@ -1,0 +1,64 @@
+# model_variables.yaml — Non-secret training and inference defaults for SeaBridgeAI local LLMs
+# DO NOT add API keys here. Keys live in .env (gitignored) only.
+# Override any value via CLI flag to train_sustainability_model.py
+
+# ── Endpoint ────────────────────────────────────────────────────────
+local_llm_base_url: "http://127.0.0.1:8888"         # Unsloth Studio port
+# API key is read from UNSLOTH_API_KEY env var at runtime
+
+# ── Model selection ─────────────────────────────────────────────────
+default_model: "unsloth/Qwen3.5-4B-GGUF:Q4_K_M"     # Default inference model
+training_model_family: "unsloth/Qwen2.5-3B"          # Default SFT base (full precision)
+# Alternatives (comment in as needed):
+#   training_model_family: "unsloth/Qwen2.5-7B"      # Larger; ~12 GB LoRA VRAM
+#   training_model_family: "unsloth/gemma-4-2b-it"   # Fast consumer inference
+
+# ── Dataset ─────────────────────────────────────────────────────────
+dataset_path: "local-llm/datasets/sustainability/smoke-test-sustainability.jsonl"
+eval_dataset_path: "local-llm/datasets/sustainability/smoke-test-sustainability.jsonl"
+dataset_text_field: "text"   # after prompt formatting
+dataset_format: "instruction"  # options: instruction | chat | dpo
+
+# ── Output ──────────────────────────────────────────────────────────
+output_dir: "./output/sustainability-model"
+save_strategy: "epoch"         # options: no | epoch | steps
+logging_steps: 1
+
+# ── Sequence length ─────────────────────────────────────────────────
+max_seq_length: 512            # Increase to 2048–4096 for long-document tasks
+
+# ── LoRA hyperparameters ────────────────────────────────────────────
+lora_rank: 16
+lora_alpha: 16
+lora_dropout: 0
+lora_target_modules:
+  - q_proj
+  - v_proj
+bias: "none"
+use_gradient_checkpointing: "unsloth"  # Enables double-buffered checkpoint reload
+
+# ── Training hyperparameters ─────────────────────────────────────────
+num_train_epochs: 1            # Smoke test default; increase to 3–5 for full fine-tune
+per_device_train_batch_size: 1
+gradient_accumulation_steps: 4
+learning_rate: 2.0e-4
+warmup_steps: 5
+weight_decay: 0.01
+lr_scheduler_type: "linear"
+random_state: 42
+
+# ── Precision ───────────────────────────────────────────────────────
+load_in_4bit: true             # Required to fit 7B+ on 16 GB VRAM
+fp16: false                    # Auto-detected by training script (bf16 preferred on RTX 4090)
+bf16: true
+
+# ── Task type ───────────────────────────────────────────────────────
+task_type: "CAUSAL_LM"         # options: CAUSAL_LM | SEQ_2_SEQ_LM | DPO
+
+# ── SeaBridgeAI domain gates ─────────────────────────────────────────
+sustainability_domain: "general"   # options: lca | emissions | climate_risk | nature_risk |
+                                   #   due_diligence | procurement | esg_qa | targets |
+                                   #   regulatory | openseabridge | general
+source_grounding_required: true    # Reject outputs without source attribution at eval time
+confidence_required: true          # Require confidence label in evaluation outputs
+hallucination_check_enabled: true  # Run hallucination_checks.md rules post-inference

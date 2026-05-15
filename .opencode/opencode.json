@@ -1,8 +1,8 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "model": "nvidia/deepseek-ai/deepseek-v4-pro",
-  "small_model": "nvidia/deepseek-ai/deepseek-v4-pro",
-  "default_agent": "build",
+  "small_model": "nvidia/meta/llama-3.1-8b-instruct",
+  "default_agent": "chat",
   "provider": {
     "nvidia": {
       "npm": "@ai-sdk/openai-compatible",
@@ -14,6 +14,9 @@
       "models": {
         "deepseek-ai/deepseek-v4-pro": {
           "name": "DeepSeek V4 Pro"
+        },
+        "meta/llama-3.1-8b-instruct": {
+          "name": "Llama 3.1 8B"
         },
         "google/gemma-4-31b-it": {
           "name": "Gemma 4 31B IT"
@@ -28,23 +31,24 @@
     "AGENTS.md",
     "CONTRIBUTING.md",
     "instructions/INSTRUCTIONS.md",
-    "instructions/SEABRIDGE_BACKEND_GUARDRAILS.md",
-    "skills/tdd-workflow/SKILL.md",
-    "skills/security-review/SKILL.md",
-    "skills/coding-standards/SKILL.md",
-    "skills/frontend-patterns/SKILL.md",
-    "skills/frontend-slides/SKILL.md",
-    "skills/backend-patterns/SKILL.md",
-    "skills/e2e-testing/SKILL.md",
-    "skills/verification-loop/SKILL.md",
-    "skills/api-design/SKILL.md",
-    "skills/strategic-compact/SKILL.md",
-    "skills/eval-harness/SKILL.md"
+    "instructions/SEABRIDGE_BACKEND_GUARDRAILS.md"
   ],
   "plugin": [
-    "./plugins"
+    "./plugins",
+    "./plugins/superpowers.js"
   ],
   "agent": {
+    "chat": {
+      "description": "Fast Q&A, summaries, explanations — no filesystem exploration. Default for questions and conversation.",
+      "mode": "primary",
+      "model": "nvidia/meta/llama-3.1-8b-instruct",
+      "tools": {
+        "read": true,
+        "bash": false,
+        "write": false,
+        "edit": false
+      }
+    },
     "build": {
       "description": "Primary coding agent for development work",
       "mode": "primary",

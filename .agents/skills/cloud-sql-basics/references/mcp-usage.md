@@ -12,19 +12,19 @@ via remote servers and through local execution with the MCP Toolbox:
 
 The Cloud SQL MCP server typically includes the following tools:
 
--   `clone_instance`: creates a Cloud SQL instance as a clone of source
+- `clone_instance`: creates a Cloud SQL instance as a clone of source
     instance.
--   `create_instance`: initiates the creation of a Cloud SQL instance.
--   `create_user`: creates a database user for a Cloud SQL instance.
--   `execute_sql`: executes any valid SQL statements (DDL, DCL, DQL, DML) on a
+- `create_instance`: initiates the creation of a Cloud SQL instance.
+- `create_user`: creates a database user for a Cloud SQL instance.
+- `execute_sql`: executes any valid SQL statements (DDL, DCL, DQL, DML) on a
     Cloud SQL instance.
--   `get_instance`: gets the details of a Cloud SQL instance.
--   `get_operation`: gets the status of a long-running operation in Cloud SQL.
--   `list_instances`: lists all Cloud SQL instances in a project.
--   `list_users`: lists all database users for a Cloud SQL instance.
--   `import_data`: imports data into a Cloud SQL instance from Cloud Storage.
--   `update_instance`: updates supported settings of a Cloud SQL instance.
--   `update_user`: updates a database user for a Cloud SQL instance.
+- `get_instance`: gets the details of a Cloud SQL instance.
+- `get_operation`: gets the status of a long-running operation in Cloud SQL.
+- `list_instances`: lists all Cloud SQL instances in a project.
+- `list_users`: lists all database users for a Cloud SQL instance.
+- `import_data`: imports data into a Cloud SQL instance from Cloud Storage.
+- `update_instance`: updates supported settings of a Cloud SQL instance.
+- `update_user`: updates a database user for a Cloud SQL instance.
 
 For additional specialized skills including health auditing, performance
 monitoring, and lifecycle management, install the Gemini CLI extension or Claude
@@ -46,6 +46,6 @@ Cloud SQL MCP for [PostgreSQL](https://docs.cloud.google.com/sql/docs/postgres/u
 
 Agents using the Cloud SQL MCP can:
 
--   Automate database schema migrations.
--   Perform health checks and monitor operation logs.
--   Assist in debugging SQL performance issues.
+- Automate database schema migrations.
+- Perform health checks and monitor operation logs.
+- Assist in debugging SQL performance issues.

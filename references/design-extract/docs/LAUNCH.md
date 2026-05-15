@@ -34,10 +34,8 @@ v8 ships three things in one release:
 ### First comment (the story)
 
 > Hey PH — I built designlang because I kept losing hours converting production designs into Tailwind configs by hand. Every existing tool gave me hex codes but missed the actual design system: spacing, radii, elevation, interaction states, the relationship between tokens.
->
-> v8 closes the last credibility gap: the extractor now picks the real brand color (not the most-used gray) and the design-score rubric is recalibrated against ground-truth sites. If it gave Linear an F before, it now gives it a C+/B, and if it gave Stripe an A before, it still does.
->
-> Would love feedback on the Figma plugin direction — the dream is that designers paste a URL and get a full Figma Variables set without touching the CLI.
+> > v8 closes the last credibility gap: the extractor now picks the real brand color (not the most-used gray) and the design-score rubric is recalibrated against ground-truth sites. If it gave Linear an F before, it now gives it a C+/B, and if it gave Stripe an A before, it still does.
+> > Would love feedback on the Figma plugin direction — the dream is that designers paste a URL and get a full Figma Variables set without touching the CLI.
 
 ### Assets (attach in this order)
 
@@ -59,17 +57,15 @@ v8 ships three things in one release:
 ### First comment
 
 > Maintainer here. Technical notes on v8:
->
-> - Brand-color detection now weights interactive backgrounds (CTAs, `<button>`, `role="button"`) by 100×, saturation by 2×, and log(usage). Previous heuristic was usage-only, which made any neutral-heavy site pick a gray as "Primary".
+> > - Brand-color detection now weights interactive backgrounds (CTAs, `<button>`, `role="button"`) by 100×, saturation by 2×, and log(usage). Previous heuristic was usage-only, which made any neutral-heavy site pick a gray as "Primary".
 > - A11y scoring filters decorative glyph spans via a new `hasText` boolean threaded from the Playwright crawler. The old count-everything path was dropping Linear to 25% WCAG.
 > - Scoring bands recalibrated against 10 real sites. Ground-truth targets: Stripe 85+, Linear 70+, Apple 80+.
 > - Output path still DTCG-compliant (v7). MCP server unchanged.
->
-> Code: https://github.com/Manavarya09/design-extract
+> > Code: https://github.com/Manavarya09/design-extract
 
 ## Twitter / X thread
 
-1. `designlang v8 is out. Paste any URL → get Tailwind config, shadcn theme, Figma Variables, CSS vars, and an MCP server for your AI agents. One command. Short video 👇`
+1. `designlang v8 is out. Paste any URL → get Tailwind config, shadcn theme, Figma Variables, CSS vars, and an MCP server for your AI agents. One command. Short video `
 2. `The big unlock: the extractor now picks real brand colors. Old version called Linear's #d0d6e0 gray the "primary". v8 correctly picks the purple CTA. Details on why this was hard at the end.`
 3. `v8 also ships four new surfaces: VS Code extension, Raycast extension, Figma plugin, and a GitHub Action that posts a design-token diff on every PR.`
 4. `GitHub link + npm badge`.

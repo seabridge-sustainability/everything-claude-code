@@ -1,0 +1,124 @@
+# MCP Toolbox — Staging Configuration Example
+# SeaBridgeAI | Staging Database Only
+#
+# NEVER use real credentials in this file.
+# Copy to tools.staging.yaml (gitignored) and fill in from staging secrets.
+#
+# Staging rules (stricter than dev):
+#   - Read-only DB users mandatory
+#   - Predefined tools only — NO arbitrary SQL enabled
+#   - Query logs MUST be configured
+#   - No homeowner PII tables exposed (pending GDPR review)
+#   - OpenTelemetry traces REQUIRED before promoting to staging
+#   - Gate: requires explicit approval to promote from dev to staging
+#
+# CONFIG FORMAT: flat multi-document YAML (--- separators).
+#   Each document has a top-level "kind:" field: source | tool | toolset
+#   MongoDB source: only "uri" (no database field — specify database on each tool)
+#   MongoDB find:   filterPayload (not filter), database required on each tool
+#   Postgres source: host/port/user/password/database (port is a string)
+#   Postgres tool:  statement (not sql/query), authRequired: []
+#   All tools:      authRequired: [] (empty list = no auth required in staging dev mode)
+
+# ============================================================
+# SOURCES — Database connections
+# ============================================================
+
+# --- manageesg-backend: MongoDB Atlas (staging cluster) ---
+kind: source
+name: seabridgeai-mongodb-staging
+type: mongodb
+uri: "<MONGODB_STAGING_SRV_URL>"
+# Note: database name goes on each tool, NOT here.
+---
+# --- openseabri: PostgreSQL (staging Supabase) ---
+kind: source
+name: openseabri-postgres-staging
+type: postgres
+host: "<SEABRI_STAGING_DB_HOST>"
+port: "5432"
+database: "<SEABRI_STAGING_DB_NAME>"
+user: "<TOOLBOX_RO_STAGING_USER>"
+password: "<TOOLBOX_RO_STAGING_PASS>"
+
+# ============================================================
+# TOOLS — Predefined read-only operations (staging = fewer tools)
+# ============================================================
+
+---
+# Staging exposes fewer tools — all predefined, no schema dumps
+kind: tool
+name: staging-sample-emission-factors
+type: mongodb-find
+source: seabridgeai-mongodb-staging
+authRequired: []
+description: Sample 3 emission factor documents from staging for QA.
+database: "<MONGODB_STAGING_DB_NAME>"
+collection: emission_factors
+filterPayload: "{}"
+limit: 3
+---
+kind: tool
+name: staging-sample-materiality-assessments
+type: mongodb-find
+source: seabridgeai-mongodb-staging
+authRequired: []
+description: Sample 3 materiality assessment documents from staging for QA.
+database: "<MONGODB_STAGING_DB_NAME>"
+collection: materiality_assessments
+filterPayload: "{}"
+limit: 3
+---
+kind: tool
+name: staging-get-claim-status
+type: postgres-sql
+source: openseabri-postgres-staging
+authRequired: []
+description: Get claim status and workflow stage from staging (no PII).
+parameters:
+  - name: claim_id
+    type: string
+    description: Claim UUID.
+statement: |
+  SELECT id, status, workflow_stage, created_at, updated_at
+  FROM claims
+  WHERE id = $1
+  LIMIT 1;
+---
+kind: tool
+name: staging-list-approved-contractors
+type: postgres-sql
+source: openseabri-postgres-staging
+authRequired: []
+description: List approved contractors from staging (business name + status only).
+statement: |
+  SELECT id, business_name, approval_status
+  FROM contractors
+  WHERE approval_status = 'approved'
+  ORDER BY id
+  LIMIT 25;
+
+# ============================================================
+# TOOLSETS — Grouped tool subsets per use case
+# ============================================================
+
+---
+kind: toolset
+name: seabridgeai-backend-staging
+tools:
+  - staging-sample-emission-factors
+  - staging-sample-materiality-assessments
+---
+kind: toolset
+name: openseabri-staging
+tools:
+  - staging-get-claim-status
+  - staging-list-approved-contractors
+---
+kind: toolset
+name: seabridge-staging-all
+tools:
+  - staging-sample-emission-factors
+  - staging-sample-materiality-assessments
+  - staging-get-claim-status
+  - staging-list-approved-contractors

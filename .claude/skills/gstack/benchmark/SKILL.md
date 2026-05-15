@@ -547,7 +547,7 @@ REGRESSIONS DETECTED: 3
 ```
 TOP 10 SLOWEST RESOURCES
 Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
-#   Resource                  Type      Size      Duration
+# Resource                  Type      Size      Duration
 1   vendor.chunk.js          script    320KB     480ms
 2   main.js                  script    250KB     320ms
 3   hero-image.webp          img       180KB     280ms

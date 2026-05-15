@@ -40,7 +40,7 @@ Real results on real project files:
 | `mixed-with-code.md` | 888 | 560 | **36.9%** |
 | **Average** | **898** | **481** | **46%** |
 
-All validations passed ✅ — headings, code blocks, URLs, file paths preserved exactly.
+All validations passed PASS: — headings, code blocks, URLs, file paths preserved exactly.
 
 ## Before / After
 
@@ -48,14 +48,14 @@ All validations passed ✅ — headings, code blocks, URLs, file paths preserved
 <tr>
 <td width="50%">
 
-### 📄 Original (706 tokens)
+### Original (706 tokens)
 
 > "I strongly prefer TypeScript with strict mode enabled for all new code. Please don't use `any` type unless there's genuinely no way around it, and if you do, leave a comment explaining the reasoning. I find that taking the time to properly type things catches a lot of bugs before they ever make it to runtime."
 
 </td>
 <td width="50%">
 
-### 🪨 Caveman (285 tokens)
+### Caveman (285 tokens)
 
 > "Prefer TypeScript strict mode always. No `any` unless unavoidable — comment why if used. Proper types catch bugs early."
 
@@ -98,10 +98,10 @@ Examples:
 
 | Type | Compress? |
 |------|-----------|
-| `.md`, `.txt`, `.rst` | ✅ Yes |
-| Extensionless natural language | ✅ Yes |
-| `.py`, `.js`, `.ts`, `.json`, `.yaml` | ❌ Skip (code/config) |
-| `*.original.md` | ❌ Skip (backup files) |
+| `.md`, `.txt`, `.rst` | PASS: Yes |
+| Extensionless natural language | PASS: Yes |
+| `.py`, `.js`, `.ts`, `.json`, `.yaml` | FAIL: Skip (code/config) |
+| `*.original.md` | FAIL: Skip (backup files) |
 
 ## How It Work
 

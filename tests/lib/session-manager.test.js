@@ -1382,9 +1382,20 @@ src/main.ts
     const realFile = '2026-02-10-abcd1234-session.tmp';
     fs.writeFileSync(path.join(sessionsDir, realFile), '# Real session\n');
 
-    // Create a broken symlink that matches the session filename pattern
+    // Create a broken symlink that matches the session filename pattern.
+    // Some Windows developer shells do not have permission to create symlinks;
+    // the statSync catch path is still covered on platforms that allow it.
     const brokenSymlink = '2026-02-10-deadbeef-session.tmp';
-    fs.symlinkSync('/nonexistent/path/that/does/not/exist', path.join(sessionsDir, brokenSymlink));
+    try {
+      fs.symlinkSync('/nonexistent/path/that/does/not/exist', path.join(sessionsDir, brokenSymlink));
+    } catch (err) {
+      if (process.platform === 'win32' && err && err.code === 'EPERM') {
+        console.log('    (skipped — symlink creation requires privileges on this Windows host)');
+        fs.rmSync(isoHome, { recursive: true, force: true });
+        return;
+      }
+      throw err;
+    }
 
     const origHome = process.env.HOME;
     const origUserProfile = process.env.USERPROFILE;
@@ -1419,9 +1430,18 @@ src/main.ts
     const sessionsDir = path.join(isoHome, '.claude', 'sessions');
     fs.mkdirSync(sessionsDir, { recursive: true });
 
-    // Create a broken symlink that matches a session ID pattern
+    // Create a broken symlink that matches a session ID pattern.
     const brokenFile = '2026-02-11-deadbeef-session.tmp';
-    fs.symlinkSync('/nonexistent/target/that/does/not/exist', path.join(sessionsDir, brokenFile));
+    try {
+      fs.symlinkSync('/nonexistent/target/that/does/not/exist', path.join(sessionsDir, brokenFile));
+    } catch (err) {
+      if (process.platform === 'win32' && err && err.code === 'EPERM') {
+        console.log('    (skipped — symlink creation requires privileges on this Windows host)');
+        fs.rmSync(isoHome, { recursive: true, force: true });
+        return;
+      }
+      throw err;
+    }
 
     const origHome = process.env.HOME;
     const origUserProfile = process.env.USERPROFILE;

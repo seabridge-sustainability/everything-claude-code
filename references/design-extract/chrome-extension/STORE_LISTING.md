@@ -18,10 +18,8 @@
 ### Detailed
 
 > designlang reads a website the way a developer reads a stylesheet. Pin this popup to any tab, hit the button, and the active URL is handed off to the hosted designlang extractor — which returns colors, typography, spacing, shadows, radii, interaction states, accessibility score, and ready-to-use Tailwind / shadcn / Figma Variables / W3C Design Tokens outputs.
->
-> There is also a "Copy CLI" button that drops `npx designlang <url>` into your clipboard for local use.
->
-> • Works on every tab (activeTab permission only)
+> > There is also a "Copy CLI" button that drops `npx designlang <url>` into your clipboard for local use.
+> > • Works on every tab (activeTab permission only)
 > • No analytics, no tracking, no background scripts
 > • Open source — https://github.com/Manavarya09/design-extract
 

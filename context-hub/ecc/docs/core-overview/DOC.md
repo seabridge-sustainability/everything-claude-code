@@ -286,16 +286,12 @@ For manual install instructions see the README in the `rules/` folder. When copy
 ### Multi-model commands require additional setup
 
 > WARNING: `multi-*` commands are **not** covered by the base plugin/rules install above.
->
-> To use `/multi-plan`, `/multi-execute`, `/multi-backend`, `/multi-frontend`, and `/multi-workflow`, you must also install the `ccg-workflow` runtime.
->
-> Initialize it with `npx ccg-workflow`.
->
-> That runtime provides the external dependencies these commands expect, including:
+> > To use `/multi-plan`, `/multi-execute`, `/multi-backend`, `/multi-frontend`, and `/multi-workflow`, you must also install the `ccg-workflow` runtime.
+> > Initialize it with `npx ccg-workflow`.
+> > That runtime provides the external dependencies these commands expect, including:
 > - `~/.claude/bin/codeagent-wrapper`
 > - `~/.claude/.ccg/prompts/*`
->
-> Without `ccg-workflow`, these `multi-*` commands will not run correctly.
+> > Without `ccg-workflow`, these `multi-*` commands will not run correctly.
 
 ---
 
@@ -690,20 +686,17 @@ Or add directly to your `~/.claude/settings.json`:
 This gives you instant access to all commands, agents, skills, and hooks.
 
 > **Note:** The Claude Code plugin system does not support distributing `rules` via plugins ([upstream limitation](https://code.claude.com/docs/en/plugins-reference)). You need to install rules manually:
->
-> ```bash
+> > ```bash
 > # Clone the repo first
 > git clone https://github.com/affaan-m/everything-claude-code.git
->
-> # Option A: User-level rules (applies to all projects)
+> > # Option A: User-level rules (applies to all projects)
 > mkdir -p ~/.claude/rules
 > cp -r everything-claude-code/rules/common ~/.claude/rules/
 > cp -r everything-claude-code/rules/typescript ~/.claude/rules/   # pick your stack
 > cp -r everything-claude-code/rules/python ~/.claude/rules/
 > cp -r everything-claude-code/rules/golang ~/.claude/rules/
 > cp -r everything-claude-code/rules/php ~/.claude/rules/
->
-> # Option B: Project-level rules (applies to current project only)
+> > # Option B: Project-level rules (applies to current project only)
 > mkdir -p .claude/rules
 > cp -r everything-claude-code/rules/common .claude/rules/
 > cp -r everything-claude-code/rules/typescript .claude/rules/     # pick your stack

@@ -466,7 +466,7 @@ Full report: ${REVIEW_PATH}
 
 If total findings > 0:
 ```
-⚠ Issues found. Review the report for details.
+WARNING: Issues found. Review the report for details.
 
 Full report: ${REVIEW_PATH}
 

@@ -5,6 +5,7 @@ tools: ["Read", "Write", "Edit", "Bash", "Grep", "Glob"]
 model: sonnet
 ---
 
+
 # C++ Build Error Resolver
 
 ## Safety And Authorization Rule
@@ -101,3 +102,4 @@ Remaining errors: 3
 Final: `Build Status: SUCCESS/FAILED | Errors Fixed: N | Files Modified: list`
 
 For detailed C++ patterns and code examples, see `skill: cpp-coding-standards`.
+

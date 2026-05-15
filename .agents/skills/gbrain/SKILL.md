@@ -72,6 +72,11 @@ maintenance.
 # Version and CLI availability.
 C:\Users\adelm\SeaBridgeAI\everything-claude-code\scripts\gbrain.ps1 --version
 
+# SeaBridgeAI workspace status checks. These do not initialize a brain or index repos.
+C:\Users\adelm\SeaBridgeAI\everything-claude-code\scripts\gbrain-workspace.ps1 check
+C:\Users\adelm\SeaBridgeAI\everything-claude-code\scripts\gbrain-workspace.ps1 mcp
+C:\Users\adelm\SeaBridgeAI\everything-claude-code\scripts\gbrain-workspace.ps1 index-plan
+
 # GBrain repository health.
 cd C:\Users\adelm\SeaBridgeAI\everything-claude-code\references\gbrain
 bun run typecheck

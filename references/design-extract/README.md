@@ -424,7 +424,7 @@ Score: 74/100  Grade: C   Tokens: 126
 
 Exits non-zero on any `error`-level finding — drop into CI.
 
-### 28. `designlang drift` — Codebase ↔ Live Site Sync Check (NEW in v9)
+### 28. `designlang drift` — Codebase  Live Site Sync Check (NEW in v9)
 
 Point at a deployed site, pass your local tokens, and get a verdict:
 

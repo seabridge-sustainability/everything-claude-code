@@ -8,6 +8,11 @@ const os = require('os');
 const path = require('path');
 const { spawnSync } = require('child_process');
 
+if (process.platform === 'win32') {
+  console.log('Skipping bash-dependent Codex hook tests on Windows');
+  process.exit(0);
+}
+
 const repoRoot = path.join(__dirname, '..', '..');
 const installScript = path.join(repoRoot, 'scripts', 'codex', 'install-global-git-hooks.sh');
 const syncScript = path.join(repoRoot, 'scripts', 'sync-ecc-to-codex.sh');

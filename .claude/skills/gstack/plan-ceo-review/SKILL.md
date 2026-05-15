@@ -1286,8 +1286,7 @@ Use AskUserQuestion:
 > give a brutally honest, independent challenge of this plan Ã¢â‚¬â€ logical gaps, feasibility
 > risks, and blind spots that are hard to catch from inside the review. Takes about 2
 > minutes."
->
-> RECOMMENDATION: Choose A Ã¢â‚¬â€ an independent second opinion catches structural blind
+> > RECOMMENDATION: Choose A Ã¢â‚¬â€ an independent second opinion catches structural blind
 > spots. Two different AI models agreeing on a plan is stronger signal than one model's
 > thorough review. Completeness: A=9/10, B=7/10.
 
@@ -1377,8 +1376,7 @@ For each substantive tension point, use AskUserQuestion:
 
 > "Cross-model disagreement on [topic]. The review found [X] but the outside voice
 > argues [Y]. [One sentence on what context you might be missing.]"
->
-> RECOMMENDATION: Choose [A or B] because [one-line reason explaining which argument
+> > RECOMMENDATION: Choose [A or B] because [one-line reason explaining which argument
 > is more compelling and why]. Completeness: A=X/10, B=Y/10.
 
 Options:

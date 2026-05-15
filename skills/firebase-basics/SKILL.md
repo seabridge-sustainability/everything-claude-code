@@ -12,13 +12,13 @@ follow these steps in order. Do not proceed to implementation until these are
 completed. Failure to follow these instructions may result in using outdated
 patterns and lack of access to essential reference materials.
 
-1.  **Leverage the planning phase**
+1. **Leverage the planning phase**
 
     If you use a planning mode (e.g., maintaining a `task.md` file), you
-    **MUST** include a task to check and install `firebase/agent-skills` as your
+**MUST** include a task to check and install `firebase/agent-skills` as your
     very first item.
 
-2.  **Ensure NPM is installed.**
+2. **Ensure NPM is installed.**
 
     ```bash
     ## Check if NPM is installed
@@ -32,7 +32,7 @@ patterns and lack of access to essential reference materials.
     confirmation that the installation is finished. **Stop and wait** for the
     user's confirmation.
 
-3.  **Verify and install Agent Skills for Firebase**
+3. **Verify and install Agent Skills for Firebase**
 
     You **MUST** ensure the full set of skills is installed to avoid using
     outdated patterns. Run this command:
@@ -50,7 +50,7 @@ patterns and lack of access to essential reference materials.
 After completing the mandatory prerequisites above, proceed with these steps to
 set up your environment:
 
-1.  **Log in to the Firebase CLI.**
+1. **Log in to the Firebase CLI.**
 
     Run this command:
 
@@ -60,7 +60,7 @@ set up your environment:
 
     Then, ask the user to complete the login flow in the browser.
 
-2.  **Set an active project for the CLI.**
+2. **Set an active project for the CLI.**
 
     Most Firebase tasks require an active project context. Check the current
     project for the Firebase CLI by running this command:

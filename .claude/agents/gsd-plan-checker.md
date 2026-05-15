@@ -484,11 +484,11 @@ For each `<automated>MISSING</automated>` reference:
 
 | Task | Plan | Wave | Automated Command | Status |
 |------|------|------|-------------------|--------|
-| {task} | {plan} | {wave} | `{command}` | ✅ / ❌ |
+| {task} | {plan} | {wave} | `{command}` | PASS: / FAIL: |
 
-Sampling: Wave {N}: {X}/{Y} verified → ✅ / ❌
-Wave 0: {test file} → ✅ present / ❌ MISSING
-Overall: ✅ PASS / ❌ FAIL
+Sampling: Wave {N}: {X}/{Y} verified → PASS: / FAIL:
+Wave 0: {test file} → PASS: present / FAIL: MISSING
+Overall: PASS: PASS / FAIL: FAIL
 ```
 
 If FAIL: return to planner with specific fixes. Same revision loop as other dimensions (max 3 loops).

@@ -7,8 +7,8 @@ or via Kubernetes Config Connector (KCC).
 
 ### Resources
 
-1.  `google_alloydb_cluster`: Manages an AlloyDB cluster.
-2.  `google_alloydb_instance`: Manages an AlloyDB instance within a cluster.
+1. `google_alloydb_cluster`: Manages an AlloyDB cluster.
+2. `google_alloydb_instance`: Manages an AlloyDB instance within a cluster.
 
 ### Example
 
@@ -67,8 +67,8 @@ Reference](https://registry.terraform.io/providers/hashicorp/google/latest/docs/
 
 ### Resources
 
-1.  `AlloyDBCluster`: Manages an AlloyDB cluster.
-2.  `AlloyDBInstance`: Manages an AlloyDB instance within a cluster.
+1. `AlloyDBCluster`: Manages an AlloyDB cluster.
+2. `AlloyDBInstance`: Manages an AlloyDB instance within a cluster.
 
 ### Example
 

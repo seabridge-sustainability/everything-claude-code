@@ -2681,7 +2681,7 @@ async function runTests() {
         name: 'cwd skip path',
         env: {
           CLAUDE_CODE_ENTRYPOINT: 'cli',
-          ECC_OBSERVE_SKIP_PATHS: ' observer-sessions , .claude-mem '
+          ECC_OBSERVE_SKIP_PATHS: ' observer-sessions , temp-agent-work '
         },
         cwdSuffix: path.join('observer-sessions', 'worker')
       });

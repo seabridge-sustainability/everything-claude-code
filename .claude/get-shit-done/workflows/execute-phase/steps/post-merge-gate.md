@@ -34,7 +34,7 @@ if [ -z "$BUILD_CMD" ]; then
     BUILD_CMD="npm run build"
   else
     BUILD_CMD=""
-    echo "⚠ No build command detected — skipping build gate"
+    echo "WARNING: No build command detected — skipping build gate"
   fi
 fi
 # Run build with 5-minute timeout
@@ -45,7 +45,7 @@ if [ -n "$BUILD_CMD" ]; then
   if [ "${BUILD_EXIT}" -eq 0 ]; then
     echo "✓ Post-merge build gate passed"
   elif [ "${BUILD_EXIT}" -eq 124 ]; then
-    echo "⚠ Post-merge build gate timed out after 5 minutes"
+    echo "WARNING: Post-merge build gate timed out after 5 minutes"
   else
     echo "✗ Post-merge build gate failed (exit code ${BUILD_EXIT})"
     WAVE_FAILURE_COUNT=$((WAVE_FAILURE_COUNT + 1))
@@ -90,7 +90,7 @@ if [ -z "$TEST_CMD" ]; then
     TEST_CMD="python -m pytest -x -q --tb=short 2>&1 || uv run python -m pytest -x -q --tb=short"
   else
     TEST_CMD="true"
-    echo "⚠ No test runner detected — skipping post-merge test gate"
+    echo "WARNING: No test runner detected — skipping post-merge test gate"
   fi
 fi
 # Run test suite with 5-minute timeout
@@ -100,7 +100,7 @@ TEST_EXIT=$?
 if [ "${TEST_EXIT}" -eq 0 ]; then
   echo "✓ Post-merge test gate passed — no cross-plan conflicts"
 elif [ "${TEST_EXIT}" -eq 124 ]; then
-  echo "⚠ Post-merge test gate timed out after 5 minutes"
+  echo "WARNING: Post-merge test gate timed out after 5 minutes"
 else
   echo "✗ Post-merge test gate failed (exit code ${TEST_EXIT})"
   WAVE_FAILURE_COUNT=$((WAVE_FAILURE_COUNT + 1))
@@ -113,4 +113,4 @@ fi
 
 **If `TEST_EXIT` is non-zero (test failure):** Increment `WAVE_FAILURE_COUNT` to track
 cumulative failures across waves. Subsequent waves should report:
-`⚠ Note: ${WAVE_FAILURE_COUNT} prior wave(s) had test failures`
+`WARNING: Note: ${WAVE_FAILURE_COUNT} prior wave(s) had test failures`

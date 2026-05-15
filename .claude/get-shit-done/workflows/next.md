@@ -38,7 +38,7 @@ Exit.
 Run hard-stop checks before routing. Exit on first hit unless `--force` was passed.
 
 If `--force` flag was passed, skip all gates and the consecutive guard.
-Print a one-line warning: `⚠ --force: skipping safety gates`
+Print a one-line warning: `WARNING: --force: skipping safety gates`
 Then proceed directly to `determine_next_action`.
 
 **Gate 1: Unresolved checkpoint**
@@ -48,7 +48,7 @@ Check if `.planning/.continue-here.md` exists:
 ```
 If found:
 ```
-⛔ Hard stop: Unresolved checkpoint
+ Hard stop: Unresolved checkpoint
 
 `.planning/.continue-here.md` exists — a previous session left
 unfinished work that needs manual review before advancing.
@@ -62,7 +62,7 @@ Exit (do not route).
 Check if STATE.md contains `status: error` or `status: failed`:
 If found:
 ```
-⛔ Hard stop: Project in error state
+ Hard stop: Project in error state
 
 STATE.md shows status: {status}. Resolve the error before advancing.
 Run `/gsd-health` to diagnose, or manually fix STATE.md.
@@ -74,7 +74,7 @@ Exit.
 Check if the current phase has a VERIFICATION.md with any `FAIL` items that don't have overrides:
 If found:
 ```
-⛔ Hard stop: Unchecked verification failures
+ Hard stop: Unchecked verification failures
 
 VERIFICATION.md for phase {N} has {count} unresolved FAIL items.
 Address the failures or add overrides before advancing to the next phase.
@@ -94,7 +94,7 @@ If no incomplete prior work is found, continue to `determine_next_action` silent
 
 If incomplete prior work is found, show a structured completeness report:
 ```
-⚠ Prior phase has incomplete work
+WARNING: Prior phase has incomplete work
 
 Phase {N} — "{name}" has unresolved items:
   • Plan {N}-{M} ({slug}): executed but no SUMMARY.md
@@ -147,7 +147,7 @@ PENDING_SKETCHES=$(grep -rl 'winner: null' .planning/sketches/*/README.md 2>/dev
 
 If either count is > 0, display before routing:
 ```
-⚠ Pending exploratory work:
+WARNING: Pending exploratory work:
   {PENDING_SPIKES} spike(s) with unresolved verdicts in .planning/spikes/
   {PENDING_SKETCHES} sketch(es) without a winning variant in .planning/sketches/
 
@@ -202,7 +202,7 @@ Display the determination:
 **Current:** Phase [N] — [name] | [progress]%
 **Status:** [status description]
 
-▶ **Next step:** `/gsd-[command] [args]`
+**Next step:** `/gsd-[command] [args]`
   [One-line explanation of why this is the next step]
 ```
 

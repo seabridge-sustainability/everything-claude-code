@@ -84,7 +84,7 @@ Continue (non-blocking).
 
 **If `SKETCH_FINDINGS_PATH` is not empty:**
 ```
-⚡ Sketch findings detected: {SKETCH_FINDINGS_PATH}
+ Sketch findings detected: {SKETCH_FINDINGS_PATH}
    Validated design decisions from /gsd-sketch will be loaded into the UI researcher.
    Pre-validated decisions (layout, palette, typography, spacing) should be treated as locked — not re-asked.
 ```
@@ -278,7 +278,7 @@ Dimensions: 6/6 passed
 
 ───────────────────────────────────────────────────────────────
 
-## ▶ Next Up — [${PROJECT_CODE}] ${PROJECT_TITLE}
+## Next Up — [${PROJECT_CODE}] ${PROJECT_TITLE}
 
 {If CONTEXT.md exists for this phase:}
 **Plan Phase {N}** — planner will use UI-SPEC.md as design context

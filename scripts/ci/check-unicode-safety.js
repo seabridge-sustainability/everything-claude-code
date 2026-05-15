@@ -12,9 +12,27 @@ const writeMode = process.argv.includes('--write');
 const ignoredDirs = new Set([
   '.git',
   'node_modules',
+  '.adal',
+  '.aider-desk',
+  '.augment',
+  '.bob',
+  '.codeartsdoer',
+  '.codebuddy',
+  '.codemaker',
+  '.codestudio',
+  '.commandcode',
   '.dmux',
   '.next',
+  '.venv',
+  '.venvs',
   'coverage',
+  'external',
+  'gstack',
+  'CLI-Anything',
+  'references',
+  'unsloth',
+  'vendor',
+  'venv',
 ]);
 
 const textExtensions = new Set([

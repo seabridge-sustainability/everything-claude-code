@@ -29,12 +29,12 @@ access to Cloud SQL resources.
 
 ## Quick Start (PostgreSQL)
 
-1.  **Enable the API:**
+1. **Enable the API:**
     ```bash
     gcloud services enable sqladmin.googleapis.com
     ```
 
-2.  **Create an Instance:**
+2. **Create an Instance:**
     ```bash
     gcloud sql instances create INSTANCE_NAME \
       --database-version=POSTGRES_18 \
@@ -43,7 +43,7 @@ access to Cloud SQL resources.
       --region=REGION
     ```
 
-3.  **Set a password for the default user:**
+3. **Set a password for the default user:**
 
     Because this is a Cloud SQL for PostgreSQL instance, the default admin user
     is `postgres`:
@@ -52,13 +52,13 @@ access to Cloud SQL resources.
       --instance=INSTANCE_NAME --password=PASSWORD
     ```
 
-4.  **Create a database:**
+4. **Create a database:**
     ```bash
     gcloud sql databases create DATABASE_NAME \
       --instance=INSTANCE_NAME
     ```
 
-5.  **Get the instance connection name:**
+5. **Get the instance connection name:**
 
     You need the instance connection name (which is formatted as
     `PROJECT_ID:REGION:INSTANCE_NAME`) to connect using the Cloud SQL Auth
@@ -68,7 +68,7 @@ access to Cloud SQL resources.
       --format="value(connectionName)"
     ```
 
-6.  **Connect to the instance:**
+6. **Connect to the instance:**
 
     The Cloud SQL Auth Proxy must be running to be able to connect to the
     instance. In a separate terminal, start the proxy using the connection name:
@@ -83,22 +83,22 @@ access to Cloud SQL resources.
 
 ## Reference Directory
 
--   [Core Concepts](references/core-concepts.md): Instance architecture, high
+- [Core Concepts](references/core-concepts.md): Instance architecture, high
     availability (HA), and supported database engines.
 
--   [CLI Usage](references/cli-usage.md): Essential `gcloud sql` commands for
+- [CLI Usage](references/cli-usage.md): Essential `gcloud sql` commands for
     instance, database, and user management.
 
--   [Client Libraries & Connectors](references/client-library-usage.md):
+- [Client Libraries & Connectors](references/client-library-usage.md):
     Connecting to Cloud SQL using Python, Java, Node.js, and Go.
 
--   [MCP Usage](references/mcp-usage.md): Using the Cloud SQL remote MCP
+- [MCP Usage](references/mcp-usage.md): Using the Cloud SQL remote MCP
     server and Gemini CLI extension.
 
--   [Infrastructure as Code](references/iac-usage.md): Terraform
+- [Infrastructure as Code](references/iac-usage.md): Terraform
     configuration for instances, databases, and users.
 
--   [IAM & Security](references/iam-security.md): Predefined roles, SSL/TLS
+- [IAM & Security](references/iam-security.md): Predefined roles, SSL/TLS
     certificates, and Auth Proxy configuration.
 
 *If you need product information not found in these references, use the

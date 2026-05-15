@@ -1,0 +1,4 @@
+Source: https://github.com/soy-rafa/claude-mcp-sentinel
+Pinned commit: 7677eca5e0313198daf39d2e3929760c80602ef8
+Verified: PYTHONIOENCODING=utf-8 python3 tests/test_hook.py => 20/20 passed
+Installed as a shared SeaBridgeAI vendor copy for project-local Claude hooks.

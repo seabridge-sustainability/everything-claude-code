@@ -129,7 +129,7 @@ WIRED = imported AND used. ORPHANED = exists but not imported/used.
 | Exists | Substantive | Wired | Status |
 |--------|-------------|-------|--------|
 | ✓ | ✓ | ✓ | ✓ VERIFIED |
-| ✓ | ✓ | ✗ | ⚠️ ORPHANED |
+| ✓ | ✓ | ✗ | WARNING: ORPHANED |
 | ✓ | ✗ | - | ✗ STUB |
 | ✗ | - | - | ✗ MISSING |
 
@@ -265,7 +265,7 @@ if [ -z "$TEST_CMD" ]; then
     TEST_CMD="python -m pytest -q --tb=short 2>&1 || uv run python -m pytest -q --tb=short"
   else
     TEST_CMD="false"
-    echo "⚠ No test runner detected — skipping test suite"
+    echo "WARNING: No test runner detected — skipping test suite"
   fi
 fi
 # Detect test runner and run all tests (timeout: 5 minutes)
@@ -275,7 +275,7 @@ TEST_EXIT=$?
 if [ "${TEST_EXIT}" -eq 0 ]; then
   echo "✓ Test suite passed"
 elif [ "${TEST_EXIT}" -eq 124 ]; then
-  echo "⚠ Test suite timed out after 5 minutes"
+  echo "WARNING: Test suite timed out after 5 minutes"
 else
   echo "✗ Test suite failed (exit code ${TEST_EXIT})"
 fi
@@ -329,12 +329,12 @@ Extract files modified in this phase from SUMMARY.md, scan each:
 
 | Pattern | Search | Severity |
 |---------|--------|----------|
-| TODO/FIXME/XXX/HACK | `grep -n -E "TODO\|FIXME\|XXX\|HACK"` | ⚠️ Warning |
-| Placeholder content | `grep -n -iE "placeholder\|coming soon\|will be here"` | 🛑 Blocker |
-| Empty returns | `grep -n -E "return null\|return \{\}\|return \[\]\|=> \{\}"` | ⚠️ Warning |
-| Log-only functions | Functions containing only console.log | ⚠️ Warning |
+| TODO/FIXME/XXX/HACK | `grep -n -E "TODO\|FIXME\|XXX\|HACK"` | WARNING: Warning |
+| Placeholder content | `grep -n -iE "placeholder\|coming soon\|will be here"` |  Blocker |
+| Empty returns | `grep -n -E "return null\|return \{\}\|return \[\]\|=> \{\}"` | WARNING: Warning |
+| Log-only functions | Functions containing only console.log | WARNING: Warning |
 
-Categorize: 🛑 Blocker (prevents goal) | ⚠️ Warning (incomplete) | ℹ️ Info (notable).
+Categorize:  Blocker (prevents goal) | WARNING: Warning (incomplete) |  Info (notable).
 </step>
 
 <step name="audit_test_quality">
@@ -355,8 +355,8 @@ grep -rn -E "it\.skip|describe\.skip|test\.skip|xit\(|xdescribe\(|xtest\(|@pytes
 ```
 
 **Rule:** A disabled test linked to a requirement = requirement NOT tested.
-- 🛑 BLOCKER if the disabled test is the only test proving that requirement
-- ⚠️ WARNING if other active tests also cover the requirement
+- BLOCKER if the disabled test is the only test proving that requirement
+- WARNING: WARNING if other active tests also cover the requirement
 
 **3. Circular test detection**
 

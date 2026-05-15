@@ -1,0 +1,71 @@
+{
+  "system_id": "SEABRIDGE_AGENT_SYSTEM_V1",
+  "source": {
+    "name": "mattpocock/skills",
+    "url": "https://github.com/mattpocock/skills",
+    "local_path": "C:\\Users\\adelm\\SeaBridgeAI\\shared-agent-skills",
+    "commit": "9f2e0bd0ea776eb6372eb81fa8a4a47814a8404a",
+    "integration_mode": "central_clone_with_seabridge_wrappers"
+  },
+  "canonical_system": "C:\\Users\\adelm\\SeaBridgeAI\\everything-claude-code",
+  "invocation": [
+    "#skill/<name>",
+    "Use skill: <name>"
+  ],
+  "active_wrappers": [
+    {
+      "name": "grill-me",
+      "category": ["Product thinking", "Architecture", "Developer workflow"],
+      "wrapper": "C:\\Users\\adelm\\SeaBridgeAI\\everything-claude-code\\.agents\\skills\\grill-me\\SKILL.md",
+      "source": "C:\\Users\\adelm\\SeaBridgeAI\\shared-agent-skills\\skills\\productivity\\grill-me\\SKILL.md",
+      "maps_to_existing": ["sea-brainstorming-and-spec-refinement", "sea-senior-dev-workflow"],
+      "status": "active"
+    },
+    {
+      "name": "ubiquitous-language",
+      "category": ["Documentation", "Architecture", "API design"],
+      "wrapper": "C:\\Users\\adelm\\SeaBridgeAI\\everything-claude-code\\.agents\\skills\\ubiquitous-language\\SKILL.md",
+      "source": "C:\\Users\\adelm\\SeaBridgeAI\\shared-agent-skills\\skills\\deprecated\\ubiquitous-language\\SKILL.md",
+      "maps_to_existing": ["sea-sustainability-domain-review", "sea-ai-data-integrity", "sea-cross-repo-handoff"],
+      "status": "active_adapted_from_upstream_deprecated"
+    },
+    {
+      "name": "improve-codebase-architecture",
+      "category": ["Architecture", "Refactoring", "Testing", "Backend reliability", "Frontend UX"],
+      "wrapper": "C:\\Users\\adelm\\SeaBridgeAI\\everything-claude-code\\.agents\\skills\\improve-codebase-architecture\\SKILL.md",
+      "source": "C:\\Users\\adelm\\SeaBridgeAI\\shared-agent-skills\\skills\\engineering\\improve-codebase-architecture\\SKILL.md",
+      "maps_to_existing": ["sea-senior-dev-workflow", "sea-test-driven-development", "sea-verification-before-completion"],
+      "status": "active"
+    }
+  ],
+  "inventory": [
+    {"name": "design-an-interface", "path": "skills/deprecated/design-an-interface/SKILL.md", "categories": ["API design", "Architecture"], "status": "upstream_deprecated", "seabridge_action": "map_to_improve-codebase-architecture_when_needed"},
+    {"name": "qa", "path": "skills/deprecated/qa/SKILL.md", "categories": ["Testing", "Developer workflow"], "status": "upstream_deprecated", "seabridge_action": "prefer_sea-verification-before-completion_and_e2e-testing"},
+    {"name": "request-refactor-plan", "path": "skills/deprecated/request-refactor-plan/SKILL.md", "categories": ["Refactoring", "Developer workflow"], "status": "upstream_deprecated", "seabridge_action": "prefer_sea-task-orchestration_and_improve-codebase-architecture"},
+    {"name": "ubiquitous-language", "path": "skills/deprecated/ubiquitous-language/SKILL.md", "categories": ["Documentation", "Architecture", "API design"], "status": "active_adapted", "seabridge_action": "use_wrapper"},
+    {"name": "diagnose", "path": "skills/engineering/diagnose/SKILL.md", "categories": ["Debugging", "Performance"], "status": "available", "seabridge_action": "map_to_sea-systematic-debugging"},
+    {"name": "grill-with-docs", "path": "skills/engineering/grill-with-docs/SKILL.md", "categories": ["Architecture", "Documentation", "Product thinking"], "status": "available", "seabridge_action": "map_to_grill-me_plus_ubiquitous-language"},
+    {"name": "improve-codebase-architecture", "path": "skills/engineering/improve-codebase-architecture/SKILL.md", "categories": ["Architecture", "Refactoring", "Testing", "Backend reliability", "Frontend UX"], "status": "active", "seabridge_action": "use_wrapper"},
+    {"name": "prototype", "path": "skills/engineering/prototype/SKILL.md", "categories": ["Product thinking", "Frontend UX", "Developer workflow"], "status": "available", "seabridge_action": "map_to_sea-brainstorming-and-spec-refinement_and_sea-frontend-design"},
+    {"name": "setup-matt-pocock-skills", "path": "skills/engineering/setup-matt-pocock-skills/SKILL.md", "categories": ["Agent orchestration", "Developer workflow"], "status": "reference_only", "seabridge_action": "do_not_run_as_separate_setup_system"},
+    {"name": "tdd", "path": "skills/engineering/tdd/SKILL.md", "categories": ["Testing", "Refactoring"], "status": "available", "seabridge_action": "map_to_sea-test-driven-development"},
+    {"name": "to-issues", "path": "skills/engineering/to-issues/SKILL.md", "categories": ["Release engineering", "Developer workflow"], "status": "available", "seabridge_action": "use_for_ticket_breakdown_only_when_requested"},
+    {"name": "to-prd", "path": "skills/engineering/to-prd/SKILL.md", "categories": ["Product thinking", "Documentation"], "status": "available", "seabridge_action": "use_for_prd_generation_only_when_requested"},
+    {"name": "triage", "path": "skills/engineering/triage/SKILL.md", "categories": ["Developer workflow", "Release engineering"], "status": "available", "seabridge_action": "use_for_issue_triage_only_when_requested"},
+    {"name": "zoom-out", "path": "skills/engineering/zoom-out/SKILL.md", "categories": ["Architecture", "Documentation"], "status": "available", "seabridge_action": "map_to_codebase_orientation"},
+    {"name": "review", "path": "skills/in-progress/review/SKILL.md", "categories": ["Testing", "Security", "Developer workflow"], "status": "upstream_in_progress", "seabridge_action": "prefer_sea-code-review-response_and_existing_review_policy"},
+    {"name": "writing-beats", "path": "skills/in-progress/writing-beats/SKILL.md", "categories": ["Documentation"], "status": "upstream_in_progress", "seabridge_action": "reference_only"},
+    {"name": "writing-fragments", "path": "skills/in-progress/writing-fragments/SKILL.md", "categories": ["Documentation"], "status": "upstream_in_progress", "seabridge_action": "reference_only"},
+    {"name": "writing-shape", "path": "skills/in-progress/writing-shape/SKILL.md", "categories": ["Documentation"], "status": "upstream_in_progress", "seabridge_action": "reference_only"},
+    {"name": "git-guardrails-claude-code", "path": "skills/misc/git-guardrails-claude-code/SKILL.md", "categories": ["Security", "Developer workflow"], "status": "available", "seabridge_action": "reference_only_no_hooks_without_approval"},
+    {"name": "migrate-to-shoehorn", "path": "skills/misc/migrate-to-shoehorn/SKILL.md", "categories": ["Testing", "Refactoring"], "status": "available", "seabridge_action": "not_adopted_by_default"},
+    {"name": "scaffold-exercises", "path": "skills/misc/scaffold-exercises/SKILL.md", "categories": ["Developer workflow", "Documentation"], "status": "available", "seabridge_action": "reference_only"},
+    {"name": "setup-pre-commit", "path": "skills/misc/setup-pre-commit/SKILL.md", "categories": ["Release engineering", "Developer workflow"], "status": "available", "seabridge_action": "requires_explicit_approval_for_hooks_or_dependencies"},
+    {"name": "edit-article", "path": "skills/personal/edit-article/SKILL.md", "categories": ["Documentation"], "status": "personal", "seabridge_action": "reference_only"},
+    {"name": "obsidian-vault", "path": "skills/personal/obsidian-vault/SKILL.md", "categories": ["Documentation", "Developer workflow"], "status": "personal", "seabridge_action": "prefer_sea-knowledge-vault"},
+    {"name": "caveman", "path": "skills/productivity/caveman/SKILL.md", "categories": ["Developer workflow"], "status": "available", "seabridge_action": "already_present_in_codex_user_skills"},
+    {"name": "grill-me", "path": "skills/productivity/grill-me/SKILL.md", "categories": ["Product thinking", "Architecture", "Developer workflow"], "status": "active", "seabridge_action": "use_wrapper"},
+    {"name": "handoff", "path": "skills/productivity/handoff/SKILL.md", "categories": ["Developer workflow", "Documentation"], "status": "available", "seabridge_action": "map_to_sea-cross-repo-handoff_and_sea-context-hygiene"},
+    {"name": "write-a-skill", "path": "skills/productivity/write-a-skill/SKILL.md", "categories": ["Agent orchestration", "Developer workflow"], "status": "available", "seabridge_action": "map_to_sea-skill-creator-protocol"}
+  ]
+}

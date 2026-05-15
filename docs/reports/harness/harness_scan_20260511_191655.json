@@ -1,0 +1,37 @@
+﻿[
+    {
+        "rule":  "agent.unsafe-permission-language",
+        "severity":  "medium",
+        "file":  "C:\\Users\\adelm\\SeaBridgeAI\\everything-claude-code\\AGENT.md",
+        "line":  1,
+        "message":  "Potential unsafe execution language without nearby approval gate."
+    },
+    {
+        "rule":  "agent.unsafe-permission-language",
+        "severity":  "medium",
+        "file":  "C:\\Users\\adelm\\SeaBridgeAI\\manageesg-backend\\AGENT.md",
+        "line":  1,
+        "message":  "Potential unsafe execution language without nearby approval gate."
+    },
+    {
+        "rule":  "agent.unsafe-permission-language",
+        "severity":  "medium",
+        "file":  "C:\\Users\\adelm\\SeaBridgeAI\\manageesg-frontend\\AGENT.md",
+        "line":  1,
+        "message":  "Potential unsafe execution language without nearby approval gate."
+    },
+    {
+        "rule":  "agent.unsafe-permission-language",
+        "severity":  "medium",
+        "file":  "C:\\Users\\adelm\\SeaBridgeAI\\openseabri\\AGENT.md",
+        "line":  1,
+        "message":  "Potential unsafe execution language without nearby approval gate."
+    },
+    {
+        "rule":  "agent.unsafe-permission-language",
+        "severity":  "medium",
+        "file":  "C:\\Users\\adelm\\SeaBridgeAI\\autoresearch\\AGENT.md",
+        "line":  1,
+        "message":  "Potential unsafe execution language without nearby approval gate."
+    }
+]

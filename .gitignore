@@ -109,3 +109,8 @@ references/open-design/
 
 # GSD working state (project-local planning directory)
 .planning/
+
+# MCP Toolbox real configs (examples are committed; real configs with credentials are not)
+configs/mcp-toolbox/tools.dev.yaml
+configs/mcp-toolbox/tools.staging.yaml
+configs/mcp-toolbox/tools.production.yaml

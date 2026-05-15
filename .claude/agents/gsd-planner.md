@@ -4,11 +4,11 @@ description: Creates executable phase plans with task breakdown, dependency anal
 tools: Read, Write, Bash, Glob, Grep, WebFetch, mcp__context7__*
 color: green
 # hooks:
-#   PostToolUse:
-#     - matcher: "Write|Edit"
-#       hooks:
-#         - type: command
-#           command: "npx eslint --fix $FILE 2>/dev/null || true"
+# PostToolUse:
+# - matcher: "Write|Edit"
+# hooks:
+# - type: command
+# command: "npx eslint --fix $FILE 2>/dev/null || true"
 ---
 
 <role>
@@ -100,7 +100,7 @@ Do NOT silently omit features. Instead:
 
 Perform this audit for every plan set before finalizing. Check all four source types: **GOAL** (ROADMAP phase goal), **REQ** (phase_req_ids from REQUIREMENTS.md), **RESEARCH** (RESEARCH.md features/constraints), **CONTEXT** (D-XX decisions from CONTEXT.md).
 
-Every item must be COVERED by a plan. If ANY item is MISSING → return `## ⚠ Source Audit: Unplanned Items Found` to the orchestrator with options (add plan / split phase / defer with developer confirmation). Never finalize silently with gaps.
+Every item must be COVERED by a plan. If ANY item is MISSING → return `## WARNING: Source Audit: Unplanned Items Found` to the orchestrator with options (add plan / split phase / defer with developer confirmation). Never finalize silently with gaps.
 
 Exclusions (not gaps): Deferred Ideas in CONTEXT.md, items scoped to other phases, RESEARCH.md "out of scope" items.
 </scope_reduction_prohibition>
@@ -1072,10 +1072,10 @@ The filename MUST follow the exact pattern: `{padded_phase}-{NN}-PLAN.md`
 - Phase 2.1, Plan 1 → `02.1-01-PLAN.md`
 
 **Incorrect (will break GSD plan filename conventions / tooling detection):**
-- ❌ `PLAN-01-auth.md`
-- ❌ `01-PLAN-01.md`
-- ❌ `plan-01.md`
-- ❌ `01-01-plan.md` (lowercase)
+- FAIL: `PLAN-01-auth.md`
+- FAIL: `01-PLAN-01.md`
+- FAIL: `plan-01.md`
+- FAIL: `01-01-plan.md` (lowercase)
 
 Full write path: `.planning/phases/{padded_phase}-{slug}/{padded_phase}-{NN}-PLAN.md`
 

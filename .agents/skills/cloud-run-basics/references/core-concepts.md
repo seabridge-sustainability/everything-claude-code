@@ -8,22 +8,22 @@ environment and can integrate with Google Cloud services.
 
 ## Services vs. Jobs vs. Worker pools
 
--   **Cloud Run services:** Used for code that handles requests or events (e.g.,
+- **Cloud Run services:** Used for code that handles requests or events (e.g.,
     web apps, APIs). They provide an HTTPS endpoint and automatically scale
     based on traffic.
 
--   **Cloud Run jobs:** Used for code that performs a specific task and then
+- **Cloud Run jobs:** Used for code that performs a specific task and then
     exits (e.g., data processing, database migrations). They can run a single
     task or an array of parallel tasks.
 
--   **Cloud Run worker pools:** Designed for continuous, non-HTTP, pull-based
+- **Cloud Run worker pools:** Designed for continuous, non-HTTP, pull-based
     background processing (e.g., Kafka consumers).
 
 ## Resource model
 
 Cloud Run organizes resources as follows:
 
-1.  **Service** The top-level resource. You can deploy a service from a
+1. **Service** The top-level resource. You can deploy a service from a
     container, repository, or source code.
                     1.  **Revision:** An immutable snapshot of a service's
                         configuration and container image. Each service
@@ -37,11 +37,11 @@ Cloud Run organizes resources as follows:
                         respond to events emitted from your cloud infrastructure
                         and services
 
-1.  **Job**: Executes one or more containers to completion. A job consists of
+1. **Job**: Executes one or more containers to completion. A job consists of
     one or multiple independent tasks that are executed in parallel in a given
     job execution.
 
-1.  **Worker pools**: If your code processes workloads from an external source
+1. **Worker pools**: If your code processes workloads from an external source
     but not from an HTTP request, such as pulling work from a message queue, you
     can deploy it to a Cloud Run worker pool .
 
@@ -49,15 +49,15 @@ Cloud Run organizes resources as follows:
 
 Cloud Run services scale automatically based on:
 
--   **Request concurrency:** The number of concurrent requests per instance.
--   **CPU utilization:**: The average CPU utilization of existing instances over
+- **Request concurrency:** The number of concurrent requests per instance.
+- **CPU utilization:**: The average CPU utilization of existing instances over
     a one minute window.
--   **Scale to zero:** Cloud Run autoscales from one to zero instances only
+- **Scale to zero:** Cloud Run autoscales from one to zero instances only
     after verifying that an instance is no longer processing requests. If you
     use instance-based billing, Cloud Run instances are charged for the entire
     lifecycle of instances, even when there are no incoming requests.
 
-## Container contract 
+## Container contract
 
 Your container image can run code written in the programming language
 of your choice and use any base image, provided that it respects the
@@ -127,8 +127,8 @@ pools](https://docs.cloud.google.com/run/docs/configuring/workerpools/gpu).
 
 Cloud Run uses a pay-as-you-go model:
 
--   **Request-based:** Charged for resources used during request processing.
--   **Instance-based:** Charged for the entire lifetime of an instance.
+- **Request-based:** Charged for resources used during request processing.
+- **Instance-based:** Charged for the entire lifetime of an instance.
 
 For the latest pricing, visit: [Cloud Run
 pricing](https://cloud.google.com/run/pricing).

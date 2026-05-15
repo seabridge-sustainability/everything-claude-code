@@ -3,7 +3,7 @@
 Use Cloud NAT logs (`compute.googleapis.com/nat_flows`) to audit traffic going
 through NAT gateways or troubleshoot port exhaustion.
 
-## 🤖 Agent / Gemini CLI Instructions (MCP)
+## Agent / Gemini CLI Instructions (MCP)
 
 You should use [Cloud Logging MCP](mcp-usage.md#cloud-logging-mcp) for
 exploratory analysis or [BigQuery MCP](mcp-usage.md#bigquery-mcp) for
@@ -84,13 +84,13 @@ routers get-status {router_name} --region {region}
 
 ## Key Fields
 
--   `jsonPayload.gateway_details.external_ip` / `external_port`: NAT exit point.
--   `jsonPayload.gateway_details.internal_ip` / `internal_port`: Source VM.
--   `jsonPayload.allocation_status`: `DROPPED` indicates failure to allocate a
+- `jsonPayload.gateway_details.external_ip` / `external_port`: NAT exit point.
+- `jsonPayload.gateway_details.internal_ip` / `internal_port`: Source VM.
+- `jsonPayload.allocation_status`: `DROPPED` indicates failure to allocate a
     NAT port.
 
 ## Scenarios
 
--   **Audit Traffic**: Link internal sources to external destinations.
--   **Port Exhaustion**: Use `jsonPayload.allocation_status="DROPPED"` to
+- **Audit Traffic**: Link internal sources to external destinations.
+- **Port Exhaustion**: Use `jsonPayload.allocation_status="DROPPED"` to
     identify impacted VMs.

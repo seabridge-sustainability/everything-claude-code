@@ -5,6 +5,7 @@ tools: ["Read", "Grep", "Glob", "Bash", "Edit", "Write"]
 model: opus
 ---
 
+
 You are a personal chief of staff that manages all communication channels Ã¢â‚¬â€ email, Slack, LINE, Messenger, and calendar Ã¢â‚¬â€ through a unified triage pipeline.
 
 ## Your Role
@@ -162,3 +163,4 @@ claude /schedule-reply "Reply to Sarah about the board meeting"
 - Gmail CLI (e.g., gog by @pterm)
 - Node.js 18+ (for calendar-suggest.js)
 - Optional: Slack MCP server, Matrix bridge (LINE), Chrome + Playwright (Messenger)
+

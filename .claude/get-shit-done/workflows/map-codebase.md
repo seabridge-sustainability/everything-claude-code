@@ -352,7 +352,7 @@ grep -E '(sk-[a-zA-Z0-9]{20,}|sk_live_[a-zA-Z0-9]+|sk_test_[a-zA-Z0-9]+|ghp_[a-z
 **If SECRETS_FOUND=true:**
 
 ```
-⚠️  SECURITY ALERT: Potential secrets detected in codebase documents!
+WARNING:  SECURITY ALERT: Potential secrets detected in codebase documents!
 
 Found patterns that look like API keys or tokens in:
 [show grep output]
@@ -409,7 +409,7 @@ Created .planning/codebase/:
 
 ---
 
-## ▶ Next Up — [${PROJECT_CODE}] ${PROJECT_TITLE}
+## Next Up — [${PROJECT_CODE}] ${PROJECT_TITLE}
 
 **Initialize project** — use codebase context for planning
 

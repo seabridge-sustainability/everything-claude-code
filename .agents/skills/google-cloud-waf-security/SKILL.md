@@ -20,20 +20,20 @@ workloads securely and at scale.
 The recommendations in the security pillar of the Well-Architected Framework are
 aligned with the following core principles:
 
--  **Implement security by design**: Integrate cloud security and network
+- **Implement security by design**: Integrate cloud security and network
    security considerations starting from the initial design phase of your
    applications and infrastructure. Google Cloud provides architecture
    blueprints and recommendations to help you apply this principle. Grounding
    document:
    https://docs.cloud.google.com/architecture/framework/security/implement-security-by-design
 
--  **Implement zero trust**: Use a _never trust, always verify_ approach, where
+- **Implement zero trust**: Use a _never trust, always verify_ approach, where
    access to resources is granted based on continuous verification of trust.
    Google Cloud supports this principle through products like Chrome Enterprise
    Premium and Identity-Aware Proxy (IAP). Grounding document:
    https://docs.cloud.google.com/architecture/framework/security/implement-zero-trust
 
--  **Implement shift-left security**: Implement security controls early in the
+- **Implement shift-left security**: Implement security controls early in the
    software development lifecycle. Avoid security defects before system changes
    are made. Detect and fix security bugs early, fast, and reliably after the
    system changes are committed. Google Cloud supports this principle through
@@ -41,7 +41,7 @@ aligned with the following core principles:
    Grounding document:
    https://docs.cloud.google.com/architecture/framework/security/implement-shift-left-security
 
--  **Implement preemptive cyber defense**: Adopt a proactive approach to
+- **Implement preemptive cyber defense**: Adopt a proactive approach to
    security by implementing robust fundamental measures like threat
    intelligence. This approach helps you build a foundation for more effective
    threat detection and response. Google Cloud's approach to layered security
@@ -50,13 +50,13 @@ aligned with the following core principles:
    and Google SecOps. Grounding document:
    https://docs.cloud.google.com/architecture/framework/security/implement-preemptive-cyber-defense
 
--  **Use AI securely and responsibly**: Develop and deploy AI systems in a
+- **Use AI securely and responsibly**: Develop and deploy AI systems in a
    responsible and secure manner. The recommendations for this principle are
    aligned with guidance in the AI and ML perspective of the Well-Architected
    Framework and in Google's Secure AI Framework (SAIF). Grounding document:
    https://docs.cloud.google.com/architecture/framework/security/use-ai-securely-and-responsibly
 
--  **Use AI for security**: Use AI capabilities to improve your existing
+- **Use AI for security**: Use AI capabilities to improve your existing
    security systems and processes through Gemini in Security and overall
    platform-security capabilities. Use AI as a tool to increase the automation
    of remedial work and ensure security hygiene to make other systems more
@@ -64,7 +64,7 @@ aligned with the following core principles:
    Threat Intelligence and Google SecOps. Grounding document:
    https://docs.cloud.google.com/architecture/framework/security/use-ai-for-security
 
--  **Meet regulatory, compliance, and privacy needs**: Adhere to
+- **Meet regulatory, compliance, and privacy needs**: Adhere to
    industry-specific regulations, compliance standards, and privacy
    requirements. Google Cloud helps you meet these obligations through products
    like Assured Workloads, Organization Policy Service, and our compliance

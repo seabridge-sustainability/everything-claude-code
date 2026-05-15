@@ -25,43 +25,43 @@ a backup, nor clone, delete, or promote instances. Cannot start or stop
 
 ## Secure Connectivity
 
--   **Cloud SQL Auth Proxy:** The recommended way to connect securely. It
+- **Cloud SQL Auth Proxy:** The recommended way to connect securely. It
     provides IAM-based authentication and end-to-end encryption without
     requiring SSL/TLS certificates or authorized networks.
 
--   **Private IP:** Use VPC, private services access, or Private Service Connect
+- **Private IP:** Use VPC, private services access, or Private Service Connect
     (PSC) to keep database traffic within the Google Cloud network.
 
--   **Authorized Networks:** If using Public IP, restrict access to specific
+- **Authorized Networks:** If using Public IP, restrict access to specific
     CIDR ranges.
 
 ## Data Security
 
--   **Encryption at Rest:** All data is encrypted by default. Use
+- **Encryption at Rest:** All data is encrypted by default. Use
     Customer-Managed Encryption Keys (CMEK) for additional control.
 
--   **IAM Database Authentication:** Authenticate to the database using IAM
+- **IAM Database Authentication:** Authenticate to the database using IAM
     users or service accounts instead of static passwords (available for MySQL
     and PostgreSQL).
 
 ## Organization Policies
 
--   **Cloud SQL organization policies:** Organization policies let organization
+- **Cloud SQL organization policies:** Organization policies let organization
     administrators set restrictions on how users can configure instances under
     that organization.
 
 ## Service Accounts
 
--   **Service Identity:** Cloud SQL uses an instance service account
+- **Service Identity:** Cloud SQL uses an instance service account
     (`p[PROJECT_NUMBER]-[UNIQUE_ID]@gcp-sa-cloud-sql.iam.gserviceaccount.com`)
     for tasks like exporting a SQL dump file to Cloud Storage. Service agent
     accounts (`service-PROJECT_NUMBER@gcp-sa-cloud-sql.iam.gserviceaccount.com`)
     are used only for internal management tasks.
 
--   **App Connectivity:** Grant the service account running your app (e.g., on
+- **App Connectivity:** Grant the service account running your app (e.g., on
     Cloud Run or GKE) the `roles/cloudsql.client` role.
 
-For more information, see: 
+For more information, see:
 - [About Access Control - Cloud SQL for MySQL](https://docs.cloud.google.com/sql/docs/mysql/instance-access-control)
 - [About Access Control - Cloud SQL for PostgreSQL](https://docs.cloud.google.com/sql/docs/postgres/instance-access-control)
 - [About Access Control - Cloud SQL for SQL Server](https://docs.cloud.google.com/sql/docs/sqlserver/instance-access-control)

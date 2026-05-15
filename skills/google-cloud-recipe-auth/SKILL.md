@@ -17,16 +17,16 @@ before [Authorization](https://docs.cloud.google.com/iam/docs/overview)
 
 Before providing a specific solution, clarify the following with the user:
 
-1.  **Who or what is authenticating?** (A human developer, a local script, or an
+1. **Who or what is authenticating?** (A human developer, a local script, or an
     application running in production?)
-2.  **Where is the code running?** (Local laptop, [Compute
+2. **Where is the code running?** (Local laptop, [Compute
     Engine](https://docs.cloud.google.com/compute/docs),
     [GKE](https://docs.cloud.google.com/kubernetes-engine/docs), [Cloud
     Run](https://docs.cloud.google.com/run/docs), or another cloud like
     AWS/Azure?)
-3.  **What is the target?** (A Google Cloud API like Storage/BigQuery, or a
+3. **What is the target?** (A Google Cloud API like Storage/BigQuery, or a
     custom application you built?)
-4.  **Are you using a high-level client library?** (e.g., Python, Go, Node.js
+4. **Are you using a high-level client library?** (e.g., Python, Go, Node.js
     libraries usually handle ADC automatically.)
 
 ---
@@ -71,7 +71,7 @@ management.
 *   **[gcloud CLI](https://docs.cloud.google.com/sdk/docs/install-sdk) (`gcloud
     auth login`)**: Used to authenticate the CLI itself so you can run
     management commands (e.g., `gcloud compute instances list`). It uses a
-    **Credential** (like an OAuth 2.0 refresh token) stored locally.
+**Credential** (like an OAuth 2.0 refresh token) stored locally.
 *   **Local Development with [App Default Credentials
     (ADC)](https://docs.cloud.google.com/docs/authentication/application-default-credentials)
     (`gcloud auth application-default login`)**: This is different from CLI
@@ -190,7 +190,7 @@ After Authentication, Google Cloud uses **[Identity and Access Management
 authenticated principal can do.
 
 *   **Allow Policy**: A record that binds a **Principal** to a **Role** on a
-    **Resource**.
+**Resource**.
 *   **[Predefined
     Roles](https://docs.cloud.google.com/iam/docs/understanding-roles)**:
     Prebuilt roles like `roles/storage.objectViewer` or
@@ -206,11 +206,11 @@ authenticated principal can do.
 
 ### Human-to-Service (Local Python Development)
 
-1.  **Authn**: Run `gcloud auth application-default login` to create local
+1. **Authn**: Run `gcloud auth application-default login` to create local
     credentials (ADC).
-2.  **Authz**: Grant your email the `roles/storage.objectViewer` role on a
+2. **Authz**: Grant your email the `roles/storage.objectViewer` role on a
     bucket.
-3.  **Code**: Use the Python `storage.Client()`. It automatically finds your
+3. **Code**: Use the Python `storage.Client()`. It automatically finds your
     local credentials via ADC. *Note: ADC searches in a specific order—first
     checking the `GOOGLE_APPLICATION_CREDENTIALS` environment variable, then the
     local gcloud JSON file, and finally the attached service account metadata
@@ -218,10 +218,10 @@ authenticated principal can do.
 
 ### Service-to-Service (Cloud Run to Cloud SQL)
 
-1.  **Authn**: Attach a custom Service Account to your Cloud Run service.
-2.  **Authz**: Grant that Service Account the `roles/cloudsql.client` role on
+1. **Authn**: Attach a custom Service Account to your Cloud Run service.
+2. **Authz**: Grant that Service Account the `roles/cloudsql.client` role on
     the project.
-3.  **Code**: The Cloud Run environment provides the token automatically to the
+3. **Code**: The Cloud Run environment provides the token automatically to the
     connection driver.
 
 ### Calling a Custom Application ([OIDC](https://docs.cloud.google.com/docs/authentication/get-id-token))
@@ -234,25 +234,25 @@ the `Authorization: Bearer <TOKEN>` header.
 
 ## Validation Checklist
 
--   [ ] Is the user running code locally? Suggest `gcloud auth
+- [ ] Is the user running code locally? Suggest `gcloud auth
     application-default login` or **Service Account Impersonation**.
--   [ ] Is the user attempting to use Service Account keys locally? Strongly
+- [ ] Is the user attempting to use Service Account keys locally? Strongly
     discourage this and recommend impersonation.
--   [ ] Is the user running in production? Recommend attaching a custom,
+- [ ] Is the user running in production? Recommend attaching a custom,
     least-privilege service account, NOT using keys.
--   [ ] Is the user relying on the Compute Engine Default Service Account?
+- [ ] Is the user relying on the Compute Engine Default Service Account?
     Recommend creating a custom service account instead.
--   [ ] Is the user running on another cloud? Recommend Workload Identity
+- [ ] Is the user running on another cloud? Recommend Workload Identity
     Federation.
--   [ ] Is the user calling a custom app? Recommend OIDC ID Tokens.
--   [ ] Has the user restricted their API Keys? Check for appropriate [API Key
+- [ ] Is the user calling a custom app? Recommend OIDC ID Tokens.
+- [ ] Has the user restricted their API Keys? Check for appropriate [API Key
     Restrictions](https://docs.cloud.google.com/docs/authentication/api-keys#adding-application-restrictions).
 
 ## References
 
--   [Authentication Overview](https://docs.cloud.google.com/docs/authentication)
--   [User Identities](https://docs.cloud.google.com/iam/docs/user-identities)
--   [Application Default Credentials](https://docs.cloud.google.com/docs/authentication/provide-credentials-adc)
--   [Service Account Best Practices](https://docs.cloud.google.com/iam/docs/best-practices-service-accounts)
+- [Authentication Overview](https://docs.cloud.google.com/docs/authentication)
+- [User Identities](https://docs.cloud.google.com/iam/docs/user-identities)
+- [Application Default Credentials](https://docs.cloud.google.com/docs/authentication/provide-credentials-adc)
+- [Service Account Best Practices](https://docs.cloud.google.com/iam/docs/best-practices-service-accounts)
 
 

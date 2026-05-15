@@ -32,8 +32,8 @@ jobs:
 
 | Name | Required | Default | Description |
 |------|----------|---------|-------------|
-| `url` | ✅ | — | URL to extract from. Typically a PR preview deploy. |
-| `baseline` | ✅ | — | Path to the committed baseline tokens file. |
+| `url` | PASS: | — | URL to extract from. Typically a PR preview deploy. |
+| `baseline` | PASS: | — | Path to the committed baseline tokens file. |
 | `comment` | | `true` | Post a PR comment with the diff. |
 | `fail-on-change` | | `false` | Fail the job if any token changed. |
 | `full` | | `false` | Pass `--full` to `designlang`. |

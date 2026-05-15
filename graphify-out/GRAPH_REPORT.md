@@ -816,11 +816,11 @@ Nodes (7): get_menu_item_state(), list_common_menu_items(), Main menu invocation
 
 ### Community 59 - "unsloth"
 Cohesion: 0.25
-Nodes (0): 
+Nodes (0):
 
 ### Community 60 - "unsloth"
 Cohesion: 0.25
-Nodes (0): 
+Nodes (0):
 
 ### Community 61 - "scripts/lib"
 Cohesion: 0.52
@@ -828,7 +828,7 @@ Nodes (6): assertValidEntity(), formatValidationErrors(), getAjv(), getEntityVal
 
 ### Community 62 - "unsloth"
 Cohesion: 0.29
-Nodes (0): 
+Nodes (0):
 
 ### Community 63 - "unsloth"
 Cohesion: 0.33
@@ -844,7 +844,7 @@ Nodes (4): applyMetricHistoryFromStatus(), sortSeries(), toSeries(), upsertPoint
 
 ### Community 66 - "unsloth"
 Cohesion: 0.33
-Nodes (0): 
+Nodes (0):
 
 ### Community 67 - "unsloth"
 Cohesion: 0.4
@@ -856,15 +856,15 @@ Nodes (4): Turn collected answers into a PREFERENCES.md string. Pure function, n
 
 ### Community 69 - "unsloth"
 Cohesion: 0.4
-Nodes (0): 
+Nodes (0):
 
 ### Community 70 - "unsloth"
 Cohesion: 0.4
-Nodes (0): 
+Nodes (0):
 
 ### Community 71 - "unsloth"
 Cohesion: 0.4
-Nodes (0): 
+Nodes (0):
 
 ### Community 72 - "unsloth"
 Cohesion: 0.5
@@ -872,11 +872,11 @@ Nodes (2): recheckSize(), updateSizeState()
 
 ### Community 73 - "unsloth"
 Cohesion: 0.4
-Nodes (0): 
+Nodes (0):
 
 ### Community 74 - "unsloth"
 Cohesion: 0.4
-Nodes (0): 
+Nodes (0):
 
 ### Community 75 - "unsloth"
 Cohesion: 0.6
@@ -884,7 +884,7 @@ Nodes (3): appendReasoningPart(), appendTextPart(), parseAssistantContent()
 
 ### Community 76 - "unsloth"
 Cohesion: 0.4
-Nodes (0): 
+Nodes (0):
 
 ### Community 77 - "unsloth"
 Cohesion: 0.6
@@ -892,15 +892,15 @@ Nodes (3): addValue(), handleChange(), handleKeyDown()
 
 ### Community 78 - "unsloth"
 Cohesion: 0.4
-Nodes (0): 
+Nodes (0):
 
 ### Community 79 - "unsloth"
 Cohesion: 0.4
-Nodes (0): 
+Nodes (0):
 
 ### Community 80 - "unsloth"
 Cohesion: 0.4
-Nodes (0): 
+Nodes (0):
 
 ### Community 81 - "plugins"
 Cohesion: 0.5
@@ -920,27 +920,27 @@ Nodes (2): extractDomain(), getDomainInitial()
 
 ### Community 85 - "unsloth"
 Cohesion: 0.5
-Nodes (0): 
+Nodes (0):
 
 ### Community 86 - "unsloth"
 Cohesion: 0.5
-Nodes (0): 
+Nodes (0):
 
 ### Community 87 - "unsloth"
 Cohesion: 0.5
-Nodes (0): 
+Nodes (0):
 
 ### Community 88 - "unsloth"
 Cohesion: 0.5
-Nodes (0): 
+Nodes (0):
 
 ### Community 89 - "unsloth"
 Cohesion: 0.5
-Nodes (0): 
+Nodes (0):
 
 ### Community 90 - "unsloth"
 Cohesion: 0.5
-Nodes (0): 
+Nodes (0):
 
 ### Community 91 - "unsloth"
 Cohesion: 0.67
@@ -948,15 +948,15 @@ Nodes (2): getThumbInBoundsOffset(), Slider()
 
 ### Community 92 - "unsloth"
 Cohesion: 0.5
-Nodes (0): 
+Nodes (0):
 
 ### Community 93 - "unsloth"
 Cohesion: 0.5
-Nodes (0): 
+Nodes (0):
 
 ### Community 94 - "unsloth"
 Cohesion: 0.5
-Nodes (0): 
+Nodes (0):
 
 ### Community 95 - "unsloth"
 Cohesion: 0.67
@@ -972,7 +972,7 @@ Nodes (3): getAvailableVariableEntries(), getAvailableVariables(), getStructured
 
 ### Community 98 - "unsloth"
 Cohesion: 0.5
-Nodes (0): 
+Nodes (0):
 
 ### Community 99 - "unsloth"
 Cohesion: 0.67
@@ -988,7 +988,7 @@ Nodes (3): buildModelVramMap(), checkVramFit(), estimateLoadingVram()
 
 ### Community 102 - "unsloth"
 Cohesion: 0.5
-Nodes (0): 
+Nodes (0):
 
 ### Community 103 - "plugins"
 Cohesion: 0.67
@@ -1004,11 +1004,11 @@ Nodes (2): parseInput(), run()
 
 ### Community 106 - "scripts/hooks"
 Cohesion: 0.67
-Nodes (0): 
+Nodes (0):
 
 ### Community 107 - "unsloth"
 Cohesion: 0.67
-Nodes (0): 
+Nodes (0):
 
 ### Community 108 - "unsloth"
 Cohesion: 1.0
@@ -1020,63 +1020,63 @@ Nodes (1): Badge()
 
 ### Community 110 - "unsloth"
 Cohesion: 0.67
-Nodes (0): 
+Nodes (0):
 
 ### Community 111 - "unsloth"
 Cohesion: 0.67
-Nodes (0): 
+Nodes (0):
 
 ### Community 112 - "unsloth"
 Cohesion: 0.67
-Nodes (0): 
+Nodes (0):
 
 ### Community 113 - "unsloth"
 Cohesion: 0.67
-Nodes (0): 
+Nodes (0):
 
 ### Community 114 - "unsloth"
 Cohesion: 0.67
-Nodes (0): 
+Nodes (0):
 
 ### Community 115 - "unsloth"
 Cohesion: 0.67
-Nodes (0): 
+Nodes (0):
 
 ### Community 116 - "unsloth"
 Cohesion: 0.67
-Nodes (0): 
+Nodes (0):
 
 ### Community 117 - "unsloth"
 Cohesion: 0.67
-Nodes (0): 
+Nodes (0):
 
 ### Community 118 - "unsloth"
 Cohesion: 0.67
-Nodes (0): 
+Nodes (0):
 
 ### Community 119 - "unsloth"
 Cohesion: 0.67
-Nodes (0): 
+Nodes (0):
 
 ### Community 120 - "unsloth"
 Cohesion: 0.67
-Nodes (0): 
+Nodes (0):
 
 ### Community 121 - "unsloth"
 Cohesion: 0.67
-Nodes (0): 
+Nodes (0):
 
 ### Community 122 - "unsloth"
 Cohesion: 0.67
-Nodes (0): 
+Nodes (0):
 
 ### Community 123 - "unsloth"
 Cohesion: 0.67
-Nodes (0): 
+Nodes (0):
 
 ### Community 124 - "unsloth"
 Cohesion: 0.67
-Nodes (0): 
+Nodes (0):
 
 ### Community 125 - "unsloth"
 Cohesion: 1.0
@@ -1084,43 +1084,43 @@ Nodes (2): handleImport(), handleOpenChange()
 
 ### Community 126 - "unsloth"
 Cohesion: 0.67
-Nodes (0): 
+Nodes (0):
 
 ### Community 127 - "unsloth"
 Cohesion: 0.67
-Nodes (0): 
+Nodes (0):
 
 ### Community 128 - "unsloth"
 Cohesion: 0.67
-Nodes (0): 
+Nodes (0):
 
 ### Community 129 - "unsloth"
 Cohesion: 0.67
-Nodes (0): 
+Nodes (0):
 
 ### Community 130 - "unsloth"
 Cohesion: 0.67
-Nodes (0): 
+Nodes (0):
 
 ### Community 131 - "unsloth"
 Cohesion: 0.67
-Nodes (0): 
+Nodes (0):
 
 ### Community 132 - "unsloth"
 Cohesion: 0.67
-Nodes (0): 
+Nodes (0):
 
 ### Community 133 - "unsloth"
 Cohesion: 0.67
-Nodes (0): 
+Nodes (0):
 
 ### Community 134 - "unsloth"
 Cohesion: 0.67
-Nodes (0): 
+Nodes (0):
 
 ### Community 135 - "unsloth"
 Cohesion: 0.67
-Nodes (0): 
+Nodes (0):
 
 ### Community 136 - "unsloth"
 Cohesion: 0.67
@@ -1128,31 +1128,31 @@ Nodes (1): Shared pytest configuration for tests/python/.
 
 ### Community 137 - "unsloth"
 Cohesion: 0.67
-Nodes (0): 
+Nodes (0):
 
 ### Community 138 - "unsloth"
 Cohesion: 0.67
-Nodes (0): 
+Nodes (0):
 
 ### Community 139 - "unsloth"
 Cohesion: 0.67
-Nodes (0): 
+Nodes (0):
 
 ### Community 140 - "agentic-stack/docs"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 141 - "agentic-stack/docs"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 142 - "agentic-stack/docs"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 143 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 144 - "plugins"
 Cohesion: 1.0
@@ -1160,439 +1160,439 @@ Nodes (1): # NOTE: iTerm2.app itself is a hard dependency that cannot be express
 
 ### Community 145 - "scripts/ci"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 146 - "scripts/hooks"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 147 - "scripts/hooks"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 148 - "scripts/lib"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 149 - "scripts/lib"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 150 - "scripts/lib"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 151 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 152 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 153 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 154 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 155 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 156 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 157 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 158 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 159 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 160 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 161 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 162 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 163 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 164 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 165 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 166 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 167 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 168 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 169 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 170 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 171 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 172 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 173 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 174 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 175 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 176 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 177 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 178 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 179 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 180 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 181 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 182 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 183 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 184 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 185 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 186 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 187 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 188 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 189 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 190 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 191 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 192 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 193 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 194 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 195 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 196 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 197 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 198 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 199 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 200 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 201 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 202 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 203 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 204 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 205 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 206 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 207 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 208 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 209 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 210 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 211 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 212 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 213 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 214 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 215 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 216 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 217 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 218 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 219 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 220 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 221 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 222 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 223 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 224 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 225 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 226 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 227 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 228 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 229 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 230 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 231 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 232 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 233 - "commitlint.config.js"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 234 - "eslint.config.js"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 235 - "install.ps1"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 236 - "agentic-stack/install.ps1"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 237 - "agentic-stack/docs"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 238 - "agentic-stack/docs"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 239 - "agentic-stack/docs"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 240 - "agentic-stack/docs"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 241 - "agentic-stack/docs"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 242 - "agentic-stack/docs"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 243 - "agentic-stack/docs"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 244 - "ecc2"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 245 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 246 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 247 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 248 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 249 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 250 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 251 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 252 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 253 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 254 - "plugins"
 Cohesion: 1.0
@@ -1600,59 +1600,59 @@ Nodes (1): Manual test: Start daemon, run commands, stop daemon.          To run
 
 ### Community 255 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 256 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 257 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 258 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 259 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 260 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 261 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 262 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 263 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 264 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 265 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 266 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 267 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 268 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 269 - "plugins"
 Cohesion: 1.0
@@ -1660,143 +1660,143 @@ Nodes (1): List all saved sessions.
 
 ### Community 270 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 271 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 272 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 273 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 274 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 275 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 276 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 277 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 278 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 279 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 280 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 281 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 282 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 283 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 284 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 285 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 286 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 287 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 288 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 289 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 290 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 291 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 292 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 293 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 294 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 295 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 296 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 297 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 298 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 299 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 300 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 301 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 302 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 303 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 304 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 305 - "plugins"
 Cohesion: 1.0
@@ -1812,87 +1812,87 @@ Nodes (1): Test --json transpose by-key via subprocess.
 
 ### Community 308 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 309 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 310 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 311 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 312 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 313 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 314 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 315 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 316 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 317 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 318 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 319 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 320 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 321 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 322 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 323 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 324 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 325 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 326 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 327 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 328 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 329 - "plugins"
 Cohesion: 1.0
@@ -1904,191 +1904,191 @@ Nodes (1): List all saved sessions.
 
 ### Community 331 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 332 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 333 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 334 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 335 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 336 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 337 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 338 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 339 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 340 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 341 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 342 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 343 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 344 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 345 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 346 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 347 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 348 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 349 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 350 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 351 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 352 - "plugins"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 353 - "scripts/hooks"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 354 - "scripts/hooks"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 355 - "scripts/hooks"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 356 - "scripts/hooks"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 357 - "scripts/hooks"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 358 - "scripts/hooks"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 359 - "scripts/hooks"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 360 - "scripts/hooks"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 361 - "scripts/hooks"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 362 - "scripts/hooks"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 363 - "scripts/lib"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 364 - "scripts/lib"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 365 - "scripts/lib"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 366 - "scripts/lib"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 367 - "scripts/lib"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 368 - "scripts/lib"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 369 - "scripts/lib"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 370 - "scripts/lib"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 371 - "skills"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 372 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 373 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 374 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 375 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 376 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 377 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 378 - "unsloth"
 Cohesion: 1.0
@@ -2120,31 +2120,31 @@ Nodes (1): Accept legacy 'split' field as alias for 'train_split'.
 
 ### Community 385 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 386 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 387 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 388 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 389 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 390 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 391 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 392 - "unsloth"
 Cohesion: 1.0
@@ -2192,487 +2192,487 @@ Nodes (1): Repeated calls with identical model + token should hit cache.
 
 ### Community 403 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 404 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 405 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 406 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 407 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 408 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 409 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 410 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 411 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 412 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 413 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 414 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 415 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 416 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 417 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 418 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 419 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 420 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 421 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 422 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 423 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 424 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 425 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 426 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 427 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 428 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 429 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 430 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 431 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 432 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 433 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 434 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 435 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 436 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 437 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 438 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 439 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 440 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 441 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 442 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 443 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 444 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 445 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 446 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 447 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 448 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 449 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 450 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 451 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 452 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 453 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 454 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 455 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 456 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 457 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 458 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 459 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 460 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 461 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 462 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 463 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 464 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 465 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 466 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 467 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 468 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 469 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 470 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 471 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 472 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 473 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 474 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 475 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 476 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 477 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 478 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 479 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 480 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 481 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 482 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 483 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 484 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 485 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 486 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 487 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 488 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 489 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 490 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 491 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 492 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 493 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 494 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 495 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 496 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 497 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 498 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 499 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 500 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 501 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 502 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 503 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 504 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 505 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 506 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 507 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 508 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 509 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 510 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 511 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 512 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 513 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 514 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 515 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 516 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 517 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 518 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 519 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 520 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 521 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 522 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 523 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 524 - "unsloth"
 Cohesion: 1.0
@@ -2692,47 +2692,47 @@ Nodes (1): Skip if requirements files are missing.
 
 ### Community 528 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 529 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 530 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 531 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 532 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 533 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 534 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 535 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 536 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 537 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 538 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 539 - "unsloth"
 Cohesion: 1.0
@@ -2740,11 +2740,11 @@ Nodes (1): Compute the top-``rank`` orthogonal matrix via truncated SVD.        
 
 ### Community 540 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ### Community 541 - "unsloth"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (0):
 
 ## Knowledge Gaps
 - **2955 isolated node(s):** `Reusable AST-only graphify build script.  Usage: run from the repo root whose gr`, `Name each community after its dominant top-level (or 2-level) source dir.`, `Run the interactive Q&A. Returns answers dict, or None to abort.`, `Optional feature toggles written by onboarding.  Stored at `.agent/memory/.featu`, `True iff the feature is explicitly enabled. Off when file missing     or key abs` (+2950 more)

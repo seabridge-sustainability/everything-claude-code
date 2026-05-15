@@ -7,7 +7,7 @@ Standard format for presenting next steps after completing a command or workflow
 ```
 ---
 
-## ▶ Next Up — [${PROJECT_CODE}] ${PROJECT_TITLE}
+## Next Up — [${PROJECT_CODE}] ${PROJECT_TITLE}
 
 **{identifier}: {name}** — {one-line description}
 
@@ -25,7 +25,7 @@ Standard format for presenting next steps after completing a command or workflow
 ```
 
 > If `project_code` is not set in the init context, omit the project identity suffix:
-> `## ▶ Next Up` (no ` — [CODE] Title`).
+> `##  Next Up` (no ` — [CODE] Title`).
 
 ## Format Rules
 
@@ -35,7 +35,7 @@ Standard format for presenting next steps after completing a command or workflow
 4. **`/clear` first** — always show `/clear` before the command so users run it in the correct order
 5. **"Also available" not "Other options"** — sounds more app-like
 6. **Visual separators** — `---` above and below to make it stand out
-7. **Project identity in heading** — include `[PROJECT_CODE] PROJECT_TITLE` from init context so handoffs are self-identifying across sessions. If `project_code` is not set, omit the suffix entirely (just `## ▶ Next Up`)
+7. **Project identity in heading** — include `[PROJECT_CODE] PROJECT_TITLE` from init context so handoffs are self-identifying across sessions. If `project_code` is not set, omit the suffix entirely (just `##  Next Up`)
 
 ## Variants
 
@@ -44,7 +44,7 @@ Standard format for presenting next steps after completing a command or workflow
 ```
 ---
 
-## ▶ Next Up — [${PROJECT_CODE}] ${PROJECT_TITLE}
+## Next Up — [${PROJECT_CODE}] ${PROJECT_TITLE}
 
 **02-03: Refresh Token Rotation** — Add /api/auth/refresh with sliding expiry
 
@@ -68,7 +68,7 @@ Add note that this is the last plan and what comes after:
 ```
 ---
 
-## ▶ Next Up — [${PROJECT_CODE}] ${PROJECT_TITLE}
+## Next Up — [${PROJECT_CODE}] ${PROJECT_TITLE}
 
 **02-03: Refresh Token Rotation** — Add /api/auth/refresh with sliding expiry
 <sub>Final plan in Phase 2</sub>
@@ -91,7 +91,7 @@ Add note that this is the last plan and what comes after:
 ```
 ---
 
-## ▶ Next Up — [${PROJECT_CODE}] ${PROJECT_TITLE}
+## Next Up — [${PROJECT_CODE}] ${PROJECT_TITLE}
 
 **Phase 2: Authentication** — JWT login flow with refresh tokens
 
@@ -120,7 +120,7 @@ Show completion status before next action:
 
 3/3 plans executed
 
-## ▶ Next Up — [${PROJECT_CODE}] ${PROJECT_TITLE}
+## Next Up — [${PROJECT_CODE}] ${PROJECT_TITLE}
 
 **Phase 3: Core Features** — User dashboard, settings, and data export
 
@@ -145,7 +145,7 @@ When there's no clear primary action:
 ```
 ---
 
-## ▶ Next Up — [${PROJECT_CODE}] ${PROJECT_TITLE}
+## Next Up — [${PROJECT_CODE}] ${PROJECT_TITLE}
 
 **Phase 3: Core Features** — User dashboard, settings, and data export
 
@@ -165,11 +165,11 @@ When there's no clear primary action:
 ```
 ---
 
-## 🎉 Milestone v1.0 Complete
+## Milestone v1.0 Complete
 
 All 4 phases shipped
 
-## ▶ Next Up — [${PROJECT_CODE}] ${PROJECT_TITLE}
+## Next Up — [${PROJECT_CODE}] ${PROJECT_TITLE}
 
 **Start v1.1** — questioning → research → requirements → roadmap
 

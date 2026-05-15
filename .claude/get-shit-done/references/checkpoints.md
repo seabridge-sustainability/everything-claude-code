@@ -544,10 +544,10 @@ timeout 30 bash -c 'until node -e "fetch(\"http://localhost:3000\").then(r=>{pro
 - Provide context: why this checkpoint exists
 
 **DON'T:**
-- Ask human to do work Claude can automate ❌
-- Assume knowledge: "Configure the usual settings" ❌
-- Skip steps: "Set up database" (too vague) ❌
-- Mix multiple verifications in one checkpoint ❌
+- Ask human to do work Claude can automate FAIL:
+- Assume knowledge: "Configure the usual settings" FAIL:
+- Skip steps: "Set up database" (too vague) FAIL:
+- Mix multiple verifications in one checkpoint FAIL:
 
 **Placement:**
 - **After automation completes** - not before Claude does the work
@@ -555,7 +555,7 @@ timeout 30 bash -c 'until node -e "fetch(\"http://localhost:3000\").then(r=>{pro
 - **Before dependent work** - decisions before implementation
 - **At integration points** - after configuring external services
 
-**Bad placement:** Before automation ❌ | Too frequent ❌ | Too late (dependent tasks already needed the result) ❌
+**Bad placement:** Before automation FAIL: | Too frequent FAIL: | Too late (dependent tasks already needed the result) FAIL:
 </writing_guidelines>
 
 <examples>
@@ -632,7 +632,7 @@ timeout 30 bash -c 'until node -e "fetch(\"http://localhost:3000\").then(r=>{pro
 
 <anti_patterns>
 
-### ❌ BAD: Asking user to start dev server
+### FAIL: BAD: Asking user to start dev server
 
 ```xml
 <task type="checkpoint:human-verify" gate="blocking">
@@ -647,7 +647,7 @@ timeout 30 bash -c 'until node -e "fetch(\"http://localhost:3000\").then(r=>{pro
 
 **Why bad:** Claude can run `npm run dev`. User should only visit URLs, not execute commands.
 
-### ✅ GOOD: Claude starts server, user visits
+### PASS: GOOD: Claude starts server, user visits
 
 ```xml
 <task type="auto">
@@ -666,7 +666,7 @@ timeout 30 bash -c 'until node -e "fetch(\"http://localhost:3000\").then(r=>{pro
 </task>
 ```
 
-### ❌ BAD: Asking human to deploy / ✅ GOOD: Claude automates
+### FAIL: BAD: Asking human to deploy / PASS: GOOD: Claude automates
 
 ```xml
 <!-- BAD: Asking user to deploy via dashboard -->
@@ -689,7 +689,7 @@ timeout 30 bash -c 'until node -e "fetch(\"http://localhost:3000\").then(r=>{pro
 </task>
 ```
 
-### ❌ BAD: Too many checkpoints / ✅ GOOD: Single checkpoint
+### FAIL: BAD: Too many checkpoints / PASS: GOOD: Single checkpoint
 
 ```xml
 <!-- BAD: Checkpoint after every task -->
@@ -712,7 +712,7 @@ timeout 30 bash -c 'until node -e "fetch(\"http://localhost:3000\").then(r=>{pro
 </task>
 ```
 
-### ❌ BAD: Vague verification / ✅ GOOD: Specific steps
+### FAIL: BAD: Vague verification / PASS: GOOD: Specific steps
 
 ```xml
 <!-- BAD -->
@@ -735,7 +735,7 @@ timeout 30 bash -c 'until node -e "fetch(\"http://localhost:3000\").then(r=>{pro
 </task>
 ```
 
-### ❌ BAD: Asking user to run CLI commands
+### FAIL: BAD: Asking user to run CLI commands
 
 ```xml
 <task type="checkpoint:human-action">
@@ -746,7 +746,7 @@ timeout 30 bash -c 'until node -e "fetch(\"http://localhost:3000\").then(r=>{pro
 
 **Why bad:** Claude can run these commands. User should never execute CLI commands.
 
-### ❌ BAD: Asking user to copy values between services
+### FAIL: BAD: Asking user to copy values between services
 
 ```xml
 <task type="checkpoint:human-action">

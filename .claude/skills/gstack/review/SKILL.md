@@ -551,18 +551,18 @@ Before reviewing code quality, check: **did they build what was requested Ã¢â
 
 1. Read `TODOS.md` (if it exists). Read PR description (`gh pr view --json body --jq .body 2>/dev/null || true`).
    Read commit messages (`git log origin/<base>..HEAD --oneline`).
-   **If no PR exists:** rely on commit messages and TODOS.md for stated intent Ã¢â‚¬â€ this is the common case since /review runs before /ship creates the PR.
+**If no PR exists:** rely on commit messages and TODOS.md for stated intent Ã¢â‚¬â€ this is the common case since /review runs before /ship creates the PR.
 2. Identify the **stated intent** Ã¢â‚¬â€ what was this branch supposed to accomplish?
 3. Run `git diff origin/<base>...HEAD --stat` and compare the files changed against the stated intent.
 
 4. Evaluate with skepticism (incorporating plan completion results if available from an earlier step or adjacent section):
 
-   **SCOPE CREEP detection:**
+**SCOPE CREEP detection:**
    - Files changed that are unrelated to the stated intent
    - New features or refactors not mentioned in the plan
    - "While I was in there..." changes that expand blast radius
 
-   **MISSING REQUIREMENTS detection:**
+**MISSING REQUIREMENTS detection:**
    - Requirements from TODOS.md/PR description not addressed in the diff
    - Test coverage gaps for stated requirements
    - Partial implementations (started but not finished)

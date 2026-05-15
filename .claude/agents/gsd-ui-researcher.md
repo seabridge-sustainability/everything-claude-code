@@ -4,11 +4,11 @@ description: Produces UI-SPEC.md design contract for frontend phases. Reads upst
 tools: Read, Write, Bash, Grep, Glob, WebSearch, WebFetch, mcp__context7__*, mcp__firecrawl__*, mcp__exa__*
 color: "#E879F9"
 # hooks:
-#   PostToolUse:
-#     - matcher: "Write|Edit"
-#       hooks:
-#         - type: command
-#           command: "npx eslint --fix $FILE 2>/dev/null || true"
+# PostToolUse:
+# - matcher: "Write|Edit"
+# hooks:
+# - type: command
+# command: "npx eslint --fix $FILE 2>/dev/null || true"
 ---
 
 <role>
@@ -239,7 +239,7 @@ Set frontmatter `status: draft` (checker will upgrade to `approved`).
 
 **ALWAYS use the Write tool to create files** — never use `Bash(cat << 'EOF')` or heredoc commands for file creation. Mandatory regardless of `commit_docs` setting.
 
-⚠️ `commit_docs` controls git only, NOT file writing. Always write first.
+WARNING: `commit_docs` controls git only, NOT file writing. Always write first.
 
 </output_format>
 

@@ -1,0 +1,55 @@
+{
+  "system_id": "SEABRIDGE_AGENT_SYSTEM_V1",
+  "version": "2026-05-11",
+  "owner": "C:\\Users\\adelm\\SeaBridgeAI\\everything-claude-code",
+  "standards": [
+    "docs/harness/standards/backend-reliability.md",
+    "docs/harness/standards/backend-api.md",
+    "docs/harness/standards/frontend-ux.md",
+    "docs/harness/standards/security.md",
+    "docs/harness/standards/ai-grounding.md",
+    "docs/harness/standards/observability.md",
+    "docs/harness/standards/deployment-readiness.md",
+    "docs/harness/standards/agent-runtime-safety.md"
+  ],
+  "reviewer_skills": [
+    "sea-reliability-reviewer",
+    "sea-security-reviewer",
+    "sea-architecture-reviewer",
+    "sea-frontend-ux-reviewer",
+    "sea-backend-api-reviewer",
+    "sea-ai-grounding-reviewer",
+    "sea-production-readiness-reviewer"
+  ],
+  "scripts": [
+    "scripts/check-harness.ps1",
+    "scripts/check-backend-guardrails.ps1",
+    "scripts/check-frontend-guardrails.ps1",
+    "scripts/check-agent-runtime-guardrails.ps1"
+  ],
+  "maturity_levels": {
+    "0": "ad hoc prompting",
+    "1": "documented expectations",
+    "2": "agent-readable standards",
+    "3": "automated guardrails",
+    "4": "reviewer-agent enforcement",
+    "5": "self-improving harness loop"
+  },
+  "repo_maturity_initial": {
+    "everything-claude-code": 4,
+    "manageesg-backend": 3,
+    "manageesg-backend/seabridge-dev": 3,
+    "manageesg-frontend": 2,
+    "openseabri": 3,
+    "_upstream": 2,
+    "autoresearch": 2
+  },
+  "approval_status": {
+    "hooks_or_precommit": "approved_but_use_repo_local_and_reversible",
+    "global_installs": "approved_but_not_required_for_initial_slice",
+    "ci_enforcement": "approved_but_roll_out_after_noise_reduction",
+    "upstream_updates": "approved_with_ff_only_when_clean",
+    "commits_pushes": "approved_but_not_performed_by_initial_slice",
+    "broad_architecture_refactors": "approved_only_with_selected_scope_and_regression_tests"
+  }
+}

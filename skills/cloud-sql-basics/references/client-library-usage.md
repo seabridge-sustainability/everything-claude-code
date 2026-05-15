@@ -17,13 +17,13 @@ certificates.
 
 #### Python
 
--   **Installation for a Cloud SQL for PostgreSQL instance:**
+- **Installation for a Cloud SQL for PostgreSQL instance:**
 
     ```bash
     pip install "cloud-sql-python-connector[pg8000]"
     ```
 
--   **Usage Example:**
+- **Usage Example:**
 
     ```python
     from google.cloud.sql.connector import Connector
@@ -41,7 +41,7 @@ certificates.
 
 #### Java
 
--   **Maven Dependencies:**
+- **Maven Dependencies:**
 
     The recommended method is to use the Cloud SQL JDBC Socket Factory. Add the
     BOM to your `<dependencyManagement>` section:
@@ -63,7 +63,7 @@ certificates.
     Then add dependencies for your database:
 
     *   **PostgreSQL:**
-        ```xml  
+        ```xml
         <dependencies>
           <dependency>
             <groupId>org.postgresql</groupId>
@@ -78,7 +78,7 @@ certificates.
         ```
 
     *   **MySQL:**
-        ```xml 
+        ```xml
         <dependencies>
           <dependency>
             <groupId>com.mysql</groupId>
@@ -94,7 +94,7 @@ certificates.
 
 #### Node.js (TypeScript)
 
--   **Installation:**
+- **Installation:**
 
     ```bash
     npm install @google-cloud/cloud-sql-connector
@@ -102,7 +102,7 @@ certificates.
 
 #### Go
 
--   **Installation:**
+- **Installation:**
 
     ```bash
     go get cloud.google.com/go/cloudsqlconn
@@ -113,4 +113,4 @@ certificates.
 To manage Cloud SQL resources (e.g., list instances) programmatically, use the
 `sqladmin` libraries.
 
--   [Cloud SQL Admin API Overview](https://docs.cloud.google.com/sql/docs/mysql/admin-api)
+- [Cloud SQL Admin API Overview](https://docs.cloud.google.com/sql/docs/mysql/admin-api)

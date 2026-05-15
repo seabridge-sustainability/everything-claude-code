@@ -18,26 +18,26 @@ expenditure (OpEx) management and a culture of accountability (FinOps).
 The recommendations in the cost optimization pillar of the Well-Architected
 Framework are aligned with the following core principles:
 
--  **Align cloud spending with business value**: Ensure that your cloud
+- **Align cloud spending with business value**: Ensure that your cloud
    resources deliver measurable business value by aligning IT spending with
    business objectives. Prioritize investments that directly contribute to
    revenue, customer satisfaction, or operational efficiency. Grounding
    document:
    https://docs.cloud.google.com/architecture/framework/cost-optimization/align-cloud-spending-business-value
 
--  **Foster a culture of cost awareness**: Ensure that people across your
+- **Foster a culture of cost awareness**: Ensure that people across your
    organization consider the cost impact of their decisions and activities.
    Provide teams with the visibility and information they need to make informed,
    cost-conscious choices. Grounding document:
    https://docs.cloud.google.com/architecture/framework/cost-optimization/foster-culture-cost-awareness
 
--  **Optimize resource usage**: Provision only the resources that you need and
+- **Optimize resource usage**: Provision only the resources that you need and
    pay only for what you consume. Select the most cost-effective resource types,
    sizes, and locations that meet your technical and business requirements.
    Grounding document:
    https://docs.cloud.google.com/architecture/framework/cost-optimization/optimize-resource-usage
 
--  **Optimize continuously**: Continuously monitor your cloud resource usage and
+- **Optimize continuously**: Continuously monitor your cloud resource usage and
    costs, and proactively make adjustments as needed to optimize your spending.
    This iterative approach helps identify and address inefficiencies before they
    become significant. Grounding document:

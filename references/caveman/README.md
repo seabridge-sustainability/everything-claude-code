@@ -24,7 +24,7 @@
 </p>
 
 <p align="center">
-  <strong>🪨 Caveman Ecosystem</strong> &nbsp;·&nbsp;
+  <strong> Caveman Ecosystem</strong> &nbsp;·&nbsp;
   <strong>caveman</strong> <em>talk less</em> <sub>(you are here)</sub> &nbsp;·&nbsp;
   <a href="https://github.com/JuliusBrussee/cavemem">cavemem</a> <em>remember more</em> &nbsp;·&nbsp;
   <a href="https://github.com/JuliusBrussee/cavekit">cavekit</a> <em>build better</em>
@@ -42,14 +42,14 @@ Based on the viral observation that caveman-speak dramatically reduces LLM token
 <tr>
 <td width="50%">
 
-### 🗣️ Normal Claude (69 tokens)
+### Normal Claude (69 tokens)
 
 > "The reason your React component is re-rendering is likely because you're creating a new object reference on each render cycle. When you pass an inline object as a prop, React's shallow comparison sees it as a different object every time, which triggers a re-render. I'd recommend using useMemo to memoize the object."
 
 </td>
 <td width="50%">
 
-### 🪨 Caveman Claude (19 tokens)
+### Caveman Claude (19 tokens)
 
 > "New object ref each render. Inline object prop = new ref = re-render. Wrap in `useMemo`."
 
@@ -58,14 +58,14 @@ Based on the viral observation that caveman-speak dramatically reduces LLM token
 <tr>
 <td>
 
-### 🗣️ Normal Claude
+### Normal Claude
 
 > "Sure! I'd be happy to help you with that. The issue you're experiencing is most likely caused by your authentication middleware not properly validating the token expiry. Let me take a look and suggest a fix."
 
 </td>
 <td>
 
-### 🪨 Caveman Claude
+### Caveman Claude
 
 > "Bug in auth middleware. Token expiry check use `<` not `<=`. Fix:"
 
@@ -81,28 +81,28 @@ Based on the viral observation that caveman-speak dramatically reduces LLM token
 <tr>
 <td width="25%">
 
-#### 🪶 Lite
+#### Lite
 
 > "Your component re-renders because you create a new object reference each render. Inline object props fail shallow comparison every time. Wrap it in `useMemo`."
 
 </td>
 <td width="25%">
 
-#### 🪨 Full
+#### Full
 
 > "New object ref each render. Inline object prop = new ref = re-render. Wrap in `useMemo`."
 
 </td>
 <td width="25%">
 
-#### 🔥 Ultra
+#### Ultra
 
 > "Inline obj prop → new ref → re-render. `useMemo`."
 
 </td>
 <td width="25%">
 
-#### 📜 文言文
+#### 文言文
 
 > "物出新參照，致重繪。useMemo Wrap之。"
 
@@ -162,8 +162,7 @@ Auto-activation is built in for Claude Code, Gemini CLI, and the repo-local Code
 
 > [!NOTE]
 > Auto-activation works differently per agent: Claude Code uses SessionStart hooks, this repo's Codex dogfood setup uses `.codex/hooks.json`, Gemini uses context files. Cursor/Windsurf/Cline/Copilot can be made always-on, but `npx skills add` installs only the skill, not the repo rule/instruction files.
->
-> ¹ Codex uses `$caveman` syntax, not `/caveman`. This repo ships `.codex/hooks.json`, so caveman auto-starts when you run Codex inside this repo. The installed plugin itself gives you `$caveman`; copy the same hook into another repo if you want always-on behavior there too. caveman-commit and caveman-review are not in the Codex plugin bundle — use the SKILL.md files directly.
+> > ¹ Codex uses `$caveman` syntax, not `/caveman`. This repo ships `.codex/hooks.json`, so caveman auto-starts when you run Codex inside this repo. The installed plugin itself gives you `$caveman`; copy the same hook into another repo if you want always-on behavior there too. caveman-commit and caveman-review are not in the Codex plugin bundle — use the SKILL.md files directly.
 > ² Add the "Want it always on?" snippet below to those agents' system prompt or rule file if you want session-start activation.
 > ³ Cursor and Windsurf receive the full SKILL.md with all intensity levels. Mode switching works on-demand via the skill; no slash command.
 > ⁴ Available in Claude Code, but plugin install only nudges setup. Standalone `install.sh` / `install.ps1` configures it automatically when no custom `statusLine` exists.
@@ -334,7 +333,7 @@ Level stick until you change it or session end.
 
 ### caveman-review
 
-`/caveman-review` — one-line PR comments: `L42: 🔴 bug: user null. Add guard.` No throat-clearing.
+`/caveman-review` — one-line PR comments: `L42:  bug: user null. Add guard.` No throat-clearing.
 
 ### caveman-help
 
@@ -409,11 +408,11 @@ uv run --with tiktoken python evals/measure.py
 
 ## Star This Repo
 
-If caveman save you mass token, mass money — leave mass star. ⭐
+If caveman save you mass token, mass money — leave mass star.
 
 [![Star History Chart](https://api.star-history.com/svg?repos=JuliusBrussee/caveman&type=Date)](https://star-history.com/#JuliusBrussee/caveman&Date)
 
-## 🪨 The Caveman Ecosystem
+## The Caveman Ecosystem
 
 Three tools. One philosophy: **agent do more with less**.
 
