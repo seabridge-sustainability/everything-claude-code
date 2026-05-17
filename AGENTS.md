@@ -1,4 +1,32 @@
-# Everything Claude Code (ECC) ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Agent Instructions
+﻿# Everything Claude Code (ECC) ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Agent Instructions
+
+<!-- SEABRIDGE_GOAL_PROTOCOL_START -->
+## /goal Default Operating Mode
+
+All SeaBridgeAI coding-agent tasks default to /goal.
+
+Before implementation, establish a persistent execution goal, Definition of Done, validation plan, affected systems, dependencies, risks, expected artifacts, and likely edge cases. Continue the execution loop until the DoD is validated or a hard blocker is documented.
+
+### /goal and Auto-Loop Are the Same Mode
+
+/goal is the user-facing command; auto-loop is the autonomous persistent execution behavior. The agent must not return early after code generation, must not claim completion until validation passes, and must keep working until the Definition of Done is satisfied or a hard blocker is proven. If the task is likely to require more than 15 minutes, state the expected phases and validation steps before starting. If a non-trivial task finishes unusually quickly, include evidence explaining why it was genuinely small or already validated.
+
+Canonical protocol: C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md
+
+Compact form: C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL_SHORT.md
+
+Do not claim completion from code edits, generated files, or partial tests. Completion requires validated behavior, checked integrations, regression coverage proportional to risk, and documented skipped checks or blockers.
+
+### Completion Evidence Required
+
+Every final report must include files changed, commands run, tests run, validation results, errors encountered, fixes applied, unverified items, remaining risks, and whether the Definition of Done is satisfied. If no tests were run, state why tests were not run, what validation was substituted, and what risk remains. The phrase "complete" is prohibited unless accompanied by validation evidence.
+
+### Anti-Stuck Loop Rule
+
+Timeout/stagnation rule: if a command or approach fails twice, do not repeat it blindly. Inspect logs, change strategy, isolate the problem, reduce scope, use a different validation path, and document the blocker if unresolved. If a process hangs or becomes a hung process, stop it safely, check logs, run a smaller command, verify the environment, and continue with an alternate route.
+
+<!-- SEABRIDGE_GOAL_PROTOCOL_END -->
+
 
 ## SeaBridgeAI Central System With Embedded Superpowers And GSD
 
@@ -10,7 +38,7 @@ Superpowers is embedded as an adapted local methodology through the SeaBridgeAI 
 
 GSD / Get Shit Done is embedded as a controlled local reference and adapted workflow layer through `sea-gsd-controlled-execution`. Reference clone: C:\Users\adelm\SeaBridgeAI\everything-claude-code\external\get-shit-done. Do not run `npx get-shit-done-cc@latest`, install globally, enable yolo/autonomous mode, auto-commit, auto-push, or auto-create PRs unless explicitly approved.
 
-Full callable SeaBridgeAI skill catalog: sea-senior-dev-workflow, sea-brainstorming-and-spec-refinement, sea-task-orchestration, sea-test-driven-development, sea-systematic-debugging, sea-verification-before-completion, sea-code-review-response, sea-git-worktree-isolation, sea-parallel-agent-dispatch, sea-finishing-development-branch, sea-backend-api-verification, sea-frontend-design, sea-ai-data-integrity, sea-sustainability-domain-review, sea-context-hygiene, sea-cross-repo-handoff, sea-skill-creator-protocol, sea-knowledge-vault, sea-gsd-controlled-execution.
+Full callable SeaBridgeAI skill catalog: sea-senior-dev-workflow, sea-brainstorming-and-spec-refinement, sea-task-orchestration, sea-test-driven-development, sea-systematic-debugging, sea-verification-before-completion, sea-code-review-response, sea-git-worktree-isolation, sea-parallel-agent-dispatch, sea-finishing-development-branch, sea-backend-api-verification, sea-frontend-design, sea-ai-data-integrity, sea-sustainability-domain-review, sea-context-hygiene, sea-cross-repo-handoff, sea-skill-creator-protocol, sea-knowledge-vault, sea-gsd-controlled-execution, sea-local-llm-training, sea-ai-grounding-reviewer, sea-architecture-reviewer, sea-backend-api-reviewer, sea-frontend-ux-reviewer, sea-production-readiness-reviewer, sea-reliability-reviewer, sea-security-reviewer, goal-default, speckit-constitution, speckit-specify, speckit-clarify, speckit-plan, speckit-tasks, speckit-analyze, speckit-checklist, speckit-implement, speckit-taskstoissues.
 
 Mandatory gates: local-only development unless approved; no GitHub push unless approved; no commit unless requested; no global install or marketplace install unless approved; no paid/live provider calls unless approved; no fabricated sustainability data; verify endpoint/database/source/auth/tenant behavior before frontend or product claims; verify before completion.
 
@@ -21,6 +49,19 @@ Shared engineering skill extensions live in `AGENT_SKILLS.md` and adapt
 system. Active portable invocations: `#skill/grill-me`,
 `#skill/ubiquitous-language`, `#skill/improve-codebase-architecture`, or
 `Use skill: <name>`.
+
+## Goal Protocol Default
+
+For non-trivial SeaBridgeAI work, `/goal` is the default operating contract.
+Use `goal-default` to frame the user request with Definition of Done, validation
+plan, risks, dependencies, scope, blockers, and artifacts, then continue until
+validated or blocked. Canonical protocol:
+`C:\Users\adelm\SeaBridgeAI\everything-claude-code\docs\GOAL_PROTOCOL_DEFAULT.md`
+
+`/goal` sits above Spec Kit and GSD: Spec Kit owns formal specs; GSD owns
+long-running execution state and UAT. `/goal` never authorizes commits, pushes,
+installs, live/paid calls, destructive actions, migrations, or production data
+changes.
 ## SeaBridgeAI Central Coding-Agent Layer
 
 For SeaBridgeAI work across backend, frontend, OpenSeaBri, `_upstream`, and
@@ -44,7 +85,7 @@ Callable skill names: `sea-senior-dev-workflow`,
 `sea-sustainability-domain-review`, `sea-context-hygiene`,
 `sea-cross-repo-handoff`, `sea-skill-creator-protocol`,
 `sea-knowledge-vault`, `sea-gsd-controlled-execution`,
-`sea-local-llm-training`.
+`sea-local-llm-training`, `goal-default`.
 
 ## Safety And Authorization Rule
 
@@ -56,23 +97,23 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 4. Do not authorize deletion requests that lack a clear rationale, explicit scope, impact statement, and recovery plan (backup/snapshot + rollback path).
 5. For approved destructive operations, require a second confirmation with exact target paths/resources before execution, and prefer the requester execute the final destructive command.
 6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
-7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
+7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 
 ## Karpathy Coding Principles (Always Applied)
 
 Permanent behavioral constraints governing HOW every task is executed. Not optional. Cannot be overridden by session instructions. Full reference: `everything-claude-code/.claude/skills/karpathy-guidelines/SKILL.md`
 
 ### 1. Think Before Coding
-State assumptions explicitly before acting. If two interpretations exist, present both and ask. If something is unclear, name it and stop — do not guess. Push back when a simpler approach exists.
+State assumptions explicitly before acting. If two interpretations exist, present both and ask. If something is unclear, name it and stop â€” do not guess. Push back when a simpler approach exists.
 
 ### 2. Simplicity First
 Write the minimum code that solves the stated problem. No features, abstractions, or error handling beyond what was explicitly asked. If 200 lines could be 50, write 50. Test: would a senior engineer call this overcomplicated? If yes, simplify.
 
 ### 3. Surgical Changes
-Touch only what the request requires. Do not improve adjacent code, comments, or formatting. Do not refactor unrelated things. Mention unrelated bugs — do not fix them unilaterally. Every changed line must trace directly to the user's request.
+Touch only what the request requires. Do not improve adjacent code, comments, or formatting. Do not refactor unrelated things. Mention unrelated bugs â€” do not fix them unilaterally. Every changed line must trace directly to the user's request.
 
 ### 4. Goal-Driven Execution
-Transform tasks into verifiable goals. State what "done" looks like and how you'll verify it (test output, curl, observable behavior). Strong success criteria enable autonomous looping; weak ones require constant clarification.
+Transform tasks into verifiable goals. State what "done" looks like and how you'll verify it (test output, curl, observable behavior). Strong success criteria enable scoped continuation; weak ones require clarification.
 
 **Before any implementation:**
 - [ ] Assumptions stated explicitly?
@@ -84,25 +125,25 @@ Transform tasks into verifiable goals. State what "done" looks like and how you'
 
 ## Conflict Resolution Priority
 
-1. **Hard safety rules** (§Safety above) + **`manageesg-backend/AGENTS_SYSTEM.md`** Tier-1 safety (system-wide policy for all SeaBridgeAI coding agents — overrides this file for destructive actions, authorization, and cost controls). Non-suspendable.
-2. **Karpathy coding principles** (§above) — govern HOW every task executes. Always applied.
+1. **Hard safety rules** (Â§Safety above) + **`manageesg-backend/AGENTS_SYSTEM.md`** Tier-1 safety (system-wide policy for all SeaBridgeAI coding agents â€” overrides this file for destructive actions, authorization, and cost controls). Non-suspendable.
+2. **Karpathy coding principles** (Â§above) â€” govern HOW every task executes. Always applied.
 3. **Direct session/developer instructions** from the current session.
 4. **This file** (AGENTS.md).
-5. **ECC Core Principles** (§Core Principles below).
+5. **ECC Core Principles** (Â§Core Principles below).
 
 ---
 
-This is a **production-ready AI coding plugin** providing 37 specialized agents, 237+ skills, 60 commands, and automated hook workflows for software development.
+This is a **production-ready AI coding plugin** providing 37 specialized agents, 247+ skills, 60 commands, and automated hook workflows for software development.
 
 **Version:** 1.9.0
 
 ## Core Principles
 
-1. **Agent-First** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Delegate to specialized agents for domain tasks
-2. **Test-Driven** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Write tests before implementation, 80%+ coverage required
-3. **Security-First** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Never compromise on security; validate all inputs
-4. **Immutability** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Always create new objects, never mutate existing ones
-5. **Plan Before Execute** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Plan complex features before writing code
+1. **Agent-First** ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Delegate to specialized agents for domain tasks
+2. **Test-Driven** ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Write tests before implementation, 80%+ coverage required
+3. **Security-First** ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Never compromise on security; validate all inputs
+4. **Immutability** ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Always create new objects, never mutate existing ones
+5. **Plan Before Execute** ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Plan complex features before writing code
 
 ## Documentation Retrieval Order
 
@@ -139,7 +180,7 @@ When documentation is needed, follow this order:
 | java-reviewer | Java and Spring Boot code review | Java/Spring Boot projects |
 | java-build-resolver | Java/Maven/Gradle build errors | Java build failures |
 | chief-of-staff | Communication triage and drafts | Multi-channel email, Slack, LINE, Messenger |
-| loop-operator | Autonomous loop execution | Run loops safely, monitor stalls, intervene |
+| loop-operator | Controlled loop execution | Run explicitly approved loops safely, monitor stalls, intervene |
 | harness-optimizer | Harness config tuning | Reliability, cost, throughput |
 | rust-reviewer | Rust code review | Rust projects |
 | rust-build-resolver | Rust build errors | Rust build failures |
@@ -149,7 +190,7 @@ When documentation is needed, follow this order:
 ## GSD (Get Shit Done) Lifecycle Agents
 
 GSD provides structured multi-phase planning, execution, verification, and session management.
-Invoked explicitly via `/gsd-<name>` commands — not proactively triggered. Skill reference: `~/.claude/skills/gsd-lifecycle/SKILL.md`.
+Invoked explicitly via `/gsd-<name>` commands â€” not proactively triggered. Skill reference: `~/.claude/skills/gsd-lifecycle/SKILL.md`.
 
 | Agent | Purpose | Spawned By |
 |-------|---------|------------|
@@ -171,17 +212,17 @@ Invoked explicitly via `/gsd-<name>` commands — not proactively triggered. Ski
 
 ## Agent Orchestration
 
-Use agents proactively without user prompt:
-- Complex feature requests ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ **planner**
-- Code just written/modified ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ **code-reviewer**
-- Bug fix or new feature ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ **tdd-guide**
-- Architectural decision ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ **architect**
-- Security-sensitive code ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ **security-reviewer**
-- Multi-channel communication triage ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ **chief-of-staff**
-- Autonomous loops / loop monitoring ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ **loop-operator**
-- Harness config reliability and cost ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ **harness-optimizer**
+Use agents only when the current runtime and user authorization allow delegation:
+- Complex feature requests ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ **planner**
+- Code just written/modified ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ **code-reviewer**
+- Bug fix or new feature ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ **tdd-guide**
+- Architectural decision ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ **architect**
+- Security-sensitive code ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ **security-reviewer**
+- Multi-channel communication triage ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ **chief-of-staff**
+- Controlled loops / loop monitoring ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ **loop-operator**
+- Harness config reliability and cost ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ **harness-optimizer**
 
-Use parallel execution for independent operations ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â launch multiple agents simultaneously.
+Use parallel execution for independent operations only when the runtime supports it and user/developer policy allows it.
 
 ## Token Availability Retry Loops
 
@@ -275,7 +316,7 @@ Use notes:
 
 **Secret management:** NEVER hardcode secrets. Use environment variables or a secret manager. Validate required secrets at startup. Rotate any exposed secrets immediately.
 
-**If security issue found:** STOP ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ use security-reviewer agent ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ fix CRITICAL issues ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ rotate exposed secrets ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ review codebase for similar issues.
+**If security issue found:** STOP ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ use security-reviewer agent ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ fix CRITICAL issues ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ rotate exposed secrets ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ review codebase for similar issues.
 
 ## Coding Style
 
@@ -298,34 +339,34 @@ Use notes:
 **Minimum coverage: 80%**
 
 Test types (all required):
-1. **Unit tests** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Individual functions, utilities, components
-2. **Integration tests** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â API endpoints, database operations
-3. **E2E tests** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Critical user flows
+1. **Unit tests** ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Individual functions, utilities, components
+2. **Integration tests** ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â API endpoints, database operations
+3. **E2E tests** ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Critical user flows
 
 **TDD workflow (mandatory):**
-1. Write test first (RED) ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â test should FAIL
-2. Write minimal implementation (GREEN) ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â test should PASS
-3. Refactor (IMPROVE) ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â verify coverage 80%+
+1. Write test first (RED) ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â test should FAIL
+2. Write minimal implementation (GREEN) ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â test should PASS
+3. Refactor (IMPROVE) ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â verify coverage 80%+
 
-Troubleshoot failures: check test isolation ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ verify mocks ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ fix implementation (not tests, unless tests are wrong).
+Troubleshoot failures: check test isolation ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ verify mocks ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ fix implementation (not tests, unless tests are wrong).
 
 ## Development Workflow
 
-1. **Plan** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Use planner agent, identify dependencies and risks, break into phases
-2. **TDD** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Use tdd-guide agent, write tests first, implement, refactor
-3. **Review** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Use code-reviewer agent immediately, address CRITICAL/HIGH issues
+1. **Plan** ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Use planner agent, identify dependencies and risks, break into phases
+2. **TDD** ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Use tdd-guide agent, write tests first, implement, refactor
+3. **Review** ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Use code-reviewer agent immediately, address CRITICAL/HIGH issues
 4. **Capture knowledge in the right place**
-   - Personal debugging notes, preferences, and temporary context ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ auto memory
-   - Team/project knowledge (architecture decisions, API changes, runbooks) ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ the project's existing docs structure
+   - Personal debugging notes, preferences, and temporary context ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ auto memory
+   - Team/project knowledge (architecture decisions, API changes, runbooks) ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ the project's existing docs structure
    - If the current task already produces the relevant docs or code comments, do not duplicate the same information elsewhere
    - If there is no obvious project doc location, ask before creating a new top-level file
-5. **Commit** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Conventional commits format, comprehensive PR summaries
+5. **Commit when explicitly approved** ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Conventional commits format, comprehensive PR summaries
 
 ## Git Workflow
 
-**Commit format:** `<type>: <description>` ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Types: feat, fix, refactor, docs, test, chore, perf, ci
+**Commit format:** `<type>: <description>` ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Types: feat, fix, refactor, docs, test, chore, perf, ci
 
-**PR workflow:** Analyze full commit history ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ draft comprehensive summary ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ include test plan ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ push with `-u` flag.
+**PR workflow:** Only when explicitly approved, analyze full commit history ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ draft comprehensive summary ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ include test plan ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ push only after the separate push approval gate is satisfied.
 
 ## Architecture Patterns
 
@@ -339,19 +380,19 @@ Troubleshoot failures: check test isolation ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â
 
 **Context management:** Avoid last 20% of context window for large refactoring and multi-file features. Lower-sensitivity tasks (single edits, docs, simple fixes) tolerate higher utilization.
 
-**Build troubleshooting:** Use build-error-resolver agent ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ analyze errors ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ fix incrementally ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ verify after each fix.
+**Build troubleshooting:** Use build-error-resolver agent ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ analyze errors ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ fix incrementally ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ verify after each fix.
 
 ## Project Structure
 
 ```
 agents/          - 37 specialized subagents
-skills/          - 237+ workflow skills and domain knowledge
+skills/          - 247+ workflow skills and domain knowledge
 commands/        - 60 slash commands
-hooks/           ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Trigger-based automations
-rules/           ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Always-follow guidelines (common + per-language)
-scripts/         ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Cross-platform Node.js utilities
-mcp-configs/     ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â 14 MCP server configurations
-tests/           ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Test suite
+hooks/           ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Trigger-based automations
+rules/           ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Always-follow guidelines (common + per-language)
+scripts/         ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Cross-platform Node.js utilities
+mcp-configs/     ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â 14 MCP server configurations
+tests/           ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Test suite
 ```
 
 ## Success Metrics
@@ -478,16 +519,16 @@ Storage path:
 
 ## ai-coscientist
 
-> **ARCHIVED** — Output feeds nowhere automatically in the current pipeline. Feynman covers the research brief; Paper2Agent covers methodology extraction. Archived at `autoresearch/archived/AI-CoScientist/`. Do not invoke unless a structured hypothesis-ranking step is explicitly added to the workflow.
+> **ARCHIVED** â€” Output feeds nowhere automatically in the current pipeline. Feynman covers the research brief; Paper2Agent covers methodology extraction. Archived at `autoresearch/archived/AI-CoScientist/`. Do not invoke unless a structured hypothesis-ranking step is explicitly added to the workflow.
 
 ## rtk
 
-RTK (Rust Token Killer) v0.35.0 is installed and active. It proxies shell commands to produce compressed, LLM-optimized output, reducing token consumption by 60–90% on verbose commands.
+RTK (Rust Token Killer) v0.35.0 is installed and active. It proxies shell commands to produce compressed, LLM-optimized output, reducing token consumption by 60â€“90% on verbose commands.
 
 Binary: `C:\Users\adelm\.local\bin\rtk.exe`
 Config: `C:\Users\adelm\AppData\Roaming\rtk\config.toml`
 
-Usage — prefix any shell command with `rtk`:
+Usage â€” prefix any shell command with `rtk`:
 ```
 rtk git status
 rtk git diff HEAD~1
@@ -497,11 +538,11 @@ rtk cargo build
 Scope: RTK only intercepts Bash/shell tool calls. It does NOT apply to built-in Read/Grep/Glob tools.
 
 Key RTK commands:
-- `rtk gain` — show token reduction statistics for the session
-- `rtk --version` — confirm binary is reachable
+- `rtk gain` â€” show token reduction statistics for the session
+- `rtk --version` â€” confirm binary is reachable
 
 Agent integrations:
-- Claude Code: CLAUDE.md injection (Windows — hook-based mode requires Unix)
+- Claude Code: CLAUDE.md injection (Windows â€” hook-based mode requires Unix)
 - Codex: `@C:\Users\adelm\.codex\RTK.md` via `~/.codex/AGENTS.md`
 - Gemini CLI: BeforeTool hook at `~/.gemini/hooks/rtk-hook-gemini.sh`
 
@@ -509,9 +550,9 @@ Agent integrations:
 
 ---
 
-## caveman — Token Compression
+## caveman â€” Token Compression
 
-Caveman compresses agent output ~65–75% using terse "caveman-style" prose that preserves full technical accuracy. Auto-activates via SessionStart hook after install.
+Caveman compresses agent output ~65â€“75% using terse "caveman-style" prose that preserves full technical accuracy. Auto-activates via SessionStart hook after install.
 
 **Reference:** `C:\Users\adelm\SeaBridgeAI\everything-claude-code\references\caveman\`
 
@@ -521,18 +562,18 @@ claude plugin marketplace add JuliusBrussee/caveman && claude plugin install cav
 ```
 
 Skills:
-- `/caveman` — activate compression (intensity: `lite` / `full` / `ultra` / `wenyan`)
-- `/caveman-commit` — terse commit messages
-- `/caveman-review` — one-line code reviews
-- `/caveman-compress` — compress CLAUDE.md ~46% to save input tokens every session
+- `/caveman` â€” activate compression (intensity: `lite` / `full` / `ultra` / `wenyan`)
+- `/caveman-commit` â€” terse commit messages
+- `/caveman-review` â€” one-line code reviews
+- `/caveman-compress` â€” compress CLAUDE.md ~46% to save input tokens every session
 
 Codex: use `$caveman` in prompts. Gemini: `gemini extensions install caveman`.
 
 ---
 
-## codeburn — Token Usage Dashboard
+## codeburn â€” Token Usage Dashboard
 
-Codeburn tracks AI coding token spend across Claude Code, Codex, Cursor, and others. Reads session data from disk — no API keys needed.
+Codeburn tracks AI coding token spend across Claude Code, Codex, Cursor, and others. Reads session data from disk â€” no API keys needed.
 
 **Reference:** `C:\Users\adelm\SeaBridgeAI\everything-claude-code\references\codeburn\`
 
@@ -556,7 +597,7 @@ codeburn export       # CSV/JSON export
 
 ---
 
-## designlang — Design Language Extraction
+## designlang â€” Design Language Extraction
 
 designlang crawls any live URL with a headless browser and generates 17+ output files (Tailwind config, CSS vars, shadcn theme, Figma variables, motion tokens, brand voice, component anatomy stubs, and an AI-optimized markdown file).
 
@@ -566,12 +607,12 @@ Skill: `/extract-design <url>` (installed at `~/.claude/skills/extract-design/`)
 CLI: `npx designlang <url>` (no install required) or `designlang <url>` (global install requires explicit approval)
 
 Key flags:
-- `--full` — multi-page crawl (auto-discovers nav pages)
-- `--out <dir>` — output directory (default: `./design-extract-output`)
-- `--dark` — also extract dark mode
-- `--screenshots` — capture component screenshots
-- `--emit-agent-rules` — writes `CLAUDE.md.fragment` rule files
-- `--smart` — LLM-assisted classifier (uses `ANTHROPIC_API_KEY`)
+- `--full` â€” multi-page crawl (auto-discovers nav pages)
+- `--out <dir>` â€” output directory (default: `./design-extract-output`)
+- `--dark` â€” also extract dark mode
+- `--screenshots` â€” capture component screenshots
+- `--emit-agent-rules` â€” writes `CLAUDE.md.fragment` rule files
+- `--smart` â€” LLM-assisted classifier (uses `ANTHROPIC_API_KEY`)
 
 SeaBridgeAI design token locations:
 - manageesg-frontend: `manageesg-frontend/design/`

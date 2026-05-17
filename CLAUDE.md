@@ -1,4 +1,32 @@
-# CLAUDE.md
+﻿# CLAUDE.md
+
+<!-- SEABRIDGE_GOAL_PROTOCOL_START -->
+## /goal Default Operating Mode
+
+All SeaBridgeAI coding-agent tasks default to /goal.
+
+Before implementation, establish a persistent execution goal, Definition of Done, validation plan, affected systems, dependencies, risks, expected artifacts, and likely edge cases. Continue the execution loop until the DoD is validated or a hard blocker is documented.
+
+### /goal and Auto-Loop Are the Same Mode
+
+/goal is the user-facing command; auto-loop is the autonomous persistent execution behavior. The agent must not return early after code generation, must not claim completion until validation passes, and must keep working until the Definition of Done is satisfied or a hard blocker is proven. If the task is likely to require more than 15 minutes, state the expected phases and validation steps before starting. If a non-trivial task finishes unusually quickly, include evidence explaining why it was genuinely small or already validated.
+
+Canonical protocol: C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md
+
+Compact form: C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL_SHORT.md
+
+Do not claim completion from code edits, generated files, or partial tests. Completion requires validated behavior, checked integrations, regression coverage proportional to risk, and documented skipped checks or blockers.
+
+### Completion Evidence Required
+
+Every final report must include files changed, commands run, tests run, validation results, errors encountered, fixes applied, unverified items, remaining risks, and whether the Definition of Done is satisfied. If no tests were run, state why tests were not run, what validation was substituted, and what risk remains. The phrase "complete" is prohibited unless accompanied by validation evidence.
+
+### Anti-Stuck Loop Rule
+
+Timeout/stagnation rule: if a command or approach fails twice, do not repeat it blindly. Inspect logs, change strategy, isolate the problem, reduce scope, use a different validation path, and document the blocker if unresolved. If a process hangs or becomes a hung process, stop it safely, check logs, run a smaller command, verify the environment, and continue with an alternate route.
+
+<!-- SEABRIDGE_GOAL_PROTOCOL_END -->
+
 
 ## SeaBridgeAI Central System With Embedded Superpowers And GSD
 
@@ -10,7 +38,7 @@ Superpowers is embedded as an adapted local methodology through the SeaBridgeAI 
 
 GSD / Get Shit Done is embedded as a controlled local reference and adapted workflow layer through `sea-gsd-controlled-execution`. Reference clone: C:\Users\adelm\SeaBridgeAI\everything-claude-code\external\get-shit-done. Do not run `npx get-shit-done-cc@latest`, install globally, enable yolo/autonomous mode, auto-commit, auto-push, or auto-create PRs unless explicitly approved.
 
-Full callable SeaBridgeAI skill catalog: sea-senior-dev-workflow, sea-brainstorming-and-spec-refinement, sea-task-orchestration, sea-test-driven-development, sea-systematic-debugging, sea-verification-before-completion, sea-code-review-response, sea-git-worktree-isolation, sea-parallel-agent-dispatch, sea-finishing-development-branch, sea-backend-api-verification, sea-frontend-design, sea-ai-data-integrity, sea-sustainability-domain-review, sea-context-hygiene, sea-cross-repo-handoff, sea-skill-creator-protocol, sea-knowledge-vault, sea-gsd-controlled-execution, sea-local-llm-training.
+Full callable SeaBridgeAI skill catalog: sea-senior-dev-workflow, sea-brainstorming-and-spec-refinement, sea-task-orchestration, sea-test-driven-development, sea-systematic-debugging, sea-verification-before-completion, sea-code-review-response, sea-git-worktree-isolation, sea-parallel-agent-dispatch, sea-finishing-development-branch, sea-backend-api-verification, sea-frontend-design, sea-ai-data-integrity, sea-sustainability-domain-review, sea-context-hygiene, sea-cross-repo-handoff, sea-skill-creator-protocol, sea-knowledge-vault, sea-gsd-controlled-execution, sea-local-llm-training, goal-default.
 
 Mandatory gates: local-only development unless approved; no GitHub push unless approved; no commit unless requested; no global install or marketplace install unless approved; no paid/live provider calls unless approved; no fabricated sustainability data; verify endpoint/database/source/auth/tenant behavior before frontend or product claims; verify before completion.
 
@@ -20,6 +48,19 @@ Shared engineering skill extensions live in `AGENT_SKILLS.md` and adapt
 system. Active portable invocations: `#skill/grill-me`,
 `#skill/ubiquitous-language`, `#skill/improve-codebase-architecture`, or
 `Use skill: <name>`.
+
+## Goal Protocol Default
+
+For non-trivial SeaBridgeAI work, `/goal` is the default operating contract.
+Use `goal-default` to frame the user request with Definition of Done, validation
+plan, risks, dependencies, scope, blockers, and artifacts, then continue until
+validated or blocked. Canonical protocol:
+`C:\Users\adelm\SeaBridgeAI\everything-claude-code\docs\GOAL_PROTOCOL_DEFAULT.md`
+
+`/goal` sits above Spec Kit and GSD: Spec Kit owns formal specs; GSD owns
+long-running execution state and UAT. `/goal` never authorizes commits, pushes,
+installs, live/paid calls, destructive actions, migrations, or production data
+changes.
 ## SeaBridgeAI Central Coding-Agent Layer
 
 For SeaBridgeAI work across backend, frontend, OpenSeaBri, `_upstream`, and
@@ -34,7 +75,7 @@ Callable skill names: `sea-senior-dev-workflow`, `sea-frontend-design`,
 `sea-skill-creator-protocol`, `sea-backend-api-verification`,
 `sea-ai-data-integrity`, `sea-sustainability-domain-review`,
 `sea-task-orchestration`, `sea-context-hygiene`, `sea-cross-repo-handoff`,
-`sea-gsd-controlled-execution`.
+`sea-gsd-controlled-execution`, `goal-default`.
 
 ## Safety And Authorization Rule
 
@@ -140,7 +181,7 @@ File naming: lowercase with hyphens (e.g. `python-reviewer.md`, `tdd-workflow.md
 
 ## gstack
 
-gstack is installed at `~/.claude/skills/gstack/` and provides 35 specialist skills. Use `/browse` for **all web browsing** â€” never use `mcp__claude-in-chrome__*` tools.
+gstack is installed at `~/.claude/skills/gstack/` and provides 35 specialist skills. Use `/browse` for **all web browsing** Ã¢â‚¬â€ never use `mcp__claude-in-chrome__*` tools.
 
 | Skill | When to Use |
 |-------|-------------|
@@ -150,16 +191,16 @@ gstack is installed at `~/.claude/skills/gstack/` and provides 35 specialist ski
 | `/plan-eng-review` | Architecture, data flow, state machines, test matrix |
 | `/plan-design-review` | Visual/UX review of plans |
 | `/plan-devex-review` | Developer experience review of plans |
-| `/review` | Pre-PR review â€” SQL safety, secrets, architecture, logic |
+| `/review` | Pre-PR review Ã¢â‚¬â€ SQL safety, secrets, architecture, logic |
 | `/cso` | Security audit: OWASP + STRIDE, secrets archaeology, deps |
 | `/qa` | Test a live URL in a headless browser, find + fix bugs |
 | `/qa-only` | Report-only QA pass (no auto-fix) |
-| `/browse` | All web browsing â€” replaces Chrome MCP tools |
+| `/browse` | All web browsing Ã¢â‚¬â€ replaces Chrome MCP tools |
 | `/investigate` | Systematic root-cause debugging |
-| `/ship` | Full ship workflow: tests â†’ review â†’ version bump â†’ PR |
+| `/ship` | Full ship workflow: tests Ã¢â€ â€™ review Ã¢â€ â€™ version bump Ã¢â€ â€™ PR |
 | `/land-and-deploy` | Merge PR, wait for CI/deploy, verify production |
 | `/canary` | Post-deploy monitoring for errors/regressions |
-| `/design-review` | Visual QA â€” spacing, hierarchy, AI slop detection |
+| `/design-review` | Visual QA Ã¢â‚¬â€ spacing, hierarchy, AI slop detection |
 | `/design-html` | Generate production-quality HTML/CSS |
 | `/design-consultation` | Product + landscape research, propose design direction |
 | `/design-shotgun` | Generate multiple design variants for comparison |
@@ -184,7 +225,7 @@ GSD provides structured multi-phase planning, execution, verification, and sessi
 
 Setup: `scripts/setup-gsd.ps1` creates the `~/.claude/get-shit-done` junction.
 
-**Core lifecycle:** `/gsd-map-codebase` â†’ `/gsd-discuss-phase` â†’ `/gsd-plan-phase` â†’ `/gsd-execute-phase` â†’ `/gsd-verify-work`
+**Core lifecycle:** `/gsd-map-codebase` Ã¢â€ â€™ `/gsd-discuss-phase` Ã¢â€ â€™ `/gsd-plan-phase` Ã¢â€ â€™ `/gsd-execute-phase` Ã¢â€ â€™ `/gsd-verify-work`
 
 | Command | Purpose |
 |---------|---------|
@@ -361,13 +402,13 @@ model quota.
 
 Two tools are installed globally for token efficiency:
 
-- **caveman** â€” compresses agent output ~65â€“75% (`/caveman` skill, `claude plugin install caveman@caveman`). Reference: `everything-claude-code/references/caveman/`
-- **codeburn** â€” token usage dashboard (`npx codeburn` or `npm install -g codeburn`). Reference: `everything-claude-code/references/codeburn/`
+- **caveman** Ã¢â‚¬â€ compresses agent output ~65Ã¢â‚¬â€œ75% (`/caveman` skill, `claude plugin install caveman@caveman`). Reference: `everything-claude-code/references/caveman/`
+- **codeburn** Ã¢â‚¬â€ token usage dashboard (`npx codeburn` or `npm install -g codeburn`). Reference: `everything-claude-code/references/codeburn/`
 
 
 ---
 
-## designlang â€” Design Language Extraction
+## designlang Ã¢â‚¬â€ Design Language Extraction
 
 designlang crawls any live URL with a headless browser and generates 17+ output files (Tailwind config, CSS vars, shadcn theme, Figma variables, motion tokens, brand voice, component anatomy stubs, and an AI-optimized markdown file).
 
@@ -377,12 +418,12 @@ Skill: `/extract-design <url>` (installed at `~/.claude/skills/extract-design/`)
 CLI: `npx designlang <url>` (no install required) or `designlang <url>` (global install requires explicit approval)
 
 Key flags:
-- `--full` â€” multi-page crawl (auto-discovers nav pages)
-- `--out <dir>` â€” output directory (default: `./design-extract-output`)
-- `--dark` â€” also extract dark mode
-- `--screenshots` â€” capture component screenshots
-- `--emit-agent-rules` â€” writes `CLAUDE.md.fragment` rule files
-- `--smart` â€” LLM-assisted classifier (uses `ANTHROPIC_API_KEY`)
+- `--full` Ã¢â‚¬â€ multi-page crawl (auto-discovers nav pages)
+- `--out <dir>` Ã¢â‚¬â€ output directory (default: `./design-extract-output`)
+- `--dark` Ã¢â‚¬â€ also extract dark mode
+- `--screenshots` Ã¢â‚¬â€ capture component screenshots
+- `--emit-agent-rules` Ã¢â‚¬â€ writes `CLAUDE.md.fragment` rule files
+- `--smart` Ã¢â‚¬â€ LLM-assisted classifier (uses `ANTHROPIC_API_KEY`)
 
 SeaBridgeAI design token locations:
 - manageesg-frontend: `manageesg-frontend/design/`
@@ -395,7 +436,7 @@ npx designlang mcp --out ./design-extract-output
 
 ---
 
-## Open Design â€” AI Design Artifact Generator
+## Open Design Ã¢â‚¬â€ AI Design Artifact Generator
 
 Open-source alternative to Claude Design (Apache-2.0). Local-first, BYOK design
 tool that auto-detects 11 coding-agent CLIs on PATH and drives them through a
@@ -415,11 +456,11 @@ pnpm tools-dev run web
 Requires Node ~24, pnpm 10.33.x. First load auto-creates `.od/` runtime folder.
 
 Key capabilities:
-- **31 skills** â€” prototypes (landings, dashboards, mobile, email, social), decks (magazine PPT, product walkthrough), operations (PM specs, OKRs, invoices, runbooks)
-- **129 design systems** â€” Linear, Stripe, Vercel, Airbnb, Tesla, Notion, Apple, Anthropic, Cursor, Supabase, Figma, and more
-- **5 visual directions** â€” Editorial Monocle, Modern Minimal, Warm Soft, Tech Utility, Brutalist Experimental
-- **Media generation** â€” gpt-image-2 for images, Seedance 2.0 for video, HyperFrames for HTMLâ†’MP4
-- **Claude Design import** â€” drop a Claude Design export ZIP to continue editing locally
+- **31 skills** Ã¢â‚¬â€ prototypes (landings, dashboards, mobile, email, social), decks (magazine PPT, product walkthrough), operations (PM specs, OKRs, invoices, runbooks)
+- **129 design systems** Ã¢â‚¬â€ Linear, Stripe, Vercel, Airbnb, Tesla, Notion, Apple, Anthropic, Cursor, Supabase, Figma, and more
+- **5 visual directions** Ã¢â‚¬â€ Editorial Monocle, Modern Minimal, Warm Soft, Tech Utility, Brutalist Experimental
+- **Media generation** Ã¢â‚¬â€ gpt-image-2 for images, Seedance 2.0 for video, HyperFrames for HTMLÃ¢â€ â€™MP4
+- **Claude Design import** Ã¢â‚¬â€ drop a Claude Design export ZIP to continue editing locally
 
 Relationship to designlang: designlang extracts tokens from existing sites (reverse-engineering); Open Design generates new artifacts from briefs (forward creation). They complement each other.
 

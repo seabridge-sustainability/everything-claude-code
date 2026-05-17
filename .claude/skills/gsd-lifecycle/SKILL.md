@@ -79,6 +79,18 @@ Commands (thin dispatchers) → Workflows (orchestration) → Agents (heavy work
 
 Both systems coexist — use GSD for multi-phase projects, existing skills for simpler tasks.
 
+## /goal And Auto-Loop Inheritance
+
+GSD inherits the SeaBridgeAI `/goal` protocol. `/goal` is the user-facing command and auto-loop is the persistent execution behavior. GSD plans, execution waves, verification, and next-step routing must not override the Definition of Done.
+
+- `/gsd-plan-phase` must include a validation plan and stuck-task strategy for complex work.
+- `/gsd-execute-phase` inherits `/goal` and must persist through implementation, validation, fixes, and re-validation until the DoD is satisfied or a hard blocker is proven.
+- `/gsd-quick` inherits `/goal` for non-trivial tasks; it may skip optional agents but not required validation.
+- `/gsd-fast`, where present in repo-local copies, is only for trivial or inspection-only tasks.
+- `/gsd-verify-work` must require completion evidence: files changed, commands run, tests run, validation results, errors, fixes, unverified items, risks, and DoD status.
+- `/gsd-next` must not skip verification when implementation summaries exist.
+- If a GSD command or agent repeats the same failing action twice, inspect logs, change strategy, reduce scope, use a smaller command, or document a proven blocker.
+
 ## Setup
 
 Run `scripts/setup-gsd.ps1` to create the `~/.claude/get-shit-done` junction

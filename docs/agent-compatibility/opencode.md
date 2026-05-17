@@ -6,6 +6,16 @@ Canonical system path: `C:\Users\adelm\SeaBridgeAI\everything-claude-code`
 
 OpenCode must load the centralized `AGENTS_SYSTEM.md` / `SEABRIDGE_CODING_AGENT_SYSTEM.md` contract first, then repo-local `AGENTS.md`, `CLAUDE.md`, and `AGENTS_SYSTEM.md` overrides.
 
+## Execution Cheatsheet
+
+- Load first: `SEABRIDGE_CODING_AGENT_SYSTEM.md`, `AGENTS_SYSTEM.md`, then the instruction files configured by `opencode.jsonc`.
+- Repo-specific instructions: apply local backend/frontend/OpenSeaBri rules only when they extend central policy; stricter safety wins.
+- Skills: read canonical `skills/sea-*/SKILL.md` bodies or wrappers configured by the harness; wrappers only point to canonical behavior.
+- Logs, reports, and handoffs: use `docs/reports`, `logs`, `test-results`, or `artifacts/agent-runs`; do not place transient reports in repo root.
+- Approval gates: never auto-commit, push, install globally, enable yolo/autonomous/dangerous modes, run live paid calls, or perform destructive actions without explicit approval.
+- Unsupported native commands: if a Claude/Codex/Gemini command has no OpenCode equivalent, use the local file/tool workflow and document the unsupported step.
+- Self-verification: keep the plan/test/verify loop and record skipped checks with reasons.
+
 ## Skill Resolution
 
 - Canonical SeaBridgeAI skill bodies: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\skills\sea-*\SKILL.md`
@@ -14,6 +24,15 @@ OpenCode must load the centralized `AGENTS_SYSTEM.md` / `SEABRIDGE_CODING_AGENT_
 - Shared engineering skills are governed by `AGENT_SKILLS.md`, including
   `grill-me`, `ubiquitous-language`, `improve-codebase-architecture`, and the
   Harness reviewer skills.
+
+## /goal Auto-Loop
+
+- `/goal <task>` or the local equivalent triggers autonomous persistent execution.
+- `/goal` and auto-loop are the same mode; `/goal` is the command pattern, auto-loop is the behavior.
+- For long-running or non-trivial work, OpenCode must define the objective, DoD, phases, validation plan, stuck-task strategy, and completion evidence before claiming success.
+- Final reports must include files changed, commands run, tests run, validation results, errors, fixes, unverified items, remaining risks, and DoD status.
+- If a command or approach fails twice, inspect logs and change strategy instead of retrying blindly.
+- Shared reference: `docs/CROSS_AGENT_GOAL_PROTOCOL.md`.
 
 ## Harness And Security Scans
 

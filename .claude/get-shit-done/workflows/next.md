@@ -207,6 +207,7 @@ Display the determination:
 ```
 
 Then immediately invoke the determined command via SlashCommand.
+Goal protocol guardrail: `/gsd-next` must not skip verification. If any implementation summary exists for the current phase, route through `/gsd-verify-work` before phase advancement unless a documented hard blocker or explicit user-approved force path exists. Forced advancement must record what remains unverified and the residual risk.
 Do not ask for confirmation — the whole point of `/gsd-next` is zero-friction advancement.
 </step>
 
@@ -217,4 +218,6 @@ Do not ask for confirmation — the whole point of `/gsd-next` is zero-friction 
 - [ ] Next action correctly determined from routing rules
 - [ ] Command invoked immediately without user confirmation
 - [ ] Clear status shown before invoking
+- [ ] Verification was not skipped when implementation summaries or completed plans exist
+- [ ] Completion evidence is present before any phase is treated as done
 </success_criteria>
