@@ -1,4 +1,4 @@
-# Refactor Clean
+﻿# Refactor Clean
 
 ## Safety And Authorization Rule
 
@@ -47,11 +47,11 @@ Sort findings into safety tiers:
 
 For each SAFE item:
 
-1. **Run full test suite** Ã¢â‚¬â€ Establish baseline (all green)
-2. **Delete the dead code** Ã¢â‚¬â€ Use Edit tool for surgical removal
-3. **Re-run test suite** Ã¢â‚¬â€ Verify nothing broke
-4. **If tests fail** Ã¢â‚¬â€ Immediately revert with `git checkout -- <file>` and skip this item
-5. **If tests pass** Ã¢â‚¬â€ Move to next item
+1. **Run full test suite** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Establish baseline (all green)
+2. **Delete the dead code** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Use Edit tool for surgical removal
+3. **Re-run test suite** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Verify nothing broke
+4. **If tests fail** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Immediately revert with `git checkout -- <file>` and skip this item
+5. **If tests pass** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Move to next item
 
 ## Step 4: Handle CAUTION Items
 
@@ -64,10 +64,10 @@ Before deleting CAUTION items:
 ## Step 5: Consolidate Duplicates
 
 After removing dead code, look for:
-- Near-duplicate functions (>80% similar) Ã¢â‚¬â€ merge into one
-- Redundant type definitions Ã¢â‚¬â€ consolidate
-- Wrapper functions that add no value Ã¢â‚¬â€ inline them
-- Re-exports that serve no purpose Ã¢â‚¬â€ remove indirection
+- Near-duplicate functions (>80% similar) ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â merge into one
+- Redundant type definitions ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â consolidate
+- Wrapper functions that add no value ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â inline them
+- Re-exports that serve no purpose ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â remove indirection
 
 ## Step 6: Summary
 
@@ -75,19 +75,27 @@ Report results:
 
 ```
 Dead Code Cleanup
-Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
 Deleted:   12 unused functions
            3 unused files
            5 unused dependencies
 Skipped:   2 items (tests failed)
 Saved:     ~450 lines removed
-Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
 All tests passing PASS:
 ```
 
 ## Rules
 
 - **Never delete without running tests first**
-- **One deletion at a time** Ã¢â‚¬â€ Atomic changes make rollback easy
-- **Skip if uncertain** Ã¢â‚¬â€ Better to keep dead code than break production
-- **Don't refactor while cleaning** Ã¢â‚¬â€ Separate concerns (clean first, refactor later)
+- **One deletion at a time** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Atomic changes make rollback easy
+- **Skip if uncertain** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Better to keep dead code than break production
+- **Don't refactor while cleaning** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Separate concerns (clean first, refactor later)
+
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_START -->
+## /goal Default Contract
+
+This command inherits the SeaBridgeAI `/goal` protocol. Establish the persistent goal, Definition of Done, validation plan, affected systems, risks, dependencies, artifacts, and blockers before execution. Continue until validation satisfies the DoD or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_END -->

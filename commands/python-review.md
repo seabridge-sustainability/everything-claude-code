@@ -1,4 +1,4 @@
----
+﻿---
 description: Comprehensive Python code review for PEP 8 compliance, type hints, security, and Pythonic idioms. Invokes the python-reviewer agent.
 ---
 
@@ -100,10 +100,10 @@ Agent:
 - app/services/auth.py (modified)
 
 ## Static Analysis Results
-Ã¢Å“â€œ ruff: No issues
-Ã¢Å“â€œ mypy: No errors
+ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ ruff: No issues
+ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ mypy: No errors
 WARNING: black: 2 files need reformatting
-Ã¢Å“â€œ bandit: No security issues
+ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ bandit: No security issues
 
 ## Issues Found
 
@@ -308,3 +308,11 @@ The reviewer notes when code uses features from newer Python versions:
 | Type unions (&#96;x &#124; None&#96;) | 3.10+ |
 
 Ensure your project's `pyproject.toml` or `setup.py` specifies the correct minimum Python version.
+
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_START -->
+## /goal Default Contract
+
+This command inherits the SeaBridgeAI `/goal` protocol. Establish the persistent goal, Definition of Done, validation plan, affected systems, risks, dependencies, artifacts, and blockers before execution. Continue until validation satisfies the DoD or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_END -->

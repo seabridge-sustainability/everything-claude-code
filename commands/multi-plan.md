@@ -1,4 +1,4 @@
-# Plan - Multi-Model Collaborative Planning
+﻿# Plan - Multi-Model Collaborative Planning
 
 ## Safety And Authorization Rule
 
@@ -13,7 +13,7 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
 
-Multi-model collaborative planning - Context retrieval + Dual-model analysis Ã¢â€ â€™ Generate step-by-step implementation plan.
+Multi-model collaborative planning - Context retrieval + Dual-model analysis ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Generate step-by-step implementation plan.
 
 $ARGUMENTS
 
@@ -182,9 +182,9 @@ Synthesize both analyses, generate **Step-by-step Implementation Plan**:
 ## Implementation Plan: <Task Name>
 
 ### Task Type
-- [ ] Frontend (Ã¢â€ â€™ Gemini)
-- [ ] Backend (Ã¢â€ â€™ Codex)
-- [ ] Fullstack (Ã¢â€ â€™ Parallel)
+- [ ] Frontend (ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Gemini)
+- [ ] Backend (ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Codex)
+- [ ] Fullstack (ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Parallel)
 
 ### Technical Solution
 <Optimal solution synthesized from Codex + Gemini analysis>
@@ -274,8 +274,16 @@ After user approves, **manually** execute:
 
 ## Key Rules
 
-1. **Plan only, no implementation** Ã¢â‚¬â€œ This command does not execute any code changes
-2. **No Y/N prompts** Ã¢â‚¬â€œ Only present plan, let user decide next steps
-3. **Trust Rules** Ã¢â‚¬â€œ Backend follows Codex, Frontend follows Gemini
+1. **Plan only, no implementation** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“ This command does not execute any code changes
+2. **No Y/N prompts** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“ Only present plan, let user decide next steps
+3. **Trust Rules** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“ Backend follows Codex, Frontend follows Gemini
 4. External models have **zero filesystem write access**
-5. **SESSION_ID Handoff** Ã¢â‚¬â€œ Plan must include `CODEX_SESSION` / `GEMINI_SESSION` at end (for `/ccg:execute resume <SESSION_ID>` use)
+5. **SESSION_ID Handoff** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“ Plan must include `CODEX_SESSION` / `GEMINI_SESSION` at end (for `/ccg:execute resume <SESSION_ID>` use)
+
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_START -->
+## /goal Default Contract
+
+This command inherits the SeaBridgeAI `/goal` protocol. Establish the persistent goal, Definition of Done, validation plan, affected systems, risks, dependencies, artifacts, and blockers before execution. Continue until validation satisfies the DoD or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_END -->

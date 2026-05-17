@@ -1,4 +1,4 @@
----
+﻿---
 name: sea-ai-data-integrity
 description: SeaBridgeAI AI data-integrity and hallucination-prevention skill for sustainability agents, RAG, prompts, reports, calculations, exports, and assistant UI outputs.
 ---
@@ -44,3 +44,11 @@ Local models (Unsloth Studio, Qwen3.5-4B, Gemma-4-2B) are subject to identical g
 ## Superpowers Adaptation
 
 Fully embeds Superpowers evidence-over-claims and verification-before-completion for AI output surfaces.
+
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_START -->
+## /goal Inheritance
+
+This skill inherits the SeaBridgeAI `/goal` default protocol. Before implementation or review, establish the persistent goal, Definition of Done, validation plan, affected systems, dependencies, risks, and expected artifacts. Continue through validation and fixes until the DoD is satisfied or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_END -->

@@ -1,4 +1,4 @@
----
+﻿---
 name: sea-sustainability-domain-review
 description: SeaBridgeAI sustainability-domain review for ESG, GHG accounting, LCA, climate and nature risk, procurement, targets, due diligence, reporting, disclosure, and utility workflows.
 ---
@@ -39,8 +39,16 @@ All coding agents should run this review before completion claims on sustainabil
 
 ## Local LLM Notes
 
-When the sustainability module uses LOCAL_LLM_ENABLED=true, apply the same domain review gates. Local fine-tuned outputs count as AI interpretation — not verified calculations — unless traced to a primary source. See `sea-local-llm-training` for model selection and output labelling.
+When the sustainability module uses LOCAL_LLM_ENABLED=true, apply the same domain review gates. Local fine-tuned outputs count as AI interpretation â€” not verified calculations â€” unless traced to a primary source. See `sea-local-llm-training` for model selection and output labelling.
 
 ## Superpowers Adaptation
 
 Fully embeds Superpowers receiving-code-review rigor and verification-before-completion for domain review.
+
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_START -->
+## /goal Inheritance
+
+This skill inherits the SeaBridgeAI `/goal` default protocol. Before implementation or review, establish the persistent goal, Definition of Done, validation plan, affected systems, dependencies, risks, and expected artifacts. Continue through validation and fixes until the DoD is satisfied or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_END -->

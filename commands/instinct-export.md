@@ -1,4 +1,4 @@
----
+﻿---
 name: instinct-export
 description: Export instincts from project/global scope to a file
 command: /instinct-export
@@ -77,3 +77,11 @@ Use functional patterns over classes.
 - `--min-confidence <n>`: Minimum confidence threshold
 - `--output <file>`: Output file path (prints to stdout when omitted)
 - `--scope <project|global|all>`: Export scope (default: `all`)
+
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_START -->
+## /goal Default Contract
+
+This command inherits the SeaBridgeAI `/goal` protocol. Establish the persistent goal, Definition of Done, validation plan, affected systems, risks, dependencies, artifacts, and blockers before execution. Continue until validation satisfies the DoD or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_END -->

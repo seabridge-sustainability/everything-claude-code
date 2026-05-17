@@ -1,5 +1,5 @@
----
-description: Start NanoClaw v2 Ã¢â‚¬â€ ECC's persistent, zero-dependency REPL with model routing, skill hot-load, branching, compaction, export, and metrics.
+﻿---
+description: Start NanoClaw v2 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â ECC's persistent, zero-dependency REPL with model routing, skill hot-load, branching, compaction, export, and metrics.
 ---
 
 # Claw Command
@@ -62,3 +62,11 @@ exit                           Quit
 - Sessions are stored at `~/.claude/claw/<session>.md`.
 - Compaction keeps the most recent turns and writes a compaction header.
 - Export supports markdown, JSON turns, and plain text.
+
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_START -->
+## /goal Default Contract
+
+This command inherits the SeaBridgeAI `/goal` protocol. Establish the persistent goal, Definition of Done, validation plan, affected systems, risks, dependencies, artifacts, and blockers before execution. Continue until validation satisfies the DoD or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_END -->

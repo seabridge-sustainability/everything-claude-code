@@ -1,4 +1,4 @@
-# Model Route Command
+﻿# Model Route Command
 
 ## Safety And Authorization Rule
 
@@ -21,7 +21,7 @@ Recommend the best model tier for the current task by complexity, cost, and infr
 
 ## Routing Tiers
 
-### Cloud (default Ã¢â‚¬â€ requires API keys)
+### Cloud (default ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â requires API keys)
 
 | Tier | Model | When to use |
 |------|-------|-------------|
@@ -29,18 +29,18 @@ Recommend the best model tier for the current task by complexity, cost, and infr
 | `sonnet` | claude-sonnet-4-6 | Default for implementation and refactors |
 | `opus` | claude-opus-4-6 | Architecture, deep review, ambiguous requirements |
 
-### Local (via llama.cpp Ã¢â‚¬â€ $0, requires local server)
+### Local (via llama.cpp ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â $0, requires local server)
 
 See `skills/sea-local-llm-training/` and `docs/local-llm/` to set up the server.
 
 | Tier | Model | VRAM | When to use |
 |------|-------|------|-------------|
 | `fast` | Gemma-4 2B Q8_0 | ~3GB | Simple completions, quick fixes, haiku-equivalent |
-| `main` | Gemma-4 31B Q4_K_M + 2B speculative | ~23GB | Default for all tasks Ã¢â‚¬â€ main coding workhorse |
+| `main` | Gemma-4 31B Q4_K_M + 2B speculative | ~23GB | Default for all tasks ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â main coding workhorse |
 | `reason` | DeepSeek-R1 14B Q4_K_M | ~10GB | Debugging, root-cause analysis, algorithm design |
 | `scout` | Llama-4 Scout 17B Q4_K_M | ~12GB | Lower VRAM alternative to Gemma-4 31B |
 
-### Online open-access (via API keys Ã¢â‚¬â€ low cost)
+### Online open-access (via API keys ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â low cost)
 
 | Tier | Model | Key |
 |------|-------|-----|
@@ -70,9 +70,9 @@ See `skills/sea-local-llm-training/` and `docs/local-llm/` to set up the server.
 ## Arguments
 
 $ARGUMENTS:
-- `[task-description]` Ã¢â‚¬â€ optional free-text description of the task
-- `--budget low|med|high` Ã¢â‚¬â€ cost constraint (low Ã¢â€ â€™ prefer local/groq, high Ã¢â€ â€™ cloud)
-- `--local` Ã¢â‚¬â€ force local inference recommendation
+- `[task-description]` ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â optional free-text description of the task
+- `--budget low|med|high` ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â cost constraint (low ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ prefer local/groq, high ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ cloud)
+- `--local` ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â force local inference recommendation
 
 ## Local Setup Reminder
 
@@ -84,3 +84,11 @@ curl -s http://localhost:4000/health | jq '.status'
 # If not running:
 # Use `docs/local-llm/` for the full local AI stack startup path.
 ```
+
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_START -->
+## /goal Default Contract
+
+This command inherits the SeaBridgeAI `/goal` protocol. Establish the persistent goal, Definition of Done, validation plan, affected systems, risks, dependencies, artifacts, and blockers before execution. Continue until validation satisfies the DoD or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_END -->

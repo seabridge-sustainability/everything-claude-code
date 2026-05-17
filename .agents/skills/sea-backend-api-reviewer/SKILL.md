@@ -1,23 +1,19 @@
 ---
 name: sea-backend-api-reviewer
-description: Review SeaBridgeAI backend API changes for typed contracts, response models, route registration, auth dependencies, tenant filters, error shapes, and frontend/OpenSeaBri contract compatibility.
+description: Callable wrapper for sea-backend-api-reviewer. Load the canonical SeaBridgeAI skill body from everything-claude-code\skills\sea-backend-api-reviewer\SKILL.md.
 ---
 
-# SeaBridgeAI Backend API Reviewer
+# sea-backend-api-reviewer
 
-Load:
+Canonical skill:
+C:\Users\adelm\SeaBridgeAI\everything-claude-code\skills\sea-backend-api-reviewer\SKILL.md
 
-- `docs/harness/standards/backend-api.md`
-- `docs/harness/standards/security.md`
-- `sea-backend-api-verification`
+Use this wrapper only for skill discovery. Follow the canonical skill body above; do not copy or fork behavior here.
 
-Review changed files for:
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_START -->
+## /goal Inheritance
 
-- Missing request/response schemas.
-- Missing auth dependency or tenant/workspace filter.
-- Route not mounted or documented.
-- Error shape drift.
-- Frontend/OpenSeaBri API mismatch.
-- Direct DB query logic in route handlers.
+This skill inherits the SeaBridgeAI `/goal` default protocol. Before implementation or review, establish the persistent goal, Definition of Done, validation plan, affected systems, dependencies, risks, and expected artifacts. Continue through validation and fixes until the DoD is satisfied or a hard blocker is documented.
 
-Require route registration and targeted test/curl proof for API changes.
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_END -->

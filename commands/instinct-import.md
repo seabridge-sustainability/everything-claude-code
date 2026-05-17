@@ -1,4 +1,4 @@
----
+﻿---
 name: instinct-import
 description: Import instincts from file or URL into project/global scope
 command: true
@@ -66,9 +66,9 @@ Analyzing conflicts...
 
 ## New Instincts (8)
 These will be added:
-  Ã¢Å“â€œ use-zod-validation (confidence: 0.7)
-  Ã¢Å“â€œ prefer-named-exports (confidence: 0.65)
-  Ã¢Å“â€œ test-async-functions (confidence: 0.8)
+  ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ use-zod-validation (confidence: 0.7)
+  ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ prefer-named-exports (confidence: 0.65)
+  ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ test-async-functions (confidence: 0.8)
   ...
 
 ## Duplicate Instincts (3)
@@ -76,12 +76,12 @@ Already have similar instincts:
   WARNING: prefer-functional-style
      Local: 0.8 confidence, 12 observations
      Import: 0.7 confidence
-     Ã¢â€ â€™ Keep local (higher confidence)
+     ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Keep local (higher confidence)
 
   WARNING: test-first-workflow
      Local: 0.75 confidence
      Import: 0.9 confidence
-     Ã¢â€ â€™ Update to import (higher confidence)
+     ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Update to import (higher confidence)
 
 Import 8 new, update 1?
 ```
@@ -125,3 +125,11 @@ New instincts saved to: ~/.claude/homunculus/instincts/inherited/
 
 Run /instinct-status to see all instincts.
 ```
+
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_START -->
+## /goal Default Contract
+
+This command inherits the SeaBridgeAI `/goal` protocol. Establish the persistent goal, Definition of Done, validation plan, affected systems, risks, dependencies, artifacts, and blockers before execution. Continue until validation satisfies the DoD or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_END -->

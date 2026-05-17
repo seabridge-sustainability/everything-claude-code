@@ -1,4 +1,4 @@
----
+﻿---
 name: sea-brainstorming-and-spec-refinement
 description: SeaBridgeAI brainstorming and spec refinement adapted from Superpowers for clarifying intent, alternatives, acceptance criteria, and sustainability data constraints before broad implementation.
 ---
@@ -40,3 +40,11 @@ Use conversational questions in every agent. Claude/Codex subagents are optional
 ## Superpowers Adaptation
 
 Fully embeds Superpowers brainstorming, adapted so small fixes can proceed directly but broad work must define done and verification.
+
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_START -->
+## /goal Inheritance
+
+This skill inherits the SeaBridgeAI `/goal` default protocol. Before implementation or review, establish the persistent goal, Definition of Done, validation plan, affected systems, dependencies, risks, and expected artifacts. Continue through validation and fixes until the DoD is satisfied or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_END -->

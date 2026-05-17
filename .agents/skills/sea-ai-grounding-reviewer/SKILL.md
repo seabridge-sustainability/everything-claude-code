@@ -1,24 +1,19 @@
 ---
 name: sea-ai-grounding-reviewer
-description: Review SeaBridgeAI AI, report, RAG, LCA, emissions, risk, and due-diligence changes for grounding, citations, unsupported claims, confidence, units, provenance, safe fallback, and prompt-injection risk.
+description: Callable wrapper for sea-ai-grounding-reviewer. Load the canonical SeaBridgeAI skill body from everything-claude-code\skills\sea-ai-grounding-reviewer\SKILL.md.
 ---
 
-# SeaBridgeAI AI Grounding Reviewer
+# sea-ai-grounding-reviewer
 
-Load:
+Canonical skill:
+C:\Users\adelm\SeaBridgeAI\everything-claude-code\skills\sea-ai-grounding-reviewer\SKILL.md
 
-- `docs/harness/standards/ai-grounding.md`
-- `sea-ai-data-integrity`
-- `sea-sustainability-domain-review`
+Use this wrapper only for skill discovery. Follow the canonical skill body above; do not copy or fork behavior here.
 
-Review changed files for:
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_START -->
+## /goal Inheritance
 
-- Unsupported or uncited claims.
-- Missing confidence, source, geography, timeframe, units, or scenario.
-- Fabricated sustainability data or fake provider results.
-- Prompt injection paths.
-- Unsafe fallback behavior.
-- User-facing chain-of-thought or prompt leakage.
+This skill inherits the SeaBridgeAI `/goal` default protocol. Before implementation or review, establish the persistent goal, Definition of Done, validation plan, affected systems, dependencies, risks, and expected artifacts. Continue through validation and fixes until the DoD is satisfied or a hard blocker is documented.
 
-Demand evidence objects or documented `NEEDS EVIDENCE` flags for uncertain
-claims.
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_END -->

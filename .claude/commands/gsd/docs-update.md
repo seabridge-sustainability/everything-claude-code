@@ -1,4 +1,4 @@
----
+﻿---
 name: gsd:docs-update
 description: Generate or update project documentation verified against the codebase
 argument-hint: "[--force] [--verify-only]"
@@ -13,7 +13,7 @@ allowed-tools:
   - AskUserQuestion
 ---
 <objective>
-Generate and update up to 9 documentation files for the current project. Each doc type is written by a gsd-doc-writer subagent that explores the codebase directly — no hallucinated paths, phantom endpoints, or stale signatures.
+Generate and update up to 9 documentation files for the current project. Each doc type is written by a gsd-doc-writer subagent that explores the codebase directly â€” no hallucinated paths, phantom endpoints, or stale signatures.
 
 Flag handling rule:
 - The optional flags documented below are available behaviors, not implied active behaviors
@@ -31,9 +31,9 @@ Flag handling rule:
 <context>
 Arguments: $ARGUMENTS
 
-**Available optional flags (documentation only — not automatically active):**
-- `--force` — Regenerate all docs. Overwrites hand-written and GSD docs alike. No preservation prompts.
-- `--verify-only` — Check existing docs for accuracy against the codebase. No files are written. Reports VERIFY marker count. Full codebase fact-checking requires the gsd-doc-verifier agent (Phase 4).
+**Available optional flags (documentation only â€” not automatically active):**
+- `--force` â€” Regenerate all docs. Overwrites hand-written and GSD docs alike. No preservation prompts.
+- `--verify-only` â€” Check existing docs for accuracy against the codebase. No files are written. Reports VERIFY marker count. Full codebase fact-checking requires the gsd-doc-verifier agent (Phase 4).
 
 **Active flags must be derived from `$ARGUMENTS`:**
 - `--force` is active only if the literal `--force` token is present in `$ARGUMENTS`
@@ -46,3 +46,11 @@ Arguments: $ARGUMENTS
 Execute the docs-update workflow from @~/.claude/get-shit-done/workflows/docs-update.md end-to-end.
 Preserve all workflow gates (preservation_check, flag handling, wave execution, monorepo dispatch, commit, reporting).
 </process>
+
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_START -->
+## /goal Default Contract
+
+This command inherits the SeaBridgeAI `/goal` protocol. Establish the persistent goal, Definition of Done, validation plan, affected systems, risks, dependencies, artifacts, and blockers before execution. Continue until validation satisfies the DoD or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_END -->

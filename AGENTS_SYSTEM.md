@@ -47,13 +47,20 @@ GSD / Get Shit Done is cloned locally at external\get-shit-done and adapted thro
 - sea-knowledge-vault
 - sea-gsd-controlled-execution
 - sea-local-llm-training
+- sea-ai-grounding-reviewer
+- sea-architecture-reviewer
+- sea-backend-api-reviewer
+- sea-frontend-ux-reviewer
+- sea-production-readiness-reviewer
+- sea-reliability-reviewer
+- sea-security-reviewer
 - grill-me
 - ubiquitous-language
 - improve-codebase-architecture
 
 ## Mandatory Use Summary
 
-Use senior workflow by default; brainstorming for broad specs; orchestration for multi-lane work; GSD-controlled execution for complex phases and context rot; TDD for behavior changes; systematic debugging for failures; verification before any completion claim; code-review response for reviews; worktree isolation for risky local isolation; parallel dispatch only when authorized; finishing branch before publish/merge/cleanup decisions; backend, frontend, AI data, sustainability, context, cross-repo, skill-creator, and knowledge-vault skills for their named domains.
+Use senior workflow by default; brainstorming for broad specs; orchestration for multi-lane work; GSD-controlled execution for complex phases and context rot; TDD for behavior changes; systematic debugging for failures; verification before any completion claim; code-review response for reviews; worktree isolation for risky local isolation; parallel dispatch only when authorized; finishing branch before publish/merge/cleanup decisions; backend, frontend, AI data, sustainability, context, cross-repo, skill-creator, knowledge-vault, local LLM, and reviewer skills for their named domains.
 
 Use `grill-me` for adversarial clarification, `ubiquitous-language` for domain terminology alignment, and `improve-codebase-architecture` for architecture refactor candidate discovery. These are Matt Pocock engineering skills adapted through ECC wrappers and governed by the same SeaBridgeAI approval gates.
 

@@ -1,4 +1,4 @@
----
+﻿---
 name: sea-context-hygiene
 description: SeaBridgeAI context hygiene for long sessions, large logs, Playwright artifacts, multi-agent handoffs, markdown state, compaction, and source-preserving summaries.
 ---
@@ -45,8 +45,16 @@ All agents should use markdown handoffs. Claude hooks or slash commands are opti
 
 ## Local LLM Notes
 
-When summarising sessions that involved local LLM inference or training, preserve: model name, Studio port, LOCAL_LLM_ENABLED state, and whether outputs were verified or provisional. Do not compress away VRAM or performance findings — they inform future model selection.
+When summarising sessions that involved local LLM inference or training, preserve: model name, Studio port, LOCAL_LLM_ENABLED state, and whether outputs were verified or provisional. Do not compress away VRAM or performance findings â€” they inform future model selection.
 
 ## Superpowers Adaptation
 
 Partially adapts Superpowers writing-plans and finishing-development-branch summaries for SeaBridgeAI handoffs.
+
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_START -->
+## /goal Inheritance
+
+This skill inherits the SeaBridgeAI `/goal` default protocol. Before implementation or review, establish the persistent goal, Definition of Done, validation plan, affected systems, dependencies, risks, and expected artifacts. Continue through validation and fixes until the DoD is satisfied or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_END -->

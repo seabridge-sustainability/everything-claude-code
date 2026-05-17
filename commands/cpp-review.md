@@ -1,4 +1,4 @@
----
+﻿---
 description: Comprehensive C++ code review for memory safety, modern C++ idioms, concurrency, and security. Invokes the cpp-reviewer agent.
 ---
 
@@ -87,8 +87,8 @@ Agent:
 - src/service/auth.cpp (modified)
 
 ## Static Analysis Results
-Ã¢Å“â€œ clang-tidy: 2 warnings
-Ã¢Å“â€œ cppcheck: No issues
+ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ clang-tidy: 2 warnings
+ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ cppcheck: No issues
 
 ## Issues Found
 
@@ -143,3 +143,11 @@ Recommendation: FAIL: Block merge until CRITICAL issue is fixed
 
 - Agent: `agents/cpp-reviewer.md`
 - Skills: `skills/cpp-coding-standards/`, `skills/cpp-testing/`
+
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_START -->
+## /goal Default Contract
+
+This command inherits the SeaBridgeAI `/goal` protocol. Establish the persistent goal, Definition of Done, validation plan, affected systems, risks, dependencies, artifacts, and blockers before execution. Continue until validation satisfies the DoD or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_END -->

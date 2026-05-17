@@ -1,4 +1,4 @@
-# Build and Fix
+﻿# Build and Fix
 
 ## Safety And Authorization Rule
 
@@ -40,11 +40,11 @@ Identify the project's build tool and run the build:
 
 For each error:
 
-1. **Read the file** Ã¢â‚¬â€ Use Read tool to see error context (10 lines around the error)
-2. **Diagnose** Ã¢â‚¬â€ Identify root cause (missing import, wrong type, syntax error)
-3. **Fix minimally** Ã¢â‚¬â€ Use Edit tool for the smallest change that resolves the error
-4. **Re-run build** Ã¢â‚¬â€ Verify the error is gone and no new errors introduced
-5. **Move to next** Ã¢â‚¬â€ Continue with remaining errors
+1. **Read the file** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Use Read tool to see error context (10 lines around the error)
+2. **Diagnose** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Identify root cause (missing import, wrong type, syntax error)
+3. **Fix minimally** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Use Edit tool for the smallest change that resolves the error
+4. **Re-run build** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Verify the error is gone and no new errors introduced
+5. **Move to next** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Continue with remaining errors
 
 ## Step 4: Guardrails
 
@@ -73,3 +73,11 @@ Show results:
 | Build tool misconfiguration | Read config file; compare with working defaults |
 
 Fix one error at a time for safety. Prefer minimal diffs over refactoring.
+
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_START -->
+## /goal Default Contract
+
+This command inherits the SeaBridgeAI `/goal` protocol. Establish the persistent goal, Definition of Done, validation plan, affected systems, risks, dependencies, artifacts, and blockers before execution. Continue until validation satisfies the DoD or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_END -->

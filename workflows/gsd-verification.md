@@ -1,4 +1,4 @@
-# GSD Verification Workflow
+﻿# GSD Verification Workflow
 
 ## Objective
 
@@ -47,3 +47,11 @@ Approval is required before commit, push, PR, merge, cleanup, live/cost calls, o
 ## Stop Conditions
 
 Stop if tests fail, browser checks fail, contract checks fail, source/provenance is missing, secrets are exposed, auth/tenant isolation is unclear, or any approval-gated action is needed.
+
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_START -->
+## /goal Default Contract
+
+This command inherits the SeaBridgeAI `/goal` protocol. Establish the persistent goal, Definition of Done, validation plan, affected systems, risks, dependencies, artifacts, and blockers before execution. Continue until validation satisfies the DoD or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_END -->

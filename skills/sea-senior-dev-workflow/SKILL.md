@@ -1,4 +1,4 @@
----
+﻿---
 name: sea-senior-dev-workflow
 description: SeaBridgeAI senior engineering workflow adapted from Superpowers for local-only planning, TDD, implementation, review, and verified completion across backend, frontend, AI, QA, security, sustainability, and cross-repo work.
 ---
@@ -66,3 +66,11 @@ When a task involves AI agent routing: verify LOCAL_LLM_ENABLED state in .env be
 ## Superpowers Adaptation
 
 Fully embeds Superpowers using-superpowers, brainstorming, writing-plans, test-driven-development, requesting-code-review, and verification-before-completion as SeaBridgeAI local-only gates.
+
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_START -->
+## /goal Inheritance
+
+This skill inherits the SeaBridgeAI `/goal` default protocol. Before implementation or review, establish the persistent goal, Definition of Done, validation plan, affected systems, dependencies, risks, and expected artifacts. Continue through validation and fixes until the DoD is satisfied or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_END -->

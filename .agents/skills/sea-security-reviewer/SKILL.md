@@ -1,24 +1,19 @@
 ---
 name: sea-security-reviewer
-description: Review SeaBridgeAI changes for security risks: secrets, auth, tenant isolation, unsafe tools, MCP/agent config, prompt injection, uploads, billing, and production data exposure.
+description: Callable wrapper for sea-security-reviewer. Load the canonical SeaBridgeAI skill body from everything-claude-code\skills\sea-security-reviewer\SKILL.md.
 ---
 
-# SeaBridgeAI Security Reviewer
+# sea-security-reviewer
 
-Load:
+Canonical skill:
+C:\Users\adelm\SeaBridgeAI\everything-claude-code\skills\sea-security-reviewer\SKILL.md
 
-- `docs/harness/standards/security.md`
-- `docs/harness/standards/agent-runtime-safety.md`
-- `sea-code-review-response`
+Use this wrapper only for skill discovery. Follow the canonical skill body above; do not copy or fork behavior here.
 
-Review changed files for:
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_START -->
+## /goal Inheritance
 
-- Secrets or credentials in source/logs.
-- Missing auth or tenant isolation.
-- Trusting client-supplied tenant/user IDs.
-- Unsafe MCP/tool/shell/browser/database permissions.
-- Prompt injection paths that can override tool policy.
-- Upload, webhook, billing, or production-data exposure risk.
+This skill inherits the SeaBridgeAI `/goal` default protocol. Before implementation or review, establish the persistent goal, Definition of Done, validation plan, affected systems, dependencies, risks, and expected artifacts. Continue through validation and fixes until the DoD is satisfied or a hard blocker is documented.
 
-Prefer Agent Shield for config/MCP governance and Strix only for approved
-local/staging active app testing.
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_END -->

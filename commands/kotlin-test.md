@@ -1,4 +1,4 @@
----
+﻿---
 description: Enforce TDD workflow for Kotlin. Write Kotest tests first, then implement. Verify 80%+ coverage with Kover.
 ---
 
@@ -164,7 +164,7 @@ RegistrationValidatorTest > valid registration returns Valid FAILED
 FAILED (5 tests, 0 passed, 5 failed)
 ```
 
-Ã¢Å“â€œ Tests fail as expected (NotImplementedError).
+ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ Tests fail as expected (NotImplementedError).
 
 ## Step 4: Implement Minimal Code (GREEN)
 
@@ -201,7 +201,7 @@ RegistrationValidatorTest > multiple errors returns all errors PASSED
 PASSED (5 tests, 5 passed, 0 failed)
 ```
 
-Ã¢Å“â€œ All tests passing!
+ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ All tests passing!
 
 ## Step 6: Check Coverage
 
@@ -211,7 +211,7 @@ $ ./gradlew koverHtmlReport
 Coverage: 100.0% of statements
 ```
 
-Ã¢Å“â€œ Coverage: 100%
+ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ Coverage: 100%
 
 ## TDD Complete!
 ````
@@ -323,3 +323,11 @@ open build/reports/kover/html/index.html
 
 - Skill: `skills/kotlin-testing/`
 - Skill: `skills/tdd-workflow/`
+
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_START -->
+## /goal Default Contract
+
+This command inherits the SeaBridgeAI `/goal` protocol. Establish the persistent goal, Definition of Done, validation plan, affected systems, risks, dependencies, artifacts, and blockers before execution. Continue until validation satisfies the DoD or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_END -->

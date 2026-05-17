@@ -1,4 +1,4 @@
----
+﻿---
 name: sea-gsd-controlled-execution
 description: SeaBridgeAI controlled GSD/Get Shit Done skill for complex multi-phase work, context-rot prevention, structured artifacts, phase planning, verification, forensics, and cross-repo coordination without autonomous/yolo execution, auto-commit, auto-push, or global installs.
 ---
@@ -140,3 +140,11 @@ Local GSD reference:
 `C:\Users\adelm\SeaBridgeAI\everything-claude-code\external\get-shit-done`
 
 SeaBridgeAI does not run the upstream installer by default.
+
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_START -->
+## /goal Inheritance
+
+This skill inherits the SeaBridgeAI `/goal` default protocol. Before implementation or review, establish the persistent goal, Definition of Done, validation plan, affected systems, dependencies, risks, and expected artifacts. Continue through validation and fixes until the DoD is satisfied or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_END -->

@@ -1,4 +1,4 @@
----
+﻿---
 name: gsd:ui-phase
 description: Generate UI design contract (UI-SPEC.md) for frontend phases
 argument-hint: "[phase]"
@@ -16,7 +16,7 @@ allowed-tools:
 <objective>
 Create a UI design contract (UI-SPEC.md) for a frontend phase.
 Orchestrates gsd-ui-researcher and gsd-ui-checker.
-Flow: Validate → Research UI → Verify UI-SPEC → Done
+Flow: Validate â†’ Research UI â†’ Verify UI-SPEC â†’ Done
 </objective>
 
 <execution_context>
@@ -25,10 +25,18 @@ Flow: Validate → Research UI → Verify UI-SPEC → Done
 </execution_context>
 
 <context>
-Phase number: $ARGUMENTS — optional, auto-detects next unplanned phase if omitted.
+Phase number: $ARGUMENTS â€” optional, auto-detects next unplanned phase if omitted.
 </context>
 
 <process>
 Execute @~/.claude/get-shit-done/workflows/ui-phase.md end-to-end.
 Preserve all workflow gates.
 </process>
+
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_START -->
+## /goal Default Contract
+
+This command inherits the SeaBridgeAI `/goal` protocol. Establish the persistent goal, Definition of Done, validation plan, affected systems, risks, dependencies, artifacts, and blockers before execution. Continue until validation satisfies the DoD or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_END -->

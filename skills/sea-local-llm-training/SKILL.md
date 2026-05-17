@@ -1,6 +1,6 @@
----
+﻿---
 name: sea-local-llm-training
-description: SeaBridgeAI local LLM fine-tuning and inference skill for Unsloth Studio on RTX 4090 Laptop — covers dataset prep, LoRA training, smoke tests, and routing AI agents to the local endpoint.
+description: SeaBridgeAI local LLM fine-tuning and inference skill for Unsloth Studio on RTX 4090 Laptop â€” covers dataset prep, LoRA training, smoke tests, and routing AI agents to the local endpoint.
 ---
 
 # sea-local-llm-training
@@ -27,7 +27,7 @@ Confirm Studio is running and /v1/models returns the target model. Run smoke-tes
 
 ## Failure Conditions
 
-Fail if Studio is not running before inference; if LOCAL_LLM_API_KEY is in a committed file; if VRAM budget is exceeded (16 GB limit on RTX 4090 Laptop — 14B+ models will OOM during fine-tuning); if training loss is not decreasing; if inference response is empty or contains hallucinated citations.
+Fail if Studio is not running before inference; if LOCAL_LLM_API_KEY is in a committed file; if VRAM budget is exceeded (16 GB limit on RTX 4090 Laptop â€” 14B+ models will OOM during fine-tuning); if training loss is not decreasing; if inference response is empty or contains hallucinated citations.
 
 ## SeaBridgeAI Sustainability And Data-Integrity Requirements
 
@@ -63,7 +63,7 @@ Do not claim completion if any smoke test probe returns `FAIL` or `ERROR`.
 
 Verify outputs meet source grounding requirements per `ECC/local-llm/evals/sustainability/source_grounding_checks.md`:
 - Every output field includes `Source: [document] ([publisher, year]). Confidence: [level].`
-- Target grounding rate ≥ 90% across evaluation set.
+- Target grounding rate â‰¥ 90% across evaluation set.
 - Zero fabricated citations.
 
 ## Runtime Reference
@@ -93,3 +93,11 @@ All coding agents should check LOCAL_LLM_ENABLED before routing to local endpoin
 ## Superpowers Adaptation
 
 Adapts Superpowers verification-before-completion and sea-ai-data-integrity for local LLM outputs. Adds VRAM budget and API-key hygiene gates specific to Unsloth Studio on Windows.
+
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_START -->
+## /goal Inheritance
+
+This skill inherits the SeaBridgeAI `/goal` default protocol. Before implementation or review, establish the persistent goal, Definition of Done, validation plan, affected systems, dependencies, risks, and expected artifacts. Continue through validation and fixes until the DoD is satisfied or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_END -->

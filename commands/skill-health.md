@@ -1,4 +1,4 @@
----
+﻿---
 name: skill-health
 description: Show skill portfolio health dashboard with charts and analytics
 command: true
@@ -61,7 +61,15 @@ node "$ECC_ROOT/scripts/skills-health.js" --dashboard --json
 
 ## Panels
 
-- **Success Rate (30d)** Ã¢â‚¬â€ Sparkline charts showing daily success rates per skill
-- **Failure Patterns** Ã¢â‚¬â€ Clustered failure reasons with horizontal bar chart
-- **Pending Amendments** Ã¢â‚¬â€ Amendment proposals awaiting review
-- **Version History** Ã¢â‚¬â€ Timeline of version snapshots per skill
+- **Success Rate (30d)** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Sparkline charts showing daily success rates per skill
+- **Failure Patterns** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Clustered failure reasons with horizontal bar chart
+- **Pending Amendments** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Amendment proposals awaiting review
+- **Version History** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Timeline of version snapshots per skill
+
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_START -->
+## /goal Default Contract
+
+This command inherits the SeaBridgeAI `/goal` protocol. Establish the persistent goal, Definition of Done, validation plan, affected systems, risks, dependencies, artifacts, and blockers before execution. Continue until validation satisfies the DoD or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_END -->

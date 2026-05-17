@@ -1,4 +1,4 @@
----
+﻿---
 name: sea-cross-repo-handoff
 description: SeaBridgeAI cross-repo handoff for backend, frontend, OpenSeaBri, ECC, upstream mirrors, shared contracts, repo pointers, and continuation by another coding agent.
 ---
@@ -46,3 +46,11 @@ All agents should write portable markdown that Claude Code, Codex, Gemini, OpenC
 ## Superpowers Adaptation
 
 Partially adapts Superpowers finishing-a-development-branch and requesting-code-review into local-only cross-repo handoffs.
+
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_START -->
+## /goal Inheritance
+
+This skill inherits the SeaBridgeAI `/goal` default protocol. Before implementation or review, establish the persistent goal, Definition of Done, validation plan, affected systems, dependencies, risks, and expected artifacts. Continue through validation and fixes until the DoD is satisfied or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_END -->

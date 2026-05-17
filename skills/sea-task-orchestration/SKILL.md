@@ -1,4 +1,4 @@
----
+﻿---
 name: sea-task-orchestration
 description: SeaBridgeAI task orchestration adapted from Superpowers for scoped decomposition, plan execution, parallel-agent routing, and cross-lane handoff without uncontrolled autonomy.
 ---
@@ -46,3 +46,11 @@ Claude Code can use subagents. Codex can use spawn_agent only when the user expl
 ## Superpowers Adaptation
 
 Partially adapts Superpowers executing-plans, subagent-driven-development, and dispatching-parallel-agents with SeaBridgeAI approval boundaries.
+
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_START -->
+## /goal Inheritance
+
+This skill inherits the SeaBridgeAI `/goal` default protocol. Before implementation or review, establish the persistent goal, Definition of Done, validation plan, affected systems, dependencies, risks, and expected artifacts. Continue through validation and fixes until the DoD is satisfied or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_END -->

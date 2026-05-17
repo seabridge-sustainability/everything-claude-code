@@ -1,4 +1,4 @@
----
+﻿---
 description: Comprehensive Rust code review for ownership, lifetimes, error handling, unsafe usage, and idiomatic patterns. Invokes the rust-reviewer agent.
 ---
 
@@ -21,7 +21,7 @@ This command invokes the **rust-reviewer** agent for comprehensive Rust-specific
 
 ## What This Command Does
 
-1. **Verify Automated Checks**: Run `cargo check`, `cargo clippy -- -D warnings`, `cargo fmt --check`, and `cargo test` Ã¢â‚¬â€ stop if any fail
+1. **Verify Automated Checks**: Run `cargo check`, `cargo clippy -- -D warnings`, `cargo fmt --check`, and `cargo test` ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â stop if any fail
 2. **Identify Rust Changes**: Find modified `.rs` files via `git diff HEAD~1` (or `git diff main...HEAD` for PRs)
 3. **Run Security Audit**: Execute `cargo audit` if available
 4. **Security Scan**: Check for unsafe usage, command injection, hardcoded secrets
@@ -153,3 +153,11 @@ Recommendation: Block merge until CRITICAL issue is fixed
 
 - Agent: `agents/rust-reviewer.md`
 - Skills: `skills/rust-patterns/`, `skills/rust-testing/`
+
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_START -->
+## /goal Default Contract
+
+This command inherits the SeaBridgeAI `/goal` protocol. Establish the persistent goal, Definition of Done, validation plan, affected systems, risks, dependencies, artifacts, and blockers before execution. Continue until validation satisfies the DoD or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_END -->

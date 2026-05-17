@@ -1,4 +1,4 @@
----
+﻿---
 name: sea-systematic-debugging
 description: SeaBridgeAI systematic debugging adapted from Superpowers for root-cause analysis across FastAPI, Next.js, AI agents, databases, integrations, browser QA, and cross-repo contracts.
 ---
@@ -40,3 +40,11 @@ All agents should use local logs/tests/browser checks. Parallel agents may inves
 ## Superpowers Adaptation
 
 Fully embeds Superpowers systematic-debugging with SeaBridgeAI backend/frontend/AI data boundaries.
+
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_START -->
+## /goal Inheritance
+
+This skill inherits the SeaBridgeAI `/goal` default protocol. Before implementation or review, establish the persistent goal, Definition of Done, validation plan, affected systems, dependencies, risks, and expected artifacts. Continue through validation and fixes until the DoD is satisfied or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_END -->

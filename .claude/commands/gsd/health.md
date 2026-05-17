@@ -1,4 +1,4 @@
----
+﻿---
 name: gsd:health
 description: Diagnose planning directory health and optionally repair issues
 argument-hint: "[--repair] [--context]"
@@ -15,9 +15,9 @@ Validate `.planning/` directory integrity and report actionable issues. Checks f
 
 | Utilization | State    | Action                                                |
 |-------------|----------|-------------------------------------------------------|
-| < 60%       | healthy  | no action — context is comfortable                    |
-| 60% – 70%   | warning  | recommend `/gsd-thread` to start fresh                |
-| ≥ 70%       | critical | reasoning quality may degrade past the fracture point |
+| < 60%       | healthy  | no action â€” context is comfortable                    |
+| 60% â€“ 70%   | warning  | recommend `/gsd-thread` to start fresh                |
+| â‰¥ 70%       | critical | reasoning quality may degrade past the fracture point |
 </objective>
 
 <execution_context>
@@ -28,3 +28,11 @@ Validate `.planning/` directory integrity and report actionable issues. Checks f
 Execute the health workflow from @~/.claude/get-shit-done/workflows/health.md end-to-end.
 Parse `--repair` and `--context` flags from arguments and pass to workflow.
 </process>
+
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_START -->
+## /goal Default Contract
+
+This command inherits the SeaBridgeAI `/goal` protocol. Establish the persistent goal, Definition of Done, validation plan, affected systems, risks, dependencies, artifacts, and blockers before execution. Continue until validation satisfies the DoD or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_END -->

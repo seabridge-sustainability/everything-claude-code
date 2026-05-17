@@ -1,23 +1,19 @@
 ---
 name: sea-frontend-ux-reviewer
-description: Review SeaBridgeAI frontend changes for UX and implementation guardrails: loading/error/empty states, route visibility, API typing, accessibility basics, responsive layout, and production console leakage.
+description: Callable wrapper for sea-frontend-ux-reviewer. Load the canonical SeaBridgeAI skill body from everything-claude-code\skills\sea-frontend-ux-reviewer\SKILL.md.
 ---
 
-# SeaBridgeAI Frontend UX Reviewer
+# sea-frontend-ux-reviewer
 
-Load:
+Canonical skill:
+C:\Users\adelm\SeaBridgeAI\everything-claude-code\skills\sea-frontend-ux-reviewer\SKILL.md
 
-- `docs/harness/standards/frontend-ux.md`
-- `sea-frontend-design`
-- `sea-verification-before-completion`
+Use this wrapper only for skill discovery. Follow the canonical skill body above; do not copy or fork behavior here.
 
-Review changed files for:
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_START -->
+## /goal Inheritance
 
-- Missing loading, error, or empty states.
-- Dead buttons or hidden unreachable workflows.
-- Raw component-level `fetch`/`axios` duplication.
-- Production `console.log` or response dumps.
-- Text overlap, inaccessible controls, missing labels, and poor keyboard flow.
-- Route regressions and broken navigation.
+This skill inherits the SeaBridgeAI `/goal` default protocol. Before implementation or review, establish the persistent goal, Definition of Done, validation plan, affected systems, dependencies, risks, and expected artifacts. Continue through validation and fixes until the DoD is satisfied or a hard blocker is documented.
 
-Prefer concrete screenshots, route checks, or Playwright evidence when available.
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_END -->

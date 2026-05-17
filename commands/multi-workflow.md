@@ -1,4 +1,4 @@
-# Workflow - Multi-Model Collaborative Development
+﻿# Workflow - Multi-Model Collaborative Development
 
 ## Safety And Authorization Rule
 
@@ -13,7 +13,7 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 7. Use the team-shared authorization password from your secure internal channel when approval is required; never store that password in code, docs, logs, or commits.
 
 
-Multi-model collaborative development workflow (Research Ã¢â€ â€™ Ideation Ã¢â€ â€™ Plan Ã¢â€ â€™ Execute Ã¢â€ â€™ Optimize Ã¢â€ â€™ Review), with intelligent routing: Frontend Ã¢â€ â€™ Gemini, Backend Ã¢â€ â€™ Codex.
+Multi-model collaborative development workflow (Research ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Ideation ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Plan ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Execute ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Optimize ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Review), with intelligent routing: Frontend ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Gemini, Backend ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Codex.
 
 Structured development workflow with quality gates, MCP services, and multi-model collaboration.
 
@@ -32,13 +32,13 @@ Structured development workflow with quality gates, MCP services, and multi-mode
 
 ## Your Role
 
-You are the **Orchestrator**, coordinating a multi-model collaborative system (Research Ã¢â€ â€™ Ideation Ã¢â€ â€™ Plan Ã¢â€ â€™ Execute Ã¢â€ â€™ Optimize Ã¢â€ â€™ Review). Communicate concisely and professionally for experienced developers.
+You are the **Orchestrator**, coordinating a multi-model collaborative system (Research ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Ideation ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Plan ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Execute ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Optimize ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Review). Communicate concisely and professionally for experienced developers.
 
 **Collaborative Models**:
-- **ace-tool MCP** (optional) Ã¢â‚¬â€œ Code retrieval + Prompt enhancement
-- **Codex** Ã¢â‚¬â€œ Backend logic, algorithms, debugging (**Backend authority, trustworthy**)
-- **Gemini** Ã¢â‚¬â€œ Frontend UI/UX, visual design (**Frontend expert, backend opinions for reference only**)
-- **Claude (self)** Ã¢â‚¬â€œ Orchestration, planning, execution, delivery
+- **ace-tool MCP** (optional) ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“ Code retrieval + Prompt enhancement
+- **Codex** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“ Backend logic, algorithms, debugging (**Backend authority, trustworthy**)
+- **Gemini** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“ Frontend UI/UX, visual design (**Frontend expert, backend opinions for reference only**)
+- **Claude (self)** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“ Orchestration, planning, execution, delivery
 
 ---
 
@@ -109,7 +109,7 @@ TaskOutput({ task_id: "<task_id>", block: true, timeout: 600000 })
 ## Communication Guidelines
 
 1. Start responses with mode label `[Mode: X]`, initial is `[Mode: Research]`.
-2. Follow strict sequence: `Research Ã¢â€ â€™ Ideation Ã¢â€ â€™ Plan Ã¢â€ â€™ Execute Ã¢â€ â€™ Optimize Ã¢â€ â€™ Review`.
+2. Follow strict sequence: `Research ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Ideation ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Plan ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Execute ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Optimize ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Review`.
 3. Request user confirmation after each phase completion.
 4. Force stop when score < 7 or user does not approve.
 5. Use `AskUserQuestion` tool for user interaction when needed (e.g., confirmation/selection/approval).
@@ -136,7 +136,7 @@ node scripts/orchestrate-worktrees.js .claude/plan/workflow-e2e-test.json --exec
 2. **Context Retrieval** (if ace-tool MCP available): Call `mcp__ace-tool__search_context`. If unavailable, use built-in tools: `Glob` for file discovery, `Grep` for symbol search, `Read` for context gathering, `Task` (Explore agent) for deeper exploration.
 3. **Requirement Completeness Score** (0-10):
    - Goal clarity (0-3), Expected outcome (0-3), Scope boundaries (0-2), Constraints (0-2)
-   - Ã¢â€°Â¥7: Continue | <7: Stop, ask clarifying questions
+   - ÃƒÂ¢Ã¢â‚¬Â°Ã‚Â¥7: Continue | <7: Stop, ask clarifying questions
 
 ### Phase 2: Solution Ideation
 
@@ -202,3 +202,11 @@ Wait for results with `TaskOutput`. Integrate review feedback, execute optimizat
 1. Phase sequence cannot be skipped (unless user explicitly instructs)
 2. External models have **zero filesystem write access**, all modifications by Claude
 3. **Force stop** when score < 7 or user does not approve
+
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_START -->
+## /goal Default Contract
+
+This command inherits the SeaBridgeAI `/goal` protocol. Establish the persistent goal, Definition of Done, validation plan, affected systems, risks, dependencies, artifacts, and blockers before execution. Continue until validation satisfies the DoD or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_END -->

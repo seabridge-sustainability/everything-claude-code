@@ -1,8 +1,8 @@
----
-description: Orchestrate parallel Claude Code agents via Claude DevFleet Ã¢â‚¬â€ plan projects from natural language, dispatch agents in isolated worktrees, monitor progress, and read structured reports.
+﻿---
+description: Orchestrate parallel Claude Code agents via Claude DevFleet ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â plan projects from natural language, dispatch agents in isolated worktrees, monitor progress, and read structured reports.
 ---
 
-# DevFleet Ã¢â‚¬â€ Multi-Agent Orchestration
+# DevFleet ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Multi-Agent Orchestration
 
 ## Safety And Authorization Rule
 
@@ -25,13 +25,13 @@ Requires the DevFleet MCP server: `claude mcp add devfleet --transport http http
 
 ```
 User describes project
-  Ã¢â€ â€™ plan_project(prompt) Ã¢â€ â€™ mission DAG with dependencies
-  Ã¢â€ â€™ Show plan, get approval
-  Ã¢â€ â€™ dispatch_mission(M1) Ã¢â€ â€™ Agent spawns in worktree
-  Ã¢â€ â€™ M1 completes Ã¢â€ â€™ auto-merge Ã¢â€ â€™ M2 auto-dispatches (depends_on M1)
-  Ã¢â€ â€™ M2 completes Ã¢â€ â€™ auto-merge
-  Ã¢â€ â€™ get_report(M2) Ã¢â€ â€™ files_changed, what_done, errors, next_steps
-  Ã¢â€ â€™ Report summary to user
+  ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ plan_project(prompt) ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ mission DAG with dependencies
+  ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Show plan, get approval
+  ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ dispatch_mission(M1) ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Agent spawns in worktree
+  ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ M1 completes ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ auto-merge ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ M2 auto-dispatches (depends_on M1)
+  ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ M2 completes ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ auto-merge
+  ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ get_report(M2) ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ files_changed, what_done, errors, next_steps
+  ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Report summary to user
 ```
 
 ## Workflow
@@ -57,7 +57,7 @@ mcp__devfleet__dispatch_mission(mission_id="<first_mission_id>")
 
 The remaining missions auto-dispatch as their dependencies complete (because `plan_project` creates them with `auto_dispatch=true`). When manually creating missions with `create_mission`, you must explicitly set `auto_dispatch=true` for this behavior.
 
-4. **Monitor progress** Ã¢â‚¬â€ check what's running:
+4. **Monitor progress** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â check what's running:
 
 ```
 mcp__devfleet__get_dashboard()
@@ -101,5 +101,13 @@ Call this for every mission that reached a terminal state. Reports contain: file
 - Include mission titles and IDs when reporting status
 - If a mission fails, read its report to understand errors before retrying
 - Agent concurrency is configurable (default: 3). Excess missions queue and auto-dispatch as slots free up. Check `get_dashboard()` for slot availability.
-- Dependencies form a DAG Ã¢â‚¬â€ never create circular dependencies
+- Dependencies form a DAG ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â never create circular dependencies
 - Each agent auto-merges its worktree on completion. If a merge conflict occurs, the changes remain on the worktree branch for manual resolution.
+
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_START -->
+## /goal Default Contract
+
+This command inherits the SeaBridgeAI `/goal` protocol. Establish the persistent goal, Definition of Done, validation plan, affected systems, risks, dependencies, artifacts, and blockers before execution. Continue until validation satisfies the DoD or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_END -->

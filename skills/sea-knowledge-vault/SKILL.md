@@ -1,4 +1,4 @@
----
+﻿---
 name: sea-knowledge-vault
 description: SeaBridgeAI knowledge-vault skill for Markdown notes, wikilinks, frontmatter, canvas/base files, validation, and source-preserving research or incident notes.
 ---
@@ -40,3 +40,11 @@ All agents call the same central validator path and keep generated artifacts out
 ## Superpowers Adaptation
 
 Reference only relative to Superpowers; uses its verification-before-completion discipline but not its skill body.
+
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_START -->
+## /goal Inheritance
+
+This skill inherits the SeaBridgeAI `/goal` default protocol. Before implementation or review, establish the persistent goal, Definition of Done, validation plan, affected systems, dependencies, risks, and expected artifacts. Continue through validation and fixes until the DoD is satisfied or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_END -->

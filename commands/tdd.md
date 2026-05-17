@@ -1,4 +1,4 @@
----
+﻿---
 description: Enforce test-driven development workflow. Scaffold interfaces, generate tests FIRST, then implement minimal code to pass. Ensure 80%+ coverage.
 ---
 
@@ -51,7 +51,7 @@ The tdd-guide agent will:
 ## TDD Cycle
 
 ```
-RED Ã¢â€ â€™ GREEN Ã¢â€ â€™ REFACTOR Ã¢â€ â€™ REPEAT
+RED ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ GREEN ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ REFACTOR ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ REPEAT
 
 RED:      Write a failing test
 GREEN:    Write minimal code to pass
@@ -140,7 +140,7 @@ describe('calculateLiquidityScore', () => {
 npm test lib/liquidity.test.ts
 
 FAIL lib/liquidity.test.ts
-  Ã¢Å“â€¢ should return high score for liquid market (2 ms)
+  ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¢ should return high score for liquid market (2 ms)
     Error: Not implemented
 
 1 test failed, 0 passed
@@ -185,9 +185,9 @@ export function calculateLiquidityScore(market: MarketData): number {
 npm test lib/liquidity.test.ts
 
 PASS lib/liquidity.test.ts
-  Ã¢Å“â€œ should return high score for liquid market (3 ms)
-  Ã¢Å“â€œ should return low score for illiquid market (2 ms)
-  Ã¢Å“â€œ should handle edge case: zero volume (1 ms)
+  ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ should return high score for liquid market (3 ms)
+  ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ should return low score for illiquid market (2 ms)
+  ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ should handle edge case: zero volume (1 ms)
 
 3 tests passed
 ```
@@ -242,9 +242,9 @@ export function calculateLiquidityScore(market: MarketData): number {
 npm test lib/liquidity.test.ts
 
 PASS lib/liquidity.test.ts
-  Ã¢Å“â€œ should return high score for liquid market (3 ms)
-  Ã¢Å“â€œ should return low score for illiquid market (2 ms)
-  Ã¢Å“â€œ should handle edge case: zero volume (1 ms)
+  ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ should return high score for liquid market (3 ms)
+  ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ should return low score for illiquid market (2 ms)
+  ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ should handle edge case: zero volume (1 ms)
 
 3 tests passed
 ```
@@ -339,3 +339,11 @@ The related `tdd-workflow` skill is also bundled with ECC.
 For manual installs, the source files live at:
 - `agents/tdd-guide.md`
 - `skills/tdd-workflow/SKILL.md`
+
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_START -->
+## /goal Default Contract
+
+This command inherits the SeaBridgeAI `/goal` protocol. Establish the persistent goal, Definition of Done, validation plan, affected systems, risks, dependencies, artifacts, and blockers before execution. Continue until validation satisfies the DoD or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_END -->

@@ -1,4 +1,4 @@
-# Update Codemaps
+﻿# Update Codemaps
 
 ## Safety And Authorization Rule
 
@@ -28,21 +28,21 @@ Create or update codemaps in `docs/CODEMAPS/` (or `.reports/codemaps/`):
 | File | Contents |
 |------|----------|
 | `architecture.md` | High-level system diagram, service boundaries, data flow |
-| `backend.md` | API routes, middleware chain, service Ã¢â€ â€™ repository mapping |
+| `backend.md` | API routes, middleware chain, service ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ repository mapping |
 | `frontend.md` | Page tree, component hierarchy, state management flow |
 | `data.md` | Database tables, relationships, migration history |
 | `dependencies.md` | External services, third-party integrations, shared libraries |
 
 ### Codemap Format
 
-Each codemap should be token-lean Ã¢â‚¬â€ optimized for AI context consumption:
+Each codemap should be token-lean ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â optimized for AI context consumption:
 
 ```markdown
 # Backend Architecture
 
 ## Routes
-POST /api/users Ã¢â€ â€™ UserController.create Ã¢â€ â€™ UserService.create Ã¢â€ â€™ UserRepo.insert
-GET  /api/users/:id Ã¢â€ â€™ UserController.get Ã¢â€ â€™ UserService.findById Ã¢â€ â€™ UserRepo.findById
+POST /api/users ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ UserController.create ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ UserService.create ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ UserRepo.insert
+GET  /api/users/:id ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ UserController.get ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ UserService.findById ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ UserRepo.findById
 
 ## Key Files
 src/services/user.ts (business logic, 120 lines)
@@ -83,3 +83,11 @@ Write a summary to `.reports/codemap-diff.txt`:
 - Keep each codemap under **1000 tokens** for efficient context loading
 - Use ASCII diagrams for data flow instead of verbose descriptions
 - Run after major feature additions or refactoring sessions
+
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_START -->
+## /goal Default Contract
+
+This command inherits the SeaBridgeAI `/goal` protocol. Establish the persistent goal, Definition of Done, validation plan, affected systems, risks, dependencies, artifacts, and blockers before execution. Continue until validation satisfies the DoD or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_END -->

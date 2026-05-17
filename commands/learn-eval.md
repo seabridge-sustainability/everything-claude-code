@@ -1,4 +1,4 @@
----
+﻿---
 description: "Extract reusable patterns from the session, self-evaluate quality before saving, and determine the right save location (Global vs Project)."
 ---
 
@@ -23,10 +23,10 @@ Extends `/learn` with a quality gate, save-location decision, and knowledge-plac
 
 Look for:
 
-1. **Error Resolution Patterns** Ã¢â‚¬â€ root cause + fix + reusability
-2. **Debugging Techniques** Ã¢â‚¬â€ non-obvious steps, tool combinations
-3. **Workarounds** Ã¢â‚¬â€ library quirks, API limitations, version-specific fixes
-4. **Project-Specific Patterns** Ã¢â‚¬â€ conventions, architecture decisions, integration patterns
+1. **Error Resolution Patterns** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â root cause + fix + reusability
+2. **Debugging Techniques** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â non-obvious steps, tool combinations
+3. **Workarounds** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â library quirks, API limitations, version-specific fixes
+4. **Project-Specific Patterns** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â conventions, architecture decisions, integration patterns
 
 ## Process
 
@@ -37,7 +37,7 @@ Look for:
    - Ask: "Would this pattern be useful in a different project?"
    - **Global** (`~/.claude/skills/learned/`): Generic patterns usable across 2+ projects (bash compatibility, LLM API behavior, debugging techniques, etc.)
    - **Project** (`.claude/skills/learned/` in current project): Project-specific knowledge (quirks of a particular config file, project-specific architecture decisions, etc.)
-   - When in doubt, choose Global (moving Global Ã¢â€ â€™ Project is easier than the reverse)
+   - When in doubt, choose Global (moving Global ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Project is easier than the reverse)
 
 4. Draft the skill file using this format:
 
@@ -64,7 +64,7 @@ origin: auto-extracted
 [Trigger conditions]
 ```
 
-5. **Quality gate Ã¢â‚¬â€ Checklist + Holistic verdict**
+5. **Quality gate ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Checklist + Holistic verdict**
 
    ### 5a. Required checklist (verify by actually reading files)
 
@@ -82,8 +82,8 @@ origin: auto-extracted
    | Verdict | Meaning | Next Action |
    |---------|---------|-------------|
    | **Save** | Unique, specific, well-scoped | Proceed to Step 6 |
-   | **Improve then Save** | Valuable but needs refinement | List improvements Ã¢â€ â€™ revise Ã¢â€ â€™ re-evaluate (once) |
-   | **Absorb into [X]** | Should be appended to an existing skill | Show target skill and additions Ã¢â€ â€™ Step 6 |
+   | **Improve then Save** | Valuable but needs refinement | List improvements ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ revise ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ re-evaluate (once) |
+   | **Absorb into [X]** | Should be appended to an existing skill | Show target skill and additions ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Step 6 |
    | **Drop** | Trivial, redundant, or too abstract | Explain reasoning and stop |
 
 **Guideline dimensions** (informing the verdict, not scored):
@@ -96,8 +96,8 @@ origin: auto-extracted
 6. **Verdict-specific confirmation flow**
 
 - **Improve then Save**: Present the required improvements + revised draft + updated checklist/verdict after one re-evaluation; if the revised verdict is **Save**, save after user confirmation, otherwise follow the new verdict
-- **Save**: Present save path + checklist results + 1-line verdict rationale + full draft Ã¢â€ â€™ save after user confirmation
-- **Absorb into [X]**: Present target path + additions (diff format) + checklist results + verdict rationale Ã¢â€ â€™ append after user confirmation
+- **Save**: Present save path + checklist results + 1-line verdict rationale + full draft ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ save after user confirmation
+- **Absorb into [X]**: Present target path + additions (diff format) + checklist results + verdict rationale ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ append after user confirmation
 - **Drop**: Show checklist results + reasoning only (no confirmation needed)
 
 7. Save / Absorb to the determined location
@@ -106,10 +106,10 @@ origin: auto-extracted
 
 ```
 ### Checklist
-- [x] skills/ grep: no overlap (or: overlap found Ã¢â€ â€™ details)
-- [x] MEMORY.md: no overlap (or: overlap found Ã¢â€ â€™ details)
+- [x] skills/ grep: no overlap (or: overlap found ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ details)
+- [x] MEMORY.md: no overlap (or: overlap found ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ details)
 - [x] Existing skill append: new file appropriate (or: should append to [X])
-- [x] Reusability: confirmed (or: one-off Ã¢â€ â€™ Drop)
+- [x] Reusability: confirmed (or: one-off ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Drop)
 
 ### Verdict: Save / Improve then Save / Absorb into [X] / Drop
 
@@ -118,12 +118,20 @@ origin: auto-extracted
 
 ## Design Rationale
 
-This version replaces the previous 5-dimension numeric scoring rubric (Specificity, Actionability, Scope Fit, Non-redundancy, Coverage scored 1-5) with a checklist-based holistic verdict system. Modern frontier models (Opus 4.6+) have strong contextual judgment Ã¢â‚¬â€ forcing rich qualitative signals into numeric scores loses nuance and can produce misleading totals. The holistic approach lets the model weigh all factors naturally, producing more accurate save/drop decisions while the explicit checklist ensures no critical check is skipped.
+This version replaces the previous 5-dimension numeric scoring rubric (Specificity, Actionability, Scope Fit, Non-redundancy, Coverage scored 1-5) with a checklist-based holistic verdict system. Modern frontier models (Opus 4.6+) have strong contextual judgment ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â forcing rich qualitative signals into numeric scores loses nuance and can produce misleading totals. The holistic approach lets the model weigh all factors naturally, producing more accurate save/drop decisions while the explicit checklist ensures no critical check is skipped.
 
 ## Notes
 
 - Don't extract trivial fixes (typos, simple syntax errors)
 - Don't extract one-time issues (specific API outages, etc.)
 - Focus on patterns that will save time in future sessions
-- Keep skills focused Ã¢â‚¬â€ one pattern per skill
+- Keep skills focused ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â one pattern per skill
 - When the verdict is Absorb, append to the existing skill rather than creating a new file
+
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_START -->
+## /goal Default Contract
+
+This command inherits the SeaBridgeAI `/goal` protocol. Establish the persistent goal, Definition of Done, validation plan, affected systems, risks, dependencies, artifacts, and blockers before execution. Continue until validation satisfies the DoD or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_END -->

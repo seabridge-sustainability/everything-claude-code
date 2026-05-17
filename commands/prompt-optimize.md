@@ -1,5 +1,5 @@
----
-description: Analyze a draft prompt and output an optimized, ECC-enriched version ready to paste and run. Does NOT execute the task Ã¢â‚¬â€ outputs advisory analysis only.
+﻿---
+description: Analyze a draft prompt and output an optimized, ECC-enriched version ready to paste and run. Does NOT execute the task ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â outputs advisory analysis only.
 ---
 
 # /prompt-optimize
@@ -23,12 +23,12 @@ Analyze and optimize the following prompt for maximum ECC leverage.
 
 Apply the **prompt-optimizer** skill to the user's input below. Follow the 6-phase analysis pipeline:
 
-0. **Project Detection** Ã¢â‚¬â€ Read CLAUDE.md, detect tech stack from project files (package.json, go.mod, pyproject.toml, etc.)
-1. **Intent Detection** Ã¢â‚¬â€ Classify the task type (new feature, bug fix, refactor, research, testing, review, documentation, infrastructure, design)
-2. **Scope Assessment** Ã¢â‚¬â€ Evaluate complexity (TRIVIAL / LOW / MEDIUM / HIGH / EPIC), using codebase size as signal if detected
-3. **ECC Component Matching** Ã¢â‚¬â€ Map to specific skills, commands, agents, and model tier
-4. **Missing Context Detection** Ã¢â‚¬â€ Identify gaps. If 3+ critical items missing, ask the user to clarify before generating
-5. **Workflow & Model** Ã¢â‚¬â€ Determine lifecycle position, recommend model tier, and split into multiple prompts if HIGH/EPIC
+0. **Project Detection** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Read CLAUDE.md, detect tech stack from project files (package.json, go.mod, pyproject.toml, etc.)
+1. **Intent Detection** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Classify the task type (new feature, bug fix, refactor, research, testing, review, documentation, infrastructure, design)
+2. **Scope Assessment** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Evaluate complexity (TRIVIAL / LOW / MEDIUM / HIGH / EPIC), using codebase size as signal if detected
+3. **ECC Component Matching** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Map to specific skills, commands, agents, and model tier
+4. **Missing Context Detection** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Identify gaps. If 3+ critical items missing, ask the user to clarify before generating
+5. **Workflow & Model** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Determine lifecycle position, recommend model tier, and split into multiple prompts if HIGH/EPIC
 
 ## Output Requirements
 
@@ -49,3 +49,11 @@ instead of presenting it as a `/...` command.
 ## User Input
 
 $ARGUMENTS
+
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_START -->
+## /goal Default Contract
+
+This command inherits the SeaBridgeAI `/goal` protocol. Establish the persistent goal, Definition of Done, validation plan, affected systems, risks, dependencies, artifacts, and blockers before execution. Continue until validation satisfies the DoD or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_END -->

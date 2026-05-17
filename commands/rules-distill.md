@@ -1,8 +1,8 @@
----
+﻿---
 description: "Scan skills to extract cross-cutting principles and distill them into rules"
 ---
 
-# /rules-distill Ã¢â‚¬â€ Distill Principles from Skills into Rules
+# /rules-distill ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Distill Principles from Skills into Rules
 
 ## Safety And Authorization Rule
 
@@ -22,3 +22,11 @@ Scan installed skills, extract cross-cutting principles, and distill them into r
 ## Process
 
 Follow the full workflow defined in the `rules-distill` skill.
+
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_START -->
+## /goal Default Contract
+
+This command inherits the SeaBridgeAI `/goal` protocol. Establish the persistent goal, Definition of Done, validation plan, affected systems, risks, dependencies, artifacts, and blockers before execution. Continue until validation satisfies the DoD or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_END -->

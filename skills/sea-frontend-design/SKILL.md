@@ -1,4 +1,4 @@
----
+﻿---
 name: sea-frontend-design
 description: SeaBridgeAI frontend design skill for enterprise sustainability dashboards, data-dense workflows, AI panels, route visibility, responsive UX, accessibility, and endpoint-backed claims.
 ---
@@ -40,3 +40,11 @@ Claude/Codex/Gemini/OpenCode/Cursor/Copilot CLI should follow the same UI gates;
 ## Superpowers Adaptation
 
 Partially adapts Superpowers brainstorming, writing-plans, TDD, and verification-before-completion into frontend workflow gates.
+
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_START -->
+## /goal Inheritance
+
+This skill inherits the SeaBridgeAI `/goal` default protocol. Before implementation or review, establish the persistent goal, Definition of Done, validation plan, affected systems, dependencies, risks, and expected artifacts. Continue through validation and fixes until the DoD is satisfied or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_END -->

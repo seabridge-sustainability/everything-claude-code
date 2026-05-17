@@ -12,6 +12,19 @@ and `checklists/` for cross-repo backend, frontend, AI, sustainability-domain,
 QA, and handoff work. Product repos should point back here instead of copying
 the full instructions.
 
+## Curated Spec Kit Skills
+
+SeaBridgeAI includes a curated GitHub Spec Kit integration under
+`skills/spec-kit/`. It adds reusable cross-agent skills for
+`speckit-constitution`, `speckit-specify`, `speckit-clarify`, `speckit-plan`,
+`speckit-tasks`, `speckit-analyze`, `speckit-checklist`,
+`speckit-implement`, and guarded `speckit-taskstoissues`.
+
+Spec Kit owns `.specify` requirement and planning artifacts. GSD remains the
+execution loop and phase-state layer for `.planning`. See
+`docs/SPECKIT_SKILLS.md`, `docs/SPECKIT_GSD_INTEGRATION.md`, and
+`docs/SPECKIT_SEABRIDGE_PRESET.md`.
+
 ## Safety And Authorization Rule
 
 Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
@@ -278,7 +291,7 @@ For manual install instructions see the README in the `rules/` folder. When copy
 /plugin list everything-claude-code@everything-claude-code
 ```
 
-**That's it!** You now have access to 37 agents, 237 skills, and 60 commands.
+**That's it!** You now have access to 37 agents, 247 skills, and 60 commands.
 
 ### Multi-model commands require additional setup
 
@@ -1162,7 +1175,7 @@ The configuration is automatically detected from `.opencode/opencode.json`.
 |---------|-------------|----------|--------|
 | Agents | PASS: 37 agents | PASS: 12 agents | **Claude Code leads** |
 | Commands | PASS: 60 commands | PASS: 31 commands | **Claude Code leads** |
-| Skills | PASS: 237 skills | PASS: 37 skills | **Claude Code leads** |
+| Skills | PASS: 247 skills | PASS: 37 skills | **Claude Code leads** |
 | Hooks | PASS: 8 event types | PASS: 11 events | **OpenCode has more!** |
 | Rules | PASS: 29 rules | PASS: 13 instructions | **Claude Code leads** |
 | MCP Servers | PASS: 14 servers | PASS: Full | **Full parity** |

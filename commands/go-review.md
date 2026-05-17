@@ -1,4 +1,4 @@
----
+﻿---
 description: Comprehensive Go code review for idiomatic patterns, concurrency safety, error handling, and security. Invokes the go-reviewer agent.
 ---
 
@@ -92,8 +92,8 @@ Agent:
 - internal/service/auth.go (modified)
 
 ## Static Analysis Results
-Ã¢Å“â€œ go vet: No issues
-Ã¢Å“â€œ staticcheck: No issues
+ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ go vet: No issues
+ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ staticcheck: No issues
 
 ## Issues Found
 
@@ -159,3 +159,11 @@ Recommendation: FAIL: Block merge until CRITICAL issue is fixed
 
 - Agent: `agents/go-reviewer.md`
 - Skills: `skills/golang-patterns/`, `skills/golang-testing/`
+
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_START -->
+## /goal Default Contract
+
+This command inherits the SeaBridgeAI `/goal` protocol. Establish the persistent goal, Definition of Done, validation plan, affected systems, risks, dependencies, artifacts, and blockers before execution. Continue until validation satisfies the DoD or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_END -->

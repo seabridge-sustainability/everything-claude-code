@@ -1,4 +1,4 @@
----
+﻿---
 description: Fix Gradle build errors for Android and KMP projects
 ---
 
@@ -43,16 +43,16 @@ Also check `gradle.properties` and `local.properties` for configuration.
 
 For each error:
 
-1. **Read the file** Ã¢â‚¬â€ Full context around the error line
-2. **Diagnose** Ã¢â‚¬â€ Common categories:
+1. **Read the file** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Full context around the error line
+2. **Diagnose** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Common categories:
    - Missing import or unresolved reference
    - Type mismatch or incompatible types
    - Missing dependency in `build.gradle.kts`
    - Expect/actual mismatch (KMP)
    - Compose compiler error
-3. **Fix minimally** Ã¢â‚¬â€ Smallest change that resolves the error
-4. **Re-run build** Ã¢â‚¬â€ Verify fix and check for new errors
-5. **Continue** Ã¢â‚¬â€ Move to next error
+3. **Fix minimally** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Smallest change that resolves the error
+4. **Re-run build** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Verify fix and check for new errors
+5. **Continue** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Move to next error
 
 ## Step 4: Guardrails
 
@@ -81,3 +81,11 @@ Report:
 | Duplicate class | Check for conflicting dependencies with `./gradlew dependencies` |
 | KSP error | Run `./gradlew kspCommonMainKotlinMetadata` to regenerate |
 | Configuration cache issue | Check for non-serializable task inputs |
+
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_START -->
+## /goal Default Contract
+
+This command inherits the SeaBridgeAI `/goal` protocol. Establish the persistent goal, Definition of Done, validation plan, affected systems, risks, dependencies, artifacts, and blockers before execution. Continue until validation satisfies the DoD or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_END -->

@@ -1,24 +1,19 @@
 ---
 name: sea-production-readiness-reviewer
-description: Review SeaBridgeAI changes for production readiness: env validation, Docker/Compose, migrations, smoke tests, health checks, rollback, package publishing safety, docs, logs, and approval gates.
+description: Callable wrapper for sea-production-readiness-reviewer. Load the canonical SeaBridgeAI skill body from everything-claude-code\skills\sea-production-readiness-reviewer\SKILL.md.
 ---
 
-# SeaBridgeAI Production Readiness Reviewer
+# sea-production-readiness-reviewer
 
-Load:
+Canonical skill:
+C:\Users\adelm\SeaBridgeAI\everything-claude-code\skills\sea-production-readiness-reviewer\SKILL.md
 
-- `docs/harness/standards/deployment-readiness.md`
-- `docs/harness/standards/observability.md`
-- `sea-verification-before-completion`
+Use this wrapper only for skill discovery. Follow the canonical skill body above; do not copy or fork behavior here.
 
-Review changed files for:
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_START -->
+## /goal Inheritance
 
-- Missing env var documentation or validation.
-- Unsafe migrations or missing rollback.
-- Health/readiness gaps.
-- Missing smoke tests or route proof.
-- Package privacy/export issues.
-- Live provider mode accidentally enabled.
-- Logs/reports outside approved folders.
+This skill inherits the SeaBridgeAI `/goal` default protocol. Before implementation or review, establish the persistent goal, Definition of Done, validation plan, affected systems, dependencies, risks, and expected artifacts. Continue through validation and fixes until the DoD is satisfied or a hard blocker is documented.
 
-Output go/no-go criteria and unresolved approval gates.
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_END -->

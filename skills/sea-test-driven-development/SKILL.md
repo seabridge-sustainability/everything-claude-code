@@ -1,4 +1,4 @@
----
+﻿---
 name: sea-test-driven-development
 description: SeaBridgeAI TDD skill adapted from Superpowers for backend, frontend, AI, data, and sustainability workflows with red-green-refactor, contract tests, and source-integrity tests.
 ---
@@ -51,3 +51,11 @@ All agents can apply red-green-refactor with their local test runner. Document s
 ## Superpowers Adaptation
 
 Fully embeds Superpowers test-driven-development with SeaBridgeAI domain and auth gates.
+
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_START -->
+## /goal Inheritance
+
+This skill inherits the SeaBridgeAI `/goal` default protocol. Before implementation or review, establish the persistent goal, Definition of Done, validation plan, affected systems, dependencies, risks, and expected artifacts. Continue through validation and fixes until the DoD is satisfied or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_END -->

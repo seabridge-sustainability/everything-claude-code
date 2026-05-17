@@ -23,16 +23,50 @@ C:\Users\adelm\SeaBridgeAI\everything-claude-code\external\get-shit-done
 
 Use `sea-gsd-controlled-execution` for complex multi-phase work, context rot prevention, structured artifacts, phase planning, verification, and forensics. GSD autonomous/yolo behavior, dangerous permission skipping, automatic commits, automatic pushes, automatic PR creation, and global installs are disabled by default and require explicit approval.
 
+## Curated Spec Kit Methodology
+
+GitHub Spec Kit is integrated as a curated SeaBridgeAI specification and
+planning layer under:
+
+`C:\Users\adelm\SeaBridgeAI\everything-claude-code\skills\spec-kit`
+
+Use `speckit-constitution`, `speckit-specify`, `speckit-clarify`,
+`speckit-plan`, `speckit-tasks`, `speckit-analyze`, `speckit-checklist`,
+`speckit-implement`, and `speckit-taskstoissues` when a task needs formal
+specification discipline. Spec Kit owns `.specify` artifacts; GSD owns
+`.planning` execution state. Spec Kit does not authorize pushes, commits,
+installs, migrations, paid/live calls, issue creation, or destructive actions.
+
+## Goal Protocol Default
+
+`/goal` is the default operating contract for non-trivial SeaBridgeAI agent
+work. Before broad implementation, frame the user request with Definition of
+Done, validation plan, risks, dependencies, scope, blockers, and artifacts, then
+continue until the Definition of Done is validated or a hard blocker is recorded.
+
+Canonical protocol:
+`C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+
+Compact embed:
+`C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL_SHORT.md`
+
+Use `goal-default` at the start of non-trivial tasks. Escalate to Spec Kit when
+requirements need formal specification discipline and to GSD when execution
+needs long-running state, phase planning, UAT, or handoff persistence. `/goal`
+does not authorize commits, pushes, installs, paid/live calls, destructive
+actions, migrations, or production data changes.
+
 ## Mandatory Load Order
 
 1. Local repo AGENTS_SYSTEM.md when present, then local AGENTS.md or CLAUDE.md.
 2. Confirm SYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1 and this canonical path.
-3. Read the matching ECC repo integration file under repo-integrations/.
-4. Load the smallest relevant canonical skills/sea-*/SKILL.md or same-name .agents/skills/sea-*/SKILL.md wrapper.
-5. Use matching workflows/ and checklists/ when they exist.
-6. Implement only scoped changes.
-7. Verify before completion claims.
-8. Report changed files, checks run, unverified items, approval-gated items, and risks.
+3. Establish the `/goal` frame for non-trivial work.
+4. Read the matching ECC repo integration file under repo-integrations/.
+5. Load the smallest relevant canonical skills/sea-*/SKILL.md or same-name .agents/skills/sea-*/SKILL.md wrapper.
+6. Use matching workflows/ and checklists/ when they exist.
+7. Implement only scoped changes.
+8. Verify before completion claims.
+9. Report changed files, checks run, unverified items, approval-gated items, and risks.
 
 ## Local-Only Rules
 
@@ -150,6 +184,23 @@ Callable wrappers live at C:\Users\adelm\SeaBridgeAI\everything-claude-code\.age
 - sea-knowledge-vault
 - sea-gsd-controlled-execution
 - sea-local-llm-training
+- sea-ai-grounding-reviewer
+- sea-architecture-reviewer
+- sea-backend-api-reviewer
+- sea-frontend-ux-reviewer
+- sea-production-readiness-reviewer
+- sea-reliability-reviewer
+- sea-security-reviewer
+- goal-default
+- speckit-constitution
+- speckit-specify
+- speckit-clarify
+- speckit-plan
+- speckit-tasks
+- speckit-analyze
+- speckit-checklist
+- speckit-implement
+- speckit-taskstoissues
 
 ## Shared Engineering Skill Extensions
 
@@ -184,6 +235,7 @@ unless explicitly approved.
 
 ## Mandatory Skill Triggers
 
+- Non-trivial work default contract: goal-default.
 - Default non-trivial work: sea-senior-dev-workflow.
 - Broad or ambiguous feature design: sea-brainstorming-and-spec-refinement.
 - Large, multi-lane, or multi-repo work: sea-task-orchestration.

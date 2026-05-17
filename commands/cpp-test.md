@@ -1,4 +1,4 @@
----
+﻿---
 description: Enforce TDD workflow for C++. Write GoogleTest tests first, then implement. Verify coverage with gcov/lcov.
 ---
 
@@ -40,10 +40,10 @@ Use `/cpp-test` when:
 ## TDD Cycle
 
 ```
-RED     Ã¢â€ â€™ Write failing GoogleTest test
-GREEN   Ã¢â€ â€™ Implement minimal code to pass
-REFACTOR Ã¢â€ â€™ Improve code, tests stay green
-REPEAT  Ã¢â€ â€™ Next test case
+RED     ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Write failing GoogleTest test
+GREEN   ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Implement minimal code to pass
+REFACTOR ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Improve code, tests stay green
+REPEAT  ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Next test case
 ```
 
 ## Example Session
@@ -120,7 +120,7 @@ $ cmake --build build && ctest --test-dir build --output-on-failure
 FAIL
 ```
 
-Ã¢Å“â€œ Tests fail as expected (unimplemented).
+ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ Tests fail as expected (unimplemented).
 
 ## Step 4: Implement Minimal Code (GREEN)
 
@@ -151,7 +151,7 @@ $ cmake --build build && ctest --test-dir build --output-on-failure
 100% tests passed.
 ```
 
-Ã¢Å“â€œ All tests passing!
+ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ All tests passing!
 
 ## Step 6: Check Coverage
 
@@ -164,7 +164,7 @@ $ lcov --list coverage.info
 validator/email.cpp     | 100%
 ```
 
-Ã¢Å“â€œ Coverage: 100%
+ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ Coverage: 100%
 
 ## TDD Complete!
 ````
@@ -262,3 +262,11 @@ genhtml coverage.info --output-directory coverage_html
 
 - Skill: `skills/cpp-testing/`
 - Skill: `skills/tdd-workflow/`
+
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_START -->
+## /goal Default Contract
+
+This command inherits the SeaBridgeAI `/goal` protocol. Establish the persistent goal, Definition of Done, validation plan, affected systems, risks, dependencies, artifacts, and blockers before execution. Continue until validation satisfies the DoD or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_END -->

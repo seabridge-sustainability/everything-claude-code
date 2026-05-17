@@ -34,6 +34,7 @@ skill. Do not copy upstream skill bodies into product repos.
 
 Supported invocation forms:
 
+- `Use skill: goal-default`
 - `#skill/grill-me`
 - `#skill/ubiquitous-language`
 - `#skill/improve-codebase-architecture`
@@ -44,18 +45,56 @@ Supported invocation forms:
 Agents without native skill support should read the matching wrapper under:
 `C:\Users\adelm\SeaBridgeAI\everything-claude-code\.agents\skills\<skill>\SKILL.md`
 
+## Goal Protocol Default
+
+`goal-default` is the default contract skill for non-trivial SeaBridgeAI work.
+It frames user requests as `/goal` with Definition of Done, validation plan,
+risks, dependencies, scope, blockers, and artifacts, then requires persistence
+until validated or blocked.
+
+Canonical protocol:
+`C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+
+Compact embed:
+`C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL_SHORT.md`
+
+Use it before Spec Kit or GSD escalation unless the task is trivial.
+
 ## Immediate Skills
 
 | Skill | SeaBridge wrapper | Upstream source | Use when |
 |---|---|---|---|
+| `goal-default` | `.agents/skills/goal-default/SKILL.md` | `skills/goal-default/SKILL.md` | Non-trivial work needs a `/goal` frame, Definition of Done, validation plan, risks, dependencies, and persistence until validated or blocked. |
 | `grill-me` | `.agents/skills/grill-me/SKILL.md` | `shared-agent-skills/skills/productivity/grill-me/SKILL.md` | Requirements are ambiguous, risky, or need adversarial clarification. |
 | `ubiquitous-language` | `.agents/skills/ubiquitous-language/SKILL.md` | `shared-agent-skills/skills/deprecated/ubiquitous-language/SKILL.md` | Domain terminology needs canonical glossary alignment across code, APIs, prompts, docs, and reports. |
 | `improve-codebase-architecture` | `.agents/skills/improve-codebase-architecture/SKILL.md` | `shared-agent-skills/skills/engineering/improve-codebase-architecture/SKILL.md` | Architecture needs modularity, testability, coupling, observability, or maintainability review. |
+
+## Spec Kit Skills
+
+Curated Spec Kit skills live under `skills/spec-kit/` and wrappers live under
+`.agents/skills/speckit-*/SKILL.md`.
+
+Use them as the SeaBridgeAI specification and planning discipline layer:
+
+- `speckit-constitution`
+- `speckit-specify`
+- `speckit-clarify`
+- `speckit-plan`
+- `speckit-tasks`
+- `speckit-analyze`
+- `speckit-checklist`
+- `speckit-implement`
+- `speckit-taskstoissues`
+
+Spec Kit owns `.specify` artifacts. GSD owns `.planning` execution state. See
+`docs/SPECKIT_SKILLS.md` and `docs/SPECKIT_GSD_INTEGRATION.md`.
 
 ## Compatibility Rules
 
 - SeaBridgeAI `sea-*` skills remain canonical for workflow, safety, verification,
   sustainability domain review, backend API verification, and frontend design.
+- Spec Kit skills complement GSD and `sea-*` skills; they do not authorize
+  pushes, commits, installs, migrations, live calls, or GitHub issue creation.
 - Matt Pocock skills are engineering lenses used inside the existing SeaBridge
   workflow.
 - If an internal skill already covers the same behavior, use the internal skill

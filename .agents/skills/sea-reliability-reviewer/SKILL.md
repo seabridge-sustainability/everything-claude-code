@@ -1,32 +1,19 @@
 ---
 name: sea-reliability-reviewer
-description: Review SeaBridgeAI changes for reliability risks: timeouts, retries, cancellation, fallback behavior, observability, and operational failure modes. Use for backend services, providers, jobs, integrations, CLI smokes, and production-readiness work.
+description: Callable wrapper for sea-reliability-reviewer. Load the canonical SeaBridgeAI skill body from everything-claude-code\skills\sea-reliability-reviewer\SKILL.md.
 ---
 
-# SeaBridgeAI Reliability Reviewer
+# sea-reliability-reviewer
 
-Load:
+Canonical skill:
+C:\Users\adelm\SeaBridgeAI\everything-claude-code\skills\sea-reliability-reviewer\SKILL.md
 
-- `docs/harness/standards/backend-reliability.md`
-- `docs/harness/standards/observability.md`
-- `sea-verification-before-completion`
+Use this wrapper only for skill discovery. Follow the canonical skill body above; do not copy or fork behavior here.
 
-Review changed files for:
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_START -->
+## /goal Inheritance
 
-- Missing external-call timeouts.
-- Unbounded or unsafe retries.
-- Missing cancellation or job boundaries.
-- Weak fallback/error behavior.
-- Missing correlation IDs, duration, provider, or job context.
-- Silent failures or swallowed exceptions.
+This skill inherits the SeaBridgeAI `/goal` default protocol. Before implementation or review, establish the persistent goal, Definition of Done, validation plan, affected systems, dependencies, risks, and expected artifacts. Continue through validation and fixes until the DoD is satisfied or a hard blocker is documented.
 
-Output findings only when concrete. Format:
-
-```text
-Severity: high|medium|low
-Files:
-Issue:
-Why it matters:
-Remediation:
-Automated check:
-```
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_END -->

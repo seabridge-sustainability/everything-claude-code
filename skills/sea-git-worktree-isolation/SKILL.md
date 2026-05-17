@@ -1,4 +1,4 @@
----
+﻿---
 name: sea-git-worktree-isolation
 description: SeaBridgeAI git worktree isolation adapted from Superpowers for local-only feature isolation, dirty-worktree safety, branch hygiene, and no-push/no-delete approval boundaries.
 ---
@@ -40,3 +40,11 @@ Use native worktree support when a runtime provides it. Otherwise use read-only 
 ## Superpowers Adaptation
 
 Partially adapts Superpowers using-git-worktrees with stricter SeaBridgeAI approval and deletion boundaries.
+
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_START -->
+## /goal Inheritance
+
+This skill inherits the SeaBridgeAI `/goal` default protocol. Before implementation or review, establish the persistent goal, Definition of Done, validation plan, affected systems, dependencies, risks, and expected artifacts. Continue through validation and fixes until the DoD is satisfied or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_END -->

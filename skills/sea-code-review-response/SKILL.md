@@ -1,4 +1,4 @@
----
+﻿---
 name: sea-code-review-response
 description: SeaBridgeAI code review response adapted from Superpowers for requesting reviews, receiving feedback, triaging severity, implementing fixes, and preserving technical rigor.
 ---
@@ -48,3 +48,11 @@ Claude/GitHub connectors can fetch PR comments. Codex/Gemini/OpenCode/Cursor/Cop
 ## Superpowers Adaptation
 
 Fully embeds Superpowers requesting-code-review and receiving-code-review with SeaBridgeAI gates.
+
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_START -->
+## /goal Inheritance
+
+This skill inherits the SeaBridgeAI `/goal` default protocol. Before implementation or review, establish the persistent goal, Definition of Done, validation plan, affected systems, dependencies, risks, and expected artifacts. Continue through validation and fixes until the DoD is satisfied or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_END -->

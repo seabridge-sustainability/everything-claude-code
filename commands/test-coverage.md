@@ -1,4 +1,4 @@
-# Test Coverage
+﻿# Test Coverage
 
 ## Safety And Authorization Rule
 
@@ -40,23 +40,23 @@ Analyze test coverage, identify gaps, and generate missing tests to reach 80%+ c
 
 For each under-covered file, generate tests following this priority:
 
-1. **Happy path** Ã¢â‚¬â€ Core functionality with valid inputs
-2. **Error handling** Ã¢â‚¬â€ Invalid inputs, missing data, network failures
-3. **Edge cases** Ã¢â‚¬â€ Empty arrays, null/undefined, boundary values (0, -1, MAX_INT)
-4. **Branch coverage** Ã¢â‚¬â€ Each if/else, switch case, ternary
+1. **Happy path** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Core functionality with valid inputs
+2. **Error handling** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Invalid inputs, missing data, network failures
+3. **Edge cases** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Empty arrays, null/undefined, boundary values (0, -1, MAX_INT)
+4. **Branch coverage** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Each if/else, switch case, ternary
 
 ### Test Generation Rules
 
-- Place tests adjacent to source: `foo.ts` Ã¢â€ â€™ `foo.test.ts` (or project convention)
+- Place tests adjacent to source: `foo.ts` ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ `foo.test.ts` (or project convention)
 - Use existing test patterns from the project (import style, assertion library, mocking approach)
 - Mock external dependencies (database, APIs, file system)
-- Each test should be independent Ã¢â‚¬â€ no shared mutable state between tests
+- Each test should be independent ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â no shared mutable state between tests
 - Name tests descriptively: `test_create_user_with_duplicate_email_returns_409`
 
 ## Step 4: Verify
 
-1. Run the full test suite Ã¢â‚¬â€ all tests must pass
-2. Re-run coverage Ã¢â‚¬â€ verify improvement
+1. Run the full test suite ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â all tests must pass
+2. Re-run coverage ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â verify improvement
 3. If still below 80%, repeat Step 3 for remaining gaps
 
 ## Step 5: Report
@@ -65,11 +65,11 @@ Show before/after comparison:
 
 ```
 Coverage Report
-Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
 File                   Before  After
 src/services/auth.ts   45%     88%
 src/utils/validation.ts 32%    82%
-Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
 Overall:               67%     84%  PASS:
 ```
 
@@ -78,5 +78,13 @@ Overall:               67%     84%  PASS:
 - Functions with complex branching (high cyclomatic complexity)
 - Error handlers and catch blocks
 - Utility functions used across the codebase
-- API endpoint handlers (request Ã¢â€ â€™ response flow)
+- API endpoint handlers (request ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ response flow)
 - Edge cases: null, undefined, empty string, empty array, zero, negative numbers
+
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_START -->
+## /goal Default Contract
+
+This command inherits the SeaBridgeAI `/goal` protocol. Establish the persistent goal, Definition of Done, validation plan, affected systems, risks, dependencies, artifacts, and blockers before execution. Continue until validation satisfies the DoD or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_END -->

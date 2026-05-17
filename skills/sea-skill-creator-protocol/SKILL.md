@@ -1,4 +1,4 @@
----
+﻿---
 name: sea-skill-creator-protocol
 description: SeaBridgeAI skill creation protocol adapted from Superpowers writing-skills and Codex skill-creator for canonical skills, wrappers, validation, and cross-agent compatibility.
 ---
@@ -40,3 +40,11 @@ Claude Code, Codex, Gemini, OpenCode, Cursor, and Copilot CLI should discover th
 ## Superpowers Adaptation
 
 Fully embeds Superpowers writing-skills, adapted to SeaBridgeAI canonical/wrapper structure.
+
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_START -->
+## /goal Inheritance
+
+This skill inherits the SeaBridgeAI `/goal` default protocol. Before implementation or review, establish the persistent goal, Definition of Done, validation plan, affected systems, dependencies, risks, and expected artifacts. Continue through validation and fixes until the DoD is satisfied or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_END -->

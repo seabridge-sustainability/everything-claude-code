@@ -1,6 +1,6 @@
----
+﻿---
 name: gsd:progress
-description: Check progress, advance workflow, or dispatch freeform intent — the unified GSD situational command
+description: Check progress, advance workflow, or dispatch freeform intent â€” the unified GSD situational command
 argument-hint: "[--forensic | --next | --do \"task description\"]"
 allowed-tools:
   - Read
@@ -16,13 +16,13 @@ Check project progress, summarize recent work and what's ahead, then intelligent
 Three modes:
 - **default**: Show progress report + intelligently route to the next action (execute or plan). Provides situational awareness before continuing work.
 - **--next**: Automatically advance to the next logical step without manual route selection. Reads STATE.md, ROADMAP.md, and phase directories. Supports `--force` to bypass safety gates.
-- **--do "task description"**: Analyze freeform natural language and dispatch to the most appropriate GSD command. Never does the work itself — matches intent, confirms, hands off.
+- **--do "task description"**: Analyze freeform natural language and dispatch to the most appropriate GSD command. Never does the work itself â€” matches intent, confirms, hands off.
 - **--forensic**: Append a 6-check integrity audit after the standard progress report.
 </objective>
 
 <flags>
 - **--next**: Detect current project state and automatically invoke the next logical GSD workflow step. Scans all prior phases for incomplete work before routing. `--next --force` bypasses safety gates.
-- **--do "..."**: Smart dispatcher — match freeform intent to the best GSD command using routing rules, confirm the match, then hand off.
+- **--do "..."**: Smart dispatcher â€” match freeform intent to the best GSD command using routing rules, confirm the match, then hand off.
 - **--forensic**: Run 6-check integrity audit after the standard progress report.
 - **(no flag)**: Standard progress check + intelligent routing (Routes A through F).
 </flags>
@@ -42,3 +42,11 @@ Parse the first token of $ARGUMENTS:
 
 Preserve all routing logic from the target workflow.
 </process>
+
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_START -->
+## /goal Default Contract
+
+This command inherits the SeaBridgeAI `/goal` protocol. Establish the persistent goal, Definition of Done, validation plan, affected systems, risks, dependencies, artifacts, and blockers before execution. Continue until validation satisfies the DoD or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_END -->

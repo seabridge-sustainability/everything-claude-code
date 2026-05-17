@@ -1,4 +1,4 @@
----
+﻿---
 description: Enforce TDD workflow for Go. Write table-driven tests first, then implement. Verify 80%+ coverage with go test -cover.
 ---
 
@@ -40,10 +40,10 @@ Use `/go-test` when:
 ## TDD Cycle
 
 ```
-RED     Ã¢â€ â€™ Write failing table-driven test
-GREEN   Ã¢â€ â€™ Implement minimal code to pass
-REFACTOR Ã¢â€ â€™ Improve code, tests stay green
-REPEAT  Ã¢â€ â€™ Next test case
+RED     ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Write failing table-driven test
+GREEN   ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Implement minimal code to pass
+REFACTOR ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Improve code, tests stay green
+REPEAT  ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Next test case
 ```
 
 ## Example Session
@@ -125,7 +125,7 @@ $ go test ./validator/...
 FAIL
 ```
 
-Ã¢Å“â€œ Tests fail as expected (panic).
+ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ Tests fail as expected (panic).
 
 ## Step 4: Implement Minimal Code (GREEN)
 
@@ -165,7 +165,7 @@ PASS
 ok      project/validator    0.003s
 ```
 
-Ã¢Å“â€œ All tests passing!
+ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ All tests passing!
 
 ## Step 6: Check Coverage
 
@@ -177,7 +177,7 @@ coverage: 100.0% of statements
 ok      project/validator    0.003s
 ```
 
-Ã¢Å“â€œ Coverage: 100%
+ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ Coverage: 100%
 
 ## TDD Complete!
 ````
@@ -279,3 +279,11 @@ go test -race -cover ./...
 
 - Skill: `skills/golang-testing/`
 - Skill: `skills/tdd-workflow/`
+
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_START -->
+## /goal Default Contract
+
+This command inherits the SeaBridgeAI `/goal` protocol. Establish the persistent goal, Definition of Done, validation plan, affected systems, risks, dependencies, artifacts, and blockers before execution. Continue until validation satisfies the DoD or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_END -->

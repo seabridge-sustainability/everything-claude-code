@@ -1,4 +1,4 @@
----
+﻿---
 name: sea-backend-api-verification
 description: SeaBridgeAI backend and API verification for FastAPI routes, schemas, services, database sources, auth, tenant isolation, provider gates, and frontend contract truth.
 ---
@@ -40,3 +40,11 @@ All agents should inspect local code and run local tests. Browser agents must st
 ## Superpowers Adaptation
 
 Fully embeds Superpowers verification-before-completion and systematic-debugging for backend truth checks.
+
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_START -->
+## /goal Inheritance
+
+This skill inherits the SeaBridgeAI `/goal` default protocol. Before implementation or review, establish the persistent goal, Definition of Done, validation plan, affected systems, dependencies, risks, and expected artifacts. Continue through validation and fixes until the DoD is satisfied or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_END -->

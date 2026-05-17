@@ -1,4 +1,4 @@
----
+﻿---
 name: skill-create
 description: Analyze local git history to extract coding patterns and generate SKILL.md files. Local version of the Skill Creator GitHub App.
 allowed_tools: ["Bash", "Read", "Write", "Grep", "Glob"]
@@ -142,11 +142,11 @@ This project uses **conventional commits**:
 
 ```
 src/
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ components/     # React components (PascalCase.tsx)
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ hooks/          # Custom hooks (use*.ts)
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ utils/          # Utility functions
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ types/          # TypeScript type definitions
-Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ services/       # API and external services
+ÃƒÂ¢Ã¢â‚¬ÂÃ…â€œÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ components/     # React components (PascalCase.tsx)
+ÃƒÂ¢Ã¢â‚¬ÂÃ…â€œÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ hooks/          # Custom hooks (use*.ts)
+ÃƒÂ¢Ã¢â‚¬ÂÃ…â€œÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ utils/          # Utility functions
+ÃƒÂ¢Ã¢â‚¬ÂÃ…â€œÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ types/          # TypeScript type definitions
+ÃƒÂ¢Ã¢â‚¬ÂÃ¢â‚¬ÂÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ services/       # API and external services
 ```
 
 ## Workflows
@@ -185,3 +185,11 @@ For advanced features (10k+ commits, team sharing, auto-PRs), use the [Skill Cre
 ---
 
 *Part of [Everything Claude Code](https://github.com/affaan-m/everything-claude-code)*
+
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_START -->
+## /goal Default Contract
+
+This command inherits the SeaBridgeAI `/goal` protocol. Establish the persistent goal, Definition of Done, validation plan, affected systems, risks, dependencies, artifacts, and blockers before execution. Continue until validation satisfies the DoD or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_END -->

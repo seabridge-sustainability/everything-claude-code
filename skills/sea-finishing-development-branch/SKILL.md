@@ -1,4 +1,4 @@
----
+﻿---
 name: sea-finishing-development-branch
 description: SeaBridgeAI finishing branch skill adapted from Superpowers for final verification, diff review, handoff, and manual approval before commit, push, merge, PR, or cleanup.
 ---
@@ -40,3 +40,11 @@ Claude may present merge/PR choices. Codex/Gemini/OpenCode/Cursor/Copilot CLI mu
 ## Superpowers Adaptation
 
 Fully embeds Superpowers finishing-a-development-branch with SeaBridgeAI no-push/no-delete boundaries.
+
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_START -->
+## /goal Inheritance
+
+This skill inherits the SeaBridgeAI `/goal` default protocol. Before implementation or review, establish the persistent goal, Definition of Done, validation plan, affected systems, dependencies, risks, and expected artifacts. Continue through validation and fixes until the DoD is satisfied or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_END -->

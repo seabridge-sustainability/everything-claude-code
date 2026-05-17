@@ -1,4 +1,4 @@
----
+﻿---
 description: Analyze context window usage across agents, skills, MCP servers, and rules to find optimization opportunities. Helps reduce token overhead and avoid performance warnings.
 ---
 
@@ -36,7 +36,15 @@ Run the **context-budget** skill (`skills/context-budget/SKILL.md`) with the fol
 
 1. Pass `--verbose` flag if present in `$ARGUMENTS`
 2. Assume a 200K context window (Claude Sonnet default) unless the user specifies otherwise
-3. Follow the skill's four phases: Inventory Ã¢â€ â€™ Classify Ã¢â€ â€™ Detect Issues Ã¢â€ â€™ Report
+3. Follow the skill's four phases: Inventory ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Classify ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Detect Issues ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Report
 4. Output the formatted Context Budget Report to the user
 
 The skill handles all scanning logic, token estimation, issue detection, and report formatting.
+
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_START -->
+## /goal Default Contract
+
+This command inherits the SeaBridgeAI `/goal` protocol. Establish the persistent goal, Definition of Done, validation plan, affected systems, risks, dependencies, artifacts, and blockers before execution. Continue until validation satisfies the DoD or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_END -->

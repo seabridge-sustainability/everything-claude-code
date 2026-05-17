@@ -1,4 +1,4 @@
----
+﻿---
 name: evolve
 description: Analyze instincts and suggest or generate evolved structures
 command: true
@@ -47,7 +47,7 @@ Analyzes instincts and clusters related ones into higher-level structures:
 
 ## Evolution Rules
 
-### Ã¢â€ â€™ Command (User-Invoked)
+### ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Command (User-Invoked)
 When instincts describe actions a user would explicitly request:
 - Multiple instincts about "when user asks to..."
 - Instincts with triggers like "when creating a new X"
@@ -58,9 +58,9 @@ Example:
 - `new-table-step2`: "when adding a database table, update schema"
 - `new-table-step3`: "when adding a database table, regenerate types"
 
-Ã¢â€ â€™ Creates: **new-table** command
+ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Creates: **new-table** command
 
-### Ã¢â€ â€™ Skill (Auto-Triggered)
+### ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Skill (Auto-Triggered)
 When instincts describe behaviors that should happen automatically:
 - Pattern-matching triggers
 - Error handling responses
@@ -71,9 +71,9 @@ Example:
 - `use-immutable`: "when modifying state, use immutable patterns"
 - `avoid-classes`: "when designing modules, avoid class-based design"
 
-Ã¢â€ â€™ Creates: `functional-patterns` skill
+ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Creates: `functional-patterns` skill
 
-### Ã¢â€ â€™ Agent (Needs Depth/Isolation)
+### ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Agent (Needs Depth/Isolation)
 When instincts describe complex, multi-step processes that benefit from isolation:
 - Debugging workflows
 - Refactoring sequences
@@ -85,7 +85,7 @@ Example:
 - `debug-step3`: "when debugging, create minimal reproduction"
 - `debug-step4`: "when debugging, verify fix with test"
 
-Ã¢â€ â€™ Creates: **debugger** agent
+ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Creates: **debugger** agent
 
 ## What to Do
 
@@ -189,3 +189,11 @@ evolved_from:
 
 [Generated content based on clustered instincts]
 ```
+
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_START -->
+## /goal Default Contract
+
+This command inherits the SeaBridgeAI `/goal` protocol. Establish the persistent goal, Definition of Done, validation plan, affected systems, risks, dependencies, artifacts, and blockers before execution. Continue until validation satisfies the DoD or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_END -->
