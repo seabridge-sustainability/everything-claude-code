@@ -44,19 +44,9 @@ Use `sea-gsd-controlled-execution` for complex multi-phase work, context rot pre
 - No uncontrolled autonomous execution. Orchestration is scoped, review-gated, and approval-aware.
 - Claude Mem remains excluded; do not clone, install, activate, or add SQLite/vector memory layers for it.
 
-## Sentinel Runtime Protection
+## Runtime Protection
 
-MCP Sentinel is active across SeaBridgeAI local coding-agent runtimes:
-
-- Claude Code: project `.claude/settings.json` runs the shared Sentinel `PreToolUse` hook.
-- Gemini CLI: project `.gemini/settings.json` runs the shared Sentinel `BeforeTool` hook.
-- Codex CLI: project `.codex/hooks.json` registers Sentinel `PreToolUse`; `.codex/config.toml` enables Codex hooks where supported.
-- OpenCode: project `.opencode/plugins/seabridge-sentinel.js` blocks suspicious tool and command execution before it runs.
-
-Shared pinned Sentinel source:
-`C:\Users\adelm\SeaBridgeAI\everything-claude-code\vendor\claude-mcp-sentinel`
-
-Do not remove or weaken Sentinel config without explicit approval. Instruction-based safety still applies even when hooks are present.
+Runtime preflight guardrails are not configured across SeaBridgeAI local coding-agent runtimes. Instruction-based safety still applies.
 
 ## Self-Verification Loop
 

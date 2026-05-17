@@ -14,7 +14,6 @@
  */
 
 import type { PluginInput } from "@opencode-ai/plugin"
-import { spawnSync } from "node:child_process"
 
 export const ECCHooksPlugin = async ({
   client,
@@ -63,74 +62,6 @@ export const ECCHooksPlugin = async ({
   ): boolean => {
     if (disabledHooks.has(hookId)) return false
     return profileAllowed(requiredProfile)
-  }
-
-  const runMcpSentinel = (input: { tool: string; args?: Record<string, unknown> }) => {
-    if (!hookEnabled("pre:mcp-sentinel", ["minimal", "standard", "strict"])) return
-
-    const sentinelPath =
-      process.env.MCP_SENTINEL_HOOK ||
-      "C:/Users/adelm/.claude/skills/mcp-sentinel/hooks/sentinel_preflight.py"
-
-    const payload = {
-      tool_name: input.tool,
-      tool_input: input.args || {},
-    }
-
-    for (const pythonBin of ["python", "python3"]) {
-      const result = spawnSync(pythonBin, [sentinelPath], {
-        input: JSON.stringify(payload),
-        encoding: "utf8",
-        timeout: 5000,
-        env: process.env,
-      })
-
-      if (result.error && (result.error as NodeJS.ErrnoException).code === "ENOENT") {
-        continue
-      }
-
-      if (result.error || !Number.isInteger(result.status)) {
-        log("warn", `[MCP Sentinel] fail-open: ${result.error?.message || result.signal || "unknown error"}`)
-        return
-      }
-
-      if (result.status !== 0) {
-        log("warn", `[MCP Sentinel] fail-open: hook exited ${result.status}`)
-        return
-      }
-
-      let response: {
-        decision?: string
-        reason?: string
-        hookSpecificOutput?: {
-          permissionDecision?: string
-          permissionDecisionReason?: string
-        }
-      }
-
-      try {
-        response = JSON.parse(result.stdout || '{"decision":"allow"}')
-      } catch (error) {
-        log("warn", "[MCP Sentinel] fail-open: invalid hook JSON")
-        return
-      }
-
-      const blocked =
-        response.decision === "block" ||
-        response.decision === "deny" ||
-        response.hookSpecificOutput?.permissionDecision === "deny"
-
-      if (blocked) {
-        const reason =
-          response.hookSpecificOutput?.permissionDecisionReason ||
-          response.reason ||
-          "MCP Sentinel blocked this tool call."
-        throw new Error(reason)
-      }
-      return
-    }
-
-    log("warn", "[MCP Sentinel] fail-open: python/python3 not found")
   }
 
   return {
@@ -223,8 +154,6 @@ export const ECCHooksPlugin = async ({
     "tool.execute.before": async (
       input: { tool: string; args?: Record<string, unknown> }
     ) => {
-      runMcpSentinel(input)
-
       // Git push review reminder
       if (
         hookEnabled("pre:bash:git-push-reminder", "strict") &&

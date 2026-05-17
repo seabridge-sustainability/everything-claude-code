@@ -1,6 +1,6 @@
 #:schema https://developers.openai.com/codex/config-schema.json
 
-# Everything Claude Code (ECC)  Codex Reference Configuration
+# Everything Claude Code (ECC) - Codex Reference Configuration
 #
 # Copy this file to ~/.codex/config.toml for global defaults, or keep it in
 # the project root as .codex/config.toml for project-local settings.
@@ -86,12 +86,12 @@ startup_timeout_sec = 30
 # args = ["-y", "@cloudflare/mcp-server-cloudflare"]
 
 [features]
-codex_hooks = true
+codex_hooks = false
 # Codex multi-agent collaboration is stable and on by default in current builds.
 # Keep the explicit toggle here so the repo documents its expectation clearly.
 multi_agent = true
 
-# Profiles  switch with `codex -p <name>`
+# Profiles - switch with `codex -p <name>`
 [profiles.strict]
 approval_policy = "on-request"
 sandbox_mode = "read-only"
@@ -102,7 +102,7 @@ approval_policy = "never"
 sandbox_mode = "workspace-write"
 web_search = "live"
 
-# Local inference profile  routes to llama.cpp server (Gemma-4 31B)
+# Local inference profile - routes to llama.cpp server (Gemma-4 31B)
 # Prerequisites:
 #   1. llama-server running on localhost:8080  (see ~/.claude/skills/local-inference/SKILL.md)
 #   2. Set env: OPENAI_BASE_URL=http://localhost:8080/v1  OPENAI_API_KEY=local
@@ -113,7 +113,7 @@ approval_policy = "on-request"
 sandbox_mode = "workspace-write"
 web_search = "live"
 
-# DeepSeek-R1 profile  reasoning-optimized (debugging, architecture)
+# DeepSeek-R1 profile - reasoning-optimized (debugging, architecture)
 # Prerequisites: llama-server running DeepSeek-R1 on localhost:8080
 # Usage: codex -p reason "explain why this test fails"
 [profiles.reason]
@@ -122,7 +122,7 @@ approval_policy = "on-request"
 sandbox_mode = "read-only"
 web_search = "cached"
 
-# Llama-4 Scout profile  lower VRAM alternative to Gemma-4 31B
+# Llama-4 Scout profile - lower VRAM alternative to Gemma-4 31B
 # Usage: codex -p llama "write unit tests"
 [profiles.llama]
 model = "Llama-4-Scout-17B-16E-Instruct"
@@ -130,7 +130,6 @@ approval_policy = "on-request"
 sandbox_mode = "workspace-write"
 web_search = "live"
 
-[agents]
 [agents]
 # Multi-agent role limits and local role definitions.
 # These map to `.codex/agents/*.toml` and mirror the repo's explorer/reviewer/docs workflow.

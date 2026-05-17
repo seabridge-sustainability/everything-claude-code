@@ -156,15 +156,12 @@ Sample role configs in this repo:
 | Skills | Skills loaded via plugin | `.agents/skills/` directory |
 | Commands | `/slash` commands | Instruction-based |
 | Agents | Subagent Task tool | Multi-agent via `/agent` and `[agents.<name>]` roles |
-| Security | Hook-based enforcement | Sentinel hooks where supported + instruction + sandbox |
+| Security | Hook-based enforcement | Instruction-based security + sandbox |
 | MCP | Full support | Supported via `config.toml` and `codex mcp add` |
 
-## Sentinel And Security Hooks
+## Security Hooks
 
-MCP Sentinel is active in SeaBridgeAI Codex projects through `.codex/hooks.json`
-`PreToolUse` entries where the installed Codex CLI supports hooks. Keep
-instruction-based security active too, because hook support can vary by runtime
-surface and sandbox.
+Runtime preflight guardrails are not configured in SeaBridgeAI Codex projects. Keep instruction-based security active across runtime surfaces and sandboxes.
 1. Always validate inputs at system boundaries
 2. Never hardcode secrets - use environment variables
 3. Run `npm audit` / `pip audit` before committing

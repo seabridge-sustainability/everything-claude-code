@@ -79,7 +79,7 @@ SeaBridgeAI already has strong process and policy coverage:
 - ECC central system and `SYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1`.
 - `sea-*` skills for verification, backend/API checks, AI data integrity, sustainability review, controlled execution, and cross-repo handoff.
 - Controlled auto-mode policy: formatting, lint fixes, test discovery, and docs path fixes are allowed; commits, pushes, installs, migrations, production data changes, auth/security changes, destructive operations, dangerous/yolo modes, global installs, and long training jobs require explicit approval.
-- MCP Sentinel is documented but deactivated for Codex because Codex lacks hook APIs.
+- Runtime preflight guardrails are deactivated for Codex because Codex hook support varies by runtime.
 - Hook guidance and local quality hooks exist in ECC for Claude Code.
 - Existing CI is mostly conventional build/test; target repo scans did not show a mature, uniform gitleaks/Semgrep/Trivy/CodeQL/AgentShield enforcement layer across all target repos.
 
