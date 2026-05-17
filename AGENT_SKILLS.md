@@ -6,7 +6,7 @@ Canonical SeaBridgeAI agent system:
 `C:\Users\adelm\SeaBridgeAI\everything-claude-code`
 
 Matt Pocock skills upstream clone:
-`C:\Users\adelm\SeaBridgeAI\shared-agent-skills`
+`C:\Users\adelm\SeaBridgeAI\everything-claude-code\references\matt-pocock-skills`
 
 This file is the shared skills contract for Claude Code, Codex, Gemini, OpenCode,
 Cursor, Copilot CLI, and future MCP-compatible coding agents. It extends the
@@ -23,7 +23,7 @@ Use this deterministic load order:
 3. ECC `SEABRIDGE_CODING_AGENT_SYSTEM.md`.
 4. This `AGENT_SKILLS.md`.
 5. Smallest matching `.agents/skills/*/SKILL.md` wrapper.
-6. Upstream source skill under `C:\Users\adelm\SeaBridgeAI\shared-agent-skills`
+6. Upstream source skill under `C:\Users\adelm\SeaBridgeAI\everything-claude-code\references\matt-pocock-skills`
    only when the wrapper asks for it.
 7. Task-specific runtime instructions.
 
@@ -65,9 +65,9 @@ Use it before Spec Kit or GSD escalation unless the task is trivial.
 | Skill | SeaBridge wrapper | Upstream source | Use when |
 |---|---|---|---|
 | `goal-default` | `.agents/skills/goal-default/SKILL.md` | `skills/goal-default/SKILL.md` | Non-trivial work needs a `/goal` frame, Definition of Done, validation plan, risks, dependencies, and persistence until validated or blocked. |
-| `grill-me` | `.agents/skills/grill-me/SKILL.md` | `shared-agent-skills/skills/productivity/grill-me/SKILL.md` | Requirements are ambiguous, risky, or need adversarial clarification. |
-| `ubiquitous-language` | `.agents/skills/ubiquitous-language/SKILL.md` | `shared-agent-skills/skills/deprecated/ubiquitous-language/SKILL.md` | Domain terminology needs canonical glossary alignment across code, APIs, prompts, docs, and reports. |
-| `improve-codebase-architecture` | `.agents/skills/improve-codebase-architecture/SKILL.md` | `shared-agent-skills/skills/engineering/improve-codebase-architecture/SKILL.md` | Architecture needs modularity, testability, coupling, observability, or maintainability review. |
+| `grill-me` | `.agents/skills/grill-me/SKILL.md` | `references/matt-pocock-skills/skills/productivity/grill-me/SKILL.md` | Requirements are ambiguous, risky, or need adversarial clarification. |
+| `ubiquitous-language` | `.agents/skills/ubiquitous-language/SKILL.md` | `references/matt-pocock-skills/skills/deprecated/ubiquitous-language/SKILL.md` | Domain terminology needs canonical glossary alignment across code, APIs, prompts, docs, and reports. |
+| `improve-codebase-architecture` | `.agents/skills/improve-codebase-architecture/SKILL.md` | `references/matt-pocock-skills/skills/engineering/improve-codebase-architecture/SKILL.md` | Architecture needs modularity, testability, coupling, observability, or maintainability review. |
 
 ## Spec Kit Skills
 

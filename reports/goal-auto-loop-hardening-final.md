@@ -1,4 +1,4 @@
-# Goal Auto-Loop Hardening Final Report
+﻿# Goal Auto-Loop Hardening Final Report
 
 Date: 2026-05-17
 
@@ -16,7 +16,7 @@ Date: 2026-05-17
 ## Repos Scanned
 
 - `everything-claude-code`
-- `shared-agent-skills`
+- `legacy-external-skills-repo`
 - `manageesg-backend`
 - `manageesg-frontend`
 - `openseabri`
@@ -124,8 +124,8 @@ Commands run:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\diagnose-goal-protocol.ps1 -Root "C:\Users\adelm\SeaBridgeAI" -Output "C:\Users\adelm\SeaBridgeAI\everything-claude-code\reports\goal-protocol-diagnostics-before.md"
-powershell -ExecutionPolicy Bypass -File .\scripts\sync-goal-protocol.ps1 -TargetRepo "C:\Users\adelm\SeaBridgeAI\shared-agent-skills" -DryRun -IncludeOptionalAgentFiles -IncludeAutoLoop -IncludeAntiStuckRules -IncludeCompletionEvidence
-powershell -ExecutionPolicy Bypass -File .\scripts\sync-goal-protocol.ps1 -TargetRepo "C:\Users\adelm\SeaBridgeAI\shared-agent-skills" -IncludeOptionalAgentFiles -IncludeAutoLoop -IncludeAntiStuckRules -IncludeCompletionEvidence
+powershell -ExecutionPolicy Bypass -File .\scripts\sync-goal-protocol.ps1 -TargetRepo "C:\Users\adelm\SeaBridgeAI\legacy-external-skills-repo" -DryRun -IncludeOptionalAgentFiles -IncludeAutoLoop -IncludeAntiStuckRules -IncludeCompletionEvidence
+powershell -ExecutionPolicy Bypass -File .\scripts\sync-goal-protocol.ps1 -TargetRepo "C:\Users\adelm\SeaBridgeAI\legacy-external-skills-repo" -IncludeOptionalAgentFiles -IncludeAutoLoop -IncludeAntiStuckRules -IncludeCompletionEvidence
 powershell -ExecutionPolicy Bypass -File .\scripts\sync-goal-protocol-all.ps1 -Apply -IncludeOptionalAgentFiles -IncludeAutoLoop -IncludeAntiStuckRules -IncludeCompletionEvidence
 powershell -ExecutionPolicy Bypass -File .\scripts\diagnose-goal-protocol.ps1 -Root "C:\Users\adelm\SeaBridgeAI" -Output "C:\Users\adelm\SeaBridgeAI\everything-claude-code\reports\goal-protocol-diagnostics-after.md"
 powershell -ExecutionPolicy Bypass -File .\scripts\check-goal-protocol.ps1 -WorkspaceRoot "C:\Users\adelm\SeaBridgeAI"

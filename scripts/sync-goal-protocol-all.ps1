@@ -24,7 +24,6 @@ $repos = @(
     "C:\Users\adelm\SeaBridgeAI\manageesg-backend",
     "C:\Users\adelm\SeaBridgeAI\manageesg-frontend",
     "C:\Users\adelm\SeaBridgeAI\openseabri",
-    "C:\Users\adelm\SeaBridgeAI\shared-agent-skills",
     "C:\Users\adelm\SeaBridgeAI\climada-stack",
     "C:\Users\adelm\SeaBridgeAI\autoresearch",
     "C:\Users\adelm\SeaBridgeAI\_upstream"

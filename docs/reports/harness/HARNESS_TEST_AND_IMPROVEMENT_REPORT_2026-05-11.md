@@ -1,4 +1,4 @@
-# Harness Test And Improvement Report - 2026-05-11
+﻿# Harness Test And Improvement Report - 2026-05-11
 
 SYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1
 
@@ -9,7 +9,7 @@ powershell -ExecutionPolicy Bypass -File C:\Users\adelm\SeaBridgeAI\everything-c
 powershell -ExecutionPolicy Bypass -File C:\Users\adelm\SeaBridgeAI\everything-claude-code\scripts\check-harness.ps1 -Advisory -UpdateBaseline
 powershell -ExecutionPolicy Bypass -File C:\Users\adelm\SeaBridgeAI\everything-claude-code\scripts\check-harness.ps1 -FailOnFinding
 powershell -ExecutionPolicy Bypass -File C:\Users\adelm\SeaBridgeAI\everything-claude-code\scripts\check-agent-runtime-guardrails.ps1
-powershell -ExecutionPolicy Bypass -File C:\Users\adelm\SeaBridgeAI\everything-claude-code\scripts\check-shared-agent-skills.ps1
+powershell -ExecutionPolicy Bypass -File C:\Users\adelm\SeaBridgeAI\everything-claude-code\scripts\check-canonical-skills.ps1
 pre-commit run seabridge-frontend-harness --files src/app/not-found.tsx
 pre-commit run seabridge-openseabri-harness --files bridge/agent_bridge.ts
 pre-commit run seabridge-backend-harness --files app/api/v1/endpoints/gresb_assessment.py

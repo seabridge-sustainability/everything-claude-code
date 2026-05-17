@@ -9,7 +9,7 @@ Review executed: 2026-05-17 local scan. No commits, pushes, global installs, pai
 | Area | Status | Notes |
 |---|---|---|
 | Central system | PASS | ECC central files exist and assert `SYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1`. |
-| Repo instruction consistency | PASS | Main active workspace repos point to ECC. `file-code` and `app-streaming` are explicitly deferred/inactive; `SeaBridgeAI_upstream` is a stale alias for `_upstream`. |
+| Repo instruction consistency | PASS | Main active workspace repos point to ECC. the previously requested non-inventory tool repos are explicitly deferred/inactive; the legacy upstream alias is a stale alias for `_upstream`. |
 | Skill conflict status | WARN | Wrapper-only reviewer skills were fixed by adding canonical files and wrapper pointers. Large vendored/upstream skill duplicates remain reference-only noise. |
 | Skill routing | PASS | Created `docs/SKILL_ROUTING_REFERENCE.md`. |
 | Cross-agent compatibility | PASS | Six compatibility guides now include load-first, repo-specific, skill, report/log, approval-gate, unsupported-command, and self-verification guidance. |
@@ -24,10 +24,10 @@ Review executed: 2026-05-17 local scan. No commits, pushes, global installs, pai
 | `openseabri` | 60 | 45 | 8 | 3 | Dirty worktree; central pointer present | WARN |
 | `everything-claude-code` | 3103 | 963 | 412 | 5669 | Central system; large external/vendor/reference corpus creates duplicate-skill scan noise | PASS/WARN |
 | `autoresearch` | 278 | 41 | 59 | 63 | No root `AGENTS.md` found by scan; backup refs exist; central pointer hits found in active tool docs | WARN |
-| `file-code` | 0 | 0 | 0 | 0 | Not listed in `SeaBridgeAI.code-workspace`; do not scan, clone, or add unless Alejandro provides a source path | DEFERRED/INACTIVE |
-| `app-streaming` | 0 | 0 | 0 | 0 | Not listed in `SeaBridgeAI.code-workspace`; do not scan, clone, or add unless Alejandro provides a source path | DEFERRED/INACTIVE |
-| `SeaBridgeAI_upstream` | 0 | 0 | 0 | 0 | Stale alias; valid active path is `C:\Users\adelm\SeaBridgeAI\_upstream` | STALE ALIAS |
-| `_upstream` | 3042 | 359 | 158 | 725 | Exists at `C:\Users\adelm\SeaBridgeAI\_upstream`; reference/upstream only | WARN |
+| the non-inventory file-intelligence repo | 0 | 0 | 0 | 0 | Not listed in `SeaBridgeAI.code-workspace`; do not scan, clone, or add unless Alejandro provides a source path | DEFERRED/INACTIVE |
+| the non-inventory streaming repo | 0 | 0 | 0 | 0 | Not listed in `SeaBridgeAI.code-workspace`; do not scan, clone, or add unless Alejandro provides a source path | DEFERRED/INACTIVE |
+| the legacy upstream alias | 0 | 0 | 0 | 0 | Stale alias; valid active path is `C:\Users\adelm\SeaBridgeAI\_upstream` | STALE ALIAS |
+| `_upstream` | 3042 | 359 | 158 | 725 | Exists at `C:\Users\adelm\SeaBridgeAI\_upstream`; active upstream mirror workspace with root SeaBridgeAI guardrails | WARN |
 
 ## Source-Of-Truth Hierarchy
 
@@ -53,8 +53,8 @@ Observed nuance: several existing files phrase load order as local repo guidance
 | `manageesg-frontend` | Next.js enterprise dashboard | API-backed claims, route visibility, loading/error/empty states, accessibility, responsive UX | `sea-frontend-design`, `sea-backend-api-verification`, `sea-ai-data-integrity` | Lint/typecheck/build/test, Playwright for user flows | Backend API contracts |
 | `openseabri` | Consumer/community sustainability product and agent harness/tool layer | MCP/resources/tools, WebSocket/HTTP, channel integrations, upstream adapters, standalone mode | `sea-frontend-design`, `sea-ai-data-integrity`, `sea-backend-api-verification`, `sea-cross-repo-handoff` | Typecheck, Vitest/node tests, MCP/HTTP/WebSocket smokes, Playwright when UI risk warrants | Backend proxy routes, Hermes/MiroFish/OpenClaw adapters |
 | `autoresearch` | Research, ML, optimization, Feynman, Paper2Agent, graphify | Provenance, experiments, local LLM boundaries, no unreviewed production feed | `sea-ai-data-integrity`, `sea-sustainability-domain-review`, `sea-context-hygiene`, `sea-cross-repo-handoff` | Tool-local tests/build/smokes; provenance sidecars | Backend autoresearch adapter, local LLM/Unsloth |
-| `file-code` | Deferred/inactive knowledge graph/file intelligence tooling | Not active in current workspace | `sea-cross-repo-handoff`, `sea-knowledge-vault` only after path confirmation | Do not scan, clone, or add until path exists | Backend/frontend/OpenSeaBri context support |
-| `app-streaming` | Deferred/inactive streaming/multi-tool orchestration | Not active in current workspace | `sea-gsd-controlled-execution`, `sea-cross-repo-handoff` only after path confirmation | Do not scan, clone, or add until path exists | OpenSeaBri and backend/frontend orchestration |
+| the non-inventory file-intelligence repo | Deferred/inactive knowledge graph/file intelligence tooling | Not active in current workspace | `sea-cross-repo-handoff`, `sea-knowledge-vault` only after path confirmation | Do not scan, clone, or add until path exists | Backend/frontend/OpenSeaBri context support |
+| the non-inventory streaming repo | Deferred/inactive streaming/multi-tool orchestration | Not active in current workspace | `sea-gsd-controlled-execution`, `sea-cross-repo-handoff` only after path confirmation | Do not scan, clone, or add until path exists | OpenSeaBri and backend/frontend orchestration |
 | `_upstream` | Reference/upstream mirrors | Reuse patterns only after validation; do not blindly copy | `sea-senior-dev-workflow`, `sea-context-hygiene`, `sea-cross-repo-handoff` | Upstream-native commands only after inspection | Hermes, MiroFish, OpenClaw, GSD, other references |
 
 ## Skill Catalog Review
@@ -92,7 +92,7 @@ Observed nuance: several existing files phrase load order as local repo guidance
 | Backend route/schema/auth verification | Backend instructions and repo integration | Keep in `sea-backend-api-verification`; add checklist if not current | Common regression source | High |
 | OpenSeaBri harness/channel gates | `openseabri` docs | Preserve repo-specific plus `repo-integrations/openseabri.md` | Product-specific runtime details | Medium |
 | AutoResearch provenance | `autoresearch` docs | Preserve repo-specific plus `sea-ai-data-integrity` | Research outputs must stay traceable | Medium |
-| file-code/app-streaming role docs | Requested paths only | Keep deferred/inactive until paths are confirmed | Current paths are not active workspace repos | Low |
+| non-inventory tool-repo role docs | Requested paths only | Keep deferred/inactive until paths are confirmed | Current paths are not active workspace repos | Low |
 | Local LLM/Unsloth guardrails | Backend AGENTS, ECC skill | Keep in `sea-local-llm-training` | Approval and VRAM safety | High |
 
 ## Contradictions Found And Actions
@@ -105,15 +105,15 @@ Fixed:
 - Stale ECC authorization-password wording. Replaced with the current no-separate-password rule.
 - Stale autonomous-loop phrasing in ECC `AGENTS.md`. Reworded to scoped/controlled/explicitly allowed execution.
 - Central callable skill catalogs omitted reviewer skills. Added reviewer skills to ECC catalog surfaces.
-- Missing-repo handling. Confirmed `SeaBridgeAI.code-workspace` contains backend, frontend, openseabri, climada-stack, ECC, autoresearch, `.falkordb-data`, `_upstream`, and the knowledge vault, but not `file-code` or `app-streaming`.
-- Decision recorded. `file-code` and `app-streaming` are not cloned or added now; they remain deferred/inactive until Alejandro provides source paths.
+- Missing-repo handling. Confirmed `SeaBridgeAI.code-workspace` contains backend, frontend, openseabri, climada-stack, ECC, autoresearch, `.falkordb-data`, `_upstream`, and the knowledge vault, but not the non-inventory file-intelligence repo or the non-inventory streaming repo.
+- Decision recorded. the previously requested non-inventory tool repos are not cloned or added now; they remain deferred/inactive until Alejandro provides source paths.
 - Efficient validation. Added `scripts/check-coding-agent-system.ps1` and `checklists/root-clutter.md`.
 - Root artifact cleanup. Moved ten root report artifacts from `manageesg-backend` and `openseabri` into approved `docs/reports/audits`, `docs/reports/readiness`, and `docs/reports/qa` folders.
 
 Remaining:
 
-- `file-code` and `app-streaming` are deferred/inactive. Agents should not recursively hunt for them, clone them, or add them unless Alejandro provides source paths.
-- `SeaBridgeAI_upstream` is a stale alias. Use `_upstream` at `C:\Users\adelm\SeaBridgeAI\_upstream`.
+- the previously requested non-inventory tool repos are deferred/inactive. Agents should not recursively hunt for them, clone them, or add them unless Alejandro provides source paths.
+- the legacy upstream alias is a stale alias. Use `_upstream` at `C:\Users\adelm\SeaBridgeAI\_upstream`.
 - Existing load-order language can be read as local-first while the requested hierarchy is central-first. Recommended wording: read local first for discovery, resolve conflicts by central hierarchy and stricter safety.
 - External/vendor/upstream directories create duplicate skill-name scan noise. Treat these as reference-only unless explicitly working in those packages.
 - Several repos have non-canonical root markdown files and extensive prior reports. Cleanup was not performed.
@@ -166,8 +166,8 @@ By default it omits deferred/inactive repos so active-system validation can fini
 | Duplicate skill name scan | WARN. Many duplicates in ECC external/vendor/docs/reference corpora; SeaBridgeAI canonical/wrapper duplicates are intentional. |
 | Missing wrapper scan | PASS after fix for canonical `skills/sea-*`. |
 | Missing canonical scan | PASS after fix for SeaBridgeAI reviewer skills. |
-| Stale path scan | PASS. `file-code` and `app-streaming` classified as deferred/inactive; `SeaBridgeAI_upstream` classified as stale alias for `_upstream`. |
-| Auto-push/auto-commit/global-install/yolo scan | PASS/WARN. Active SeaBridgeAI guidance prohibits these without approval; external/upstream/reference files are noisy. |
+| Stale path scan | PASS. the previously requested non-inventory tool repos classified as deferred/inactive; the legacy upstream alias classified as stale alias for `_upstream`. |
+| Unsafe automation and install scan | PASS/WARN. Active SeaBridgeAI guidance prohibits approval-gated automation and install actions without approval; external/upstream/reference files are noisy. |
 | Repo pointer scan | PASS for backend, frontend, openseabri, ECC, autoresearch, and `_upstream`; deferred repos require path confirmation before scanning. |
 | Root clutter policy scan | PASS. Policy exists, `checklists/root-clutter.md` was added, and current root artifact candidates were moved. |
 
@@ -189,9 +189,9 @@ Current result:
 
 Optional findings:
 
-- `file-code` not present at `C:\Users\adelm\SeaBridgeAI\file-code`.
-- `app-streaming` not present at `C:\Users\adelm\SeaBridgeAI\app-streaming`.
-- `SeaBridgeAI_upstream` not present at `C:\Users\adelm\SeaBridgeAI_upstream`; use `_upstream` instead.
+- the non-inventory file-intelligence repo not present at `C:\Users\adelm\SeaBridgeAI\non-inventory file-intelligence repo`.
+- the non-inventory streaming repo not present at `C:\Users\adelm\SeaBridgeAI\non-inventory streaming repo`.
+- the legacy upstream alias not present at `C:\Users\adelm\legacy upstream alias`; use `_upstream` instead.
 
 Moved root report artifacts:
 
@@ -208,15 +208,15 @@ Moved root report artifacts:
 
 ## Unresolved Risks
 
-- Deferred repos need user-supplied source paths before `file-code` or `app-streaming` can become active workspace repos.
+- Deferred repos need user-supplied source paths before the non-inventory file-intelligence repo or the non-inventory streaming repo can become active workspace repos.
 - The worktrees were already dirty before edits; final commit grouping needs manual review.
 - External/vendor/upstream reference corpora will keep producing false positives unless future scans use the targeted validation script or classify those folders separately.
 - Load-order wording should be harmonized in central and repo root files in a future focused pass.
 
 ## Next Recommended Work
 
-1. Keep `file-code` and `app-streaming` out of active tasks unless Alejandro provides source paths.
+1. Keep the previously requested non-inventory tool repos out of active tasks unless Alejandro provides source paths.
 2. Harmonize load-order wording across ECC and repo root guidance.
-3. Add or update repo integration docs for any confirmed file-code/app-streaming repos.
+3. Add or update repo integration docs for any confirmed non-inventory tool-repo repos.
 4. Keep using `scripts/check-coding-agent-system.ps1` before/after future agent-system edits.
 5. Run a periodic cross-agent sync validation after the above cleanup.

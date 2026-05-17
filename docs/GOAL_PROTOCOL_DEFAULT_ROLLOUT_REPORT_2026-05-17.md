@@ -1,4 +1,4 @@
-# /goal Default Protocol Rollout Report
+﻿# /goal Default Protocol Rollout Report
 
 Date: 2026-05-17
 
@@ -10,7 +10,7 @@ Authorized repos scanned and updated:
 - `C:\Users\adelm\SeaBridgeAI\manageesg-backend`
 - `C:\Users\adelm\SeaBridgeAI\manageesg-frontend`
 - `C:\Users\adelm\SeaBridgeAI\openseabri`
-- `C:\Users\adelm\SeaBridgeAI\shared-agent-skills`
+- `C:\Users\adelm\SeaBridgeAI\legacy-external-skills-repo`
 - `C:\Users\adelm\SeaBridgeAI\climada-stack`
 - `C:\Users\adelm\SeaBridgeAI\autoresearch`
 
@@ -86,7 +86,7 @@ Added compact `/goal` inheritance blocks to:
 - ECC reviewer skill wrappers
 - ECC Spec Kit skills
 - product/repo-local `SKILL.md` files under `.agents`, `.claude/skills`, `.deepagents`, `agent-tooling`, `skills`, and design skill folders in the authorized repos
-- `shared-agent-skills` skill corpus
+- `legacy-external-skills-repo` skill corpus
 - `autoresearch` local and Feynman-related agent skills
 - OpenSeaBri consumer sustainability/resilience skills
 

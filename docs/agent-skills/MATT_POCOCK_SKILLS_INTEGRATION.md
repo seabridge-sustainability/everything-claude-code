@@ -1,4 +1,4 @@
-# Matt Pocock Skills Integration For SeaBridgeAI
+﻿# Matt Pocock Skills Integration For SeaBridgeAI
 
 Date: 2026-05-11
 
@@ -11,8 +11,8 @@ reference, adapted through ECC wrappers. The integration extends the existing
 SeaBridgeAI agent ecosystem; it does not replace `sea-*` skills, Superpowers,
 GSD, Agent Shield, Graphify, FalkorDB, or repo-specific instructions.
 
-Central upstream clone:
-`C:\Users\adelm\SeaBridgeAI\shared-agent-skills`
+ECC-vendored upstream snapshot:
+`C:\Users\adelm\SeaBridgeAI\everything-claude-code\references\matt-pocock-skills`
 
 ECC shared contract:
 `C:\Users\adelm\SeaBridgeAI\everything-claude-code\AGENT_SKILLS.md`
@@ -27,12 +27,12 @@ flowchart TD
   A[Global Shared Standards<br/>SEABRIDGE_CODING_AGENT_SYSTEM.md] --> B[Shared Agent Skills<br/>AGENT_SKILLS.md + ECC wrappers]
   B --> C[Repository-Specific Overrides<br/>AGENTS.md / CLAUDE.md / AGENTS_SYSTEM.md]
   C --> D[Task Runtime Instructions<br/>user request + active skills]
-  B --> E[Matt Pocock Upstream Clone<br/>shared-agent-skills]
+  B --> E[Matt Pocock Skills Snapshot<br/>references/matt-pocock-skills]
   B --> F[SeaBridge sea-* Skills]
 ```
 
 No circular loading is required: product repos point to ECC; ECC wrappers point
-to the central upstream clone; upstream skill bodies do not point back into
+to the vendored ECC reference snapshot; upstream skill bodies do not point back into
 product repos.
 
 ## Active Invocation
@@ -178,22 +178,19 @@ Order:
 
 ## Update Mechanism
 
-Check current clone:
+Check current ECC snapshot:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File C:\Users\adelm\SeaBridgeAI\everything-claude-code\scripts\update-shared-agent-skills.ps1
+powershell -ExecutionPolicy Bypass -File C:\Users\adelm\SeaBridgeAI\everything-claude-code\scripts\update-canonical-skills.ps1
 ```
 
-Pull only if the clone is clean:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File C:\Users\adelm\SeaBridgeAI\everything-claude-code\scripts\update-shared-agent-skills.ps1 -Pull
-```
+Upstream pulls are intentionally disabled for this snapshot. Update through the
+normal `everything-claude-code` review, test, commit, and push flow.
 
 Validate integration:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File C:\Users\adelm\SeaBridgeAI\everything-claude-code\scripts\check-shared-agent-skills.ps1
+powershell -ExecutionPolicy Bypass -File C:\Users\adelm\SeaBridgeAI\everything-claude-code\scripts\check-canonical-skills.ps1
 ```
 
 ## Rollback
@@ -202,6 +199,6 @@ powershell -ExecutionPolicy Bypass -File C:\Users\adelm\SeaBridgeAI\everything-c
    `#skill/improve-codebase-architecture`.
 2. Remove repo-level `AGENT_SKILLS.md` and `AGENT.md` pointer files if needed.
 3. Remove ECC wrappers for the three skills.
-4. Keep or delete the central clone only after confirming no other agents use it.
+4. Keep or remove the vendored reference snapshot only after confirming no other agents use it.
 
-Do not delete the central clone automatically.
+Do not delete the vendored reference snapshot automatically.

@@ -11,16 +11,14 @@ $expectedActiveRepos = @(
   "manageesg-backend",
   "manageesg-frontend",
   "openseabri",
+  "climada-stack",
   "everything-claude-code",
   "autoresearch",
+  ".falkordb-data",
   "_upstream"
 )
 
-$optionalUnresolvedRepos = @(
-  @{ Name = "file-code"; Path = Join-Path $RootPath "file-code"; Expected = "optional-or-future" },
-  @{ Name = "app-streaming"; Path = Join-Path $RootPath "app-streaming"; Expected = "optional-or-future" },
-  @{ Name = "SeaBridgeAI_upstream"; Path = "C:\Users\adelm\SeaBridgeAI_upstream"; Expected = "stale-alias-for-_upstream" }
-)
+$optionalUnresolvedRepos = @()
 
 function Add-Finding($List, $Rule, $Severity, $Message, $Path = $null) {
   $List.Add([pscustomobject]@{
@@ -83,6 +81,8 @@ foreach ($repo in $expectedActiveRepos) {
     "AGENTS_SYSTEM.md",
     "AGENT.md",
     "AGENT_SKILLS.md",
+    "AGENT_SYSTEM_AUDIT.md",
+    "CANONICAL_SKILLS_AUDIT.md",
     "CLAUDE.md",
     "GEMINI.md",
     "CODEX.md",

@@ -8,8 +8,8 @@ description: SeaBridgeAI wrapper for Matt Pocock's ubiquitous-language skill. Us
 Use this as a focused supplement to `sea-sustainability-domain-review`,
 `sea-ai-data-integrity`, and `sea-cross-repo-handoff`.
 
-Upstream reference:
-`C:\Users\adelm\SeaBridgeAI\shared-agent-skills\skills\deprecated\ubiquitous-language\SKILL.md`
+ECC vendored reference:
+`C:\Users\adelm\SeaBridgeAI\everything-claude-code\references\matt-pocock-skills\skills\deprecated\ubiquitous-language\SKILL.md`
 
 Note: the upstream skill is currently under `deprecated`. SeaBridgeAI keeps it
 as an adapted terminology workflow, not as an upstream command dependency.

@@ -65,9 +65,11 @@ Use reviewer skills for second-pass risk checks or focused reviews.
 | `manageesg-frontend` | Next.js enterprise dashboard and API-backed workflows | `sea-frontend-design`, `sea-backend-api-verification`, `sea-ai-data-integrity` |
 | `openseabri` | Consumer/community sustainability product and reusable agent harness/tool layer | `sea-frontend-design`, `sea-ai-data-integrity`, `sea-backend-api-verification`, `sea-cross-repo-handoff` |
 | `autoresearch` | Research, Feynman, Paper2Agent, graphify, ML experiments | `sea-ai-data-integrity`, `sea-sustainability-domain-review`, `sea-context-hygiene`, `sea-cross-repo-handoff` |
-| `_upstream` | Pinned/reference upstream mirrors | `sea-senior-dev-workflow`, `sea-context-hygiene`, `sea-cross-repo-handoff` |
-| `file-code` | Deferred/inactive knowledge graph/file intelligence repo; not present in the active workspace as of 2026-05-17 | Do not scan, clone, or add unless Alejandro provides a source path |
-| `app-streaming` | Deferred/inactive streaming/multi-tool orchestration repo; not present in the active workspace as of 2026-05-17 | Do not scan, clone, or add unless Alejandro provides a source path |
+| `climada-stack` | CLIMADA physical/nature/climate-risk reference stack | `sea-ai-data-integrity`, `sea-sustainability-domain-review`, `sea-cross-repo-handoff` |
+| `.falkordb-data` | FalkorDB data volume, not a source repo | `sea-context-hygiene`, `sea-ai-data-integrity` only for explicit data-volume review |
+| `_upstream` | Active pinned upstream workspace for mirror review, compatibility patches, adapter analysis, tests, and controlled reference extraction | `sea-senior-dev-workflow`, `sea-context-hygiene`, `sea-cross-repo-handoff`, reviewer skills as needed |
+
+Only these rows are active routing targets. Unlisted repos and secondary shared-skills repositories are outside the active workspace unless Alejandro explicitly updates the inventory.
 
 ## Safety Defaults
 
@@ -87,6 +89,6 @@ For a fast consistency check, run from ECC:
 powershell -ExecutionPolicy Bypass -File scripts\check-coding-agent-system.ps1
 ```
 
-Use this targeted check instead of broad recursive workspace scans. It exits cleanly when the active workspace is consistent. To show deferred/inactive repos such as `file-code` and `app-streaming`, add `-IncludeOptionalRepos`.
+Use this targeted check instead of broad recursive workspace scans. It exits cleanly when the active workspace is consistent.
 
 Broad scans should exclude `external/`, `vendor/`, `plugins/`, `node_modules/`, virtual environments, build outputs, and generated graph/report artifacts.

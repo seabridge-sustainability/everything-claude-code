@@ -9,7 +9,7 @@ Root: C:\Users\adelm\SeaBridgeAI
 | Repo | Files scanned | /goal | auto-loop | unified | DoD | validation | stuck recovery | anti-false-completion | timeout/stagnation | completion evidence | duplicate blocks | empty files | missing protocol | potential conflicts |
 |---|---:|---|---|---|---|---|---|---|---|---|---:|---:|---|---|
 | everything-claude-code | 10 | True | True | False | True | True | True | True | True | False | 0 | 0 | GoalAutoUnified, CompletionEvidence | auto-push, yolo |
-| shared-agent-skills | 6 | True | True | False | True | True | True | True | False | False | 0 | 0 | GoalAutoUnified, TimeoutStagnation, CompletionEvidence |  |
+| legacy-external-skills-repo | 6 | True | True | False | True | True | True | True | False | False | 0 | 0 | GoalAutoUnified, TimeoutStagnation, CompletionEvidence |  |
 | manageesg-backend | 12 | True | True | False | True | True | True | True | False | False | 0 | 0 | GoalAutoUnified, TimeoutStagnation, CompletionEvidence | yolo |
 | manageesg-frontend | 10 | True | True | False | True | True | True | True | False | False | 0 | 0 | GoalAutoUnified, TimeoutStagnation, CompletionEvidence | yolo |
 | openseabri | 10 | True | True | False | True | True | True | True | False | False | 0 | 0 | GoalAutoUnified, TimeoutStagnation, CompletionEvidence | yolo |
@@ -30,12 +30,12 @@ Root: C:\Users\adelm\SeaBridgeAI
 | everything-claude-code | CODEX.md | True | True | True | True | True | False |
 | everything-claude-code | GEMINI.md | True | True | True | True | True | False |
 | everything-claude-code | OPENCODE.md | True | True | True | True | True | False |
-| shared-agent-skills | AGENT.md | True | True | True | True | True | False |
-| shared-agent-skills | AGENTS.md | True | True | True | True | True | False |
-| shared-agent-skills | CLAUDE.md | True | True | True | True | True | False |
-| shared-agent-skills | CODEX.md | True | True | True | True | True | False |
-| shared-agent-skills | GEMINI.md | True | True | True | True | True | False |
-| shared-agent-skills | OPENCODE.md | True | True | True | True | True | False |
+| legacy-external-skills-repo | AGENT.md | True | True | True | True | True | False |
+| legacy-external-skills-repo | AGENTS.md | True | True | True | True | True | False |
+| legacy-external-skills-repo | CLAUDE.md | True | True | True | True | True | False |
+| legacy-external-skills-repo | CODEX.md | True | True | True | True | True | False |
+| legacy-external-skills-repo | GEMINI.md | True | True | True | True | True | False |
+| legacy-external-skills-repo | OPENCODE.md | True | True | True | True | True | False |
 | manageesg-backend | AGENT.md | True | True | True | True | True | False |
 | manageesg-backend | AGENTS.md | True | True | True | True | True | False |
 | manageesg-backend | CLAUDE.md | True | True | True | True | True | False |

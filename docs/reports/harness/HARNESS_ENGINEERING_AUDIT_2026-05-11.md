@@ -1,4 +1,4 @@
-# Harness Engineering Audit - 2026-05-11
+﻿# Harness Engineering Audit - 2026-05-11
 
 SYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1
 
@@ -13,7 +13,7 @@ Audited the harness surface across:
 - `openseabri`
 - `_upstream`
 - `autoresearch`
-- `shared-agent-skills`
+- `legacy-external-skills-repo`
 
 ## Existing Harness Components Preserved
 

@@ -14,13 +14,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Validate shared agent skills
+      - name: Validate canonical ECC skills
         shell: pwsh
         run: |
-          git clone https://github.com/mattpocock/skills "$env:GITHUB_WORKSPACE\..\shared-agent-skills"
-          powershell -ExecutionPolicy Bypass -File scripts/check-shared-agent-skills.ps1 `
+          powershell -ExecutionPolicy Bypass -File scripts/check-canonical-skills.ps1 `
             -EccPath "$env:GITHUB_WORKSPACE" `
-            -SharedSkillsPath "$env:GITHUB_WORKSPACE\..\shared-agent-skills" `
+            -MattPocockSnapshotPath "$env:GITHUB_WORKSPACE\references\matt-pocock-skills" `
             -SkipRepoPointers
 
       - name: Agent runtime harness checks

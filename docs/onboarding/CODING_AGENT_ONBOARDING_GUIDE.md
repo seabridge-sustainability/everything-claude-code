@@ -29,9 +29,11 @@ If two instructions conflict, keep the stricter safety rule and document the con
 | `openseabri` | Consumer/community app and agent harness/tool layer | MCP resources/tools, channels, OpenSeaBri bridge/proxy surfaces | Duplicating enterprise backend data systems |
 | `everything-claude-code` | Central coding-agent system | Skills, workflows, checklists, compatibility, onboarding, reports | Product feature implementation |
 | `autoresearch` | Research/ML/optimization tooling | Feynman, Paper2Agent, graphify, experiment harnesses | Direct production behavior without review |
-| `_upstream` | Pinned upstream mirrors/reference tools | Learning, adapters, audited reusable patterns | Blind copying into product repos |
-| `file-code` | Deferred/inactive file intelligence/knowledge graph repo | Not present in the active workspace as of 2026-05-17 | Do not scan, clone, or add unless Alejandro provides a source path |
-| `app-streaming` | Deferred/inactive streaming/multi-tool orchestration repo | Not present in the active workspace as of 2026-05-17 | Do not scan, clone, or add unless Alejandro provides a source path |
+| `climada-stack` | CLIMADA physical/nature/climate-risk reference stack | Opt-in climate-risk review, adapters, and validation context | Silent production integration without explicit scope |
+| `.falkordb-data` | FalkorDB local data volume | Data-volume awareness and explicit approval-gated maintenance only | Source-code work, skill storage, or destructive cleanup |
+| `_upstream` | Active pinned upstream mirror workspace | Upstream review, compatibility patches, adapter analysis, tests, and controlled reference extraction | Blind copying into product repos or treating upstream unsafe examples as permission |
+
+Only the repositories listed in this table are active workspace targets. Do not scan for, clone, or expect secondary shared-skills repositories or unlisted tool repos.
 
 ## Cross-Repo Workflow
 
@@ -51,7 +53,7 @@ For efficient system validation, prefer:
 powershell -ExecutionPolicy Bypass -File C:\Users\adelm\SeaBridgeAI\everything-claude-code\scripts\check-coding-agent-system.ps1
 ```
 
-Do not use broad recursive searches for deferred repos unless the user confirms a path. Use `-IncludeOptionalRepos` only when you want informational visibility into deferred/inactive repos.
+Do not use broad recursive searches for unlisted repos unless Alejandro explicitly adds them to the active inventory.
 
 ## Testing Expectations
 

@@ -1,4 +1,4 @@
-﻿# Everything Claude Code (ECC) ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Agent Instructions
+# Everything Claude Code (ECC) ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Agent Instructions
 
 <!-- SEABRIDGE_GOAL_PROTOCOL_START -->
 ## /goal Default Operating Mode
@@ -45,7 +45,7 @@ Mandatory gates: local-only development unless approved; no GitHub push unless a
 Claude Code, Codex, Gemini, OpenCode, Cursor, GitHub Copilot CLI, and future coding agents must use the same SYSTEM_ID, canonical path, skill catalog, workflows, and checklists. Product repos should point here rather than duplicating divergent guidance.
 
 Shared engineering skill extensions live in `AGENT_SKILLS.md` and adapt
-`C:\Users\adelm\SeaBridgeAI\shared-agent-skills` without creating a parallel
+`C:\Users\adelm\SeaBridgeAI\everything-claude-code\references\matt-pocock-skills` without creating a parallel
 system. Active portable invocations: `#skill/grill-me`,
 `#skill/ubiquitous-language`, `#skill/improve-codebase-architecture`, or
 `Use skill: <name>`.
@@ -104,13 +104,13 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 Permanent behavioral constraints governing HOW every task is executed. Not optional. Cannot be overridden by session instructions. Full reference: `everything-claude-code/.claude/skills/karpathy-guidelines/SKILL.md`
 
 ### 1. Think Before Coding
-State assumptions explicitly before acting. If two interpretations exist, present both and ask. If something is unclear, name it and stop â€” do not guess. Push back when a simpler approach exists.
+State assumptions explicitly before acting. If two interpretations exist, present both and ask. If something is unclear, name it and stop — do not guess. Push back when a simpler approach exists.
 
 ### 2. Simplicity First
 Write the minimum code that solves the stated problem. No features, abstractions, or error handling beyond what was explicitly asked. If 200 lines could be 50, write 50. Test: would a senior engineer call this overcomplicated? If yes, simplify.
 
 ### 3. Surgical Changes
-Touch only what the request requires. Do not improve adjacent code, comments, or formatting. Do not refactor unrelated things. Mention unrelated bugs â€” do not fix them unilaterally. Every changed line must trace directly to the user's request.
+Touch only what the request requires. Do not improve adjacent code, comments, or formatting. Do not refactor unrelated things. Mention unrelated bugs — do not fix them unilaterally. Every changed line must trace directly to the user's request.
 
 ### 4. Goal-Driven Execution
 Transform tasks into verifiable goals. State what "done" looks like and how you'll verify it (test output, curl, observable behavior). Strong success criteria enable scoped continuation; weak ones require clarification.
@@ -125,11 +125,11 @@ Transform tasks into verifiable goals. State what "done" looks like and how you'
 
 ## Conflict Resolution Priority
 
-1. **Hard safety rules** (Â§Safety above) + **`manageesg-backend/AGENTS_SYSTEM.md`** Tier-1 safety (system-wide policy for all SeaBridgeAI coding agents â€” overrides this file for destructive actions, authorization, and cost controls). Non-suspendable.
-2. **Karpathy coding principles** (Â§above) â€” govern HOW every task executes. Always applied.
+1. **Hard safety rules** (§Safety above) + **`manageesg-backend/AGENTS_SYSTEM.md`** Tier-1 safety (system-wide policy for all SeaBridgeAI coding agents — overrides this file for destructive actions, authorization, and cost controls). Non-suspendable.
+2. **Karpathy coding principles** (§above) — govern HOW every task executes. Always applied.
 3. **Direct session/developer instructions** from the current session.
 4. **This file** (AGENTS.md).
-5. **ECC Core Principles** (Â§Core Principles below).
+5. **ECC Core Principles** (§Core Principles below).
 
 ---
 
@@ -139,11 +139,11 @@ This is a **production-ready AI coding plugin** providing 37 specialized agents,
 
 ## Core Principles
 
-1. **Agent-First** ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Delegate to specialized agents for domain tasks
-2. **Test-Driven** ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Write tests before implementation, 80%+ coverage required
-3. **Security-First** ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Never compromise on security; validate all inputs
-4. **Immutability** ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Always create new objects, never mutate existing ones
-5. **Plan Before Execute** ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Plan complex features before writing code
+1. **Agent-First** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Delegate to specialized agents for domain tasks
+2. **Test-Driven** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Write tests before implementation, 80%+ coverage required
+3. **Security-First** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Never compromise on security; validate all inputs
+4. **Immutability** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Always create new objects, never mutate existing ones
+5. **Plan Before Execute** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Plan complex features before writing code
 
 ## Documentation Retrieval Order
 
@@ -190,7 +190,7 @@ When documentation is needed, follow this order:
 ## GSD (Get Shit Done) Lifecycle Agents
 
 GSD provides structured multi-phase planning, execution, verification, and session management.
-Invoked explicitly via `/gsd-<name>` commands â€” not proactively triggered. Skill reference: `~/.claude/skills/gsd-lifecycle/SKILL.md`.
+Invoked explicitly via `/gsd-<name>` commands — not proactively triggered. Skill reference: `~/.claude/skills/gsd-lifecycle/SKILL.md`.
 
 | Agent | Purpose | Spawned By |
 |-------|---------|------------|
@@ -213,14 +213,14 @@ Invoked explicitly via `/gsd-<name>` commands â€” not proactively triggered
 ## Agent Orchestration
 
 Use agents only when the current runtime and user authorization allow delegation:
-- Complex feature requests ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ **planner**
-- Code just written/modified ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ **code-reviewer**
-- Bug fix or new feature ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ **tdd-guide**
-- Architectural decision ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ **architect**
-- Security-sensitive code ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ **security-reviewer**
-- Multi-channel communication triage ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ **chief-of-staff**
-- Controlled loops / loop monitoring ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ **loop-operator**
-- Harness config reliability and cost ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ **harness-optimizer**
+- Complex feature requests ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ **planner**
+- Code just written/modified ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ **code-reviewer**
+- Bug fix or new feature ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ **tdd-guide**
+- Architectural decision ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ **architect**
+- Security-sensitive code ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ **security-reviewer**
+- Multi-channel communication triage ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ **chief-of-staff**
+- Controlled loops / loop monitoring ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ **loop-operator**
+- Harness config reliability and cost ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ **harness-optimizer**
 
 Use parallel execution for independent operations only when the runtime supports it and user/developer policy allows it.
 
@@ -316,7 +316,7 @@ Use notes:
 
 **Secret management:** NEVER hardcode secrets. Use environment variables or a secret manager. Validate required secrets at startup. Rotate any exposed secrets immediately.
 
-**If security issue found:** STOP ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ use security-reviewer agent ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ fix CRITICAL issues ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ rotate exposed secrets ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ review codebase for similar issues.
+**If security issue found:** STOP ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ use security-reviewer agent ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ fix CRITICAL issues ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ rotate exposed secrets ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ review codebase for similar issues.
 
 ## Coding Style
 
@@ -339,34 +339,34 @@ Use notes:
 **Minimum coverage: 80%**
 
 Test types (all required):
-1. **Unit tests** ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Individual functions, utilities, components
-2. **Integration tests** ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â API endpoints, database operations
-3. **E2E tests** ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Critical user flows
+1. **Unit tests** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Individual functions, utilities, components
+2. **Integration tests** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â API endpoints, database operations
+3. **E2E tests** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Critical user flows
 
 **TDD workflow (mandatory):**
-1. Write test first (RED) ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â test should FAIL
-2. Write minimal implementation (GREEN) ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â test should PASS
-3. Refactor (IMPROVE) ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â verify coverage 80%+
+1. Write test first (RED) ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â test should FAIL
+2. Write minimal implementation (GREEN) ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â test should PASS
+3. Refactor (IMPROVE) ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â verify coverage 80%+
 
-Troubleshoot failures: check test isolation ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ verify mocks ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ fix implementation (not tests, unless tests are wrong).
+Troubleshoot failures: check test isolation ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ verify mocks ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ fix implementation (not tests, unless tests are wrong).
 
 ## Development Workflow
 
-1. **Plan** ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Use planner agent, identify dependencies and risks, break into phases
-2. **TDD** ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Use tdd-guide agent, write tests first, implement, refactor
-3. **Review** ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Use code-reviewer agent immediately, address CRITICAL/HIGH issues
+1. **Plan** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Use planner agent, identify dependencies and risks, break into phases
+2. **TDD** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Use tdd-guide agent, write tests first, implement, refactor
+3. **Review** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Use code-reviewer agent immediately, address CRITICAL/HIGH issues
 4. **Capture knowledge in the right place**
-   - Personal debugging notes, preferences, and temporary context ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ auto memory
-   - Team/project knowledge (architecture decisions, API changes, runbooks) ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ the project's existing docs structure
+   - Personal debugging notes, preferences, and temporary context ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ auto memory
+   - Team/project knowledge (architecture decisions, API changes, runbooks) ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ the project's existing docs structure
    - If the current task already produces the relevant docs or code comments, do not duplicate the same information elsewhere
    - If there is no obvious project doc location, ask before creating a new top-level file
-5. **Commit when explicitly approved** ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Conventional commits format, comprehensive PR summaries
+5. **Commit when explicitly approved** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Conventional commits format, comprehensive PR summaries
 
 ## Git Workflow
 
-**Commit format:** `<type>: <description>` ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Types: feat, fix, refactor, docs, test, chore, perf, ci
+**Commit format:** `<type>: <description>` ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Types: feat, fix, refactor, docs, test, chore, perf, ci
 
-**PR workflow:** Only when explicitly approved, analyze full commit history ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ draft comprehensive summary ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ include test plan ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ push only after the separate push approval gate is satisfied.
+**PR workflow:** Only when explicitly approved, analyze full commit history ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ draft comprehensive summary ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ include test plan ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ push only after the separate push approval gate is satisfied.
 
 ## Architecture Patterns
 
@@ -380,7 +380,7 @@ Troubleshoot failures: check test isolation ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€�
 
 **Context management:** Avoid last 20% of context window for large refactoring and multi-file features. Lower-sensitivity tasks (single edits, docs, simple fixes) tolerate higher utilization.
 
-**Build troubleshooting:** Use build-error-resolver agent ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ analyze errors ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ fix incrementally ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ verify after each fix.
+**Build troubleshooting:** Use build-error-resolver agent ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ analyze errors ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ fix incrementally ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ verify after each fix.
 
 ## Project Structure
 
@@ -388,11 +388,11 @@ Troubleshoot failures: check test isolation ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€�
 agents/          - 37 specialized subagents
 skills/          - 247+ workflow skills and domain knowledge
 commands/        - 60 slash commands
-hooks/           ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Trigger-based automations
-rules/           ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Always-follow guidelines (common + per-language)
-scripts/         ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Cross-platform Node.js utilities
-mcp-configs/     ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â 14 MCP server configurations
-tests/           ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Test suite
+hooks/           ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Trigger-based automations
+rules/           ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Always-follow guidelines (common + per-language)
+scripts/         ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Cross-platform Node.js utilities
+mcp-configs/     ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â 14 MCP server configurations
+tests/           ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Test suite
 ```
 
 ## Success Metrics
@@ -519,16 +519,16 @@ Storage path:
 
 ## ai-coscientist
 
-> **ARCHIVED** â€” Output feeds nowhere automatically in the current pipeline. Feynman covers the research brief; Paper2Agent covers methodology extraction. Archived at `autoresearch/archived/AI-CoScientist/`. Do not invoke unless a structured hypothesis-ranking step is explicitly added to the workflow.
+> **ARCHIVED** — Output feeds nowhere automatically in the current pipeline. Feynman covers the research brief; Paper2Agent covers methodology extraction. Archived at `autoresearch/archived/AI-CoScientist/`. Do not invoke unless a structured hypothesis-ranking step is explicitly added to the workflow.
 
 ## rtk
 
-RTK (Rust Token Killer) v0.35.0 is installed and active. It proxies shell commands to produce compressed, LLM-optimized output, reducing token consumption by 60â€“90% on verbose commands.
+RTK (Rust Token Killer) v0.35.0 is installed and active. It proxies shell commands to produce compressed, LLM-optimized output, reducing token consumption by 60–90% on verbose commands.
 
 Binary: `C:\Users\adelm\.local\bin\rtk.exe`
 Config: `C:\Users\adelm\AppData\Roaming\rtk\config.toml`
 
-Usage â€” prefix any shell command with `rtk`:
+Usage — prefix any shell command with `rtk`:
 ```
 rtk git status
 rtk git diff HEAD~1
@@ -538,11 +538,11 @@ rtk cargo build
 Scope: RTK only intercepts Bash/shell tool calls. It does NOT apply to built-in Read/Grep/Glob tools.
 
 Key RTK commands:
-- `rtk gain` â€” show token reduction statistics for the session
-- `rtk --version` â€” confirm binary is reachable
+- `rtk gain` — show token reduction statistics for the session
+- `rtk --version` — confirm binary is reachable
 
 Agent integrations:
-- Claude Code: CLAUDE.md injection (Windows â€” hook-based mode requires Unix)
+- Claude Code: CLAUDE.md injection (Windows — hook-based mode requires Unix)
 - Codex: `@C:\Users\adelm\.codex\RTK.md` via `~/.codex/AGENTS.md`
 - Gemini CLI: BeforeTool hook at `~/.gemini/hooks/rtk-hook-gemini.sh`
 
@@ -550,9 +550,9 @@ Agent integrations:
 
 ---
 
-## caveman â€” Token Compression
+## caveman — Token Compression
 
-Caveman compresses agent output ~65â€“75% using terse "caveman-style" prose that preserves full technical accuracy. Auto-activates via SessionStart hook after install.
+Caveman compresses agent output ~65–75% using terse "caveman-style" prose that preserves full technical accuracy. Auto-activates via SessionStart hook after install.
 
 **Reference:** `C:\Users\adelm\SeaBridgeAI\everything-claude-code\references\caveman\`
 
@@ -562,25 +562,23 @@ claude plugin marketplace add JuliusBrussee/caveman && claude plugin install cav
 ```
 
 Skills:
-- `/caveman` â€” activate compression (intensity: `lite` / `full` / `ultra` / `wenyan`)
-- `/caveman-commit` â€” terse commit messages
-- `/caveman-review` â€” one-line code reviews
-- `/caveman-compress` â€” compress CLAUDE.md ~46% to save input tokens every session
+- `/caveman` — activate compression (intensity: `lite` / `full` / `ultra` / `wenyan`)
+- `/caveman-commit` — terse commit messages
+- `/caveman-review` — one-line code reviews
+- `/caveman-compress` — compress CLAUDE.md ~46% to save input tokens every session
 
 Codex: use `$caveman` in prompts. Gemini: `gemini extensions install caveman`.
 
 ---
 
-## codeburn â€” Token Usage Dashboard
+## codeburn — Token Usage Dashboard
 
-Codeburn tracks AI coding token spend across Claude Code, Codex, Cursor, and others. Reads session data from disk â€” no API keys needed.
+Codeburn tracks AI coding token spend across Claude Code, Codex, Cursor, and others. Reads session data from disk — no API keys needed.
 
 **Reference:** `C:\Users\adelm\SeaBridgeAI\everything-claude-code\references\codeburn\`
 
-Install:
+Run one-shot with no global install:
 ```bash
-npm install -g codeburn
-# or one-shot:
 npx codeburn
 ```
 
@@ -597,7 +595,7 @@ codeburn export       # CSV/JSON export
 
 ---
 
-## designlang â€” Design Language Extraction
+## designlang — Design Language Extraction
 
 designlang crawls any live URL with a headless browser and generates 17+ output files (Tailwind config, CSS vars, shadcn theme, Figma variables, motion tokens, brand voice, component anatomy stubs, and an AI-optimized markdown file).
 
@@ -607,12 +605,12 @@ Skill: `/extract-design <url>` (installed at `~/.claude/skills/extract-design/`)
 CLI: `npx designlang <url>` (no install required) or `designlang <url>` (global install requires explicit approval)
 
 Key flags:
-- `--full` â€” multi-page crawl (auto-discovers nav pages)
-- `--out <dir>` â€” output directory (default: `./design-extract-output`)
-- `--dark` â€” also extract dark mode
-- `--screenshots` â€” capture component screenshots
-- `--emit-agent-rules` â€” writes `CLAUDE.md.fragment` rule files
-- `--smart` â€” LLM-assisted classifier (uses `ANTHROPIC_API_KEY`)
+- `--full` — multi-page crawl (auto-discovers nav pages)
+- `--out <dir>` — output directory (default: `./design-extract-output`)
+- `--dark` — also extract dark mode
+- `--screenshots` — capture component screenshots
+- `--emit-agent-rules` — writes `CLAUDE.md.fragment` rule files
+- `--smart` — LLM-assisted classifier (uses `ANTHROPIC_API_KEY`)
 
 SeaBridgeAI design token locations:
 - manageesg-frontend: `manageesg-frontend/design/`

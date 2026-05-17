@@ -1,4 +1,4 @@
-# Matt Pocock Shared Agent Skills Production Readiness Report - 2026-05-11
+﻿# Matt Pocock Shared Agent Skills Production Readiness Report - 2026-05-11
 
 SYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1
 
@@ -13,7 +13,7 @@ not replace existing SeaBridge `sea-*` workflows.
 | Item | Value |
 |---|---|
 | Upstream | `https://github.com/mattpocock/skills` |
-| Local clone | `C:\Users\adelm\SeaBridgeAI\shared-agent-skills` |
+| ECC vendored snapshot | `C:\Users\adelm\SeaBridgeAI\everything-claude-code\references\matt-pocock-skills` |
 | Commit inspected | `9f2e0bd0ea776eb6372eb81fa8a4a47814a8404a` |
 | ECC integration | `C:\Users\adelm\SeaBridgeAI\everything-claude-code` |
 
@@ -24,7 +24,7 @@ not replace existing SeaBridge `sea-*` workflows.
 - `everything-claude-code/AGENTS.md`
 - `everything-claude-code/CLAUDE.md`
 - root `AGENTS.md`, `CLAUDE.md`, `AGENTS_SYSTEM.md`, `.mcp.json` files across backend, frontend, OpenSeaBri, `_upstream`, and autoresearch
-- `shared-agent-skills/**/SKILL.md`
+- `references/matt-pocock-skills/**/SKILL.md`
 - existing ECC `.agents/skills/*` and `skills/*`
 
 ## Files Changed
@@ -38,8 +38,8 @@ not replace existing SeaBridge `sea-*` workflows.
 - `everything-claude-code/skills/ubiquitous-language/SKILL.md`
 - `everything-claude-code/skills/improve-codebase-architecture/SKILL.md`
 - `everything-claude-code/manifests/agent-skills/matt-pocock-skills.json`
-- `everything-claude-code/scripts/update-shared-agent-skills.ps1`
-- `everything-claude-code/scripts/check-shared-agent-skills.ps1`
+- `everything-claude-code/scripts/update-canonical-skills.ps1`
+- `everything-claude-code/scripts/check-canonical-skills.ps1`
 - `everything-claude-code/docs/agent-skills/MATT_POCOCK_SKILLS_INTEGRATION.md`
 - root `AGENT.md` / `AGENT_SKILLS.md` pointers in target repos
 
@@ -57,7 +57,7 @@ not replace existing SeaBridge `sea-*` workflows.
 
 ## Validation Checklist
 
-- Central clone exists: PASS
+- ECC vendored snapshot exists: PASS
 - Upstream commit recorded: PASS
 - Active wrappers exist: PASS
 - Registry metadata exists: PASS
@@ -83,7 +83,7 @@ not replace existing SeaBridge `sea-*` workflows.
 Validation commands run:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File C:\Users\adelm\SeaBridgeAI\everything-claude-code\scripts\check-shared-agent-skills.ps1
+powershell -ExecutionPolicy Bypass -File C:\Users\adelm\SeaBridgeAI\everything-claude-code\scripts\check-canonical-skills.ps1
 ```
 
 Result: PASS.
@@ -91,10 +91,10 @@ Result: PASS.
 Clone/update status command run:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File C:\Users\adelm\SeaBridgeAI\everything-claude-code\scripts\update-shared-agent-skills.ps1
+powershell -ExecutionPolicy Bypass -File C:\Users\adelm\SeaBridgeAI\everything-claude-code\scripts\update-canonical-skills.ps1
 ```
 
-Result: PASS. Clone path and commit reported without pulling.
+Result: PASS. ECC vendored snapshot path reported without pulling.
 
 Prompt conflict scans:
 

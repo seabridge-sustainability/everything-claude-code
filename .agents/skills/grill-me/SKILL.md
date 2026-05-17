@@ -8,8 +8,8 @@ description: SeaBridgeAI wrapper for Matt Pocock's grill-me skill. Use to advers
 Use this as a focused supplement to `sea-brainstorming-and-spec-refinement` and
 `sea-senior-dev-workflow`.
 
-Upstream reference:
-`C:\Users\adelm\SeaBridgeAI\shared-agent-skills\skills\productivity\grill-me\SKILL.md`
+ECC vendored reference:
+`C:\Users\adelm\SeaBridgeAI\everything-claude-code\references\matt-pocock-skills\skills\productivity\grill-me\SKILL.md`
 
 ## SeaBridgeAI Adaptation
 

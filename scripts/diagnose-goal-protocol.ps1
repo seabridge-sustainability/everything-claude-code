@@ -12,7 +12,6 @@ $InstructionNames = @(
 
 $TopLevelRepos = @(
     "everything-claude-code",
-    "shared-agent-skills",
     "manageesg-backend",
     "manageesg-frontend",
     "openseabri",

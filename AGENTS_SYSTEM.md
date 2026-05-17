@@ -151,7 +151,7 @@ All agents must follow these four principles as default coding behavior:
 1. Canonical skill bodies live at: `skills/sea-*/SKILL.md`
 2. Callable wrappers live at: `.agents/skills/sea-*/SKILL.md`
 3. Shared engineering skill wrappers live at `.agents/skills/grill-me`, `.agents/skills/ubiquitous-language`, and `.agents/skills/improve-codebase-architecture`.
-4. Matt Pocock upstream source lives at `C:\Users\adelm\SeaBridgeAI\shared-agent-skills`; use it only through ECC wrappers unless directly auditing upstream.
+4. Matt Pocock upstream source lives at `C:\Users\adelm\SeaBridgeAI\everything-claude-code\references\matt-pocock-skills`; use it only through ECC wrappers unless directly auditing upstream.
 5. Agents that support .agents/ directory (Codex) use wrappers directly.
 6. Agents without .agents/ support read canonical skills from skills/ directory.
 7. Both canonical and wrapper SKILL.md files describe the same behavior.

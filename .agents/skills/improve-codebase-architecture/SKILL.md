@@ -9,8 +9,8 @@ Use this as a focused supplement to `sea-senior-dev-workflow`,
 `sea-test-driven-development`, `sea-verification-before-completion`, and the
 relevant backend/frontend/AI/domain SeaBridge skills.
 
-Upstream reference:
-`C:\Users\adelm\SeaBridgeAI\shared-agent-skills\skills\engineering\improve-codebase-architecture\SKILL.md`
+ECC vendored reference:
+`C:\Users\adelm\SeaBridgeAI\everything-claude-code\references\matt-pocock-skills\skills\engineering\improve-codebase-architecture\SKILL.md`
 
 ## SeaBridgeAI Adaptation
 

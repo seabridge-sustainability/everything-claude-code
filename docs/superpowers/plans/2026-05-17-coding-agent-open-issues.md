@@ -24,7 +24,7 @@ Add the switch to the script parameters and wrap optional repo findings behind i
 
 - [x] **Step 2: Update docs**
 
-Document that default mode validates active repos only and optional mode shows `file-code`, `app-streaming`, and `SeaBridgeAI_upstream` information.
+Document that default mode validates active repos only and optional mode shows the non-inventory file-intelligence repo, the non-inventory streaming repo, and the legacy upstream alias information.
 
 - [x] **Step 3: Verify default mode**
 
@@ -88,7 +88,7 @@ Report central system status, repo consistency, skill conflict status, validatio
 
 - [x] **Step 1: Record decision**
 
-Recorded that `file-code` and `app-streaming` are deferred/inactive, should not be scanned recursively, and should not be cloned or added unless Alejandro provides source paths.
+Recorded that the previously requested non-inventory tool repos are deferred/inactive, should not be scanned recursively, and should not be cloned or added unless Alejandro provides source paths.
 
 - [ ] **Step 2: Re-run validation**
 

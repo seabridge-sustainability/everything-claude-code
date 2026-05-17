@@ -106,6 +106,8 @@ graphify-obsidian/
 # Local upstream reference checkouts
 references/opencode/
 references/open-design/
+references/spec-kit-temp/
+references/get-shit-done-temp/
 
 # GSD working state (project-local planning directory)
 .planning/

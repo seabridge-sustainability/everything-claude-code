@@ -20,9 +20,9 @@ repos:
         entry: powershell -ExecutionPolicy Bypass -File scripts/check-agent-runtime-guardrails.ps1
         language: system
         pass_filenames: false
-      - id: seabridge-shared-agent-skills
-        name: SeaBridgeAI shared agent skills validation
-        entry: powershell -ExecutionPolicy Bypass -File scripts/check-shared-agent-skills.ps1
+      - id: seabridge-canonical-skills
+        name: SeaBridgeAI canonical ECC skills validation
+        entry: powershell -ExecutionPolicy Bypass -File scripts/check-canonical-skills.ps1
         language: system
         pass_filenames: false
       - id: npm-audit-on-push

@@ -3,7 +3,7 @@
   "source": {
     "name": "mattpocock/skills",
     "url": "https://github.com/mattpocock/skills",
-    "local_path": "C:\\Users\\adelm\\SeaBridgeAI\\shared-agent-skills",
+    "local_path": "C:\\Users\\adelm\\SeaBridgeAI\\everything-claude-code\\references\\matt-pocock-skills",
     "commit": "9f2e0bd0ea776eb6372eb81fa8a4a47814a8404a",
     "integration_mode": "central_clone_with_seabridge_wrappers"
   },
@@ -17,7 +17,7 @@
       "name": "grill-me",
       "category": ["Product thinking", "Architecture", "Developer workflow"],
       "wrapper": "C:\\Users\\adelm\\SeaBridgeAI\\everything-claude-code\\.agents\\skills\\grill-me\\SKILL.md",
-      "source": "C:\\Users\\adelm\\SeaBridgeAI\\shared-agent-skills\\skills\\productivity\\grill-me\\SKILL.md",
+      "source": "C:\\Users\\adelm\\SeaBridgeAI\\everything-claude-code\\references\\matt-pocock-skills\\skills\\productivity\\grill-me\\SKILL.md",
       "maps_to_existing": ["sea-brainstorming-and-spec-refinement", "sea-senior-dev-workflow"],
       "status": "active"
     },
@@ -25,7 +25,7 @@
       "name": "ubiquitous-language",
       "category": ["Documentation", "Architecture", "API design"],
       "wrapper": "C:\\Users\\adelm\\SeaBridgeAI\\everything-claude-code\\.agents\\skills\\ubiquitous-language\\SKILL.md",
-      "source": "C:\\Users\\adelm\\SeaBridgeAI\\shared-agent-skills\\skills\\deprecated\\ubiquitous-language\\SKILL.md",
+      "source": "C:\\Users\\adelm\\SeaBridgeAI\\everything-claude-code\\references\\matt-pocock-skills\\skills\\deprecated\\ubiquitous-language\\SKILL.md",
       "maps_to_existing": ["sea-sustainability-domain-review", "sea-ai-data-integrity", "sea-cross-repo-handoff"],
       "status": "active_adapted_from_upstream_deprecated"
     },
@@ -33,7 +33,7 @@
       "name": "improve-codebase-architecture",
       "category": ["Architecture", "Refactoring", "Testing", "Backend reliability", "Frontend UX"],
       "wrapper": "C:\\Users\\adelm\\SeaBridgeAI\\everything-claude-code\\.agents\\skills\\improve-codebase-architecture\\SKILL.md",
-      "source": "C:\\Users\\adelm\\SeaBridgeAI\\shared-agent-skills\\skills\\engineering\\improve-codebase-architecture\\SKILL.md",
+      "source": "C:\\Users\\adelm\\SeaBridgeAI\\everything-claude-code\\references\\matt-pocock-skills\\skills\\engineering\\improve-codebase-architecture\\SKILL.md",
       "maps_to_existing": ["sea-senior-dev-workflow", "sea-test-driven-development", "sea-verification-before-completion"],
       "status": "active"
     }

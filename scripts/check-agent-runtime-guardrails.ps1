@@ -2,11 +2,12 @@ param(
   [string[]]$RepoPaths = @(
     "C:\Users\adelm\SeaBridgeAI\everything-claude-code",
     "C:\Users\adelm\SeaBridgeAI\manageesg-backend",
-    "C:\Users\adelm\SeaBridgeAI\manageesg-backend\seabridge-dev",
     "C:\Users\adelm\SeaBridgeAI\manageesg-frontend",
     "C:\Users\adelm\SeaBridgeAI\openseabri",
-    "C:\Users\adelm\SeaBridgeAI\_upstream",
-    "C:\Users\adelm\SeaBridgeAI\autoresearch"
+    "C:\Users\adelm\SeaBridgeAI\climada-stack",
+    "C:\Users\adelm\SeaBridgeAI\autoresearch",
+    "C:\Users\adelm\SeaBridgeAI\.falkordb-data",
+    "C:\Users\adelm\SeaBridgeAI\_upstream"
   ),
   [switch]$FailOnFinding
 )
@@ -43,8 +44,9 @@ foreach ($repo in $RepoPaths) {
 }
 
 $central = "C:\Users\adelm\SeaBridgeAI\everything-claude-code"
-if (Test-Path "$central\scripts\check-shared-agent-skills.ps1") {
-  & "$central\scripts\check-shared-agent-skills.ps1" | Out-Host
+if (Test-Path "$central\scripts\check-canonical-skills.ps1") {
+  & "$central\scripts\check-canonical-skills.ps1" `
+    -MattPocockSnapshotPath "$central\references\matt-pocock-skills" | Out-Host
 }
 
 $findings | ConvertTo-Json -Depth 4

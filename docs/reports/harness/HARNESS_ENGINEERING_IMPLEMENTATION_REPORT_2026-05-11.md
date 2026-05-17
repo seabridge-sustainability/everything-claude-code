@@ -1,4 +1,4 @@
-# Harness Engineering Implementation Report - 2026-05-11
+﻿# Harness Engineering Implementation Report - 2026-05-11
 
 SYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1
 
@@ -41,7 +41,7 @@ SYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1
 Commands run:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File C:\Users\adelm\SeaBridgeAI\everything-claude-code\scripts\check-shared-agent-skills.ps1
+powershell -ExecutionPolicy Bypass -File C:\Users\adelm\SeaBridgeAI\everything-claude-code\scripts\check-canonical-skills.ps1
 powershell -ExecutionPolicy Bypass -File C:\Users\adelm\SeaBridgeAI\everything-claude-code\scripts\check-agent-runtime-guardrails.ps1
 powershell -ExecutionPolicy Bypass -File C:\Users\adelm\SeaBridgeAI\everything-claude-code\scripts\check-harness.ps1 -Advisory
 pre-commit validate-config

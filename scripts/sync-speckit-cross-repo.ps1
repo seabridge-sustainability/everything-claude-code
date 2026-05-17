@@ -41,8 +41,7 @@ function Get-DefaultTargets {
         'manageesg-backend',
         'manageesg-frontend',
         'openseabri',
-        'seabridge-dev',
-        'shared-agent-skills'
+        'seabridge-dev'
     )
     if ($IncludeUpstream) {
         $names += '_upstream'

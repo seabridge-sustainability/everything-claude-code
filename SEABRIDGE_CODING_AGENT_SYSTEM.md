@@ -206,7 +206,7 @@ Callable wrappers live at C:\Users\adelm\SeaBridgeAI\everything-claude-code\.age
 
 SeaBridgeAI also maintains a centralized Matt Pocock skills reference clone at:
 
-C:\Users\adelm\SeaBridgeAI\shared-agent-skills
+C:\Users\adelm\SeaBridgeAI\everything-claude-code\references\matt-pocock-skills
 
 These skills extend the existing SeaBridgeAI system through ECC wrappers and do
 not create a second instruction hierarchy. The shared contract is:
@@ -334,5 +334,5 @@ GSD artifact templates:
 - Full vulnerability scans: when the user explicitly asks for a "full vulnerabilities scan" or "full vulnerability scan", run both Agent Shield and Strix through `scripts\run-full-vulnerability-scan.ps1 -ApprovedFullScan` after confirming the target scope is local/staging and not production. Agent Shield covers agent/MCP/config governance; Strix covers active application security testing. Do not run Strix against production, external domains, real tenant data, or paid/live providers beyond the approved scope.
 - Claude Mem: evaluated and intentionally excluded. SeaBridgeAI uses explicit markdown-based project memory through CLAUDE.md, AGENTS.md, AGENTS_SYSTEM.md, skills, workflows, checklists, audit logs, and handoff notes.
 - GSD: controlled local reference at external/get-shit-done, adapted through sea-gsd-controlled-execution, workflows, checklists, and templates. Uncontrolled autonomous/yolo execution is not enabled.
-- Matt Pocock skills: centralized local reference at C:\Users\adelm\SeaBridgeAI\shared-agent-skills, adapted through AGENT_SKILLS.md and ECC wrappers for grill-me, ubiquitous-language, and improve-codebase-architecture. Upstream setup, hooks, global installs, and product-repo skill copies are not enabled.
+- Matt Pocock skills: centralized local reference at C:\Users\adelm\SeaBridgeAI\everything-claude-code\references\matt-pocock-skills, adapted through AGENT_SKILLS.md and ECC wrappers for grill-me, ubiquitous-language, and improve-codebase-architecture. Upstream setup, hooks, global installs, and product-repo skill copies are not enabled.
 - Context hygiene: integrated through sea-context-hygiene; no global install is authorized by this file.
