@@ -122,6 +122,25 @@ has a working pattern.
 
 Controlled auto mode means an agent may continue through low-risk local maintenance steps without repeated prompts, while preserving approval gates.
 
+## SeaBridgeAI Branch Policy
+
+Use the normal branch for each repository unless the user explicitly requests a
+temporary branch:
+
+- `manageesg-backend`: `seabridge_development`
+- `manageesg-frontend`: `development`
+- `openseabri`: `main`
+- `climada-stack`: `master`
+- `everything-claude-code`: `main`
+- `autoresearch`: `master`
+- `_upstream`: `master`
+
+Do not create secondary audit, feature, or task branches merely because work is
+broad, risky, or cross-repo. Risk should change planning, validation, and review
+depth, not branch naming. If a temporary branch is explicitly requested, keep it
+short-lived and, after approval, land the work back onto the repository's normal
+branch.
+
 Allowed without repeated prompts:
 
 - Formatting.
