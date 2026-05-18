@@ -7,6 +7,18 @@ C:\Users\adelm\SeaBridgeAI\everything-claude-code
 
 This file applies to Claude Code, Codex, Gemini, OpenCode, Cursor, GitHub Copilot CLI, and future coding agents.
 
+## Instruction File Architecture
+
+Authoritative ECC instruction files:
+
+1. `AGENTS_SYSTEM.md` - cross-agent compatibility and load-order guide.
+2. `SEABRIDGE_CODING_AGENT_SYSTEM.md` - canonical SeaBridgeAI coding-agent operating system.
+3. `AGENTS.md` - generic/Codex-style ECC execution instructions.
+4. `CLAUDE.md`, `CODEX.md`, `GEMINI.md`, and `OPENCODE.md` - thin per-agent adapters.
+5. `AGENT_SKILLS.md` - canonical shared skills contract and invocation registry.
+
+Do not recreate `AGENT.md`. Agents should load `AGENTS_SYSTEM.md`, `SEABRIDGE_CODING_AGENT_SYSTEM.md`, `AGENTS.md`, the relevant thin adapter, and `AGENT_SKILLS.md` directly.
+
 ## Embedded Superpowers
 
 Superpowers is vendored locally as a reference at vendor\superpowers, adapted into the canonical SeaBridgeAI sea-* skills, and installed for Claude Code as the user-scope local plugin `superpowers@superpowers-dev` from the ECC vendor marketplace. Do not add, update, remove, or reinstall Superpowers globally or through any marketplace unless the user explicitly approves that separate action.
@@ -25,44 +37,25 @@ GSD / Get Shit Done is cloned locally at external\get-shit-done and adapted thro
 6. `AGENT_SKILLS.md` and the smallest relevant engineering-skill wrapper when invoked or clearly applicable.
 7. Matching workflows/ and checklists/.
 
-## Full Callable Skill Catalog
+## Dynamic Skill Registry
 
-- sea-senior-dev-workflow
-- sea-brainstorming-and-spec-refinement
-- sea-task-orchestration
-- sea-test-driven-development
-- sea-systematic-debugging
-- sea-verification-before-completion
-- sea-code-review-response
-- sea-git-worktree-isolation
-- sea-parallel-agent-dispatch
-- sea-finishing-development-branch
-- sea-backend-api-verification
-- sea-frontend-design
-- sea-ai-data-integrity
-- sea-sustainability-domain-review
-- sea-context-hygiene
-- sea-cross-repo-handoff
-- sea-skill-creator-protocol
-- sea-knowledge-vault
-- sea-gsd-controlled-execution
-- sea-local-llm-training
-- sea-ai-grounding-reviewer
-- sea-architecture-reviewer
-- sea-backend-api-reviewer
-- sea-frontend-ux-reviewer
-- sea-production-readiness-reviewer
-- sea-reliability-reviewer
-- sea-security-reviewer
-- grill-me
-- ubiquitous-language
-- improve-codebase-architecture
+ECC is the canonical source for reusable skills, but agents must discover the
+current skill surface dynamically instead of relying on copied static catalogs in
+product repos.
 
-## Mandatory Use Summary
+Primary lookup surfaces:
 
-Use senior workflow by default; brainstorming for broad specs; orchestration for multi-lane work; GSD-controlled execution for complex phases and context rot; TDD for behavior changes; systematic debugging for failures; verification before any completion claim; code-review response for reviews; worktree isolation for risky local isolation; parallel dispatch only when authorized; finishing branch before publish/merge/cleanup decisions; backend, frontend, AI data, sustainability, context, cross-repo, skill-creator, knowledge-vault, local LLM, and reviewer skills for their named domains.
+- `AGENT_SKILLS.md`
+- `.agents/skills/*/SKILL.md`
+- `skills/*/SKILL.md`
+- `.claude/skills/*/SKILL.md`
+- `workflows/`
+- `checklists/`
 
-Use `grill-me` for adversarial clarification, `ubiquitous-language` for domain terminology alignment, and `improve-codebase-architecture` for architecture refactor candidate discovery. These are Matt Pocock engineering skills adapted through ECC wrappers and governed by the same SeaBridgeAI approval gates.
+Use the smallest skill/workflow/checklist set that materially improves the task.
+Do not load every skill. If a task is simple, proceed without skills and state
+that no skill was needed. New skills become available through filesystem
+inspection, not through product-repo skill matrices.
 
 ## Approval Boundaries
 
@@ -114,13 +107,13 @@ All agents must follow these four principles as default coding behavior:
 ## Per-Agent Loading Instructions
 
 ### Claude Code
-1. CLAUDE.md is auto-loaded. It contains SYSTEM_ID pointer and skill catalog.
+1. CLAUDE.md is auto-loaded. It contains SYSTEM_ID pointer and dynamic skill registry policy.
 2. Skills can be invoked with /skill-name or by reading skills/sea-*/SKILL.md.
 3. .claude/settings.json and .claude/settings.local.json configure hooks and permissions.
 4. .mcp.json configures MCP servers (Berry, FalkorDB, etc.).
 
 ### Codex
-1. AGENTS.md is auto-loaded. It contains the same SYSTEM_ID pointer and skill catalog.
+1. AGENTS.md is auto-loaded. It contains the same SYSTEM_ID pointer and dynamic skill registry policy.
 2. Skills are invoked by reading SKILL.md content and following instructions.
 3. .codex/config.toml configures MCP servers and model providers.
 4. Subagents can be spawned for parallel work.
@@ -168,7 +161,7 @@ Agents should load the matching workflow/checklist when the task type aligns.
 
 ## Avoiding Agent-Specific Drift
 
-1. All agent instruction files (CLAUDE.md, AGENTS.md) in each repo must list the same SYSTEM_ID, canonical path, and skill catalog.
+1. All agent instruction files (CLAUDE.md, AGENTS.md) in each repo must list the same SYSTEM_ID, canonical path, and dynamic skill retrieval policy.
 2. Repo-specific rules may extend but never contradict the central system.
 3. When updating a skill, update the canonical file first, then verify the wrapper matches.
 4. Cross-repo changes require sea-cross-repo-handoff skill.

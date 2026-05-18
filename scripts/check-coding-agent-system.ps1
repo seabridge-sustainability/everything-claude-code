@@ -15,7 +15,8 @@ $expectedActiveRepos = @(
   "everything-claude-code",
   "autoresearch",
   ".falkordb-data",
-  "_upstream"
+  "_upstream",
+  "SeaBridgeAI"
 )
 
 $optionalUnresolvedRepos = @()
@@ -79,7 +80,6 @@ foreach ($repo in $expectedActiveRepos) {
     "README.zh-CN.md",
     "AGENTS.md",
     "AGENTS_SYSTEM.md",
-    "AGENT.md",
     "AGENT_SKILLS.md",
     "AGENT_SYSTEM_AUDIT.md",
     "CANONICAL_SKILLS_AUDIT.md",

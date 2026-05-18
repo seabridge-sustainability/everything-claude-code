@@ -79,13 +79,12 @@ $MarkerEnd
 function Test-AgentInstructionFile {
     param([string]$Path)
     $name = [System.IO.Path]::GetFileName($Path)
-    return $name -in @("AGENT.md", "AGENTS.md", "CLAUDE.md", "CODEX.md", "GEMINI.md", "OPENCODE.md")
+    return $name -in @("AGENTS.md", "CLAUDE.md", "CODEX.md", "GEMINI.md", "OPENCODE.md")
 }
 
 function Get-Heading {
     param([string]$FileName)
     switch ($FileName) {
-        "AGENT.md" { return "# SeaBridgeAI Agent Instructions" }
         "AGENTS.md" { return "# SeaBridgeAI Coding Agent Instructions" }
         "CLAUDE.md" { return "# SeaBridgeAI Claude Code Instructions" }
         "CODEX.md" { return "# SeaBridgeAI Codex Instructions" }
@@ -129,7 +128,7 @@ if (-not (Test-Path -LiteralPath $TargetRepo -PathType Container)) {
     throw "Target repo does not exist: $TargetRepo"
 }
 
-$required = @("AGENT.md", "AGENTS.md", "CLAUDE.md")
+$required = @("AGENTS.md", "CLAUDE.md")
 $optional = @("CODEX.md", "GEMINI.md", "OPENCODE.md")
 $files = @()
 $files += $required

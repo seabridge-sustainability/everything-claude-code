@@ -6,7 +6,7 @@ param(
 $ErrorActionPreference = "Stop"
 
 $InstructionNames = @(
-    "AGENT.md", "AGENTS.md", "CLAUDE.md", "CODEX.md", "GEMINI.md", "OPENCODE.md",
+    "AGENTS.md", "CLAUDE.md", "CODEX.md", "GEMINI.md", "OPENCODE.md",
     ".cursorrules", ".clinerules", ".windsurfrules", "opencode.jsonc"
 )
 

@@ -1443,6 +1443,10 @@ MIT - Use freely, modify as needed, contribute back if you can.
 
 `everything-claude-code` (ECC) is the **developer-tooling hub** for the SeaBridgeAI workspace. It does not run in production and is not imported by any backend or frontend service.
 
+### Coding Agent Instruction Architecture
+
+ECC keeps the reusable coding-agent system centralized. Authoritative files are `AGENTS_SYSTEM.md`, `SEABRIDGE_CODING_AGENT_SYSTEM.md`, `AGENTS.md`, `CLAUDE.md`, `CODEX.md`, `GEMINI.md`, `OPENCODE.md`, and `AGENT_SKILLS.md`. Do not recreate `AGENT.md`; repo-local product workspaces should point directly at these standard ECC files instead of carrying local skill catalogs or shim files.
+
 ### What ECC Does in the SeaBridgeAI Stack
 
 | ECC Component | What It Provides | Who Consumes It |

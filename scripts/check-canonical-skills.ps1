@@ -11,7 +11,6 @@ $required = @(
   "$MattPocockSnapshotPath\skills\deprecated\ubiquitous-language\SKILL.md",
   "$MattPocockSnapshotPath\skills\engineering\improve-codebase-architecture\SKILL.md",
   "$EccPath\AGENT_SKILLS.md",
-  "$EccPath\AGENT.md",
   "$EccPath\.agents\skills\grill-me\SKILL.md",
   "$EccPath\.agents\skills\ubiquitous-language\SKILL.md",
   "$EccPath\.agents\skills\improve-codebase-architecture\SKILL.md",
@@ -46,7 +45,7 @@ foreach ($wrapper in $registry.active_wrappers) {
   }
 }
 
-$repoPointers = @(
+$deprecatedRepoPointers = @(
   "C:\Users\adelm\SeaBridgeAI\manageesg-backend\AGENT_SKILLS.md",
   "C:\Users\adelm\SeaBridgeAI\manageesg-frontend\AGENT_SKILLS.md",
   "C:\Users\adelm\SeaBridgeAI\openseabri\AGENT_SKILLS.md",
@@ -55,13 +54,9 @@ $repoPointers = @(
 )
 
 if (-not $SkipRepoPointers) {
-  foreach ($path in $repoPointers) {
-    if (-not (Test-Path $path)) {
-      throw "Repo pointer missing: $path"
-    }
-    $content = Get-Content -Raw -LiteralPath $path
-    if ($content -notmatch "SEABRIDGE_AGENT_SYSTEM_V1" -or $content -notmatch "AGENT_SKILLS.md") {
-      throw "Repo pointer does not reference central skills contract: $path"
+  foreach ($path in $deprecatedRepoPointers) {
+    if (Test-Path $path) {
+      throw "Deprecated repo-local skill pointer should be removed: $path"
     }
   }
 }

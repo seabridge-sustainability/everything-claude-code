@@ -7,7 +7,8 @@ param(
     "C:\Users\adelm\SeaBridgeAI\climada-stack",
     "C:\Users\adelm\SeaBridgeAI\autoresearch",
     "C:\Users\adelm\SeaBridgeAI\.falkordb-data",
-    "C:\Users\adelm\SeaBridgeAI\_upstream"
+    "C:\Users\adelm\SeaBridgeAI\_upstream",
+    "C:\Users\adelm\SeaBridgeAI\SeaBridgeAI"
   ),
   [switch]$FailOnFinding
 )
@@ -31,7 +32,7 @@ foreach ($repo in $RepoPaths) {
     continue
   }
   $agentFiles = Get-ChildItem -Path $repo -File -ErrorAction SilentlyContinue |
-    Where-Object { $_.Name -in @("AGENTS.md","CLAUDE.md","AGENTS_SYSTEM.md","AGENT.md","AGENT_SKILLS.md") }
+    Where-Object { $_.Name -in @("AGENTS.md","CLAUDE.md","AGENTS_SYSTEM.md","CODEX.md","GEMINI.md","OPENCODE.md","AGENT_SKILLS.md") }
   foreach ($file in $agentFiles) {
     $content = Get-Content -Raw -LiteralPath $file.FullName
     if ($content -notmatch 'SEABRIDGE_AGENT_SYSTEM_V1') {

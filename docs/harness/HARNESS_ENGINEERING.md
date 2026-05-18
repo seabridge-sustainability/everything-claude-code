@@ -21,7 +21,7 @@ Global Shared Standards
 ## Load Order
 
 1. Session and developer instructions.
-2. Repo-local `AGENTS_SYSTEM.md`, `AGENTS.md`, `CLAUDE.md`, `AGENT.md`.
+2. Repo-local `AGENTS_SYSTEM.md`, `AGENTS.md`, `CLAUDE.md`, and any explicit per-agent adapter.
 3. ECC `SEABRIDGE_CODING_AGENT_SYSTEM.md`.
 4. ECC `AGENT_SKILLS.md`.
 5. This harness guide and the smallest matching standard.

@@ -1,6 +1,6 @@
 ---
 name: goal-default
-description: Defines /goal as the default execution wrapper for SeaBridgeAI coding-agent tasks and workflows. Use for every implementation, debugging, review, QA, planning, GSD, Spec Kit, skill, command, workflow, or cross-repo task that needs goal framing, Definition of Done, validation, persistence, and no-false-completion behavior across Claude Code, Codex, Gemini, OpenCode, Cursor, Copilot, Hermes Agent, Cline, and other agents.
+description: Defines the SeaBridgeAI goal protocol as the default execution wrapper for coding-agent tasks. Invoke this skill only by the exact name goal-default. Do not invoke Skill(goal); /goal is a user-facing Claude Code slash command, not a callable skill.
 ---
 
 # goal-default
@@ -21,7 +21,10 @@ Short embed:
 
 ## Invocation Patterns
 
-- Claude Code: `/goal <task>`
+- Claude Code: the user may type `/goal <task>` as a UI slash command. The agent
+  must not invoke `Skill(goal)`. If slash-command execution is unavailable or the
+  user typed `/goal` in plain text, apply this protocol manually or load this
+  skill by its exact name: `goal-default`.
 - Codex: `$goal <task>` or use this skill when slash commands are unavailable.
 - Gemini, OpenCode, Cursor, Copilot, Hermes Agent, Cline, and other agents: treat `goal:`, `/goal`, or any coding-agent task as wrapped by this protocol.
 

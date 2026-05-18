@@ -22,7 +22,7 @@ $findings = New-Object System.Collections.Generic.List[object]
 if (-not (Test-Path -LiteralPath $UpstreamPath)) {
   Add-Finding $findings "upstream.missing" "error" $UpstreamPath 0 "_upstream path is missing."
 } else {
-  $rootDocs = @("AGENTS.md", "CLAUDE.md", "AGENTS_SYSTEM.md", "CODEX.md", "GEMINI.md", "OPENCODE.md", "AGENT.md", "AGENT_SKILLS.md") |
+  $rootDocs = @("AGENTS.md", "CLAUDE.md", "AGENTS_SYSTEM.md", "CODEX.md", "GEMINI.md", "OPENCODE.md", "AGENT_SKILLS.md") |
     ForEach-Object { Join-Path $UpstreamPath $_ } |
     Where-Object { Test-Path -LiteralPath $_ }
 

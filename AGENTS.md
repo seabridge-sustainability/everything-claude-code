@@ -11,6 +11,11 @@ Before implementation, establish a persistent execution goal, Definition of Done
 
 /goal is the user-facing command; auto-loop is the autonomous persistent execution behavior. The agent must not return early after code generation, must not claim completion until validation passes, and must keep working until the Definition of Done is satisfied or a hard blocker is proven. If the task is likely to require more than 15 minutes, state the expected phases and validation steps before starting. If a non-trivial task finishes unusually quickly, include evidence explaining why it was genuinely small or already validated.
 
+Claude Code boundary: `/goal` is a UI slash command, not a callable skill. Agents
+must never invoke `Skill(goal)`. If the user includes `/goal`, treat it as the
+goal protocol wrapper and continue. If slash-command execution is unavailable,
+apply the protocol manually or use the exact skill name `goal-default`.
+
 Canonical protocol: C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md
 
 Compact form: C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL_SHORT.md
@@ -38,11 +43,14 @@ Superpowers is embedded as an adapted local methodology through the SeaBridgeAI 
 
 GSD / Get Shit Done is embedded as a controlled local reference and adapted workflow layer through `sea-gsd-controlled-execution`. Reference clone: C:\Users\adelm\SeaBridgeAI\everything-claude-code\external\get-shit-done. Do not run `npx get-shit-done-cc@latest`, install globally, enable yolo/autonomous mode, auto-commit, auto-push, or auto-create PRs unless explicitly approved.
 
-Full callable SeaBridgeAI skill catalog: sea-senior-dev-workflow, sea-brainstorming-and-spec-refinement, sea-task-orchestration, sea-test-driven-development, sea-systematic-debugging, sea-verification-before-completion, sea-code-review-response, sea-git-worktree-isolation, sea-parallel-agent-dispatch, sea-finishing-development-branch, sea-backend-api-verification, sea-frontend-design, sea-ai-data-integrity, sea-sustainability-domain-review, sea-context-hygiene, sea-cross-repo-handoff, sea-skill-creator-protocol, sea-knowledge-vault, sea-gsd-controlled-execution, sea-local-llm-training, sea-ai-grounding-reviewer, sea-architecture-reviewer, sea-backend-api-reviewer, sea-frontend-ux-reviewer, sea-production-readiness-reviewer, sea-reliability-reviewer, sea-security-reviewer, goal-default, speckit-constitution, speckit-specify, speckit-clarify, speckit-plan, speckit-tasks, speckit-analyze, speckit-checklist, speckit-implement, speckit-taskstoissues.
+Discover available SeaBridgeAI skills dynamically from `AGENT_SKILLS.md`,
+`.agents/skills/`, `skills/`, `.claude/skills/`, workflows, and checklists. Do
+not maintain copied full catalogs in product repos. Use only the smallest
+skill/workflow/checklist set that materially improves the task.
 
 Mandatory gates: local-only development unless approved; no GitHub push unless approved; no commit unless requested; no global install or marketplace install unless approved; no paid/live provider calls unless approved; no fabricated sustainability data; verify endpoint/database/source/auth/tenant behavior before frontend or product claims; verify before completion.
 
-Claude Code, Codex, Gemini, OpenCode, Cursor, GitHub Copilot CLI, and future coding agents must use the same SYSTEM_ID, canonical path, skill catalog, workflows, and checklists. Product repos should point here rather than duplicating divergent guidance.
+Claude Code, Codex, Gemini, OpenCode, Cursor, GitHub Copilot CLI, and future coding agents must use the same SYSTEM_ID, canonical path, dynamic skill retrieval policy, workflows, and checklists. Product repos should point here rather than duplicating divergent guidance.
 
 Shared engineering skill extensions live in `AGENT_SKILLS.md` and adapt
 `C:\Users\adelm\SeaBridgeAI\everything-claude-code\references\matt-pocock-skills` without creating a parallel
@@ -55,7 +63,8 @@ system. Active portable invocations: `#skill/grill-me`,
 For non-trivial SeaBridgeAI work, `/goal` is the default operating contract.
 Use `goal-default` to frame the user request with Definition of Done, validation
 plan, risks, dependencies, scope, blockers, and artifacts, then continue until
-validated or blocked. Canonical protocol:
+validated or blocked. Do not call a skill named `goal`; use `goal-default` or
+read the protocol directly. Canonical protocol:
 `C:\Users\adelm\SeaBridgeAI\everything-claude-code\docs\GOAL_PROTOCOL_DEFAULT.md`
 
 `/goal` sits above Spec Kit and GSD: Spec Kit owns formal specs; GSD owns
@@ -75,17 +84,8 @@ For optional GBrain checks and code-lookup planning, use `skills/gbrain/SKILL.md
 and `scripts/gbrain-workspace.ps1`; it is intentionally check/plan first and does
 not initialize a brain or index sources by default.
 
-Callable skill names: `sea-senior-dev-workflow`,
-`sea-brainstorming-and-spec-refinement`, `sea-task-orchestration`,
-`sea-test-driven-development`, `sea-systematic-debugging`,
-`sea-verification-before-completion`, `sea-code-review-response`,
-`sea-git-worktree-isolation`, `sea-parallel-agent-dispatch`,
-`sea-finishing-development-branch`, `sea-backend-api-verification`,
-`sea-frontend-design`, `sea-ai-data-integrity`,
-`sea-sustainability-domain-review`, `sea-context-hygiene`,
-`sea-cross-repo-handoff`, `sea-skill-creator-protocol`,
-`sea-knowledge-vault`, `sea-gsd-controlled-execution`,
-`sea-local-llm-training`, `goal-default`.
+Select skills dynamically by inspecting ECC skill frontmatter and task context.
+If the task is simple, proceed without skills and state that no skill was needed.
 
 ## Safety And Authorization Rule
 
@@ -490,7 +490,7 @@ Outputs:
 - `<project_dir>/reports/`
 
 Storage path:
-- `C:\Users\adelm\SeaBridgeAI\autoresearch\Paper2Agent`
+- `C:\Users\adelm\SeaBridgeAI\autoresearch\paper2agent-suite\Paper2Agent`
 
 ## paper2agent-bench
 
@@ -515,7 +515,7 @@ Outputs:
 - benchmark outputs under `eval/` and analysis summaries.
 
 Storage path:
-- `C:\Users\adelm\SeaBridgeAI\autoresearch\Paper2AgentBench`
+- `C:\Users\adelm\SeaBridgeAI\autoresearch\paper2agent-suite\Paper2AgentBench`
 
 ## ai-coscientist
 

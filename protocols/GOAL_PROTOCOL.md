@@ -378,6 +378,9 @@ Preferred forms:
 
 - Claude Code: `/goal <task>`.
 - Codex: `$goal <task>` or use the `goal-default` skill.
+- Claude Code: `/goal` is a user-facing UI slash command. Agents must not invoke
+  `Skill(goal)`; if slash-command execution is unavailable, apply this protocol
+  manually or use the exact skill name `goal-default`.
 - Gemini, OpenCode, Cursor, Copilot, Hermes Agent, Cline, and other agents: treat `goal:`, `/goal`, or any coding-agent task as wrapped by this protocol.
 
 When a task invokes GSD, Spec Kit, QA, review, security, frontend, backend, AI, or sustainability-domain skills, those workflows inherit this protocol unless a higher-priority safety rule narrows the allowed actions.
