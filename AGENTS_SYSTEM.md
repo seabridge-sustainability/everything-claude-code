@@ -61,6 +61,32 @@ inspection, not through product-repo skill matrices.
 
 No global installs, marketplace installs, GitHub pushes, commits, live paid calls, destructive actions, or uncontrolled autonomous execution without explicit approval.
 
+## SeaBridge Git Integration Discipline
+
+- Integration branches are fixed for ManageESG product work: backend uses
+  `seabridge_development`; frontend uses `development`. Do not create feature
+  branches, PRs, or new repositories without explicit user approval.
+- Always run `git status --short --branch` and `git fetch --prune` before work,
+  before integration, and before final reporting.
+- If isolation is required, use a short-lived isolated git worktree from the
+  latest remote tip, integrate changes there, rebase onto the latest remote tip,
+  fast-forward push, then remove the worktree. Do not leave unnecessary
+  worktrees behind.
+- Never force-push.
+- Concurrent Codex/agent sessions may be active in `manageesg-backend` and
+  `manageesg-frontend`. Never clobber uncommitted working-tree changes; inspect
+  and preserve them before acting. As of the 2026-06-08 cleanup, backend
+  climate-pptx export work may be mid-rewrite in another session.
+- Historical 2026-06-08 content-validation anchors: backend
+  `seabridge_development` included compliance content at `a2ac8cbf`; frontend
+  `development` included compliance content at `827034b`. These are anchors,
+  not reset targets; always fetch and use the current remote tip.
+- SeaBridge environment defaults: Windows + PowerShell; backend Python is
+  `.\venv\Scripts\python.exe`; loguru formatting uses `{}` placeholders, not
+  `%s`; `.env` is gitignored and normally exists only in the main repo, so test
+  worktrees may need a local ignored copy; first GitHub push may require
+  interactive credential setup, then cached credentials can be reused.
+
 ## Self-Verification Loop
 
 Every agent must plan before edits, update relevant tests when practical, prove the test fails on old behavior when practical, implement the scoped fix, prove focused tests pass, run targeted checks before completion, broaden tests when risk warrants it, document skipped tests with reasons, and never claim completion based only on code changes.

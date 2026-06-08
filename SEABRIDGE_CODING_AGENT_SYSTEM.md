@@ -141,6 +141,31 @@ depth, not branch naming. If a temporary branch is explicitly requested, keep it
 short-lived and, after approval, land the work back onto the repository's normal
 branch.
 
+For ManageESG integration, the only integration branches are backend
+`seabridge_development` and frontend `development`. Do not create feature
+branches, PRs, or new repositories without explicit user approval. Before any
+work, integration, or final report, run `git status --short --branch` and
+`git fetch --prune`. If isolation is required, use a short-lived isolated git
+worktree from the latest remote tip, integrate changes there, rebase onto the
+latest remote tip, fast-forward push, and remove the worktree. Never
+force-push. Never leave unnecessary worktrees behind.
+
+Concurrent Codex/agent sessions may be active in backend and frontend. Never
+clobber uncommitted working-tree changes; inspect and preserve them before
+acting. As of the 2026-06-08 cleanup, backend climate-pptx export work may be
+mid-rewrite in another session.
+
+Historical 2026-06-08 content-validation anchors: backend
+`seabridge_development` included compliance content at `a2ac8cbf`; frontend
+`development` included compliance content at `827034b`. These are anchors, not
+reset targets; always fetch and use the current remote tip.
+
+SeaBridge environment defaults: Windows + PowerShell; backend Python is
+`.\venv\Scripts\python.exe`; loguru formatting uses `{}` placeholders, not
+`%s`; `.env` is gitignored and normally exists only in the main repo, so test
+worktrees may need a local ignored copy; first GitHub push may require
+interactive credential setup, then cached credentials can be reused.
+
 Allowed without repeated prompts:
 
 - Formatting.
