@@ -57,6 +57,23 @@ Use reviewer skills for second-pass risk checks or focused reviews.
 | Reliability, timeouts, retries, observability | `sea-reliability-reviewer` |
 | Security, secrets, auth, tenant isolation, unsafe tools | `sea-security-reviewer` |
 
+## Platform Diagnostics Skills (manageesg-backend product domains)
+
+Domain-specific diagnostics for the SeaBridgeAI platform itself, distinct
+from the generic coding-workflow skills above. Sourced from
+`docs/reports/platform-diagnostics/seabridge_platform_improvement_plan_2026-07-03.md`.
+
+| Domain / Trigger | Skill |
+|---|---|
+| Platform-wide module status before scoping new work | `sea-platform-diagnostics` |
+| Contract drift across backend/frontend/openseabri | `sea-cross-repo-contract-map` |
+| Evidence/claim provenance tracing | `sea-evidence-lineage` |
+| Any change near reporting/emission-factor/GRESB-adjacent code | `sea-reporting-no-touch` |
+| Initiatives & Investments (business case, source conversion, Action Center) | `sea-initiatives-action-center` |
+| Sustainability Procurement / Supply Chain | `sea-procurement-and-supply-chain` |
+| Marketplace demo/seed/bootstrap endpoints | `sea-marketplace-production-gating` |
+| Integration hub / sync-engine changes | `sea-integration-health-review` |
+
 ## Repository Routes
 
 | Repository | Role | Default Skills |
