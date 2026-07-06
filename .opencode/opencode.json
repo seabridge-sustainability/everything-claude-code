@@ -28,10 +28,9 @@
     }
   },
   "instructions": [
+    "AGENTS_SYSTEM.md",
     "AGENTS.md",
-    "CONTRIBUTING.md",
-    "instructions/INSTRUCTIONS.md",
-    "instructions/SEABRIDGE_BACKEND_GUARDRAILS.md"
+    "CONTRIBUTING.md"
   ],
   "plugin": [
     "./plugins",
