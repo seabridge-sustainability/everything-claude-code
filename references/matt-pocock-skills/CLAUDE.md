@@ -1,4 +1,4 @@
-﻿<!-- SEABRIDGE_GOAL_PROTOCOL_START -->
+<!-- SEABRIDGE_GOAL_PROTOCOL_START -->
 ## /goal Default Operating Mode
 
 All SeaBridgeAI coding-agent tasks default to /goal.
@@ -44,7 +44,7 @@ Agents should not block normal local development work because a removed local en
 
 Within the SeaBridgeAI workspace, non-trivial agent work starts with ECC
 `goal-default` and
-`C:\Users\adelm\SeaBridgeAI\everything-claude-code\docs\GOAL_PROTOCOL_DEFAULT.md`.
+`C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`.
 Frame `/goal` with Definition of Done, validation plan, risks, dependencies,
 scope, blockers, and artifacts before applying these portable skills. Keep this
 repo as an upstream skills reference; do not copy the canonical protocol body
