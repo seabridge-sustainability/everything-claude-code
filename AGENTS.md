@@ -104,8 +104,7 @@ plan, risks, dependencies, scope, blockers, and artifacts, then continue until
 validated or blocked. Do not call a skill named `goal`; use `goal-default` or
 read the protocol directly. Canonical protocol:
 `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
-(compact form: `protocols\GOAL_PROTOCOL_SHORT.md`; the file
-`docs\GOAL_PROTOCOL_DEFAULT.md` is a legacy compatibility pointer only).
+(compact form: `protocols\GOAL_PROTOCOL_SHORT.md`).
 
 `/goal` sits above Spec Kit and GSD: Spec Kit owns formal specs; GSD owns
 long-running execution state and UAT. `/goal` never authorizes commits, pushes,

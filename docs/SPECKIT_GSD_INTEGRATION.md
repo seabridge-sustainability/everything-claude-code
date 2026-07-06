@@ -55,7 +55,7 @@ Use GSD when the work needs:
 
 | Artifact | Owner | Purpose |
 | --- | --- | --- |
-| `/goal` frame or `GOAL_PROTOCOL_DEFAULT.md` reference | Goal Protocol | Definition of Done, validation plan, risks, dependencies, scope, blockers, and artifacts |
+| `/goal` frame or `protocols/GOAL_PROTOCOL.md` reference | Goal Protocol | Definition of Done, validation plan, risks, dependencies, scope, blockers, and artifacts |
 | `.specify/memory/constitution.md` | Spec Kit | Durable principles |
 | `.specify/specs/<feature>/spec.md` | Spec Kit | What and why |
 | `.specify/specs/<feature>/plan.md` | Spec Kit | Technical plan |

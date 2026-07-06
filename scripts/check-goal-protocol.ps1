@@ -7,7 +7,6 @@ $ErrorActionPreference = "Stop"
 $checks = @(
     @{ Path = "everything-claude-code\protocols\GOAL_PROTOCOL.md"; Pattern = "/goal" },
     @{ Path = "everything-claude-code\protocols\GOAL_PROTOCOL_SHORT.md"; Pattern = "/goal" },
-    @{ Path = "everything-claude-code\docs\GOAL_PROTOCOL_DEFAULT.md"; Pattern = "Canonical source" },
     @{ Path = "everything-claude-code\skills\goal-default\SKILL.md"; Pattern = "Definition of Done" },
     @{ Path = "everything-claude-code\.agents\skills\goal-default\SKILL.md"; Pattern = "canonical SeaBridgeAI skill" },
     @{ Path = "everything-claude-code\SEABRIDGE_CODING_AGENT_SYSTEM.md"; Pattern = "Goal Protocol Default" },
