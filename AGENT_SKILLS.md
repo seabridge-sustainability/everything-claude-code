@@ -16,16 +16,18 @@ instructions.
 
 ## Precedence
 
-Use this deterministic load order:
+The canonical precedence lives in ECC `AGENTS_SYSTEM.md` ("Instruction
+Precedence And Load Order") and wins over anything here. Consistent with it:
 
-1. Session and developer instructions.
-2. Repo-local `AGENTS_SYSTEM.md`, `AGENTS.md`, `CLAUDE.md`, and repo overrides.
-3. ECC `SEABRIDGE_CODING_AGENT_SYSTEM.md`.
-4. This `AGENT_SKILLS.md`.
-5. Smallest matching `.agents/skills/*/SKILL.md` wrapper.
-6. Upstream source skill under `C:\Users\adelm\SeaBridgeAI\everything-claude-code\references\matt-pocock-skills`
+1. Tier-1 hard safety rules in ECC `AGENTS_SYSTEM.md`. Non-suspendable.
+2. Session and developer instructions (may relax anything except Tier-1).
+3. Repo-local `AGENTS_SYSTEM.md`, `AGENTS.md`, `CLAUDE.md`, and repo overrides.
+4. ECC `SEABRIDGE_CODING_AGENT_SYSTEM.md`.
+5. This `AGENT_SKILLS.md`.
+6. Smallest matching `.agents/skills/*/SKILL.md` wrapper.
+7. Upstream source skill under `references\matt-pocock-skills`
    only when the wrapper asks for it.
-7. Task-specific runtime instructions.
+8. Task-specific runtime instructions.
 
 Do not recursively load every skill. Load only the named or clearly relevant
 skill. Do not copy upstream skill bodies into product repos.
@@ -35,6 +37,10 @@ skill. Do not copy upstream skill bodies into product repos.
 Supported invocation forms:
 
 - `Use skill: goal-default`
+- `Use skill: sea-skill-map`
+- `Use skill: sea-task-queue-execution`
+- `Use skill: sea-teach-loop`
+- `Use skill: sea-error-recovery-loop`
 - `#skill/grill-me`
 - `#skill/ubiquitous-language`
 - `#skill/improve-codebase-architecture`
@@ -65,6 +71,10 @@ Use it before Spec Kit or GSD escalation unless the task is trivial.
 | Skill | SeaBridge wrapper | Upstream source | Use when |
 |---|---|---|---|
 | `goal-default` | `.agents/skills/goal-default/SKILL.md` | `skills/goal-default/SKILL.md` | Non-trivial work needs a `/goal` frame, Definition of Done, validation plan, risks, dependencies, and persistence until validated or blocked. |
+| `sea-skill-map` | `.agents/skills/sea-skill-map/SKILL.md` | `skills/sea-skill-map/SKILL.md` | The agent needs to choose the smallest useful procedural skill set without loading the whole catalog. |
+| `sea-task-queue-execution` | `.agents/skills/sea-task-queue-execution/SKILL.md` | `skills/sea-task-queue-execution/SKILL.md` | Work should run as a scoped queued task, issue, ticket, or AFK implementation unit with acceptance criteria and stop conditions. |
+| `sea-teach-loop` | `.agents/skills/sea-teach-loop/SKILL.md` | `skills/sea-teach-loop/SKILL.md` | The user wants to learn a repo area, workflow, concept, or coding-agent practice with lightweight continuity. |
+| `sea-error-recovery-loop` | `.agents/skills/sea-error-recovery-loop/SKILL.md` | `skills/sea-error-recovery-loop/SKILL.md` | A task, test, implementation, review, or verification step failed and needs root-cause plus prevention analysis. |
 | `grill-me` | `.agents/skills/grill-me/SKILL.md` | `references/matt-pocock-skills/skills/productivity/grill-me/SKILL.md` | Requirements are ambiguous, risky, or need adversarial clarification. |
 | `ubiquitous-language` | `.agents/skills/ubiquitous-language/SKILL.md` | `references/matt-pocock-skills/skills/deprecated/ubiquitous-language/SKILL.md` | Domain terminology needs canonical glossary alignment across code, APIs, prompts, docs, and reports. |
 | `improve-codebase-architecture` | `.agents/skills/improve-codebase-architecture/SKILL.md` | `references/matt-pocock-skills/skills/engineering/improve-codebase-architecture/SKILL.md` | Architecture needs modularity, testability, coupling, observability, or maintainability review. |
@@ -97,6 +107,9 @@ Spec Kit owns `.specify` artifacts. GSD owns `.planning` execution state. See
   pushes, commits, installs, migrations, live calls, or GitHub issue creation.
 - Matt Pocock skills are engineering lenses used inside the existing SeaBridge
   workflow.
+- SeaBridge procedural skills adapt Matt Pocock queue, triage, teach, TDD,
+  diagnose, and handoff ideas without adopting upstream setup or issue
+  automation by default.
 - If an internal skill already covers the same behavior, use the internal skill
   first and load the Matt Pocock wrapper as a focused supplement.
 - No auto-refactor, hook installation, global install, commit, push, dependency

@@ -30,16 +30,17 @@ Timeout/stagnation rule: if a command or approach fails twice, do not repeat it 
 
 SYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1
 
-OpenCode/OpenCode-style agents must load the canonical SeaBridgeAI system from:
-`C:\Users\adelm\SeaBridgeAI\everything-claude-code\SEABRIDGE_CODING_AGENT_SYSTEM.md`
+Follow the canonical precedence and load order in `AGENTS_SYSTEM.md`
+("Instruction Precedence And Load Order"). For work in this repo, load in this
+order, reading only what the task needs:
 
-Also load:
-
-1. `AGENTS_SYSTEM.md`
+1. `AGENTS_SYSTEM.md` (canonical precedence, safety canon, branch protection)
 2. `AGENTS.md`
-3. `AGENT_SKILLS.md`
-4. `docs\harness\HARNESS_ENGINEERING.md`
-5. `docs\agent-compatibility\opencode.md`
+3. `SEABRIDGE_CODING_AGENT_SYSTEM.md` (non-trivial work)
+4. `AGENT_SKILLS.md`
+5. `docs\harness\HARNESS_ENGINEERING.md` and
+   `docs\agent-compatibility\opencode.md` only when harness or
+   compatibility work is in scope
 
 Shared skills are centralized through `AGENT_SKILLS.md`, including
 `grill-me`, `ubiquitous-language`, `improve-codebase-architecture`, the

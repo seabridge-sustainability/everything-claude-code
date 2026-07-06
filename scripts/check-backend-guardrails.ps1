@@ -39,6 +39,17 @@ function Get-RoutePath($Line) {
   return $null
 }
 
+function Test-CommentOrDocstringLine($Line) {
+  $trimmed = ([string]$Line).TrimStart()
+  return ($trimmed.StartsWith("#") -or $trimmed.StartsWith('"""') -or $trimmed.StartsWith("'''"))
+}
+
+function Test-CallWindowHasTimeout($Lines, $Index) {
+  $end = [Math]::Min($Index + 16, $Lines.Count - 1)
+  $window = ($Lines[$Index..$end] -join "`n")
+  return ($window -match 'timeout\s*=')
+}
+
 $publicRouteAllowlist = @()
 if (Test-Path -LiteralPath $PublicRouteAllowlistPath) {
   $allowlistJson = Get-Content -Raw -LiteralPath $PublicRouteAllowlistPath
@@ -79,6 +90,8 @@ $pythonFiles = if ($Files -and $Files.Count -gt 0) {
 $pythonFiles = $pythonFiles | Where-Object {
     ($_.FullName -notmatch '\\(\.venv|venv|venv312|site-packages|node_modules|__pycache__|\.ruff_cache|\.mypy_cache)\\') -and
     ($_.FullName -notmatch '\\(\.uv-cache|\.venv-win|build|dist|mindsdb)\\') -and
+    ($_.FullName -notmatch '\\(\.agents|\.claude|\.openhands)\\') -and
+    ($_.FullName -notmatch '\\data\\skills\\') -and
     ($_.FullName -notmatch '\\tests?\\')
 }
 
@@ -89,13 +102,13 @@ foreach ($file in $pythonFiles) {
   for ($i = 0; $i -lt $lines.Count; $i++) {
     $line = $lines[$i]
     $lineNo = $i + 1
-    if ($line -match '\brequests\.(get|post|put|patch|delete|request)\s*\(' -and $line -notmatch 'timeout\s*=') {
+    if (-not (Test-CommentOrDocstringLine $line) -and $line -match '\brequests\.(get|post|put|patch|delete|request)\s*\(' -and -not (Test-CallWindowHasTimeout $lines $i)) {
       Add-Finding "backend.external-call-timeout" "medium" $file.FullName $lineNo "requests call without timeout on same line; verify explicit timeout/cancellation boundary."
     }
-    if ($line -match '\bhttpx\.(get|post|put|patch|delete|request)\s*\(' -and $line -notmatch 'timeout\s*=') {
+    if (-not (Test-CommentOrDocstringLine $line) -and $line -match '\bhttpx\.(get|post|put|patch|delete|request)\s*\(' -and -not (Test-CallWindowHasTimeout $lines $i)) {
       Add-Finding "backend.external-call-timeout" "medium" $file.FullName $lineNo "httpx call without timeout on same line; verify client timeout or call timeout."
     }
-    if ($line -match '\bsubprocess\.(run|Popen|call|check_call|check_output)\s*\(' -and $line -notmatch 'timeout\s*=') {
+    if (-not (Test-CommentOrDocstringLine $line) -and $line -match '\bsubprocess\.(run|Popen|call|check_call|check_output)\s*\(' -and -not (Test-CallWindowHasTimeout $lines $i)) {
       Add-Finding "backend.subprocess-timeout" "low" $file.FullName $lineNo "subprocess call without timeout on same line; verify bounded execution."
     }
     if ($line -match 'while\s+True\s*:' -and ($file.FullName -match '(worker|job|retry|loop|agent|provider|sync|poll)')) {

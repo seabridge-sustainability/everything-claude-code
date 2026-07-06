@@ -82,8 +82,8 @@
     "vibe-check": {
       "source": "VibiumDev/vibium",
       "sourceType": "github",
-      "skillPath": "skills/vibe-check/SKILL.md",
-      "computedHash": "5180373943710326a1ee724936acdaf7d2e22135baf3b92bdcaf9d341efd851f"
+      "skillPath": ".agents/skills/vibe-check/SKILL.md",
+      "computedHash": "8b676b9a5e20ed0a47706a535af058eeaf85234b8bc663c35818b663a23dafa0"
     }
   }
 }

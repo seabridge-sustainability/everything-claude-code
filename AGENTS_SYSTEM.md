@@ -27,11 +27,30 @@ Superpowers is vendored locally as a reference at vendor\superpowers, adapted in
 
 GSD / Get Shit Done is cloned locally at external\get-shit-done and adapted through sea-gsd-controlled-execution, GSD workflows, GSD checklists, and GSD templates. Do not run npx, install globally, switch on yolo/autonomous mode, auto-commit, auto-push, or auto-create PRs unless the user explicitly approves that separate action.
 
-## Load Order
+## Instruction Precedence And Load Order
+
+This is the single canonical statement. Other files summarize or point here;
+if any other file states a different order, this section wins.
+
+Precedence when instructions conflict (highest wins):
+
+1. Tier-1 hard safety rules (this file: Approval Boundaries, Branch Protection,
+   Safety/authorization, Controlled Auto Mode "requires explicit approval"
+   list). Non-suspendable.
+2. Explicit user/session instructions in the current session. They may relax
+   anything except Tier-1 rules.
+3. Repo-local `AGENTS_SYSTEM.md`, then repo-local `AGENTS.md`/`CLAUDE.md`
+   (repo-specific, stricter overrides only — they extend, never weaken, canon).
+4. ECC canonical files: this file, then `SEABRIDGE_CODING_AGENT_SYSTEM.md`,
+   then `AGENT_SKILLS.md`, then the per-agent adapter
+   (`CLAUDE.md`/`CODEX.md`/`GEMINI.md`/`OPENCODE.md`).
+5. Skills, workflows, checklists, and `repo-integrations/` docs.
+
+Load order for a task (read only what the task actually needs):
 
 1. Local repo AGENTS_SYSTEM.md, when present.
-2. Local repo AGENTS.md or CLAUDE.md.
-3. ECC SEABRIDGE_CODING_AGENT_SYSTEM.md.
+2. Local repo AGENTS.md or CLAUDE.md (usually auto-loaded by the runtime).
+3. ECC SEABRIDGE_CODING_AGENT_SYSTEM.md, for non-trivial work.
 4. ECC repo-integrations/<repo>.md.
 5. The smallest relevant skills/sea-* canonical skill or .agents/skills/sea-* wrapper.
 6. `AGENT_SKILLS.md` and the smallest relevant engineering-skill wrapper when invoked or clearly applicable.
@@ -53,9 +72,20 @@ Primary lookup surfaces:
 - `checklists/`
 
 Use the smallest skill/workflow/checklist set that materially improves the task.
-Do not load every skill. If a task is simple, proceed without skills and state
-that no skill was needed. New skills become available through filesystem
-inspection, not through product-repo skill matrices.
+Do not load every skill. Default: load at most ONE skill per task. A task is
+simple (no skill needed) when it touches at most 2 files, adds no dependency,
+and involves none of: auth, tenant isolation, billing, migrations, security,
+production data, destructive operations, AI grounding, or sustainability-data
+provenance. When unsure which skill applies, load only `sea-skill-map` and
+follow its routing. State it when no skill was needed. New skills become
+available through filesystem inspection, not through product-repo skill
+matrices.
+
+Use `sea-skill-map` when the correct procedure is unclear. Use
+`sea-task-queue-execution` for queued issues, tickets, AFK implementation units,
+or scoped task slices. Use `sea-error-recovery-loop` after failed implementation
+or verification loops. Use `sea-teach-loop` when the user wants a stateful
+teaching session.
 
 ## Approval Boundaries
 
@@ -63,9 +93,22 @@ No global installs, marketplace installs, GitHub pushes, commits, live paid call
 
 ## SeaBridge Git Integration Discipline
 
-- Integration branches are fixed for ManageESG product work: backend uses
-  `seabridge_development`; frontend uses `development`. Do not create feature
-  branches, PRs, or new repositories without explicit user approval.
+Branch Protection (Tier-1):
+
+| Repo | Working branch | Live/protected branch |
+|---|---|---|
+| manageesg-backend | `seabridge_development` | `main` — never modify without explicit user request in that session |
+| manageesg-frontend | `development` | `main` (live) — same rule |
+| openseabri | `main` (single-branch repo; normal work lands here) | production deploys gated separately |
+| autoresearch | `master` (+ `autoresearch/<tag>` experiment branches) | `master` protection per repo docs |
+| everything-claude-code | `main` | commits/pushes still require explicit approval |
+
+The backend/frontend live-branch rule applies even when fixing something
+reported against `main` (Dependabot alerts, CI failures): report it and ask
+first.
+
+- Do not create feature branches, PRs, or new repositories without explicit
+  user approval.
 - Always run `git status --short --branch` and `git fetch --prune` before work,
   before integration, and before final reporting.
 - If isolation is required, use a short-lived isolated git worktree from the
@@ -75,12 +118,7 @@ No global installs, marketplace installs, GitHub pushes, commits, live paid call
 - Never force-push.
 - Concurrent Codex/agent sessions may be active in `manageesg-backend` and
   `manageesg-frontend`. Never clobber uncommitted working-tree changes; inspect
-  and preserve them before acting. As of the 2026-06-08 cleanup, backend
-  climate-pptx export work may be mid-rewrite in another session.
-- Historical 2026-06-08 content-validation anchors: backend
-  `seabridge_development` included compliance content at `a2ac8cbf`; frontend
-  `development` included compliance content at `827034b`. These are anchors,
-  not reset targets; always fetch and use the current remote tip.
+  and preserve them before acting.
 - SeaBridge environment defaults: Windows + PowerShell; backend Python is
   `.\venv\Scripts\python.exe`; loguru formatting uses `{}` placeholders, not
   `%s`; `.env` is gitignored and normally exists only in the main repo, so test
@@ -118,6 +156,124 @@ All agents must follow these four principles as default coding behavior:
 3. Surgical changes: touch only what the request requires.
 4. Goal-driven execution: define done with observable verification.
 
+## Ponytail-Inspired Minimalism Guardrail (Always Applied)
+
+SeaBridgeAI adopts Ponytail's "lazy senior developer" rule as an efficiency
+guardrail under the existing hierarchy, not as a plugin, installer, or separate
+authority. Lazy means no unnecessary code, never carelessness.
+
+Before editing, understand the task and the code it touches: read the real flow,
+callers, consumers, schemas, and tests needed to avoid a small diff in the wrong
+place. Then ask whether new code needs to exist at all. When behavior stays
+correct, prefer deletion, simplification, configuration, or an existing workflow
+over adding code.
+
+Reuse existing repo helpers, services, schemas, types, workflows, skills, and
+patterns before writing a new solution. Prefer standard library, native platform,
+database/framework, and built-in tool features before custom code. Prefer
+already-installed dependencies before adding dependencies, and add no dependency
+without explicit need and normal approval gates.
+
+Avoid speculative abstractions, boilerplate, scaffolding, feature flags, config,
+and "for later" code. For bugs, fix the root cause at the shared boundary rather
+than patching only the named symptom or one caller.
+
+Never simplify away security, validation, tenant isolation, provenance, error
+handling, accessibility, data-loss protections, source integrity, or explicitly
+requested behavior. For non-trivial changes, leave the smallest meaningful
+verification that would catch a regression, and document any skipped checks.
+
+## LLM Wiki / Knowledge Vault Protocol
+
+SeaBridgeAI supports a lightweight LLM Wiki pattern for non-sensitive,
+durable knowledge that should compound over time. This is not a competing
+memory layer. It is a Markdown knowledge-vault workflow that routes through
+existing ECC systems: `agent-memory` for session/project/runtime memory
+questions, `knowledge-ops` for ingestion, storage, and deduplication decisions,
+`sea-knowledge-vault` before editing or validating wiki notes, and
+`openkb-knowledge-base` only when a compiled OpenKB/PageIndex workflow is
+explicitly requested or already configured.
+
+Default vault structure:
+
+- `knowledge-vault/raw/` stores immutable source inputs or source-reference
+  records for repo-owned files.
+- `knowledge-vault/wiki/` stores agent-maintained Markdown synthesis pages.
+- `knowledge-vault/index.md` is the content-oriented navigation entrypoint.
+- `knowledge-vault/log.md` is the append-only chronological operations log.
+- `knowledge-vault/assets/` is optional and only for approved local images.
+
+Raw sources are the source of truth. Wiki pages are Markdown synthesis maintained
+by agents, with YAML frontmatter where useful, Obsidian-style `[[wikilinks]]`
+where they add navigational value, explicit source/provenance links, confidence
+or caveat notes when claims are incomplete, and no secrets, credentials,
+customer data, private conversations, auth files, `.env` content, token-bearing
+logs, or proprietary third-party content unless explicitly approved and
+sanitized.
+
+Ingest path: classify the source with `knowledge-ops`, check for duplicates,
+store or reference it under `knowledge-vault/raw/`, update or create only the
+wiki pages that earn their keep, update `knowledge-vault/index.md`, and append
+`knowledge-vault/log.md`. Query path: read `knowledge-vault/index.md` first,
+then only relevant wiki pages and source records. Lint path: check stale pages,
+contradictions, orphans, missing links, duplicates, missing frontmatter, source
+or provenance gaps, and sensitive-source leakage.
+
+Do not duplicate the same fact into agent memory, project memory, OpenKB, and
+the wiki unless explicitly requested. Apply the Ponytail minimalism guardrail:
+do not create pages, folders, schemas, assets, or tooling unless they earn their
+keep; prefer the index and plain Markdown before search infrastructure.
+
+## Autonomous Senior Engineer Operating Model
+
+This model composes the existing SeaBridgeAI practices; it does not add a new
+plugin, loop system, or authority layer.
+
+For non-trivial work, start with `/goal` or `goal-default`: define the
+Definition of Done, validation commands, risks, approval gates, and explicit
+stop conditions before implementation. Continue only inside a bounded loop until
+the DoD is validated or a concrete blocker is documented.
+
+Before writing code, apply the Ponytail minimalism ladder: ask whether the work
+needs new code at all, then prefer an existing repo helper or workflow, standard
+library, native platform/database/framework feature, already-installed
+dependency, and finally the smallest clear diff. Delete or simplify when
+behavior stays correct.
+
+For behavior changes, use `sea-test-driven-development` where practical:
+capture the expected failing test or contract check, implement the smallest
+change, refactor only when it reduces real complexity, and rerun focused then
+risk-proportional broader verification. For docs, config, or instruction-only
+changes, substitute appropriate static validation, diff checks, guardrail
+scripts, or targeted searches instead of inventing fake tests.
+
+Use review or challenge before risky architecture, auth, tenant isolation,
+billing, AI/data, dependency, MCP/runtime, or production-facing changes. The
+primary agent remains responsible for implementation and evidence; reviewer
+skills and secondary reviews surface concrete risks and missing verification.
+
+Bounded autonomy only: no uncontrolled yolo/autonomous mode, auto-commit,
+auto-push, PR creation, global or marketplace installs, dependency installs,
+paid/live calls, destructive changes, migrations, production data access, or
+security/auth weakening without explicit approval. Deep audits run only when
+the user requests them, when scheduled, or when the risk profile clearly
+requires them; do not interrupt ordinary feature work with surprise broad
+audits.
+
+## Deep Audit Routing
+
+- Security-sensitive work: use `sea-security-reviewer` and relevant harness
+  security standards.
+- Harness or runtime reliability: read
+  `docs/harness/HARNESS_ENGINEERING.md` and run `scripts/check-harness.ps1`
+  when scope and approval gates allow.
+- Platform drift, gap, or module-status checks: use
+  `sea-platform-diagnostics` and produce evidence-backed current-state claims.
+- Failed task, weak verification, or repeated mistake: use
+  `sea-error-recovery-loop`.
+- Before claiming done, fixed, passing, production-ready, reviewed, or safe:
+  use `sea-verification-before-completion` and fresh evidence.
+
 ## Tool Compatibility Matrix
 
 | Capability | Claude Code | Codex | Gemini | OpenCode | Cursor | Copilot CLI |
@@ -145,10 +301,11 @@ All agents must follow these four principles as default coding behavior:
 4. Subagents can be spawned for parallel work.
 
 ### Gemini
-1. AGENTS.md is auto-loaded. Same SYSTEM_ID and catalog.
-2. Skills are invoked by reading SKILL.md content.
-3. .gemini/settings.json configures MCP servers.
-4. Use AGENTS.md instructions for all safety and approval gates.
+1. AGENTS.md is auto-loaded; GEMINI.md is the thin adapter. Same SYSTEM_ID and dynamic skill policy.
+2. Load this file (AGENTS_SYSTEM.md) and AGENTS.md before SEABRIDGE_CODING_AGENT_SYSTEM.md, per the canonical load order above.
+3. Skills are invoked by reading SKILL.md content.
+4. .gemini/settings.json configures MCP servers.
+5. Use AGENTS.md instructions for all safety and approval gates.
 
 ### OpenCode
 1. .opencode/opencode.json specifies model and instruction files to load.
@@ -169,7 +326,7 @@ All agents must follow these four principles as default coding behavior:
 
 1. Canonical skill bodies live at: `skills/sea-*/SKILL.md`
 2. Callable wrappers live at: `.agents/skills/sea-*/SKILL.md`
-3. Shared engineering skill wrappers live at `.agents/skills/grill-me`, `.agents/skills/ubiquitous-language`, and `.agents/skills/improve-codebase-architecture`.
+3. Shared engineering skill wrappers live at `.agents/skills/grill-me`, `.agents/skills/ubiquitous-language`, `.agents/skills/improve-codebase-architecture`, and the SeaBridge procedural wrappers `sea-skill-map`, `sea-task-queue-execution`, `sea-teach-loop`, and `sea-error-recovery-loop`.
 4. Matt Pocock upstream source lives at `C:\Users\adelm\SeaBridgeAI\everything-claude-code\references\matt-pocock-skills`; use it only through ECC wrappers unless directly auditing upstream.
 5. Agents that support .agents/ directory (Codex) use wrappers directly.
 6. Agents without .agents/ support read canonical skills from skills/ directory.
@@ -179,9 +336,12 @@ All agents must follow these four principles as default coding behavior:
 
 ## Workflow and Checklist Resolution
 
-Workflows: `workflows/*.md` (10 files covering bugfix, full-feature, cross-repo, GSD, module review, etc.)
-Checklists: `checklists/*.md` (11 files covering security, backend-api, frontend-uiux, pre-edit, pre-merge, pre-completion, sustainability-data, GSD, AI hallucination prevention)
-Templates: `templates/gsd/*.md` (8 GSD artifact templates)
+Workflows: `workflows/*.md` (bugfix, full-feature, cross-repo, GSD, module review, etc.)
+Checklists: `checklists/*.md` (security, backend-api, frontend-uiux, pre-edit, pre-merge, pre-completion, sustainability-data, GSD, AI hallucination prevention)
+Templates: `templates/gsd/*.md` (GSD artifact templates)
+
+Do not hardcode file counts anywhere; enumerate the directories when a current
+inventory is needed.
 
 Agents should load the matching workflow/checklist when the task type aligns.
 
@@ -192,7 +352,8 @@ Agents should load the matching workflow/checklist when the task type aligns.
 3. When updating a skill, update the canonical file first, then verify the wrapper matches.
 4. Cross-repo changes require sea-cross-repo-handoff skill.
 5. New skills require sea-skill-creator-protocol skill.
-6. Periodic sync validation should be run (see docs/CROSS_AGENT_SYSTEM_SYNC_VALIDATION_*.md).
+6. Periodic sync validation: run `scripts/check-coding-agent-system.ps1`, `scripts/check-cross-agent-skills.ps1`, and `scripts/sync-safety-rule.ps1 -Check`.
+7. The Safety And Authorization Rule block is marker-synced from `protocols/SAFETY_AUTHORIZATION_RULE.md`; edit only that file, then run `scripts/sync-safety-rule.ps1`.
 
 ## Repository Root Organization Policy
 

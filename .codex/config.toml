@@ -97,7 +97,11 @@ approval_policy = "on-request"
 sandbox_mode = "read-only"
 web_search = "cached"
 
-[profiles.yolo]
+# Full-auto profile - approval-gated by policy, not a default.
+# Canonical instructions (AGENTS_SYSTEM.md) forbid uncontrolled autonomous
+# execution: only use this profile when the user explicitly approves it for a
+# specific session, and never for destructive, paid, or production-facing work.
+[profiles.full-auto-approved]
 approval_policy = "never"
 sandbox_mode = "workspace-write"
 web_search = "live"

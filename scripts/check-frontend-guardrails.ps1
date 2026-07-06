@@ -52,7 +52,7 @@ $frontFiles = if ($Files -and $Files.Count -gt 0) {
 }
 
 $frontFiles = $frontFiles | Where-Object {
-    $_.FullName -notmatch '\\(node_modules|dist|build|\.next|coverage|test-results|playwright-report)\\' -and
+    $_.FullName -notmatch '\\(node_modules|dist|build|\.next|coverage|test-results|playwright-report|\.qa-snapshots)\\' -and
     $_.FullName -notmatch '\\(design_handoff|design-references|storybook-static)\\' -and
     $_.FullName -notmatch '\.(test|spec)\.(ts|tsx|js|jsx)$' -and
     (

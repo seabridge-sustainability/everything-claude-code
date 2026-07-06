@@ -8,15 +8,17 @@ Use this file as the fast routing map for SeaBridgeAI coding agents. It does not
 
 ## Priority
 
-1. User's explicit task instructions.
-2. Safety and security constraints.
-3. Central SeaBridgeAI system files in ECC.
-4. Cross-agent compatibility guidance.
-5. Repo-specific agent instructions.
-6. Relevant canonical `skills/sea-*/SKILL.md` files and wrappers.
-7. Relevant workflows and checklists.
-8. Tool docs and upstream references.
-9. Prior handoffs, notes, and reports.
+The canonical precedence lives in ECC `AGENTS_SYSTEM.md` ("Instruction
+Precedence And Load Order"). Consistent with it:
+
+1. Tier-1 hard safety rules in ECC `AGENTS_SYSTEM.md`. Non-suspendable.
+2. User's explicit task instructions (may relax anything except Tier-1).
+3. Repo-specific agent instructions.
+4. Central SeaBridgeAI system files in ECC and cross-agent compatibility guidance.
+5. Relevant canonical `skills/sea-*/SKILL.md` files and wrappers.
+6. Relevant workflows and checklists.
+7. Tool docs and upstream references.
+8. Prior handoffs, notes, and reports.
 
 When local repo guidance appears to conflict with central policy, preserve the stricter safety rule and document the conflict in the task report.
 
@@ -42,6 +44,11 @@ Use `sea-senior-dev-workflow` for any non-trivial SeaBridgeAI coding, docs, QA, 
 | Branch finish / publish readiness | `sea-finishing-development-branch` | Final diff review, tests, manual approval before commit or push |
 | Knowledge vault / markdown notes / frontmatter / canvas / base | `sea-knowledge-vault` | Dry-run validation unless apply is explicitly approved |
 | Local LLM, Unsloth, LoRA, inference routing | `sea-local-llm-training` | HF/model access, VRAM budget, local endpoint health, no long job without approval |
+| Unsure which skill applies | `sea-skill-map` | Smallest routed skill set stated in the plan |
+| Queued issues, tickets, AFK implementation units | `sea-task-queue-execution` | Acceptance criteria and stop conditions per unit |
+| Stateful teaching session | `sea-teach-loop` | Lightweight continuity notes |
+| Failed task, weak verification, repeated mistake | `sea-error-recovery-loop` | Root cause plus prevention decision |
+| Broad or ambiguous feature design | `sea-brainstorming-and-spec-refinement` | Refined spec with explicit assumptions |
 
 ## Reviewer Skills
 

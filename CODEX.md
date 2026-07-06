@@ -30,20 +30,23 @@ Timeout/stagnation rule: if a command or approach fails twice, do not repeat it 
 
 SYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1
 
-Codex agents must load the canonical SeaBridgeAI system from:
-`C:\Users\adelm\SeaBridgeAI\everything-claude-code\SEABRIDGE_CODING_AGENT_SYSTEM.md`
+Follow the canonical precedence and load order in `AGENTS_SYSTEM.md`
+("Instruction Precedence And Load Order"). For work in this repo, load in this
+order, reading only what the task needs:
 
-Also load:
-
-1. `AGENTS_SYSTEM.md`
+1. `AGENTS_SYSTEM.md` (canonical precedence, safety canon, branch protection)
 2. `AGENTS.md`
-3. `AGENT_SKILLS.md`
-4. `docs\harness\HARNESS_ENGINEERING.md`
-5. `docs\agent-compatibility\codex.md`
+3. `SEABRIDGE_CODING_AGENT_SYSTEM.md` (non-trivial work)
+4. `AGENT_SKILLS.md`
+5. `docs\harness\HARNESS_ENGINEERING.md` and
+   `docs\agent-compatibility\codex.md` only when harness or
+   compatibility work is in scope
 
 Shared skills are centralized through `AGENT_SKILLS.md`, including
-`grill-me`, `ubiquitous-language`, `improve-codebase-architecture`, the
-SeaBridgeAI `sea-*` skills, and Harness Engineering reviewer skills.
+`grill-me`, `ubiquitous-language`, `improve-codebase-architecture`,
+`sea-skill-map`, `sea-task-queue-execution`, `sea-teach-loop`,
+`sea-error-recovery-loop`, the SeaBridgeAI `sea-*` skills, and Harness
+Engineering reviewer skills.
 
 Harness checks use `scripts\check-harness.ps1`, baseline findings live in
 `manifests\harness\harness-baseline.json`, and backend public route exemptions

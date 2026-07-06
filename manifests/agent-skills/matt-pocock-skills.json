@@ -36,6 +36,38 @@
       "source": "C:\\Users\\adelm\\SeaBridgeAI\\everything-claude-code\\references\\matt-pocock-skills\\skills\\engineering\\improve-codebase-architecture\\SKILL.md",
       "maps_to_existing": ["sea-senior-dev-workflow", "sea-test-driven-development", "sea-verification-before-completion"],
       "status": "active"
+    },
+    {
+      "name": "sea-skill-map",
+      "category": ["Agent orchestration", "Developer workflow", "Context efficiency"],
+      "wrapper": "C:\\Users\\adelm\\SeaBridgeAI\\everything-claude-code\\.agents\\skills\\sea-skill-map\\SKILL.md",
+      "source": "C:\\Users\\adelm\\SeaBridgeAI\\everything-claude-code\\references\\matt-pocock-skills\\README.md",
+      "maps_to_existing": ["AGENT_SKILLS.md", "Dynamic Skill Registry"],
+      "status": "active_seabridge_adaptation"
+    },
+    {
+      "name": "sea-task-queue-execution",
+      "category": ["Developer workflow", "Release engineering", "Task queue"],
+      "wrapper": "C:\\Users\\adelm\\SeaBridgeAI\\everything-claude-code\\.agents\\skills\\sea-task-queue-execution\\SKILL.md",
+      "source": "C:\\Users\\adelm\\SeaBridgeAI\\everything-claude-code\\references\\matt-pocock-skills\\skills\\engineering\\triage\\SKILL.md",
+      "maps_to_existing": ["sea-task-orchestration", "sea-verification-before-completion"],
+      "status": "active_seabridge_adaptation"
+    },
+    {
+      "name": "sea-teach-loop",
+      "category": ["Developer workflow", "Teaching", "Stateful workspace"],
+      "wrapper": "C:\\Users\\adelm\\SeaBridgeAI\\everything-claude-code\\.agents\\skills\\sea-teach-loop\\SKILL.md",
+      "source": "C:\\Users\\adelm\\SeaBridgeAI\\everything-claude-code\\references\\matt-pocock-skills\\README.md",
+      "maps_to_existing": ["sea-context-hygiene", "sea-knowledge-vault"],
+      "status": "active_seabridge_adaptation"
+    },
+    {
+      "name": "sea-error-recovery-loop",
+      "category": ["Debugging", "Verification", "Harness improvement"],
+      "wrapper": "C:\\Users\\adelm\\SeaBridgeAI\\everything-claude-code\\.agents\\skills\\sea-error-recovery-loop\\SKILL.md",
+      "source": "C:\\Users\\adelm\\SeaBridgeAI\\everything-claude-code\\references\\matt-pocock-skills\\skills\\engineering\\diagnose\\SKILL.md",
+      "maps_to_existing": ["sea-systematic-debugging", "sea-test-driven-development", "sea-verification-before-completion", "sea-skill-creator-protocol"],
+      "status": "active_seabridge_adaptation"
     }
   ],
   "inventory": [

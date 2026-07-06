@@ -56,17 +56,38 @@ needs long-running state, phase planning, UAT, or handoff persistence. `/goal`
 does not authorize commits, pushes, installs, paid/live calls, destructive
 actions, migrations, or production data changes.
 
-## Mandatory Load Order
+## Task Queue And Procedural Skills
 
-1. Local repo AGENTS_SYSTEM.md when present, then local AGENTS.md or CLAUDE.md.
-2. Confirm SYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1 and this canonical path.
-3. Establish the `/goal` frame for non-trivial work.
-4. Read the matching ECC repo integration file under repo-integrations/.
-5. Load the smallest relevant canonical skills/sea-*/SKILL.md or same-name .agents/skills/sea-*/SKILL.md wrapper.
-6. Use matching workflows/ and checklists/ when they exist.
-7. Implement only scoped changes.
-8. Verify before completion claims.
-9. Report changed files, checks run, unverified items, approval-gated items, and risks.
+SeaBridgeAI uses finite task execution, not uncontrolled infinite loops. Treat a
+ticket, issue, user request, or local plan item as a queued task with scope,
+acceptance criteria, affected files, verification, residual risks, and explicit
+stop conditions. Use `sea-task-queue-execution` when work should move through
+triage -> strategy -> bounded execution -> verification -> final report.
+
+Procedural skills are deliberate tools, not always-on context. Use
+`sea-skill-map` to select the smallest relevant skill set. Use `sea-teach-loop`
+for stateful teaching sessions and `sea-error-recovery-loop` when a task or
+verification step fails and the system needs a prevention decision.
+
+Matt Pocock's `mattpocock/skills` is a reference source for small, composable,
+model-agnostic procedures. SeaBridgeAI adapts useful concepts through ECC skills;
+do not run upstream setup, install commands, issue-tracker automation, global
+hooks, commits, pushes, or PR creation unless explicitly approved.
+
+## Mandatory Execution Sequence
+
+Precedence and file load order are defined once, in ECC `AGENTS_SYSTEM.md`
+("Instruction Precedence And Load Order"); follow that for what to read.
+Execution steps for a task:
+
+1. Confirm SYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1 and this canonical path.
+2. Establish the `/goal` frame for non-trivial work.
+3. Read the matching ECC repo integration file under repo-integrations/.
+4. Load the smallest relevant canonical skills/sea-*/SKILL.md or same-name .agents/skills/sea-*/SKILL.md wrapper (default: at most one skill; see the skill-selection rule in AGENTS_SYSTEM.md).
+5. Use matching workflows/ and checklists/ when they exist.
+6. Implement only scoped changes.
+7. Verify before completion claims.
+8. Report changed files, checks run, unverified items, approval-gated items, and risks.
 
 ## Local-Only Rules
 
@@ -202,49 +223,19 @@ Controlled auto mode does not authorize unsafe execution, external publishing, p
 - Recommend `/ultra-review` for auth, tenant isolation, database migrations, AI output, LCA/emissions/risk scoring, uploads, billing, shared utilities, and production-readiness changes.
 - CodeRabbit or similar external review tools may be used as secondary review only; they do not replace local tests.
 
-## Full Callable SeaBridgeAI Skill Catalog
+## Callable SeaBridgeAI Skill Surface
 
-Canonical skill bodies live at C:\Users\adelm\SeaBridgeAI\everything-claude-code\skills\sea-*\SKILL.md.
+Canonical skill bodies live at `skills\sea-*\SKILL.md`; callable wrappers live
+at `.agents\skills\sea-*\SKILL.md` (`goal-default` and `speckit-*` follow the
+same pattern). Do not rely on a copied list of skill names: this file
+intentionally carries no static catalog, because static catalogs go stale and
+compete with dynamic discovery.
 
-Callable wrappers live at C:\Users\adelm\SeaBridgeAI\everything-claude-code\.agents\skills\sea-*\SKILL.md.
-
-- sea-senior-dev-workflow
-- sea-brainstorming-and-spec-refinement
-- sea-task-orchestration
-- sea-test-driven-development
-- sea-systematic-debugging
-- sea-verification-before-completion
-- sea-code-review-response
-- sea-git-worktree-isolation
-- sea-parallel-agent-dispatch
-- sea-finishing-development-branch
-- sea-backend-api-verification
-- sea-frontend-design
-- sea-ai-data-integrity
-- sea-sustainability-domain-review
-- sea-context-hygiene
-- sea-cross-repo-handoff
-- sea-skill-creator-protocol
-- sea-knowledge-vault
-- sea-gsd-controlled-execution
-- sea-local-llm-training
-- sea-ai-grounding-reviewer
-- sea-architecture-reviewer
-- sea-backend-api-reviewer
-- sea-frontend-ux-reviewer
-- sea-production-readiness-reviewer
-- sea-reliability-reviewer
-- sea-security-reviewer
-- goal-default
-- speckit-constitution
-- speckit-specify
-- speckit-clarify
-- speckit-plan
-- speckit-tasks
-- speckit-analyze
-- speckit-checklist
-- speckit-implement
-- speckit-taskstoissues
+To discover the current surface, list the directories (`skills\sea-*`,
+`.agents\skills\sea-*`) or use `sea-skill-map` for routing, and consult
+`docs\SKILL_ROUTING_REFERENCE.md` for the maintained routing table. Parity
+between bodies and wrappers is enforced by
+`scripts\check-cross-agent-skills.ps1`.
 
 ## Shared Engineering Skill Extensions
 
@@ -259,12 +250,20 @@ C:\Users\adelm\SeaBridgeAI\everything-claude-code\AGENT_SKILLS.md
 
 Active adapted skills:
 
+- sea-skill-map
+- sea-task-queue-execution
+- sea-teach-loop
+- sea-error-recovery-loop
 - grill-me
 - ubiquitous-language
 - improve-codebase-architecture
 
 Supported invocation forms:
 
+- Use skill: sea-skill-map
+- Use skill: sea-task-queue-execution
+- Use skill: sea-teach-loop
+- Use skill: sea-error-recovery-loop
 - #skill/grill-me
 - #skill/ubiquitous-language
 - #skill/improve-codebase-architecture
@@ -279,12 +278,20 @@ unless explicitly approved.
 
 ## Mandatory Skill Triggers
 
+Tie-break rule: when several triggers match, load only the single most specific
+one (a domain/reviewer trigger beats a generic workflow trigger); `goal-default`
+is a framing contract, not a competing skill, and applies alongside whichever
+skill wins. When still unsure, load only `sea-skill-map`.
+
 - Non-trivial work default contract: goal-default.
+- Choosing procedural skills without context bloat: sea-skill-map.
 - Default non-trivial work: sea-senior-dev-workflow.
+- Queued issues, tickets, AFK implementation units, or scoped task execution: sea-task-queue-execution.
 - Broad or ambiguous feature design: sea-brainstorming-and-spec-refinement.
 - Large, multi-lane, or multi-repo work: sea-task-orchestration.
 - Features, bug fixes, refactors, and behavior changes: sea-test-driven-development unless explicitly impractical.
 - Runtime failures, route bugs, auth issues, flaky tests, or data mismatches: sea-systematic-debugging.
+- Post-failure root cause, weak harness, missing verification, or instruction/process improvement: sea-error-recovery-loop.
 - Before saying done, fixed, passing, wired, production-ready, or safe: sea-verification-before-completion.
 - Review requests or review feedback: sea-code-review-response.
 - Risky or parallel feature work with dirty worktrees: sea-git-worktree-isolation.
@@ -297,6 +304,7 @@ unless explicitly approved.
 - Long logs, compaction, artifacts, or handoffs: sea-context-hygiene.
 - Backend/frontend/OpenSeaBri/ECC/_upstream coordination: sea-cross-repo-handoff.
 - Creating or changing reusable skills: sea-skill-creator-protocol.
+- Teaching a concept, workflow, repo area, or coding-agent procedure over multiple sessions: sea-teach-loop.
 - Markdown knowledge vault notes, wikilinks, frontmatter, canvas/base docs: sea-knowledge-vault.
 - Complex multi-phase work, context rot, structured artifacts, GSD-style planning, verification, forensics, or milestone tracking: sea-gsd-controlled-execution.
 - Adversarial clarification or stress-testing a plan: grill-me, after or alongside sea-brainstorming-and-spec-refinement.
@@ -378,5 +386,5 @@ GSD artifact templates:
 - Full vulnerability scans: when the user explicitly asks for a "full vulnerabilities scan" or "full vulnerability scan", run both Agent Shield and Strix through `scripts\run-full-vulnerability-scan.ps1 -ApprovedFullScan` after confirming the target scope is local/staging and not production. Agent Shield covers agent/MCP/config governance; Strix covers active application security testing. Do not run Strix against production, external domains, real tenant data, or paid/live providers beyond the approved scope.
 - Claude Mem: evaluated and intentionally excluded. SeaBridgeAI uses explicit markdown-based project memory through CLAUDE.md, AGENTS.md, AGENTS_SYSTEM.md, skills, workflows, checklists, audit logs, and handoff notes.
 - GSD: controlled local reference at external/get-shit-done, adapted through sea-gsd-controlled-execution, workflows, checklists, and templates. Uncontrolled autonomous/yolo execution is not enabled.
-- Matt Pocock skills: centralized local reference at C:\Users\adelm\SeaBridgeAI\everything-claude-code\references\matt-pocock-skills, adapted through AGENT_SKILLS.md and ECC wrappers for grill-me, ubiquitous-language, and improve-codebase-architecture. Upstream setup, hooks, global installs, and product-repo skill copies are not enabled.
+- Matt Pocock skills: centralized local reference at C:\Users\adelm\SeaBridgeAI\everything-claude-code\references\matt-pocock-skills, adapted through AGENT_SKILLS.md and ECC wrappers for grill-me, ubiquitous-language, improve-codebase-architecture, sea-skill-map, sea-task-queue-execution, sea-teach-loop, and sea-error-recovery-loop. Upstream setup, hooks, global installs, issue-tracker automation, and product-repo skill copies are not enabled.
 - Context hygiene: integrated through sea-context-hygiene; no global install is authorized by this file.
