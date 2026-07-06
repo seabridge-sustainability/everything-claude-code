@@ -1,4 +1,4 @@
-﻿# Refactor Clean
+# Refactor Clean
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -51,11 +51,11 @@ Sort findings into safety tiers:
 
 For each SAFE item:
 
-1. **Run full test suite** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Establish baseline (all green)
-2. **Delete the dead code** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Use Edit tool for surgical removal
-3. **Re-run test suite** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Verify nothing broke
-4. **If tests fail** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Immediately revert with `git checkout -- <file>` and skip this item
-5. **If tests pass** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Move to next item
+1. **Run full test suite** — Establish baseline (all green)
+2. **Delete the dead code** — Use Edit tool for surgical removal
+3. **Re-run test suite** — Verify nothing broke
+4. **If tests fail** — Immediately revert with `git checkout -- <file>` and skip this item
+5. **If tests pass** — Move to next item
 
 ## Step 4: Handle CAUTION Items
 
@@ -68,10 +68,10 @@ Before deleting CAUTION items:
 ## Step 5: Consolidate Duplicates
 
 After removing dead code, look for:
-- Near-duplicate functions (>80% similar) ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â merge into one
-- Redundant type definitions ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â consolidate
-- Wrapper functions that add no value ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â inline them
-- Re-exports that serve no purpose ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â remove indirection
+- Near-duplicate functions (>80% similar) — merge into one
+- Redundant type definitions — consolidate
+- Wrapper functions that add no value — inline them
+- Re-exports that serve no purpose — remove indirection
 
 ## Step 6: Summary
 
@@ -79,22 +79,22 @@ Report results:
 
 ```
 Dead Code Cleanup
-ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
+──────────────────────────────
 Deleted:   12 unused functions
            3 unused files
            5 unused dependencies
 Skipped:   2 items (tests failed)
 Saved:     ~450 lines removed
-ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
+──────────────────────────────
 All tests passing PASS:
 ```
 
 ## Rules
 
 - **Never delete without running tests first**
-- **One deletion at a time** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Atomic changes make rollback easy
-- **Skip if uncertain** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Better to keep dead code than break production
-- **Don't refactor while cleaning** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Separate concerns (clean first, refactor later)
+- **One deletion at a time** — Atomic changes make rollback easy
+- **Skip if uncertain** — Better to keep dead code than break production
+- **Don't refactor while cleaning** — Separate concerns (clean first, refactor later)
 
 <!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_START -->
 ## /goal Default Contract

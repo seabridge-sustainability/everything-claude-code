@@ -1,4 +1,4 @@
-﻿---
+---
 description: Route documentation requests to ECC Context Hub for ECC internals and Context7 for external libraries or APIs.
 ---
 

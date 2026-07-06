@@ -1,4 +1,4 @@
-﻿---
+---
 description: Enforce TDD workflow for Kotlin. Write Kotest tests first, then implement. Verify 80%+ coverage with Kover.
 ---
 
@@ -168,7 +168,7 @@ RegistrationValidatorTest > valid registration returns Valid FAILED
 FAILED (5 tests, 0 passed, 5 failed)
 ```
 
-ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ Tests fail as expected (NotImplementedError).
+✓ Tests fail as expected (NotImplementedError).
 
 ## Step 4: Implement Minimal Code (GREEN)
 
@@ -205,7 +205,7 @@ RegistrationValidatorTest > multiple errors returns all errors PASSED
 PASSED (5 tests, 5 passed, 0 failed)
 ```
 
-ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ All tests passing!
+✓ All tests passing!
 
 ## Step 6: Check Coverage
 
@@ -215,7 +215,7 @@ $ ./gradlew koverHtmlReport
 Coverage: 100.0% of statements
 ```
 
-ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ Coverage: 100%
+✓ Coverage: 100%
 
 ## TDD Complete!
 ````

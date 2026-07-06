@@ -1,4 +1,4 @@
-﻿# Build and Fix
+# Build and Fix
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -44,11 +44,11 @@ Identify the project's build tool and run the build:
 
 For each error:
 
-1. **Read the file** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Use Read tool to see error context (10 lines around the error)
-2. **Diagnose** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Identify root cause (missing import, wrong type, syntax error)
-3. **Fix minimally** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Use Edit tool for the smallest change that resolves the error
-4. **Re-run build** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Verify the error is gone and no new errors introduced
-5. **Move to next** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Continue with remaining errors
+1. **Read the file** — Use Read tool to see error context (10 lines around the error)
+2. **Diagnose** — Identify root cause (missing import, wrong type, syntax error)
+3. **Fix minimally** — Use Edit tool for the smallest change that resolves the error
+4. **Re-run build** — Verify the error is gone and no new errors introduced
+5. **Move to next** — Continue with remaining errors
 
 ## Step 4: Guardrails
 

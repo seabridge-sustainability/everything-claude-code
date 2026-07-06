@@ -1,4 +1,4 @@
-﻿# Quality Gate Command
+# Quality Gate Command
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule

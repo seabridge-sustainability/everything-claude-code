@@ -1,4 +1,4 @@
-﻿---
+---
 description: Sequential and tmux/worktree orchestration guidance for multi-agent workflows.
 ---
 

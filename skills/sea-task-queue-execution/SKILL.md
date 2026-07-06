@@ -24,8 +24,9 @@ implementation slices, and work that needs triage before code changes.
    or protected areas are involved; otherwise proceed inside the known scope.
 4. Execute: make bounded changes only in the task scope. Preserve dirty user work.
 5. Verify: run repo-appropriate tests/checks and capture exact evidence.
-6. Close: report files changed, validation, skipped checks, residual risks, and
-   whether the Definition of Done is met.
+6. Close: apply `sea-verification-before-completion`, then report files changed,
+   validation, skipped checks, residual risks, and whether the Definition of
+   Done is met.
 
 ## Human Checkpoints
 

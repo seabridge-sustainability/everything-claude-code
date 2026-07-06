@@ -1,4 +1,4 @@
-﻿# Execute - Multi-Model Collaborative Execution
+# Execute - Multi-Model Collaborative Execution
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -17,7 +17,7 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-Multi-model collaborative execution - Get prototype from plan ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Claude refactors and implements ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Multi-model audit and delivery.
+Multi-model collaborative execution - Get prototype from plan → Claude refactors and implements → Multi-model audit and delivery.
 
 $ARGUMENTS
 
@@ -145,7 +145,7 @@ TaskOutput({ task_id: "<task_id>", block: true, timeout: 600000 })
    |-----------|-----------|-------|
    | **Frontend** | Pages, components, UI, styles, layout | Gemini |
    | **Backend** | API, interfaces, database, logic, algorithms | Codex |
-   | **Fullstack** | Contains both frontend and backend | Codex ÃƒÂ¢Ã‹â€ Ã‚Â¥ Gemini parallel |
+   | **Fullstack** | Contains both frontend and backend | Codex ∥ Gemini parallel |
 
 ---
 
@@ -188,7 +188,7 @@ mcp__ace-tool__search_context({
 
 **Route Based on Task Type**:
 
-#### Route A: Frontend/UI/Styles ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Gemini
+#### Route A: Frontend/UI/Styles → Gemini
 
 **Limit**: Context < 32k tokens
 
@@ -199,7 +199,7 @@ mcp__ace-tool__search_context({
 5. **WARNING**: Ignore Gemini's backend logic suggestions
 6. If plan contains `GEMINI_SESSION`: prefer `resume <GEMINI_SESSION>`
 
-#### Route B: Backend/Logic/Algorithms ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Codex
+#### Route B: Backend/Logic/Algorithms → Codex
 
 1. Call Codex (use `~/.claude/.ccg/prompts/codex/architect.md`)
 2. Input: Plan content + retrieved context + target files
@@ -207,7 +207,7 @@ mcp__ace-tool__search_context({
 4. **Codex is backend logic authority, leverage its logical reasoning and debug capabilities**
 5. If plan contains `CODEX_SESSION`: prefer `resume <CODEX_SESSION>`
 
-#### Route C: Fullstack ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Parallel Calls
+#### Route C: Fullstack → Parallel Calls
 
 1. **Parallel Calls** (`run_in_background: true`):
    - Gemini: Handle frontend part
@@ -305,11 +305,11 @@ After audit passes, report to user:
 
 ## Key Rules
 
-1. **Code Sovereignty** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“ All file modifications by Claude, external models have zero write access
-2. **Dirty Prototype Refactoring** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“ Codex/Gemini output treated as draft, must refactor
-3. **Trust Rules** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“ Backend follows Codex, Frontend follows Gemini
-4. **Minimal Changes** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“ Only modify necessary code, no side effects
-5. **Mandatory Audit** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“ Must perform multi-model Code Review after changes
+1. **Code Sovereignty** – All file modifications by Claude, external models have zero write access
+2. **Dirty Prototype Refactoring** – Codex/Gemini output treated as draft, must refactor
+3. **Trust Rules** – Backend follows Codex, Frontend follows Gemini
+4. **Minimal Changes** – Only modify necessary code, no side effects
+5. **Mandatory Audit** – Must perform multi-model Code Review after changes
 
 ---
 

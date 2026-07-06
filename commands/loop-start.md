@@ -1,4 +1,4 @@
-﻿# Loop Start Command
+# Loop Start Command
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule

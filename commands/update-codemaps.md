@@ -1,4 +1,4 @@
-﻿# Update Codemaps
+# Update Codemaps
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -32,21 +32,21 @@ Create or update codemaps in `docs/CODEMAPS/` (or `.reports/codemaps/`):
 | File | Contents |
 |------|----------|
 | `architecture.md` | High-level system diagram, service boundaries, data flow |
-| `backend.md` | API routes, middleware chain, service ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ repository mapping |
+| `backend.md` | API routes, middleware chain, service → repository mapping |
 | `frontend.md` | Page tree, component hierarchy, state management flow |
 | `data.md` | Database tables, relationships, migration history |
 | `dependencies.md` | External services, third-party integrations, shared libraries |
 
 ### Codemap Format
 
-Each codemap should be token-lean ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â optimized for AI context consumption:
+Each codemap should be token-lean — optimized for AI context consumption:
 
 ```markdown
 # Backend Architecture
 
 ## Routes
-POST /api/users ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ UserController.create ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ UserService.create ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ UserRepo.insert
-GET  /api/users/:id ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ UserController.get ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ UserService.findById ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ UserRepo.findById
+POST /api/users → UserController.create → UserService.create → UserRepo.insert
+GET  /api/users/:id → UserController.get → UserService.findById → UserRepo.findById
 
 ## Key Files
 src/services/user.ts (business logic, 120 lines)

@@ -1,4 +1,4 @@
-﻿---
+---
 description: Comprehensive C++ code review for memory safety, modern C++ idioms, concurrency, and security. Invokes the cpp-reviewer agent.
 ---
 
@@ -91,8 +91,8 @@ Agent:
 - src/service/auth.cpp (modified)
 
 ## Static Analysis Results
-ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ clang-tidy: 2 warnings
-ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ cppcheck: No issues
+✓ clang-tidy: 2 warnings
+✓ cppcheck: No issues
 
 ## Issues Found
 

@@ -21,7 +21,10 @@ patch.
 5. Add or update regression evidence when practical.
 6. Decide whether an instruction, skill, checklist, or handoff improvement would
    prevent recurrence. Propose it; implement only when in scope or requested.
-7. Re-run the original check and report what changed.
+7. Re-run the original check and report what changed. If the re-run fails
+   twice, stop and escalate as a hard blocker per GOAL_PROTOCOL.md — do not
+   repeat steps 1-7 a third time.
+8. Before any done/fixed claim, apply `sea-verification-before-completion`.
 
 ## Guardrails
 

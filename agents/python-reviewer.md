@@ -31,47 +31,47 @@ When invoked:
 
 ## Review Priorities
 
-### CRITICAL Ã¢â‚¬â€ Security
-- **SQL Injection**: f-strings in queries Ã¢â‚¬â€ use parameterized queries
-- **Command Injection**: unvalidated input in shell commands Ã¢â‚¬â€ use subprocess with list args
-- **Path Traversal**: user-controlled paths Ã¢â‚¬â€ validate with normpath, reject `..`
+### CRITICAL — Security
+- **SQL Injection**: f-strings in queries — use parameterized queries
+- **Command Injection**: unvalidated input in shell commands — use subprocess with list args
+- **Path Traversal**: user-controlled paths — validate with normpath, reject `..`
 - **Eval/exec abuse**, **unsafe deserialization**, **hardcoded secrets**
 - **Weak crypto** (MD5/SHA1 for security), **YAML unsafe load**
 
-### CRITICAL Ã¢â‚¬â€ Error Handling
-- **Bare except**: `except: pass` Ã¢â‚¬â€ catch specific exceptions
-- **Swallowed exceptions**: silent failures Ã¢â‚¬â€ log and handle
-- **Missing context managers**: manual file/resource management Ã¢â‚¬â€ use `with`
+### CRITICAL — Error Handling
+- **Bare except**: `except: pass` — catch specific exceptions
+- **Swallowed exceptions**: silent failures — log and handle
+- **Missing context managers**: manual file/resource management — use `with`
 
-### HIGH Ã¢â‚¬â€ Type Hints
+### HIGH — Type Hints
 - Public functions without type annotations
 - Using `Any` when specific types are possible
 - Missing `Optional` for nullable parameters
 
-### HIGH Ã¢â‚¬â€ Pythonic Patterns
+### HIGH — Pythonic Patterns
 - Use list comprehensions over C-style loops
 - Use `isinstance()` not `type() ==`
 - Use `Enum` not magic numbers
 - Use `"".join()` not string concatenation in loops
-- **Mutable default arguments**: `def f(x=[])` Ã¢â‚¬â€ use `def f(x=None)`
+- **Mutable default arguments**: `def f(x=[])` — use `def f(x=None)`
 
-### HIGH Ã¢â‚¬â€ Code Quality
+### HIGH — Code Quality
 - Functions > 50 lines, > 5 parameters (use dataclass)
 - Deep nesting (> 4 levels)
 - Duplicate code patterns
 - Magic numbers without named constants
 
-### HIGH Ã¢â‚¬â€ Concurrency
-- Shared state without locks Ã¢â‚¬â€ use `threading.Lock`
+### HIGH — Concurrency
+- Shared state without locks — use `threading.Lock`
 - Mixing sync/async incorrectly
-- N+1 queries in loops Ã¢â‚¬â€ batch query
+- N+1 queries in loops — batch query
 
-### MEDIUM Ã¢â‚¬â€ Best Practices
+### MEDIUM — Best Practices
 - PEP 8: import order, naming, spacing
 - Missing docstrings on public functions
 - `print()` instead of `logging`
-- `from module import *` Ã¢â‚¬â€ namespace pollution
-- `value == None` Ã¢â‚¬â€ use `value is None`
+- `from module import *` — namespace pollution
+- `value == None` — use `value is None`
 - Shadowing builtins (`list`, `dict`, `str`)
 
 ## Diagnostic Commands

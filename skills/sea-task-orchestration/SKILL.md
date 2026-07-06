@@ -43,6 +43,12 @@ Every data lane must preserve provenance, units, scenario, timeframe, confidence
 
 Claude Code can use subagents. Codex can use spawn_agent only when the user explicitly asks for subagents. Gemini, OpenCode, Cursor, and Copilot CLI should run equivalent isolated task prompts.
 
+## Related Skills
+
+Use `sea-parallel-agent-dispatch` for dispatch mechanics when authorized
+subagent lanes are involved; `sea-gsd-controlled-execution` owns long-running
+phase state.
+
 ## Superpowers Adaptation
 
 Partially adapts Superpowers executing-plans, subagent-driven-development, and dispatching-parallel-agents with SeaBridgeAI approval boundaries.

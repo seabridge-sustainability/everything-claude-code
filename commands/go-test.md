@@ -1,4 +1,4 @@
-﻿---
+---
 description: Enforce TDD workflow for Go. Write table-driven tests first, then implement. Verify 80%+ coverage with go test -cover.
 ---
 
@@ -44,10 +44,10 @@ Use `/go-test` when:
 ## TDD Cycle
 
 ```
-RED     ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Write failing table-driven test
-GREEN   ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Implement minimal code to pass
-REFACTOR ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Improve code, tests stay green
-REPEAT  ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Next test case
+RED     → Write failing table-driven test
+GREEN   → Implement minimal code to pass
+REFACTOR → Improve code, tests stay green
+REPEAT  → Next test case
 ```
 
 ## Example Session
@@ -129,7 +129,7 @@ $ go test ./validator/...
 FAIL
 ```
 
-ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ Tests fail as expected (panic).
+✓ Tests fail as expected (panic).
 
 ## Step 4: Implement Minimal Code (GREEN)
 
@@ -169,7 +169,7 @@ PASS
 ok      project/validator    0.003s
 ```
 
-ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ All tests passing!
+✓ All tests passing!
 
 ## Step 6: Check Coverage
 
@@ -181,7 +181,7 @@ coverage: 100.0% of statements
 ok      project/validator    0.003s
 ```
 
-ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ Coverage: 100%
+✓ Coverage: 100%
 
 ## TDD Complete!
 ````

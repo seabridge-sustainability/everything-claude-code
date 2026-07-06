@@ -13,7 +13,7 @@ SYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1
 - The agent must not return early after code generation.
 - The agent must not claim completion until validation passes.
 - The agent must keep working until the Definition of Done is satisfied or a hard blocker is proven.
-- If the task is likely to require more than 15 minutes, the agent must explicitly state the expected work phases and validation steps before starting.
+- If the task is multi-phase (touches more than 2 files, adds a dependency, requires a schema/migration change, or spans more than one repo), the agent must explicitly state the expected work phases and validation steps before starting.
 - If the task completes unusually quickly, the agent must include evidence explaining why the task was genuinely small.
 
 ## 1. Core Operating Principle
@@ -121,16 +121,17 @@ If something fails, debug it, identify the root cause, fix it, rerun validation,
 
 ### No Premature Completion
 
-If a task includes implementation, refactoring, integration, multi-file changes, tests, or cross-repo updates, the agent must assume it requires meaningful execution time and validation. It cannot report complete in under 10 minutes unless:
+If a task includes implementation, refactoring, integration, multi-file changes, tests, or cross-repo updates, the agent must assume it requires meaningful execution time and validation. It cannot report complete unless:
 
-- The task was inspection-only.
-- No code changes were needed.
-- Validation was actually run and passed.
-- It clearly documents why the task was small.
+- The task was inspection-only, or
+- No code changes were needed, or
+- It can list at least one test/build/lint/validation command it actually ran, with its output, and validation passed.
 
-### Fifteen-Minute Complexity Heuristic
+If none of those hold, it clearly documents why the task was genuinely small.
 
-For tasks likely to take more than 15 minutes, the agent must break the work into phases:
+### Multi-Phase Complexity Trigger
+
+Treat a task as multi-phase when it touches more than 2 files, adds a dependency, requires a schema/migration change, or spans more than one repo. For multi-phase tasks, the agent must break the work into phases:
 
 - Inspection.
 - Implementation.
@@ -138,11 +139,11 @@ For tasks likely to take more than 15 minutes, the agent must break the work int
 - Fixes.
 - Final verification.
 
-The agent should state the expected phases and validation path before starting material edits.
+The agent must state the expected phases and validation path before starting material edits.
 
 ### Stagnation Detection
 
-If the agent spends more than 5 minutes on the same failing action without measurable progress, it must change strategy.
+After 2 failed attempts of the same command or action with no change in the error message or output, the agent must change strategy (this is the same rule as Maximum Same-Action Retry below).
 
 Examples of stagnation:
 
@@ -183,7 +184,7 @@ A blocker is only valid if:
 
 ### Progress Heartbeat
 
-For long tasks, the agent should maintain a progress log:
+For multi-phase tasks (per the Multi-Phase Complexity Trigger above), the agent must maintain a progress log:
 
 - Current phase.
 - Last successful action.
@@ -369,7 +370,7 @@ All SeaBridgeAI agents must also:
 - Do not commit unless explicitly requested.
 - Do not install dependencies, run paid calls, run live provider calls, run migrations, or launch long-running jobs without explicit approval.
 - Do not delete repositories, source folders, databases, vector indexes/documents, generated data volumes, or infrastructure.
-- Preserve Sentinel, hook, and safety configurations unless explicit approval authorizes a scoped change.
+- Preserve hook and safety configurations unless explicit approval authorizes a scoped change.
 - Document unverified items, skipped checks, blockers, and residual risks clearly.
 
 ## Runtime Invocation

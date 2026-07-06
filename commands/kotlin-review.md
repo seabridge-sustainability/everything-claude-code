@@ -1,4 +1,4 @@
-﻿---
+---
 description: Comprehensive Kotlin code review for idiomatic patterns, null safety, coroutine safety, and security. Invokes the kotlin-reviewer agent.
 ---
 
@@ -95,8 +95,8 @@ Agent:
 - src/main/kotlin/com/example/routes/UserRoutes.kt (modified)
 
 ## Static Analysis Results
-ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ Build: Successful
-ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ detekt: No issues
+✓ Build: Successful
+✓ detekt: No issues
 WARNING: ktlint: 2 formatting warnings
 
 ## Issues Found

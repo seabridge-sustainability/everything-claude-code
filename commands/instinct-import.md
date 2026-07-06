@@ -1,4 +1,4 @@
-﻿---
+---
 name: instinct-import
 description: Import instincts from file or URL into project/global scope
 command: true
@@ -70,9 +70,9 @@ Analyzing conflicts...
 
 ## New Instincts (8)
 These will be added:
-  ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ use-zod-validation (confidence: 0.7)
-  ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ prefer-named-exports (confidence: 0.65)
-  ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ test-async-functions (confidence: 0.8)
+  ✓ use-zod-validation (confidence: 0.7)
+  ✓ prefer-named-exports (confidence: 0.65)
+  ✓ test-async-functions (confidence: 0.8)
   ...
 
 ## Duplicate Instincts (3)
@@ -80,12 +80,12 @@ Already have similar instincts:
   WARNING: prefer-functional-style
      Local: 0.8 confidence, 12 observations
      Import: 0.7 confidence
-     ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Keep local (higher confidence)
+     → Keep local (higher confidence)
 
   WARNING: test-first-workflow
      Local: 0.75 confidence
      Import: 0.9 confidence
-     ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Update to import (higher confidence)
+     → Update to import (higher confidence)
 
 Import 8 new, update 1?
 ```

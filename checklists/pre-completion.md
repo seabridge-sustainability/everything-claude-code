@@ -1,5 +1,9 @@
 # Pre-Completion Checklist
 
+Canonical source: `skills/sea-verification-before-completion/SKILL.md` and the
+self-verification loop in `skills/sea-senior-dev-workflow/SKILL.md` — if this
+list and those skills ever disagree, the skills win.
+
 - [ ] User request fully addressed.
 - [ ] No requirement silently dropped.
 - [ ] Plan/assumptions and done criteria were stated before edits.

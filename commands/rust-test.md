@@ -1,4 +1,4 @@
-﻿---
+---
 description: Enforce TDD workflow for Rust. Write tests first, then implement. Verify 80%+ coverage with cargo-llvm-cov.
 ---
 
@@ -138,7 +138,7 @@ mod tests {
 }
 ```
 
-## Step 3: Run Tests ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Verify FAIL
+## Step 3: Run Tests — Verify FAIL
 
 ```bash
 $ cargo test
@@ -175,7 +175,7 @@ pub fn validate_registration(request: &RegistrationRequest) -> ValidationResult 
 }
 ```
 
-## Step 5: Run Tests ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Verify PASS
+## Step 5: Run Tests — Verify PASS
 
 ```bash
 $ cargo test
@@ -310,8 +310,8 @@ cargo test --no-fail-fast
 - Write implementation before tests
 - Skip the RED phase
 - Use `#[should_panic]` when `Result::is_err()` works
-- Use `sleep()` in tests ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â use channels or `tokio::time::pause()`
-- Mock everything ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â prefer integration tests when feasible
+- Use `sleep()` in tests — use channels or `tokio::time::pause()`
+- Mock everything — prefer integration tests when feasible
 
 ## Related Commands
 

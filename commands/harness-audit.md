@@ -1,4 +1,4 @@
-﻿# Harness Audit Command
+# Harness Audit Command
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule

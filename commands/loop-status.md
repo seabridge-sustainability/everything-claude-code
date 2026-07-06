@@ -1,4 +1,4 @@
-﻿# Loop Status Command
+# Loop Status Command
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule

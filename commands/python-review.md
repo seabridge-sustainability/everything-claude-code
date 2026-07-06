@@ -1,4 +1,4 @@
-﻿---
+---
 description: Comprehensive Python code review for PEP 8 compliance, type hints, security, and Pythonic idioms. Invokes the python-reviewer agent.
 ---
 
@@ -104,10 +104,10 @@ Agent:
 - app/services/auth.py (modified)
 
 ## Static Analysis Results
-ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ ruff: No issues
-ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ mypy: No errors
+✓ ruff: No issues
+✓ mypy: No errors
 WARNING: black: 2 files need reformatting
-ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ bandit: No security issues
+✓ bandit: No security issues
 
 ## Issues Found
 

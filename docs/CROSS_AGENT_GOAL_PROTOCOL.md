@@ -34,4 +34,4 @@ After 2 identical failures, agents must stop repeating the same action, inspect 
 
 ## Safety
 
-The goal protocol never authorizes commits, pushes, dependency installs, paid or live provider calls, migrations, production data changes, destructive actions, protected-branch work, global installs, or disabled hook/Sentinel changes without explicit approval.
+The goal protocol never authorizes commits, pushes, dependency installs, paid or live provider calls, migrations, production data changes, destructive actions, protected-branch work, global installs, or disabled-hook changes without explicit approval.

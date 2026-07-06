@@ -1,4 +1,4 @@
-﻿---
+---
 description: Fix Rust build errors, borrow checker issues, and dependency problems incrementally. Invokes the rust-build-resolver agent for minimal, surgical fixes.
 ---
 
@@ -84,7 +84,7 @@ Errors found: 3
 ## Fix 1: Borrow Checker Error
 
 File: src/service/cache.rs:25
-Error: E0502 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â cannot borrow `map` as mutable because also borrowed as immutable
+Error: E0502 — cannot borrow `map` as mutable because also borrowed as immutable
 Cause: Immutable borrow still active during mutable insert
 
 ```rust
@@ -102,7 +102,7 @@ $ cargo check
 ## Fix 2: Type Mismatch
 
 File: src/handler/api.rs:42
-Error: E0308 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â mismatched types: expected `usize`, found `&str`
+Error: E0308 — mismatched types: expected `usize`, found `&str`
 
 ```rust
 // Changed
@@ -121,7 +121,7 @@ $ cargo check
 ## Fix 3: Unresolved Name
 
 File: src/handler/api.rs:58
-Error: E0425 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â cannot find value `db` in this scope
+Error: E0425 — cannot find value `db` in this scope
 Cause: Missing import
 
 ```rust

@@ -1,4 +1,4 @@
-﻿# Backend - Backend-Focused Development
+# Backend - Backend-Focused Development
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -17,7 +17,7 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-Backend-focused workflow (Research ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Ideation ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Plan ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Execute ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Optimize ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Review), Codex-led.
+Backend-focused workflow (Research → Ideation → Plan → Execute → Optimize → Review), Codex-led.
 
 ## Usage
 
@@ -33,12 +33,12 @@ Backend-focused workflow (Research ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Ide
 
 ## Your Role
 
-You are the **Backend Orchestrator**, coordinating multi-model collaboration for server-side tasks (Research ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Ideation ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Plan ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Execute ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Optimize ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Review).
+You are the **Backend Orchestrator**, coordinating multi-model collaboration for server-side tasks (Research → Ideation → Plan → Execute → Optimize → Review).
 
 **Collaborative Models**:
-- **Codex** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“ Backend logic, algorithms (**Backend authority, trustworthy**)
-- **Gemini** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“ Frontend perspective (**Backend opinions for reference only**)
-- **Claude (self)** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“ Orchestration, planning, execution, delivery
+- **Codex** – Backend logic, algorithms (**Backend authority, trustworthy**)
+- **Gemini** – Frontend perspective (**Backend opinions for reference only**)
+- **Claude (self)** – Orchestration, planning, execution, delivery
 
 ---
 
@@ -93,7 +93,7 @@ EOF",
 ## Communication Guidelines
 
 1. Start responses with mode label `[Mode: X]`, initial is `[Mode: Research]`
-2. Follow strict sequence: `Research ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Ideation ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Plan ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Execute ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Optimize ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Review`
+2. Follow strict sequence: `Research → Ideation → Plan → Execute → Optimize → Review`
 3. Use `AskUserQuestion` tool for user interaction when needed (e.g., confirmation/selection/approval)
 
 ---

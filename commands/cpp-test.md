@@ -1,4 +1,4 @@
-﻿---
+---
 description: Enforce TDD workflow for C++. Write GoogleTest tests first, then implement. Verify coverage with gcov/lcov.
 ---
 
@@ -44,10 +44,10 @@ Use `/cpp-test` when:
 ## TDD Cycle
 
 ```
-RED     ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Write failing GoogleTest test
-GREEN   ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Implement minimal code to pass
-REFACTOR ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Improve code, tests stay green
-REPEAT  ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Next test case
+RED     → Write failing GoogleTest test
+GREEN   → Implement minimal code to pass
+REFACTOR → Improve code, tests stay green
+REPEAT  → Next test case
 ```
 
 ## Example Session
@@ -124,7 +124,7 @@ $ cmake --build build && ctest --test-dir build --output-on-failure
 FAIL
 ```
 
-ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ Tests fail as expected (unimplemented).
+✓ Tests fail as expected (unimplemented).
 
 ## Step 4: Implement Minimal Code (GREEN)
 
@@ -155,7 +155,7 @@ $ cmake --build build && ctest --test-dir build --output-on-failure
 100% tests passed.
 ```
 
-ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ All tests passing!
+✓ All tests passing!
 
 ## Step 6: Check Coverage
 
@@ -168,7 +168,7 @@ $ lcov --list coverage.info
 validator/email.cpp     | 100%
 ```
 
-ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ Coverage: 100%
+✓ Coverage: 100%
 
 ## TDD Complete!
 ````

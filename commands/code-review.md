@@ -1,4 +1,4 @@
-﻿# Code Review
+# Code Review
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule

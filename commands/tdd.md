@@ -1,4 +1,4 @@
-﻿---
+---
 description: Enforce test-driven development workflow. Scaffold interfaces, generate tests FIRST, then implement minimal code to pass. Ensure 80%+ coverage.
 ---
 
@@ -55,7 +55,7 @@ The tdd-guide agent will:
 ## TDD Cycle
 
 ```
-RED ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ GREEN ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ REFACTOR ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ REPEAT
+RED → GREEN → REFACTOR → REPEAT
 
 RED:      Write a failing test
 GREEN:    Write minimal code to pass
@@ -144,7 +144,7 @@ describe('calculateLiquidityScore', () => {
 npm test lib/liquidity.test.ts
 
 FAIL lib/liquidity.test.ts
-  ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¢ should return high score for liquid market (2 ms)
+  ✕ should return high score for liquid market (2 ms)
     Error: Not implemented
 
 1 test failed, 0 passed
@@ -189,9 +189,9 @@ export function calculateLiquidityScore(market: MarketData): number {
 npm test lib/liquidity.test.ts
 
 PASS lib/liquidity.test.ts
-  ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ should return high score for liquid market (3 ms)
-  ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ should return low score for illiquid market (2 ms)
-  ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ should handle edge case: zero volume (1 ms)
+  ✓ should return high score for liquid market (3 ms)
+  ✓ should return low score for illiquid market (2 ms)
+  ✓ should handle edge case: zero volume (1 ms)
 
 3 tests passed
 ```
@@ -246,9 +246,9 @@ export function calculateLiquidityScore(market: MarketData): number {
 npm test lib/liquidity.test.ts
 
 PASS lib/liquidity.test.ts
-  ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ should return high score for liquid market (3 ms)
-  ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ should return low score for illiquid market (2 ms)
-  ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ should handle edge case: zero volume (1 ms)
+  ✓ should return high score for liquid market (3 ms)
+  ✓ should return low score for illiquid market (2 ms)
+  ✓ should handle edge case: zero volume (1 ms)
 
 3 tests passed
 ```

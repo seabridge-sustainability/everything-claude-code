@@ -1,4 +1,4 @@
-﻿---
+---
 name: skill-health
 description: Show skill portfolio health dashboard with charts and analytics
 command: true
@@ -65,10 +65,10 @@ node "$ECC_ROOT/scripts/skills-health.js" --dashboard --json
 
 ## Panels
 
-- **Success Rate (30d)** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Sparkline charts showing daily success rates per skill
-- **Failure Patterns** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Clustered failure reasons with horizontal bar chart
-- **Pending Amendments** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Amendment proposals awaiting review
-- **Version History** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Timeline of version snapshots per skill
+- **Success Rate (30d)** — Sparkline charts showing daily success rates per skill
+- **Failure Patterns** — Clustered failure reasons with horizontal bar chart
+- **Pending Amendments** — Amendment proposals awaiting review
+- **Version History** — Timeline of version snapshots per skill
 
 <!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_START -->
 ## /goal Default Contract

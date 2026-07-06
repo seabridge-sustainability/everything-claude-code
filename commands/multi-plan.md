@@ -1,4 +1,4 @@
-﻿# Plan - Multi-Model Collaborative Planning
+# Plan - Multi-Model Collaborative Planning
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -17,7 +17,7 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-Multi-model collaborative planning - Context retrieval + Dual-model analysis ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Generate step-by-step implementation plan.
+Multi-model collaborative planning - Context retrieval + Dual-model analysis → Generate step-by-step implementation plan.
 
 $ARGUMENTS
 
@@ -186,9 +186,9 @@ Synthesize both analyses, generate **Step-by-step Implementation Plan**:
 ## Implementation Plan: <Task Name>
 
 ### Task Type
-- [ ] Frontend (ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Gemini)
-- [ ] Backend (ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Codex)
-- [ ] Fullstack (ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Parallel)
+- [ ] Frontend (→ Gemini)
+- [ ] Backend (→ Codex)
+- [ ] Fullstack (→ Parallel)
 
 ### Technical Solution
 <Optimal solution synthesized from Codex + Gemini analysis>
@@ -278,11 +278,11 @@ After user approves, **manually** execute:
 
 ## Key Rules
 
-1. **Plan only, no implementation** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“ This command does not execute any code changes
-2. **No Y/N prompts** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“ Only present plan, let user decide next steps
-3. **Trust Rules** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“ Backend follows Codex, Frontend follows Gemini
+1. **Plan only, no implementation** – This command does not execute any code changes
+2. **No Y/N prompts** – Only present plan, let user decide next steps
+3. **Trust Rules** – Backend follows Codex, Frontend follows Gemini
 4. External models have **zero filesystem write access**
-5. **SESSION_ID Handoff** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“ Plan must include `CODEX_SESSION` / `GEMINI_SESSION` at end (for `/ccg:execute resume <SESSION_ID>` use)
+5. **SESSION_ID Handoff** – Plan must include `CODEX_SESSION` / `GEMINI_SESSION` at end (for `/ccg:execute resume <SESSION_ID>` use)
 
 <!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_START -->
 ## /goal Default Contract

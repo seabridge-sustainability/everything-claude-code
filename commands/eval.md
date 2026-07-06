@@ -1,4 +1,4 @@
-﻿# Eval Command
+# Eval Command
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule

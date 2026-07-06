@@ -1,7 +1,10 @@
 ﻿# GSD Safe Execution Checklist
 
+Canonical source: `skills/sea-gsd-controlled-execution/SKILL.md` ("Controlled
+Auto Mode Pattern") — if this list and the skill ever disagree, the skill wins.
+
 - [ ] Local-only development unless explicitly approved.
-- [ ] Controlled auto-mode limited to formatting, lint/typecheck fixes, test discovery, import cleanup, small tested refactors, approved report/log moves, docs link/path fixes, and safe read-only scans.
+- [ ] Controlled auto-mode limited to the allowances defined in `sea-gsd-controlled-execution` (formatting, lint/typecheck fixes, test discovery, import cleanup, small tested refactors, approved report/log moves, docs link/path fixes, safe read-only scans).
 - [ ] No uncontrolled autonomous mode.
 - [ ] No yolo mode.
 - [ ] No dangerous permission skipping.

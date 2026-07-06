@@ -1,4 +1,4 @@
-﻿# Workflow - Multi-Model Collaborative Development
+# Workflow - Multi-Model Collaborative Development
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -17,7 +17,7 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-Multi-model collaborative development workflow (Research ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Ideation ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Plan ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Execute ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Optimize ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Review), with intelligent routing: Frontend ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Gemini, Backend ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Codex.
+Multi-model collaborative development workflow (Research → Ideation → Plan → Execute → Optimize → Review), with intelligent routing: Frontend → Gemini, Backend → Codex.
 
 Structured development workflow with quality gates, MCP services, and multi-model collaboration.
 
@@ -36,13 +36,13 @@ Structured development workflow with quality gates, MCP services, and multi-mode
 
 ## Your Role
 
-You are the **Orchestrator**, coordinating a multi-model collaborative system (Research ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Ideation ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Plan ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Execute ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Optimize ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Review). Communicate concisely and professionally for experienced developers.
+You are the **Orchestrator**, coordinating a multi-model collaborative system (Research → Ideation → Plan → Execute → Optimize → Review). Communicate concisely and professionally for experienced developers.
 
 **Collaborative Models**:
-- **ace-tool MCP** (optional) ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“ Code retrieval + Prompt enhancement
-- **Codex** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“ Backend logic, algorithms, debugging (**Backend authority, trustworthy**)
-- **Gemini** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“ Frontend UI/UX, visual design (**Frontend expert, backend opinions for reference only**)
-- **Claude (self)** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“ Orchestration, planning, execution, delivery
+- **ace-tool MCP** (optional) – Code retrieval + Prompt enhancement
+- **Codex** – Backend logic, algorithms, debugging (**Backend authority, trustworthy**)
+- **Gemini** – Frontend UI/UX, visual design (**Frontend expert, backend opinions for reference only**)
+- **Claude (self)** – Orchestration, planning, execution, delivery
 
 ---
 
@@ -113,7 +113,7 @@ TaskOutput({ task_id: "<task_id>", block: true, timeout: 600000 })
 ## Communication Guidelines
 
 1. Start responses with mode label `[Mode: X]`, initial is `[Mode: Research]`.
-2. Follow strict sequence: `Research ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Ideation ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Plan ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Execute ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Optimize ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Review`.
+2. Follow strict sequence: `Research → Ideation → Plan → Execute → Optimize → Review`.
 3. Request user confirmation after each phase completion.
 4. Force stop when score < 7 or user does not approve.
 5. Use `AskUserQuestion` tool for user interaction when needed (e.g., confirmation/selection/approval).
@@ -140,7 +140,7 @@ node scripts/orchestrate-worktrees.js .claude/plan/workflow-e2e-test.json --exec
 2. **Context Retrieval** (if ace-tool MCP available): Call `mcp__ace-tool__search_context`. If unavailable, use built-in tools: `Glob` for file discovery, `Grep` for symbol search, `Read` for context gathering, `Task` (Explore agent) for deeper exploration.
 3. **Requirement Completeness Score** (0-10):
    - Goal clarity (0-3), Expected outcome (0-3), Scope boundaries (0-2), Constraints (0-2)
-   - ÃƒÂ¢Ã¢â‚¬Â°Ã‚Â¥7: Continue | <7: Stop, ask clarifying questions
+   - ≥7: Continue | <7: Stop, ask clarifying questions
 
 ### Phase 2: Solution Ideation
 

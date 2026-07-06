@@ -1,4 +1,4 @@
-﻿---
+---
 description: Comprehensive Go code review for idiomatic patterns, concurrency safety, error handling, and security. Invokes the go-reviewer agent.
 ---
 
@@ -96,8 +96,8 @@ Agent:
 - internal/service/auth.go (modified)
 
 ## Static Analysis Results
-ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ go vet: No issues
-ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ staticcheck: No issues
+✓ go vet: No issues
+✓ staticcheck: No issues
 
 ## Issues Found
 

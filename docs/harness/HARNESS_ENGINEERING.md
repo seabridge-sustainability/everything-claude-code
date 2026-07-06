@@ -64,6 +64,10 @@ Global Shared Standards
 
 ## Local Commands
 
+Each run writes reports to `docs/reports/harness/harness_scan_<timestamp>.json`
+and `harness_scan_new_findings_<timestamp>.json` (created on first run). The
+baseline lives at `manifests/harness/harness-baseline.json`.
+
 Run all harness checks:
 
 ```powershell

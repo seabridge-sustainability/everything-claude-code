@@ -1,8 +1,8 @@
-﻿---
+---
 description: "Scan skills to extract cross-cutting principles and distill them into rules"
 ---
 
-# /rules-distill ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Distill Principles from Skills into Rules
+# /rules-distill — Distill Principles from Skills into Rules
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule

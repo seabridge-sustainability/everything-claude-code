@@ -120,6 +120,9 @@ Use `FORENSICS.md` after failed or ambiguous workflows.
 
 ## Verification Gates
 
+Before any completion claim, also apply `sea-verification-before-completion`;
+the gates below scope what to verify, they do not replace that skill.
+
 - Backend/API: route registration, schema, data source, writer, auth, tenant isolation, error states, feature gates.
 - Frontend/UI: route visibility, endpoint calls, contract match, state behavior, no dead controls, responsive checks.
 - AI/data integrity: source traceability, citations, confidence, missing-data behavior, no fabricated facts.

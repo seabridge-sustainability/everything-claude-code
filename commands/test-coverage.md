@@ -1,4 +1,4 @@
-﻿# Test Coverage
+# Test Coverage
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -44,23 +44,23 @@ Analyze test coverage, identify gaps, and generate missing tests to reach 80%+ c
 
 For each under-covered file, generate tests following this priority:
 
-1. **Happy path** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Core functionality with valid inputs
-2. **Error handling** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Invalid inputs, missing data, network failures
-3. **Edge cases** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Empty arrays, null/undefined, boundary values (0, -1, MAX_INT)
-4. **Branch coverage** ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Each if/else, switch case, ternary
+1. **Happy path** — Core functionality with valid inputs
+2. **Error handling** — Invalid inputs, missing data, network failures
+3. **Edge cases** — Empty arrays, null/undefined, boundary values (0, -1, MAX_INT)
+4. **Branch coverage** — Each if/else, switch case, ternary
 
 ### Test Generation Rules
 
-- Place tests adjacent to source: `foo.ts` ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ `foo.test.ts` (or project convention)
+- Place tests adjacent to source: `foo.ts` → `foo.test.ts` (or project convention)
 - Use existing test patterns from the project (import style, assertion library, mocking approach)
 - Mock external dependencies (database, APIs, file system)
-- Each test should be independent ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â no shared mutable state between tests
+- Each test should be independent — no shared mutable state between tests
 - Name tests descriptively: `test_create_user_with_duplicate_email_returns_409`
 
 ## Step 4: Verify
 
-1. Run the full test suite ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â all tests must pass
-2. Re-run coverage ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â verify improvement
+1. Run the full test suite — all tests must pass
+2. Re-run coverage — verify improvement
 3. If still below 80%, repeat Step 3 for remaining gaps
 
 ## Step 5: Report
@@ -69,11 +69,11 @@ Show before/after comparison:
 
 ```
 Coverage Report
-ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
+──────────────────────────────
 File                   Before  After
 src/services/auth.ts   45%     88%
 src/utils/validation.ts 32%    82%
-ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
+──────────────────────────────
 Overall:               67%     84%  PASS:
 ```
 
@@ -82,7 +82,7 @@ Overall:               67%     84%  PASS:
 - Functions with complex branching (high cyclomatic complexity)
 - Error handlers and catch blocks
 - Utility functions used across the codebase
-- API endpoint handlers (request ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ response flow)
+- API endpoint handlers (request → response flow)
 - Edge cases: null, undefined, empty string, empty array, zero, negative numbers
 
 <!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_START -->

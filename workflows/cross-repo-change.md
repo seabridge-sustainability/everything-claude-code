@@ -9,4 +9,5 @@
 7. Run Claude Code `/review` where supported, or equivalent local diff review elsewhere.
 8. Recommend `/ultra-review` for auth, tenant isolation, migrations, AI output, LCA/emissions/risk scoring, uploads, billing, shared utilities, and production-readiness changes.
 9. Treat CodeRabbit or similar tools as secondary only; they do not replace local tests.
-10. Produce a handoff with changed files, commands run, and manual follow-up.
+10. Produce the handoff by invoking `sea-cross-repo-handoff` (mandatory trigger
+    for cross-repo changes): changed files, commands run, and manual follow-up.

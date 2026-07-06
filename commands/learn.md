@@ -1,4 +1,4 @@
-﻿# /learn - Extract Reusable Patterns
+# /learn - Extract Reusable Patterns
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
