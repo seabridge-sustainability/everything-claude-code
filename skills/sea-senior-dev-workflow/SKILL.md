@@ -1,4 +1,4 @@
-﻿---
+---
 name: sea-senior-dev-workflow
 description: SeaBridgeAI senior engineering workflow adapted from Superpowers for local-only planning, TDD, implementation, review, and verified completion across backend, frontend, AI, QA, security, sustainability, and cross-repo work.
 ---
@@ -7,7 +7,11 @@ description: SeaBridgeAI senior engineering workflow adapted from Superpowers fo
 
 ## Purpose
 
-Run the default SeaBridgeAI engineering loop with Superpowers discipline: understand intent, scope the smallest change, plan when needed, implement surgically, review, and verify before completion.
+Run the default SeaBridgeAI engineering loop with Superpowers discipline:
+understand intent, scope the smallest change, plan when needed, implement
+surgically, review, and verify before completion. This skill is a thin
+orchestrator: it sequences its sibling skills instead of restating them, so
+each rule has exactly one home.
 
 ## When To Call
 
@@ -17,6 +21,32 @@ Use for any non-trivial SeaBridgeAI code, docs, workflow, agent, test, QA, or cr
 
 User request and acceptance criteria; local repo instructions; dirty-worktree status; relevant endpoint, database, UI, AI, or domain surface; approval constraints.
 
+## Orchestration
+
+Apply the phases in order, loading each sibling skill only when its phase is
+actually reached (the one-skill default in `AGENTS_SYSTEM.md` treats this
+orchestrator plus the phase skill it loads as one routed unit, not a
+violation):
+
+1. Clarify — if the request is broad or ambiguous, Load:
+   `skills/sea-brainstorming-and-spec-refinement/SKILL.md`; otherwise state
+   assumptions and done criteria directly.
+2. Implement with tests — for behavior changes, Load:
+   `skills/sea-test-driven-development/SKILL.md` (red/green when practical,
+   smallest scoped fix). For docs/config-only work, substitute static checks
+   per `AGENTS_SYSTEM.md`.
+3. Review — when review feedback exists or risky surfaces are touched, Load:
+   `skills/sea-code-review-response/SKILL.md`; route domain/security review
+   per the Mandatory Skill Triggers in `SEABRIDGE_CODING_AGENT_SYSTEM.md`.
+4. Verify and close — always Load:
+   `skills/sea-verification-before-completion/SKILL.md` before any done/fixed
+   claim (mandatory trigger; never waived).
+
+The step-level self-verification loop (plan before edits, failing test when
+practical, focused pass, risk-based broadening, documented skips, no
+completion claims from code changes alone) is canonical in ECC
+`AGENTS_SYSTEM.md` ("Self-Verification Loop") — follow it there.
+
 ## Expected Outputs
 
 Scoped plan or direct execution note; changed files; tests and checks run; security/data/domain review notes; concise completion or blocker summary.
@@ -25,21 +55,14 @@ Scoped plan or direct execution note; changed files; tests and checks run; secur
 
 Run focused tests or contract checks; inspect git diff; verify endpoint/database/source/auth/tenant behavior when relevant; run domain and security gates for sensitive work.
 
-Self-verification loop:
-
-1. Plan before edits with assumptions, target files, and done criteria.
-2. Write or update relevant tests when practical.
-3. Prove the test fails on old behavior when practical; document why if skipped.
-4. Implement the smallest scoped fix.
-5. Prove the focused test passes after the fix.
-6. Broaden tests when shared behavior, auth, data, AI output, or UI routing risk warrants it.
-7. Document skipped tests and never claim completion from code changes alone.
-
 ## Controlled Auto Mode
 
-Allowed without repeated prompts: formatting, lint fixes, typecheck fixes, test discovery, import cleanup, small refactors with tests, moving logs/reports into approved folders, docs link/path fixes, and safe read-only scans.
-
-Requires explicit approval: commits, pushes, dependency installs, migrations, production data changes, auth/security changes, billing changes, destructive file operations, yolo/autonomous/dangerous permission modes, global installs, and long-running training jobs.
+Follow the canonical Controlled Auto Mode Policy in ECC `AGENTS_SYSTEM.md`:
+formatting/lint/typecheck fixes, test discovery, import cleanup, small tested
+refactors, approved report/log moves, docs path fixes, and read-only scans are
+allowed; commits, pushes, installs, migrations, production data,
+auth/security/billing changes, destructive operations, autonomous modes, and
+long-running jobs require explicit approval.
 
 ## GSD Controlled Execution
 
@@ -65,7 +88,10 @@ When a task involves AI agent routing: verify LOCAL_LLM_ENABLED state in .env be
 
 ## Superpowers Adaptation
 
-Fully embeds Superpowers using-superpowers, brainstorming, writing-plans, test-driven-development, requesting-code-review, and verification-before-completion as SeaBridgeAI local-only gates.
+Composes (rather than embedding) the Superpowers-derived siblings:
+`sea-brainstorming-and-spec-refinement`, `sea-test-driven-development`,
+`sea-code-review-response`, and `sea-verification-before-completion`, plus the
+canonical self-verification and controlled-auto policies in `AGENTS_SYSTEM.md`.
 
 <!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_START -->
 ## /goal Inheritance
