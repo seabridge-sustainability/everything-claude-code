@@ -1,5 +1,12 @@
 # Skill: terrabit — Binary Earth Embedding Similarity Search
 
+Canonical skill (promoted, use this path for the current content):
+`C:\Users\adelm\SeaBridgeAI\everything-claude-code\skills\terrabit\SKILL.md`
+Wrapper: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\.agents\skills\terrabit\SKILL.md`
+
+The section below is kept for Claude Code's own skill discovery path but should
+match the canonical file; update the canonical file first if behavior changes.
+
 ## What this skill covers
 
 Working with [terrabit](https://github.com/isaaccorley/terrabit) in the SeaBridgeAI

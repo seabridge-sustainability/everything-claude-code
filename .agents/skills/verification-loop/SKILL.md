@@ -1,3 +1,9 @@
+---
+name: verification-loop
+description: "A comprehensive verification system for Claude Code sessions."
+origin: ECC
+---
+
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
 
@@ -13,11 +19,6 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
----
-name: verification-loop
-description: "A comprehensive verification system for Claude Code sessions."
-origin: ECC
----
 
 # Verification Loop Skill
 

@@ -1,3 +1,17 @@
+---
+name: deep-research
+description: Multi-source deep research using firecrawl and exa MCPs. Searches the web, synthesizes findings, and delivers cited reports with source attribution. Use when the user wants thorough research on any topic with evidence and citations. Not the same as Feynman's own deep-research mode (`co-scientist-orchestrator.ps1 -Action run-feynman -DeepResearch`, ECC skill `feynman`) — use that one instead for ESG/sustainability research tasks that need Feynman's cited-brief format.
+origin: ECC
+---
+
+# Deep Research
+
+Not this skill: for ESG/sustainability research tasks, use the `feynman` skill's
+`-DeepResearch` mode instead — it produces cited briefs in Feynman's format and
+is the one named in `manageesg-backend/AGENTS.md`'s research-tool guidance.
+Use this generic firecrawl/exa skill for general web research unrelated to
+Feynman.
+
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
 
@@ -13,13 +27,6 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
----
-name: deep-research
-description: Multi-source deep research using firecrawl and exa MCPs. Searches the web, synthesizes findings, and delivers cited reports with source attribution. Use when the user wants thorough research on any topic with evidence and citations.
-origin: ECC
----
-
-# Deep Research
 
 Produce thorough, cited research reports from multiple web sources using firecrawl and exa MCP tools.
 

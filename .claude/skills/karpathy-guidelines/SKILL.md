@@ -1,17 +1,26 @@
 ---
 name: karpathy-guidelines
-description: Four Karpathy-inspired principles for disciplined LLM-assisted coding — assumption surfacing, simplicity, surgical precision, and goal-driven execution. Use before any non-trivial implementation.
+description: Full playbook for the SeaBridgeAI Coding-Agent Principles — four Karpathy-inspired principles (assumption surfacing, simplicity, surgical precision, goal-driven execution) plus the five-gate execution discipline (scope, evidence, adversarial reasoning, verification, reporting). Use before any non-trivial implementation.
 triggers:
   - "before implementing"
   - "about to write"
   - "start coding"
   - "new feature"
   - "karpathy"
+  - "five-gate"
+  - "coding-agent principles"
 ---
 
-# Karpathy-Inspired Coding Guidelines
+# Coding-Agent Principles Playbook
 
-Derived from Andrej Karpathy's observations on LLM coding pitfalls. Apply these four principles before and during any non-trivial change.
+Principles 1-4 are derived from Andrej Karpathy's observations on LLM coding
+pitfalls. Principles 5-8 are the model-agnostic five-gate execution discipline
+(scope, evidence, adversarial reasoning, verification, reporting) that every
+SeaBridgeAI agent's `AGENTS_SYSTEM.md`/`AGENTS.md` names as "Coding-Agent
+Principles (Always Applied)". This file is the detailed reference; the short
+numbered statements in each repo's instruction file are the canonical summary
+— if they conflict, the repo's `AGENTS_SYSTEM.md` wins. Apply all eight before
+and during any non-trivial change.
 
 ---
 
@@ -110,6 +119,86 @@ Strong success criteria enable autonomous looping. Weak criteria ("make it work"
 - [ ] Can I state what "done" looks like in a testable way?
 - [ ] For each phase, do I know how I'll verify it worked?
 - [ ] Is there a test, curl command, or observable output that proves success?
+
+---
+
+## Principle 5 — Evidence Before Reasoning
+
+**Read available files, reports, tests, logs, git history, source docs, and
+runtime state before relying on memory or plausible assumptions.**
+
+- Remembered facts — from prior sessions, training data, or a user's prompt —
+  are hypotheses until verified against the current repo state
+- A prompt implying that a file, function, or endpoint exists is not evidence
+  that it exists — check first
+- Prefer `git log`/`git blame` over recalling "what changed recently"
+- Prefer reading the current test/lint/build output over assuming prior
+  results still hold
+
+**Checklist:**
+- [ ] Did I read the file/test/log instead of assuming its contents?
+- [ ] Am I about to act on a claim (mine or the user's) that I haven't verified?
+- [ ] Is there a cheap check (grep, `git log`, running the test) that would
+  confirm or refute this before I act?
+
+---
+
+## Principle 6 — Adversarial Reasoning
+
+**Before implementing or recommending a plan, look for ways it can fail.**
+Mandatory for cross-repo, security, tenant-isolation, data, AI, architecture,
+or cleanup work.
+
+- Stale assumptions: does the plan depend on something that may have changed?
+- Dirty worktrees: is there uncommitted work this plan could clobber?
+- Duplicate recent work: has this already been done in a recent commit?
+- Contract drift: does this change a shape another repo/service depends on?
+- Generated artifacts: is a "source" file actually build output?
+- Hidden dependencies, branch safety, and cost/quota risk
+
+**Test:** finding a problem before implementation beats producing a confident
+but brittle plan.
+
+**Checklist:**
+- [ ] What is the most likely way this plan is wrong?
+- [ ] Have I checked git history/status for conflicting recent work?
+- [ ] Does this cross a tenant, auth, or contract boundary that needs a
+  closer look?
+
+---
+
+## Principle 7 — Verification Before Completion
+
+**Specify targeted checks before claiming success. Never claim completion
+from code changes, summaries, or confidence alone.**
+
+- Run the smallest meaningful validation that proves the specific claim first
+- Broaden checks when shared contracts, auth, tenant isolation, AI/data,
+  persistence, or user-facing behavior are touched
+- Document skipped checks and why, rather than omitting them silently
+
+**Checklist:**
+- [ ] What is the cheapest check that would prove this claim true or false?
+- [ ] Did I run it, or am I inferring the result?
+- [ ] Does the blast radius of this change call for a broader check too?
+
+---
+
+## Principle 8 — Calibrated Reporting
+
+**Final reports must connect the work to the request and separate facts from
+inference.**
+
+- Name files reviewed and changed, commands run, and evidence gathered
+- State validation performed, skipped checks and why, and residual risks
+- Name approval gates crossed or still pending
+- End with the next useful action, not a vague "let me know if you need
+  anything else"
+
+**Checklist:**
+- [ ] Could someone else reconstruct what I actually did from this report?
+- [ ] Have I flagged what I did *not* verify, instead of staying silent on it?
+- [ ] Is every "done"/"fixed"/"working" claim backed by evidence in this report?
 
 ---
 

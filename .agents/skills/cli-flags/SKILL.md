@@ -1,3 +1,9 @@
+---
+name: cli-flags
+description: Reference for high-impact Claude Code CLI flags and settings.json options: --bare (10x faster startup), --add-dir (multi-repo), additionalDirectories, --agent, and --fork-session. Covers when and how to use each.
+origin: ECC
+---
+
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
 
@@ -13,11 +19,6 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
----
-name: cli-flags
-description: Reference for high-impact Claude Code CLI flags and settings.json options: --bare (10x faster startup), --add-dir (multi-repo), additionalDirectories, --agent, and --fork-session. Covers when and how to use each.
-origin: ECC
----
 
 # Claude Code CLI Productivity Flags
 

@@ -1,5 +1,12 @@
 # Skill: feynman — AI Research Agent
 
+Canonical skill (promoted, use this path for the current content):
+`C:\Users\adelm\SeaBridgeAI\everything-claude-code\skills\feynman\SKILL.md`
+Wrapper: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\.agents\skills\feynman\SKILL.md`
+
+The section below is kept for Claude Code's own skill discovery path but should
+match the canonical file; update the canonical file first if behavior changes.
+
 ## What this skill covers
 
 Working with [Feynman](https://github.com/getcompanion-ai/feynman) in the SeaBridgeAI

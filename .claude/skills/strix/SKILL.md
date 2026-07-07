@@ -14,10 +14,17 @@ triggers:
 
 # Strix — AI Security Pentesting Skill
 
+Canonical skill (promoted, use this path for the current content):
+`C:\Users\adelm\SeaBridgeAI\everything-claude-code\skills\strix\SKILL.md`
+Wrapper: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\.agents\skills\strix\SKILL.md`
+
+The section below is kept for Claude Code's own skill discovery path but should
+match the canonical file; update the canonical file first if behavior changes.
+
 Strix deploys autonomous AI hacker agents that find and validate real vulnerabilities with proof-of-concepts. Unlike static analysis, Strix executes code dynamically inside a Docker sandbox.
 
 **Repo cloned at:** `C:\Users\adelm\SeaBridgeAI\autoresearch\strix\`
-**Wrapper script:** `C:\Users\adelm\SeaBridgeAI\autoresearch\strix.ps1`
+**Wrapper script:** `C:\Users\adelm\SeaBridgeAI\autoresearch\strix\strix.ps1`
 
 ---
 
@@ -40,28 +47,32 @@ Strix deploys autonomous AI hacker agents that find and validate real vulnerabil
 
 ## Quick Usage
 
+Run from `C:\Users\adelm\SeaBridgeAI\autoresearch\strix\`, or use the full path:
+
 ```powershell
 # Scan the backend
-.\strix.ps1 -Target backend
+.\strix\strix.ps1 -Target backend
 
 # Scan the frontend
-.\strix.ps1 -Target frontend
+.\strix\strix.ps1 -Target frontend
 
 # Scan a custom path
-.\strix.ps1 -Target custom -Path "C:\path\to\app"
+.\strix\strix.ps1 -Target custom -Path "C:\path\to\app"
 
 # Quick scan (CI/CD speed)
-.\strix.ps1 -Target backend -Mode quick
+.\strix\strix.ps1 -Target backend -Mode quick
 
 # Standard scan
-.\strix.ps1 -Target backend -Mode standard
+.\strix\strix.ps1 -Target backend -Mode standard
 
 # Headless (non-interactive, for CI)
-.\strix.ps1 -Target backend -Headless
+.\strix\strix.ps1 -Target backend -Headless
 
 # Use a different LLM model
-.\strix.ps1 -Target backend -Model "anthropic/claude-opus-4-6"
+.\strix\strix.ps1 -Target backend -Model "anthropic/claude-opus-4-6"
 ```
+
+(paths above assume the current directory is `autoresearch\`; adjust if running from elsewhere)
 
 ---
 

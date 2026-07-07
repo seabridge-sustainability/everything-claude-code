@@ -169,14 +169,62 @@ Use only C:\Users\adelm\SeaBridgeAI\everything-claude-code. Do not reference alt
 
 Claude Mem was evaluated and intentionally excluded. Do not clone, install, activate, or add a SQLite/vector memory layer for Claude Mem.
 
-## Karpathy Coding Principles (Always Applied)
+## Coding-Agent Principles (Always Applied)
 
-All agents must follow these four principles as default coding behavior:
+These are persistent behavioral guardrails, not optional skills, slash
+commands, or triggers. Active user/developer instructions define what to do;
+these principles govern how the work is executed across SeaBridgeAI agents —
+Claude, Codex, Gemini, OpenCode, local models, and delegated subagents alike.
+They are suspended only by direct higher-priority safety, system, or developer
+policy. Principles 5-8 form a five-gate execution discipline with principle 1:
+scope, gather evidence, reason adversarially, verify, report.
 
-1. Think before coding: state assumptions, clarify ambiguity, push back when simpler.
-2. Simplicity first: minimum code that solves the stated problem.
-3. Surgical changes: touch only what the request requires.
-4. Goal-driven execution: define done with observable verification.
+1. **Think Before Coding (scope first):** state assumptions, scope, affected
+   files and repos, ownership boundaries, and verification before acting on
+   non-trivial work. Name what must not be touched. If the request is
+   ambiguous, make one bounded, stated assumption or ask one focused question
+   before execution.
+2. **Simplicity First:** choose the smallest clear solution that satisfies the
+   task. Avoid speculative features, broad abstractions, and complexity that
+   the request does not require.
+3. **Surgical Changes:** touch only files and lines that trace directly to the
+   user's instruction. Mention unrelated issues instead of fixing them
+   unilaterally.
+4. **Goal-Driven Execution:** define success criteria and verification
+   evidence before implementation, then iterate until the goal is met or a
+   true blocker is documented.
+5. **Evidence Before Reasoning:** read available files, reports, tests, logs,
+   git history, source docs, and runtime state before relying on memory or
+   plausible assumptions. Remembered facts are hypotheses until verified. A
+   prompt implying that something exists is not evidence that it exists.
+6. **Adversarial Reasoning:** before implementing or recommending a plan, look
+   for ways it can fail — mandatory for cross-repo, security, tenant, data,
+   AI, architecture, or cleanup work: stale assumptions, dirty worktrees,
+   duplicate recent work, contract drift, generated artifacts, hidden
+   dependencies, branch safety, cost/quota risk, and unsafe approval paths.
+   Finding problems early beats a confident but brittle plan.
+7. **Verification Before Completion:** specify targeted checks before
+   claiming success. Run the smallest meaningful validation that proves the
+   claim first, then broaden when shared contracts, auth, tenant isolation,
+   AI/data, persistence, or user-facing behavior warrant it. Never claim
+   completion from code changes, summaries, or confidence alone.
+8. **Calibrated Reporting:** final reports must connect the work to the
+   request and separate facts from inference: files reviewed and changed,
+   commands run, evidence gathered, validation performed, skipped checks,
+   residual risks, approval gates, and the next useful action.
+
+- Prefer repository patterns over new abstractions.
+- Read first, then edit. Do not act from stale memory when files are available.
+- Evidence beats confidence. Never claim completion from code changes alone.
+- Preserve user work. Do not revert dirty files you did not create.
+- Spend reasoning effort deliberately: use low/medium effort for small,
+  well-scoped edits and simple inspection or search; reserve high/max effort
+  for orchestration, architecture, adversarial review, and high-risk
+  verification. Do not default to max effort — it is an escalation, not a
+  baseline. Delegate simple inspection and search to smaller or cheaper
+  agents when available. Provider routing and live/paid calls follow this
+  file's existing runtime-routing and guardrail rules; report the model,
+  effort tier, and provider used for any non-trivial task in the final report.
 
 ## Ponytail-Inspired Minimalism Guardrail (Always Applied)
 

@@ -140,29 +140,15 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
-## Karpathy Coding Principles (Always Applied)
+## Coding-Agent Principles (Always Applied)
 
-Default behavioral constraints governing HOW every task is executed. Only the
-user may explicitly relax them for a specific task. Full reference:
-`everything-claude-code/.claude/skills/karpathy-guidelines/SKILL.md`
-
-### 1. Think Before Coding
-State assumptions explicitly before acting. If two interpretations exist, present both and ask. If something is unclear, name it and stop — do not guess. Push back when a simpler approach exists.
-
-### 2. Simplicity First
-Write the minimum code that solves the stated problem. No features, abstractions, or error handling beyond what was explicitly asked. If 200 lines could be 50, write 50. Test: would a senior engineer call this overcomplicated? If yes, simplify.
-
-### 3. Surgical Changes
-Touch only what the request requires. Do not improve adjacent code, comments, or formatting. Do not refactor unrelated things. Mention unrelated bugs — do not fix them unilaterally. Every changed line must trace directly to the user's request.
-
-### 4. Goal-Driven Execution
-Transform tasks into verifiable goals. State what "done" looks like and how you'll verify it (test output, curl, observable behavior). Strong success criteria enable scoped continuation; weak ones require clarification.
-
-**Before any implementation:**
-- [ ] Assumptions stated explicitly?
-- [ ] Every planned line traces to a requirement?
-- [ ] Only touching what was requested?
-- [ ] Verifiable definition of "done" established?
+Canonical text lives in this repo's `AGENTS_SYSTEM.md` under "Coding-Agent
+Principles (Always Applied)". Follow it as mandatory behavioral guardrails —
+Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven
+Execution, and the five-gate execution discipline (evidence before reasoning,
+adversarial reasoning, verification before completion, calibrated reporting).
+Only the user may explicitly relax them for a specific task. Full playbook:
+`everything-claude-code/.claude/skills/karpathy-guidelines/SKILL.md`.
 
 ## Ponytail Minimalism Pointer
 
