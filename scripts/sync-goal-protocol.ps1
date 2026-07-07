@@ -143,7 +143,9 @@ foreach ($file in $files) {
     $exists = Test-Path -LiteralPath $path -PathType Leaf
     $old = ""
     if ($exists) {
-        $old = Get-Content -LiteralPath $path -Raw
+        # Read as UTF-8 explicitly: PS 5.1's default ANSI read corrupts
+        # multibyte characters in BOM-less UTF-8 files.
+        $old = [System.IO.File]::ReadAllText($path, [System.Text.Encoding]::UTF8)
     }
 
     $new = Update-Content -Existing $old -FileName $file
@@ -161,7 +163,7 @@ foreach ($file in $files) {
             $stamp = Get-Date -Format "yyyyMMdd-HHmmss"
             Copy-Item -LiteralPath $path -Destination "$path.goal-backup-$stamp" -Force
         }
-        Set-Content -LiteralPath $path -Value $new -Encoding UTF8 -NoNewline
+        [System.IO.File]::WriteAllText($path, $new, (New-Object System.Text.UTF8Encoding($false)))
     }
 }
 

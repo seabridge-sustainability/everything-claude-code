@@ -4,7 +4,9 @@ param(
     "C:\Users\adelm\SeaBridgeAI\manageesg-backend",
     "C:\Users\adelm\SeaBridgeAI\manageesg-frontend",
     "C:\Users\adelm\SeaBridgeAI\openseabri",
-    "C:\Users\adelm\SeaBridgeAI\autoresearch"
+    "C:\Users\adelm\SeaBridgeAI\autoresearch",
+    "C:\Users\adelm\SeaBridgeAI\climada-stack",
+    "C:\Users\adelm\SeaBridgeAI\_upstream"
   ),
   [string]$CanonicalFile = "C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\SAFETY_AUTHORIZATION_RULE.md",
   [switch]$Check
