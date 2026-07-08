@@ -310,6 +310,7 @@ skill wins. When still unsure, load only `sea-skill-map`.
 - Adversarial clarification or stress-testing a plan: grill-me, after or alongside sea-brainstorming-and-spec-refinement.
 - Domain terminology and DDD-style glossary alignment: ubiquitous-language, alongside sea-sustainability-domain-review and sea-ai-data-integrity.
 - Modular architecture improvement or refactor candidate discovery: improve-codebase-architecture, alongside sea-senior-dev-workflow, sea-test-driven-development, and sea-verification-before-completion.
+- Architecturally significant or ambiguous feature work where Codex CLI is installed, authenticated, and the user has authorized multi-agent dispatch: sea-grill-me-codex (Claude interview + adversarial planning consensus with Codex, execution handoff to Codex, Claude review). Ordinary multi-phase work still defaults to sea-senior-dev-workflow alone; propose sea-grill-me-codex, do not invoke it silently.
 
 ## Agent Compatibility
 

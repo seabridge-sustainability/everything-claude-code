@@ -33,6 +33,7 @@ Use `sea-senior-dev-workflow` for any non-trivial SeaBridgeAI coding, docs, QA, 
 | Frontend dashboard or UI workflow | `sea-frontend-design`, `sea-backend-api-verification` | Route visibility, responsive states, endpoint-backed data, screenshot or Playwright check |
 | AI assistant, RAG, report, LCA, emissions, climate-risk, or due-diligence output | `sea-ai-data-integrity`, `sea-sustainability-domain-review` | Provenance, citations, confidence, units, geography, scenario, timeframe |
 | Cross-repo feature | `sea-task-orchestration`, `sea-cross-repo-handoff`, `sea-gsd-controlled-execution` | Per-repo contract checks and handoff artifact |
+| Architecturally significant or ambiguous feature build, Codex CLI available and authorized | `sea-grill-me-codex` | Consensus plan (≤5 rounds), Codex execution scoped to plan, Claude review (≤2 fix rounds), `sea-verification-before-completion` before any done claim |
 | Multi-phase long-running local task | `sea-gsd-controlled-execution`, `sea-context-hygiene` | Phase plan, preserved state, explicit skipped checks |
 | Bug or failing test | `sea-systematic-debugging`, then the domain skill | Reproduce, isolate root cause, focused regression proof |
 | New reusable skill, wrapper, workflow, or checklist | `sea-skill-creator-protocol` | Canonical file, wrapper, unique name, cross-agent notes, no unsafe permissions |
