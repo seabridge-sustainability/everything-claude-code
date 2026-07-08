@@ -65,21 +65,48 @@ approach.
 1. Check the installed Codex CLI's non-interactive invocation syntax first —
    do not assume flags; run `codex --help` / `codex exec --help` (exact name
    varies by version) and use what is actually supported.
-2. Send the plan draft to Codex as a **read-only critique** request: ask it
+2. Create the round-by-round consensus log as you go (see Consensus Log
+   Artifact below) — do not reconstruct it after the fact.
+3. Send the plan draft to Codex as a **read-only critique** request: ask it
    to identify weaknesses, propose alternatives, and flag anything it would
    implement differently, without writing code. Prefer a read-only sandbox
    mode for this stage if the CLI supports it (mirrors `sea-security-reviewer`
    read-only critique posture).
-3. Integrate Codex's feedback into the plan. If Codex's critique changes the
-   approach, note why.
-4. Repeat steps 2-3 until Codex has no further objections, or **5 rounds**
+4. Integrate Codex's feedback into the plan. If Codex's critique changes the
+   approach, note why. Append the round to the consensus log.
+5. Repeat steps 3-4 until Codex has no further objections, or **5 rounds**
    have run, whichever comes first.
-5. If round 5 ends without consensus: document the specific disagreement,
-   apply Claude's best judgment as tie-break (Claude owns the plan), and
-   state the residual disagreement to the user before proceeding. Do not
+6. If round 5 ends without consensus: document the specific disagreement in
+   the log, apply Claude's best judgment as tie-break (Claude owns the plan),
+   and state the residual disagreement to the user before proceeding. Do not
    silently pick a side.
 
-### Stage 3 — Execution (Codex implements)
+### Consensus Log Artifact
+
+Write each round's exchange (Claude's proposal, Codex's response, what
+changed and why) to a single markdown file as the rounds happen, per the
+Repository Root Organization Policy's "Conflict logs" bucket:
+`docs/reports/conflicts/<task-slug>-grill-me-codex-log.md`. This is the
+durable record of how the two models reached (or failed to reach) consensus
+— do not skip it to save a round.
+
+### Stage 2.5 — Build Checkpoint (explicit user choice, always)
+
+Once Stage 2 ends (consensus or documented disagreement), **stop and present
+the consensus plan plus three options** — do not default to any of them
+without the user picking:
+
+1. **Codex builds** — hand the plan to Codex CLI (the token-efficient path
+   this skill exists for).
+2. **Claude builds** — proceed with the normal `sea-senior-dev-workflow`
+   implementation loop instead, using the same consensus plan.
+3. **Stop here** — the plan is the deliverable; do not implement yet.
+
+If the user's original request already named the execution path (e.g. "use
+Codex to build this"), that counts as the answer — do not re-ask, but still
+state which path you're taking before proceeding.
+
+### Stage 3 — Execution (Codex implements, if chosen)
 
 Hand the consensus plan to Codex CLI in the repo's normal workspace-write
 mode. Scope Codex to the agreed plan only — no unrelated refactors, no scope
@@ -105,6 +132,10 @@ endpoint/auth/tenant checks where relevant — same bar as
 - Before any done/fixed/production-ready claim, apply
   `sea-verification-before-completion` — mandatory, not waived by this
   skill.
+- **Stop and ask before committing.** Present the review summary (what
+  Codex built, what deviated from plan and why, verification results) and
+  let the user choose to commit or inspect further first — never commit
+  automatically, even after a clean review.
 
 ## Guardrails
 
@@ -125,6 +156,18 @@ endpoint/auth/tenant checks where relevant — same bar as
 authorization model this skill's Codex dispatch follows; `sea-senior-dev-workflow`
 as the default single-model path; `sea-verification-before-completion` as
 the mandatory close-out gate.
+
+A lighter-weight variant exists conceptually — Claude plans, Codex builds
+directly, with no adversarial-planning stage — for when the plan is already
+clear and a second model's critique wouldn't change it. This skill does not
+implement that variant; if it's wanted, request it as a separate skill
+rather than skipping Stage 2 of this one.
+
+## Invocation
+
+Primary entry point: `/grill-me-codex <what to build>` (see
+`commands/grill-me-codex.md`). Agents without slash-command support can
+invoke this skill directly by name when the complexity gate above applies.
 
 <!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_START -->
 ## /goal Inheritance
