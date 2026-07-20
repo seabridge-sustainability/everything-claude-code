@@ -101,6 +101,8 @@ assets/images/security/badrudi-exploit.mp4
 graphify-out/cache/
 graphify-out/manifest.json
 graphify-out/cost.json
+graphify-out/.graphify_ast.json
+graphify-out/.graphify_extract.json
 graphify-obsidian/
 
 # Local upstream reference checkouts

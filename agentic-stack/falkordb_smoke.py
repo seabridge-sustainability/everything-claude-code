@@ -19,10 +19,10 @@ HOST = "localhost"
 PORT = 6380
 
 EXPECTED = [
-    "manageesg-backend",
-    "manageesg-frontend",
+    "manageesg",
+    "frontend",
     "autoresearch",
-    "everything-claude-code",
+    "ecc",
     "openseabri",
 ]
 
@@ -53,8 +53,8 @@ def main() -> int:
         for t, c in rels:
             print(f"      :{t:30s}  {c}")
 
-    print("\n--- multi-hop test on manageesg-backend ---")
-    be = db.select_graph("manageesg-backend")
+    print("\n--- multi-hop test on manageesg ---")
+    be = db.select_graph("manageesg")
     q = """
     MATCH p = (a:Node)-[*2..3]->(b:Node)
     WHERE toLower(a.label) CONTAINS 'aimanager'
@@ -67,7 +67,7 @@ def main() -> int:
     for row in res.result_set:
         print(f"    {row[0]!r:45s} -> {row[2]}h -> {row[1]!r}")
 
-    print("\n--- top 10 god nodes in manageesg-backend ---")
+    print("\n--- top 10 god nodes in manageesg ---")
     res = be.query(
         "MATCH (n:Node) OPTIONAL MATCH (n)-[r]-() "
         "RETURN n.label, n.source_file, count(r) AS deg "
@@ -77,7 +77,7 @@ def main() -> int:
         print(f"    deg={row[2]:>4}  {row[0]!r:50s}  {row[1]}")
 
     print("\n--- cross-repo: labels that appear in both frontend and backend ---")
-    fe = db.select_graph("manageesg-frontend")
+    fe = db.select_graph("frontend")
     fe_labels = {
         r[0].lower()
         for r in fe.query(

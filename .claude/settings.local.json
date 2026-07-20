@@ -50,7 +50,8 @@
       "Bash(grep -E \"log$|\\\\.log\")",
       "Bash(pip index:*)",
       "Bash(npm install:*)",
-      "Bash(ls node_modules/mapbox-gl/*.md)"
+      "Bash(ls node_modules/mapbox-gl/*.md)",
+      "Agent"
     ]
   },
   "enabledMcpjsonServers": [
@@ -60,6 +61,9 @@
     "exa",
     "memory",
     "playwright",
-    "sequential-thinking"
+    "sequential-thinking",
+    "gitnexus",
+    "gbrain",
+    "falkordb"
   ]
 }
