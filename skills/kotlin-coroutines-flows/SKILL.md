@@ -1,7 +1,8 @@
 ---
 name: kotlin-coroutines-flows
-description: Kotlin Coroutines and Flow patterns for Android and KMP Ã¢â‚¬â€ structured concurrency, Flow operators, StateFlow, error handling, and testing.
-origin: ECC
+description: Kotlin Coroutines and Flow patterns for Android and KMP — structured concurrency, Flow operators, StateFlow, error handling, and testing. Use when writing coroutines or Flow code on Android or KMP, or debugging cancellation and concurrency.
+metadata:
+  origin: ECC
 ---
 
 # Kotlin Coroutines & Flows
@@ -22,7 +23,6 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
-
 Patterns for structured concurrency, Flow-based reactive streams, and coroutine testing in Android and Kotlin Multiplatform projects.
 
 ## When to Activate
@@ -39,22 +39,22 @@ Patterns for structured concurrency, Flow-based reactive streams, and coroutine 
 
 ```
 Application
-  Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ viewModelScope (ViewModel)
-        Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ coroutineScope { } (structured child)
-              Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ async { } (concurrent task)
-              Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ async { } (concurrent task)
+  └── viewModelScope (ViewModel)
+        └── coroutineScope { } (structured child)
+              ├── async { } (concurrent task)
+              └── async { } (concurrent task)
 ```
 
-Always use structured concurrency Ã¢â‚¬â€ never `GlobalScope`:
+Always use structured concurrency — never `GlobalScope`:
 
 ```kotlin
 // BAD
 GlobalScope.launch { fetchData() }
 
-// GOOD Ã¢â‚¬â€ scoped to ViewModel lifecycle
+// GOOD — scoped to ViewModel lifecycle
 viewModelScope.launch { fetchData() }
 
-// GOOD Ã¢â‚¬â€ scoped to composable lifecycle
+// GOOD — scoped to composable lifecycle
 LaunchedEffect(key) { fetchData() }
 ```
 
@@ -89,7 +89,7 @@ suspend fun syncAll() = supervisorScope {
 
 ## Flow Patterns
 
-### Cold Flow Ã¢â‚¬â€ One-Shot to Stream Conversion
+### Cold Flow — One-Shot to Stream Conversion
 
 ```kotlin
 fun observeItems(): Flow<List<Item>> = flow {
@@ -115,7 +115,7 @@ class DashboardViewModel(
 }
 ```
 
-`WhileSubscribed(5_000)` keeps the upstream active for 5 seconds after the last subscriber leaves Ã¢â‚¬â€ survives configuration changes without restarting.
+`WhileSubscribed(5_000)` keeps the upstream active for 5 seconds after the last subscriber leaves — survives configuration changes without restarting.
 
 ### Combining Multiple Flows
 
@@ -192,11 +192,11 @@ withContext(Dispatchers.Default) { parseJson(largePayload) }
 // IO-bound work
 withContext(Dispatchers.IO) { database.query() }
 
-// Main thread (UI) Ã¢â‚¬â€ default in viewModelScope
+// Main thread (UI) — default in viewModelScope
 withContext(Dispatchers.Main) { updateUi() }
 ```
 
-In KMP, use `Dispatchers.Default` and `Dispatchers.Main` (available on all platforms). `Dispatchers.IO` is JVM/Android only Ã¢â‚¬â€ use `Dispatchers.Default` on other platforms or provide via DI.
+In KMP, use `Dispatchers.Default` and `Dispatchers.Main` (available on all platforms). `Dispatchers.IO` is JVM/Android only — use `Dispatchers.Default` on other platforms or provide via DI.
 
 ## Cancellation
 
@@ -288,12 +288,12 @@ class FakeItemRepository : ItemRepository {
 
 ## Anti-Patterns to Avoid
 
-- Using `GlobalScope` Ã¢â‚¬â€ leaks coroutines, no structured cancellation
-- Collecting Flows in `init {}` without a scope Ã¢â‚¬â€ use `viewModelScope.launch`
-- Using `MutableStateFlow` with mutable collections Ã¢â‚¬â€ always use immutable copies: `_state.update { it.copy(list = it.list + newItem) }`
-- Catching `CancellationException` Ã¢â‚¬â€ let it propagate for proper cancellation
-- Using `flowOn(Dispatchers.Main)` to collect Ã¢â‚¬â€ collection dispatcher is the caller's dispatcher
-- Creating `Flow` in `@Composable` without `remember` Ã¢â‚¬â€ recreates the flow every recomposition
+- Using `GlobalScope` — leaks coroutines, no structured cancellation
+- Collecting Flows in `init {}` without a scope — use `viewModelScope.launch`
+- Using `MutableStateFlow` with mutable collections — always use immutable copies: `_state.update { it.copy(list = it.list + newItem) }`
+- Catching `CancellationException` — let it propagate for proper cancellation
+- Using `flowOn(Dispatchers.Main)` to collect — collection dispatcher is the caller's dispatcher
+- Creating `Flow` in `@Composable` without `remember` — recreates the flow every recomposition
 
 ## References
 

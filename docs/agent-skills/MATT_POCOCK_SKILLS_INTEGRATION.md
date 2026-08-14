@@ -1,4 +1,4 @@
-﻿# Matt Pocock Skills Integration For SeaBridgeAI
+# Matt Pocock Skills Integration For SeaBridgeAI
 
 Date: 2026-05-11
 

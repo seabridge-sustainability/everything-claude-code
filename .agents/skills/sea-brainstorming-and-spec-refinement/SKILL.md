@@ -1,4 +1,4 @@
-﻿---
+---
 name: sea-brainstorming-and-spec-refinement
 description: Callable wrapper for sea-brainstorming-and-spec-refinement. Load the canonical SeaBridgeAI skill body from everything-claude-code\skills\sea-brainstorming-and-spec-refinement\SKILL.md.
 ---

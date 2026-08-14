@@ -3,7 +3,7 @@ paths:
   - "**/*.java"
 ---
 
-# Java Ã¦Â¨Â¡Ã¥Â¼Â
+# Java 模式
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -21,12 +21,11 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
+> 本文档扩展了 [common/patterns.md](../common/patterns.md) 中的内容，增加了 Java 特有的部分。
 
-> Ã¦Å“Â¬Ã¦â€“â€¡Ã¦Â¡Â£Ã¦â€°Â©Ã¥Â±â€¢Ã¤Âºâ€  [common/patterns.md](../common/patterns.md) Ã¤Â¸Â­Ã§Å¡â€žÃ¥â€ â€¦Ã¥Â®Â¹Ã¯Â¼Å’Ã¥Â¢Å¾Ã¥Å Â Ã¤Âºâ€  Java Ã§â€°Â¹Ã¦Å“â€°Ã§Å¡â€žÃ©Æ’Â¨Ã¥Ë†â€ Ã£â‚¬â€š
+## 仓储模式
 
-## Ã¤Â»â€œÃ¥â€šÂ¨Ã¦Â¨Â¡Ã¥Â¼Â
-
-Ã¥Â°â€ Ã¦â€¢Â°Ã¦ÂÂ®Ã¨Â®Â¿Ã©â€”Â®Ã¥Â°ÂÃ¨Â£â€¦Ã¥Å“Â¨Ã¦Å½Â¥Ã¥ÂÂ£Ã¤Â¹â€¹Ã¥ÂÅ½Ã¯Â¼Å¡
+将数据访问封装在接口之后：
 
 ```java
 public interface OrderRepository {
@@ -37,11 +36,11 @@ public interface OrderRepository {
 }
 ```
 
-Ã¥â€¦Â·Ã¤Â½â€œÃ§Å¡â€žÃ¥Â®Å¾Ã§Å½Â°Ã§Â±Â»Ã¥Â¤â€žÃ§Ââ€ Ã¥Â­ËœÃ¥â€šÂ¨Ã§Â»â€ Ã¨Å â€šÃ¯Â¼Ë†JPAÃ£â‚¬ÂJDBCÃ£â‚¬ÂÃ§â€Â¨Ã¤ÂºÅ½Ã¦Âµâ€¹Ã¨Â¯â€¢Ã§Å¡â€žÃ¥â€ â€¦Ã¥Â­ËœÃ¥Â­ËœÃ¥â€šÂ¨Ã§Â­â€°Ã¯Â¼â€°Ã£â‚¬â€š
+具体的实现类处理存储细节（JPA、JDBC、用于测试的内存存储等）。
 
-## Ã¦Å“ÂÃ¥Å Â¡Ã¥Â±â€š
+## 服务层
 
-Ã¤Â¸Å¡Ã¥Å Â¡Ã©â‚¬Â»Ã¨Â¾â€˜Ã¦â€Â¾Ã¥Å“Â¨Ã¦Å“ÂÃ¥Å Â¡Ã§Â±Â»Ã¤Â¸Â­Ã¯Â¼â€ºÃ¤Â¿ÂÃ¦Å’ÂÃ¦Å½Â§Ã¥Ë†Â¶Ã¥â„¢Â¨Ã¥â€™Å’Ã¤Â»â€œÃ¥â€šÂ¨Ã¥Â±â€šÃ§Å¡â€žÃ§Â²Â¾Ã§Â®â‚¬Ã¯Â¼Å¡
+业务逻辑放在服务类中；保持控制器和仓储层的精简：
 
 ```java
 public class OrderService {
@@ -62,12 +61,12 @@ public class OrderService {
 }
 ```
 
-## Ã¦Å¾â€žÃ©â‚¬Â Ã¥â€¡Â½Ã¦â€¢Â°Ã¦Â³Â¨Ã¥â€¦Â¥
+## 构造函数注入
 
-Ã¥Â§â€¹Ã§Â»Ë†Ã¤Â½Â¿Ã§â€Â¨Ã¦Å¾â€žÃ©â‚¬Â Ã¥â€¡Â½Ã¦â€¢Â°Ã¦Â³Â¨Ã¥â€¦Â¥ Ã¢â‚¬â€Ã¢â‚¬â€ Ã§Â»ÂÃ¤Â¸ÂÃ¤Â½Â¿Ã§â€Â¨Ã¥Â­â€”Ã¦Â®ÂµÃ¦Â³Â¨Ã¥â€¦Â¥Ã¯Â¼Å¡
+始终使用构造函数注入 —— 绝不使用字段注入：
 
 ```java
-// GOOD Ã¢â‚¬â€ constructor injection (testable, immutable)
+// GOOD — constructor injection (testable, immutable)
 public class NotificationService {
     private final EmailSender emailSender;
 
@@ -76,16 +75,16 @@ public class NotificationService {
     }
 }
 
-// BAD Ã¢â‚¬â€ field injection (untestable without reflection, requires framework magic)
+// BAD — field injection (untestable without reflection, requires framework magic)
 public class NotificationService {
     @Inject // or @Autowired
     private EmailSender emailSender;
 }
 ```
 
-## DTO Ã¦ËœÂ Ã¥Â°â€ž
+## DTO 映射
 
-Ã¤Â½Â¿Ã§â€Â¨Ã¨Â®Â°Ã¥Â½â€¢Ã¯Â¼Ë†recordÃ¯Â¼â€°Ã¤Â½Å“Ã¤Â¸Âº DTOÃ£â‚¬â€šÃ¥Å“Â¨Ã¦Å“ÂÃ¥Å Â¡Ã¥Â±â€š/Ã¦Å½Â§Ã¥Ë†Â¶Ã¥â„¢Â¨Ã¨Â¾Â¹Ã§â€¢Å’Ã¨Â¿â€ºÃ¨Â¡Å’Ã¦ËœÂ Ã¥Â°â€žÃ¯Â¼Å¡
+使用记录（record）作为 DTO。在服务层/控制器边界进行映射：
 
 ```java
 public record OrderResponse(Long id, String customer, BigDecimal total) {
@@ -95,9 +94,9 @@ public record OrderResponse(Long id, String customer, BigDecimal total) {
 }
 ```
 
-## Ã¥Â»ÂºÃ©â‚¬Â Ã¨â‚¬â€¦Ã¦Â¨Â¡Ã¥Â¼Â
+## 建造者模式
 
-Ã§â€Â¨Ã¤ÂºÅ½Ã¥â€¦Â·Ã¦Å“â€°Ã¥Â¤Å¡Ã¤Â¸ÂªÃ¥ÂÂ¯Ã©â‚¬â€°Ã¥Ââ€šÃ¦â€¢Â°Ã§Å¡â€žÃ¥Â¯Â¹Ã¨Â±Â¡Ã¯Â¼Å¡
+用于具有多个可选参数的对象：
 
 ```java
 public class SearchCriteria {
@@ -128,7 +127,7 @@ public class SearchCriteria {
 }
 ```
 
-## Ã¤Â½Â¿Ã§â€Â¨Ã¥Â¯â€ Ã¥Â°ÂÃ§Â±Â»Ã¥Å¾â€¹Ã¦Å¾â€žÃ¥Â»ÂºÃ©Â¢â€ Ã¥Å¸Å¸Ã¦Â¨Â¡Ã¥Å¾â€¹
+## 使用密封类型构建领域模型
 
 ```java
 public sealed interface PaymentResult permits PaymentSuccess, PaymentFailure {
@@ -143,9 +142,9 @@ String message = switch (result) {
 };
 ```
 
-## API Ã¥â€œÂÃ¥Âºâ€Ã¥Â°ÂÃ¨Â£â€¦
+## API 响应封装
 
-Ã§Â»Å¸Ã¤Â¸â‚¬Ã§Å¡â€ž API Ã¥â€œÂÃ¥Âºâ€Ã¦Â Â¼Ã¥Â¼ÂÃ¯Â¼Å¡
+统一的 API 响应格式：
 
 ```java
 public record ApiResponse<T>(boolean success, T data, String error) {
@@ -158,7 +157,8 @@ public record ApiResponse<T>(boolean success, T data, String error) {
 }
 ```
 
-## Ã¥Ââ€šÃ¨â‚¬Æ’
+## 参考
 
-Ã¦Å“â€°Ã¥â€¦Â³ Spring Boot Ã¦Å¾Â¶Ã¦Å¾â€žÃ¦Â¨Â¡Ã¥Â¼ÂÃ¯Â¼Å’Ã¨Â¯Â·Ã¥Ââ€šÃ¨Â§ÂÃ¦Å â‚¬Ã¨Æ’Â½Ã¯Â¼Å¡`springboot-patterns`Ã£â‚¬â€š
-Ã¦Å“â€°Ã¥â€¦Â³Ã¥Â®Å¾Ã¤Â½â€œÃ¨Â®Â¾Ã¨Â®Â¡Ã¥â€™Å’Ã¦Å¸Â¥Ã¨Â¯Â¢Ã¤Â¼ËœÃ¥Å’â€“Ã¯Â¼Å’Ã¨Â¯Â·Ã¥Ââ€šÃ¨Â§ÂÃ¦Å â‚¬Ã¨Æ’Â½Ã¯Â¼Å¡`jpa-patterns`Ã£â‚¬â€š
+有关 Spring Boot 架构模式，请参见技能：`springboot-patterns`。
+有关使用 Camel 和 Panache 的 Quarkus 架构模式，请参见技能：`quarkus-patterns`。
+有关实体设计和查询优化，请参见技能：`jpa-patterns`。

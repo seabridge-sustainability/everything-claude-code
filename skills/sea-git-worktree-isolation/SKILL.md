@@ -1,4 +1,4 @@
-﻿---
+---
 name: sea-git-worktree-isolation
 description: SeaBridgeAI git worktree isolation adapted from Superpowers for local-only feature isolation, dirty-worktree safety, branch hygiene, and no-push/no-delete approval boundaries.
 ---

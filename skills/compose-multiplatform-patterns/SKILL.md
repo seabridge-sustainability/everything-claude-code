@@ -1,7 +1,8 @@
 ---
 name: compose-multiplatform-patterns
-description: Compose Multiplatform and Jetpack Compose patterns for KMP projects Ã¢â‚¬â€ state management, navigation, theming, performance, and platform-specific UI.
-origin: ECC
+description: Compose Multiplatform and Jetpack Compose patterns for KMP projects — state management, navigation, theming, performance, and platform-specific UI. Use when building Compose or Jetpack Compose UI, state, navigation, or theming in a KMP project.
+metadata:
+  origin: ECC
 ---
 
 # Compose Multiplatform Patterns
@@ -21,7 +22,6 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
-
 
 Patterns for building shared UI across Android, iOS, Desktop, and Web using Compose Multiplatform and Jetpack Compose. Covers state management, navigation, theming, and performance.
 
@@ -88,7 +88,7 @@ private fun ItemListContent(
     state: ItemListState,
     onSearch: (String) -> Unit
 ) {
-    // Stateless composable Ã¢â‚¬â€ easy to preview and test
+    // Stateless composable — easy to preview and test
 }
 ```
 
@@ -112,7 +112,7 @@ fun onEvent(event: ItemListEvent) {
     }
 }
 
-// In Composable Ã¢â‚¬â€ single lambda instead of many
+// In Composable — single lambda instead of many
 ItemListContent(
     state = state,
     onEvent = viewModel::onEvent
@@ -189,7 +189,7 @@ fun AppCard(
 
 ### Modifier Ordering
 
-Modifier order matters Ã¢â‚¬â€ apply in this sequence:
+Modifier order matters — apply in this sequence:
 
 ```kotlin
 Text(
@@ -266,10 +266,10 @@ val showScrollToTop by remember {
 ### Avoid Allocations in Recomposition
 
 ```kotlin
-// BAD Ã¢â‚¬â€ new lambda and list every recomposition
+// BAD — new lambda and list every recomposition
 items.filter { it.isActive }.forEach { ActiveItem(it, onClick = { handle(it) }) }
 
-// GOOD Ã¢â‚¬â€ key each item so callbacks stay attached to the right row
+// GOOD — key each item so callbacks stay attached to the right row
 val activeItems = remember(items) { items.filter { it.isActive } }
 activeItems.forEach { item ->
     key(item.id) {
@@ -305,10 +305,10 @@ fun AppTheme(
 ## Anti-Patterns to Avoid
 
 - Using `mutableStateOf` in ViewModels when `MutableStateFlow` with `collectAsStateWithLifecycle` is safer for lifecycle
-- Passing `NavController` deep into composables Ã¢â‚¬â€ pass lambda callbacks instead
-- Heavy computation inside `@Composable` functions Ã¢â‚¬â€ move to ViewModel or `remember {}`
-- Using `LaunchedEffect(Unit)` as a substitute for ViewModel init Ã¢â‚¬â€ it re-runs on configuration change in some setups
-- Creating new object instances in composable parameters Ã¢â‚¬â€ causes unnecessary recomposition
+- Passing `NavController` deep into composables — pass lambda callbacks instead
+- Heavy computation inside `@Composable` functions — move to ViewModel or `remember {}`
+- Using `LaunchedEffect(Unit)` as a substitute for ViewModel init — it re-runs on configuration change in some setups
+- Creating new object instances in composable parameters — causes unnecessary recomposition
 
 ## References
 

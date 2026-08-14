@@ -16,60 +16,59 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
+Everything Claude Code (ECC) eklentisi için yaygın sorunlar ve çözümler.
 
-Everything Claude Code (ECC) eklentisi iÃƒÂ§in yaygÃ„Â±n sorunlar ve ÃƒÂ§ÃƒÂ¶zÃƒÂ¼mler.
+## İçindekiler
 
-## Ã„Â°ÃƒÂ§indekiler
-
-- [Bellek ve Context SorunlarÃ„Â±](#bellek-ve-context-sorunlarÃ„Â±)
-- [Ajan Harness HatalarÃ„Â±](#ajan-harness-hatalarÃ„Â±)
-- [Hook ve Ã„Â°Ã…Å¸ AkÃ„Â±Ã…Å¸Ã„Â± HatalarÃ„Â±](#hook-ve-iÃ…Å¸-akÃ„Â±Ã…Å¸Ã„Â±-hatalarÃ„Â±)
-- [Kurulum ve YapÃ„Â±landÃ„Â±rma](#kurulum-ve-yapÃ„Â±landÃ„Â±rma)
-- [Performans SorunlarÃ„Â±](#performans-sorunlarÃ„Â±)
-- [YaygÃ„Â±n Hata MesajlarÃ„Â±](#yaygÃ„Â±n-hata-mesajlarÃ„Â±)
-- [YardÃ„Â±m Alma](#yardÃ„Â±m-alma)
+- [Bellek ve Context Sorunları](#bellek-ve-context-sorunları)
+- [Ajan Harness Hataları](#ajan-harness-hataları)
+- [Hook ve İş Akışı Hataları](#hook-ve-i̇ş-akışı-hataları)
+- [Kurulum ve Yapılandırma](#kurulum-ve-yapılandırma)
+- [Performans Sorunları](#performans-sorunları)
+- [Yaygın Hata Mesajları](#yaygın-hata-mesajları)
+- [Yardım Alma](#yardım-alma)
 
 ---
 
-## Bellek ve Context SorunlarÃ„Â±
+## Bellek ve Context Sorunları
 
-### Context Window TaÃ…Å¸masÃ„Â±
+### Context Window Taşması
 
-**Belirti:** "Context too long" hatalarÃ„Â± veya eksik yanÃ„Â±tlar
+**Belirti:** "Context too long" hataları veya eksik yanıtlar
 
 **Nedenler:**
-- Token limitlerini aÃ…Å¸an bÃƒÂ¼yÃƒÂ¼k dosya yÃƒÂ¼klemeleri
-- BirikmiÃ…Å¸ konuÃ…Å¸ma geÃƒÂ§miÃ…Å¸i
-- Tek oturumda birden fazla bÃƒÂ¼yÃƒÂ¼k araÃƒÂ§ ÃƒÂ§Ã„Â±ktÃ„Â±sÃ„Â±
+- Token limitlerini aşan büyük dosya yüklemeleri
+- Birikmiş konuşma geçmişi
+- Tek oturumda birden fazla büyük araç çıktısı
 
-**Ãƒâ€¡ÃƒÂ¶zÃƒÂ¼mler:**
+**Çözümler:**
 ```bash
-# 1. KonuÃ…Å¸ma geÃƒÂ§miÃ…Å¸ini temizle ve yeni baÃ…Å¸la
+# 1. Konuşma geçmişini temizle ve yeni başla
 # Claude Code kullan: "New Chat" veya Cmd/Ctrl+Shift+N
 
-# 2. Analiz ÃƒÂ¶ncesi dosya boyutunu kÃƒÂ¼ÃƒÂ§ÃƒÂ¼lt
+# 2. Analiz öncesi dosya boyutunu küçült
 head -n 100 large-file.log > sample.log
 
-# 3. BÃƒÂ¼yÃƒÂ¼k ÃƒÂ§Ã„Â±ktÃ„Â±lar iÃƒÂ§in streaming kullan
+# 3. Büyük çıktılar için streaming kullan
 head -n 50 large-file.txt
 
-# 4. GÃƒÂ¶revleri daha kÃƒÂ¼ÃƒÂ§ÃƒÂ¼k parÃƒÂ§alara bÃƒÂ¶l
-# Bunun yerine: "50 dosyanÃ„Â±n hepsini analiz et"
-# Kullan: "src/components/ dizinindeki dosyalarÃ„Â± analiz et"
+# 4. Görevleri daha küçük parçalara böl
+# Bunun yerine: "50 dosyanın hepsini analiz et"
+# Kullan: "src/components/ dizinindeki dosyaları analiz et"
 ```
 
-### Bellek KalÃ„Â±cÃ„Â±lÃ„Â±Ã„Å¸Ã„Â± HatalarÃ„Â±
+### Bellek Kalıcılığı Hataları
 
-**Belirti:** Ajan ÃƒÂ¶nceki context veya gÃƒÂ¶zlemleri hatÃ„Â±rlamÃ„Â±yor
+**Belirti:** Ajan önceki context veya gözlemleri hatırlamıyor
 
 **Nedenler:**
-- Devre dÃ„Â±Ã…Å¸Ã„Â± bÃ„Â±rakÃ„Â±lmÃ„Â±Ã…Å¸ sÃƒÂ¼rekli ÃƒÂ¶Ã„Å¸renme hook'larÃ„Â±
-- Bozuk gÃƒÂ¶zlem dosyalarÃ„Â±
-- Proje algÃ„Â±lama hatalarÃ„Â±
+- Devre dışı bırakılmış sürekli öğrenme hook'ları
+- Bozuk gözlem dosyaları
+- Proje algılama hataları
 
-**Ãƒâ€¡ÃƒÂ¶zÃƒÂ¼mler:**
+**Çözümler:**
 ```bash
-# GÃƒÂ¶zlemlerin kaydedilip kaydedilmediÃ„Å¸ini kontrol et
+# Gözlemlerin kaydedilip kaydedilmediğini kontrol et
 ls ~/.claude/homunculus/projects/*/observations.jsonl
 
 # Mevcut projenin hash id'sini bul
@@ -86,131 +85,131 @@ else:
     raise SystemExit("Project hash not found in ~/.claude/homunculus/projects.json")
 PY
 
-# O proje iÃƒÂ§in son gÃƒÂ¶zlemleri gÃƒÂ¶rÃƒÂ¼ntÃƒÂ¼le
+# O proje için son gözlemleri görüntüle
 tail -20 ~/.claude/homunculus/projects/<project-hash>/observations.jsonl
 
-# Bozuk bir observations dosyasÃ„Â±nÃ„Â± yeniden oluÃ…Å¸turmadan ÃƒÂ¶nce yedekle
+# Bozuk bir observations dosyasını yeniden oluşturmadan önce yedekle
 mv ~/.claude/homunculus/projects/<project-hash>/observations.jsonl \
   ~/.claude/homunculus/projects/<project-hash>/observations.jsonl.bak.$(date +%Y%m%d-%H%M%S)
 
-# Hook'larÃ„Â±n etkin olduÃ„Å¸unu doÃ„Å¸rula
+# Hook'ların etkin olduğunu doğrula
 grep -r "observe" ~/.claude/settings.json
 ```
 
 ---
 
-## Ajan Harness HatalarÃ„Â±
+## Ajan Harness Hataları
 
-### Ajan BulunamadÃ„Â±
+### Ajan Bulunamadı
 
-**Belirti:** "Agent not loaded" veya "Unknown agent" hatalarÃ„Â±
+**Belirti:** "Agent not loaded" veya "Unknown agent" hataları
 
 **Nedenler:**
-- Eklenti doÃ„Å¸ru kurulmadÃ„Â±
-- Ajan yolu yanlÃ„Â±Ã…Å¸ yapÃ„Â±landÃ„Â±rÃ„Â±lmÃ„Â±Ã…Å¸
-- Marketplace vs manuel kurulum uyumsuzluÃ„Å¸u
+- Eklenti doğru kurulmadı
+- Ajan yolu yanlış yapılandırılmış
+- Marketplace vs manuel kurulum uyumsuzluğu
 
-**Ãƒâ€¡ÃƒÂ¶zÃƒÂ¼mler:**
+**Çözümler:**
 ```bash
 # Eklenti kurulumunu kontrol et
 ls ~/.claude/plugins/cache/
 
-# AjanÃ„Â±n var olduÃ„Å¸unu doÃ„Å¸rula (marketplace kurulumu)
+# Ajanın var olduğunu doğrula (marketplace kurulumu)
 ls ~/.claude/plugins/cache/*/agents/
 
-# Manuel kurulum iÃƒÂ§in ajanlar Ã…Å¸urada olmalÃ„Â±:
-ls ~/.claude/agents/  # Sadece ÃƒÂ¶zel ajanlar
+# Manuel kurulum için ajanlar şurada olmalı:
+ls ~/.claude/agents/  # Sadece özel ajanlar
 
-# Eklentiyi yeniden yÃƒÂ¼kle
-# Claude Code Ã¢â€ â€™ Settings Ã¢â€ â€™ Extensions Ã¢â€ â€™ Reload
+# Eklentiyi yeniden yükle
+# Claude Code → Settings → Extensions → Reload
 ```
 
-### Ã„Â°Ã…Å¸ AkÃ„Â±Ã…Å¸Ã„Â± YÃƒÂ¼rÃƒÂ¼tmesi TakÃ„Â±lÃ„Â±yor
+### İş Akışı Yürütmesi Takılıyor
 
-**Belirti:** Ajan baÃ…Å¸lÃ„Â±yor ama hiÃƒÂ§ tamamlanmÃ„Â±yor
+**Belirti:** Ajan başlıyor ama hiç tamamlanmıyor
 
 **Nedenler:**
-- Ajan mantÃ„Â±Ã„Å¸Ã„Â±nda sonsuz dÃƒÂ¶ngÃƒÂ¼ler
-- KullanÃ„Â±cÃ„Â± girdisinde takÃ„Â±lÃ„Â±
-- API'yi beklerken aÃ„Å¸ zaman aÃ…Å¸Ã„Â±mÃ„Â±
+- Ajan mantığında sonsuz döngüler
+- Kullanıcı girdisinde takılı
+- API'yi beklerken ağ zaman aşımı
 
-**Ãƒâ€¡ÃƒÂ¶zÃƒÂ¼mler:**
+**Çözümler:**
 ```bash
-# 1. TakÃ„Â±lÃ„Â± iÃ…Å¸lemleri kontrol et
+# 1. Takılı işlemleri kontrol et
 ps aux | grep claude
 
-# 2. Debug modunu etkinleÃ…Å¸tir
+# 2. Debug modunu etkinleştir
 export CLAUDE_DEBUG=1
 
-# 3. Daha kÃ„Â±sa zaman aÃ…Å¸Ã„Â±mlarÃ„Â± ayarla
+# 3. Daha kısa zaman aşımları ayarla
 export CLAUDE_TIMEOUT=30
 
-# 4. AÃ„Å¸ baÃ„Å¸lantÃ„Â±sÃ„Â±nÃ„Â± kontrol et
+# 4. Ağ bağlantısını kontrol et
 curl -I https://api.anthropic.com
 ```
 
-### AraÃƒÂ§ KullanÃ„Â±m HatalarÃ„Â±
+### Araç Kullanım Hataları
 
 **Belirti:** "Tool execution failed" veya izin reddedildi
 
 **Nedenler:**
-- Eksik baÃ„Å¸Ã„Â±mlÃ„Â±lÃ„Â±klar (npm, python, vb.)
+- Eksik bağımlılıklar (npm, python, vb.)
 - Yetersiz dosya izinleri
-- Yol bulunamadÃ„Â±
+- Yol bulunamadı
 
-**Ãƒâ€¡ÃƒÂ¶zÃƒÂ¼mler:**
+**Çözümler:**
 ```bash
-# Gerekli araÃƒÂ§larÃ„Â±n kurulu olduÃ„Å¸unu doÃ„Å¸rula
+# Gerekli araçların kurulu olduğunu doğrula
 which node python3 npm git
 
-# Hook scriptlerinin izinlerini dÃƒÂ¼zelt
+# Hook scriptlerinin izinlerini düzelt
 chmod +x ~/.claude/plugins/cache/*/hooks/*.sh
 chmod +x ~/.claude/plugins/cache/*/skills/*/hooks/*.sh
 
-# PATH'in gerekli binary'leri iÃƒÂ§erdiÃ„Å¸ini kontrol et
+# PATH'in gerekli binary'leri içerdiğini kontrol et
 echo $PATH
 ```
 
 ---
 
-## Hook ve Ã„Â°Ã…Å¸ AkÃ„Â±Ã…Å¸Ã„Â± HatalarÃ„Â±
+## Hook ve İş Akışı Hataları
 
-### Hook'lar Ãƒâ€¡alÃ„Â±Ã…Å¸mÃ„Â±yor
+### Hook'lar Çalışmıyor
 
-**Belirti:** Pre/post hook'lar ÃƒÂ§alÃ„Â±Ã…Å¸mÃ„Â±yor
+**Belirti:** Pre/post hook'lar çalışmıyor
 
 **Nedenler:**
-- Hook'lar settings.json'da kayÃ„Â±tlÃ„Â± deÃ„Å¸il
-- GeÃƒÂ§ersiz hook sÃƒÂ¶zdizimi
-- Hook scripti ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±rÃ„Â±labilir deÃ„Å¸il
+- Hook'lar settings.json'da kayıtlı değil
+- Geçersiz hook sözdizimi
+- Hook scripti çalıştırılabilir değil
 
-**Ãƒâ€¡ÃƒÂ¶zÃƒÂ¼mler:**
+**Çözümler:**
 ```bash
-# Hook'larÃ„Â±n kayÃ„Â±tlÃ„Â± olduÃ„Å¸unu kontrol et
+# Hook'ların kayıtlı olduğunu kontrol et
 grep -A 10 '"hooks"' ~/.claude/settings.json
 
-# Hook dosyalarÃ„Â±nÃ„Â±n var olduÃ„Å¸unu ve ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±rÃ„Â±labilir olduÃ„Å¸unu doÃ„Å¸rula
+# Hook dosyalarının var olduğunu ve çalıştırılabilir olduğunu doğrula
 ls -la ~/.claude/plugins/cache/*/hooks/
 
 # Hook'u manuel olarak test et
 bash ~/.claude/plugins/cache/*/hooks/pre-bash.sh <<< '{"command":"echo test"}'
 
-# Hook'larÃ„Â± yeniden kaydet (eklenti kullanÃ„Â±yorsa)
-# Claude Code ayarlarÃ„Â±nda eklentiyi devre dÃ„Â±Ã…Å¸Ã„Â± bÃ„Â±rak ve yeniden etkinleÃ…Å¸tir
+# Hook'ları yeniden kaydet (eklenti kullanıyorsa)
+# Claude Code ayarlarında eklentiyi devre dışı bırak ve yeniden etkinleştir
 ```
 
-### Python/Node SÃƒÂ¼rÃƒÂ¼m UyumsuzluklarÃ„Â±
+### Python/Node Sürüm Uyumsuzlukları
 
 **Belirti:** "python3 not found" veya "node: command not found"
 
 **Nedenler:**
 - Python/Node kurulumu eksik
-- PATH yapÃ„Â±landÃ„Â±rÃ„Â±lmamÃ„Â±Ã…Å¸
-- YanlÃ„Â±Ã…Å¸ Python sÃƒÂ¼rÃƒÂ¼mÃƒÂ¼ (Windows)
+- PATH yapılandırılmamış
+- Yanlış Python sürümü (Windows)
 
-**Ãƒâ€¡ÃƒÂ¶zÃƒÂ¼mler:**
+**Çözümler:**
 ```bash
-# Python 3'ÃƒÂ¼ kur (eksikse)
+# Python 3'ü kur (eksikse)
 # macOS: brew install python3
 # Ubuntu: sudo apt install python3
 # Windows: python.org'dan indir
@@ -220,114 +219,114 @@ bash ~/.claude/plugins/cache/*/hooks/pre-bash.sh <<< '{"command":"echo test"}'
 # Ubuntu: sudo apt install nodejs npm
 # Windows: nodejs.org'dan indir
 
-# KurulumlarÃ„Â± doÃ„Å¸rula
+# Kurulumları doğrula
 python3 --version
 node --version
 npm --version
 
-# Windows: python'un (python3 deÃ„Å¸il) ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±Ã„Å¸Ã„Â±ndan emin ol
+# Windows: python'un (python3 değil) çalıştığından emin ol
 python --version
 ```
 
-### Dev Server Blocker YanlÃ„Â±Ã…Å¸ Pozitifleri
+### Dev Server Blocker Yanlış Pozitifleri
 
-**Belirti:** Hook, "dev" iÃƒÂ§eren meÃ…Å¸ru komutlarÃ„Â± engelliyor
+**Belirti:** Hook, "dev" içeren meşru komutları engelliyor
 
 **Nedenler:**
-- Heredoc iÃƒÂ§eriÃ„Å¸i pattern eÃ…Å¸leÃ…Å¸mesini tetikliyor
-- ArgÃƒÂ¼manlarda "dev" olan dev olmayan komutlar
+- Heredoc içeriği pattern eşleşmesini tetikliyor
+- Argümanlarda "dev" olan dev olmayan komutlar
 
-**Ãƒâ€¡ÃƒÂ¶zÃƒÂ¼mler:**
+**Çözümler:**
 ```bash
-# Bu v1.8.0+'da dÃƒÂ¼zeltildi (PR #371)
-# Eklentiyi en son sÃƒÂ¼rÃƒÂ¼me yÃƒÂ¼kselt
+# Bu v1.8.0+'da düzeltildi (PR #371)
+# Eklentiyi en son sürüme yükselt
 
-# GeÃƒÂ§ici ÃƒÂ§ÃƒÂ¶zÃƒÂ¼m: Dev sunucularÃ„Â±nÃ„Â± tmux'ta sarmalayÃ„Â±n
+# Geçici çözüm: Dev sunucularını tmux'ta sarmalayın
 tmux new-session -d -s dev "npm run dev"
 tmux attach -t dev
 
-# Gerekirse hook'u geÃƒÂ§ici olarak devre dÃ„Â±Ã…Å¸Ã„Â± bÃ„Â±rak
-# ~/.claude/settings.json'u dÃƒÂ¼zenle ve pre-bash hook'unu kaldÃ„Â±r
+# Gerekirse hook'u geçici olarak devre dışı bırak
+# ~/.claude/settings.json'u düzenle ve pre-bash hook'unu kaldır
 ```
 
 ---
 
-## Kurulum ve YapÃ„Â±landÃ„Â±rma
+## Kurulum ve Yapılandırma
 
-### Eklenti YÃƒÂ¼klenmiyor
+### Eklenti Yüklenmiyor
 
-**Belirti:** Kurulumdan sonra eklenti ÃƒÂ¶zellikleri kullanÃ„Â±lamÃ„Â±yor
+**Belirti:** Kurulumdan sonra eklenti özellikleri kullanılamıyor
 
 **Nedenler:**
-- Marketplace ÃƒÂ¶nbelleÃ„Å¸i gÃƒÂ¼ncellenmedi
-- Claude Code sÃƒÂ¼rÃƒÂ¼m uyumsuzluÃ„Å¸u
-- Bozuk eklenti dosyalarÃ„Â±
+- Marketplace önbelleği güncellenmedi
+- Claude Code sürüm uyumsuzluğu
+- Bozuk eklenti dosyaları
 
-**Ãƒâ€¡ÃƒÂ¶zÃƒÂ¼mler:**
+**Çözümler:**
 ```bash
-# DeÃ„Å¸iÃ…Å¸tirmeden ÃƒÂ¶nce eklenti ÃƒÂ¶nbelleÃ„Å¸ini incele
+# Değiştirmeden önce eklenti önbelleğini incele
 ls -la ~/.claude/plugins/cache/
 
-# Silmek yerine eklenti ÃƒÂ¶nbelleÃ„Å¸ini yedekle
+# Silmek yerine eklenti önbelleğini yedekle
 mv ~/.claude/plugins/cache ~/.claude/plugins/cache.backup.$(date +%Y%m%d-%H%M%S)
 mkdir -p ~/.claude/plugins/cache
 
 # Marketplace'ten yeniden kur
-# Claude Code Ã¢â€ â€™ Extensions Ã¢â€ â€™ Everything Claude Code Ã¢â€ â€™ Uninstall
-# ArdÃ„Â±ndan marketplace'ten yeniden kur
+# Claude Code → Extensions → Everything Claude Code → Uninstall
+# Ardından marketplace'ten yeniden kur
 
-# Claude Code sÃƒÂ¼rÃƒÂ¼mÃƒÂ¼nÃƒÂ¼ kontrol et
+# Claude Code sürümünü kontrol et
 claude --version
 # Claude Code 2.0+ gerektirir
 
-# Manuel kurulum (marketplace baÃ…Å¸arÃ„Â±sÃ„Â±z olursa)
+# Manuel kurulum (marketplace başarısız olursa)
 git clone https://github.com/affaan-m/everything-claude-code.git
 cp -r everything-claude-code ~/.claude/plugins/ecc
 ```
 
-### Paket YÃƒÂ¶neticisi AlgÃ„Â±lama BaÃ…Å¸arÃ„Â±sÃ„Â±z
+### Paket Yöneticisi Algılama Başarısız
 
-**Belirti:** YanlÃ„Â±Ã…Å¸ paket yÃƒÂ¶neticisi kullanÃ„Â±lÃ„Â±yor (pnpm yerine npm)
+**Belirti:** Yanlış paket yöneticisi kullanılıyor (pnpm yerine npm)
 
 **Nedenler:**
-- Lock dosyasÃ„Â± mevcut deÃ„Å¸il
-- CLAUDE_PACKAGE_MANAGER ayarlanmamÃ„Â±Ã…Å¸
-- Birden fazla lock dosyasÃ„Â± algÃ„Â±lamayÃ„Â± karÃ„Â±Ã…Å¸tÃ„Â±rÃ„Â±yor
+- Lock dosyası mevcut değil
+- CLAUDE_PACKAGE_MANAGER ayarlanmamış
+- Birden fazla lock dosyası algılamayı karıştırıyor
 
-**Ãƒâ€¡ÃƒÂ¶zÃƒÂ¼mler:**
+**Çözümler:**
 ```bash
-# Tercih edilen paket yÃƒÂ¶neticisini global olarak ayarla
+# Tercih edilen paket yöneticisini global olarak ayarla
 export CLAUDE_PACKAGE_MANAGER=pnpm
 # ~/.bashrc veya ~/.zshrc'ye ekle
 
-# Veya proje bazÃ„Â±nda ayarla
+# Veya proje bazında ayarla
 echo '{"packageManager": "pnpm"}' > .claude/package-manager.json
 
-# Veya package.json alanÃ„Â±nÃ„Â± kullan
+# Veya package.json alanını kullan
 npm pkg set packageManager="pnpm@8.15.0"
 
-# UyarÃ„Â±: lock dosyalarÃ„Â±nÃ„Â± kaldÃ„Â±rmak kurulu baÃ„Å¸Ã„Â±mlÃ„Â±lÃ„Â±k sÃƒÂ¼rÃƒÂ¼mlerini deÃ„Å¸iÃ…Å¸tirebilir.
-# Ãƒâ€“nce lock dosyasÃ„Â±nÃ„Â± commit et veya yedekle, ardÃ„Â±ndan yeni bir kurulum yap ve CI'Ã„Â± yeniden ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r.
-# Bunu sadece kasÃ„Â±tlÃ„Â± olarak paket yÃƒÂ¶neticilerini deÃ„Å¸iÃ…Å¸tirirken yap.
-rm package-lock.json  # pnpm/yarn/bun kullanÃ„Â±yorsan
+# Uyarı: lock dosyalarını kaldırmak kurulu bağımlılık sürümlerini değiştirebilir.
+# Önce lock dosyasını commit et veya yedekle, ardından yeni bir kurulum yap ve CI'ı yeniden çalıştır.
+# Bunu sadece kasıtlı olarak paket yöneticilerini değiştirirken yap.
+rm package-lock.json  # pnpm/yarn/bun kullanıyorsan
 ```
 
 ---
 
-## Performans SorunlarÃ„Â±
+## Performans Sorunları
 
-### YavaÃ…Å¸ YanÃ„Â±t SÃƒÂ¼releri
+### Yavaş Yanıt Süreleri
 
-**Belirti:** Ajan yanÃ„Â±t vermek iÃƒÂ§in 30+ saniye sÃƒÂ¼rÃƒÂ¼yor
+**Belirti:** Ajan yanıt vermek için 30+ saniye sürüyor
 
 **Nedenler:**
-- BÃƒÂ¼yÃƒÂ¼k gÃƒÂ¶zlem dosyalarÃ„Â±
-- Ãƒâ€¡ok fazla aktif hook
-- API'ye aÃ„Å¸ gecikmesi
+- Büyük gözlem dosyaları
+- Çok fazla aktif hook
+- API'ye ağ gecikmesi
 
-**Ãƒâ€¡ÃƒÂ¶zÃƒÂ¼mler:**
+**Çözümler:**
 ```bash
-# BÃƒÂ¼yÃƒÂ¼k gÃƒÂ¶zlemleri silmek yerine arÃ…Å¸ivle
+# Büyük gözlemleri silmek yerine arşivle
 archive_dir="$HOME/.claude/homunculus/archive/$(date +%Y%m%d)"
 mkdir -p "$archive_dir"
 find ~/.claude/homunculus/projects -name "observations.jsonl" -size +10M -exec sh -c '
@@ -338,59 +337,59 @@ find ~/.claude/homunculus/projects -name "observations.jsonl" -size +10M -exec s
   done
 ' sh {} +
 
-# KullanÃ„Â±lmayan hook'larÃ„Â± geÃƒÂ§ici olarak devre dÃ„Â±Ã…Å¸Ã„Â± bÃ„Â±rak
-# ~/.claude/settings.json'u dÃƒÂ¼zenle
+# Kullanılmayan hook'ları geçici olarak devre dışı bırak
+# ~/.claude/settings.json'u düzenle
 
-# Aktif gÃƒÂ¶zlem dosyalarÃ„Â±nÃ„Â± kÃƒÂ¼ÃƒÂ§ÃƒÂ¼k tut
-# BÃƒÂ¼yÃƒÂ¼k arÃ…Å¸ivler ~/.claude/homunculus/archive/ altÃ„Â±nda olmalÃ„Â±
+# Aktif gözlem dosyalarını küçük tut
+# Büyük arşivler ~/.claude/homunculus/archive/ altında olmalı
 ```
 
-### YÃƒÂ¼ksek CPU KullanÃ„Â±mÃ„Â±
+### Yüksek CPU Kullanımı
 
-**Belirti:** Claude Code %100 CPU tÃƒÂ¼ketiyor
+**Belirti:** Claude Code %100 CPU tüketiyor
 
 **Nedenler:**
-- Sonsuz gÃƒÂ¶zlem dÃƒÂ¶ngÃƒÂ¼leri
-- BÃƒÂ¼yÃƒÂ¼k dizinlerde dosya izleme
-- Hook'larda bellek sÃ„Â±zÃ„Â±ntÃ„Â±larÃ„Â±
+- Sonsuz gözlem döngüleri
+- Büyük dizinlerde dosya izleme
+- Hook'larda bellek sızıntıları
 
-**Ãƒâ€¡ÃƒÂ¶zÃƒÂ¼mler:**
+**Çözümler:**
 ```bash
-# Kontrolden ÃƒÂ§Ã„Â±kmÃ„Â±Ã…Å¸ iÃ…Å¸lemleri kontrol et
+# Kontrolden çıkmış işlemleri kontrol et
 top -o cpu | grep claude
 
-# SÃƒÂ¼rekli ÃƒÂ¶Ã„Å¸renmeyi geÃƒÂ§ici olarak devre dÃ„Â±Ã…Å¸Ã„Â± bÃ„Â±rak
+# Sürekli öğrenmeyi geçici olarak devre dışı bırak
 touch ~/.claude/homunculus/disabled
 
-# Claude Code'u yeniden baÃ…Å¸lat
-# Cmd/Ctrl+Q ardÃ„Â±ndan yeniden aÃƒÂ§
+# Claude Code'u yeniden başlat
+# Cmd/Ctrl+Q ardından yeniden aç
 
-# GÃƒÂ¶zlem dosyasÃ„Â± boyutunu kontrol et
+# Gözlem dosyası boyutunu kontrol et
 du -sh ~/.claude/homunculus/*/
 ```
 
 ---
 
-## YaygÃ„Â±n Hata MesajlarÃ„Â±
+## Yaygın Hata Mesajları
 
 ### "EACCES: permission denied"
 
 ```bash
-# Hook izinlerini dÃƒÂ¼zelt
+# Hook izinlerini düzelt
 find ~/.claude/plugins -name "*.sh" -exec chmod +x {} \;
 
-# GÃƒÂ¶zlem dizini izinlerini dÃƒÂ¼zelt
+# Gözlem dizini izinlerini düzelt
 chmod -R u+rwX,go+rX ~/.claude/homunculus
 ```
 
 ### "MODULE_NOT_FOUND"
 
 ```bash
-# Eklenti baÃ„Å¸Ã„Â±mlÃ„Â±lÃ„Â±klarÃ„Â±nÃ„Â± kur
-cd ~/.claude/plugins/cache/everything-claude-code
+# Eklenti bağımlılıklarını kur
+cd ~/.claude/plugins/cache/ecc
 npm install
 
-# Veya manuel kurulum iÃƒÂ§in
+# Veya manuel kurulum için
 cd ~/.claude/plugins/ecc
 npm install
 ```
@@ -398,8 +397,8 @@ npm install
 ### "spawn UNKNOWN"
 
 ```bash
-# Windows'a ÃƒÂ¶zgÃƒÂ¼: Scriptlerin doÃ„Å¸ru satÃ„Â±r sonlarÃ„Â±nÃ„Â± kullandÃ„Â±Ã„Å¸Ã„Â±ndan emin ol
-# CRLF'yi LF'ye dÃƒÂ¶nÃƒÂ¼Ã…Å¸tÃƒÂ¼r
+# Windows'a özgü: Scriptlerin doğru satır sonlarını kullandığından emin ol
+# CRLF'yi LF'ye dönüştür
 find ~/.claude/plugins -name "*.sh" -exec dos2unix {} \;
 
 # Veya dos2unix'i kur
@@ -409,17 +408,17 @@ find ~/.claude/plugins -name "*.sh" -exec dos2unix {} \;
 
 ---
 
-## YardÃ„Â±m Alma
+## Yardım Alma
 
-Hala sorunlar yaÃ…Å¸Ã„Â±yorsanÃ„Â±z:
+Hala sorunlar yaşıyorsanız:
 
-1. **GitHub Issues'Ã„Â± Kontrol Edin**: [github.com/affaan-m/everything-claude-code/issues](https://github.com/affaan-m/everything-claude-code/issues)
-2. **Debug Logging'i EtkinleÃ…Å¸tirin**:
+1. **GitHub Issues'ı Kontrol Edin**: [github.com/affaan-m/everything-claude-code/issues](https://github.com/affaan-m/everything-claude-code/issues)
+2. **Debug Logging'i Etkinleştirin**:
    ```bash
    export CLAUDE_DEBUG=1
    export CLAUDE_LOG_LEVEL=debug
    ```
-3. **Diagnostic Bilgisi ToplayÃ„Â±n**:
+3. **Diagnostic Bilgisi Toplayın**:
    ```bash
    claude --version
    node --version
@@ -427,13 +426,13 @@ Hala sorunlar yaÃ…Å¸Ã„Â±yorsanÃ„Â±z:
    echo $CLAUDE_PACKAGE_MANAGER
    ls -la ~/.claude/plugins/cache/
    ```
-4. **Issue AÃƒÂ§Ã„Â±n**: Debug loglarÃ„Â±nÃ„Â±, hata mesajlarÃ„Â±nÃ„Â± ve diagnostic bilgiyi dahil edin
+4. **Issue Açın**: Debug loglarını, hata mesajlarını ve diagnostic bilgiyi dahil edin
 
 ---
 
-## Ã„Â°lgili DokÃƒÂ¼mantasyon
+## İlgili Dokümantasyon
 
-- [README.md](./README.md) - Kurulum ve ÃƒÂ¶zellikler
-- [CONTRIBUTING.md](./CONTRIBUTING.md) - GeliÃ…Å¸tirme rehberleri
-- [docs/](../) - DetaylÃ„Â± dokÃƒÂ¼mantasyon
-- [examples/](./examples/) - KullanÃ„Â±m ÃƒÂ¶rnekleri
+- [README.md](./README.md) - Kurulum ve özellikler
+- [CONTRIBUTING.md](./CONTRIBUTING.md) - Geliştirme rehberleri
+- [docs/](../) - Detaylı dokümantasyon
+- [examples/](./examples/) - Kullanım örnekleri

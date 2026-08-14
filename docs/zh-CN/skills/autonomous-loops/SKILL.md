@@ -254,9 +254,7 @@ PROMPT 1Ã¯Â¼Ë†Ã¥ÂÂÃ¨Â°Æ’Ã¥â„¢Â¨Ã¯Â¼â€°    
 
 ### Ã¥Â®â€°Ã¨Â£â€¦
 
-```bash
-curl -fsSL https://raw.githubusercontent.com/AnandChowdhary/continuous-claude/HEAD/install.sh | bash
-```
+> **警告：** 请在审阅代码后，从 continuous-claude 的仓库安装。不要将外部脚本直接管道传入 bash。
 
 ### Ã§â€Â¨Ã¦Â³â€¢
 

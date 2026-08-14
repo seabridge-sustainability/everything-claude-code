@@ -16,57 +16,56 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
+## Model Seçim Stratejisi
 
-## Model SeÃƒÂ§im Stratejisi
-
-**Haiku 4.5** (Sonnet kapasitesinin %90'Ã„Â±, 3x maliyet tasarrufu):
-- SÃ„Â±k ÃƒÂ§aÃ„Å¸rÃ„Â±lan hafif agent'lar
-- Pair programming ve kod ÃƒÂ¼retimi
+**Haiku 4.5** (Sonnet kapasitesinin %90'ı, 3x maliyet tasarrufu):
+- Sık çağrılan hafif agent'lar
+- Pair programming ve kod üretimi
 - Multi-agent sistemlerinde worker agent'lar
 
-**Sonnet 4.6** (En iyi kodlama modeli):
-- Ana geliÃ…Å¸tirme ÃƒÂ§alÃ„Â±Ã…Å¸masÃ„Â±
-- Multi-agent iÃ…Å¸ akÃ„Â±Ã…Å¸larÃ„Â±nÃ„Â± orkestrasyon
-- KarmaÃ…Å¸Ã„Â±k kodlama gÃƒÂ¶revleri
+**Sonnet 5** (En iyi kodlama modeli):
+- Ana geliştirme çalışması
+- Multi-agent iş akışlarını orkestrasyon
+- Karmaşık kodlama görevleri
 
-**Opus 4.5** (En derin akÃ„Â±l yÃƒÂ¼rÃƒÂ¼tme):
-- KarmaÃ…Å¸Ã„Â±k mimari kararlar
-- Maksimum akÃ„Â±l yÃƒÂ¼rÃƒÂ¼tme gereksinimleri
-- AraÃ…Å¸tÃ„Â±rma ve analiz gÃƒÂ¶revleri
+**Opus 5** (En derin akıl yürütme):
+- Karmaşık mimari kararlar
+- Maksimum akıl yürütme gereksinimleri
+- Araştırma ve analiz görevleri
 
-## Context Window YÃƒÂ¶netimi
+## Context Window Yönetimi
 
-Context window'un son %20'sinden kaÃƒÂ§Ã„Â±n:
-- BÃƒÂ¼yÃƒÂ¼k ÃƒÂ¶lÃƒÂ§ekli refactoring
-- Birden fazla dosyaya yayÃ„Â±lan ÃƒÂ¶zellik implementasyonu
-- KarmaÃ…Å¸Ã„Â±k etkileÃ…Å¸imleri debug etme
+Context window'un son %20'sinden kaçın:
+- Büyük ölçekli refactoring
+- Birden fazla dosyaya yayılan özellik implementasyonu
+- Karmaşık etkileşimleri debug etme
 
-Daha dÃƒÂ¼Ã…Å¸ÃƒÂ¼k context hassasiyeti olan gÃƒÂ¶revler:
-- Tek dosya dÃƒÂ¼zenlemeleri
-- BaÃ„Å¸Ã„Â±msÃ„Â±z utility oluÃ…Å¸turma
-- DokÃƒÂ¼mantasyon gÃƒÂ¼ncellemeleri
-- Basit hata dÃƒÂ¼zeltmeleri
+Daha düşük context hassasiyeti olan görevler:
+- Tek dosya düzenlemeleri
+- Bağımsız utility oluşturma
+- Dokümantasyon güncellemeleri
+- Basit hata düzeltmeleri
 
 ## Extended Thinking + Plan Mode
 
-Extended thinking varsayÃ„Â±lan olarak etkindir ve dahili akÃ„Â±l yÃƒÂ¼rÃƒÂ¼tme iÃƒÂ§in 31,999 token'a kadar ayÃ„Â±rÃ„Â±r.
+Extended thinking varsayılan olarak etkindir ve dahili akıl yürütme için 31,999 token'a kadar ayırır.
 
-Extended thinking kontrolÃƒÂ¼:
+Extended thinking kontrolü:
 - **Toggle**: Option+T (macOS) / Alt+T (Windows/Linux)
-- **Config**: `~/.claude/settings.json` iÃƒÂ§inde `alwaysThinkingEnabled` ayarla
-- **Budget cap**: `export MAX_THINKING_TOKENS=10000`
-- **Verbose mode**: Thinking ÃƒÂ§Ã„Â±ktÃ„Â±sÃ„Â±nÃ„Â± gÃƒÂ¶rmek iÃƒÂ§in Ctrl+O
+- **Config**: `~/.claude/settings.json` içinde `alwaysThinkingEnabled` ayarla
+- **Budget cap**: `export MAX_THINKING_TOKENS=10000` (bash) veya `$env:MAX_THINKING_TOKENS = "10000"` (PowerShell)
+- **Verbose mode**: Thinking çıktısını görmek için Ctrl+O
 
-Derin akÃ„Â±l yÃƒÂ¼rÃƒÂ¼tme gerektiren karmaÃ…Å¸Ã„Â±k gÃƒÂ¶revler iÃƒÂ§in:
-1. Extended thinking'in etkin olduÃ„Å¸undan emin ol (varsayÃ„Â±lan olarak aÃƒÂ§Ã„Â±k)
-2. YapÃ„Â±landÃ„Â±rÃ„Â±lmÃ„Â±Ã…Å¸ yaklaÃ…Å¸Ã„Â±m iÃƒÂ§in **Plan Mode**'u etkinleÃ…Å¸tir
-3. KapsamlÃ„Â± analiz iÃƒÂ§in birden fazla kritik tur kullan
-4. Ãƒâ€¡eÃ…Å¸itli perspektifler iÃƒÂ§in split role sub-agent'lar kullan
+Derin akıl yürütme gerektiren karmaşık görevler için:
+1. Extended thinking'in etkin olduğundan emin ol (varsayılan olarak açık)
+2. Yapılandırılmış yaklaşım için **Plan Mode**'u etkinleştir
+3. Kapsamlı analiz için birden fazla kritik tur kullan
+4. Çeşitli perspektifler için split role sub-agent'lar kullan
 
 ## Build Sorun Giderme
 
-Build baÃ…Å¸arÃ„Â±sÃ„Â±z olursa:
+Build başarısız olursa:
 1. **build-error-resolver** agent kullan
-2. Hata mesajlarÃ„Â±nÃ„Â± analiz et
-3. AÃ…Å¸amalÃ„Â± olarak dÃƒÂ¼zelt
-4. Her dÃƒÂ¼zeltmeden sonra doÃ„Å¸rula
+2. Hata mesajlarını analiz et
+3. Aşamalı olarak düzelt
+4. Her düzeltmeden sonra doğrula

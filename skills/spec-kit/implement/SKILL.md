@@ -1,4 +1,4 @@
-﻿---
+---
 name: speckit-implement
 description: Execute Spec Kit tasks with SeaBridgeAI persistent DoD, TDD, approval gates, and verification.
 ---

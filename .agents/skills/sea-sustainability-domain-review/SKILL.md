@@ -1,4 +1,4 @@
-﻿---
+---
 name: sea-sustainability-domain-review
 description: Callable wrapper for sea-sustainability-domain-review. Load the canonical SeaBridgeAI skill body from everything-claude-code\skills\sea-sustainability-domain-review\SKILL.md.
 ---

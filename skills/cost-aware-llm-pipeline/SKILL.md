@@ -1,7 +1,8 @@
 ---
 name: cost-aware-llm-pipeline
-description: Cost optimization patterns for LLM API usage Ã¢â‚¬â€ model routing by task complexity, budget tracking, retry logic, and prompt caching.
-origin: ECC
+description: Cost optimization patterns for LLM API usage — model routing by task complexity, budget tracking, retry logic, and prompt caching. Use when LLM spend needs to come down, or when routing tasks across model tiers and budgets.
+metadata:
+  origin: ECC
 ---
 
 # Cost-Aware LLM Pipeline
@@ -22,7 +23,6 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
-
 Patterns for controlling LLM API costs while maintaining quality. Combines model routing, budget tracking, retry logic, and prompt caching into a composable pipeline.
 
 ## When to Activate
@@ -39,7 +39,7 @@ Patterns for controlling LLM API costs while maintaining quality. Combines model
 Automatically select cheaper models for simple tasks, reserving expensive models for complex ones.
 
 ```python
-MODEL_SONNET = "claude-sonnet-4-6"
+MODEL_SONNET = "claude-sonnet-5"
 MODEL_HAIKU = "claude-haiku-4-5-20251001"
 
 _SONNET_TEXT_THRESHOLD = 10_000  # chars
@@ -60,7 +60,7 @@ def select_model(
 
 ### 2. Immutable Cost Tracking
 
-Track cumulative spend with frozen dataclasses. Each API call returns a new tracker Ã¢â‚¬â€ never mutates state.
+Track cumulative spend with frozen dataclasses. Each API call returns a new tracker — never mutates state.
 
 ```python
 from dataclasses import dataclass
@@ -116,7 +116,7 @@ def call_with_retry(func, *, max_retries: int = _MAX_RETRIES):
             if attempt == max_retries - 1:
                 raise
             time.sleep(2 ** attempt)  # Exponential backoff
-    # AuthenticationError, BadRequestError etc. Ã¢â€ â€™ raise immediately
+    # AuthenticationError, BadRequestError etc. → raise immediately
 ```
 
 ### 4. Prompt Caching
@@ -179,10 +179,10 @@ def process(text: str, config: Config, tracker: CostTracker) -> tuple[Result, Co
 ## Best Practices
 
 - **Start with the cheapest model** and only route to expensive models when complexity thresholds are met
-- **Set explicit budget limits** before processing batches Ã¢â‚¬â€ fail early rather than overspend
+- **Set explicit budget limits** before processing batches — fail early rather than overspend
 - **Log model selection decisions** so you can tune thresholds based on real data
-- **Use prompt caching** for system prompts over 1024 tokens Ã¢â‚¬â€ saves both cost and latency
-- **Never retry on authentication or validation errors** Ã¢â‚¬â€ only transient failures (network, rate limit, server error)
+- **Use prompt caching** for system prompts over 1024 tokens — saves both cost and latency
+- **Never retry on authentication or validation errors** — only transient failures (network, rate limit, server error)
 
 ## Anti-Patterns to Avoid
 

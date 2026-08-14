@@ -1,4 +1,4 @@
-﻿# Cross-Agent System Sync Validation Report
+# Cross-Agent System Sync Validation Report
 
 Date: 2026-05-08
 SYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1

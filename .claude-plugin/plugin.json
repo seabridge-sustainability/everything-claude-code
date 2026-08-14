@@ -1,13 +1,13 @@
 {
-  "name": "everything-claude-code",
-  "version": "1.9.0",
-  "description": "Complete collection of battle-tested Claude Code configs from an Anthropic hackathon winner - agents, skills, hooks, and rules evolved over 10+ months of intensive daily use",
+  "name": "ecc",
+  "version": "2.2.0",
+  "description": "Harness-native ECC plugin for engineering teams - 75 agents, 376 skills, 96 legacy command shims, reusable hooks, rules, MCP conventions, and operator workflows for Claude Code plus adjacent agent harnesses",
   "author": {
     "name": "Affaan Mustafa",
     "url": "https://x.com/affaanmustafa"
   },
-  "homepage": "https://github.com/affaan-m/everything-claude-code",
-  "repository": "https://github.com/affaan-m/everything-claude-code",
+  "homepage": "https://ecc.tools",
+  "repository": "https://github.com/affaan-m/ECC",
   "license": "MIT",
   "keywords": [
     "claude-code",
@@ -22,36 +22,25 @@
     "automation",
     "best-practices"
   ],
-  "agents": [
-    "./agents/architect.md",
-    "./agents/build-error-resolver.md",
-    "./agents/chief-of-staff.md",
-    "./agents/code-reviewer.md",
-    "./agents/cpp-build-resolver.md",
-    "./agents/cpp-reviewer.md",
-    "./agents/database-reviewer.md",
-    "./agents/doc-updater.md",
-    "./agents/docs-lookup.md",
-    "./agents/e2e-runner.md",
-    "./agents/flutter-reviewer.md",
-    "./agents/go-build-resolver.md",
-    "./agents/go-reviewer.md",
-    "./agents/harness-optimizer.md",
-    "./agents/java-build-resolver.md",
-    "./agents/java-reviewer.md",
-    "./agents/kotlin-build-resolver.md",
-    "./agents/kotlin-reviewer.md",
-    "./agents/loop-operator.md",
-    "./agents/planner.md",
-    "./agents/python-reviewer.md",
-    "./agents/pytorch-build-resolver.md",
-    "./agents/refactor-cleaner.md",
-    "./agents/rust-build-resolver.md",
-    "./agents/rust-reviewer.md",
-    "./agents/security-reviewer.md",
-    "./agents/tdd-guide.md",
-    "./agents/typescript-reviewer.md"
+  "userConfig": {
+    "hooks_enabled": {
+      "type": "boolean",
+      "title": "Enable ECC hooks",
+      "description": "Run ECC's local lifecycle, quality, and safety automation. Disable this to keep skills and commands without local hook automation.",
+      "default": true
+    },
+    "hook_profile": {
+      "type": "string",
+      "title": "ECC hook profile",
+      "description": "Choose minimal, standard, or strict. Invalid values safely fall back to standard.",
+      "default": "standard"
+    }
+  },
+  "mcpServers": {},
+  "skills": [
+    "./skills/"
   ],
-  "skills": ["./skills/"],
-  "commands": ["./commands/"]
+  "commands": [
+    "./commands/"
+  ]
 }

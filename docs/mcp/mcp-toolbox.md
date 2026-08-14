@@ -1,8 +1,8 @@
 # MCP Toolbox for Databases — SeaBridgeAI Integration Guide
 
-**Source:** `everything-claude-code/external/mcp-toolbox/`  
-**Version:** 1.2.0 (commit `8d2d521`, 2026-05-08)  
-**License:** Apache 2.0  
+**Source:** `everything-claude-code/external/mcp-toolbox/`
+**Version:** 1.2.0 (commit `8d2d521`, 2026-05-08)
+**License:** Apache 2.0
 **Repository:** https://github.com/googleapis/mcp-toolbox
 
 ---
@@ -82,24 +82,24 @@ and customer data risks. The safe pattern:
 
 ## Phase 2 — Clone Status
 
-**Cloned to:** `C:\Users\adelm\SeaBridgeAI\everything-claude-code\external\mcp-toolbox`  
-**Version:** 1.2.0  
-**Commit:** `8d2d521a36d8b2225179846b922856ea1f9994d9` (2026-05-08 15:30 EDT)  
-**License:** Apache 2.0  
-**MCP transports:** stdio (default), HTTP/SSE (`--transport sse`)  
-**Authentication:** IAM integration (Google Cloud), OAuth, env-var credentials  
+**Cloned to:** `C:\Users\adelm\SeaBridgeAI\everything-claude-code\external\mcp-toolbox`
+**Version:** 1.2.0
+**Commit:** `8d2d521a36d8b2225179846b922856ea1f9994d9` (2026-05-08 15:30 EDT)
+**License:** Apache 2.0
+**MCP transports:** stdio (default), HTTP/SSE (`--transport sse`)
+**Authentication:** IAM integration (Google Cloud), OAuth, env-var credentials
 **Observability:** Built-in OpenTelemetry traces + metrics via `--telemetry-otlp=<endpoint>`
 
 ### Supported Databases Relevant to SeaBridgeAI
 
 | Database | SeaBridgeAI Use | Toolbox Support |
 |----------|----------------|-----------------|
-| MongoDB | Backend primary store (Motor/Beanie) | ✅ Built-in prebuilt tools |
-| PostgreSQL | OpenSeaBri (Drizzle ORM) | ✅ Built-in prebuilt tools |
-| Redis | Backend caching + sessions | ✅ Built-in prebuilt tools |
-| Neo4j | Autoresearch graphify | ✅ Built-in prebuilt tools |
-| Elasticsearch | ESG data search (if enabled) | ✅ Built-in prebuilt tools |
-| MongoDB Atlas | Backend cloud Atlas | ✅ (same driver, SRV URI) |
+| MongoDB | Backend primary store (Motor/Beanie) | PASS: Built-in prebuilt tools |
+| PostgreSQL | OpenSeaBri (Drizzle ORM) | PASS: Built-in prebuilt tools |
+| Redis | Backend caching + sessions | PASS: Built-in prebuilt tools |
+| Neo4j | Autoresearch graphify | PASS: Built-in prebuilt tools |
+| Elasticsearch | ESG data search (if enabled) | PASS: Built-in prebuilt tools |
+| MongoDB Atlas | Backend cloud Atlas | PASS: (same driver, SRV URI) |
 
 ---
 

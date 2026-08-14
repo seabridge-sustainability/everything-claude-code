@@ -1,10 +1,10 @@
 ---
 name: python-patterns
-description: Pythonic idiomlar, PEP 8 standartlarÃ„Â±, type hint'ler ve saÃ„Å¸lam, verimli ve bakÃ„Â±mÃ„Â± kolay Python uygulamalarÃ„Â± oluÃ…Å¸turmak iÃƒÂ§in en iyi uygulamalar.
+description: Pythonic idiomlar, PEP 8 standartları, type hint'ler ve sağlam, verimli ve bakımı kolay Python uygulamaları oluşturmak için en iyi uygulamalar.
 origin: ECC
 ---
 
-# Python GeliÃ…Å¸tirme Desenleri
+# Python Geliştirme Desenleri
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -22,40 +22,39 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
+Sağlam, verimli ve bakımı kolay uygulamalar oluşturmak için idiomatic Python desenleri ve en iyi uygulamalar.
 
-SaÃ„Å¸lam, verimli ve bakÃ„Â±mÃ„Â± kolay uygulamalar oluÃ…Å¸turmak iÃƒÂ§in idiomatic Python desenleri ve en iyi uygulamalar.
-
-## Ne Zaman EtkinleÃ…Å¸tirmeli
+## Ne Zaman Etkinleştirmeli
 
 - Yeni Python kodu yazarken
-- Python kodunu gÃƒÂ¶zden geÃƒÂ§irirken
+- Python kodunu gözden geçirirken
 - Mevcut Python kodunu refactor ederken
-- Python paketleri/modÃƒÂ¼lleri tasarlarken
+- Python paketleri/modülleri tasarlarken
 
 ## Temel Prensipler
 
-### 1. Okunabilirlik Ãƒâ€“nemlidir
+### 1. Okunabilirlik Önemlidir
 
-Python okunabilirliÃ„Å¸i ÃƒÂ¶nceliklendirir. Kod aÃƒÂ§Ã„Â±k ve anlaÃ…Å¸Ã„Â±lmasÃ„Â± kolay olmalÃ„Â±dÃ„Â±r.
+Python okunabilirliği önceliklendirir. Kod açık ve anlaşılması kolay olmalıdır.
 
 ```python
-# Ã„Â°yi: AÃƒÂ§Ã„Â±k ve okunabilir
+# İyi: Açık ve okunabilir
 def get_active_users(users: list[User]) -> list[User]:
-    """SaÃ„Å¸lanan listeden sadece aktif kullanÃ„Â±cÃ„Â±larÃ„Â± dÃƒÂ¶ndÃƒÂ¼r."""
+    """Sağlanan listeden sadece aktif kullanıcıları döndür."""
     return [user for user in users if user.is_active]
 
 
-# KÃƒÂ¶tÃƒÂ¼: Zeki ama kafa karÃ„Â±Ã…Å¸tÃ„Â±rÃ„Â±cÃ„Â±
+# Kötü: Zeki ama kafa karıştırıcı
 def get_active_users(u):
     return [x for x in u if x.a]
 ```
 
-### 2. AÃƒÂ§Ã„Â±k, Ãƒâ€“rtÃƒÂ¼k Olandan Daha Ã„Â°yidir
+### 2. Açık, Örtük Olandan Daha İyidir
 
-Sihirden kaÃƒÂ§Ã„Â±nÃ„Â±n; kodunuzun ne yaptÃ„Â±Ã„Å¸Ã„Â± konusunda aÃƒÂ§Ã„Â±k olun.
+Sihirden kaçının; kodunuzun ne yaptığı konusunda açık olun.
 
 ```python
-# Ã„Â°yi: AÃƒÂ§Ã„Â±k yapÃ„Â±landÃ„Â±rma
+# İyi: Açık yapılandırma
 import logging
 
 logging.basicConfig(
@@ -63,25 +62,25 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 
-# KÃƒÂ¶tÃƒÂ¼: Gizli yan etkiler
+# Kötü: Gizli yan etkiler
 import some_module
-some_module.setup()  # Bu ne yapÃ„Â±yor?
+some_module.setup()  # Bu ne yapıyor?
 ```
 
-### 3. EAFP - Affederek Sormaktansa Ã„Â°zin Ã„Â°stemek Daha KolaydÃ„Â±r
+### 3. EAFP - Affederek Sormaktansa İzin İstemek Daha Kolaydır
 
-Python, koÃ…Å¸ullarÃ„Â± kontrol etmek yerine exception handling'i tercih eder.
+Python, koşulları kontrol etmek yerine exception handling'i tercih eder.
 
 ```python
-# Ã„Â°yi: EAFP stili
-def get_value(dictionary: dict, key: str) -> Any:
+# İyi: EAFP stili
+def get_value(dictionary: dict, key: str, default_value: Any = None) -> Any:
     try:
         return dictionary[key]
     except KeyError:
         return default_value
 
-# KÃƒÂ¶tÃƒÂ¼: LBYL (Atlamadan Ãƒâ€“nce Bak) stili
-def get_value(dictionary: dict, key: str) -> Any:
+# Kötü: LBYL (Atlamadan Önce Bak) stili
+def get_value(dictionary: dict, key: str, default_value: Any = None) -> Any:
     if key in dictionary:
         return dictionary[key]
     else:
@@ -100,7 +99,7 @@ def process_user(
     data: Dict[str, Any],
     active: bool = True
 ) -> Optional[User]:
-    """Bir kullanÃ„Â±cÃ„Â±yÃ„Â± iÃ…Å¸le ve gÃƒÂ¼ncellenmiÃ…Å¸ User'Ã„Â± veya None dÃƒÂ¶ndÃƒÂ¼r."""
+    """Bir kullanıcıyı işle ve güncellenmiş User'ı veya None döndür."""
     if not active:
         return None
     return User(user_id, data)
@@ -113,19 +112,19 @@ def process_user(
 def process_items(items: list[str]) -> dict[str, int]:
     return {item: len(item) for item in items}
 
-# Python 3.8 ve ÃƒÂ¶ncesi - typing modÃƒÂ¼lÃƒÂ¼nÃƒÂ¼ kullan
+# Python 3.8 ve öncesi - typing modülünü kullan
 from typing import List, Dict
 
 def process_items(items: List[str]) -> Dict[str, int]:
     return {item: len(item) for item in items}
 ```
 
-### Type Alias'larÃ„Â± ve TypeVar
+### Type Alias'ları ve TypeVar
 
 ```python
 from typing import TypeVar, Union
 
-# KarmaÃ…Å¸Ã„Â±k tipler iÃƒÂ§in type alias
+# Karmaşık tipler için type alias
 JSON = Union[dict[str, Any], list[Any], str, int, float, bool, None]
 
 def parse_json(data: str) -> JSON:
@@ -135,11 +134,11 @@ def parse_json(data: str) -> JSON:
 T = TypeVar('T')
 
 def first(items: list[T]) -> T | None:
-    """Ã„Â°lk ÃƒÂ¶Ã„Å¸eyi dÃƒÂ¶ndÃƒÂ¼r veya liste boÃ…Å¸sa None dÃƒÂ¶ndÃƒÂ¼r."""
+    """İlk öğeyi döndür veya liste boşsa None döndür."""
     return items[0] if items else None
 ```
 
-### Protocol TabanlÃ„Â± Duck Typing
+### Protocol Tabanlı Duck Typing
 
 ```python
 from typing import Protocol
@@ -149,16 +148,16 @@ class Renderable(Protocol):
         """Nesneyi string'e render et."""
 
 def render_all(items: list[Renderable]) -> str:
-    """Renderable protocol'ÃƒÂ¼nÃƒÂ¼ implement eden tÃƒÂ¼m ÃƒÂ¶Ã„Å¸eleri render et."""
+    """Renderable protocol'ünü implement eden tüm öğeleri render et."""
     return "\n".join(item.render() for item in items)
 ```
 
-## Hata Ã„Â°Ã…Å¸leme Desenleri
+## Hata İşleme Desenleri
 
 ### Spesifik Exception Handling
 
 ```python
-# Ã„Â°yi: Spesifik exception'larÃ„Â± yakala
+# İyi: Spesifik exception'ları yakala
 def load_config(path: str) -> Config:
     try:
         with open(path) as f:
@@ -168,7 +167,7 @@ def load_config(path: str) -> Config:
     except json.JSONDecodeError as e:
         raise ConfigError(f"Invalid JSON in config: {path}") from e
 
-# KÃƒÂ¶tÃƒÂ¼: Bare except
+# Kötü: Bare except
 def load_config(path: str) -> Config:
     try:
         with open(path) as f:
@@ -184,26 +183,26 @@ def process_data(data: str) -> Result:
     try:
         parsed = json.loads(data)
     except json.JSONDecodeError as e:
-        # Traceback'i korumak iÃƒÂ§in exception'larÃ„Â± zincirleme
+        # Traceback'i korumak için exception'ları zincirleme
         raise ValueError(f"Failed to parse data: {data}") from e
 ```
 
-### Ãƒâ€“zel Exception HiyerarÃ…Å¸isi
+### Özel Exception Hiyerarşisi
 
 ```python
 class AppError(Exception):
-    """TÃƒÂ¼m uygulama hatalarÃ„Â± iÃƒÂ§in base exception."""
+    """Tüm uygulama hataları için base exception."""
     pass
 
 class ValidationError(AppError):
-    """Input validation baÃ…Å¸arÃ„Â±sÃ„Â±z olduÃ„Å¸unda raise edilir."""
+    """Input validation başarısız olduğunda raise edilir."""
     pass
 
 class NotFoundError(AppError):
-    """Ã„Â°stenen kaynak bulunamadÃ„Â±Ã„Å¸Ã„Â±nda raise edilir."""
+    """İstenen kaynak bulunamadığında raise edilir."""
     pass
 
-# KullanÃ„Â±m
+# Kullanım
 def get_user(user_id: str) -> User:
     user = db.find_user(user_id)
     if not user:
@@ -213,15 +212,15 @@ def get_user(user_id: str) -> User:
 
 ## Context Manager'lar
 
-### Kaynak YÃƒÂ¶netimi
+### Kaynak Yönetimi
 
 ```python
-# Ã„Â°yi: Context manager'larÃ„Â± kullanma
+# İyi: Context manager'ları kullanma
 def process_file(path: str) -> str:
     with open(path, 'r') as f:
         return f.read()
 
-# KÃƒÂ¶tÃƒÂ¼: Manuel kaynak yÃƒÂ¶netimi
+# Kötü: Manuel kaynak yönetimi
 def process_file(path: str) -> str:
     f = open(path, 'r')
     try:
@@ -230,25 +229,25 @@ def process_file(path: str) -> str:
         f.close()
 ```
 
-### Ãƒâ€“zel Context Manager'lar
+### Özel Context Manager'lar
 
 ```python
 from contextlib import contextmanager
 
 @contextmanager
 def timer(name: str):
-    """Bir kod bloÃ„Å¸unu zamanlamak iÃƒÂ§in context manager."""
+    """Bir kod bloğunu zamanlamak için context manager."""
     start = time.perf_counter()
     yield
     elapsed = time.perf_counter() - start
     print(f"{name} took {elapsed:.4f} seconds")
 
-# KullanÃ„Â±m
+# Kullanım
 with timer("data processing"):
     process_large_dataset()
 ```
 
-### Context Manager Class'larÃ„Â±
+### Context Manager Class'ları
 
 ```python
 class DatabaseTransaction:
@@ -264,9 +263,9 @@ class DatabaseTransaction:
             self.connection.commit()
         else:
             self.connection.rollback()
-        return False  # Exception'larÃ„Â± suppress etme
+        return False  # Exception'ları suppress etme
 
-# KullanÃ„Â±m
+# Kullanım
 with DatabaseTransaction(conn):
     user = conn.create_user(user_data)
     conn.create_profile(user.id, profile_data)
@@ -274,23 +273,23 @@ with DatabaseTransaction(conn):
 
 ## Comprehension'lar ve Generator'lar
 
-### List Comprehension'larÃ„Â±
+### List Comprehension'ları
 
 ```python
-# Ã„Â°yi: Basit dÃƒÂ¶nÃƒÂ¼Ã…Å¸ÃƒÂ¼mler iÃƒÂ§in list comprehension
+# İyi: Basit dönüşümler için list comprehension
 names = [user.name for user in users if user.is_active]
 
-# KÃƒÂ¶tÃƒÂ¼: Manuel dÃƒÂ¶ngÃƒÂ¼
+# Kötü: Manuel döngü
 names = []
 for user in users:
     if user.is_active:
         names.append(user.name)
 
-# KarmaÃ…Å¸Ã„Â±k comprehension'lar geniÃ…Å¸letilmelidir
-# KÃƒÂ¶tÃƒÂ¼: Ãƒâ€¡ok karmaÃ…Å¸Ã„Â±k
+# Karmaşık comprehension'lar genişletilmelidir
+# Kötü: Çok karmaşık
 result = [x * 2 for x in items if x > 0 if x % 2 == 0]
 
-# Ã„Â°yi: Bir generator fonksiyonu kullan
+# İyi: Bir generator fonksiyonu kullan
 def filter_and_transform(items: Iterable[int]) -> list[int]:
     result = []
     for x in items:
@@ -299,26 +298,26 @@ def filter_and_transform(items: Iterable[int]) -> list[int]:
     return result
 ```
 
-### Generator Expression'larÃ„Â±
+### Generator Expression'ları
 
 ```python
-# Ã„Â°yi: Lazy evaluation iÃƒÂ§in generator
+# İyi: Lazy evaluation için generator
 total = sum(x * x for x in range(1_000_000))
 
-# KÃƒÂ¶tÃƒÂ¼: BÃƒÂ¼yÃƒÂ¼k ara liste oluÃ…Å¸turur
+# Kötü: Büyük ara liste oluşturur
 total = sum([x * x for x in range(1_000_000)])
 ```
 
-### Generator FonksiyonlarÃ„Â±
+### Generator Fonksiyonları
 
 ```python
 def read_large_file(path: str) -> Iterator[str]:
-    """BÃƒÂ¼yÃƒÂ¼k bir dosyayÃ„Â± satÃ„Â±r satÃ„Â±r oku."""
+    """Büyük bir dosyayı satır satır oku."""
     with open(path) as f:
         for line in f:
             yield line.strip()
 
-# KullanÃ„Â±m
+# Kullanım
 for line in read_large_file("huge.txt"):
     process(line)
 ```
@@ -340,7 +339,7 @@ class User:
     created_at: datetime = field(default_factory=datetime.now)
     is_active: bool = True
 
-# KullanÃ„Â±m
+# Kullanım
 user = User(
     id="123",
     name="Alice",
@@ -357,10 +356,10 @@ class User:
     age: int
 
     def __post_init__(self):
-        # Email formatÃ„Â±nÃ„Â± validate et
+        # Email formatını validate et
         if "@" not in self.email:
             raise ValueError(f"Invalid email: {self.email}")
-        # YaÃ…Å¸ aralÃ„Â±Ã„Å¸Ã„Â±nÃ„Â± validate et
+        # Yaş aralığını validate et
         if self.age < 0 or self.age > 150:
             raise ValueError(f"Invalid age: {self.age}")
 ```
@@ -378,7 +377,7 @@ class Point(NamedTuple):
     def distance(self, other: 'Point') -> float:
         return ((self.x - other.x) ** 2 + (self.y - other.y) ** 2) ** 0.5
 
-# KullanÃ„Â±m
+# Kullanım
 p1 = Point(0, 0)
 p2 = Point(3, 4)
 print(p1.distance(p2))  # 5.0
@@ -386,14 +385,14 @@ print(p1.distance(p2))  # 5.0
 
 ## Decorator'lar
 
-### Fonksiyon Decorator'larÃ„Â±
+### Fonksiyon Decorator'ları
 
 ```python
 import functools
 import time
 
 def timer(func: Callable) -> Callable:
-    """Fonksiyon yÃƒÂ¼rÃƒÂ¼tmesini zamanlamak iÃƒÂ§in decorator."""
+    """Fonksiyon yürütmesini zamanlamak için decorator."""
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         start = time.perf_counter()
@@ -407,14 +406,14 @@ def timer(func: Callable) -> Callable:
 def slow_function():
     time.sleep(1)
 
-# slow_function() yazdÃ„Â±rÃ„Â±r: slow_function took 1.0012s
+# slow_function() yazdırır: slow_function took 1.0012s
 ```
 
 ### Parametreli Decorator'lar
 
 ```python
 def repeat(times: int):
-    """Bir fonksiyonu birden ÃƒÂ§ok kez tekrarlamak iÃƒÂ§in decorator."""
+    """Bir fonksiyonu birden çok kez tekrarlamak için decorator."""
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
@@ -429,14 +428,14 @@ def repeat(times: int):
 def greet(name: str) -> str:
     return f"Hello, {name}!"
 
-# greet("Alice") dÃƒÂ¶ndÃƒÂ¼rÃƒÂ¼r ["Hello, Alice!", "Hello, Alice!", "Hello, Alice!"]
+# greet("Alice") döndürür ["Hello, Alice!", "Hello, Alice!", "Hello, Alice!"]
 ```
 
-### Class TabanlÃ„Â± Decorator'lar
+### Class Tabanlı Decorator'lar
 
 ```python
 class CountCalls:
-    """Bir fonksiyonun kaÃƒÂ§ kez ÃƒÂ§aÃ„Å¸rÃ„Â±ldÃ„Â±Ã„Å¸Ã„Â±nÃ„Â± sayan decorator."""
+    """Bir fonksiyonun kaç kez çağrıldığını sayan decorator."""
     def __init__(self, func: Callable):
         functools.update_wrapper(self, func)
         self.func = func
@@ -451,12 +450,12 @@ class CountCalls:
 def process():
     pass
 
-# Her process() ÃƒÂ§aÃ„Å¸rÃ„Â±sÃ„Â± ÃƒÂ§aÃ„Å¸rÃ„Â± sayÃ„Â±sÃ„Â±nÃ„Â± yazdÃ„Â±rÃ„Â±r
+# Her process() çağrısı çağrı sayısını yazdırır
 ```
 
-## EÃ…Å¸zamanlÃ„Â±lÃ„Â±k Desenleri
+## Eşzamanlılık Desenleri
 
-### I/O-Bound GÃƒÂ¶revler iÃƒÂ§in Threading
+### I/O-Bound Görevler için Threading
 
 ```python
 import concurrent.futures
@@ -469,7 +468,7 @@ def fetch_url(url: str) -> str:
         return response.read().decode()
 
 def fetch_all_urls(urls: list[str]) -> dict[str, str]:
-    """Thread'ler kullanarak birden fazla URL'yi eÃ…Å¸zamanlÃ„Â± fetch et."""
+    """Thread'ler kullanarak birden fazla URL'yi eşzamanlı fetch et."""
     with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
         future_to_url = {executor.submit(fetch_url, url): url for url in urls}
         results = {}
@@ -482,21 +481,21 @@ def fetch_all_urls(urls: list[str]) -> dict[str, str]:
     return results
 ```
 
-### CPU-Bound GÃƒÂ¶revler iÃƒÂ§in Multiprocessing
+### CPU-Bound Görevler için Multiprocessing
 
 ```python
 def process_data(data: list[int]) -> int:
-    """CPU-yoÃ„Å¸un hesaplama."""
+    """CPU-yoğun hesaplama."""
     return sum(x ** 2 for x in data)
 
 def process_all(datasets: list[list[int]]) -> list[int]:
-    """Birden fazla process kullanarak birden fazla dataset iÃ…Å¸le."""
+    """Birden fazla process kullanarak birden fazla dataset işle."""
     with concurrent.futures.ProcessPoolExecutor() as executor:
         results = list(executor.map(process_data, datasets))
     return results
 ```
 
-### EÃ…Å¸zamanlÃ„Â± I/O iÃƒÂ§in Async/Await
+### Eşzamanlı I/O için Async/Await
 
 ```python
 import asyncio
@@ -509,7 +508,7 @@ async def fetch_async(url: str) -> str:
             return await response.text()
 
 async def fetch_all(urls: list[str]) -> dict[str, str]:
-    """Birden fazla URL'yi eÃ…Å¸zamanlÃ„Â± fetch et."""
+    """Birden fazla URL'yi eşzamanlı fetch et."""
     tasks = [fetch_async(url) for url in urls]
     results = await asyncio.gather(*tasks, return_exceptions=True)
     return dict(zip(urls, results))
@@ -517,37 +516,37 @@ async def fetch_all(urls: list[str]) -> dict[str, str]:
 
 ## Paket Organizasyonu
 
-### Standart Proje DÃƒÂ¼zeni
+### Standart Proje Düzeni
 
 ```
 myproject/
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ src/
-Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ mypackage/
-Ã¢â€â€š       Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ __init__.py
-Ã¢â€â€š       Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ main.py
-Ã¢â€â€š       Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ api/
-Ã¢â€â€š       Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ __init__.py
-Ã¢â€â€š       Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ routes.py
-Ã¢â€â€š       Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ models/
-Ã¢â€â€š       Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ __init__.py
-Ã¢â€â€š       Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ user.py
-Ã¢â€â€š       Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ utils/
-Ã¢â€â€š           Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ __init__.py
-Ã¢â€â€š           Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ helpers.py
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ tests/
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ __init__.py
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ conftest.py
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ test_api.py
-Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ test_models.py
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ pyproject.toml
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ README.md
-Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ .gitignore
+├── src/
+│   └── mypackage/
+│       ├── __init__.py
+│       ├── main.py
+│       ├── api/
+│       │   ├── __init__.py
+│       │   └── routes.py
+│       ├── models/
+│       │   ├── __init__.py
+│       │   └── user.py
+│       └── utils/
+│           ├── __init__.py
+│           └── helpers.py
+├── tests/
+│   ├── __init__.py
+│   ├── conftest.py
+│   ├── test_api.py
+│   └── test_models.py
+├── pyproject.toml
+├── README.md
+└── .gitignore
 ```
 
-### Import KonvansiyonlarÃ„Â±
+### Import Konvansiyonları
 
 ```python
-# Ã„Â°yi: Import sÃ„Â±rasÃ„Â± - stdlib, third-party, local
+# İyi: Import sırası - stdlib, third-party, local
 import os
 import sys
 from pathlib import Path
@@ -558,19 +557,19 @@ from fastapi import FastAPI
 from mypackage.models import User
 from mypackage.utils import format_name
 
-# Ã„Â°yi: Otomatik import sÃ„Â±ralama iÃƒÂ§in isort kullanÃ„Â±n
+# İyi: Otomatik import sıralama için isort kullanın
 # pip install isort
 ```
 
-### Paket Export'larÃ„Â± iÃƒÂ§in __init__.py
+### Paket Export'ları için __init__.py
 
 ```python
 # mypackage/__init__.py
-"""mypackage - Ãƒâ€“rnek bir Python paketi."""
+"""mypackage - Örnek bir Python paketi."""
 
 __version__ = "1.0.0"
 
-# Ana class/fonksiyonlarÃ„Â± paket seviyesinde export et
+# Ana class/fonksiyonları paket seviyesinde export et
 from mypackage.models import User, Post
 from mypackage.utils import format_name
 
@@ -579,16 +578,16 @@ __all__ = ["User", "Post", "format_name"]
 
 ## Bellek ve Performans
 
-### Bellek VerimliliÃ„Å¸i iÃƒÂ§in __slots__ Kullanma
+### Bellek Verimliliği için __slots__ Kullanma
 
 ```python
-# KÃƒÂ¶tÃƒÂ¼: Normal class __dict__ kullanÃ„Â±r (daha fazla bellek)
+# Kötü: Normal class __dict__ kullanır (daha fazla bellek)
 class Point:
     def __init__(self, x: float, y: float):
         self.x = x
         self.y = y
 
-# Ã„Â°yi: __slots__ bellek kullanÃ„Â±mÃ„Â±nÃ„Â± azaltÃ„Â±r
+# İyi: __slots__ bellek kullanımını azaltır
 class Point:
     __slots__ = ['x', 'y']
 
@@ -597,33 +596,33 @@ class Point:
         self.y = y
 ```
 
-### BÃƒÂ¼yÃƒÂ¼k Veri iÃƒÂ§in Generator
+### Büyük Veri için Generator
 
 ```python
-# KÃƒÂ¶tÃƒÂ¼: Bellekte tam liste dÃƒÂ¶ndÃƒÂ¼rÃƒÂ¼r
+# Kötü: Bellekte tam liste döndürür
 def read_lines(path: str) -> list[str]:
     with open(path) as f:
         return [line.strip() for line in f]
 
-# Ã„Â°yi: SatÃ„Â±rlarÃ„Â± birer birer yield eder
+# İyi: Satırları birer birer yield eder
 def read_lines(path: str) -> Iterator[str]:
     with open(path) as f:
         for line in f:
             yield line.strip()
 ```
 
-### DÃƒÂ¶ngÃƒÂ¼lerde String BirleÃ…Å¸tirmekten KaÃƒÂ§Ã„Â±nÃ„Â±n
+### Döngülerde String Birleştirmekten Kaçının
 
 ```python
-# KÃƒÂ¶tÃƒÂ¼: String immutability nedeniyle O(nÃ‚Â²)
+# Kötü: String immutability nedeniyle O(n²)
 result = ""
 for item in items:
     result += str(item)
 
-# Ã„Â°yi: join kullanarak O(n)
+# İyi: join kullanarak O(n)
 result = "".join(str(item) for item in items)
 
-# Ã„Â°yi: OluÃ…Å¸turma iÃƒÂ§in StringIO kullanma
+# İyi: Oluşturma için StringIO kullanma
 from io import StringIO
 
 buffer = StringIO()
@@ -651,15 +650,15 @@ mypy .
 # Test
 pytest --cov=mypackage --cov-report=html
 
-# GÃƒÂ¼venlik taramasÃ„Â±
+# Güvenlik taraması
 bandit -r .
 
-# Dependency yÃƒÂ¶netimi
+# Dependency yönetimi
 pip-audit
 safety check
 ```
 
-### pyproject.toml YapÃ„Â±landÃ„Â±rmasÃ„Â±
+### pyproject.toml Yapılandırması
 
 ```toml
 [project]
@@ -699,69 +698,69 @@ testpaths = ["tests"]
 addopts = "--cov=mypackage --cov-report=term-missing"
 ```
 
-## HÃ„Â±zlÃ„Â± Referans: Python Ã„Â°fadeleri
+## Hızlı Referans: Python İfadeleri
 
-| Ã„Â°fade | AÃƒÂ§Ã„Â±klama |
+| İfade | Açıklama |
 |-------|----------|
-| EAFP | Affederek Sormaktansa Ã„Â°zin Ã„Â°stemek Daha Kolay |
-| Context manager'lar | Kaynak yÃƒÂ¶netimi iÃƒÂ§in `with` kullan |
-| List comprehension'lar | Basit dÃƒÂ¶nÃƒÂ¼Ã…Å¸ÃƒÂ¼mler iÃƒÂ§in |
-| Generator'lar | Lazy evaluation ve bÃƒÂ¼yÃƒÂ¼k dataset'ler iÃƒÂ§in |
-| Type hint'ler | Fonksiyon signature'larÃ„Â±nÃ„Â± annotate et |
-| Dataclass'lar | Auto-generated metodlarla veri container'larÃ„Â± iÃƒÂ§in |
-| `__slots__` | Bellek optimizasyonu iÃƒÂ§in |
-| f-string'ler | String formatlama iÃƒÂ§in (Python 3.6+) |
-| `pathlib.Path` | Path operasyonlarÃ„Â± iÃƒÂ§in (Python 3.4+) |
-| `enumerate` | DÃƒÂ¶ngÃƒÂ¼lerde index-element ÃƒÂ§iftleri iÃƒÂ§in |
+| EAFP | Affederek Sormaktansa İzin İstemek Daha Kolay |
+| Context manager'lar | Kaynak yönetimi için `with` kullan |
+| List comprehension'lar | Basit dönüşümler için |
+| Generator'lar | Lazy evaluation ve büyük dataset'ler için |
+| Type hint'ler | Fonksiyon signature'larını annotate et |
+| Dataclass'lar | Auto-generated metodlarla veri container'ları için |
+| `__slots__` | Bellek optimizasyonu için |
+| f-string'ler | String formatlama için (Python 3.6+) |
+| `pathlib.Path` | Path operasyonları için (Python 3.4+) |
+| `enumerate` | Döngülerde index-element çiftleri için |
 
-## KaÃƒÂ§Ã„Â±nÃ„Â±lmasÃ„Â± Gereken Anti-Desenler
+## Kaçınılması Gereken Anti-Desenler
 
 ```python
-# KÃƒÂ¶tÃƒÂ¼: Mutable default argÃƒÂ¼manlar
+# Kötü: Mutable default argümanlar
 def append_to(item, items=[]):
     items.append(item)
     return items
 
-# Ã„Â°yi: None kullan ve yeni liste oluÃ…Å¸tur
+# İyi: None kullan ve yeni liste oluştur
 def append_to(item, items=None):
     if items is None:
         items = []
     items.append(item)
     return items
 
-# KÃƒÂ¶tÃƒÂ¼: type() ile tip kontrolÃƒÂ¼
+# Kötü: type() ile tip kontrolü
 if type(obj) == list:
     process(obj)
 
-# Ã„Â°yi: isinstance kullan
+# İyi: isinstance kullan
 if isinstance(obj, list):
     process(obj)
 
-# KÃƒÂ¶tÃƒÂ¼: None ile == ile karÃ…Å¸Ã„Â±laÃ…Å¸tÃ„Â±rma
+# Kötü: None ile == ile karşılaştırma
 if value == None:
     process()
 
-# Ã„Â°yi: is kullan
+# İyi: is kullan
 if value is None:
     process()
 
-# KÃƒÂ¶tÃƒÂ¼: from module import *
+# Kötü: from module import *
 from os.path import *
 
-# Ã„Â°yi: AÃƒÂ§Ã„Â±k import'lar
+# İyi: Açık import'lar
 from os.path import join, exists
 
-# KÃƒÂ¶tÃƒÂ¼: Bare except
+# Kötü: Bare except
 try:
     risky_operation()
 except:
     pass
 
-# Ã„Â°yi: Spesifik exception
+# İyi: Spesifik exception
 try:
     risky_operation()
 except SpecificError as e:
     logger.error(f"Operation failed: {e}")
 ```
 
-__UnutmayÃ„Â±n__: Python kodu okunabilir, aÃƒÂ§Ã„Â±k ve en az sÃƒÂ¼rpriz ilkesine uygun olmalÃ„Â±dÃ„Â±r. Ã…Å¾ÃƒÂ¼phe duyduÃ„Å¸unuzda, aÃƒÂ§Ã„Â±klÃ„Â±Ã„Å¸Ã„Â± zekiceden ÃƒÂ¶ncelikli kÃ„Â±lÃ„Â±n.
+__Unutmayın__: Python kodu okunabilir, açık ve en az sürpriz ilkesine uygun olmalıdır. Şüphe duyduğunuzda, açıklığı zekiceden öncelikli kılın.

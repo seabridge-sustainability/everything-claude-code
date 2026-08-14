@@ -1,8 +1,9 @@
 ---
 name: fal-ai-media
-description: Unified media generation via fal.ai MCP Ã¢â‚¬â€ image, video, and audio. Covers text-to-image (Nano Banana), text/image-to-video (Seedance, Kling, Veo 3), text-to-speech (CSM-1B), and video-to-audio (ThinkSound). Use when the user wants to generate images, videos, or audio with AI.
-origin: ECC
+description: Unified media generation via fal.ai MCP — image, video, and audio. Covers text-to-image (Nano Banana), text/image-to-video (Seedance, Kling, Veo 3), text-to-speech (CSM-1B), and video-to-audio (ThinkSound). Use when the user wants to generate images, videos, or audio with AI.
 ---
+
+# fal.ai Media Generation
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -19,8 +20,6 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
-
-# fal.ai Media Generation
 
 Generate images, videos, and audio using fal.ai models via MCP.
 
@@ -49,15 +48,15 @@ Get an API key at [fal.ai](https://fal.ai).
 ## MCP Tools
 
 The fal.ai MCP provides these tools:
-- `search` Ã¢â‚¬â€ Find available models by keyword
-- `find` Ã¢â‚¬â€ Get model details and parameters
-- `generate` Ã¢â‚¬â€ Run a model with parameters
-- `result` Ã¢â‚¬â€ Check async generation status
-- `status` Ã¢â‚¬â€ Check job status
-- `cancel` Ã¢â‚¬â€ Cancel a running job
-- `estimate_cost` Ã¢â‚¬â€ Estimate generation cost
-- `models` Ã¢â‚¬â€ List popular models
-- `upload` Ã¢â‚¬â€ Upload files for use as inputs
+- `search` — Find available models by keyword
+- `find` — Get model details and parameters
+- `generate` — Run a model with parameters
+- `result` — Check async generation status
+- `status` — Check job status
+- `cancel` — Cancel a running job
+- `estimate_cost` — Estimate generation cost
+- `models` — List popular models
+- `upload` — Upload files for use as inputs
 
 ---
 
@@ -282,12 +281,12 @@ models()
 
 - Use `seed` for reproducible results when iterating on prompts
 - Start with lower-cost models (Nano Banana 2) for prompt iteration, then switch to Pro for finals
-- For video, keep prompts descriptive but concise Ã¢â‚¬â€ focus on motion and scene
+- For video, keep prompts descriptive but concise — focus on motion and scene
 - Image-to-video produces more controlled results than pure text-to-video
 - Check `estimate_cost` before running expensive video generations
 
 ## Related Skills
 
-- `videodb` Ã¢â‚¬â€ Video processing, editing, and streaming
-- `video-editing` Ã¢â‚¬â€ AI-powered video editing workflows
-- `content-engine` Ã¢â‚¬â€ Content creation for social platforms
+- `videodb` — Video processing, editing, and streaming
+- `video-editing` — AI-powered video editing workflows
+- `content-engine` — Content creation for social platforms

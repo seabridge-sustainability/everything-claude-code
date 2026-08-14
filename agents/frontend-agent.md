@@ -1,7 +1,7 @@
 ---
 name: frontend-agent
 description: SeaBridgeAI frontend/UI specialist for dashboards, data workflows, charts, forms, AI panels, and responsive enterprise SaaS UX.
-tools: ["Read", "Grep", "Glob", "Bash"]
+tools: Read, Grep, Glob, Bash
 model: sonnet
 ---
 

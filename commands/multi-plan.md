@@ -1,3 +1,7 @@
+---
+description: Create a multi-model implementation plan without modifying production code.
+---
+
 # Plan - Multi-Model Collaborative Planning
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
@@ -15,9 +19,17 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_START -->
+## /goal Default Contract
 
+This command inherits the SeaBridgeAI `/goal` protocol. Establish the persistent goal, Definition of Done, validation plan, affected systems, risks, dependencies, artifacts, and blockers before execution. Continue until validation satisfies the DoD or a hard blocker is documented.
+
+Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_END -->
 
 Multi-model collaborative planning - Context retrieval + Dual-model analysis → Generate step-by-step implementation plan.
+
+> **Prerequisite:** Requires the external `ccg-workflow` runtime, which is **not** part of the base ECC install. Initialize it with `npx ccg-workflow` to provision `~/.claude/bin/codeagent-wrapper` and the `~/.claude/.ccg/prompts/*` role files this command depends on. Without that runtime, this command will not run correctly.
 
 $ARGUMENTS
 
@@ -26,7 +38,7 @@ $ARGUMENTS
 ## Core Protocols
 
 - **Language Protocol**: Use **English** when interacting with tools/models, communicate with user in their language
-- **Mandatory Parallel**: Codex/Gemini calls MUST use `run_in_background: true` (including single model calls, to avoid blocking main thread)
+- **Mandatory Parallel**: Codex/Antigravity calls MUST use `run_in_background: true` (including single model calls, to avoid blocking main thread)
 - **Code Sovereignty**: External models have **zero filesystem write access**, all modifications by Claude
 - **Stop-Loss Mechanism**: Do not proceed to next phase until current phase output is validated
 - **Planning Only**: This command allows reading context and writing to `.claude/plan/*` plan files, but **NEVER modify production code**
@@ -39,7 +51,7 @@ $ARGUMENTS
 
 ```
 Bash({
-  command: "~/.claude/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend <codex|gemini> {{GEMINI_MODEL_FLAG}}- \"$PWD\" <<'EOF'
+  command: "~/.claude/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend <codex|antigravity> - \"$PWD\" <<'EOF'
 ROLE_FILE: <role prompt path>
 <TASK>
 Requirement: <enhanced requirement>
@@ -54,14 +66,14 @@ EOF",
 ```
 
 **Model Parameter Notes**:
-- `{{GEMINI_MODEL_FLAG}}`: When using `--backend gemini`, replace with `--gemini-model gemini-3-pro-preview` (note trailing space); use empty string for codex
+- No extra model flag is needed for `--backend antigravity` or `--backend codex`; `codeagent-wrapper` picks each backend's default model.
 
 **Role Prompts**:
 
-| Phase | Codex | Gemini |
+| Phase | Codex | Antigravity |
 |-------|-------|--------|
-| Analysis | `~/.claude/.ccg/prompts/codex/analyzer.md` | `~/.claude/.ccg/prompts/gemini/analyzer.md` |
-| Planning | `~/.claude/.ccg/prompts/codex/architect.md` | `~/.claude/.ccg/prompts/gemini/architect.md` |
+| Analysis | `~/.claude/.ccg/prompts/codex/analyzer.md` | `~/.claude/.ccg/prompts/antigravity/analyzer.md` |
+| Planning | `~/.claude/.ccg/prompts/codex/architect.md` | `~/.claude/.ccg/prompts/antigravity/architect.md` |
 
 **Session Reuse**: Each call returns `SESSION_ID: xxx` (typically output by wrapper), **MUST save** for subsequent `/ccg:execute` use.
 
@@ -139,7 +151,7 @@ mcp__ace-tool__search_context({
 
 #### 2.1 Distribute Inputs
 
-**Parallel call** Codex and Gemini (`run_in_background: true`):
+**Parallel call** Codex and Antigravity (`run_in_background: true`):
 
 Distribute **original requirement** (without preset opinions) to both models:
 
@@ -148,12 +160,12 @@ Distribute **original requirement** (without preset opinions) to both models:
    - Focus: Technical feasibility, architecture impact, performance considerations, potential risks
    - OUTPUT: Multi-perspective solutions + pros/cons analysis
 
-2. **Gemini Frontend Analysis**:
-   - ROLE_FILE: `~/.claude/.ccg/prompts/gemini/analyzer.md`
+2. **Antigravity Frontend Analysis**:
+   - ROLE_FILE: `~/.claude/.ccg/prompts/antigravity/analyzer.md`
    - Focus: UI/UX impact, user experience, visual design
    - OUTPUT: Multi-perspective solutions + pros/cons analysis
 
-Wait for both models' complete results with `TaskOutput`. **Save SESSION_ID** (`CODEX_SESSION` and `GEMINI_SESSION`).
+Wait for both models' complete results with `TaskOutput`. **Save SESSION_ID** (`CODEX_SESSION` and `ANTIGRAVITY_SESSION`).
 
 #### 2.2 Cross-Validation
 
@@ -161,7 +173,7 @@ Integrate perspectives and iterate for optimization:
 
 1. **Identify consensus** (strong signal)
 2. **Identify divergence** (needs weighing)
-3. **Complementary strengths**: Backend logic follows Codex, Frontend design follows Gemini
+3. **Complementary strengths**: Backend logic follows Codex, Frontend design follows Antigravity
 4. **Logical reasoning**: Eliminate logical gaps in solutions
 
 #### 2.3 (Optional but Recommended) Dual-Model Plan Draft
@@ -172,8 +184,8 @@ To reduce risk of omissions in Claude's synthesized plan, can parallel have both
    - ROLE_FILE: `~/.claude/.ccg/prompts/codex/architect.md`
    - OUTPUT: Step-by-step plan + pseudo-code (focus: data flow/edge cases/error handling/test strategy)
 
-2. **Gemini Plan Draft** (Frontend authority):
-   - ROLE_FILE: `~/.claude/.ccg/prompts/gemini/architect.md`
+2. **Antigravity Plan Draft** (Frontend authority):
+   - ROLE_FILE: `~/.claude/.ccg/prompts/antigravity/architect.md`
    - OUTPUT: Step-by-step plan + pseudo-code (focus: information architecture/interaction/accessibility/visual consistency)
 
 Wait for both models' complete results with `TaskOutput`, record key differences in their suggestions.
@@ -186,12 +198,12 @@ Synthesize both analyses, generate **Step-by-step Implementation Plan**:
 ## Implementation Plan: <Task Name>
 
 ### Task Type
-- [ ] Frontend (→ Gemini)
+- [ ] Frontend (→ Antigravity)
 - [ ] Backend (→ Codex)
 - [ ] Fullstack (→ Parallel)
 
 ### Technical Solution
-<Optimal solution synthesized from Codex + Gemini analysis>
+<Optimal solution synthesized from Codex + Antigravity analysis>
 
 ### Implementation Steps
 1. <Step 1> - Expected deliverable
@@ -209,7 +221,7 @@ Synthesize both analyses, generate **Step-by-step Implementation Plan**:
 
 ### SESSION_ID (for /ccg:execute use)
 - CODEX_SESSION: <session_id>
-- GEMINI_SESSION: <session_id>
+- ANTIGRAVITY_SESSION: <session_id>
 ```
 
 ### Phase 2 End: Plan Delivery (Not Execution)
@@ -280,14 +292,6 @@ After user approves, **manually** execute:
 
 1. **Plan only, no implementation** – This command does not execute any code changes
 2. **No Y/N prompts** – Only present plan, let user decide next steps
-3. **Trust Rules** – Backend follows Codex, Frontend follows Gemini
+3. **Trust Rules** – Backend follows Codex, Frontend follows Antigravity
 4. External models have **zero filesystem write access**
-5. **SESSION_ID Handoff** – Plan must include `CODEX_SESSION` / `GEMINI_SESSION` at end (for `/ccg:execute resume <SESSION_ID>` use)
-
-<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_START -->
-## /goal Default Contract
-
-This command inherits the SeaBridgeAI `/goal` protocol. Establish the persistent goal, Definition of Done, validation plan, affected systems, risks, dependencies, artifacts, and blockers before execution. Continue until validation satisfies the DoD or a hard blocker is documented.
-
-Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
-<!-- SEABRIDGE_GOAL_COMMAND_INHERITANCE_END -->
+5. **SESSION_ID Handoff** – Plan must include `CODEX_SESSION` / `ANTIGRAVITY_SESSION` at end (for `/ccg:execute resume <SESSION_ID>` use)

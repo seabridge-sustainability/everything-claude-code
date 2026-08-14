@@ -1,4 +1,4 @@
-﻿---
+---
 name: sea-systematic-debugging
 description: SeaBridgeAI systematic debugging adapted from Superpowers for root-cause analysis across FastAPI, Next.js, AI agents, databases, integrations, browser QA, and cross-repo contracts.
 ---

@@ -1,7 +1,7 @@
 ---
 name: backend-agent
 description: SeaBridgeAI backend/API specialist for FastAPI, MongoDB, agents, integrations, auth, and tenant isolation.
-tools: ["Read", "Grep", "Glob", "Bash"]
+tools: Read, Grep, Glob, Bash
 model: sonnet
 ---
 

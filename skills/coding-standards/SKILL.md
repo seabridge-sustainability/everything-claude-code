@@ -1,7 +1,8 @@
 ---
 name: coding-standards
-description: Universal coding standards, best practices, and patterns for TypeScript, JavaScript, React, and Node.js development.
-origin: ECC
+description: Baseline cross-project coding conventions for naming, readability, immutability, and code-quality review. Use detailed frontend or backend skills for framework-specific patterns. Use when reviewing code quality or naming with no framework-specific skill that applies.
+metadata:
+  origin: ECC
 ---
 
 # Coding Standards & Best Practices
@@ -22,8 +23,13 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
+Baseline coding conventions applicable across projects.
 
-Universal coding standards applicable across all projects.
+This skill is the shared floor, not the detailed framework playbook.
+
+- Use `frontend-patterns` for React, state, forms, rendering, and UI architecture.
+- Use `backend-patterns` or `api-design` for repository/service layers, endpoint design, validation, and server-specific concerns.
+- Use `rules/common/coding-style.md` when you need the shortest reusable rule layer instead of a full skill walkthrough.
 
 ## When to Activate
 
@@ -33,6 +39,19 @@ Universal coding standards applicable across all projects.
 - Enforcing naming, formatting, or structural consistency
 - Setting up linting, formatting, or type-checking rules
 - Onboarding new contributors to coding conventions
+
+## Scope Boundaries
+
+Activate this skill for:
+- descriptive naming
+- immutability defaults
+- readability, KISS, DRY, and YAGNI enforcement
+- error-handling expectations and code-smell review
+
+Do not use this skill as the primary source for:
+- React composition, hooks, or rendering patterns
+- backend architecture, API design, or database layering
+- domain-specific framework guidance when a narrower ECC skill already exists
 
 ## Code Quality Principles
 
@@ -321,7 +340,7 @@ export async function POST(request: Request) {
       return NextResponse.json({
         success: false,
         error: 'Validation failed',
-        details: error.errors
+        details: error.issues
       }, { status: 400 })
     }
   }
@@ -334,21 +353,21 @@ export async function POST(request: Request) {
 
 ```
 src/
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ app/                    # Next.js App Router
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ api/               # API routes
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ markets/           # Market pages
-Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ (auth)/           # Auth pages (route groups)
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ components/            # React components
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ ui/               # Generic UI components
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ forms/            # Form components
-Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ layouts/          # Layout components
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ hooks/                # Custom React hooks
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ lib/                  # Utilities and configs
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ api/             # API clients
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ utils/           # Helper functions
-Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ constants/       # Constants
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ types/                # TypeScript types
-Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ styles/              # Global styles
+├── app/                    # Next.js App Router
+│   ├── api/               # API routes
+│   ├── markets/           # Market pages
+│   └── (auth)/           # Auth pages (route groups)
+├── components/            # React components
+│   ├── ui/               # Generic UI components
+│   ├── forms/            # Form components
+│   └── layouts/          # Layout components
+├── hooks/                # Custom React hooks
+├── lib/                  # Utilities and configs
+│   ├── api/             # API clients
+│   ├── utils/           # Helper functions
+│   └── constants/       # Constants
+├── types/                # TypeScript types
+└── styles/              # Global styles
 ```
 
 ### File Naming
@@ -413,8 +432,9 @@ export async function searchMarkets(
 import { useMemo, useCallback } from 'react'
 
 // PASS: GOOD: Memoize expensive computations
+// Copy before sorting - Array.prototype.sort mutates in place
 const sortedMarkets = useMemo(() => {
-  return markets.sort((a, b) => b.volume - a.volume)
+  return [...markets].sort((a, b) => b.volume - a.volume)
 }, [markets])
 
 // PASS: GOOD: Memoize callbacks

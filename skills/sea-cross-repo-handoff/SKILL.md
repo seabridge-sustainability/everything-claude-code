@@ -1,4 +1,4 @@
-﻿---
+---
 name: sea-cross-repo-handoff
 description: SeaBridgeAI cross-repo handoff for backend, frontend, OpenSeaBri, ECC, upstream mirrors, shared contracts, repo pointers, and continuation by another coding agent.
 ---

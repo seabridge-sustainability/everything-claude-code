@@ -1,4 +1,4 @@
-﻿# Tasks: [FEATURE NAME]
+# Tasks: [FEATURE NAME]
 
 **Input**: `spec.md`, `plan.md`, `research.md`, `data-model.md`, `contracts/`, `quickstart.md`
 

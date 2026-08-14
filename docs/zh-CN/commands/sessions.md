@@ -1,8 +1,8 @@
 ---
-description: Ã§Â®Â¡Ã§Ââ€ Claude CodeÃ¤Â¼Å¡Ã¨Â¯ÂÃ¥Å½â€ Ã¥ÂÂ²Ã£â‚¬ÂÃ¥Ë†Â«Ã¥ÂÂÃ¥â€™Å’Ã¤Â¼Å¡Ã¨Â¯ÂÃ¥â€¦Æ’Ã¦â€¢Â°Ã¦ÂÂ®Ã£â‚¬â€š
+description: 管理Claude Code会话历史、别名和会话元数据。
 ---
 
-# Sessions Ã¥â€˜Â½Ã¤Â»Â¤
+# Sessions 命令
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -20,20 +20,19 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
+管理 Claude Code 会话历史 - 列出、加载、设置别名和编辑存储在 `~/.claude/session-data/` 中的会话，同时兼容读取旧的 `~/.claude/sessions/` 文件。
 
-Ã§Â®Â¡Ã§Ââ€  Claude Code Ã¤Â¼Å¡Ã¨Â¯ÂÃ¥Å½â€ Ã¥ÂÂ² - Ã¥Ë†â€”Ã¥â€¡ÂºÃ£â‚¬ÂÃ¥Å Â Ã¨Â½Â½Ã£â‚¬ÂÃ¨Â®Â¾Ã§Â½Â®Ã¥Ë†Â«Ã¥ÂÂÃ¥â€™Å’Ã§Â¼â€“Ã¨Â¾â€˜Ã¥Â­ËœÃ¥â€šÂ¨Ã¥Å“Â¨ `~/.claude/sessions/` Ã¤Â¸Â­Ã§Å¡â€žÃ¤Â¼Å¡Ã¨Â¯ÂÃ£â‚¬â€š
-
-## Ã§â€Â¨Ã¦Â³â€¢
+## 用法
 
 `/sessions [list|load|alias|info|help] [options]`
 
-## Ã¦â€œÂÃ¤Â½Å“
+## 操作
 
-### Ã¥Ë†â€”Ã¥â€¡ÂºÃ¤Â¼Å¡Ã¨Â¯Â
+### 列出会话
 
-Ã¦ËœÂ¾Ã§Â¤ÂºÃ¦â€°â‚¬Ã¦Å“â€°Ã¤Â¼Å¡Ã¨Â¯ÂÃ¥ÂÅ Ã¥â€¦Â¶Ã¥â€¦Æ’Ã¦â€¢Â°Ã¦ÂÂ®Ã¯Â¼Å’Ã¦â€Â¯Ã¦Å’ÂÃ§Â­â€ºÃ©â‚¬â€°Ã¥â€™Å’Ã¥Ë†â€ Ã©Â¡ÂµÃ£â‚¬â€š
+显示所有会话及其元数据，支持筛选和分页。
 
-Ã¥Â½â€œÃ¦â€šÂ¨Ã©Å“â‚¬Ã¨Â¦ÂÃ§Â¾Â¤Ã§Â»â€žÃ§Å¡â€žÃ¦â€œÂÃ¤Â½Å“Ã¥â€˜ËœÃ¨Â¡Â¨Ã¥Â±â€šÃ¤Â¸Å Ã¤Â¸â€¹Ã¦â€“â€¡Ã¦â€”Â¶Ã¯Â¼Å’Ã¤Â½Â¿Ã§â€Â¨ `/sessions info`Ã¯Â¼Å¡Ã¥Ë†â€ Ã¦â€Â¯Ã£â‚¬ÂÃ¥Â·Â¥Ã¤Â½Å“Ã¦Â â€˜Ã¨Â·Â¯Ã¥Â¾â€žÃ¥â€™Å’Ã¤Â¼Å¡Ã¨Â¯ÂÃ¦Å“â‚¬Ã¨Â¿â€˜Ã¦â‚¬Â§Ã£â‚¬â€š
+当您需要群组的操作员表层上下文时，使用 `/sessions info`：分支、工作树路径和会话最近性。
 
 ```bash
 /sessions                              # List all sessions (default)
@@ -43,12 +42,12 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 /sessions list --search abc            # Search by session ID
 ```
 
-**Ã¨â€žÅ¡Ã¦Å“Â¬Ã¯Â¼Å¡**
+**脚本：**
 
 ```bash
 node -e "
-const sm = require((()=>{var e=process.env.CLAUDE_PLUGIN_ROOT;if(e&&e.trim())return e.trim();var p=require('path'),f=require('fs'),h=require('os').homedir(),d=p.join(h,'.claude'),q=p.join('scripts','lib','utils.js');if(f.existsSync(p.join(d,q)))return d;try{var b=p.join(d,'plugins','cache','everything-claude-code');for(var o of f.readdirSync(b))for(var v of f.readdirSync(p.join(b,o))){var c=p.join(b,o,v);if(f.existsSync(p.join(c,q)))return c}}catch(x){}return d})()+'/scripts/lib/session-manager');
-const aa = require((()=>{var e=process.env.CLAUDE_PLUGIN_ROOT;if(e&&e.trim())return e.trim();var p=require('path'),f=require('fs'),h=require('os').homedir(),d=p.join(h,'.claude'),q=p.join('scripts','lib','utils.js');if(f.existsSync(p.join(d,q)))return d;try{var b=p.join(d,'plugins','cache','everything-claude-code');for(var o of f.readdirSync(b))for(var v of f.readdirSync(p.join(b,o))){var c=p.join(b,o,v);if(f.existsSync(p.join(c,q)))return c}}catch(x){}return d})()+'/scripts/lib/session-aliases');
+const sm = require((function(){var p=require('path'),f=require('fs'),o=require('os');var e=process.env.CLAUDE_PLUGIN_ROOT;if(e&&e.trim())return e.trim();var d=p.join(o.homedir(),'.claude');function L(x){try{return require(p.join(x,'scripts','lib','resolve-ecc-root')).resolveEccRoot()}catch(_){return null}}var r=L(d);if(r)return r;var s=['ecc','ecc@ecc','marketplaces/ecc','everything-claude-code','everything-claude-code@everything-claude-code','marketplaces/everything-claude-code'];for(var i=0;i<s.length;i++){r=L(p.join(d,'plugins',s[i]));if(r)return r}try{var g=['ecc','everything-claude-code'];for(var j=0;j<g.length;j++){var c=p.join(d,'plugins','cache',g[j]);var O=f.readdirSync(c);for(var k=0;k<O.length;k++){var q=p.join(c,O[k]);var V=f.readdirSync(q);for(var m=0;m<V.length;m++){r=L(p.join(q,V[m]));if(r)return r}}}}catch(_){}return d})()+'/scripts/lib/session-manager');
+const aa = require((function(){var p=require('path'),f=require('fs'),o=require('os');var e=process.env.CLAUDE_PLUGIN_ROOT;if(e&&e.trim())return e.trim();var d=p.join(o.homedir(),'.claude');function L(x){try{return require(p.join(x,'scripts','lib','resolve-ecc-root')).resolveEccRoot()}catch(_){return null}}var r=L(d);if(r)return r;var s=['ecc','ecc@ecc','marketplaces/ecc','everything-claude-code','everything-claude-code@everything-claude-code','marketplaces/everything-claude-code'];for(var i=0;i<s.length;i++){r=L(p.join(d,'plugins',s[i]));if(r)return r}try{var g=['ecc','everything-claude-code'];for(var j=0;j<g.length;j++){var c=p.join(d,'plugins','cache',g[j]);var O=f.readdirSync(c);for(var k=0;k<O.length;k++){var q=p.join(c,O[k]);var V=f.readdirSync(q);for(var m=0;m<V.length;m++){r=L(p.join(q,V[m]));if(r)return r}}}}catch(_){}return d})()+'/scripts/lib/session-aliases');
 const path = require('path');
 
 const result = sm.getAllSessions({ limit: 20 });
@@ -59,7 +58,7 @@ for (const a of aliases) aliasMap[a.sessionPath] = a.name;
 console.log('Sessions (showing ' + result.sessions.length + ' of ' + result.total + '):');
 console.log('');
 console.log('ID        Date        Time     Branch       Worktree           Alias');
-console.log('Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬');
+console.log('────────────────────────────────────────────────────────────────────');
 
 for (const s of result.sessions) {
   const alias = aliasMap[s.filename] || '';
@@ -74,9 +73,9 @@ for (const s of result.sessions) {
 "
 ```
 
-### Ã¥Å Â Ã¨Â½Â½Ã¤Â¼Å¡Ã¨Â¯Â
+### 加载会话
 
-Ã¥Å Â Ã¨Â½Â½Ã¥Â¹Â¶Ã¦ËœÂ¾Ã§Â¤ÂºÃ¤Â¼Å¡Ã¨Â¯ÂÃ¥â€ â€¦Ã¥Â®Â¹Ã¯Â¼Ë†Ã©â‚¬Å¡Ã¨Â¿â€¡ ID Ã¦Ë†â€“Ã¥Ë†Â«Ã¥ÂÂÃ¯Â¼â€°Ã£â‚¬â€š
+加载并显示会话内容（通过 ID 或别名）。
 
 ```bash
 /sessions load <id|alias>             # Load session
@@ -85,12 +84,12 @@ for (const s of result.sessions) {
 /sessions load my-alias               # By alias name
 ```
 
-**Ã¨â€žÅ¡Ã¦Å“Â¬Ã¯Â¼Å¡**
+**脚本：**
 
 ```bash
 node -e "
-const sm = require((()=>{var e=process.env.CLAUDE_PLUGIN_ROOT;if(e&&e.trim())return e.trim();var p=require('path'),f=require('fs'),h=require('os').homedir(),d=p.join(h,'.claude'),q=p.join('scripts','lib','utils.js');if(f.existsSync(p.join(d,q)))return d;try{var b=p.join(d,'plugins','cache','everything-claude-code');for(var o of f.readdirSync(b))for(var v of f.readdirSync(p.join(b,o))){var c=p.join(b,o,v);if(f.existsSync(p.join(c,q)))return c}}catch(x){}return d})()+'/scripts/lib/session-manager');
-const aa = require((()=>{var e=process.env.CLAUDE_PLUGIN_ROOT;if(e&&e.trim())return e.trim();var p=require('path'),f=require('fs'),h=require('os').homedir(),d=p.join(h,'.claude'),q=p.join('scripts','lib','utils.js');if(f.existsSync(p.join(d,q)))return d;try{var b=p.join(d,'plugins','cache','everything-claude-code');for(var o of f.readdirSync(b))for(var v of f.readdirSync(p.join(b,o))){var c=p.join(b,o,v);if(f.existsSync(p.join(c,q)))return c}}catch(x){}return d})()+'/scripts/lib/session-aliases');
+const sm = require((function(){var p=require('path'),f=require('fs'),o=require('os');var e=process.env.CLAUDE_PLUGIN_ROOT;if(e&&e.trim())return e.trim();var d=p.join(o.homedir(),'.claude');function L(x){try{return require(p.join(x,'scripts','lib','resolve-ecc-root')).resolveEccRoot()}catch(_){return null}}var r=L(d);if(r)return r;var s=['ecc','ecc@ecc','marketplaces/ecc','everything-claude-code','everything-claude-code@everything-claude-code','marketplaces/everything-claude-code'];for(var i=0;i<s.length;i++){r=L(p.join(d,'plugins',s[i]));if(r)return r}try{var g=['ecc','everything-claude-code'];for(var j=0;j<g.length;j++){var c=p.join(d,'plugins','cache',g[j]);var O=f.readdirSync(c);for(var k=0;k<O.length;k++){var q=p.join(c,O[k]);var V=f.readdirSync(q);for(var m=0;m<V.length;m++){r=L(p.join(q,V[m]));if(r)return r}}}}catch(_){}return d})()+'/scripts/lib/session-manager');
+const aa = require((function(){var p=require('path'),f=require('fs'),o=require('os');var e=process.env.CLAUDE_PLUGIN_ROOT;if(e&&e.trim())return e.trim();var d=p.join(o.homedir(),'.claude');function L(x){try{return require(p.join(x,'scripts','lib','resolve-ecc-root')).resolveEccRoot()}catch(_){return null}}var r=L(d);if(r)return r;var s=['ecc','ecc@ecc','marketplaces/ecc','everything-claude-code','everything-claude-code@everything-claude-code','marketplaces/everything-claude-code'];for(var i=0;i<s.length;i++){r=L(p.join(d,'plugins',s[i]));if(r)return r}try{var g=['ecc','everything-claude-code'];for(var j=0;j<g.length;j++){var c=p.join(d,'plugins','cache',g[j]);var O=f.readdirSync(c);for(var k=0;k<O.length;k++){var q=p.join(c,O[k]);var V=f.readdirSync(q);for(var m=0;m<V.length;m++){r=L(p.join(q,V[m]));if(r)return r}}}}catch(_){}return d})()+'/scripts/lib/session-aliases');
 const id = process.argv[1];
 
 // First try to resolve as alias
@@ -108,7 +107,7 @@ const size = sm.getSessionSize(session.sessionPath);
 const aliases = aa.getAliasesForSession(session.filename);
 
 console.log('Session: ' + session.filename);
-console.log('Path: ~/.claude/sessions/' + session.filename);
+console.log('Path: ' + session.sessionPath);
 console.log('');
 console.log('Statistics:');
 console.log('  Lines: ' + stats.lineCount);
@@ -150,21 +149,21 @@ if (session.metadata.worktree) {
 " "$ARGUMENTS"
 ```
 
-### Ã¥Ë†â€ºÃ¥Â»ÂºÃ¥Ë†Â«Ã¥ÂÂ
+### 创建别名
 
-Ã¤Â¸ÂºÃ¤Â¼Å¡Ã¨Â¯ÂÃ¥Ë†â€ºÃ¥Â»ÂºÃ¤Â¸â‚¬Ã¤Â¸ÂªÃ¦Ëœâ€œÃ¨Â®Â°Ã§Å¡â€žÃ¥Ë†Â«Ã¥ÂÂÃ£â‚¬â€š
+为会话创建一个易记的别名。
 
 ```bash
 /sessions alias <id> <name>           # Create alias
 /sessions alias 2026-02-01 today-work # Create alias named "today-work"
 ```
 
-**Ã¨â€žÅ¡Ã¦Å“Â¬Ã¯Â¼Å¡**
+**脚本：**
 
 ```bash
 node -e "
-const sm = require((()=>{var e=process.env.CLAUDE_PLUGIN_ROOT;if(e&&e.trim())return e.trim();var p=require('path'),f=require('fs'),h=require('os').homedir(),d=p.join(h,'.claude'),q=p.join('scripts','lib','utils.js');if(f.existsSync(p.join(d,q)))return d;try{var b=p.join(d,'plugins','cache','everything-claude-code');for(var o of f.readdirSync(b))for(var v of f.readdirSync(p.join(b,o))){var c=p.join(b,o,v);if(f.existsSync(p.join(c,q)))return c}}catch(x){}return d})()+'/scripts/lib/session-manager');
-const aa = require((()=>{var e=process.env.CLAUDE_PLUGIN_ROOT;if(e&&e.trim())return e.trim();var p=require('path'),f=require('fs'),h=require('os').homedir(),d=p.join(h,'.claude'),q=p.join('scripts','lib','utils.js');if(f.existsSync(p.join(d,q)))return d;try{var b=p.join(d,'plugins','cache','everything-claude-code');for(var o of f.readdirSync(b))for(var v of f.readdirSync(p.join(b,o))){var c=p.join(b,o,v);if(f.existsSync(p.join(c,q)))return c}}catch(x){}return d})()+'/scripts/lib/session-aliases');
+const sm = require((function(){var p=require('path'),f=require('fs'),o=require('os');var e=process.env.CLAUDE_PLUGIN_ROOT;if(e&&e.trim())return e.trim();var d=p.join(o.homedir(),'.claude');function L(x){try{return require(p.join(x,'scripts','lib','resolve-ecc-root')).resolveEccRoot()}catch(_){return null}}var r=L(d);if(r)return r;var s=['ecc','ecc@ecc','marketplaces/ecc','everything-claude-code','everything-claude-code@everything-claude-code','marketplaces/everything-claude-code'];for(var i=0;i<s.length;i++){r=L(p.join(d,'plugins',s[i]));if(r)return r}try{var g=['ecc','everything-claude-code'];for(var j=0;j<g.length;j++){var c=p.join(d,'plugins','cache',g[j]);var O=f.readdirSync(c);for(var k=0;k<O.length;k++){var q=p.join(c,O[k]);var V=f.readdirSync(q);for(var m=0;m<V.length;m++){r=L(p.join(q,V[m]));if(r)return r}}}}catch(_){}return d})()+'/scripts/lib/session-manager');
+const aa = require((function(){var p=require('path'),f=require('fs'),o=require('os');var e=process.env.CLAUDE_PLUGIN_ROOT;if(e&&e.trim())return e.trim();var d=p.join(o.homedir(),'.claude');function L(x){try{return require(p.join(x,'scripts','lib','resolve-ecc-root')).resolveEccRoot()}catch(_){return null}}var r=L(d);if(r)return r;var s=['ecc','ecc@ecc','marketplaces/ecc','everything-claude-code','everything-claude-code@everything-claude-code','marketplaces/everything-claude-code'];for(var i=0;i<s.length;i++){r=L(p.join(d,'plugins',s[i]));if(r)return r}try{var g=['ecc','everything-claude-code'];for(var j=0;j<g.length;j++){var c=p.join(d,'plugins','cache',g[j]);var O=f.readdirSync(c);for(var k=0;k<O.length;k++){var q=p.join(c,O[k]);var V=f.readdirSync(q);for(var m=0;m<V.length;m++){r=L(p.join(q,V[m]));if(r)return r}}}}catch(_){}return d})()+'/scripts/lib/session-aliases');
 
 const sessionId = process.argv[1];
 const aliasName = process.argv[2];
@@ -183,28 +182,28 @@ if (!session) {
 
 const result = aa.setAlias(aliasName, session.filename);
 if (result.success) {
-  console.log('Ã¢Å“â€œ Alias created: ' + aliasName + ' Ã¢â€ â€™ ' + session.filename);
+  console.log('✓ Alias created: ' + aliasName + ' → ' + session.filename);
 } else {
-  console.log('Ã¢Å“â€” Error: ' + result.error);
+  console.log('✗ Error: ' + result.error);
   process.exit(1);
 }
 " "$ARGUMENTS"
 ```
 
-### Ã§Â§Â»Ã©â„¢Â¤Ã¥Ë†Â«Ã¥ÂÂ
+### 移除别名
 
-Ã¥Ë†Â Ã©â„¢Â¤Ã§Å½Â°Ã¦Å“â€°Ã§Å¡â€žÃ¥Ë†Â«Ã¥ÂÂÃ£â‚¬â€š
+删除现有的别名。
 
 ```bash
 /sessions alias --remove <name>        # Remove alias
 /sessions unalias <name>               # Same as above
 ```
 
-**Ã¨â€žÅ¡Ã¦Å“Â¬Ã¯Â¼Å¡**
+**脚本：**
 
 ```bash
 node -e "
-const aa = require((()=>{var e=process.env.CLAUDE_PLUGIN_ROOT;if(e&&e.trim())return e.trim();var p=require('path'),f=require('fs'),h=require('os').homedir(),d=p.join(h,'.claude'),q=p.join('scripts','lib','utils.js');if(f.existsSync(p.join(d,q)))return d;try{var b=p.join(d,'plugins','cache','everything-claude-code');for(var o of f.readdirSync(b))for(var v of f.readdirSync(p.join(b,o))){var c=p.join(b,o,v);if(f.existsSync(p.join(c,q)))return c}}catch(x){}return d})()+'/scripts/lib/session-aliases');
+const aa = require((function(){var p=require('path'),f=require('fs'),o=require('os');var e=process.env.CLAUDE_PLUGIN_ROOT;if(e&&e.trim())return e.trim();var d=p.join(o.homedir(),'.claude');function L(x){try{return require(p.join(x,'scripts','lib','resolve-ecc-root')).resolveEccRoot()}catch(_){return null}}var r=L(d);if(r)return r;var s=['ecc','ecc@ecc','marketplaces/ecc','everything-claude-code','everything-claude-code@everything-claude-code','marketplaces/everything-claude-code'];for(var i=0;i<s.length;i++){r=L(p.join(d,'plugins',s[i]));if(r)return r}try{var g=['ecc','everything-claude-code'];for(var j=0;j<g.length;j++){var c=p.join(d,'plugins','cache',g[j]);var O=f.readdirSync(c);for(var k=0;k<O.length;k++){var q=p.join(c,O[k]);var V=f.readdirSync(q);for(var m=0;m<V.length;m++){r=L(p.join(q,V[m]));if(r)return r}}}}catch(_){}return d})()+'/scripts/lib/session-aliases');
 
 const aliasName = process.argv[1];
 if (!aliasName) {
@@ -214,28 +213,28 @@ if (!aliasName) {
 
 const result = aa.deleteAlias(aliasName);
 if (result.success) {
-  console.log('Ã¢Å“â€œ Alias removed: ' + aliasName);
+  console.log('✓ Alias removed: ' + aliasName);
 } else {
-  console.log('Ã¢Å“â€” Error: ' + result.error);
+  console.log('✗ Error: ' + result.error);
   process.exit(1);
 }
 " "$ARGUMENTS"
 ```
 
-### Ã¤Â¼Å¡Ã¨Â¯ÂÃ¤Â¿Â¡Ã¦ÂÂ¯
+### 会话信息
 
-Ã¦ËœÂ¾Ã§Â¤ÂºÃ¤Â¼Å¡Ã¨Â¯ÂÃ§Å¡â€žÃ¨Â¯Â¦Ã§Â»â€ Ã¤Â¿Â¡Ã¦ÂÂ¯Ã£â‚¬â€š
+显示会话的详细信息。
 
 ```bash
 /sessions info <id|alias>              # Show session details
 ```
 
-**Ã¨â€žÅ¡Ã¦Å“Â¬Ã¯Â¼Å¡**
+**脚本：**
 
 ```bash
 node -e "
-const sm = require((()=>{var e=process.env.CLAUDE_PLUGIN_ROOT;if(e&&e.trim())return e.trim();var p=require('path'),f=require('fs'),h=require('os').homedir(),d=p.join(h,'.claude'),q=p.join('scripts','lib','utils.js');if(f.existsSync(p.join(d,q)))return d;try{var b=p.join(d,'plugins','cache','everything-claude-code');for(var o of f.readdirSync(b))for(var v of f.readdirSync(p.join(b,o))){var c=p.join(b,o,v);if(f.existsSync(p.join(c,q)))return c}}catch(x){}return d})()+'/scripts/lib/session-manager');
-const aa = require((()=>{var e=process.env.CLAUDE_PLUGIN_ROOT;if(e&&e.trim())return e.trim();var p=require('path'),f=require('fs'),h=require('os').homedir(),d=p.join(h,'.claude'),q=p.join('scripts','lib','utils.js');if(f.existsSync(p.join(d,q)))return d;try{var b=p.join(d,'plugins','cache','everything-claude-code');for(var o of f.readdirSync(b))for(var v of f.readdirSync(p.join(b,o))){var c=p.join(b,o,v);if(f.existsSync(p.join(c,q)))return c}}catch(x){}return d})()+'/scripts/lib/session-aliases');
+const sm = require((function(){var p=require('path'),f=require('fs'),o=require('os');var e=process.env.CLAUDE_PLUGIN_ROOT;if(e&&e.trim())return e.trim();var d=p.join(o.homedir(),'.claude');function L(x){try{return require(p.join(x,'scripts','lib','resolve-ecc-root')).resolveEccRoot()}catch(_){return null}}var r=L(d);if(r)return r;var s=['ecc','ecc@ecc','marketplaces/ecc','everything-claude-code','everything-claude-code@everything-claude-code','marketplaces/everything-claude-code'];for(var i=0;i<s.length;i++){r=L(p.join(d,'plugins',s[i]));if(r)return r}try{var g=['ecc','everything-claude-code'];for(var j=0;j<g.length;j++){var c=p.join(d,'plugins','cache',g[j]);var O=f.readdirSync(c);for(var k=0;k<O.length;k++){var q=p.join(c,O[k]);var V=f.readdirSync(q);for(var m=0;m<V.length;m++){r=L(p.join(q,V[m]));if(r)return r}}}}catch(_){}return d})()+'/scripts/lib/session-manager');
+const aa = require((function(){var p=require('path'),f=require('fs'),o=require('os');var e=process.env.CLAUDE_PLUGIN_ROOT;if(e&&e.trim())return e.trim();var d=p.join(o.homedir(),'.claude');function L(x){try{return require(p.join(x,'scripts','lib','resolve-ecc-root')).resolveEccRoot()}catch(_){return null}}var r=L(d);if(r)return r;var s=['ecc','ecc@ecc','marketplaces/ecc','everything-claude-code','everything-claude-code@everything-claude-code','marketplaces/everything-claude-code'];for(var i=0;i<s.length;i++){r=L(p.join(d,'plugins',s[i]));if(r)return r}try{var g=['ecc','everything-claude-code'];for(var j=0;j<g.length;j++){var c=p.join(d,'plugins','cache',g[j]);var O=f.readdirSync(c);for(var k=0;k<O.length;k++){var q=p.join(c,O[k]);var V=f.readdirSync(q);for(var m=0;m<V.length;m++){r=L(p.join(q,V[m]));if(r)return r}}}}catch(_){}return d})()+'/scripts/lib/session-aliases');
 
 const id = process.argv[1];
 const resolved = aa.resolveAlias(id);
@@ -252,7 +251,7 @@ const size = sm.getSessionSize(session.sessionPath);
 const aliases = aa.getAliasesForSession(session.filename);
 
 console.log('Session Information');
-console.log('Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â');
+console.log('════════════════════');
 console.log('ID:          ' + (session.shortId === 'no-id' ? '(none)' : session.shortId));
 console.log('Filename:    ' + session.filename);
 console.log('Date:        ' + session.date);
@@ -273,19 +272,19 @@ if (aliases.length > 0) {
 " "$ARGUMENTS"
 ```
 
-### Ã¥Ë†â€”Ã¥â€¡ÂºÃ¥Ë†Â«Ã¥ÂÂ
+### 列出别名
 
-Ã¦ËœÂ¾Ã§Â¤ÂºÃ¦â€°â‚¬Ã¦Å“â€°Ã¤Â¼Å¡Ã¨Â¯ÂÃ¥Ë†Â«Ã¥ÂÂÃ£â‚¬â€š
+显示所有会话别名。
 
 ```bash
 /sessions aliases                      # List all aliases
 ```
 
-**Ã¨â€žÅ¡Ã¦Å“Â¬Ã¯Â¼Å¡**
+**脚本：**
 
 ```bash
 node -e "
-const aa = require((()=>{var e=process.env.CLAUDE_PLUGIN_ROOT;if(e&&e.trim())return e.trim();var p=require('path'),f=require('fs'),h=require('os').homedir(),d=p.join(h,'.claude'),q=p.join('scripts','lib','utils.js');if(f.existsSync(p.join(d,q)))return d;try{var b=p.join(d,'plugins','cache','everything-claude-code');for(var o of f.readdirSync(b))for(var v of f.readdirSync(p.join(b,o))){var c=p.join(b,o,v);if(f.existsSync(p.join(c,q)))return c}}catch(x){}return d})()+'/scripts/lib/session-aliases');
+const aa = require((function(){var p=require('path'),f=require('fs'),o=require('os');var e=process.env.CLAUDE_PLUGIN_ROOT;if(e&&e.trim())return e.trim();var d=p.join(o.homedir(),'.claude');function L(x){try{return require(p.join(x,'scripts','lib','resolve-ecc-root')).resolveEccRoot()}catch(_){return null}}var r=L(d);if(r)return r;var s=['ecc','ecc@ecc','marketplaces/ecc','everything-claude-code','everything-claude-code@everything-claude-code','marketplaces/everything-claude-code'];for(var i=0;i<s.length;i++){r=L(p.join(d,'plugins',s[i]));if(r)return r}try{var g=['ecc','everything-claude-code'];for(var j=0;j<g.length;j++){var c=p.join(d,'plugins','cache',g[j]);var O=f.readdirSync(c);for(var k=0;k<O.length;k++){var q=p.join(c,O[k]);var V=f.readdirSync(q);for(var m=0;m<V.length;m++){r=L(p.join(q,V[m]));if(r)return r}}}}catch(_){}return d})()+'/scripts/lib/session-aliases');
 
 const aliases = aa.listAliases();
 console.log('Session Aliases (' + aliases.length + '):');
@@ -295,7 +294,7 @@ if (aliases.length === 0) {
   console.log('No aliases found.');
 } else {
   console.log('Name          Session File                    Title');
-  console.log('Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬');
+  console.log('─────────────────────────────────────────────────────────────');
   for (const a of aliases) {
     const name = a.name.padEnd(12);
     const file = (a.sessionPath.length > 30 ? a.sessionPath.slice(0, 27) + '...' : a.sessionPath).padEnd(30);
@@ -306,28 +305,28 @@ if (aliases.length === 0) {
 "
 ```
 
-## Ã¦â€œÂÃ¤Â½Å“Ã¥â€˜ËœÃ§Â¬â€Ã¨Â®Â°
+## 操作员笔记
 
-* Ã¤Â¼Å¡Ã¨Â¯ÂÃ¦â€“â€¡Ã¤Â»Â¶Ã¥Å“Â¨Ã¥Â¤Â´Ã©Æ’Â¨Ã¦Å’ÂÃ¤Â¹â€¦Ã¥Å’â€“ `Project`Ã£â‚¬Â`Branch` Ã¥â€™Å’ `Worktree`Ã¯Â¼Å’Ã¤Â»Â¥Ã¤Â¾Â¿ `/sessions info` Ã¥ÂÂ¯Ã¤Â»Â¥Ã¥Å’ÂºÃ¥Ë†â€ Ã¥Â¹Â¶Ã¨Â¡Å’ tmux/Ã¥Â·Â¥Ã¤Â½Å“Ã¦Â â€˜Ã¨Â¿ÂÃ¨Â¡Å’Ã£â‚¬â€š
-* Ã¥Â¯Â¹Ã¤ÂºÅ½Ã¦Å’â€¡Ã¦Å’Â¥Ã¤Â¸Â­Ã¥Â¿Æ’Ã¥Â¼ÂÃ§â€ºâ€˜Ã¦Å½Â§Ã¯Â¼Å’Ã¨Â¯Â·Ã§Â»â€œÃ¥ÂË†Ã¤Â½Â¿Ã§â€Â¨ `/sessions info`Ã£â‚¬Â`git diff --stat` Ã¤Â»Â¥Ã¥ÂÅ Ã§â€Â± `scripts/hooks/cost-tracker.js` Ã¥Ââ€˜Ã¥â€¡ÂºÃ§Å¡â€žÃ¦Ë†ÂÃ¦Å“Â¬Ã¦Å’â€¡Ã¦Â â€¡Ã£â‚¬â€š
+* 会话文件在头部持久化 `Project`、`Branch` 和 `Worktree`，以便 `/sessions info` 可以区分并行 tmux/工作树运行。
+* 对于指挥中心式监控，请结合使用 `/sessions info`、`git diff --stat` 以及由 `scripts/hooks/cost-tracker.js` 发出的成本指标。
 
-## Ã¥Ââ€šÃ¦â€¢Â°
+## 参数
 
 $ARGUMENTS:
 
-* `list [options]` - Ã¥Ë†â€”Ã¥â€¡ÂºÃ¤Â¼Å¡Ã¨Â¯Â
-  * `--limit <n>` - Ã¦Å“â‚¬Ã¥Â¤Â§Ã¦ËœÂ¾Ã§Â¤ÂºÃ¤Â¼Å¡Ã¨Â¯ÂÃ¦â€¢Â°Ã¯Â¼Ë†Ã©Â»ËœÃ¨Â®Â¤Ã¯Â¼Å¡50Ã¯Â¼â€°
-  * `--date <YYYY-MM-DD>` - Ã¦Å’â€°Ã¦â€”Â¥Ã¦Å“Å¸Ã§Â­â€ºÃ©â‚¬â€°
-  * `--search <pattern>` - Ã¥Å“Â¨Ã¤Â¼Å¡Ã¨Â¯Â ID Ã¤Â¸Â­Ã¦ÂÅ“Ã§Â´Â¢
-* `load <id|alias>` - Ã¥Å Â Ã¨Â½Â½Ã¤Â¼Å¡Ã¨Â¯ÂÃ¥â€ â€¦Ã¥Â®Â¹
-* `alias <id> <name>` - Ã¤Â¸ÂºÃ¤Â¼Å¡Ã¨Â¯ÂÃ¥Ë†â€ºÃ¥Â»ÂºÃ¥Ë†Â«Ã¥ÂÂ
-* `alias --remove <name>` - Ã§Â§Â»Ã©â„¢Â¤Ã¥Ë†Â«Ã¥ÂÂ
-* `unalias <name>` - Ã¤Â¸Å½ `--remove` Ã§â€ºÂ¸Ã¥ÂÅ’
-* `info <id|alias>` - Ã¦ËœÂ¾Ã§Â¤ÂºÃ¤Â¼Å¡Ã¨Â¯ÂÃ§Â»Å¸Ã¨Â®Â¡Ã¤Â¿Â¡Ã¦ÂÂ¯
-* `aliases` - Ã¥Ë†â€”Ã¥â€¡ÂºÃ¦â€°â‚¬Ã¦Å“â€°Ã¥Ë†Â«Ã¥ÂÂ
-* `help` - Ã¦ËœÂ¾Ã§Â¤ÂºÃ¦Â­Â¤Ã¥Â¸Â®Ã¥Å Â©Ã¤Â¿Â¡Ã¦ÂÂ¯
+* `list [options]` - 列出会话
+  * `--limit <n>` - 最大显示会话数（默认：50）
+  * `--date <YYYY-MM-DD>` - 按日期筛选
+  * `--search <pattern>` - 在会话 ID 中搜索
+* `load <id|alias>` - 加载会话内容
+* `alias <id> <name>` - 为会话创建别名
+* `alias --remove <name>` - 移除别名
+* `unalias <name>` - 与 `--remove` 相同
+* `info <id|alias>` - 显示会话统计信息
+* `aliases` - 列出所有别名
+* `help` - 显示此帮助信息
 
-## Ã§Â¤ÂºÃ¤Â¾â€¹
+## 示例
 
 ```bash
 # List all sessions
@@ -349,9 +348,9 @@ $ARGUMENTS:
 /sessions aliases
 ```
 
-## Ã¥Â¤â€¡Ã¦Â³Â¨
+## 备注
 
-* Ã¤Â¼Å¡Ã¨Â¯ÂÃ¤Â»Â¥ Markdown Ã¦â€“â€¡Ã¤Â»Â¶Ã¥Â½Â¢Ã¥Â¼ÂÃ¥Â­ËœÃ¥â€šÂ¨Ã¥Å“Â¨ `~/.claude/sessions/`
-* Ã¥Ë†Â«Ã¥ÂÂÃ¥Â­ËœÃ¥â€šÂ¨Ã¥Å“Â¨ `~/.claude/session-aliases.json`
-* Ã¤Â¼Å¡Ã¨Â¯Â ID Ã¥ÂÂ¯Ã¤Â»Â¥Ã§Â¼Â©Ã§Å¸Â­Ã¯Â¼Ë†Ã©â‚¬Å¡Ã¥Â¸Â¸Ã¥â€°Â 4-8 Ã¤Â¸ÂªÃ¥Â­â€”Ã§Â¬Â¦Ã¥Â°Â±Ã¨Â¶Â³Ã¥Â¤Å¸Ã¥â€Â¯Ã¤Â¸â‚¬Ã¯Â¼â€°
-* Ã¤Â¸ÂºÃ§Â»ÂÃ¥Â¸Â¸Ã¥Â¼â€¢Ã§â€Â¨Ã§Å¡â€žÃ¤Â¼Å¡Ã¨Â¯ÂÃ¤Â½Â¿Ã§â€Â¨Ã¥Ë†Â«Ã¥ÂÂ
+* 会话以 Markdown 文件形式存储在 `~/.claude/session-data/`，并继续兼容读取旧的 `~/.claude/sessions/`
+* 别名存储在 `~/.claude/session-aliases.json`
+* 会话 ID 可以缩短（通常前 4-8 个字符就足够唯一）
+* 为经常引用的会话使用别名

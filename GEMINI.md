@@ -1,4 +1,4 @@
-﻿# SeaBridgeAI Gemini Guidance
+# SeaBridgeAI Gemini Guidance
 
 <!-- SEABRIDGE_GOAL_PROTOCOL_START -->
 ## /goal Default Operating Mode

@@ -1,4 +1,4 @@
-﻿---
+---
 type: prompt
 name: gsd:forensics
 description: Post-mortem investigation for failed GSD workflows â€” diagnoses what went wrong.

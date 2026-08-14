@@ -1,4 +1,4 @@
-﻿---
+---
 name: sea-local-llm-training
 description: SeaBridgeAI local LLM fine-tuning and inference skill for Unsloth Studio on RTX 4090 Laptop â€” covers dataset prep, LoRA training, smoke tests, and routing AI agents to the local endpoint.
 ---

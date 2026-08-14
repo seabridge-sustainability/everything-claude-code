@@ -1,4 +1,4 @@
-﻿---
+---
 name: speckit-tasks
 description: Generate dependency-ordered `tasks.md` from spec and plan artifacts.
 ---

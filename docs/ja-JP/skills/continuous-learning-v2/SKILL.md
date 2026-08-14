@@ -114,25 +114,9 @@ source: "session-observation"
 **Ã£Æ’â€”Ã£Æ’Â©Ã£â€šÂ°Ã£â€šÂ¤Ã£Æ’Â³Ã£ÂÂ¨Ã£Ââ€”Ã£ÂÂ¦Ã£â€šÂ¤Ã£Æ’Â³Ã£â€šÂ¹Ã£Æ’Ë†Ã£Æ’Â¼Ã£Æ’Â«Ã£Ââ€”Ã£ÂÅ¸Ã¥Â Â´Ã¥ÂË†**Ã¯Â¼Ë†Ã¦Å½Â¨Ã¥Â¥Â¨Ã¯Â¼â€°Ã¯Â¼Å¡
 
 ```json
-{
-  "hooks": {
-    "PreToolUse": [{
-      "matcher": "*",
-      "hooks": [{
-        "type": "command",
-        "command": "${CLAUDE_PLUGIN_ROOT}/skills/continuous-learning-v2/hooks/observe.sh pre"
-      }]
-    }],
-    "PostToolUse": [{
-      "matcher": "*",
-      "hooks": [{
-        "type": "command",
-        "command": "${CLAUDE_PLUGIN_ROOT}/skills/continuous-learning-v2/hooks/observe.sh post"
-      }]
-    }]
-  }
-}
-```
+プラグインの `hooks/hooks.json` が Claude Code v2.1+ で自動読み込みされるため、`~/.claude/settings.json` に追加の hook 設定は不要です。`observe.sh` はそこで既に登録されています。
+
+以前に `observe.sh` を `~/.claude/settings.json` にコピーした場合は、重複した `PreToolUse` / `PostToolUse` ブロックを削除してください。重複登録は二重実行と `${CLAUDE_PLUGIN_ROOT}` 解決エラーを引き起こします。この変数はプラグイン管理の `hooks/hooks.json` でのみ展開されます。
 
 **`~/.claude/skills`Ã£ÂÂ«Ã¦â€°â€¹Ã¥â€¹â€¢Ã£ÂÂ§Ã£â€šÂ¤Ã£Æ’Â³Ã£â€šÂ¹Ã£Æ’Ë†Ã£Æ’Â¼Ã£Æ’Â«Ã£Ââ€”Ã£ÂÅ¸Ã¥Â Â´Ã¥ÂË†**Ã¯Â¼Å¡
 
@@ -143,14 +127,14 @@ source: "session-observation"
       "matcher": "*",
       "hooks": [{
         "type": "command",
-        "command": "~/.claude/skills/continuous-learning-v2/hooks/observe.sh pre"
+        "command": "~/.claude/skills/continuous-learning-v2/hooks/observe.sh"
       }]
     }],
     "PostToolUse": [{
       "matcher": "*",
       "hooks": [{
         "type": "command",
-        "command": "~/.claude/skills/continuous-learning-v2/hooks/observe.sh post"
+        "command": "~/.claude/skills/continuous-learning-v2/hooks/observe.sh"
       }]
     }]
   }

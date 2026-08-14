@@ -1,4 +1,4 @@
-﻿# VERIFY WORK
+# VERIFY WORK
 
 - Module:
 - Repo:

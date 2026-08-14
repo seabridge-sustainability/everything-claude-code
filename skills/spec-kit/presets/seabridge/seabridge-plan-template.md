@@ -1,4 +1,4 @@
-﻿# Implementation Plan: [FEATURE NAME]
+# Implementation Plan: [FEATURE NAME]
 
 **Feature ID**: `[FEATURE_ID]`
 **Spec**: `spec.md`

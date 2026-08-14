@@ -1,4 +1,4 @@
-﻿---
+---
 name: sea-senior-dev-workflow
 description: Callable wrapper for sea-senior-dev-workflow. Load the canonical SeaBridgeAI skill body from everything-claude-code\skills\sea-senior-dev-workflow\SKILL.md.
 ---

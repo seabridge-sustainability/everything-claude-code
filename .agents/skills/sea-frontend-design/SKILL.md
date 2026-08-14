@@ -1,4 +1,4 @@
-﻿---
+---
 name: sea-frontend-design
 description: Callable wrapper for sea-frontend-design. Load the canonical SeaBridgeAI skill body from everything-claude-code\skills\sea-frontend-design\SKILL.md.
 ---

@@ -19,17 +19,17 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 
 ## Model Selection Strategy
 
-**Haiku 4.5** (90% of Sonnet capability, 3x cost savings):
+**Haiku** (90% of Sonnet capability, 3x cost savings):
 - Lightweight agents with frequent invocation
 - Pair programming and code generation
 - Worker agents in multi-agent systems
 
-**Sonnet 4.6** (Best coding model):
+**Sonnet** (Best coding model):
 - Main development work
 - Orchestrating multi-agent workflows
 - Complex coding tasks
 
-**Opus 4.5** (Deepest reasoning):
+**Opus** (Deepest reasoning):
 - Complex architectural decisions
 - Maximum reasoning requirements
 - Research and analysis tasks
@@ -54,7 +54,7 @@ Extended thinking is enabled by default, reserving up to 31,999 tokens for inter
 Control extended thinking via:
 - **Toggle**: Option+T (macOS) / Alt+T (Windows/Linux)
 - **Config**: Set `alwaysThinkingEnabled` in `~/.claude/settings.json`
-- **Budget cap**: `export MAX_THINKING_TOKENS=10000`
+- **Budget cap**: `export MAX_THINKING_TOKENS=10000` (bash) or `$env:MAX_THINKING_TOKENS = "10000"` (PowerShell)
 - **Verbose mode**: Ctrl+O to see thinking output
 
 For complex tasks requiring deep reasoning:

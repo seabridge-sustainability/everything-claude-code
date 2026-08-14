@@ -1,4 +1,4 @@
-﻿---
+---
 name: sea-cross-repo-handoff
 description: Callable wrapper for sea-cross-repo-handoff. Load the canonical SeaBridgeAI skill body from everything-claude-code\skills\sea-cross-repo-handoff\SKILL.md.
 ---

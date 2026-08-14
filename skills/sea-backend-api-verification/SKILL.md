@@ -1,4 +1,4 @@
-﻿---
+---
 name: sea-backend-api-verification
 description: SeaBridgeAI backend and API verification for FastAPI routes, schemas, services, database sources, auth, tenant isolation, provider gates, and frontend contract truth.
 ---

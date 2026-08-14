@@ -1,7 +1,8 @@
 ---
 name: content-hash-cache-pattern
-description: Cache expensive file processing results using SHA-256 content hashes Ã¢â‚¬â€ path-independent, auto-invalidating, with service layer separation.
-origin: ECC
+description: Cache expensive file processing results using SHA-256 content hashes — path-independent, auto-invalidating, with service layer separation. Use when repeated file processing is slow and results should be cached and invalidated by content rather than path.
+metadata:
+  origin: ECC
 ---
 
 # Content-Hash File Cache Pattern
@@ -21,7 +22,6 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
-
 
 Cache expensive file processing results (PDF parsing, text extraction, image analysis) using SHA-256 content hashes as cache keys. Unlike path-based caching, this approach survives file moves/renames and auto-invalidates when content changes.
 
@@ -74,7 +74,7 @@ class CacheEntry:
 
 ### 3. File-Based Cache Storage
 
-Each cache entry is stored as `{hash}.json` Ã¢â‚¬â€ O(1) lookup by hash, no index file required.
+Each cache entry is stored as `{hash}.json` — O(1) lookup by hash, no index file required.
 
 ```python
 import json
@@ -142,11 +142,11 @@ def extract_with_cache(
 
 ## Best Practices
 
-- **Hash content, not paths** Ã¢â‚¬â€ paths change, content identity doesn't
-- **Chunk large files** when hashing Ã¢â‚¬â€ avoid loading entire files into memory
-- **Keep processing functions pure** Ã¢â‚¬â€ they should know nothing about caching
+- **Hash content, not paths** — paths change, content identity doesn't
+- **Chunk large files** when hashing — avoid loading entire files into memory
+- **Keep processing functions pure** — they should know nothing about caching
 - **Log cache hit/miss** with truncated hashes for debugging
-- **Handle corruption gracefully** Ã¢â‚¬â€ treat invalid cache entries as misses, never crash
+- **Handle corruption gracefully** — treat invalid cache entries as misses, never crash
 
 ## Anti-Patterns to Avoid
 

@@ -1,4 +1,4 @@
-﻿---
+---
 name: sea-verification-before-completion
 description: Callable wrapper for sea-verification-before-completion. Load the canonical SeaBridgeAI skill body from everything-claude-code\skills\sea-verification-before-completion\SKILL.md.
 ---

@@ -1,4 +1,4 @@
-﻿---
+---
 name: sea-task-orchestration
 description: SeaBridgeAI task orchestration adapted from Superpowers for scoped decomposition, plan execution, parallel-agent routing, and cross-lane handoff without uncontrolled autonomy.
 ---

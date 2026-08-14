@@ -1,4 +1,4 @@
-﻿---
+---
 name: speckit-checklist
 description: Generate and validate requirements-quality checklists for a feature.
 ---

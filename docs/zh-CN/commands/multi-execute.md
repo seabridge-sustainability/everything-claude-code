@@ -19,6 +19,8 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 
 Ã¥Â¤Å¡Ã¦Â¨Â¡Ã¥Å¾â€¹Ã¥ÂÂÃ¥ÂÅ’Ã¦â€°Â§Ã¨Â¡Å’ - Ã¤Â»Å½Ã¨Â®Â¡Ã¥Ë†â€™Ã¨Å½Â·Ã¥Ââ€“Ã¥Å½Å¸Ã¥Å¾â€¹ Ã¢â€ â€™ Claude Ã©â€¡ÂÃ¦Å¾â€žÃ¥Â¹Â¶Ã¥Â®Å¾Ã¦â€“Â½ Ã¢â€ â€™ Ã¥Â¤Å¡Ã¦Â¨Â¡Ã¥Å¾â€¹Ã¥Â®Â¡Ã¨Â®Â¡Ã¤Â¸Å½Ã¤ÂºÂ¤Ã¤Â»ËœÃ£â‚¬â€š
 
+> **前提条件：** 此命令需要外部的 `ccg-workflow` 运行时，它**不**包含在基础 ECC 安装中。请运行 `npx ccg-workflow` 进行初始化，以配置此命令所依赖的 `~/.claude/bin/codeagent-wrapper` 和 `~/.claude/.ccg/prompts/*` 角色文件。没有该运行时，此命令将无法正常运行。
+
 $ARGUMENTS
 
 ***

@@ -1,14 +1,15 @@
 {
-  "name": "everything-claude-code",
+  "name": "ecc",
   "interface": {
-    "displayName": "Everything Claude Code"
+    "displayName": "ECC"
   },
   "plugins": [
     {
-      "name": "everything-claude-code",
+      "name": "ecc",
+      "version": "2.2.0",
       "source": {
         "source": "local",
-        "path": "../.."
+        "path": "./"
       },
       "policy": {
         "installation": "AVAILABLE",

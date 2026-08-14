@@ -1,8 +1,9 @@
 ---
 name: nextjs-turbopack
-description: Next.js 16+ and Turbopack Ã¢â‚¬â€ incremental bundling, FS caching, dev speed, and when to use Turbopack vs webpack.
-origin: ECC
+description: Next.js 16+ and Turbopack — incremental bundling, FS caching, dev speed, and when to use Turbopack vs webpack.
 ---
+
+# Next.js and Turbopack
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -20,8 +21,6 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
-# Next.js and Turbopack
-
 Next.js 16+ uses Turbopack by default for local development: an incremental bundler written in Rust that significantly speeds up dev startup and hot updates.
 
 ## When to Use
@@ -34,7 +33,7 @@ Use when: developing or debugging Next.js 16+ apps, diagnosing slow dev startup 
 
 ## How It Works
 
-- **Turbopack**: Incremental bundler for Next.js dev. Uses file-system caching so restarts are much faster (e.g. 5Ã¢â‚¬â€œ14x on large projects).
+- **Turbopack**: Incremental bundler for Next.js dev. Uses file-system caching so restarts are much faster (e.g. 5–14x on large projects).
 - **Default in dev**: From Next.js 16, `next dev` runs with Turbopack unless disabled.
 - **File-system caching**: Restarts reuse previous work; cache is typically under `.next`; no extra config needed for basic use.
 - **Bundle Analyzer (Next.js 16.1+)**: Experimental Bundle Analyzer to inspect output and find heavy dependencies; enable via config or experimental flag (see Next.js docs for your version).

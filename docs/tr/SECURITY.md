@@ -1,4 +1,4 @@
-# GÃƒÂ¼venlik PolitikasÃ„Â±
+# Güvenlik Politikası
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -16,55 +16,54 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
+## Desteklenen Sürümler
 
-## Desteklenen SÃƒÂ¼rÃƒÂ¼mler
-
-| SÃƒÂ¼rÃƒÂ¼m   | Destekleniyor      |
+| Sürüm   | Destekleniyor      |
 | ------- | ------------------ |
 | 1.9.x   | :white_check_mark: |
 | 1.8.x   | :white_check_mark: |
 | < 1.8   | :x:                |
 
-## GÃƒÂ¼venlik AÃƒÂ§Ã„Â±Ã„Å¸Ã„Â± Bildirimi
+## Güvenlik Açığı Bildirimi
 
-ECC'de bir gÃƒÂ¼venlik aÃƒÂ§Ã„Â±Ã„Å¸Ã„Â± keÃ…Å¸federseniz, lÃƒÂ¼tfen sorumlu bir Ã…Å¸ekilde bildirin.
+ECC'de bir güvenlik açığı keşfederseniz, lütfen sorumlu bir şekilde bildirin.
 
-**GÃƒÂ¼venlik aÃƒÂ§Ã„Â±klarÃ„Â± iÃƒÂ§in herkese aÃƒÂ§Ã„Â±k GitHub issue aÃƒÂ§mayÃ„Â±n.**
+**Güvenlik açıkları için herkese açık GitHub issue açmayın.**
 
-Bunun yerine, **security@ecc.tools** adresine aÃ…Å¸aÃ„Å¸Ã„Â±daki bilgilerle e-posta gÃƒÂ¶nderin:
+Bunun yerine, **<security@ecc.tools>** adresine aşağıdaki bilgilerle e-posta gönderin:
 
-- GÃƒÂ¼venlik aÃƒÂ§Ã„Â±Ã„Å¸Ã„Â±nÃ„Â±n aÃƒÂ§Ã„Â±klamasÃ„Â±
-- Yeniden oluÃ…Å¸turma adÃ„Â±mlarÃ„Â±
-- Etkilenen sÃƒÂ¼rÃƒÂ¼m(ler)
-- Potansiyel etki deÃ„Å¸erlendirmesi
+- Güvenlik açığının açıklaması
+- Yeniden oluşturma adımları
+- Etkilenen sürüm(ler)
+- Potansiyel etki değerlendirmesi
 
 Beklentileriniz:
 
-- 48 saat iÃƒÂ§inde **onay**
-- 7 gÃƒÂ¼n iÃƒÂ§inde **durum gÃƒÂ¼ncellemesi**
-- Kritik sorunlar iÃƒÂ§in 30 gÃƒÂ¼n iÃƒÂ§inde **dÃƒÂ¼zeltme veya azaltma**
+- 48 saat içinde **onay**
+- 7 gün içinde **durum güncellemesi**
+- Kritik sorunlar için 30 gün içinde **düzeltme veya azaltma**
 
-GÃƒÂ¼venlik aÃƒÂ§Ã„Â±Ã„Å¸Ã„Â± kabul edilirse:
+Güvenlik açığı kabul edilirse:
 
-- SÃƒÂ¼rÃƒÂ¼m notlarÃ„Â±nda size teÃ…Å¸ekkÃƒÂ¼r edeceÃ„Å¸iz (anonim kalmayÃ„Â± tercih etmiyorsanÃ„Â±z)
-- Sorunu zamanÃ„Â±nda dÃƒÂ¼zelteceÃ„Å¸iz
-- AÃƒÂ§Ã„Â±klama zamanlamasÃ„Â±nÃ„Â± sizinle koordine edeceÃ„Å¸iz
+- Sürüm notlarında size teşekkür edeceğiz (anonim kalmayı tercih etmiyorsanız)
+- Sorunu zamanında düzelteceğiz
+- Açıklama zamanlamasını sizinle koordine edeceğiz
 
-GÃƒÂ¼venlik aÃƒÂ§Ã„Â±Ã„Å¸Ã„Â± reddedilirse, nedenini aÃƒÂ§Ã„Â±klayacaÃ„Å¸Ã„Â±z ve baÃ…Å¸ka bir yere bildirilmesi gerekip gerekmediÃ„Å¸i konusunda rehberlik saÃ„Å¸layacaÃ„Å¸Ã„Â±z.
+Güvenlik açığı reddedilirse, nedenini açıklayacağız ve başka bir yere bildirilmesi gerekip gerekmediği konusunda rehberlik sağlayacağız.
 
 ## Kapsam
 
-Bu politika aÃ…Å¸aÃ„Å¸Ã„Â±dakileri kapsar:
+Bu politika aşağıdakileri kapsar:
 
-- ECC eklentisi ve bu depodaki tÃƒÂ¼m script'ler
-- Makinenizde ÃƒÂ§alÃ„Â±Ã…Å¸an hook script'leri
-- Install/uninstall/repair yaÃ…Å¸am dÃƒÂ¶ngÃƒÂ¼sÃƒÂ¼ script'leri
-- ECC ile birlikte gelen MCP konfigÃƒÂ¼rasyonlarÃ„Â±
-- AgentShield gÃƒÂ¼venlik tarayÃ„Â±cÃ„Â±sÃ„Â± ([github.com/affaan-m/agentshield](https://github.com/affaan-m/agentshield))
+- ECC eklentisi ve bu depodaki tüm script'ler
+- Makinenizde çalışan hook script'leri
+- Install/uninstall/repair yaşam döngüsü script'leri
+- ECC ile birlikte gelen MCP konfigürasyonları
+- AgentShield güvenlik tarayıcısı ([github.com/affaan-m/agentshield](https://github.com/affaan-m/agentshield))
 
-## GÃƒÂ¼venlik KaynaklarÃ„Â±
+## Güvenlik Kaynakları
 
-- **AgentShield**: Agent konfigÃƒÂ¼rasyonunuzu gÃƒÂ¼venlik aÃƒÂ§Ã„Â±klarÃ„Â± iÃƒÂ§in tarayÃ„Â±n Ã¢â‚¬â€ `npx ecc-agentshield scan`
-- **GÃƒÂ¼venlik KÃ„Â±lavuzu**: [The Shorthand Guide to Everything Agentic Security](./the-security-guide.md)
+- **AgentShield**: Agent konfigürasyonunuzu güvenlik açıkları için tarayın — `npx ecc-agentshield scan`
+- **Güvenlik Kılavuzu**: [The Shorthand Guide to Everything Agentic Security](./the-security-guide.md)
 - **OWASP MCP Top 10**: [owasp.org/www-project-mcp-top-10](https://owasp.org/www-project-mcp-top-10/)
 - **OWASP Agentic Applications Top 10**: [genai.owasp.org](https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/)

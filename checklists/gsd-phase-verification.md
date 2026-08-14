@@ -1,4 +1,4 @@
-﻿# GSD Phase Verification Checklist
+# GSD Phase Verification Checklist
 
 - [ ] Phase acceptance criteria are checked.
 - [ ] Endpoint registration is verified where relevant.

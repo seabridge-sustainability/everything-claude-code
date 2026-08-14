@@ -1,4 +1,4 @@
-﻿---
+---
 name: speckit-clarify
 description: Resolve high-impact ambiguity in the active feature spec before planning, then record the answers in `spec.md`.
 ---

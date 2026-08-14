@@ -1,4 +1,4 @@
-﻿---
+---
 name: speckit-specify
 description: Create `.specify/specs/<feature-id>/spec.md` focused on what and why, not implementation.
 ---

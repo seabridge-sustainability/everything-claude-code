@@ -1,7 +1,8 @@
 ---
 name: swift-protocol-di-testing
-description: Protocol-based dependency injection for testable Swift code Ã¢â‚¬â€ mock file system, network, and external APIs using focused protocols and Swift Testing.
-origin: ECC
+description: Protocol-based dependency injection for testable Swift code — mock file system, network, and external APIs using focused protocols and Swift Testing. Use when Swift code needs testing and file system, network, or external APIs must be mocked.
+metadata:
+  origin: ECC
 ---
 
 # Swift Protocol-Based Dependency Injection for Testing
@@ -21,7 +22,6 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
-
 
 Patterns for making Swift code testable by abstracting external dependencies (file system, network, iCloud) behind small, focused protocols. Enables deterministic tests without I/O.
 
@@ -185,7 +185,7 @@ func testReadError() async {
 
 ## Best Practices
 
-- **Single Responsibility**: Each protocol should handle one concern Ã¢â‚¬â€ don't create "god protocols" with many methods
+- **Single Responsibility**: Each protocol should handle one concern — don't create "god protocols" with many methods
 - **Sendable conformance**: Required when protocols are used across actor boundaries
 - **Default parameters**: Let production code use real implementations by default; only tests need to specify mocks
 - **Error simulation**: Design mocks with configurable error properties for testing failure paths

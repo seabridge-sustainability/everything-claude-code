@@ -3,7 +3,7 @@ name: clickhouse-io
 description: ClickHouse database patterns, query optimization, analytics, and data engineering best practices for high-performance analytical workloads.
 ---
 
-# ClickHouse Ã¥Ë†â€ Ã¦Å¾ÂÃ£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³
+# ClickHouse 分析パターン
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -21,23 +21,22 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
+高性能分析とデータエンジニアリングのためのClickHouse固有のパターン。
 
-Ã©Â«ËœÃ¦â‚¬Â§Ã¨Æ’Â½Ã¥Ë†â€ Ã¦Å¾ÂÃ£ÂÂ¨Ã£Æ’â€¡Ã£Æ’Â¼Ã£â€šÂ¿Ã£â€šÂ¨Ã£Æ’Â³Ã£â€šÂ¸Ã£Æ’â€¹Ã£â€šÂ¢Ã£Æ’ÂªÃ£Æ’Â³Ã£â€šÂ°Ã£ÂÂ®Ã£ÂÅ¸Ã£â€šÂÃ£ÂÂ®ClickHouseÃ¥â€ºÂºÃ¦Å“â€°Ã£ÂÂ®Ã£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³Ã£â‚¬â€š
+## 概要
 
-## Ã¦Â¦â€šÃ¨Â¦Â
+ClickHouseは、オンライン分析処理（OLAP）用のカラム指向データベース管理システム（DBMS）です。大規模データセットに対する高速分析クエリに最適化されています。
 
-ClickHouseÃ£ÂÂ¯Ã£â‚¬ÂÃ£â€šÂªÃ£Æ’Â³Ã£Æ’Â©Ã£â€šÂ¤Ã£Æ’Â³Ã¥Ë†â€ Ã¦Å¾ÂÃ¥â€¡Â¦Ã§Ââ€ Ã¯Â¼Ë†OLAPÃ¯Â¼â€°Ã§â€Â¨Ã£ÂÂ®Ã£â€šÂ«Ã£Æ’Â©Ã£Æ’Â Ã¦Å’â€¡Ã¥Ââ€˜Ã£Æ’â€¡Ã£Æ’Â¼Ã£â€šÂ¿Ã£Æ’â„¢Ã£Æ’Â¼Ã£â€šÂ¹Ã§Â®Â¡Ã§Ââ€ Ã£â€šÂ·Ã£â€šÂ¹Ã£Æ’â€ Ã£Æ’Â Ã¯Â¼Ë†DBMSÃ¯Â¼â€°Ã£ÂÂ§Ã£Ââ„¢Ã£â‚¬â€šÃ¥Â¤Â§Ã¨Â¦ÂÃ¦Â¨Â¡Ã£Æ’â€¡Ã£Æ’Â¼Ã£â€šÂ¿Ã£â€šÂ»Ã£Æ’Æ’Ã£Æ’Ë†Ã£ÂÂ«Ã¥Â¯Â¾Ã£Ââ„¢Ã£â€šâ€¹Ã©Â«ËœÃ©â‚¬Å¸Ã¥Ë†â€ Ã¦Å¾ÂÃ£â€šÂ¯Ã£â€šÂ¨Ã£Æ’ÂªÃ£ÂÂ«Ã¦Å“â‚¬Ã©ÂÂ©Ã¥Å’â€“Ã£Ââ€¢Ã£â€šÅ’Ã£ÂÂ¦Ã£Ââ€žÃ£ÂÂ¾Ã£Ââ„¢Ã£â‚¬â€š
+**主な機能:**
+- カラム指向ストレージ
+- データ圧縮
+- 並列クエリ実行
+- 分散クエリ
+- リアルタイム分析
 
-**Ã¤Â¸Â»Ã£ÂÂªÃ¦Â©Å¸Ã¨Æ’Â½:**
-- Ã£â€šÂ«Ã£Æ’Â©Ã£Æ’Â Ã¦Å’â€¡Ã¥Ââ€˜Ã£â€šÂ¹Ã£Æ’Ë†Ã£Æ’Â¬Ã£Æ’Â¼Ã£â€šÂ¸
-- Ã£Æ’â€¡Ã£Æ’Â¼Ã£â€šÂ¿Ã¥Å“Â§Ã§Â¸Â®
-- Ã¤Â¸Â¦Ã¥Ë†â€”Ã£â€šÂ¯Ã£â€šÂ¨Ã£Æ’ÂªÃ¥Â®Å¸Ã¨Â¡Å’
-- Ã¥Ë†â€ Ã¦â€¢Â£Ã£â€šÂ¯Ã£â€šÂ¨Ã£Æ’Âª
-- Ã£Æ’ÂªÃ£â€šÂ¢Ã£Æ’Â«Ã£â€šÂ¿Ã£â€šÂ¤Ã£Æ’Â Ã¥Ë†â€ Ã¦Å¾Â
+## テーブル設計パターン
 
-## Ã£Æ’â€ Ã£Æ’Â¼Ã£Æ’â€“Ã£Æ’Â«Ã¨Â¨Â­Ã¨Â¨Ë†Ã£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³
-
-### MergeTreeÃ£â€šÂ¨Ã£Æ’Â³Ã£â€šÂ¸Ã£Æ’Â³Ã¯Â¼Ë†Ã¦Å“â‚¬Ã£â€šâ€šÃ¤Â¸â‚¬Ã¨Ë†Â¬Ã§Å¡â€žÃ¯Â¼â€°
+### MergeTreeエンジン（最も一般的）
 
 ```sql
 CREATE TABLE markets_analytics (
@@ -55,10 +54,10 @@ ORDER BY (date, market_id)
 SETTINGS index_granularity = 8192;
 ```
 
-### ReplacingMergeTreeÃ¯Â¼Ë†Ã©â€¡ÂÃ¨Â¤â€¡Ã¦Å½â€™Ã©â„¢Â¤Ã¯Â¼â€°
+### ReplacingMergeTree（重複排除）
 
 ```sql
--- Ã©â€¡ÂÃ¨Â¤â€¡Ã£ÂÅ’Ã£Ââ€šÃ£â€šâ€¹Ã¥ÂÂ¯Ã¨Æ’Â½Ã¦â‚¬Â§Ã£ÂÂ®Ã£Ââ€šÃ£â€šâ€¹Ã£Æ’â€¡Ã£Æ’Â¼Ã£â€šÂ¿Ã¯Â¼Ë†Ã¨Â¤â€¡Ã¦â€¢Â°Ã£ÂÂ®Ã£â€šÂ½Ã£Æ’Â¼Ã£â€šÂ¹Ã£Ââ€¹Ã£â€šâ€°Ã£ÂÂªÃ£ÂÂ©Ã¯Â¼â€°Ã§â€Â¨
+-- 重複がある可能性のあるデータ（複数のソースからなど）用
 CREATE TABLE user_events (
     event_id String,
     user_id String,
@@ -71,10 +70,10 @@ ORDER BY (user_id, event_id, timestamp)
 PRIMARY KEY (user_id, event_id);
 ```
 
-### AggregatingMergeTreeÃ¯Â¼Ë†Ã¤Âºâ€¹Ã¥â€°ÂÃ©â€ºâ€ Ã¨Â¨Ë†Ã¯Â¼â€°
+### AggregatingMergeTree（事前集計）
 
 ```sql
--- Ã©â€ºâ€ Ã¨Â¨Ë†Ã£Æ’Â¡Ã£Æ’Ë†Ã£Æ’ÂªÃ£â€šÂ¯Ã£â€šÂ¹Ã£ÂÂ®Ã§Â¶Â­Ã¦Å’ÂÃ§â€Â¨
+-- 集計メトリクスの維持用
 CREATE TABLE market_stats_hourly (
     hour DateTime,
     market_id String,
@@ -85,7 +84,7 @@ CREATE TABLE market_stats_hourly (
 PARTITION BY toYYYYMM(hour)
 ORDER BY (hour, market_id);
 
--- Ã©â€ºâ€ Ã¨Â¨Ë†Ã£Æ’â€¡Ã£Æ’Â¼Ã£â€šÂ¿Ã£ÂÂ®Ã£â€šÂ¯Ã£â€šÂ¨Ã£Æ’Âª
+-- 集計データのクエリ
 SELECT
     hour,
     market_id,
@@ -98,12 +97,12 @@ GROUP BY hour, market_id
 ORDER BY hour DESC;
 ```
 
-## Ã£â€šÂ¯Ã£â€šÂ¨Ã£Æ’ÂªÃ¦Å“â‚¬Ã©ÂÂ©Ã¥Å’â€“Ã£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³
+## クエリ最適化パターン
 
-### Ã¥Å Â¹Ã§Å½â€¡Ã§Å¡â€žÃ£ÂÂªÃ£Æ’â€¢Ã£â€šÂ£Ã£Æ’Â«Ã£â€šÂ¿Ã£Æ’ÂªÃ£Æ’Â³Ã£â€šÂ°
+### 効率的なフィルタリング
 
 ```sql
--- PASS: Ã¨â€°Â¯Ã£Ââ€ž: Ã£â€šÂ¤Ã£Æ’Â³Ã£Æ’â€¡Ã£Æ’Æ’Ã£â€šÂ¯Ã£â€šÂ¹Ã¥Ë†â€”Ã£â€šâ€™Ã¦Å“â‚¬Ã¥Ë†ÂÃ£ÂÂ«Ã¤Â½Â¿Ã§â€Â¨
+-- PASS: 良い: インデックス列を最初に使用
 SELECT *
 FROM markets_analytics
 WHERE date >= '2025-01-01'
@@ -112,7 +111,7 @@ WHERE date >= '2025-01-01'
 ORDER BY date DESC
 LIMIT 100;
 
--- FAIL: Ã¦â€šÂªÃ£Ââ€ž: Ã£â€šÂ¤Ã£Æ’Â³Ã£Æ’â€¡Ã£Æ’Æ’Ã£â€šÂ¯Ã£â€šÂ¹Ã£ÂÂ®Ã£ÂÂªÃ£Ââ€žÃ¥Ë†â€”Ã£â€šâ€™Ã¦Å“â‚¬Ã¥Ë†ÂÃ£ÂÂ«Ã£Æ’â€¢Ã£â€šÂ£Ã£Æ’Â«Ã£â€šÂ¿Ã£Æ’ÂªÃ£Æ’Â³Ã£â€šÂ°
+-- FAIL: 悪い: インデックスのない列を最初にフィルタリング
 SELECT *
 FROM markets_analytics
 WHERE volume > 1000
@@ -120,10 +119,10 @@ WHERE volume > 1000
   AND date >= '2025-01-01';
 ```
 
-### Ã©â€ºâ€ Ã¨Â¨Ë†
+### 集計
 
 ```sql
--- PASS: Ã¨â€°Â¯Ã£Ââ€ž: ClickHouseÃ¥â€ºÂºÃ¦Å“â€°Ã£ÂÂ®Ã©â€ºâ€ Ã¨Â¨Ë†Ã©â€“Â¢Ã¦â€¢Â°Ã£â€šâ€™Ã¤Â½Â¿Ã§â€Â¨
+-- PASS: 良い: ClickHouse固有の集計関数を使用
 SELECT
     toStartOfDay(created_at) AS day,
     market_id,
@@ -136,7 +135,7 @@ WHERE created_at >= today() - INTERVAL 7 DAY
 GROUP BY day, market_id
 ORDER BY day DESC, total_volume DESC;
 
--- PASS: Ã£Æ’â€˜Ã£Æ’Â¼Ã£â€šÂ»Ã£Æ’Â³Ã£â€šÂ¿Ã£â€šÂ¤Ã£Æ’Â«Ã£ÂÂ«Ã£ÂÂ¯quantileÃ£â€šâ€™Ã¤Â½Â¿Ã§â€Â¨Ã¯Â¼Ë†percentileÃ£â€šË†Ã£â€šÅ Ã¥Å Â¹Ã§Å½â€¡Ã§Å¡â€žÃ¯Â¼â€°
+-- PASS: パーセンタイルにはquantileを使用（percentileより効率的）
 SELECT
     quantile(0.50)(trade_size) AS median,
     quantile(0.95)(trade_size) AS p95,
@@ -145,10 +144,10 @@ FROM trades
 WHERE created_at >= now() - INTERVAL 1 HOUR;
 ```
 
-### Ã£â€šÂ¦Ã£â€šÂ£Ã£Æ’Â³Ã£Æ’â€°Ã£â€šÂ¦Ã©â€“Â¢Ã¦â€¢Â°
+### ウィンドウ関数
 
 ```sql
--- Ã§Â´Â¯Ã¨Â¨Ë†Ã¨Â¨Ë†Ã§Â®â€”
+-- 累計計算
 SELECT
     date,
     market_id,
@@ -163,71 +162,72 @@ WHERE date >= today() - INTERVAL 30 DAY
 ORDER BY market_id, date;
 ```
 
-## Ã£Æ’â€¡Ã£Æ’Â¼Ã£â€šÂ¿Ã¦Å’Â¿Ã¥â€¦Â¥Ã£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³
+## データ挿入パターン
 
-### Ã¤Â¸â‚¬Ã¦â€¹Â¬Ã¦Å’Â¿Ã¥â€¦Â¥Ã¯Â¼Ë†Ã¦Å½Â¨Ã¥Â¥Â¨Ã¯Â¼â€°
+### 一括挿入（推奨）
 
 ```typescript
-import { ClickHouse } from 'clickhouse'
+import { createClient } from '@clickhouse/client'
 
-const clickhouse = new ClickHouse({
-  url: process.env.CLICKHOUSE_URL,
-  port: 8123,
-  basicAuth: {
-    username: process.env.CLICKHOUSE_USER,
-    password: process.env.CLICKHOUSE_PASSWORD
-  }
+const clickhouse = createClient({
+  url: process.env.CLICKHOUSE_URL ?? 'http://localhost:8123',
+  username: process.env.CLICKHOUSE_USER,
+  password: process.env.CLICKHOUSE_PASSWORD
 })
 
-// PASS: Ã£Æ’ÂÃ£Æ’Æ’Ã£Æ’ÂÃ¦Å’Â¿Ã¥â€¦Â¥Ã¯Â¼Ë†Ã¥Å Â¹Ã§Å½â€¡Ã§Å¡â€žÃ¯Â¼â€°
+// PASS: バッチ挿入（効率的）
 async function bulkInsertTrades(trades: Trade[]) {
-  const values = trades.map(trade => `(
-    '${trade.id}',
-    '${trade.market_id}',
-    '${trade.user_id}',
-    ${trade.amount},
-    '${trade.timestamp.toISOString()}'
-  )`).join(',')
-
-  await clickhouse.query(`
-    INSERT INTO trades (id, market_id, user_id, amount, timestamp)
-    VALUES ${values}
-  `).toPromise()
+  await clickhouse.insert({
+    table: 'trades',
+    values: trades.map(trade => ({
+      id: trade.id,
+      market_id: trade.market_id,
+      user_id: trade.user_id,
+      amount: trade.amount,
+      timestamp: trade.timestamp.toISOString()
+    })),
+    format: 'JSONEachRow'
+  })
 }
 
-// FAIL: Ã¥â‚¬â€¹Ã¥Ë†Â¥Ã¦Å’Â¿Ã¥â€¦Â¥Ã¯Â¼Ë†Ã¤Â½Å½Ã©â‚¬Å¸Ã¯Â¼â€°
+// FAIL: 個別挿入（低速）
 async function insertTrade(trade: Trade) {
-  // Ã£Æ’Â«Ã£Æ’Â¼Ã£Æ’â€”Ã¥â€ â€¦Ã£ÂÂ§Ã£Ââ€œÃ£â€šÅ’Ã£â€šâ€™Ã£Ââ€”Ã£ÂÂªÃ£Ââ€žÃ£ÂÂ§Ã£ÂÂÃ£ÂÂ Ã£Ââ€¢Ã£Ââ€žÃ¯Â¼Â
-  await clickhouse.query(`
-    INSERT INTO trades VALUES ('${trade.id}', ...)
-  `).toPromise()
+  // ループ内でこれをしないでください！
+  await clickhouse.insert({
+    table: 'trades',
+    values: [{
+      id: trade.id,
+      market_id: trade.market_id,
+      user_id: trade.user_id,
+      amount: trade.amount,
+      timestamp: trade.timestamp.toISOString()
+    }],
+    format: 'JSONEachRow'
+  })
 }
 ```
 
-### Ã£â€šÂ¹Ã£Æ’Ë†Ã£Æ’ÂªÃ£Æ’Â¼Ã£Æ’Å¸Ã£Æ’Â³Ã£â€šÂ°Ã¦Å’Â¿Ã¥â€¦Â¥
+### ストリーミング挿入
 
 ```typescript
-// Ã§Â¶â„¢Ã§Â¶Å¡Ã§Å¡â€žÃ£ÂÂªÃ£Æ’â€¡Ã£Æ’Â¼Ã£â€šÂ¿Ã¥Ââ€“Ã£â€šÅ Ã¨Â¾Â¼Ã£ÂÂ¿Ã§â€Â¨
-import { createWriteStream } from 'fs'
-import { pipeline } from 'stream/promises'
+// 継続的なデータ取り込み用
+import { Readable } from 'node:stream'
 
-async function streamInserts() {
-  const stream = clickhouse.insert('trades').stream()
-
-  for await (const batch of dataSource) {
-    stream.write(batch)
-  }
-
-  await stream.end()
+async function streamInserts(dataSource: AsyncIterable<Record<string, unknown>>) {
+  await clickhouse.insert({
+    table: 'trades',
+    values: Readable.from(dataSource, { objectMode: true }),
+    format: 'JSONEachRow'
+  })
 }
 ```
 
-## Ã£Æ’Å¾Ã£Æ’â€ Ã£Æ’ÂªÃ£â€šÂ¢Ã£Æ’Â©Ã£â€šÂ¤Ã£â€šÂºÃ£Æ’â€°Ã£Æ’â€œÃ£Æ’Â¥Ã£Æ’Â¼
+## マテリアライズドビュー
 
-### Ã£Æ’ÂªÃ£â€šÂ¢Ã£Æ’Â«Ã£â€šÂ¿Ã£â€šÂ¤Ã£Æ’Â Ã©â€ºâ€ Ã¨Â¨Ë†
+### リアルタイム集計
 
 ```sql
--- Ã¦â„¢â€šÃ©â€“â€œÃ¥Ë†Â¥Ã§ÂµÂ±Ã¨Â¨Ë†Ã£ÂÂ®Ã£Æ’Å¾Ã£Æ’â€ Ã£Æ’ÂªÃ£â€šÂ¢Ã£Æ’Â©Ã£â€šÂ¤Ã£â€šÂºÃ£Æ’â€°Ã£Æ’â€œÃ£Æ’Â¥Ã£Æ’Â¼Ã£â€šâ€™Ã¤Â½Å“Ã¦Ë†Â
+-- 時間別統計のマテリアライズドビューを作成
 CREATE MATERIALIZED VIEW market_stats_hourly_mv
 TO market_stats_hourly
 AS SELECT
@@ -239,7 +239,7 @@ AS SELECT
 FROM trades
 GROUP BY hour, market_id;
 
--- Ã£Æ’Å¾Ã£Æ’â€ Ã£Æ’ÂªÃ£â€šÂ¢Ã£Æ’Â©Ã£â€šÂ¤Ã£â€šÂºÃ£Æ’â€°Ã£Æ’â€œÃ£Æ’Â¥Ã£Æ’Â¼Ã£ÂÂ®Ã£â€šÂ¯Ã£â€šÂ¨Ã£Æ’Âª
+-- マテリアライズドビューのクエリ
 SELECT
     hour,
     market_id,
@@ -251,12 +251,12 @@ WHERE hour >= now() - INTERVAL 24 HOUR
 GROUP BY hour, market_id;
 ```
 
-## Ã£Æ’â€˜Ã£Æ’â€¢Ã£â€šÂ©Ã£Æ’Â¼Ã£Æ’Å¾Ã£Æ’Â³Ã£â€šÂ¹Ã£Æ’Â¢Ã£Æ’â€¹Ã£â€šÂ¿Ã£Æ’ÂªÃ£Æ’Â³Ã£â€šÂ°
+## パフォーマンスモニタリング
 
-### Ã£â€šÂ¯Ã£â€šÂ¨Ã£Æ’ÂªÃ£Æ’â€˜Ã£Æ’â€¢Ã£â€šÂ©Ã£Æ’Â¼Ã£Æ’Å¾Ã£Æ’Â³Ã£â€šÂ¹
+### クエリパフォーマンス
 
 ```sql
--- Ã¤Â½Å½Ã©â‚¬Å¸Ã£â€šÂ¯Ã£â€šÂ¨Ã£Æ’ÂªÃ£â€šâ€™Ã£Æ’ÂÃ£â€šÂ§Ã£Æ’Æ’Ã£â€šÂ¯
+-- 低速クエリをチェック
 SELECT
     query_id,
     user,
@@ -273,10 +273,10 @@ ORDER BY query_duration_ms DESC
 LIMIT 10;
 ```
 
-### Ã£Æ’â€ Ã£Æ’Â¼Ã£Æ’â€“Ã£Æ’Â«Ã§ÂµÂ±Ã¨Â¨Ë†
+### テーブル統計
 
 ```sql
--- Ã£Æ’â€ Ã£Æ’Â¼Ã£Æ’â€“Ã£Æ’Â«Ã£â€šÂµÃ£â€šÂ¤Ã£â€šÂºÃ£â€šâ€™Ã£Æ’ÂÃ£â€šÂ§Ã£Æ’Æ’Ã£â€šÂ¯
+-- テーブルサイズをチェック
 SELECT
     database,
     table,
@@ -289,12 +289,12 @@ GROUP BY database, table
 ORDER BY sum(bytes) DESC;
 ```
 
-## Ã¤Â¸â‚¬Ã¨Ë†Â¬Ã§Å¡â€žÃ£ÂÂªÃ¥Ë†â€ Ã¦Å¾ÂÃ£â€šÂ¯Ã£â€šÂ¨Ã£Æ’Âª
+## 一般的な分析クエリ
 
-### Ã¦â„¢â€šÃ§Â³Â»Ã¥Ë†â€”Ã¥Ë†â€ Ã¦Å¾Â
+### 時系列分析
 
 ```sql
--- Ã¦â€”Â¥Ã¦Â¬Â¡Ã£â€šÂ¢Ã£â€šÂ¯Ã£Æ’â€ Ã£â€šÂ£Ã£Æ’â€“Ã£Æ’Â¦Ã£Æ’Â¼Ã£â€šÂ¶Ã£Æ’Â¼
+-- 日次アクティブユーザー
 SELECT
     toDate(timestamp) AS date,
     uniq(user_id) AS daily_active_users
@@ -303,7 +303,7 @@ WHERE timestamp >= today() - INTERVAL 30 DAY
 GROUP BY date
 ORDER BY date;
 
--- Ã£Æ’ÂªÃ£Æ’â€ Ã£Æ’Â³Ã£â€šÂ·Ã£Æ’Â§Ã£Æ’Â³Ã¥Ë†â€ Ã¦Å¾Â
+-- リテンション分析
 SELECT
     signup_date,
     countIf(days_since_signup = 0) AS day_0,
@@ -323,10 +323,10 @@ GROUP BY signup_date
 ORDER BY signup_date DESC;
 ```
 
-### Ã£Æ’â€¢Ã£â€šÂ¡Ã£Æ’ÂÃ£Æ’Â«Ã¥Ë†â€ Ã¦Å¾Â
+### ファネル分析
 
 ```sql
--- Ã£â€šÂ³Ã£Æ’Â³Ã£Æ’ÂÃ£Æ’Â¼Ã£â€šÂ¸Ã£Æ’Â§Ã£Æ’Â³Ã£Æ’â€¢Ã£â€šÂ¡Ã£Æ’ÂÃ£Æ’Â«
+-- コンバージョンファネル
 SELECT
     countIf(step = 'viewed_market') AS viewed,
     countIf(step = 'clicked_trade') AS clicked,
@@ -344,10 +344,10 @@ FROM (
 GROUP BY session_id;
 ```
 
-### Ã£â€šÂ³Ã£Æ’â€ºÃ£Æ’Â¼Ã£Æ’Ë†Ã¥Ë†â€ Ã¦Å¾Â
+### コホート分析
 
 ```sql
--- Ã£â€šÂµÃ£â€šÂ¤Ã£Æ’Â³Ã£â€šÂ¢Ã£Æ’Æ’Ã£Æ’â€”Ã¦Å“Ë†Ã¥Ë†Â¥Ã£ÂÂ®Ã£Æ’Â¦Ã£Æ’Â¼Ã£â€šÂ¶Ã£Æ’Â¼Ã£â€šÂ³Ã£Æ’â€ºÃ£Æ’Â¼Ã£Æ’Ë†
+-- サインアップ月別のユーザーコホート
 SELECT
     toStartOfMonth(signup_date) AS cohort,
     toStartOfMonth(activity_date) AS month,
@@ -364,17 +364,17 @@ GROUP BY cohort, month, months_since_signup
 ORDER BY cohort, months_since_signup;
 ```
 
-## Ã£Æ’â€¡Ã£Æ’Â¼Ã£â€šÂ¿Ã£Æ’â€˜Ã£â€šÂ¤Ã£Æ’â€”Ã£Æ’Â©Ã£â€šÂ¤Ã£Æ’Â³Ã£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³
+## データパイプラインパターン
 
-### ETLÃ£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³
+### ETLパターン
 
 ```typescript
-// Ã¦Å Â½Ã¥â€¡ÂºÃ£â‚¬ÂÃ¥Â¤â€°Ã¦Ââ€ºÃ£â‚¬ÂÃ£Æ’Â­Ã£Æ’Â¼Ã£Æ’â€°
+// 抽出、変換、ロード
 async function etlPipeline() {
-  // 1. Ã£â€šÂ½Ã£Æ’Â¼Ã£â€šÂ¹Ã£Ââ€¹Ã£â€šâ€°Ã¦Å Â½Ã¥â€¡Âº
+  // 1. ソースから抽出
   const rawData = await extractFromPostgres()
 
-  // 2. Ã¥Â¤â€°Ã¦Ââ€º
+  // 2. 変換
   const transformed = rawData.map(row => ({
     date: new Date(row.created_at).toISOString().split('T')[0],
     market_id: row.market_slug,
@@ -382,18 +382,18 @@ async function etlPipeline() {
     trades: parseInt(row.trade_count)
   }))
 
-  // 3. ClickHouseÃ£ÂÂ«Ã£Æ’Â­Ã£Æ’Â¼Ã£Æ’â€°
+  // 3. ClickHouseにロード
   await bulkInsertToClickHouse(transformed)
 }
 
-// Ã¥Â®Å¡Ã¦Å“Å¸Ã§Å¡â€žÃ£ÂÂ«Ã¥Â®Å¸Ã¨Â¡Å’
-setInterval(etlPipeline, 60 * 60 * 1000)  // 1Ã¦â„¢â€šÃ©â€“â€œÃ£Ââ€Ã£ÂÂ¨
+// 定期的に実行
+setInterval(etlPipeline, 60 * 60 * 1000)  // 1時間ごと
 ```
 
-### Ã¥Â¤â€°Ã¦â€ºÂ´Ã£Æ’â€¡Ã£Æ’Â¼Ã£â€šÂ¿Ã£â€šÂ­Ã£Æ’Â£Ã£Æ’â€”Ã£Æ’ÂÃ£Æ’Â£Ã¯Â¼Ë†CDCÃ¯Â¼â€°
+### 変更データキャプチャ（CDC）
 
 ```typescript
-// PostgreSQLÃ£ÂÂ®Ã¥Â¤â€°Ã¦â€ºÂ´Ã£â€šâ€™Ã£Æ’ÂªÃ£Æ’Æ’Ã£â€šÂ¹Ã£Æ’Â³Ã£Ââ€”Ã£ÂÂ¦ClickHouseÃ£ÂÂ«Ã¥ÂÅ’Ã¦Å“Å¸
+// PostgreSQLの変更をリッスンしてClickHouseに同期
 import { Client } from 'pg'
 
 const pgClient = new Client({ connectionString: process.env.DATABASE_URL })
@@ -403,44 +403,48 @@ pgClient.query('LISTEN market_updates')
 pgClient.on('notification', async (msg) => {
   const update = JSON.parse(msg.payload)
 
-  await clickhouse.insert('market_updates', [
-    {
-      market_id: update.id,
-      event_type: update.operation,  // INSERT, UPDATE, DELETE
-      timestamp: new Date(),
-      data: JSON.stringify(update.new_data)
-    }
-  ])
+  await clickhouse.insert({
+    table: 'market_updates',
+    values: [
+      {
+        market_id: update.id,
+        event_type: update.operation,  // INSERT, UPDATE, DELETE
+        timestamp: new Date(),
+        data: JSON.stringify(update.new_data)
+      }
+    ],
+    format: 'JSONEachRow'
+  })
 })
 ```
 
-## Ã£Æ’â„¢Ã£â€šÂ¹Ã£Æ’Ë†Ã£Æ’â€”Ã£Æ’Â©Ã£â€šÂ¯Ã£Æ’â€ Ã£â€šÂ£Ã£â€šÂ¹
+## ベストプラクティス
 
-### 1. Ã£Æ’â€˜Ã£Æ’Â¼Ã£Æ’â€ Ã£â€šÂ£Ã£â€šÂ·Ã£Æ’Â§Ã£Æ’â€¹Ã£Æ’Â³Ã£â€šÂ°Ã¦Ë†Â¦Ã§â€¢Â¥
-- Ã¦â„¢â€šÃ©â€“â€œÃ£ÂÂ§Ã£Æ’â€˜Ã£Æ’Â¼Ã£Æ’â€ Ã£â€šÂ£Ã£â€šÂ·Ã£Æ’Â§Ã£Æ’Â³Ã¥Å’â€“Ã¯Â¼Ë†Ã©â‚¬Å¡Ã¥Â¸Â¸Ã£ÂÂ¯Ã¦Å“Ë†Ã£ÂÂ¾Ã£ÂÅ¸Ã£ÂÂ¯Ã¦â€”Â¥Ã¯Â¼â€°
-- Ã£Æ’â€˜Ã£Æ’Â¼Ã£Æ’â€ Ã£â€šÂ£Ã£â€šÂ·Ã£Æ’Â§Ã£Æ’Â³Ã£ÂÅ’Ã¥Â¤Å¡Ã£Ââ„¢Ã£ÂÅ½Ã£ÂÂªÃ£Ââ€žÃ£â€šË†Ã£Ââ€ Ã£ÂÂ«Ã£Ââ„¢Ã£â€šâ€¹Ã¯Â¼Ë†Ã£Æ’â€˜Ã£Æ’â€¢Ã£â€šÂ©Ã£Æ’Â¼Ã£Æ’Å¾Ã£Æ’Â³Ã£â€šÂ¹Ã£ÂÂ¸Ã£ÂÂ®Ã¥Â½Â±Ã©Å¸Â¿Ã¯Â¼â€°
-- Ã£Æ’â€˜Ã£Æ’Â¼Ã£Æ’â€ Ã£â€šÂ£Ã£â€šÂ·Ã£Æ’Â§Ã£Æ’Â³Ã£â€šÂ­Ã£Æ’Â¼Ã£ÂÂ«Ã£ÂÂ¯DATEÃ£â€šÂ¿Ã£â€šÂ¤Ã£Æ’â€”Ã£â€šâ€™Ã¤Â½Â¿Ã§â€Â¨
+### 1. パーティショニング戦略
+- 時間でパーティション化（通常は月または日）
+- パーティションが多すぎないようにする（パフォーマンスへの影響）
+- パーティションキーにはDATEタイプを使用
 
-### 2. Ã£â€šÂ½Ã£Æ’Â¼Ã£Æ’Ë†Ã£â€šÂ­Ã£Æ’Â¼
-- Ã¦Å“â‚¬Ã£â€šâ€šÃ©Â Â»Ã§Â¹ÂÃ£ÂÂ«Ã£Æ’â€¢Ã£â€šÂ£Ã£Æ’Â«Ã£â€šÂ¿Ã£Æ’ÂªÃ£Æ’Â³Ã£â€šÂ°Ã£Ââ€¢Ã£â€šÅ’Ã£â€šâ€¹Ã¥Ë†â€”Ã£â€šâ€™Ã¦Å“â‚¬Ã¥Ë†ÂÃ£ÂÂ«Ã©â€¦ÂÃ§Â½Â®
-- Ã£â€šÂ«Ã£Æ’Â¼Ã£Æ’â€¡Ã£â€šÂ£Ã£Æ’Å Ã£Æ’ÂªÃ£Æ’â€ Ã£â€šÂ£Ã£â€šâ€™Ã¨â‚¬Æ’Ã¦â€¦Â®Ã¯Â¼Ë†Ã©Â«ËœÃ£â€šÂ«Ã£Æ’Â¼Ã£Æ’â€¡Ã£â€šÂ£Ã£Æ’Å Ã£Æ’ÂªÃ£Æ’â€ Ã£â€šÂ£Ã£â€šâ€™Ã¦Å“â‚¬Ã¥Ë†ÂÃ£ÂÂ«Ã¯Â¼â€°
-- Ã©Â â€ Ã¥ÂºÂÃ£ÂÂ¯Ã¥Å“Â§Ã§Â¸Â®Ã£ÂÂ«Ã¥Â½Â±Ã©Å¸Â¿
+### 2. ソートキー
+- 最も頻繁にフィルタリングされる列を最初に配置
+- カーディナリティを考慮（高カーディナリティを最初に）
+- 順序は圧縮に影響
 
-### 3. Ã£Æ’â€¡Ã£Æ’Â¼Ã£â€šÂ¿Ã£â€šÂ¿Ã£â€šÂ¤Ã£Æ’â€”
-- Ã¦Å“â‚¬Ã¥Â°ÂÃ£ÂÂ®Ã©ÂÂ©Ã¥Ë†â€¡Ã£ÂÂªÃ£â€šÂ¿Ã£â€šÂ¤Ã£Æ’â€”Ã£â€šâ€™Ã¤Â½Â¿Ã§â€Â¨Ã¯Â¼Ë†UInt32 vs UInt64Ã¯Â¼â€°
-- Ã§Â¹Â°Ã£â€šÅ Ã¨Â¿â€Ã£Ââ€¢Ã£â€šÅ’Ã£â€šâ€¹Ã¦â€“â€¡Ã¥Â­â€”Ã¥Ë†â€”Ã£ÂÂ«Ã£ÂÂ¯LowCardinalityÃ£â€šâ€™Ã¤Â½Â¿Ã§â€Â¨
-- Ã£â€šÂ«Ã£Æ’â€ Ã£â€šÂ´Ã£Æ’ÂªÃ£â€šÂ«Ã£Æ’Â«Ã£Æ’â€¡Ã£Æ’Â¼Ã£â€šÂ¿Ã£ÂÂ«Ã£ÂÂ¯EnumÃ£â€šâ€™Ã¤Â½Â¿Ã§â€Â¨
+### 3. データタイプ
+- 最小の適切なタイプを使用（UInt32 vs UInt64）
+- 繰り返される文字列にはLowCardinalityを使用
+- カテゴリカルデータにはEnumを使用
 
-### 4. Ã©ÂÂ¿Ã£Ââ€˜Ã£â€šâ€¹Ã£ÂÂ¹Ã£ÂÂ
-- SELECT *Ã¯Â¼Ë†Ã¥Ë†â€”Ã£â€šâ€™Ã¦Å’â€¡Ã¥Â®Å¡Ã¯Â¼â€°
-- FINALÃ¯Â¼Ë†Ã¤Â»Â£Ã£â€šÂÃ£â€šÅ Ã£ÂÂ«Ã£â€šÂ¯Ã£â€šÂ¨Ã£Æ’ÂªÃ¥â€°ÂÃ£ÂÂ«Ã£Æ’â€¡Ã£Æ’Â¼Ã£â€šÂ¿Ã£â€šâ€™Ã£Æ’Å¾Ã£Æ’Â¼Ã£â€šÂ¸Ã¯Â¼â€°
-- JOINÃ£ÂÅ’Ã¥Â¤Å¡Ã£Ââ„¢Ã£ÂÅ½Ã£â€šâ€¹Ã¯Â¼Ë†Ã¥Ë†â€ Ã¦Å¾ÂÃ§â€Â¨Ã£ÂÂ«Ã©ÂÅ¾Ã¦Â­Â£Ã¨Â¦ÂÃ¥Å’â€“Ã¯Â¼â€°
-- Ã¥Â°ÂÃ£Ââ€¢Ã£ÂÂªÃ©Â Â»Ã§Â¹ÂÃ£ÂÂªÃ¦Å’Â¿Ã¥â€¦Â¥Ã¯Â¼Ë†Ã¤Â»Â£Ã£â€šÂÃ£â€šÅ Ã£ÂÂ«Ã£Æ’ÂÃ£Æ’Æ’Ã£Æ’ÂÃ¥â€¡Â¦Ã§Ââ€ Ã¯Â¼â€°
+### 4. 避けるべき
+- SELECT *（列を指定）
+- FINAL（代わりにクエリ前にデータをマージ）
+- JOINが多すぎる（分析用に非正規化）
+- 小さな頻繁な挿入（代わりにバッチ処理）
 
-### 5. Ã£Æ’Â¢Ã£Æ’â€¹Ã£â€šÂ¿Ã£Æ’ÂªÃ£Æ’Â³Ã£â€šÂ°
-- Ã£â€šÂ¯Ã£â€šÂ¨Ã£Æ’ÂªÃ£Æ’â€˜Ã£Æ’â€¢Ã£â€šÂ©Ã£Æ’Â¼Ã£Æ’Å¾Ã£Æ’Â³Ã£â€šÂ¹Ã£â€šâ€™Ã¨Â¿Â½Ã¨Â·Â¡
-- Ã£Æ’â€¡Ã£â€šÂ£Ã£â€šÂ¹Ã£â€šÂ¯Ã¤Â½Â¿Ã§â€Â¨Ã©â€¡ÂÃ£â€šâ€™Ã§â€ºÂ£Ã¨Â¦â€“
-- Ã£Æ’Å¾Ã£Æ’Â¼Ã£â€šÂ¸Ã¦â€œÂÃ¤Â½Å“Ã£â€šâ€™Ã£Æ’ÂÃ£â€šÂ§Ã£Æ’Æ’Ã£â€šÂ¯
-- Ã¤Â½Å½Ã©â‚¬Å¸Ã£â€šÂ¯Ã£â€šÂ¨Ã£Æ’ÂªÃ£Æ’Â­Ã£â€šÂ°Ã£â€šâ€™Ã£Æ’Â¬Ã£Æ’â€œÃ£Æ’Â¥Ã£Æ’Â¼
+### 5. モニタリング
+- クエリパフォーマンスを追跡
+- ディスク使用量を監視
+- マージ操作をチェック
+- 低速クエリログをレビュー
 
-**Ã¦Â³Â¨Ã¦â€žÂ**: ClickHouseÃ£ÂÂ¯Ã¥Ë†â€ Ã¦Å¾ÂÃ£Æ’Â¯Ã£Æ’Â¼Ã£â€šÂ¯Ã£Æ’Â­Ã£Æ’Â¼Ã£Æ’â€°Ã£ÂÂ«Ã¥â€žÂªÃ£â€šÅ’Ã£ÂÂ¦Ã£Ââ€žÃ£ÂÂ¾Ã£Ââ„¢Ã£â‚¬â€šÃ£â€šÂ¯Ã£â€šÂ¨Ã£Æ’ÂªÃ£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³Ã£ÂÂ«Ã¥ÂË†Ã£â€šÂÃ£Ââ€ºÃ£ÂÂ¦Ã£Æ’â€ Ã£Æ’Â¼Ã£Æ’â€“Ã£Æ’Â«Ã£â€šâ€™Ã¨Â¨Â­Ã¨Â¨Ë†Ã£Ââ€”Ã£â‚¬ÂÃ¦Å’Â¿Ã¥â€¦Â¥Ã£â€šâ€™Ã£Æ’ÂÃ£Æ’Æ’Ã£Æ’ÂÃ¥Å’â€“Ã£Ââ€”Ã£â‚¬ÂÃ£Æ’ÂªÃ£â€šÂ¢Ã£Æ’Â«Ã£â€šÂ¿Ã£â€šÂ¤Ã£Æ’Â Ã©â€ºâ€ Ã¨Â¨Ë†Ã£ÂÂ«Ã£ÂÂ¯Ã£Æ’Å¾Ã£Æ’â€ Ã£Æ’ÂªÃ£â€šÂ¢Ã£Æ’Â©Ã£â€šÂ¤Ã£â€šÂºÃ£Æ’â€°Ã£Æ’â€œÃ£Æ’Â¥Ã£Æ’Â¼Ã£â€šâ€™Ã¦Â´Â»Ã§â€Â¨Ã£Ââ€”Ã£ÂÂ¾Ã£Ââ„¢Ã£â‚¬â€š
+**注意**: ClickHouseは分析ワークロードに優れています。クエリパターンに合わせてテーブルを設計し、挿入をバッチ化し、リアルタイム集計にはマテリアライズドビューを活用します。

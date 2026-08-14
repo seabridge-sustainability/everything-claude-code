@@ -1,6 +1,6 @@
 ---
 name: instinct-status
-description: Ãƒâ€“Ã„Å¸renilen iÃƒÂ§gÃƒÂ¼dÃƒÂ¼leri (proje + global) gÃƒÂ¼ven seviyesiyle gÃƒÂ¶ster
+description: Öğrenilen içgüdüleri (proje + global) güven seviyesiyle göster
 command: true
 ---
 
@@ -22,38 +22,37 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
-
-Mevcut proje iÃƒÂ§in ÃƒÂ¶Ã„Å¸renilen iÃƒÂ§gÃƒÂ¼dÃƒÂ¼leri ve global iÃƒÂ§gÃƒÂ¼dÃƒÂ¼leri, domain'e gÃƒÂ¶re gruplandÃ„Â±rÃ„Â±lmÃ„Â±Ã…Å¸ Ã…Å¸ekilde gÃƒÂ¶sterir.
+Mevcut proje için öğrenilen içgüdüleri ve global içgüdüleri, domain'e göre gruplandırılmış şekilde gösterir.
 
 ## Uygulama
 
-Plugin root path kullanarak instinct CLI'Ã„Â± ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r:
+`hooks/hooks.json` ve diğer slash komutlarının (`/sessions`, `/skill-health`)
+kullandığı çözümleyiciyle (env var → standart kurulum → bilinen plugin
+kökleri → plugin önbelleği → fallback) instinct CLI'ı çalıştır.
+Bu, `CLAUDE_PLUGIN_ROOT` ayarlanmamışken eski bir
+`~/.claude/skills/continuous-learning-v2/` dizini hâlâ varsa oluşan
+yol sapmasını önler (#2037).
 
 ```bash
-python3 "${CLAUDE_PLUGIN_ROOT}/skills/continuous-learning-v2/scripts/instinct-cli.py" status
+ECC_ROOT="${CLAUDE_PLUGIN_ROOT:-$(node -e "var r=(function(){var p=require('path'),f=require('fs'),o=require('os');var e=process.env.CLAUDE_PLUGIN_ROOT;if(e&&e.trim())return e.trim();var d=p.join(o.homedir(),'.claude');function L(x){try{return require(p.join(x,'scripts','lib','resolve-ecc-root')).resolveEccRoot()}catch(_){return null}}var r=L(d);if(r)return r;var s=['ecc','ecc@ecc','marketplaces/ecc','everything-claude-code','everything-claude-code@everything-claude-code','marketplaces/everything-claude-code'];for(var i=0;i<s.length;i++){r=L(p.join(d,'plugins',s[i]));if(r)return r}try{var g=['ecc','everything-claude-code'];for(var j=0;j<g.length;j++){var c=p.join(d,'plugins','cache',g[j]);var O=f.readdirSync(c);for(var k=0;k<O.length;k++){var q=p.join(c,O[k]);var V=f.readdirSync(q);for(var m=0;m<V.length;m++){r=L(p.join(q,V[m]));if(r)return r}}}}catch(_){}return d})();console.log(r)")}"
+python3 "$ECC_ROOT/skills/continuous-learning-v2/scripts/instinct-cli.py" status
 ```
 
-Veya `CLAUDE_PLUGIN_ROOT` ayarlanmamÃ„Â±Ã…Å¸sa (manuel kurulum):
-
-```bash
-python3 ~/.claude/skills/continuous-learning-v2/scripts/instinct-cli.py status
-```
-
-## KullanÃ„Â±m
+## Kullanım
 
 ```
 /instinct-status
 ```
 
-## YapÃ„Â±lacaklar
+## Yapılacaklar
 
-1. Mevcut proje baÃ„Å¸lamÃ„Â±nÃ„Â± tespit et (git remote/path hash)
-2. `~/.claude/homunculus/projects/<project-id>/instincts/` konumundan proje iÃƒÂ§gÃƒÂ¼dÃƒÂ¼lerini oku
-3. `~/.claude/homunculus/instincts/` konumundan global iÃƒÂ§gÃƒÂ¼dÃƒÂ¼leri oku
-4. Ãƒâ€“ncelik kurallarÃ„Â±yla birleÃ…Å¸tir (ID ÃƒÂ§akÃ„Â±Ã…Å¸masÃ„Â±nda proje global'i geÃƒÂ§ersiz kÃ„Â±lar)
-5. Domain'e gÃƒÂ¶re gruplandÃ„Â±rÃ„Â±lmÃ„Â±Ã…Å¸, gÃƒÂ¼ven ÃƒÂ§ubuklarÃ„Â± ve gÃƒÂ¶zlem istatistikleriyle gÃƒÂ¶ster
+1. Mevcut proje bağlamını tespit et (git remote/path hash)
+2. `~/.claude/homunculus/projects/<project-id>/instincts/` konumundan proje içgüdülerini oku
+3. `~/.claude/homunculus/instincts/` konumundan global içgüdüleri oku
+4. Öncelik kurallarıyla birleştir (ID çakışmasında proje global'i geçersiz kılar)
+5. Domain'e göre gruplandırılmış, güven çubukları ve gözlem istatistikleriyle göster
 
-## Ãƒâ€¡Ã„Â±ktÃ„Â± FormatÃ„Â±
+## Çıktı Formatı
 
 ```
 ============================================================
@@ -66,11 +65,11 @@ python3 ~/.claude/skills/continuous-learning-v2/scripts/instinct-cli.py status
 
 ## PROJECT-SCOPED (my-app)
   ### WORKFLOW (3)
-    Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“â€˜Ã¢â€“â€˜Ã¢â€“â€˜  70%  grep-before-edit [project]
+    ███████░░░  70%  grep-before-edit [project]
               trigger: when modifying code
 
 ## GLOBAL (apply to all projects)
   ### SECURITY (2)
-    Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“Ë†Ã¢â€“â€˜  85%  validate-user-input [global]
+    █████████░  85%  validate-user-input [global]
               trigger: when handling user input
 ```

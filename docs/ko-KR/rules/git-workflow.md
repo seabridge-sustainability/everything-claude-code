@@ -1,4 +1,4 @@
-# Git Ã¬â€ºÅ’Ã­ÂÂ¬Ã­â€Å’Ã«Â¡Å“Ã¬Å¡Â°
+# Git 워크플로우
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -16,26 +16,25 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
-
-## Ã¬Â»Â¤Ã«Â°â€¹ Ã«Â©â€Ã¬â€¹Å“Ã¬Â§â‚¬ Ã­Ëœâ€¢Ã¬â€¹Â
+## 커밋 메시지 형식
 ```
 <type>: <description>
 
-<Ã¬â€žÂ Ã­Æ’ÂÃ¬Â Â Ã«Â³Â¸Ã«Â¬Â¸>
+<선택적 본문>
 ```
 
-Ã­Æ’â‚¬Ã¬Å¾â€¦: feat, fix, refactor, docs, test, chore, perf, ci
+타입: feat, fix, refactor, docs, test, chore, perf, ci
 
-Ã¬Â°Â¸ÃªÂ³Â : Ã¬â€“Â´Ã­Å Â¸Ã«Â¦Â¬Ã«Â·Â°Ã¬â€¦Ëœ Ã«Â¹â€žÃ­â„¢Å“Ã¬â€žÂ±Ã­â„¢â€ Ã¬â€”Â¬Ã«Â¶â‚¬Ã«Å â€ ÃªÂ°ÂÃ¬Å¾ÂÃ¬ÂËœ `~/.claude/settings.json` Ã«Â¡Å“Ã¬Â»Â¬ Ã¬â€žÂ¤Ã¬Â â€¢Ã¬â€”Â Ã«â€Â°Ã«ÂÂ¼ Ã«â€¹Â¬Ã«ÂÂ¼Ã¬Â§Ë† Ã¬Ë†Ëœ Ã¬Å¾Ë†Ã¬Å ÂµÃ«â€¹Ë†Ã«â€¹Â¤.
+참고: ECC가 관리하는 설치는 `~/.claude/settings.json`에 `"includeCoAuthoredBy": false`를 설정하므로 커밋에 기본적으로 `Co-Authored-By`가 붙지 않습니다. Claude 표기를 유지하려면 `"includeCoAuthoredBy": true`를 설정하거나 `attribution`을 구성하세요. ECC는 명시적인 선택을 덮어쓰지 않습니다.
 
-## Pull Request Ã¬â€ºÅ’Ã­ÂÂ¬Ã­â€Å’Ã«Â¡Å“Ã¬Å¡Â°
+## Pull Request 워크플로우
 
-PRÃ¬Ââ€ž Ã«Â§Å’Ã«â€œÂ¤ Ã«â€¢Å’:
-1. Ã¬Â â€žÃ¬Â²Â´ Ã¬Â»Â¤Ã«Â°â€¹ Ã­Å¾Ë†Ã¬Å Â¤Ã­â€ Â Ã«Â¦Â¬Ã«Â¥Â¼ Ã«Â¶â€žÃ¬â€žÂ (Ã¬ÂµÅ“Ã¬â€¹Â  Ã¬Â»Â¤Ã«Â°â€¹Ã«Â§Å’Ã¬ÂÂ´ Ã¬â€¢â€žÃ«â€¹Å’)
-2. `git diff [base-branch]...HEAD`Ã«Â¡Å“ Ã«ÂªÂ¨Ã«â€œÂ  Ã«Â³â‚¬ÃªÂ²Â½Ã¬â€šÂ¬Ã­â€¢Â­ Ã­â„¢â€¢Ã¬ÂÂ¸
-3. Ã­ÂÂ¬ÃªÂ´â€žÃ¬Â ÂÃ¬ÂÂ¸ PR Ã¬Å¡â€Ã¬â€¢Â½ Ã¬Å¾â€˜Ã¬â€žÂ±
-4. TODOÃªÂ°â‚¬ Ã­ÂÂ¬Ã­â€¢Â¨Ã«ÂÅ“ Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸ ÃªÂ³â€žÃ­Å¡Â Ã­ÂÂ¬Ã­â€¢Â¨
-5. Ã¬Æ’Ë† Ã«Â¸Å’Ã«Å¾Å“Ã¬Â¹ËœÃ¬ÂÂ¸ ÃªÂ²Â½Ã¬Å¡Â° `-u` Ã­â€Å’Ã«Å¾ËœÃªÂ·Â¸Ã¬â„¢â‚¬ Ã­â€¢Â¨ÃªÂ»Ëœ push
+PR을 만들 때:
+1. 전체 커밋 히스토리를 분석 (최신 커밋만이 아닌)
+2. `git diff [base-branch]...HEAD`로 모든 변경사항 확인
+3. 포괄적인 PR 요약 작성
+4. TODO가 포함된 테스트 계획 포함
+5. 새 브랜치인 경우 `-u` 플래그와 함께 push
 
-> git Ã¬Å¾â€˜Ã¬â€”â€¦ Ã¬Â â€ž Ã¬Â â€žÃ¬Â²Â´ ÃªÂ°Å“Ã«Â°Å“ Ã­â€â€žÃ«Â¡Å“Ã¬â€žÂ¸Ã¬Å Â¤(ÃªÂ³â€žÃ­Å¡Â, TDD, Ã¬Â½â€Ã«â€œÅ“ Ã«Â¦Â¬Ã«Â·Â°)Ã«Å â€
-> [development-workflow.md](./development-workflow.md)Ã«Â¥Â¼ Ã¬Â°Â¸ÃªÂ³Â Ã­â€¢ËœÃ¬â€žÂ¸Ã¬Å¡â€.
+> git 작업 전 전체 개발 프로세스(계획, TDD, 코드 리뷰)는
+> [development-workflow.md](./development-workflow.md)를 참고하세요.

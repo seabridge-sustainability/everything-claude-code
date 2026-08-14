@@ -1,7 +1,8 @@
 ---
 name: team-builder
-description: Interactive agent picker for composing and dispatching parallel teams
-origin: community
+description: Interactive agent picker for composing and dispatching parallel teams. Use when composing and dispatching a parallel team of agents for a task.
+metadata:
+  origin: community
 ---
 
 # Team Builder
@@ -22,7 +23,6 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
-
 Interactive menu for browsing and composing agent teams on demand. Works with flat or domain-subdirectory agent collections.
 
 ## When to Use
@@ -37,59 +37,66 @@ Agent files must be markdown files containing a persona prompt (identity, rules,
 
 Both flat and subdirectory layouts are supported:
 
-**Subdirectory layout** Ã¢â‚¬â€ domain is inferred from the folder name:
+**Subdirectory layout** — domain is inferred from the folder name:
 
 ```
 agents/
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ engineering/
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ security-engineer.md
-Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ software-architect.md
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ marketing/
-Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ seo-specialist.md
-Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ sales/
-    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ discovery-coach.md
+├── engineering/
+│   ├── security-engineer.md
+│   └── software-architect.md
+├── marketing/
+│   └── seo-specialist.md
+└── sales/
+    └── discovery-coach.md
 ```
 
-**Flat layout** Ã¢â‚¬â€ domain inferred from shared filename prefixes. A prefix counts as a domain when 2+ files share it. Files with unique prefixes go to "General". Note: the algorithm splits at the first `-`, so multi-word domains (e.g., `product-management`) should use the subdirectory layout instead:
+**Flat layout** — domain inferred from shared filename prefixes. A prefix counts as a domain when 2+ files share it. Files with unique prefixes go to "General". Note: the algorithm splits at the first `-`, so multi-word domains (e.g., `product-management`) should use the subdirectory layout instead:
 
 ```
 agents/
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ engineering-security-engineer.md
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ engineering-software-architect.md
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ marketing-seo-specialist.md
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ marketing-content-strategist.md
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ sales-discovery-coach.md
-Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ sales-outbound-strategist.md
+├── engineering-security-engineer.md
+├── engineering-software-architect.md
+├── marketing-seo-specialist.md
+├── marketing-content-strategist.md
+├── sales-discovery-coach.md
+└── sales-outbound-strategist.md
 ```
 
 ## Configuration
 
-Agent directories are probed in order and results are merged:
+Agents are discovered via two methods, merged and deduplicated by agent name:
 
-1. `./agents/**/*.md` + `./agents/*.md` Ã¢â‚¬â€ project-local agents (both depths)
-2. `~/.claude/agents/**/*.md` + `~/.claude/agents/*.md` Ã¢â‚¬â€ global agents (both depths)
+1. **`claude agents` command** (primary) — run `claude agents` to get all agents known to the CLI, including user agents, plugin agents (e.g. `ecc:architect`), and built-in agents. This automatically covers ECC marketplace installs without any path configuration.
+2. **File glob** (fallback, for reading agent content) — agent markdown files are read from:
+   - `./agents/**/*.md` + `./agents/*.md` — project-local agents
+   - `~/.claude/agents/**/*.md` + `~/.claude/agents/*.md` — global user agents
 
-Results from all locations are merged and deduplicated by agent name. Project-local agents take precedence over global agents with the same name. A custom path can be used instead if the user specifies one.
+Earlier sources take precedence when names collide: user agents > plugin agents > built-in agents. A custom path can be used instead if the user specifies one.
 
 ## How It Works
 
 ### Step 1: Discover Available Agents
 
-Glob agent directories using the probe order above. Exclude README files. For each file found:
+Run `claude agents` to get the full agent list. Parse each line:
+- **Plugin agents** are prefixed with `plugin-name:` (e.g., `ecc:security-reviewer`). Use the part after `:` as the agent name and the plugin name as the domain.
+- **User agents** have no prefix. Read the corresponding markdown file from `~/.claude/agents/` or `./agents/` to extract the name and description.
+- **Built-in agents** (e.g., `Explore`, `Plan`) are skipped unless the user explicitly asks to include them.
+
+For user agents loaded from markdown files:
 - **Subdirectory layout:** extract the domain from the parent folder name
-- **Flat layout:** collect all filename prefixes (text before the first `-`). A prefix qualifies as a domain only if it appears in 2 or more filenames (e.g., `engineering-security-engineer.md` and `engineering-software-architect.md` both start with `engineering` Ã¢â€ â€™ Engineering domain). Files with unique prefixes (e.g., `code-reviewer.md`, `tdd-guide.md`) are grouped under "General"
+- **Flat layout:** collect all filename prefixes (text before the first `-`). A prefix qualifies as a domain only if it appears in 2 or more filenames (e.g., `engineering-security-engineer.md` and `engineering-software-architect.md` both start with `engineering` → Engineering domain). Files with unique prefixes (e.g., `code-reviewer.md`, `tdd-guide.md`) are grouped under "General"
 - Extract the agent name from the first `# Heading`. If no heading is found, derive the name from the filename (strip `.md`, replace hyphens with spaces, title-case)
 - Extract a one-line summary from the first paragraph after the heading
 
-If no agent files are found after probing all locations, inform the user: "No agent files found. Checked: [list paths probed]. Expected: markdown files in one of those directories." Then stop.
+If no agents are found after running `claude agents` and probing file locations, inform the user: "No agents found. Run `claude agents` to verify your setup." Then stop.
 
 ### Step 2: Present Domain Menu
 
 ```
 Available agent domains:
-1. Engineering Ã¢â‚¬â€ Software Architect, Security Engineer
-2. Marketing Ã¢â‚¬â€ SEO Specialist
-3. Sales Ã¢â‚¬â€ Discovery Coach, Outbound Strategist
+1. Engineering — Software Architect, Security Engineer
+2. Marketing — SEO Specialist
+3. Sales — Discovery Coach, Outbound Strategist
 
 Pick domains or name specific agents (e.g., "1,3" or "security + seo"):
 ```
@@ -119,8 +126,8 @@ What should they work on? (describe the task):
 3. Spawn all agents in parallel using the Agent tool:
    - `subagent_type: "general-purpose"`
    - `prompt: "{agent file content}\n\nTask: {task description}"`
-   - Each agent runs independently Ã¢â‚¬â€ no inter-agent communication needed
-4. If an agent fails (error, timeout, or empty output), note the failure inline (e.g., "Security Engineer: failed Ã¢â‚¬â€ [reason]") and continue with results from agents that succeeded
+   - Each agent runs independently — no inter-agent communication needed
+4. If an agent fails (error, timeout, or empty output), note the failure inline (e.g., "Security Engineer: failed — [reason]") and continue with results from agents that succeeded
 
 ### Step 5: Synthesize Results
 
@@ -137,7 +144,7 @@ If only 1 agent was selected, skip synthesis and present the output directly.
 
 - **Dynamic discovery only.** Never hardcode agent lists. New files in the directory auto-appear in the menu.
 - **Max 5 agents per team.** More than 5 produces diminishing returns and excessive token usage. Enforce at selection time.
-- **Parallel dispatch.** All agents run simultaneously Ã¢â‚¬â€ use the Agent tool's parallel invocation pattern.
+- **Parallel dispatch.** All agents run simultaneously — use the Agent tool's parallel invocation pattern.
 - **Parallel Agent calls, not TeamCreate.** This skill uses parallel Agent tool calls for independent work. TeamCreate (a Claude Code tool for multi-agent dialogue) is only needed when agents must debate or respond to each other.
 
 ## Examples
@@ -147,10 +154,10 @@ User: team builder
 
 Claude:
 Available agent domains:
-1. Engineering (2) Ã¢â‚¬â€ Software Architect, Security Engineer
-2. Marketing (1) Ã¢â‚¬â€ SEO Specialist
-3. Sales (4) Ã¢â‚¬â€ Discovery Coach, Outbound Strategist, Proposal Strategist, Sales Engineer
-4. Support (1) Ã¢â‚¬â€ Executive Summary
+1. Engineering (2) — Software Architect, Security Engineer
+2. Marketing (1) — SEO Specialist
+3. Sales (4) — Discovery Coach, Outbound Strategist, Proposal Strategist, Sales Engineer
+4. Support (1) — Executive Summary
 
 Pick domains or name specific agents:
 

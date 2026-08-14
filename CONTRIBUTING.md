@@ -24,6 +24,7 @@ Thanks for wanting to contribute! This repo is a community resource for Claude C
 - [What We're Looking For](#what-were-looking-for)
 - [Quick Start](#quick-start)
 - [Contributing Skills](#contributing-skills)
+- [Skill Adaptation Policy](#skill-adaptation-policy)
 - [Contributing Agents](#contributing-agents)
 - [Contributing Hooks](#contributing-hooks)
 - [Contributing Commands](#contributing-commands)
@@ -68,8 +69,8 @@ Slash commands that invoke useful workflows:
 
 ```bash
 # 1. Fork and clone
-gh repo fork affaan-m/everything-claude-code --clone
-cd everything-claude-code
+gh repo fork affaan-m/ECC --clone
+cd ECC
 
 # 2. Create a branch
 git checkout -b feat/my-contribution
@@ -90,7 +91,7 @@ git add . && git commit -m "feat: add my-skill" && git push -u origin feat/my-co
 
 Skills are knowledge modules that Claude Code loads based on context.
 
-> ** Comprehensive Guide:** For detailed guidance on creating effective skills, see [Skill Development Guide](docs/SKILL-DEVELOPMENT-GUIDE.md). It covers:
+> **Comprehensive Guide:** For detailed guidance on creating effective skills, see [Skill Development Guide](docs/SKILL-DEVELOPMENT-GUIDE.md). It covers:
 > - Skill architecture and categories
 > - Writing effective content with examples
 > - Best practices and common patterns
@@ -159,7 +160,18 @@ Link to complementary skills (e.g., `related-skill-1`, `related-skill-2`).
 | **Workflow** | Step-by-step processes | `tdd-workflow`, `refactoring-workflow` |
 | **Domain Knowledge** | Specialized domains | `security-review`, `api-design` |
 | **Tool Integration** | Tool/library usage | `docker-patterns`, `supabase-patterns` |
-| **Template** | Project-specific skill templates | `project-guidelines-example` |
+| **Template** | Project-specific skill templates | `docs/examples/project-guidelines-template.md` |
+
+### Skill Adaptation Policy
+
+If you are porting an idea from another repo, plugin, harness, or personal prompt pack, read [Skill Adaptation Policy](docs/skill-adaptation-policy.md) before opening the PR.
+
+Short version:
+
+- copy the underlying idea, not the external product identity
+- rename the skill when ECC materially changes or expands the surface
+- prefer ECC-native rules, skills, scripts, and MCPs over new default third-party dependencies
+- do not ship a skill whose main value is telling users to install an unvetted package
 
 ### Skill Checklist
 
@@ -172,6 +184,8 @@ Link to complementary skills (e.g., `related-skill-1`, `related-skill-2`).
 - [ ] Tested with Claude Code
 - [ ] Links to related skills
 - [ ] No sensitive data (API keys, tokens, paths)
+- [ ] Frontmatter declares `name:` matching the directory name
+- [ ] Frontmatter `description:` is an inline string or folded (`>`) scalar — not a literal block (`|`, `|-`, or `|+`), which preserves internal newlines and breaks flat-table renderers
 
 ### Example Skills
 
@@ -182,7 +196,7 @@ Link to complementary skills (e.g., `related-skill-1`, `related-skill-2`).
 | `backend-patterns/` | Framework Patterns | API and database patterns |
 | `security-review/` | Domain Knowledge | Security checklist |
 | `tdd-workflow/` | Workflow | Test-driven development process |
-| `project-guidelines-example/` | Template | Project-specific skill template |
+| `docs/examples/project-guidelines-template.md` | Template | Project-specific skill template |
 
 ---
 
@@ -202,7 +216,7 @@ agents/your-agent-name.md
 ---
 name: your-agent-name
 description: What this agent does and when Claude should invoke it. Be specific!
-tools: ["Read", "Write", "Edit", "Bash", "Grep", "Glob"]
+tools: Read, Write, Edit, Bash, Grep, Glob
 model: sonnet
 ---
 
@@ -470,7 +484,19 @@ How you tested this.
 - [ ] Clear descriptions
 ```
 
-### 3. Review Process
+### 3. Before You Push (avoid red CI)
+
+Run `npm test` locally. It is the same gauntlet CI runs, and it catches almost everything below.
+
+- **Changed `package.json`?** If you touched `bin`, `files`, or dependencies, run `yarn install --mode=update-lockfile` and commit the `yarn.lock` change. CI runs Yarn in hardened mode on public PRs and fails if the lockfile would be modified, so a stale `yarn.lock` breaks the build on its own.
+- **Added a skill, command, agent, hook, or CLI tool?** Wire up every surface it belongs to:
+  - `package.json` (`bin` and `files`), `manifests/install-components.json`, `manifests/install-modules.json`, and `agent.yaml`
+  - Regenerate the catalog (`npm run catalog:sync`) and command registry (`npm run command-registry:write`)
+  - Update the docs tables (`README.md`, `COMMANDS-QUICK-REF.md`, `docs/COMMAND-AGENT-MAP.md`)
+  - New script path? Add it to the publish surface allowlist (`tests/scripts/npm-publish-surface.test.js`)
+  - Cross-harness: for Codex, add `.agents/skills/<name>/` plus `agents/openai.yaml`. The Codex frontmatter validator only allows `name`, `description`, `metadata`, `license`, and `allowed-tools`, so drop keys like `version` from that copy.
+
+### 4. Review Process
 
 1. Maintainers review within 48 hours
 2. Address feedback if requested
@@ -505,7 +531,7 @@ How you tested this.
 
 ## Questions?
 
-- **Issues:** [github.com/affaan-m/everything-claude-code/issues](https://github.com/affaan-m/everything-claude-code/issues)
+- **Issues:** [github.com/affaan-m/ECC/issues](https://github.com/affaan-m/ECC/issues)
 - **X/Twitter:** [@affaanmustafa](https://x.com/affaanmustafa)
 
 ---

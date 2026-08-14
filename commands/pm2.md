@@ -1,3 +1,7 @@
+---
+description: Analyze a project and generate PM2 service commands for detected frontend, backend, or database services.
+---
+
 # PM2 Init
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->

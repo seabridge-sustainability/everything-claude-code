@@ -16,7 +16,6 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
-
 Gerencie o fluxo de desenvolvimento orientado por evals.
 
 ## Uso
@@ -27,7 +26,7 @@ Gerencie o fluxo de desenvolvimento orientado por evals.
 
 `/eval define feature-name`
 
-Crie uma nova definiÃƒÂ§ÃƒÂ£o de eval:
+Crie uma nova definição de eval:
 
 1. Crie `.claude/evals/feature-name.md` com o template:
 
@@ -36,18 +35,19 @@ Crie uma nova definiÃƒÂ§ÃƒÂ£o de eval:
 Created: $(date)
 
 ### Evals de Capacidade
-- [ ] [DescriÃƒÂ§ÃƒÂ£o da capacidade 1]
-- [ ] [DescriÃƒÂ§ÃƒÂ£o da capacidade 2]
+- [ ] [Descrição da capacidade 1]
+- [ ] [Descrição da capacidade 2]
 
-### Evals de RegressÃƒÂ£o
+### Evals de Regressão
 - [ ] [Comportamento existente 1 ainda funciona]
 - [ ] [Comportamento existente 2 ainda funciona]
 
-### CritÃƒÂ©rios de Sucesso
+### Critérios de Sucesso
 - pass@3 > 90% para evals de capacidade
-- pass^3 = 100% para evals de regressÃƒÂ£o
+- pass^3 = 100% para evals de regressão
+```
 
-2. PeÃƒÂ§a ao usuÃƒÂ¡rio para preencher os critÃƒÂ©rios especÃƒÂ­ficos
+2. Peça ao usuário para preencher os critérios específicos
 
 ## Verificar Evals
 
@@ -55,12 +55,12 @@ Created: $(date)
 
 Rode evals para uma feature:
 
-1. Leia a definiÃƒÂ§ÃƒÂ£o de eval em `.claude/evals/feature-name.md`
+1. Leia a definição de eval em `.claude/evals/feature-name.md`
 2. Para cada eval de capability:
-   - Tente verificar o critÃƒÂ©rio
+   - Tente verificar o critério
    - Registre PASS/FAIL
    - Salve tentativa em `.claude/evals/feature-name.log`
-3. Para cada eval de regressÃƒÂ£o:
+3. Para cada eval de regressão:
    - Rode os testes relevantes
    - Compare com baseline
    - Registre PASS/FAIL
@@ -74,11 +74,11 @@ Regression: X/Y passing
 Status: IN PROGRESS / READY
 ```
 
-## RelatÃƒÂ³rio de Evals
+## Relatório de Evals
 
 `/eval report feature-name`
 
-Gere relatÃƒÂ³rio completo de eval:
+Gere relatório completo de eval:
 
 ```
 EVAL REPORT: feature-name
@@ -116,7 +116,7 @@ RECOMMENDATION
 
 `/eval list`
 
-Mostre todas as definiÃƒÂ§ÃƒÂµes de eval:
+Mostre todas as definições de eval:
 
 ```
 EVAL DEFINITIONS
@@ -129,8 +129,8 @@ feature-export    [0/4 passing] NOT STARTED
 ## Argumentos
 
 $ARGUMENTS:
-- `define <name>` - Criar nova definiÃƒÂ§ÃƒÂ£o de eval
+- `define <name>` - Criar nova definição de eval
 - `check <name>` - Rodar e verificar evals
-- `report <name>` - Gerar relatÃƒÂ³rio completo
+- `report <name>` - Gerar relatório completo
 - `list` - Mostrar todos os evals
-- `clean` - Remover logs antigos de eval (mantÃƒÂ©m as ÃƒÂºltimas 10 execuÃƒÂ§ÃƒÂµes)
+- `clean` - Remover logs antigos de eval (mantém as últimas 10 execuções)

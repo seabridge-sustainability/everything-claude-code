@@ -1,10 +1,10 @@
 ---
 name: clickhouse-io
-description: ÃªÂ³Â Ã¬â€žÂ±Ã«Å Â¥ Ã«Â¶â€žÃ¬â€žÂ Ã¬â€ºÅ’Ã­ÂÂ¬Ã«Â¡Å“Ã«â€œÅ“Ã«Â¥Â¼ Ã¬Å“â€žÃ­â€¢Å“ ClickHouse Ã«ÂÂ°Ã¬ÂÂ´Ã­â€žÂ°Ã«Â²Â Ã¬ÂÂ´Ã¬Å Â¤ Ã­Å’Â¨Ã­â€žÂ´, Ã¬Â¿Â¼Ã«Â¦Â¬ Ã¬ÂµÅ“Ã¬Â ÂÃ­â„¢â€, Ã«Â¶â€žÃ¬â€žÂ Ã«Â°Â Ã«ÂÂ°Ã¬ÂÂ´Ã­â€žÂ° Ã¬â€”â€Ã¬Â§â‚¬Ã«â€¹Ë†Ã¬â€“Â´Ã«Â§Â Ã«ÂªÂ¨Ã«Â²â€ Ã¬â€šÂ¬Ã«Â¡â‚¬.
+description: 고성능 분석 워크로드를 위한 ClickHouse 데이터베이스 패턴, 쿼리 최적화, 분석 및 데이터 엔지니어링 모범 사례.
 origin: ECC
 ---
 
-# ClickHouse Ã«Â¶â€žÃ¬â€žÂ Ã­Å’Â¨Ã­â€žÂ´
+# ClickHouse 분석 패턴
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -22,32 +22,31 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
+고성능 분석 및 데이터 엔지니어링을 위한 ClickHouse 전용 패턴.
 
-ÃªÂ³Â Ã¬â€žÂ±Ã«Å Â¥ Ã«Â¶â€žÃ¬â€žÂ Ã«Â°Â Ã«ÂÂ°Ã¬ÂÂ´Ã­â€žÂ° Ã¬â€”â€Ã¬Â§â‚¬Ã«â€¹Ë†Ã¬â€“Â´Ã«Â§ÂÃ¬Ââ€ž Ã¬Å“â€žÃ­â€¢Å“ ClickHouse Ã¬Â â€žÃ¬Å¡Â© Ã­Å’Â¨Ã­â€žÂ´.
+## 활성화 시점
 
-## Ã­â„¢Å“Ã¬â€žÂ±Ã­â„¢â€ Ã¬â€¹Å“Ã¬Â Â
+- ClickHouse 테이블 스키마 설계 시 (MergeTree 엔진 선택)
+- 분석 쿼리 작성 시 (집계, 윈도우 함수, 조인)
+- 쿼리 성능 최적화 시 (파티션 프루닝, 프로젝션, 구체화된 뷰)
+- 대량 데이터 수집 시 (배치 삽입, Kafka 통합)
+- PostgreSQL/MySQL에서 ClickHouse로 분석 마이그레이션 시
+- 실시간 대시보드 또는 시계열 분석 구현 시
 
-- ClickHouse Ã­â€¦Å’Ã¬ÂÂ´Ã«Â¸â€ Ã¬Å Â¤Ã­â€šÂ¤Ã«Â§Ë† Ã¬â€žÂ¤ÃªÂ³â€ž Ã¬â€¹Å“ (MergeTree Ã¬â€”â€Ã¬Â§â€ž Ã¬â€žÂ Ã­Æ’Â)
-- Ã«Â¶â€žÃ¬â€žÂ Ã¬Â¿Â¼Ã«Â¦Â¬ Ã¬Å¾â€˜Ã¬â€žÂ± Ã¬â€¹Å“ (Ã¬Â§â€˜ÃªÂ³â€ž, Ã¬Å“Ë†Ã«Ââ€žÃ¬Å¡Â° Ã­â€¢Â¨Ã¬Ë†Ëœ, Ã¬Â¡Â°Ã¬ÂÂ¸)
-- Ã¬Â¿Â¼Ã«Â¦Â¬ Ã¬â€žÂ±Ã«Å Â¥ Ã¬ÂµÅ“Ã¬Â ÂÃ­â„¢â€ Ã¬â€¹Å“ (Ã­Å’Å’Ã­â€¹Â°Ã¬â€¦Ëœ Ã­â€â€žÃ«Â£Â¨Ã«â€¹Â, Ã­â€â€žÃ«Â¡Å“Ã¬Â ÂÃ¬â€¦Ëœ, ÃªÂµÂ¬Ã¬Â²Â´Ã­â„¢â€Ã«ÂÅ“ Ã«Â·Â°)
-- Ã«Å’â‚¬Ã«Å¸â€° Ã«ÂÂ°Ã¬ÂÂ´Ã­â€žÂ° Ã¬Ë†ËœÃ¬Â§â€˜ Ã¬â€¹Å“ (Ã«Â°Â°Ã¬Â¹Ëœ Ã¬â€šÂ½Ã¬Å¾â€¦, Kafka Ã­â€ ÂµÃ­â€¢Â©)
-- PostgreSQL/MySQLÃ¬â€”ÂÃ¬â€žÅ“ ClickHouseÃ«Â¡Å“ Ã«Â¶â€žÃ¬â€žÂ Ã«Â§Ë†Ã¬ÂÂ´ÃªÂ·Â¸Ã«Â Ë†Ã¬ÂÂ´Ã¬â€¦Ëœ Ã¬â€¹Å“
-- Ã¬â€¹Â¤Ã¬â€¹Å“ÃªÂ°â€ž Ã«Å’â‚¬Ã¬â€¹Å“Ã«Â³Â´Ã«â€œÅ“ Ã«ËœÂÃ«Å â€ Ã¬â€¹Å“ÃªÂ³â€žÃ¬â€”Â´ Ã«Â¶â€žÃ¬â€žÂ ÃªÂµÂ¬Ã­Ëœâ€ž Ã¬â€¹Å“
+## 개요
 
-## ÃªÂ°Å“Ã¬Å¡â€
+ClickHouse는 온라인 분석 처리(OLAP)를 위한 컬럼 지향 데이터베이스 관리 시스템(DBMS)입니다. 대규모 데이터셋에 대한 빠른 분석 쿼리에 최적화되어 있습니다.
 
-ClickHouseÃ«Å â€ Ã¬ËœÂ¨Ã«ÂÂ¼Ã¬ÂÂ¸ Ã«Â¶â€žÃ¬â€žÂ Ã¬Â²ËœÃ«Â¦Â¬(OLAP)Ã«Â¥Â¼ Ã¬Å“â€žÃ­â€¢Å“ Ã¬Â»Â¬Ã«Å¸Â¼ Ã¬Â§â‚¬Ã­â€“Â¥ Ã«ÂÂ°Ã¬ÂÂ´Ã­â€žÂ°Ã«Â²Â Ã¬ÂÂ´Ã¬Å Â¤ ÃªÂ´â‚¬Ã«Â¦Â¬ Ã¬â€¹Å“Ã¬Å Â¤Ã­â€¦Å“(DBMS)Ã¬Å¾â€¦Ã«â€¹Ë†Ã«â€¹Â¤. Ã«Å’â‚¬ÃªÂ·Å“Ã«ÂªÂ¨ Ã«ÂÂ°Ã¬ÂÂ´Ã­â€žÂ°Ã¬â€¦â€¹Ã¬â€”Â Ã«Å’â‚¬Ã­â€¢Å“ Ã«Â¹Â Ã«Â¥Â¸ Ã«Â¶â€žÃ¬â€žÂ Ã¬Â¿Â¼Ã«Â¦Â¬Ã¬â€”Â Ã¬ÂµÅ“Ã¬Â ÂÃ­â„¢â€Ã«ÂËœÃ¬â€“Â´ Ã¬Å¾Ë†Ã¬Å ÂµÃ«â€¹Ë†Ã«â€¹Â¤.
+**주요 특징:**
+- 컬럼 지향 저장소
+- 데이터 압축
+- 병렬 쿼리 실행
+- 분산 쿼리
+- 실시간 분석
 
-**Ã¬Â£Â¼Ã¬Å¡â€ Ã­Å Â¹Ã¬Â§â€¢:**
-- Ã¬Â»Â¬Ã«Å¸Â¼ Ã¬Â§â‚¬Ã­â€“Â¥ Ã¬Â â‚¬Ã¬Å¾Â¥Ã¬â€ Å’
-- Ã«ÂÂ°Ã¬ÂÂ´Ã­â€žÂ° Ã¬â€¢â€¢Ã¬Â¶â€¢
-- Ã«Â³â€˜Ã«Â Â¬ Ã¬Â¿Â¼Ã«Â¦Â¬ Ã¬â€¹Â¤Ã­â€“â€°
-- Ã«Â¶â€žÃ¬â€šÂ° Ã¬Â¿Â¼Ã«Â¦Â¬
-- Ã¬â€¹Â¤Ã¬â€¹Å“ÃªÂ°â€ž Ã«Â¶â€žÃ¬â€žÂ
+## 테이블 설계 패턴
 
-## Ã­â€¦Å’Ã¬ÂÂ´Ã«Â¸â€ Ã¬â€žÂ¤ÃªÂ³â€ž Ã­Å’Â¨Ã­â€žÂ´
-
-### MergeTree Ã¬â€”â€Ã¬Â§â€ž (ÃªÂ°â‚¬Ã¬Å¾Â¥ Ã¬ÂÂ¼Ã«Â°ËœÃ¬Â Â)
+### MergeTree 엔진 (가장 일반적)
 
 ```sql
 CREATE TABLE markets_analytics (
@@ -65,10 +64,10 @@ ORDER BY (date, market_id)
 SETTINGS index_granularity = 8192;
 ```
 
-### ReplacingMergeTree (Ã¬Â¤â€˜Ã«Â³Âµ Ã¬Â Å“ÃªÂ±Â°)
+### ReplacingMergeTree (중복 제거)
 
 ```sql
--- Ã¬Â¤â€˜Ã«Â³ÂµÃ¬ÂÂ´ Ã¬Å¾Ë†Ã¬Ââ€ž Ã¬Ë†Ëœ Ã¬Å¾Ë†Ã«Å â€ Ã«ÂÂ°Ã¬ÂÂ´Ã­â€žÂ°Ã¬Å¡Â© (Ã¬ËœË†: Ã¬â€”Â¬Ã«Å¸Â¬ Ã¬â€ Å’Ã¬Å Â¤Ã¬â€”ÂÃ¬â€žÅ“ Ã¬Ë†ËœÃ¬Â§â€˜Ã«ÂÅ“ ÃªÂ²Â½Ã¬Å¡Â°)
+-- 중복이 있을 수 있는 데이터용 (예: 여러 소스에서 수집된 경우)
 CREATE TABLE user_events (
     event_id String,
     user_id String,
@@ -81,10 +80,10 @@ ORDER BY (user_id, event_id, timestamp)
 PRIMARY KEY (user_id, event_id);
 ```
 
-### AggregatingMergeTree (Ã¬â€šÂ¬Ã¬Â â€ž Ã¬Â§â€˜ÃªÂ³â€ž)
+### AggregatingMergeTree (사전 집계)
 
 ```sql
--- Ã¬Â§â€˜ÃªÂ³â€ž Ã«Â©â€Ã­Å Â¸Ã«Â¦Â­Ã¬Ââ€ž Ã¬Å“Â Ã¬Â§â‚¬Ã­â€¢ËœÃªÂ¸Â° Ã¬Å“â€žÃ­â€¢Å“ Ã¬Å¡Â©Ã«Ââ€ž
+-- 집계 메트릭을 유지하기 위한 용도
 CREATE TABLE market_stats_hourly (
     hour DateTime,
     market_id String,
@@ -95,7 +94,7 @@ CREATE TABLE market_stats_hourly (
 PARTITION BY toYYYYMM(hour)
 ORDER BY (hour, market_id);
 
--- Ã¬Â§â€˜ÃªÂ³â€žÃ«ÂÅ“ Ã«ÂÂ°Ã¬ÂÂ´Ã­â€žÂ° Ã¬Â¡Â°Ã­Å¡Å’
+-- 집계된 데이터 조회
 SELECT
     hour,
     market_id,
@@ -108,12 +107,12 @@ GROUP BY hour, market_id
 ORDER BY hour DESC;
 ```
 
-## Ã¬Â¿Â¼Ã«Â¦Â¬ Ã¬ÂµÅ“Ã¬Â ÂÃ­â„¢â€ Ã­Å’Â¨Ã­â€žÂ´
+## 쿼리 최적화 패턴
 
-### Ã­Å¡Â¨Ã¬Å“Â¨Ã¬Â ÂÃ¬ÂÂ¸ Ã­â€¢â€žÃ­â€žÂ°Ã«Â§Â
+### 효율적인 필터링
 
 ```sql
--- PASS: Ã¬Â¢â€¹Ã¬ÂÅ’: Ã¬ÂÂ¸Ã«ÂÂ±Ã¬Å Â¤Ã«ÂÅ“ Ã¬Â»Â¬Ã«Å¸Â¼Ã¬Ââ€ž Ã«Â¨Â¼Ã¬Â â‚¬ Ã¬â€šÂ¬Ã¬Å¡Â©
+-- PASS: 좋음: 인덱스된 컬럼을 먼저 사용
 SELECT *
 FROM markets_analytics
 WHERE date >= '2025-01-01'
@@ -122,7 +121,7 @@ WHERE date >= '2025-01-01'
 ORDER BY date DESC
 LIMIT 100;
 
--- FAIL: Ã«â€šËœÃ¬ÂÂ¨: Ã«Â¹â€žÃ¬ÂÂ¸Ã«ÂÂ±Ã¬Å Â¤ Ã¬Â»Â¬Ã«Å¸Â¼Ã¬Ââ€ž Ã«Â¨Â¼Ã¬Â â‚¬ Ã­â€¢â€žÃ­â€žÂ°Ã«Â§Â
+-- FAIL: 나쁨: 비인덱스 컬럼을 먼저 필터링
 SELECT *
 FROM markets_analytics
 WHERE volume > 1000
@@ -130,10 +129,10 @@ WHERE volume > 1000
   AND date >= '2025-01-01';
 ```
 
-### Ã¬Â§â€˜ÃªÂ³â€ž
+### 집계
 
 ```sql
--- PASS: Ã¬Â¢â€¹Ã¬ÂÅ’: ClickHouse Ã¬Â â€žÃ¬Å¡Â© Ã¬Â§â€˜ÃªÂ³â€ž Ã­â€¢Â¨Ã¬Ë†ËœÃ«Â¥Â¼ Ã¬â€šÂ¬Ã¬Å¡Â©
+-- PASS: 좋음: ClickHouse 전용 집계 함수를 사용
 SELECT
     toStartOfDay(created_at) AS day,
     market_id,
@@ -146,7 +145,7 @@ WHERE created_at >= today() - INTERVAL 7 DAY
 GROUP BY day, market_id
 ORDER BY day DESC, total_volume DESC;
 
--- PASS: Ã«Â°Â±Ã«Â¶â€žÃ¬Å“â€žÃ¬Ë†ËœÃ¬â€”ÂÃ«Å â€ quantile Ã¬â€šÂ¬Ã¬Å¡Â© (percentileÃ«Â³Â´Ã«â€¹Â¤ Ã­Å¡Â¨Ã¬Å“Â¨Ã¬Â Â)
+-- PASS: 백분위수에는 quantile 사용 (percentile보다 효율적)
 SELECT
     quantile(0.50)(trade_size) AS median,
     quantile(0.95)(trade_size) AS p95,
@@ -155,10 +154,10 @@ FROM trades
 WHERE created_at >= now() - INTERVAL 1 HOUR;
 ```
 
-### Ã¬Å“Ë†Ã«Ââ€žÃ¬Å¡Â° Ã­â€¢Â¨Ã¬Ë†Ëœ
+### 윈도우 함수
 
 ```sql
--- Ã«Ë†â€žÃ¬Â Â Ã­â€¢Â©ÃªÂ³â€ž ÃªÂ³â€žÃ¬â€šÂ°
+-- 누적 합계 계산
 SELECT
     date,
     market_id,
@@ -173,68 +172,72 @@ WHERE date >= today() - INTERVAL 30 DAY
 ORDER BY market_id, date;
 ```
 
-## Ã«ÂÂ°Ã¬ÂÂ´Ã­â€žÂ° Ã¬â€šÂ½Ã¬Å¾â€¦ Ã­Å’Â¨Ã­â€žÂ´
+## 데이터 삽입 패턴
 
-### Ã«Â°Â°Ã¬Â¹Ëœ Ã¬â€šÂ½Ã¬Å¾â€¦ (ÃªÂ¶Å’Ã¬Å¾Â¥)
+### 배치 삽입 (권장)
 
 ```typescript
-import { ClickHouse } from 'clickhouse'
+import { createClient } from '@clickhouse/client'
 
-const clickhouse = new ClickHouse({
-  url: process.env.CLICKHOUSE_URL,
-  port: 8123,
-  basicAuth: {
-    username: process.env.CLICKHOUSE_USER,
-    password: process.env.CLICKHOUSE_PASSWORD
-  }
+const clickhouse = createClient({
+  url: process.env.CLICKHOUSE_URL ?? 'http://localhost:8123',
+  username: process.env.CLICKHOUSE_USER,
+  password: process.env.CLICKHOUSE_PASSWORD
 })
 
-// PASS: Ã«Â°Â°Ã¬Â¹Ëœ Ã¬â€šÂ½Ã¬Å¾â€¦ (Ã­Å¡Â¨Ã¬Å“Â¨Ã¬Â Â)
+// PASS: 배치 삽입 (효율적)
 async function bulkInsertTrades(trades: Trade[]) {
-  const rows = trades.map(trade => ({
-    id: trade.id,
-    market_id: trade.market_id,
-    user_id: trade.user_id,
-    amount: trade.amount,
-    timestamp: trade.timestamp.toISOString()
-  }))
-
-  await clickhouse.insert('trades', rows)
+  await clickhouse.insert({
+    table: 'trades',
+    values: trades.map(trade => ({
+      id: trade.id,
+      market_id: trade.market_id,
+      user_id: trade.user_id,
+      amount: trade.amount,
+      timestamp: trade.timestamp.toISOString()
+    })),
+    format: 'JSONEachRow'
+  })
 }
 
-// FAIL: ÃªÂ°Å“Ã«Â³â€ž Ã¬â€šÂ½Ã¬Å¾â€¦ (Ã«Å ÂÃ«Â¦Â¼)
+// FAIL: 개별 삽입 (느림)
 async function insertTrade(trade: Trade) {
-  // Ã«Â£Â¨Ã­â€â€ž Ã¬â€¢Ë†Ã¬â€”ÂÃ¬â€žÅ“ Ã¬ÂÂ´Ã«Â â€¡ÃªÂ²Å’ Ã­â€¢ËœÃ¬Â§â‚¬ Ã«Â§Ë†Ã¬â€žÂ¸Ã¬Å¡â€!
-  await clickhouse.query(`
-    INSERT INTO trades VALUES ('${trade.id}', ...)
-  `).toPromise()
+  // 루프 안에서 이렇게 하지 마세요!
+  await clickhouse.insert({
+    table: 'trades',
+    values: [{
+      id: trade.id,
+      market_id: trade.market_id,
+      user_id: trade.user_id,
+      amount: trade.amount,
+      timestamp: trade.timestamp.toISOString()
+    }],
+    format: 'JSONEachRow'
+  })
 }
 ```
 
-### Ã¬Å Â¤Ã­Å Â¸Ã«Â¦Â¬Ã«Â°Â Ã¬â€šÂ½Ã¬Å¾â€¦
+### 스트리밍 삽입
 
 ```typescript
-// Ã¬â€”Â°Ã¬â€ ÂÃ¬Â ÂÃ¬ÂÂ¸ Ã«ÂÂ°Ã¬ÂÂ´Ã­â€žÂ° Ã¬Ë†ËœÃ¬Â§â€˜Ã¬Å¡Â©
-import { createWriteStream } from 'fs'
-import { pipeline } from 'stream/promises'
+// 연속적인 데이터 수집용
+import { Readable } from 'node:stream'
 
-async function streamInserts() {
-  const stream = clickhouse.insert('trades').stream()
-
-  for await (const batch of dataSource) {
-    stream.write(batch)
-  }
-
-  await stream.end()
+async function streamInserts(dataSource: AsyncIterable<Record<string, unknown>>) {
+  await clickhouse.insert({
+    table: 'trades',
+    values: Readable.from(dataSource, { objectMode: true }),
+    format: 'JSONEachRow'
+  })
 }
 ```
 
-## ÃªÂµÂ¬Ã¬Â²Â´Ã­â„¢â€Ã«ÂÅ“ Ã«Â·Â°
+## 구체화된 뷰
 
-### Ã¬â€¹Â¤Ã¬â€¹Å“ÃªÂ°â€ž Ã¬Â§â€˜ÃªÂ³â€ž
+### 실시간 집계
 
 ```sql
--- Ã¬â€¹Å“ÃªÂ°â€žÃ«Â³â€ž Ã­â€ ÂµÃªÂ³â€žÃ«Â¥Â¼ Ã¬Å“â€žÃ­â€¢Å“ materialized view Ã¬Æ’ÂÃ¬â€žÂ±
+-- 시간별 통계를 위한 materialized view 생성
 CREATE MATERIALIZED VIEW market_stats_hourly_mv
 TO market_stats_hourly
 AS SELECT
@@ -246,7 +249,7 @@ AS SELECT
 FROM trades
 GROUP BY hour, market_id;
 
--- materialized view Ã¬Â¡Â°Ã­Å¡Å’
+-- materialized view 조회
 SELECT
     hour,
     market_id,
@@ -258,12 +261,12 @@ WHERE hour >= now() - INTERVAL 24 HOUR
 GROUP BY hour, market_id;
 ```
 
-## Ã¬â€žÂ±Ã«Å Â¥ Ã«ÂªÂ¨Ã«â€¹Ë†Ã­â€žÂ°Ã«Â§Â
+## 성능 모니터링
 
-### Ã¬Â¿Â¼Ã«Â¦Â¬ Ã¬â€žÂ±Ã«Å Â¥
+### 쿼리 성능
 
 ```sql
--- Ã«Å ÂÃ«Â¦Â° Ã¬Â¿Â¼Ã«Â¦Â¬ Ã­â„¢â€¢Ã¬ÂÂ¸
+-- 느린 쿼리 확인
 SELECT
     query_id,
     user,
@@ -280,10 +283,10 @@ ORDER BY query_duration_ms DESC
 LIMIT 10;
 ```
 
-### Ã­â€¦Å’Ã¬ÂÂ´Ã«Â¸â€ Ã­â€ ÂµÃªÂ³â€ž
+### 테이블 통계
 
 ```sql
--- Ã­â€¦Å’Ã¬ÂÂ´Ã«Â¸â€ Ã­ÂÂ¬ÃªÂ¸Â° Ã­â„¢â€¢Ã¬ÂÂ¸
+-- 테이블 크기 확인
 SELECT
     database,
     table,
@@ -296,12 +299,12 @@ GROUP BY database, table
 ORDER BY sum(bytes) DESC;
 ```
 
-## Ã¬ÂÂ¼Ã«Â°ËœÃ¬Â ÂÃ¬ÂÂ¸ Ã«Â¶â€žÃ¬â€žÂ Ã¬Â¿Â¼Ã«Â¦Â¬
+## 일반적인 분석 쿼리
 
-### Ã¬â€¹Å“ÃªÂ³â€žÃ¬â€”Â´ Ã«Â¶â€žÃ¬â€žÂ
+### 시계열 분석
 
 ```sql
--- Ã¬ÂÂ¼ÃªÂ°â€ž Ã­â„¢Å“Ã¬â€žÂ± Ã¬â€šÂ¬Ã¬Å¡Â©Ã¬Å¾Â
+-- 일간 활성 사용자
 SELECT
     toDate(timestamp) AS date,
     uniq(user_id) AS daily_active_users
@@ -310,7 +313,7 @@ WHERE timestamp >= today() - INTERVAL 30 DAY
 GROUP BY date
 ORDER BY date;
 
--- Ã«Â¦Â¬Ã­â€¦ÂÃ¬â€¦Ëœ Ã«Â¶â€žÃ¬â€žÂ
+-- 리텐션 분석
 SELECT
     signup_date,
     countIf(days_since_signup = 0) AS day_0,
@@ -330,10 +333,10 @@ GROUP BY signup_date
 ORDER BY signup_date DESC;
 ```
 
-### Ã­ÂÂ¼Ã«â€žÂ Ã«Â¶â€žÃ¬â€žÂ
+### 퍼널 분석
 
 ```sql
--- Ã¬Â â€žÃ­â„¢Ëœ Ã­ÂÂ¼Ã«â€žÂ
+-- 전환 퍼널
 SELECT
     countIf(step = 'viewed_market') AS viewed,
     countIf(step = 'clicked_trade') AS clicked,
@@ -351,10 +354,10 @@ FROM (
 GROUP BY session_id;
 ```
 
-### Ã¬Â½â€Ã­ËœÂ¸Ã­Å Â¸ Ã«Â¶â€žÃ¬â€žÂ
+### 코호트 분석
 
 ```sql
--- ÃªÂ°â‚¬Ã¬Å¾â€¦ Ã¬â€ºâ€Ã«Â³â€ž Ã¬â€šÂ¬Ã¬Å¡Â©Ã¬Å¾Â Ã¬Â½â€Ã­ËœÂ¸Ã­Å Â¸
+-- 가입 월별 사용자 코호트
 SELECT
     toStartOfMonth(signup_date) AS cohort,
     toStartOfMonth(activity_date) AS month,
@@ -371,17 +374,17 @@ GROUP BY cohort, month, months_since_signup
 ORDER BY cohort, months_since_signup;
 ```
 
-## Ã«ÂÂ°Ã¬ÂÂ´Ã­â€žÂ° Ã­Å’Å’Ã¬ÂÂ´Ã­â€â€žÃ«ÂÂ¼Ã¬ÂÂ¸ Ã­Å’Â¨Ã­â€žÂ´
+## 데이터 파이프라인 패턴
 
-### ETL Ã­Å’Â¨Ã­â€žÂ´
+### ETL 패턴
 
 ```typescript
-// Ã¬Â¶â€Ã¬Â¶Å“, Ã«Â³â‚¬Ã­â„¢Ëœ, Ã¬Â ÂÃ¬Å¾Â¬(ETL)
+// 추출, 변환, 적재(ETL)
 async function etlPipeline() {
-  // 1. Ã¬â€ Å’Ã¬Å Â¤Ã¬â€”ÂÃ¬â€žÅ“ Ã¬Â¶â€Ã¬Â¶Å“
+  // 1. 소스에서 추출
   const rawData = await extractFromPostgres()
 
-  // 2. Ã«Â³â‚¬Ã­â„¢Ëœ
+  // 2. 변환
   const transformed = rawData.map(row => ({
     date: new Date(row.created_at).toISOString().split('T')[0],
     market_id: row.market_slug,
@@ -389,11 +392,11 @@ async function etlPipeline() {
     trades: parseInt(row.trade_count)
   }))
 
-  // 3. ClickHouseÃ¬â€”Â Ã¬Â ÂÃ¬Å¾Â¬
+  // 3. ClickHouse에 적재
   await bulkInsertToClickHouse(transformed)
 }
 
-// Ã¬Â£Â¼ÃªÂ¸Â°Ã¬Â ÂÃ¬Å“Â¼Ã«Â¡Å“ Ã¬â€¹Â¤Ã­â€“â€°
+// 주기적으로 실행
 let etlRunning = false
 
 setInterval(async () => {
@@ -408,10 +411,10 @@ setInterval(async () => {
 }, 60 * 60 * 1000)  // Every hour
 ```
 
-### Ã«Â³â‚¬ÃªÂ²Â½ Ã«ÂÂ°Ã¬ÂÂ´Ã­â€žÂ° Ã¬ÂºÂ¡Ã¬Â²Ëœ (CDC)
+### 변경 데이터 캡처 (CDC)
 
 ```typescript
-// PostgreSQL Ã«Â³â‚¬ÃªÂ²Â½Ã¬Ââ€ž Ã¬Ë†ËœÃ¬â€¹Â Ã­â€¢ËœÃªÂ³Â  ClickHouseÃ¬â„¢â‚¬ Ã«Ââ„¢ÃªÂ¸Â°Ã­â„¢â€
+// PostgreSQL 변경을 수신하고 ClickHouse와 동기화
 import { Client } from 'pg'
 
 const pgClient = new Client({ connectionString: process.env.DATABASE_URL })
@@ -421,44 +424,48 @@ pgClient.query('LISTEN market_updates')
 pgClient.on('notification', async (msg) => {
   const update = JSON.parse(msg.payload)
 
-  await clickhouse.insert('market_updates', [
-    {
-      market_id: update.id,
-      event_type: update.operation,  // INSERT, UPDATE, DELETE
-      timestamp: new Date(),
-      data: JSON.stringify(update.new_data)
-    }
-  ])
+  await clickhouse.insert({
+    table: 'market_updates',
+    values: [
+      {
+        market_id: update.id,
+        event_type: update.operation,  // INSERT, UPDATE, DELETE
+        timestamp: new Date(),
+        data: JSON.stringify(update.new_data)
+      }
+    ],
+    format: 'JSONEachRow'
+  })
 })
 ```
 
-## Ã«ÂªÂ¨Ã«Â²â€ Ã¬â€šÂ¬Ã«Â¡â‚¬
+## 모범 사례
 
-### 1. Ã­Å’Å’Ã­â€¹Â°Ã¬â€¦â€Ã«â€¹Â Ã¬Â â€žÃ«Å¾Âµ
-- Ã¬â€¹Å“ÃªÂ°â€žÃ«Â³â€ž Ã­Å’Å’Ã­â€¹Â°Ã¬â€¦â€Ã«â€¹Â (Ã«Â³Â´Ã­â€ Âµ Ã¬â€ºâ€ Ã«ËœÂÃ«Å â€ Ã¬ÂÂ¼)
-- Ã­Å’Å’Ã­â€¹Â°Ã¬â€¦ËœÃ¬ÂÂ´ Ã«â€žË†Ã«Â¬Â´ Ã«Â§Å½Ã¬Ââ‚¬ ÃªÂ²Æ’ Ã«Â°Â©Ã¬Â§â‚¬ (Ã¬â€žÂ±Ã«Å Â¥ Ã¬ËœÂÃ­â€“Â¥)
-- Ã­Å’Å’Ã­â€¹Â°Ã¬â€¦Ëœ Ã­â€šÂ¤Ã¬â€”Â DATE Ã­Æ’â‚¬Ã¬Å¾â€¦ Ã¬â€šÂ¬Ã¬Å¡Â©
+### 1. 파티셔닝 전략
+- 시간별 파티셔닝 (보통 월 또는 일)
+- 파티션이 너무 많은 것 방지 (성능 영향)
+- 파티션 키에 DATE 타입 사용
 
-### 2. Ã¬Â â€¢Ã«Â Â¬ Ã­â€šÂ¤
-- ÃªÂ°â‚¬Ã¬Å¾Â¥ Ã¬Å¾ÂÃ¬Â£Â¼ Ã­â€¢â€žÃ­â€žÂ°Ã«Â§ÂÃ«ÂËœÃ«Å â€ Ã¬Â»Â¬Ã«Å¸Â¼Ã¬Ââ€ž Ã«Â¨Â¼Ã¬Â â‚¬ Ã«Â°Â°Ã¬Â¹Ëœ
-- Ã¬Â¹Â´Ã«â€â€Ã«â€žÂÃ«Â¦Â¬Ã­â€¹Â° ÃªÂ³Â Ã«Â Â¤ (Ã«â€ â€™Ã¬Ââ‚¬ Ã¬Â¹Â´Ã«â€â€Ã«â€žÂÃ«Â¦Â¬Ã­â€¹Â° Ã«Â¨Â¼Ã¬Â â‚¬)
-- Ã¬Â â€¢Ã«Â Â¬Ã¬ÂÂ´ Ã¬â€¢â€¢Ã¬Â¶â€¢Ã¬â€”Â Ã¬ËœÂÃ­â€“Â¥Ã¬Ââ€ž Ã«Â¯Â¸Ã¬Â¹Â¨
+### 2. 정렬 키
+- 가장 자주 필터링되는 컬럼을 먼저 배치
+- 카디널리티 고려 (높은 카디널리티 먼저)
+- 정렬이 압축에 영향을 미침
 
-### 3. Ã«ÂÂ°Ã¬ÂÂ´Ã­â€žÂ° Ã­Æ’â‚¬Ã¬Å¾â€¦
-- ÃªÂ°â‚¬Ã¬Å¾Â¥ Ã¬Å¾â€˜Ã¬Ââ‚¬ Ã¬Â ÂÃ¬Â Ë†Ã­â€¢Å“ Ã­Æ’â‚¬Ã¬Å¾â€¦ Ã¬â€šÂ¬Ã¬Å¡Â© (UInt32 vs UInt64)
-- Ã«Â°ËœÃ«Â³ÂµÃ«ÂËœÃ«Å â€ Ã«Â¬Â¸Ã¬Å¾ÂÃ¬â€”Â´Ã¬â€”Â LowCardinality Ã¬â€šÂ¬Ã¬Å¡Â©
-- Ã«Â²â€Ã¬Â£Â¼Ã­Ëœâ€¢ Ã«ÂÂ°Ã¬ÂÂ´Ã­â€žÂ°Ã¬â€”Â Enum Ã¬â€šÂ¬Ã¬Å¡Â©
+### 3. 데이터 타입
+- 가장 작은 적절한 타입 사용 (UInt32 vs UInt64)
+- 반복되는 문자열에 LowCardinality 사용
+- 범주형 데이터에 Enum 사용
 
-### 4. Ã­â€Â¼Ã­â€¢Â´Ã¬â€¢Â¼ Ã­â€¢Â  ÃªÂ²Æ’
-- SELECT * (Ã¬Â»Â¬Ã«Å¸Â¼Ã¬Ââ€ž Ã«Âªâ€¦Ã¬â€¹Å“)
-- FINAL (Ã¬Â¿Â¼Ã«Â¦Â¬ Ã¬Â â€žÃ¬â€”Â Ã«ÂÂ°Ã¬ÂÂ´Ã­â€žÂ°Ã«Â¥Â¼ Ã«Â³â€˜Ã­â€¢Â©)
-- Ã«â€žË†Ã«Â¬Â´ Ã«Â§Å½Ã¬Ââ‚¬ JOIN (Ã«Â¶â€žÃ¬â€žÂÃ¬Ââ€ž Ã¬Å“â€žÃ­â€¢Â´ Ã«Â¹â€žÃ¬Â â€¢ÃªÂ·Å“Ã­â„¢â€)
-- Ã¬Å¾â€˜Ã¬Ââ‚¬ Ã«Â¹Ë†Ã«Â²Ë†Ã­â€¢Å“ Ã¬â€šÂ½Ã¬Å¾â€¦ (Ã«Â°Â°Ã¬Â¹Ëœ Ã¬Â²ËœÃ«Â¦Â¬)
+### 4. 피해야 할 것
+- SELECT * (컬럼을 명시)
+- FINAL (쿼리 전에 데이터를 병합)
+- 너무 많은 JOIN (분석을 위해 비정규화)
+- 작은 빈번한 삽입 (배치 처리)
 
-### 5. Ã«ÂªÂ¨Ã«â€¹Ë†Ã­â€žÂ°Ã«Â§Â
-- Ã¬Â¿Â¼Ã«Â¦Â¬ Ã¬â€žÂ±Ã«Å Â¥ Ã¬Â¶â€Ã¬Â Â
-- Ã«â€â€Ã¬Å Â¤Ã­ÂÂ¬ Ã¬â€šÂ¬Ã¬Å¡Â©Ã«Å¸â€° Ã«ÂªÂ¨Ã«â€¹Ë†Ã­â€žÂ°Ã«Â§Â
-- Ã«Â³â€˜Ã­â€¢Â© Ã¬Å¾â€˜Ã¬â€”â€¦ Ã­â„¢â€¢Ã¬ÂÂ¸
-- Ã¬Å Â¬Ã«Â¡Å“Ã¬Å¡Â° Ã¬Â¿Â¼Ã«Â¦Â¬ Ã«Â¡Å“ÃªÂ·Â¸ ÃªÂ²â‚¬Ã­â€ Â 
+### 5. 모니터링
+- 쿼리 성능 추적
+- 디스크 사용량 모니터링
+- 병합 작업 확인
+- 슬로우 쿼리 로그 검토
 
-**ÃªÂ¸Â°Ã¬â€“ÂµÃ­â€¢ËœÃ¬â€žÂ¸Ã¬Å¡â€**: ClickHouseÃ«Å â€ Ã«Â¶â€žÃ¬â€žÂ Ã¬â€ºÅ’Ã­ÂÂ¬Ã«Â¡Å“Ã«â€œÅ“Ã¬â€”Â Ã­Æ’ÂÃ¬â€ºâ€Ã­â€¢Â©Ã«â€¹Ë†Ã«â€¹Â¤. Ã¬Â¿Â¼Ã«Â¦Â¬ Ã­Å’Â¨Ã­â€žÂ´Ã¬â€”Â Ã«Â§Å¾ÃªÂ²Å’ Ã­â€¦Å’Ã¬ÂÂ´Ã«Â¸â€Ã¬Ââ€ž Ã¬â€žÂ¤ÃªÂ³â€žÃ­â€¢ËœÃªÂ³Â , Ã«Â°Â°Ã¬Â¹Ëœ Ã¬â€šÂ½Ã¬Å¾â€¦Ã¬Ââ€ž Ã¬â€šÂ¬Ã¬Å¡Â©Ã­â€¢ËœÃ«Â©Â°, Ã¬â€¹Â¤Ã¬â€¹Å“ÃªÂ°â€ž Ã¬Â§â€˜ÃªÂ³â€žÃ«Â¥Â¼ Ã¬Å“â€žÃ­â€¢Â´ ÃªÂµÂ¬Ã¬Â²Â´Ã­â„¢â€Ã«ÂÅ“ Ã«Â·Â°Ã«Â¥Â¼ Ã­â„¢Å“Ã¬Å¡Â©Ã­â€¢ËœÃ¬â€žÂ¸Ã¬Å¡â€.
+**기억하세요**: ClickHouse는 분석 워크로드에 탁월합니다. 쿼리 패턴에 맞게 테이블을 설계하고, 배치 삽입을 사용하며, 실시간 집계를 위해 구체화된 뷰를 활용하세요.

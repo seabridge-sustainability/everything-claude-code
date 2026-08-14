@@ -1,7 +1,7 @@
 ---
 name: ai-agent
 description: SeaBridgeAI AI-agent specialist for LangGraph/LangChain, prompts, RAG, tools, HITL, feedback runs, and grounded sustainability outputs.
-tools: ["Read", "Grep", "Glob", "Bash"]
+tools: Read, Grep, Glob, Bash
 model: sonnet
 ---
 

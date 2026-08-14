@@ -1,4 +1,4 @@
-﻿# GSD Controlled Project Workflow
+# GSD Controlled Project Workflow
 
 ## Objective
 

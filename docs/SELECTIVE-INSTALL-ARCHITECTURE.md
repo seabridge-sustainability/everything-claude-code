@@ -610,7 +610,7 @@ Suggested first adapters:
 2. `cursor-project`
    writes into `./.cursor/...`
 3. `antigravity-project`
-   writes into `./.agent/...`
+   writes into `./.agents/...`
 4. `codex-home`
    later
 5. `opencode-home`
@@ -657,7 +657,7 @@ Suggested operation shape:
   "kind": "copy",
   "moduleId": "rules-core",
   "source": "rules/common/coding-style.md",
-  "destination": "/Users/example/.claude/rules/common/coding-style.md",
+  "destination": "/Users/example/.claude/rules/ecc/common/coding-style.md",
   "ownership": "managed",
   "overwritePolicy": "replace"
 }
@@ -685,7 +685,7 @@ Suggested path conventions:
 - Cursor target:
   `./.cursor/ecc-install-state.json`
 - Antigravity target:
-  `./.agent/ecc-install-state.json`
+  `./.agents/ecc-install-state.json`
 - future Codex target:
   `~/.codex/ecc-install-state.json`
 
@@ -720,7 +720,7 @@ Suggested payload:
     "skippedModules": []
   },
   "source": {
-    "repoVersion": "1.9.0",
+    "repoVersion": "2.2.0",
     "repoCommit": "git-sha",
     "manifestVersion": 1
   },
@@ -728,7 +728,7 @@ Suggested payload:
     {
       "kind": "copy",
       "moduleId": "rules-core",
-      "destination": "/Users/example/.claude/rules/common/coding-style.md",
+      "destination": "/Users/example/.claude/rules/ecc/common/coding-style.md",
       "digest": "sha256:..."
     }
   ]

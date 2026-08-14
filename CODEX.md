@@ -1,4 +1,4 @@
-﻿# SeaBridgeAI Codex Entry Point
+# SeaBridgeAI Codex Entry Point
 
 <!-- SEABRIDGE_GOAL_PROTOCOL_START -->
 ## /goal Default Operating Mode

@@ -1,4 +1,4 @@
-﻿---
+---
 name: sea-gsd-controlled-execution
 description: SeaBridgeAI controlled GSD/Get Shit Done skill for complex multi-phase work, context-rot prevention, structured artifacts, phase planning, verification, forensics, and cross-repo coordination without autonomous/yolo execution, auto-commit, auto-push, or global installs.
 ---

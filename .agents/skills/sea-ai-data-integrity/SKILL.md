@@ -1,4 +1,4 @@
-﻿---
+---
 name: sea-ai-data-integrity
 description: Callable wrapper for sea-ai-data-integrity. Load the canonical SeaBridgeAI skill body from everything-claude-code\skills\sea-ai-data-integrity\SKILL.md.
 ---

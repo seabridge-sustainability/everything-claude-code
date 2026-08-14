@@ -1,4 +1,4 @@
-﻿---
+---
 name: sea-task-orchestration
 description: Callable wrapper for sea-task-orchestration. Load the canonical SeaBridgeAI skill body from everything-claude-code\skills\sea-task-orchestration\SKILL.md.
 ---

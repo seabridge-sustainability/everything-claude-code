@@ -1,4 +1,4 @@
-﻿# PHASE PLAN
+# PHASE PLAN
 
 - Module:
 - Repo:

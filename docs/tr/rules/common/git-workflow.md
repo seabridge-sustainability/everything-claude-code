@@ -1,4 +1,4 @@
-# Git Ã„Â°Ã…Å¸ AkÃ„Â±Ã…Å¸Ã„Â±
+# Git İş Akışı
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -16,8 +16,7 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
-
-## Commit Mesaj FormatÃ„Â±
+## Commit Mesaj Formatı
 ```
 <type>: <description>
 
@@ -26,16 +25,16 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 
 Types: feat, fix, refactor, docs, test, chore, perf, ci
 
-Not: Attribution ~/.claude/settings.json aracÃ„Â±lÃ„Â±Ã„Å¸Ã„Â±yla global olarak devre dÃ„Â±Ã…Å¸Ã„Â± bÃ„Â±rakÃ„Â±ldÃ„Â±.
+Not: ECC tarafından yönetilen kurulumlar `~/.claude/settings.json` içinde `"includeCoAuthoredBy": false` ayarlar, bu nedenle commitler varsayılan olarak `Co-Authored-By` içermez. Claude atfını korumak için `"includeCoAuthoredBy": true` veya `attribution` ayarlayın; ECC açık bir tercihin üzerine asla yazmaz.
 
-## Pull Request Ã„Â°Ã…Å¸ AkÃ„Â±Ã…Å¸Ã„Â±
+## Pull Request İş Akışı
 
-PR oluÃ…Å¸tururken:
-1. Tam commit geÃƒÂ§miÃ…Å¸ini analiz et (sadece son commit deÃ„Å¸il)
-2. TÃƒÂ¼m deÃ„Å¸iÃ…Å¸iklikleri gÃƒÂ¶rmek iÃƒÂ§in `git diff [base-branch]...HEAD` kullan
-3. KapsamlÃ„Â± PR ÃƒÂ¶zeti taslaÃ„Å¸Ã„Â± hazÃ„Â±rla
-4. TODO'larÃ„Â± iÃƒÂ§eren test planÃ„Â± ekle
+PR oluştururken:
+1. Tam commit geçmişini analiz et (sadece son commit değil)
+2. Tüm değişiklikleri görmek için `git diff [base-branch]...HEAD` kullan
+3. Kapsamlı PR özeti taslağı hazırla
+4. TODO'ları içeren test planı ekle
 5. Yeni branch ise `-u` flag'i ile push et
 
-> Git iÃ…Å¸lemlerinden ÃƒÂ¶nce tam geliÃ…Å¸tirme sÃƒÂ¼reci (planlama, TDD, kod incelemesi) iÃƒÂ§in
-> [development-workflow.md](./development-workflow.md) dosyasÃ„Â±na bakÃ„Â±n.
+> Git işlemlerinden önce tam geliştirme süreci (planlama, TDD, kod incelemesi) için
+> [development-workflow.md](./development-workflow.md) dosyasına bakın.

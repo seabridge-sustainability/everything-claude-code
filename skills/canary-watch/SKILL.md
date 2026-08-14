@@ -1,10 +1,11 @@
 ---
 name: canary-watch
-description: Use this skill to monitor a deployed URL for regressions after deploys, merges, or dependency upgrades.
-origin: ECC
+description: Use this skill to monitor and verify a deployed URL after releases — checks HTTP endpoints, SSE streams, static assets, console errors, and performance regressions after deploys, merges, or dependency upgrades. Smoke / canary / post-deploy verification.
+metadata:
+  origin: ECC
 ---
 
-# Canary Watch Ã¢â‚¬â€ Post-Deploy Monitoring
+# Canary Watch — Post-Deploy Monitoring
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -22,7 +23,6 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
-
 ## When to Use
 
 - After deploying to production or staging
@@ -38,12 +38,14 @@ Monitors a deployed URL for regressions. Runs in a loop until stopped or until t
 ### What It Watches
 
 ```
-1. HTTP Status Ã¢â‚¬â€ is the page returning 200?
-2. Console Errors Ã¢â‚¬â€ new errors that weren't there before?
-3. Network Failures Ã¢â‚¬â€ failed API calls, 5xx responses?
-4. Performance Ã¢â‚¬â€ LCP/CLS/INP regression vs baseline?
-5. Content Ã¢â‚¬â€ did key elements disappear? (h1, nav, footer, CTA)
-6. API Health Ã¢â‚¬â€ are critical endpoints responding within SLA?
+1. HTTP Status — is the page returning 200?
+2. Console Errors — new errors that weren't there before?
+3. Network Failures — failed API calls, 5xx responses?
+4. Performance — LCP/CLS/INP regression vs baseline?
+5. Content — did key elements disappear? (h1, nav, footer, CTA)
+6. API Health — are critical endpoints responding within SLA?
+7. Static Assets — are JS, CSS, image, and font requests returning 2xx/3xx with expected content types?
+8. SSE Streams — do event-stream endpoints connect and receive an initial event or heartbeat?
 ```
 
 ### Watch Modes
@@ -71,12 +73,16 @@ critical:  # immediate alert
   - Console error count > 5 (new errors only)
   - LCP > 4s
   - API endpoint returns 5xx
+  - Static asset returns 4xx/5xx
+  - SSE endpoint cannot connect or drops before first heartbeat
 
 warning:   # flag in report
   - LCP increased > 500ms from baseline
   - CLS > 0.1
   - New console warnings
   - Response time > 2x baseline
+  - Static asset content type changed unexpectedly
+  - SSE heartbeat latency > 2x baseline
 
 info:      # log only
   - Minor performance variance
@@ -93,17 +99,19 @@ When a critical threshold is crossed:
 ## Output
 
 ```markdown
-## Canary Report Ã¢â‚¬â€ myapp.com Ã¢â‚¬â€ 2026-03-23 03:15 PST
+## Canary Report — myapp.com — 2026-03-23 03:15 PST
 
-### Status: HEALTHY Ã¢Å“â€œ
+### Status: HEALTHY ✓
 
 | Check | Result | Baseline | Delta |
 |-------|--------|----------|-------|
-| HTTP | 200 Ã¢Å“â€œ | 200 | Ã¢â‚¬â€ |
-| Console errors | 0 Ã¢Å“â€œ | 0 | Ã¢â‚¬â€ |
-| LCP | 1.8s Ã¢Å“â€œ | 1.6s | +200ms |
-| CLS | 0.01 Ã¢Å“â€œ | 0.01 | Ã¢â‚¬â€ |
-| API /health | 145ms Ã¢Å“â€œ | 120ms | +25ms |
+| HTTP | 200 ✓ | 200 | — |
+| Console errors | 0 ✓ | 0 | — |
+| LCP | 1.8s ✓ | 1.6s | +200ms |
+| CLS | 0.01 ✓ | 0.01 | — |
+| API /health | 145ms ✓ | 120ms | +25ms |
+| Static assets | 42/42 ✓ | 42/42 | — |
+| SSE /events | connected ✓ | connected | +80ms heartbeat |
 
 ### No regressions detected. Deploy is clean.
 ```

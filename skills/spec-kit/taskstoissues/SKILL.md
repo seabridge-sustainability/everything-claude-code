@@ -1,4 +1,4 @@
-﻿---
+---
 name: speckit-taskstoissues
 description: Convert Spec Kit tasks into GitHub issue drafts or approved issues with strict repository and approval gates.
 ---

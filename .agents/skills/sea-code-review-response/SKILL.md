@@ -1,4 +1,4 @@
-﻿---
+---
 name: sea-code-review-response
 description: Callable wrapper for sea-code-review-response. Load the canonical SeaBridgeAI skill body from everything-claude-code\skills\sea-code-review-response\SKILL.md.
 ---

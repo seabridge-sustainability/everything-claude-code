@@ -1,4 +1,4 @@
-﻿---
+---
 name: sea-ai-data-integrity
 description: SeaBridgeAI AI data-integrity and hallucination-prevention skill for sustainability agents, RAG, prompts, reports, calculations, exports, and assistant UI outputs.
 ---

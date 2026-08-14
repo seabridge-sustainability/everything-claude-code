@@ -1,4 +1,4 @@
-﻿# [CHECKLIST TYPE] Checklist: [FEATURE NAME]
+# [CHECKLIST TYPE] Checklist: [FEATURE NAME]
 
 **Purpose**: Validate requirement quality before implementation.
 **Created**: [DATE]

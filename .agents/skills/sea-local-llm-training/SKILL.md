@@ -1,4 +1,4 @@
-﻿---
+---
 name: sea-local-llm-training
 description: Callable wrapper for sea-local-llm-training. Load the canonical SeaBridgeAI skill body from everything-claude-code\skills\sea-local-llm-training\SKILL.md.
 ---

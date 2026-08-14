@@ -1,4 +1,4 @@
-﻿---
+---
 name: spec-kit
 description: SeaBridgeAI curated Spec Kit workflow package. Use for specification-driven development across SeaBridgeAI repos when a feature needs constitution, specification, clarification, planning, tasking, analysis, checklist, or implementation discipline.
 ---

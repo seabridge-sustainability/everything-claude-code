@@ -1,7 +1,7 @@
 ---
 name: qa-agent
 description: SeaBridgeAI QA specialist for focused tests, browser checks, contract tests, regression coverage, and completion evidence.
-tools: ["Read", "Grep", "Glob", "Bash"]
+tools: Read, Grep, Glob, Bash
 model: sonnet
 ---
 

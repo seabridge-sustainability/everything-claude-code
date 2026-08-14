@@ -1,4 +1,4 @@
-﻿---
+---
 name: sea-gsd-controlled-execution
 description: Callable wrapper for SeaBridgeAI controlled GSD/Get Shit Done workflows. Load the canonical skill body from everything-claude-code\skills\sea-gsd-controlled-execution\SKILL.md.
 ---

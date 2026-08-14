@@ -1,4 +1,4 @@
-﻿---
+---
 name: sea-test-driven-development
 description: SeaBridgeAI TDD skill adapted from Superpowers for backend, frontend, AI, data, and sustainability workflows with red-green-refactor, contract tests, and source-integrity tests.
 ---

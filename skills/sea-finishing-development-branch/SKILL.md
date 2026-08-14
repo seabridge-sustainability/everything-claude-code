@@ -1,4 +1,4 @@
-﻿---
+---
 name: sea-finishing-development-branch
 description: SeaBridgeAI finishing branch skill adapted from Superpowers for final verification, diff review, handoff, and manual approval before commit, push, merge, PR, or cleanup.
 ---

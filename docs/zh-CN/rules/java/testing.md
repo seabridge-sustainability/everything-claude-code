@@ -3,7 +3,7 @@ paths:
   - "**/*.java"
 ---
 
-# Java Ã¦Âµâ€¹Ã¨Â¯â€¢
+# Java 测试
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -21,29 +21,28 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
+> 本文档扩展了 [common/testing.md](../common/testing.md) 中与 Java 相关的内容。
 
-> Ã¦Å“Â¬Ã¦â€“â€¡Ã¦Â¡Â£Ã¦â€°Â©Ã¥Â±â€¢Ã¤Âºâ€  [common/testing.md](../common/testing.md) Ã¤Â¸Â­Ã¤Â¸Å½ Java Ã§â€ºÂ¸Ã¥â€¦Â³Ã§Å¡â€žÃ¥â€ â€¦Ã¥Â®Â¹Ã£â‚¬â€š
-
-## Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¦Â¡â€ Ã¦Å¾Â¶
+## 测试框架
 
 * **JUnit 5** (`@Test`, `@ParameterizedTest`, `@Nested`, `@DisplayName`)
-* **AssertJ** Ã§â€Â¨Ã¤ÂºÅ½Ã¦ÂµÂÃ¥Â¼ÂÃ¦â€“Â­Ã¨Â¨â‚¬ (`assertThat(result).isEqualTo(expected)`)
-* **Mockito** Ã§â€Â¨Ã¤ÂºÅ½Ã¦Â¨Â¡Ã¦â€¹Å¸Ã¤Â¾ÂÃ¨Âµâ€“
-* **Testcontainers** Ã§â€Â¨Ã¤ÂºÅ½Ã©Å“â‚¬Ã¨Â¦ÂÃ¦â€¢Â°Ã¦ÂÂ®Ã¥Âºâ€œÃ¦Ë†â€“Ã¦Å“ÂÃ¥Å Â¡Ã§Å¡â€žÃ©â€ºâ€ Ã¦Ë†ÂÃ¦Âµâ€¹Ã¨Â¯â€¢
+* **AssertJ** 用于流式断言 (`assertThat(result).isEqualTo(expected)`)
+* **Mockito** 用于模拟依赖
+* **Testcontainers** 用于需要数据库或服务的集成测试
 
-## Ã¦Âµâ€¹Ã¨Â¯â€¢Ã§Â»â€žÃ§Â»â€¡
+## 测试组织
 
 ```
 src/test/java/com/example/app/
-  service/           # Ã¦Å“ÂÃ¥Å Â¡Ã¥Â±â€šÃ¥Ââ€¢Ã¥â€¦Æ’Ã¦Âµâ€¹Ã¨Â¯â€¢
-  controller/        # Web Ã¥Â±â€š/API Ã¦Âµâ€¹Ã¨Â¯â€¢
-  repository/        # Ã¦â€¢Â°Ã¦ÂÂ®Ã¨Â®Â¿Ã©â€”Â®Ã¦Âµâ€¹Ã¨Â¯â€¢
-  integration/       # Ã¨Â·Â¨Ã¥Â±â€šÃ©â€ºâ€ Ã¦Ë†ÂÃ¦Âµâ€¹Ã¨Â¯â€¢
+  service/           # 服务层单元测试
+  controller/        # Web 层/API 测试
+  repository/        # 数据访问测试
+  integration/       # 跨层集成测试
 ```
 
-Ã¥Å“Â¨ `src/test/java` Ã¤Â¸Â­Ã©â€¢Å“Ã¥Æ’Â `src/main/java` Ã§Å¡â€žÃ¥Å’â€¦Ã§Â»â€œÃ¦Å¾â€žÃ£â‚¬â€š
+在 `src/test/java` 中镜像 `src/main/java` 的包结构。
 
-## Ã¥Ââ€¢Ã¥â€¦Æ’Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¦Â¨Â¡Ã¥Â¼Â
+## 单元测试模式
 
 ```java
 @ExtendWith(MockitoExtension.class)
@@ -83,7 +82,7 @@ class OrderServiceTest {
 }
 ```
 
-## Ã¥Ââ€šÃ¦â€¢Â°Ã¥Å’â€“Ã¦Âµâ€¹Ã¨Â¯â€¢
+## 参数化测试
 
 ```java
 @ParameterizedTest
@@ -98,9 +97,9 @@ void applyDiscount(BigDecimal price, int pct, BigDecimal expected) {
 }
 ```
 
-## Ã©â€ºâ€ Ã¦Ë†ÂÃ¦Âµâ€¹Ã¨Â¯â€¢
+## 集成测试
 
-Ã¤Â½Â¿Ã§â€Â¨ Testcontainers Ã¨Â¿â€ºÃ¨Â¡Å’Ã§Å“Å¸Ã¥Â®Å¾Ã§Å¡â€žÃ¦â€¢Â°Ã¦ÂÂ®Ã¥Âºâ€œÃ©â€ºâ€ Ã¦Ë†ÂÃ¯Â¼Å¡
+使用 Testcontainers 进行真实的数据库集成：
 
 ```java
 @Testcontainers
@@ -129,22 +128,24 @@ class OrderRepositoryIT {
 }
 ```
 
-Ã¥â€¦Â³Ã¤ÂºÅ½ Spring Boot Ã©â€ºâ€ Ã¦Ë†ÂÃ¦Âµâ€¹Ã¨Â¯â€¢Ã¯Â¼Å’Ã¨Â¯Â·Ã¥Ââ€šÃ©Ëœâ€¦Ã¦Å â‚¬Ã¨Æ’Â½Ã¯Â¼Å¡`springboot-tdd`Ã£â‚¬â€š
+关于 Spring Boot 集成测试，请参阅技能：`springboot-tdd`。
+关于 Quarkus 集成测试，请参阅技能：`quarkus-tdd`。
 
-## Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¥â€˜Â½Ã¥ÂÂ
+## 测试命名
 
-Ã¤Â½Â¿Ã§â€Â¨Ã¥Â¸Â¦Ã¦Å“â€° `@DisplayName` Ã§Å¡â€žÃ¦ÂÂÃ¨Â¿Â°Ã¦â‚¬Â§Ã¥ÂÂÃ§Â§Â°Ã¯Â¼Å¡
+使用带有 `@DisplayName` 的描述性名称：
 
-* `methodName_scenario_expectedBehavior()` Ã§â€Â¨Ã¤ÂºÅ½Ã¦â€“Â¹Ã¦Â³â€¢Ã¥ÂÂ
-* `@DisplayName("human-readable description")` Ã§â€Â¨Ã¤ÂºÅ½Ã¦Å Â¥Ã¥â€˜Å 
+* `methodName_scenario_expectedBehavior()` 用于方法名
+* `@DisplayName("human-readable description")` 用于报告
 
-## Ã¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡
+## 覆盖率
 
-* Ã§â€ºÂ®Ã¦Â â€¡Ã¤Â¸Âº 80%+ Ã§Å¡â€žÃ¨Â¡Å’Ã¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡
-* Ã¤Â½Â¿Ã§â€Â¨ JaCoCo Ã§â€Å¸Ã¦Ë†ÂÃ¨Â¦â€ Ã§â€ºâ€“Ã§Å½â€¡Ã¦Å Â¥Ã¥â€˜Å 
-* Ã©â€¡ÂÃ§â€šÂ¹Ã¥â€¦Â³Ã¦Â³Â¨Ã¦Å“ÂÃ¥Å Â¡Ã¥â€™Å’Ã©Â¢â€ Ã¥Å¸Å¸Ã©â‚¬Â»Ã¨Â¾â€˜ Ã¢â‚¬â€ Ã¨Â·Â³Ã¨Â¿â€¡Ã§Â®â‚¬Ã¥Ââ€¢Ã§Å¡â€ž getter/Ã©â€¦ÂÃ§Â½Â®Ã§Â±Â»
+* 目标为 80%+ 的行覆盖率
+* 使用 JaCoCo 生成覆盖率报告
+* 重点关注服务和领域逻辑 — 跳过简单的 getter/配置类
 
-## Ã¥Ââ€šÃ¨â‚¬Æ’
+## 参考
 
-Ã¥â€¦Â³Ã¤ÂºÅ½Ã¤Â½Â¿Ã§â€Â¨ MockMvc Ã¥â€™Å’ Testcontainers Ã§Å¡â€ž Spring Boot TDD Ã¦Â¨Â¡Ã¥Â¼ÂÃ¯Â¼Å’Ã¨Â¯Â·Ã¥Ââ€šÃ©Ëœâ€¦Ã¦Å â‚¬Ã¨Æ’Â½Ã¯Â¼Å¡`springboot-tdd`Ã£â‚¬â€š
-Ã¥â€¦Â³Ã¤ÂºÅ½Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¦Å“Å¸Ã¦Å“â€ºÃ¯Â¼Å’Ã¨Â¯Â·Ã¥Ââ€šÃ©Ëœâ€¦Ã¦Å â‚¬Ã¨Æ’Â½Ã¯Â¼Å¡`java-coding-standards`Ã£â‚¬â€š
+关于使用 MockMvc 和 Testcontainers 的 Spring Boot TDD 模式，请参阅技能：`springboot-tdd`。
+关于使用 REST Assured 和 Camel 测试的 Quarkus TDD 模式，请参阅技能：`quarkus-tdd`。
+关于测试期望，请参阅技能：`java-coding-standards`。

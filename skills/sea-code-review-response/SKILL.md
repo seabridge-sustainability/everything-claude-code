@@ -1,4 +1,4 @@
-﻿---
+---
 name: sea-code-review-response
 description: SeaBridgeAI code review response adapted from Superpowers for requesting reviews, receiving feedback, triaging severity, implementing fixes, and preserving technical rigor.
 ---

@@ -1,3 +1,7 @@
+---
+description: Run a backend-focused multi-model workflow for APIs, algorithms, data, and business logic.
+---
+
 # Backend - Backend-Focused Development
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
@@ -18,6 +22,8 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 
 
 Backend-focused workflow (Research → Ideation → Plan → Execute → Optimize → Review), Codex-led.
+
+> **Prerequisite:** Requires the external `ccg-workflow` runtime, which is **not** part of the base ECC install. Initialize it with `npx ccg-workflow` to provision `~/.claude/bin/codeagent-wrapper` and the `~/.claude/.ccg/prompts/*` role files this command depends on. Without that runtime, this command will not run correctly.
 
 ## Usage
 

@@ -1,7 +1,8 @@
 ---
 name: exa-search
 description: Neural search via Exa MCP for web, code, and company research. Use when the user needs web search, code examples, company intel, people lookup, or AI-powered deep research with Exa's neural search engine.
-origin: ECC
+metadata:
+  origin: ECC
 ---
 
 # Exa Search
@@ -22,6 +23,9 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
+> **Drift-prone skill.** Exa MCP tool names, parameters, and account limits can
+> change. Confirm the exposed tool surface and current Exa docs before relying
+> on a specific search mode, category, or livecrawl behavior.
 
 Neural search for web content, code, companies, and people via the Exa MCP server.
 
@@ -116,5 +120,5 @@ get_code_context_exa(query: "WebAssembly component model examples", tokensNum: 4
 
 ## Related Skills
 
-- `deep-research` Ã¢â‚¬â€ Full research workflow using firecrawl + exa together
-- `market-research` Ã¢â‚¬â€ Business-oriented research with decision frameworks
+- `deep-research` — Full research workflow using firecrawl + exa together
+- `market-research` — Business-oriented research with decision frameworks

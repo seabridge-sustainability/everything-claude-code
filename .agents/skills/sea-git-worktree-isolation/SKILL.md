@@ -1,4 +1,4 @@
-﻿---
+---
 name: sea-git-worktree-isolation
 description: Callable wrapper for sea-git-worktree-isolation. Load the canonical SeaBridgeAI skill body from everything-claude-code\skills\sea-git-worktree-isolation\SKILL.md.
 ---

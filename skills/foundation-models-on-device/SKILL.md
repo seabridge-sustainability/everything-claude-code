@@ -1,6 +1,6 @@
 ---
 name: foundation-models-on-device
-description: Apple FoundationModels framework for on-device LLM Ã¢â‚¬â€ text generation, guided generation with @Generable, tool calling, and snapshot streaming in iOS 26+.
+description: Apple FoundationModels framework for on-device LLM — text generation, guided generation with @Generable, tool calling, and snapshot streaming in iOS 26+. Use when adding on-device LLM features with Apple FoundationModels on iOS 26+.
 ---
 
 # FoundationModels: On-Device LLM (iOS 26)
@@ -21,8 +21,7 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
-
-Patterns for integrating Apple's on-device language model into apps using the FoundationModels framework. Covers text generation, structured output with `@Generable`, custom tool calling, and snapshot streaming Ã¢â‚¬â€ all running on-device for privacy and offline support.
+Patterns for integrating Apple's on-device language model into apps using the FoundationModels framework. Covers text generation, structured output with `@Generable`, custom tool calling, and snapshot streaming — all running on-device for privacy and offline support.
 
 ## When to Activate
 
@@ -33,7 +32,7 @@ Patterns for integrating Apple's on-device language model into apps using the Fo
 - Streaming structured responses for real-time UI updates
 - Need privacy-preserving AI (no data leaves the device)
 
-## Core Pattern Ã¢â‚¬â€ Availability Check
+## Core Pattern — Availability Check
 
 Always check model availability before creating a session:
 
@@ -58,7 +57,7 @@ struct GenerativeView: View {
 }
 ```
 
-## Core Pattern Ã¢â‚¬â€ Basic Session
+## Core Pattern — Basic Session
 
 ```swift
 // Single-turn: create a new session each time
@@ -83,7 +82,7 @@ Key points for instructions:
 - Set style preferences ("Respond as briefly as possible")
 - Add safety measures ("Respond with 'I can't help with that' for dangerous requests")
 
-## Core Pattern Ã¢â‚¬â€ Guided Generation with @Generable
+## Core Pattern — Guided Generation with @Generable
 
 Generate structured Swift types instead of raw strings:
 
@@ -118,11 +117,11 @@ print("Profile: \(response.content.profile)")
 
 ### Supported @Guide Constraints
 
-- `.range(0...20)` Ã¢â‚¬â€ numeric range
-- `.count(3)` Ã¢â‚¬â€ array element count
-- `description:` Ã¢â‚¬â€ semantic guidance for generation
+- `.range(0...20)` — numeric range
+- `.count(3)` — array element count
+- `description:` — semantic guidance for generation
 
-## Core Pattern Ã¢â‚¬â€ Tool Calling
+## Core Pattern — Tool Calling
 
 Let the model invoke custom code for domain-specific tasks:
 
@@ -169,7 +168,7 @@ do {
 }
 ```
 
-## Core Pattern Ã¢â‚¬â€ Snapshot Streaming
+## Core Pattern — Snapshot Streaming
 
 Stream structured responses for real-time UI with `PartiallyGenerated` types:
 
@@ -223,23 +222,23 @@ var body: some View {
 
 | Decision | Rationale |
 |----------|-----------|
-| On-device execution | Privacy Ã¢â‚¬â€ no data leaves the device; works offline |
+| On-device execution | Privacy — no data leaves the device; works offline |
 | 4,096 token limit | On-device model constraint; chunk large data across sessions |
 | Snapshot streaming (not deltas) | Structured output friendly; each snapshot is a complete partial state |
 | `@Generable` macro | Compile-time safety for structured generation; auto-generates `PartiallyGenerated` type |
 | Single request per session | `isResponding` prevents concurrent requests; create multiple sessions if needed |
-| `response.content` (not `.output`) | Correct API Ã¢â‚¬â€ always access results via `.content` property |
+| `response.content` (not `.output`) | Correct API — always access results via `.content` property |
 
 ## Best Practices
 
-- **Always check `model.availability`** before creating a session Ã¢â‚¬â€ handle all unavailability cases
-- **Use `instructions`** to guide model behavior Ã¢â‚¬â€ they take priority over prompts
-- **Check `isResponding`** before sending a new request Ã¢â‚¬â€ sessions handle one request at a time
-- **Access `response.content`** for results Ã¢â‚¬â€ not `.output`
-- **Break large inputs into chunks** Ã¢â‚¬â€ 4,096 token limit applies to instructions + prompt + output combined
-- **Use `@Generable`** for structured output Ã¢â‚¬â€ stronger guarantees than parsing raw strings
+- **Always check `model.availability`** before creating a session — handle all unavailability cases
+- **Use `instructions`** to guide model behavior — they take priority over prompts
+- **Check `isResponding`** before sending a new request — sessions handle one request at a time
+- **Access `response.content`** for results — not `.output`
+- **Break large inputs into chunks** — 4,096 token limit applies to instructions + prompt + output combined
+- **Use `@Generable`** for structured output — stronger guarantees than parsing raw strings
 - **Use `GenerationOptions(temperature:)`** to tune creativity (higher = more creative)
-- **Monitor with Instruments** Ã¢â‚¬â€ use Xcode Instruments to profile request performance
+- **Monitor with Instruments** — use Xcode Instruments to profile request performance
 
 ## Anti-Patterns to Avoid
 
@@ -248,8 +247,8 @@ var body: some View {
 - Attempting concurrent requests on a single session
 - Using `.output` instead of `.content` to access response data
 - Parsing raw string responses when `@Generable` structured output would work
-- Building complex multi-step logic in a single prompt Ã¢â‚¬â€ break into multiple focused prompts
-- Assuming the model is always available Ã¢â‚¬â€ device eligibility and settings vary
+- Building complex multi-step logic in a single prompt — break into multiple focused prompts
+- Assuming the model is always available — device eligibility and settings vary
 
 ## When to Use
 

@@ -1,4 +1,4 @@
-﻿# GSD Verification Workflow
+# GSD Verification Workflow
 
 ## Objective
 

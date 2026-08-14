@@ -1,4 +1,4 @@
-﻿# SeaBridgeAI OpenCode Entry Point
+# SeaBridgeAI OpenCode Entry Point
 
 <!-- SEABRIDGE_GOAL_PROTOCOL_START -->
 ## /goal Default Operating Mode

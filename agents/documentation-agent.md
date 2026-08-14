@@ -1,7 +1,7 @@
 ---
 name: documentation-agent
 description: SeaBridgeAI documentation specialist for repo pointers, handoffs, architecture notes, validation reports, and skill documentation.
-tools: ["Read", "Grep", "Glob", "Bash"]
+tools: Read, Grep, Glob, Bash
 model: sonnet
 ---
 

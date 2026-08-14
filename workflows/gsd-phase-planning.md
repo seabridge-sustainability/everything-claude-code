@@ -1,4 +1,4 @@
-﻿# GSD Phase Planning Workflow
+# GSD Phase Planning Workflow
 
 ## Objective
 

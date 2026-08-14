@@ -1,4 +1,4 @@
-﻿---
+---
 name: sea-finishing-development-branch
 description: Callable wrapper for sea-finishing-development-branch. Load the canonical SeaBridgeAI skill body from everything-claude-code\skills\sea-finishing-development-branch\SKILL.md.
 ---

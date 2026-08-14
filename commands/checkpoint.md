@@ -1,3 +1,7 @@
+---
+description: Create, verify, or list workflow checkpoints after running verification checks.
+---
+
 # Checkpoint Command
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->

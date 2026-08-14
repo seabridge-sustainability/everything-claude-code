@@ -16,8 +16,7 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
-
-This guide helps you migrate from Claude Code to OpenCode while using the Everything Claude Code (ECC) configuration.
+This guide helps you migrate from Claude Code to OpenCode while using the ECC configuration.
 
 ## Overview
 
@@ -111,25 +110,25 @@ The `.opencode/` directory in this repository contains the translated configurat
 
 ```
 .opencode/
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ opencode.json              # Main configuration
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ plugins/                   # Hook plugins (translated from hooks.json)
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ ecc-hooks.ts           # All ECC hooks as plugins
-Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ index.ts               # Plugin exports
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ tools/                     # Custom tools
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ run-tests.ts           # Run test suite
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ check-coverage.ts      # Check coverage
-Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ security-audit.ts      # npm audit wrapper
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ commands/                  # All 23 commands (markdown)
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ plan.md
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ tdd.md
-Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ ... (21 more)
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ prompts/
-Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ agents/                # Agent prompt files (12)
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ instructions/
-Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ INSTRUCTIONS.md        # Consolidated rules
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ package.json               # For npm distribution
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ tsconfig.json              # TypeScript config
-Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ MIGRATION.md               # This file
+├── opencode.json              # Main configuration
+├── plugins/                   # Hook plugins (translated from hooks.json)
+│   ├── ecc-hooks.ts           # All ECC hooks as plugins
+│   └── index.ts               # Plugin exports
+├── tools/                     # Custom tools
+│   ├── run-tests.ts           # Run test suite
+│   ├── check-coverage.ts      # Check coverage
+│   └── security-audit.ts      # npm audit wrapper
+├── commands/                  # All 23 commands (markdown)
+│   ├── plan.md
+│   ├── tdd.md
+│   └── ... (21 more)
+├── prompts/
+│   └── agents/                # Agent prompt files (12)
+├── instructions/
+│   └── INSTRUCTIONS.md        # Consolidated rules
+├── package.json               # For npm distribution
+├── tsconfig.json              # TypeScript config
+└── MIGRATION.md               # This file
 ```
 
 ### 3. Run OpenCode
@@ -382,4 +381,4 @@ If you need to switch back:
 
 For issues specific to:
 - **OpenCode CLI**: Report to OpenCode's issue tracker
-- **ECC Configuration**: Report to [github.com/affaan-m/everything-claude-code](https://github.com/affaan-m/everything-claude-code)
+- **ECC Configuration**: Report to [github.com/affaan-m/ECC](https://github.com/affaan-m/ECC)

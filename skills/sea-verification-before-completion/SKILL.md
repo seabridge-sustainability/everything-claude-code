@@ -1,4 +1,4 @@
-﻿---
+---
 name: sea-verification-before-completion
 description: SeaBridgeAI verification-before-completion adapted from Superpowers requiring fresh evidence before claiming work is done, fixed, passing, production-ready, or wired.
 ---

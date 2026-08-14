@@ -1,10 +1,11 @@
 ---
 name: search-first
 description: Research-before-coding workflow. Search for existing tools, libraries, and patterns before writing custom code. Invokes the researcher agent.
-origin: ECC
+metadata:
+  origin: ECC
 ---
 
-# /search-first Ã¢â‚¬â€ Research Before You Code
+# /search-first — Research Before You Code
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -22,7 +23,6 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
-
 Systematizes the "search for existing solutions before implementing" workflow.
 
 ## Trigger
@@ -36,60 +36,77 @@ Use this skill when:
 ## Workflow
 
 ```
-Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
-Ã¢â€â€š  1. NEED ANALYSIS                           Ã¢â€â€š
-Ã¢â€â€š     Define what functionality is needed      Ã¢â€â€š
-Ã¢â€â€š     Identify language/framework constraints  Ã¢â€â€š
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¤
-Ã¢â€â€š  2. PARALLEL SEARCH (researcher agent)      Ã¢â€â€š
-Ã¢â€â€š     Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â  Ã¢â€â€š
-Ã¢â€â€š     Ã¢â€â€š  npm /   Ã¢â€â€š Ã¢â€â€š  MCP /   Ã¢â€â€š Ã¢â€â€š  GitHub / Ã¢â€â€š  Ã¢â€â€š
-Ã¢â€â€š     Ã¢â€â€š  PyPI    Ã¢â€â€š Ã¢â€â€š  Skills  Ã¢â€â€š Ã¢â€â€š  Web      Ã¢â€â€š  Ã¢â€â€š
-Ã¢â€â€š     Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ  Ã¢â€â€š
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¤
-Ã¢â€â€š  3. EVALUATE                                Ã¢â€â€š
-Ã¢â€â€š     Score candidates (functionality, maint, Ã¢â€â€š
-Ã¢â€â€š     community, docs, license, deps)         Ã¢â€â€š
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¤
-Ã¢â€â€š  4. DECIDE                                  Ã¢â€â€š
-Ã¢â€â€š     Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â  Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â  Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â  Ã¢â€â€š
-Ã¢â€â€š     Ã¢â€â€š  Adopt  Ã¢â€â€š  Ã¢â€â€š  Extend  Ã¢â€â€š  Ã¢â€â€š  Build   Ã¢â€â€š  Ã¢â€â€š
-Ã¢â€â€š     Ã¢â€â€š as-is   Ã¢â€â€š  Ã¢â€â€š  /Wrap   Ã¢â€â€š  Ã¢â€â€š  Custom  Ã¢â€â€š  Ã¢â€â€š
-Ã¢â€â€š     Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ  Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ  Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ  Ã¢â€â€š
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¤
-Ã¢â€â€š  5. IMPLEMENT                               Ã¢â€â€š
-Ã¢â€â€š     Install package / Configure MCP /       Ã¢â€â€š
-Ã¢â€â€š     Write minimal custom code               Ã¢â€â€š
-Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
+┌─────────────────────────────────────────────┐
+│  0. TOOL AVAILABILITY PREFLIGHT             │
+│     Check search channels before relying on │
+│     them; report skipped channels honestly   │
+├─────────────────────────────────────────────┤
+│  1. NEED ANALYSIS                           │
+│     Define what functionality is needed      │
+│     Identify language/framework constraints  │
+├─────────────────────────────────────────────┤
+│  2. PARALLEL SEARCH (researcher agent)      │
+│     ┌──────────┐ ┌──────────┐ ┌──────────┐  │
+│     │  npm /   │ │  MCP /   │ │  GitHub / │  │
+│     │  PyPI    │ │  Skills  │ │  Web      │  │
+│     └──────────┘ └──────────┘ └──────────┘  │
+├─────────────────────────────────────────────┤
+│  3. EVALUATE                                │
+│     Score candidates (functionality, maint, │
+│     community, docs, license, deps)         │
+├─────────────────────────────────────────────┤
+│  4. DECIDE                                  │
+│     ┌─────────┐  ┌──────────┐  ┌─────────┐  │
+│     │  Adopt  │  │  Extend  │  │  Build   │  │
+│     │ as-is   │  │  /Wrap   │  │  Custom  │  │
+│     └─────────┘  └──────────┘  └─────────┘  │
+├─────────────────────────────────────────────┤
+│  5. IMPLEMENT                               │
+│     Install package / Configure MCP /       │
+│     Write minimal custom code               │
+└─────────────────────────────────────────────┘
 ```
 
 ## Decision Matrix
 
 | Signal | Action |
 |--------|--------|
-| Exact match, well-maintained, MIT/Apache | **Adopt** Ã¢â‚¬â€ install and use directly |
-| Partial match, good foundation | **Extend** Ã¢â‚¬â€ install + write thin wrapper |
-| Multiple weak matches | **Compose** Ã¢â‚¬â€ combine 2-3 small packages |
-| Nothing suitable found | **Build** Ã¢â‚¬â€ write custom, but informed by research |
+| Exact match, well-maintained, MIT/Apache | **Adopt** — install and use directly |
+| Partial match, good foundation | **Extend** — install + write thin wrapper |
+| Multiple weak matches | **Compose** — combine 2-3 small packages |
+| Nothing suitable found | **Build** — write custom, but informed by research |
 
 ## How to Use
+
+### Step 0: Tool Availability Preflight
+
+This is agent guidance, not an executable setup script. Check only the channels
+that are relevant to the task and project in front of you.
+
+| Channel | Check | If missing |
+|---------|-------|------------|
+| Repository search | `rg --files` and targeted `rg` queries | State that only visible files were inspected |
+| Package registry | `npm --version`, `python -m pip --version`, or project package manager | Use web/docs search and avoid claiming registry coverage |
+| GitHub CLI | `gh auth status` | Use public web or local git history only |
+| MCP/docs tools | Available tool list or local MCP config | Fall back to official docs/web search |
+| Skills directory | `ls ~/.claude/skills ~/.codex/skills` where applicable | Say no local skill catalog was available |
 
 ### Quick Mode (inline)
 
 Before writing a utility or adding functionality, mentally run through:
 
-0. Does this already exist in the repo? Ã¢â€ â€™ `rg` through relevant modules/tests first
-1. Is this a common problem? Ã¢â€ â€™ Search npm/PyPI
-2. Is there an MCP for this? Ã¢â€ â€™ Check `~/.claude/settings.json` and search
-3. Is there a skill for this? Ã¢â€ â€™ Check `~/.claude/skills/`
-4. Is there a GitHub implementation/template? Ã¢â€ â€™ Run GitHub code search for maintained OSS before writing net-new code
+0. Does this already exist in the repo? → `rg` through relevant modules/tests first
+1. Is this a common problem? → Search npm/PyPI
+2. Is there an MCP for this? → Check `~/.claude/settings.json` and search
+3. Is there a skill for this? → Check `~/.claude/skills/`
+4. Is there a GitHub implementation/template? → Run GitHub code search for maintained OSS before writing net-new code
 
 ### Full Mode (agent)
 
 For non-trivial functionality, launch the researcher agent:
 
 ```
-Task(subagent_type="general-purpose", prompt="
+Agent(subagent_type="general-purpose", prompt="
   Research existing tools for: [DESCRIPTION]
   Language/framework: [LANG]
   Constraints: [ANY]
@@ -99,27 +116,30 @@ Task(subagent_type="general-purpose", prompt="
 ")
 ```
 
+Older Claude Code docs may call this `Task(...)`; use the current agent/subagent
+tool name exposed by the active harness.
+
 ## Search Shortcuts by Category
 
 ### Development Tooling
-- Linting Ã¢â€ â€™ `eslint`, `ruff`, `textlint`, `markdownlint`
-- Formatting Ã¢â€ â€™ `prettier`, `black`, `gofmt`
-- Testing Ã¢â€ â€™ `jest`, `pytest`, `go test`
-- Pre-commit Ã¢â€ â€™ `husky`, `lint-staged`, `pre-commit`
+- Linting → `eslint`, `ruff`, `textlint`, `markdownlint`
+- Formatting → `prettier`, `black`, `gofmt`
+- Testing → `jest`, `pytest`, `go test`
+- Pre-commit → `husky`, `lint-staged`, `pre-commit`
 
 ### AI/LLM Integration
-- Claude SDK Ã¢â€ â€™ Context7 for latest docs
-- Prompt management Ã¢â€ â€™ Check MCP servers
-- Document processing Ã¢â€ â€™ `unstructured`, `pdfplumber`, `mammoth`
+- Claude SDK → Context7 for latest docs
+- Prompt management → Check MCP servers
+- Document processing → `unstructured`, `pdfplumber`, `mammoth`
 
 ### Data & APIs
-- HTTP clients Ã¢â€ â€™ `httpx` (Python), `ky`/`got` (Node)
-- Validation Ã¢â€ â€™ `zod` (TS), `pydantic` (Python)
-- Database Ã¢â€ â€™ Check for MCP servers first
+- HTTP clients → `httpx` (Python), `ky`/`undici` (Node)
+- Validation → `zod` (TS), `pydantic` (Python)
+- Database → Check for MCP servers first
 
 ### Content & Publishing
-- Markdown processing Ã¢â€ â€™ `remark`, `unified`, `markdown-it`
-- Image optimization Ã¢â€ â€™ `sharp`, `imagemin`
+- Markdown processing → `remark`, `unified`, `markdown-it`
+- Image optimization → `sharp`, `imagemin`
 
 ## Integration Points
 
@@ -148,7 +168,7 @@ Combine for progressive discovery:
 Need: Check markdown files for broken links
 Search: npm "markdown dead link checker"
 Found: textlint-rule-no-dead-link (score: 9/10)
-Action: ADOPT Ã¢â‚¬â€ npm install textlint-rule-no-dead-link
+Action: ADOPT — npm install textlint-rule-no-dead-link
 Result: Zero custom code, battle-tested solution
 ```
 
@@ -157,7 +177,7 @@ Result: Zero custom code, battle-tested solution
 Need: Resilient HTTP client with retries and timeout handling
 Search: npm "http client retry", PyPI "httpx retry"
 Found: got (Node) with retry plugin, httpx (Python) with built-in retry
-Action: ADOPT Ã¢â‚¬â€ use got/httpx directly with retry config
+Action: ADOPT — use got/httpx directly with retry config
 Result: Zero custom code, production-proven libraries
 ```
 
@@ -166,7 +186,7 @@ Result: Zero custom code, production-proven libraries
 Need: Validate project config files against a schema
 Search: npm "config linter schema", "json schema validator cli"
 Found: ajv-cli (score: 8/10)
-Action: ADOPT + EXTEND Ã¢â‚¬â€ install ajv-cli, write project-specific schema
+Action: ADOPT + EXTEND — install ajv-cli, write project-specific schema
 Result: 1 package + 1 schema file, no custom validation logic
 ```
 
@@ -174,5 +194,6 @@ Result: 1 package + 1 schema file, no custom validation logic
 
 - **Jumping to code**: Writing a utility without checking if one exists
 - **Ignoring MCP**: Not checking if an MCP server already provides the capability
+- **Silent skipping**: Reporting "nothing found" when a search channel was unavailable
 - **Over-customizing**: Wrapping a library so heavily it loses its benefits
 - **Dependency bloat**: Installing a massive package for one small feature

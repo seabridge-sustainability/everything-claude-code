@@ -1,7 +1,8 @@
 ---
 name: skill-comply
-description: Visualize whether skills, rules, and agent definitions are actually followed Ã¢â‚¬â€ auto-generates scenarios at 3 prompt strictness levels, runs agents, classifies behavioral sequences, and reports compliance rates with full tool call timelines
-origin: ECC
+description: Visualize whether skills, rules, and agent definitions are actually followed — auto-generates scenarios at 3 prompt strictness levels, runs agents, classifies behavioral sequences, and reports compliance rates with full tool call timelines. Use when checking whether agents actually follow the skills, rules, and definitions they were given, rather than assuming they do.
+metadata:
+  origin: ECC
 tools: Read, Bash
 ---
 
@@ -23,10 +24,9 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
-
 Measures whether coding agents actually follow skills, rules, or agent definitions by:
 1. Auto-generating expected behavioral sequences (specs) from any .md file
-2. Auto-generating scenarios with decreasing prompt strictness (supportive Ã¢â€ â€™ neutral Ã¢â€ â€™ competing)
+2. Auto-generating scenarios with decreasing prompt strictness (supportive → neutral → competing)
 3. Running `claude -p` and capturing tool call traces via stream-json
 4. Classifying tool calls against spec steps using LLM (not regex)
 5. Checking temporal ordering deterministically
@@ -72,4 +72,4 @@ Reports are self-contained and include:
 
 ### Advanced (optional)
 
-For users familiar with hooks, reports also include hook promotion recommendations for steps with low compliance. This is informational Ã¢â‚¬â€ the main value is the compliance visibility itself.
+For users familiar with hooks, reports also include hook promotion recommendations for steps with low compliance. This is informational — the main value is the compliance visibility itself.

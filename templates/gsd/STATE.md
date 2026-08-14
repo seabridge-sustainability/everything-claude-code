@@ -1,4 +1,4 @@
-﻿# STATE
+# STATE
 
 - Module:
 - Repo:

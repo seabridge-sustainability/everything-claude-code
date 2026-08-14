@@ -74,14 +74,14 @@ Python Ã¥â‚¬Â¾Ã¥Ââ€˜Ã¤ÂºÅ½Ã¤Â½Â¿Ã§â€Â¨Ã¥
 
 ```python
 # Good: EAFP style
-def get_value(dictionary: dict, key: str) -> Any:
+def get_value(dictionary: dict, key: str, default_value: Any = None) -> Any:
     try:
         return dictionary[key]
     except KeyError:
         return default_value
 
 # Bad: LBYL (Look Before You Leap) style
-def get_value(dictionary: dict, key: str) -> Any:
+def get_value(dictionary: dict, key: str, default_value: Any = None) -> Any:
     if key in dictionary:
         return dictionary[key]
     else:

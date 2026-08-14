@@ -1,4 +1,4 @@
-# OtimizaÃƒÂ§ÃƒÂ£o de Desempenho
+# Otimização de Desempenho
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -16,57 +16,56 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
-
-## EstratÃƒÂ©gia de SeleÃƒÂ§ÃƒÂ£o de Modelo
+## Estratégia de Seleção de Modelo
 
 **Haiku 4.5** (90% da capacidade do Sonnet, 3x economia de custo):
-- Agentes leves com invocaÃƒÂ§ÃƒÂ£o frequente
-- ProgramaÃƒÂ§ÃƒÂ£o em par e geraÃƒÂ§ÃƒÂ£o de cÃƒÂ³digo
+- Agentes leves com invocação frequente
+- Programação em par e geração de código
 - Agentes worker em sistemas multi-agente
 
-**Sonnet 4.6** (Melhor modelo para codificaÃƒÂ§ÃƒÂ£o):
+**Sonnet 5** (Melhor modelo para codificação):
 - Trabalho principal de desenvolvimento
 - Orquestrando fluxos de trabalho multi-agente
-- Tarefas de codificaÃƒÂ§ÃƒÂ£o complexas
+- Tarefas de codificação complexas
 
-**Opus 4.5** (RaciocÃƒÂ­nio mais profundo):
-- DecisÃƒÂµes arquiteturais complexas
-- Requisitos mÃƒÂ¡ximos de raciocÃƒÂ­nio
-- Pesquisa e anÃƒÂ¡lise
+**Opus 5** (Raciocínio mais profundo):
+- Decisões arquiteturais complexas
+- Requisitos máximos de raciocínio
+- Pesquisa e análise
 
 ## Gerenciamento da Janela de Contexto
 
-Evite os ÃƒÂºltimos 20% da janela de contexto para:
-- RefatoraÃƒÂ§ÃƒÂ£o em grande escala
-- ImplementaÃƒÂ§ÃƒÂ£o de recursos abrangendo mÃƒÂºltiplos arquivos
-- DepuraÃƒÂ§ÃƒÂ£o de interaÃƒÂ§ÃƒÂµes complexas
+Evite os últimos 20% da janela de contexto para:
+- Refatoração em grande escala
+- Implementação de recursos abrangendo múltiplos arquivos
+- Depuração de interações complexas
 
 Tarefas com menor sensibilidade ao contexto:
-- EdiÃƒÂ§ÃƒÂµes de arquivo ÃƒÂºnico
-- CriaÃƒÂ§ÃƒÂ£o de utilitÃƒÂ¡rios independentes
-- AtualizaÃƒÂ§ÃƒÂµes de documentaÃƒÂ§ÃƒÂ£o
-- CorreÃƒÂ§ÃƒÂµes de bugs simples
+- Edições de arquivo único
+- Criação de utilitários independentes
+- Atualizações de documentação
+- Correções de bugs simples
 
 ## Pensamento Estendido + Modo de Plano
 
-O pensamento estendido estÃƒÂ¡ habilitado por padrÃƒÂ£o, reservando atÃƒÂ© 31.999 tokens para raciocÃƒÂ­nio interno.
+O pensamento estendido está habilitado por padrão, reservando até 31.999 tokens para raciocínio interno.
 
 Controle o pensamento estendido via:
 - **Toggle**: Option+T (macOS) / Alt+T (Windows/Linux)
 - **Config**: Defina `alwaysThinkingEnabled` em `~/.claude/settings.json`
-- **Limite de orÃƒÂ§amento**: `export MAX_THINKING_TOKENS=10000`
-- **Modo verbose**: Ctrl+O para ver a saÃƒÂ­da de pensamento
+- **Limite de orçamento**: `export MAX_THINKING_TOKENS=10000` (bash) ou `$env:MAX_THINKING_TOKENS = "10000"` (PowerShell)
+- **Modo verbose**: Ctrl+O para ver a saída de pensamento
 
-Para tarefas complexas que requerem raciocÃƒÂ­nio profundo:
-1. Garantir que o pensamento estendido esteja habilitado (habilitado por padrÃƒÂ£o)
+Para tarefas complexas que requerem raciocínio profundo:
+1. Garantir que o pensamento estendido esteja habilitado (habilitado por padrão)
 2. Habilitar **Modo de Plano** para abordagem estruturada
-3. Usar mÃƒÂºltiplas rodadas de crÃƒÂ­tica para anÃƒÂ¡lise minuciosa
-4. Usar subagentes com papÃƒÂ©is divididos para perspectivas diversas
+3. Usar múltiplas rodadas de crítica para análise minuciosa
+4. Usar subagentes com papéis divididos para perspectivas diversas
 
-## ResoluÃƒÂ§ÃƒÂ£o de Problemas de Build
+## Resolução de Problemas de Build
 
 Se o build falhar:
 1. Use o agente **build-error-resolver**
 2. Analise mensagens de erro
 3. Corrija incrementalmente
-4. Verifique apÃƒÂ³s cada correÃƒÂ§ÃƒÂ£o
+4. Verifique após cada correção

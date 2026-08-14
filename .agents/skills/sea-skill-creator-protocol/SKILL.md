@@ -1,4 +1,4 @@
-﻿---
+---
 name: sea-skill-creator-protocol
 description: Callable wrapper for sea-skill-creator-protocol. Load the canonical SeaBridgeAI skill body from everything-claude-code\skills\sea-skill-creator-protocol\SKILL.md.
 ---

@@ -1,4 +1,4 @@
-﻿---
+---
 name: speckit-analyze
 description: Run a read-only consistency and coverage analysis across Spec Kit artifacts.
 ---

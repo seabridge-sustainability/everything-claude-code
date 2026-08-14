@@ -1,7 +1,8 @@
 ---
 name: android-clean-architecture
-description: Clean Architecture patterns for Android and Kotlin Multiplatform projects Ã¢â‚¬â€ module structure, dependency rules, UseCases, Repositories, and data layer patterns.
-origin: ECC
+description: Clean Architecture patterns for Android and Kotlin Multiplatform projects — module structure, dependency rules, UseCases, Repositories, and data layer patterns. Use when structuring modules, layers, or data flow in an Android or KMP project.
+metadata:
+  origin: ECC
 ---
 
 # Android Clean Architecture
@@ -22,7 +23,6 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
-
 Clean Architecture patterns for Android and KMP projects. Covers module boundaries, dependency inversion, UseCase/Repository patterns, and data layer design with Room, SQLDelight, and Ktor.
 
 ## When to Activate
@@ -39,26 +39,26 @@ Clean Architecture patterns for Android and KMP projects. Covers module boundari
 
 ```
 project/
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ app/                  # Android entry point, DI wiring, Application class
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ core/                 # Shared utilities, base classes, error types
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ domain/               # UseCases, domain models, repository interfaces (pure Kotlin)
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ data/                 # Repository implementations, DataSources, DB, network
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ presentation/         # Screens, ViewModels, UI models, navigation
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ design-system/        # Reusable Compose components, theme, typography
-Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ feature/              # Feature modules (optional, for larger projects)
-    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ auth/
-    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ settings/
-    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ profile/
+├── app/                  # Android entry point, DI wiring, Application class
+├── core/                 # Shared utilities, base classes, error types
+├── domain/               # UseCases, domain models, repository interfaces (pure Kotlin)
+├── data/                 # Repository implementations, DataSources, DB, network
+├── presentation/         # Screens, ViewModels, UI models, navigation
+├── design-system/        # Reusable Compose components, theme, typography
+└── feature/              # Feature modules (optional, for larger projects)
+    ├── auth/
+    ├── settings/
+    └── profile/
 ```
 
 ### Dependency Rules
 
 ```
-app Ã¢â€ â€™ presentation, domain, data, core
-presentation Ã¢â€ â€™ domain, design-system, core
-data Ã¢â€ â€™ domain, core
-domain Ã¢â€ â€™ core (or no dependencies)
-core Ã¢â€ â€™ (nothing)
+app → presentation, domain, data, core
+presentation → domain, design-system, core
+data → domain, core
+domain → core (or no dependencies)
+core → (nothing)
 ```
 
 **Critical**: `domain` must NEVER depend on `data`, `presentation`, or any framework. It contains pure Kotlin only.
@@ -90,7 +90,7 @@ class ObserveUserProgressUseCase(
 
 ### Domain Models
 
-Domain models are plain Kotlin data classes Ã¢â‚¬â€ no framework annotations:
+Domain models are plain Kotlin data classes — no framework annotations:
 
 ```kotlin
 data class Item(
@@ -305,7 +305,7 @@ sealed interface AppError {
     data object Unauthorized : AppError
 }
 
-// In ViewModel Ã¢â‚¬â€ map to UI state
+// In ViewModel — map to UI state
 viewModelScope.launch {
     when (val result = getItems(category)) {
         is Try.Success -> _state.update { it.copy(items = result.value, isLoading = false) }
@@ -343,12 +343,12 @@ plugins { id("kmp-library") }
 
 ## Anti-Patterns to Avoid
 
-- Importing Android framework classes in `domain` Ã¢â‚¬â€ keep it pure Kotlin
-- Exposing database entities or DTOs to the UI layer Ã¢â‚¬â€ always map to domain models
-- Putting business logic in ViewModels Ã¢â‚¬â€ extract to UseCases
-- Using `GlobalScope` or unstructured coroutines Ã¢â‚¬â€ use `viewModelScope` or structured concurrency
-- Fat repository implementations Ã¢â‚¬â€ split into focused DataSources
-- Circular module dependencies Ã¢â‚¬â€ if A depends on B, B must not depend on A
+- Importing Android framework classes in `domain` — keep it pure Kotlin
+- Exposing database entities or DTOs to the UI layer — always map to domain models
+- Putting business logic in ViewModels — extract to UseCases
+- Using `GlobalScope` or unstructured coroutines — use `viewModelScope` or structured concurrency
+- Fat repository implementations — split into focused DataSources
+- Circular module dependencies — if A depends on B, B must not depend on A
 
 ## References
 

@@ -1,4 +1,4 @@
-﻿---
+---
 name: gsd:ui-review
 description: Retroactive 6-pillar visual audit of implemented frontend code
 argument-hint: "[phase]"

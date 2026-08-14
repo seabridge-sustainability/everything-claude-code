@@ -1,4 +1,4 @@
-﻿---
+---
 name: sea-parallel-agent-dispatch
 description: SeaBridgeAI parallel agent dispatch adapted from Superpowers for independent bounded subtasks, disjoint write scopes, review integration, and cross-agent compatibility.
 ---

@@ -1,6 +1,6 @@
 #:schema https://developers.openai.com/codex/config-schema.json
 
-# Everything Claude Code (ECC) - Codex Reference Configuration
+# Everything Claude Code (ECC) — Codex Reference Configuration
 #
 # Copy this file to ~/.codex/config.toml for global defaults, or keep it in
 # the project root as .codex/config.toml for project-local settings.
@@ -51,7 +51,9 @@ args = ["-y", "@upstash/context7-mcp@latest"]
 startup_timeout_sec = 30
 
 [mcp_servers.exa]
-url = "https://mcp.exa.ai/mcp"
+command = "npx"
+args = ["-y", "mcp-remote", "https://mcp.exa.ai/mcp"]
+startup_timeout_sec = 30
 
 [mcp_servers.memory]
 command = "npx"
@@ -91,7 +93,7 @@ codex_hooks = false
 # Keep the explicit toggle here so the repo documents its expectation clearly.
 multi_agent = true
 
-# Profiles - switch with `codex -p <name>`
+# Profiles — switch with `codex -p <name>`
 [profiles.strict]
 approval_policy = "on-request"
 sandbox_mode = "read-only"

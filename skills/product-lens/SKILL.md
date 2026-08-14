@@ -1,10 +1,11 @@
 ---
 name: product-lens
-description: Use this skill to validate the "why" before building, run product diagnostics, and convert vague ideas into specs.
-origin: ECC
+description: Use this skill to validate the "why" before building, run product diagnostics, and pressure-test product direction before the request becomes an implementation contract.
+metadata:
+  origin: ECC
 ---
 
-# Product Lens Ã¢â‚¬â€ Think Before You Build
+# Product Lens — Think Before You Build
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -22,14 +23,17 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
+This lane owns product diagnosis, not implementation-ready specification writing.
+
+If the user needs a durable PRD-to-SRS or capability-contract artifact, hand off to `product-capability`.
 
 ## When to Use
 
-- Before starting any feature Ã¢â‚¬â€ validate the "why"
-- Weekly product review Ã¢â‚¬â€ are we building the right thing?
+- Before starting any feature — validate the "why"
+- Weekly product review — are we building the right thing?
 - When stuck choosing between features
-- Before a launch Ã¢â‚¬â€ sanity check the user journey
-- When converting a vague idea into a spec
+- Before a launch — sanity check the user journey
+- When converting a vague idea into a product brief before engineering planning starts
 
 ## How It Works
 
@@ -48,6 +52,8 @@ Like YC office hours but automated. Asks the hard questions:
 ```
 
 Output: a `PRODUCT-BRIEF.md` with answers, risks, and a go/no-go recommendation.
+
+If the result is "yes, build this," the next lane is `product-capability`, not more founder-theater.
 
 ### Mode 2: Founder Review
 
@@ -84,7 +90,7 @@ When you have 10 ideas and need to pick 2:
 
 ```
 1. List all candidate features
-2. Score each on: impact (1-5) Ãƒâ€” confidence (1-5) ÃƒÂ· effort (1-5)
+2. Score each on: impact (1-5) × confidence (1-5) ÷ effort (1-5)
 3. Rank by ICE score
 4. Apply constraints: runway, team size, dependencies
 5. Output: prioritized roadmap with rationale
@@ -100,3 +106,4 @@ Pair with:
 - `/browser-qa` to verify the user journey audit findings
 - `/design-system audit` for visual polish assessment
 - `/canary-watch` for post-launch monitoring
+- `product-capability` when the product brief needs to become an implementation-ready capability plan

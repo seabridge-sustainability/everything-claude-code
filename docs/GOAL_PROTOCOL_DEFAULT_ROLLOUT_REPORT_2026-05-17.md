@@ -1,4 +1,4 @@
-﻿# /goal Default Protocol Rollout Report
+# /goal Default Protocol Rollout Report
 
 Date: 2026-05-17
 

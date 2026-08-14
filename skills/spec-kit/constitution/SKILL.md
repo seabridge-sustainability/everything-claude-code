@@ -1,4 +1,4 @@
-﻿---
+---
 name: speckit-constitution
 description: Create or update `.specify/memory/constitution.md` with SeaBridgeAI project principles before broad feature planning or reusable agent work.
 ---

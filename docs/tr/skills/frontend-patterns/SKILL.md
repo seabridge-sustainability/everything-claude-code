@@ -1,10 +1,10 @@
 ---
 name: frontend-patterns
-description: React, Next.js, state yÃƒÂ¶netimi, performans optimizasyonu ve UI en iyi uygulamalarÃ„Â± iÃƒÂ§in frontend geliÃ…Å¸tirme kalÃ„Â±plarÃ„Â±.
+description: React, Next.js, state yönetimi, performans optimizasyonu ve UI en iyi uygulamaları için frontend geliştirme kalıpları.
 origin: ECC
 ---
 
-# Frontend GeliÃ…Å¸tirme KalÃ„Â±plarÃ„Â±
+# Frontend Geliştirme Kalıpları
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -22,25 +22,24 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
+React, Next.js ve performanslı kullanıcı arayüzleri için modern frontend kalıpları.
 
-React, Next.js ve performanslÃ„Â± kullanÃ„Â±cÃ„Â± arayÃƒÂ¼zleri iÃƒÂ§in modern frontend kalÃ„Â±plarÃ„Â±.
+## Ne Zaman Aktifleştirmelisiniz
 
-## Ne Zaman AktifleÃ…Å¸tirmelisiniz
-
-- React bileÃ…Å¸enleri oluÃ…Å¸tururken (composition, props, rendering)
-- State yÃƒÂ¶netirken (useState, useReducer, Zustand, Context)
-- Veri ÃƒÂ§ekme implementasyonu (SWR, React Query, server components)
+- React bileşenleri oluştururken (composition, props, rendering)
+- State yönetirken (useState, useReducer, Zustand, Context)
+- Veri çekme implementasyonu (SWR, React Query, server components)
 - Performans optimize ederken (memoization, virtualization, code splitting)
-- Formlarla ÃƒÂ§alÃ„Â±Ã…Å¸Ã„Â±rken (validation, controlled inputs, Zod schemas)
-- Client-side routing ve navigasyon iÃ…Å¸lerken
-- EriÃ…Å¸ilebilir, responsive UI kalÃ„Â±plarÃ„Â± oluÃ…Å¸tururken
+- Formlarla çalışırken (validation, controlled inputs, Zod schemas)
+- Client-side routing ve navigasyon işlerken
+- Erişilebilir, responsive UI kalıpları oluştururken
 
-## BileÃ…Å¸en KalÃ„Â±plarÃ„Â±
+## Bileşen Kalıpları
 
-### KalÃ„Â±tÃ„Â±m Yerine Composition
+### Kalıtım Yerine Composition
 
 ```typescript
-// PASS: Ã„Â°YÃ„Â°: BileÃ…Å¸en composition
+// PASS: İYİ: Bileşen composition
 interface CardProps {
   children: React.ReactNode
   variant?: 'default' | 'outlined'
@@ -58,10 +57,10 @@ export function CardBody({ children }: { children: React.ReactNode }) {
   return <div className="card-body">{children}</div>
 }
 
-// KullanÃ„Â±m
+// Kullanım
 <Card>
-  <CardHeader>BaÃ…Å¸lÃ„Â±k</CardHeader>
-  <CardBody>Ã„Â°ÃƒÂ§erik</CardBody>
+  <CardHeader>Başlık</CardHeader>
+  <CardBody>İçerik</CardBody>
 </Card>
 ```
 
@@ -106,16 +105,16 @@ export function Tab({ id, children }: { id: string, children: React.ReactNode })
   )
 }
 
-// KullanÃ„Â±m
+// Kullanım
 <Tabs defaultTab="overview">
   <TabList>
-    <Tab id="overview">Genel BakÃ„Â±Ã…Å¸</Tab>
+    <Tab id="overview">Genel Bakış</Tab>
     <Tab id="details">Detaylar</Tab>
   </TabList>
 </Tabs>
 ```
 
-### Render Props KalÃ„Â±bÃ„Â±
+### Render Props Kalıbı
 
 ```typescript
 interface DataLoaderProps<T> {
@@ -139,7 +138,7 @@ export function DataLoader<T>({ url, children }: DataLoaderProps<T>) {
   return <>{children(data, loading, error)}</>
 }
 
-// KullanÃ„Â±m
+// Kullanım
 <DataLoader<Market[]> url="/api/markets">
   {(markets, loading, error) => {
     if (loading) return <Spinner />
@@ -149,9 +148,9 @@ export function DataLoader<T>({ url, children }: DataLoaderProps<T>) {
 </DataLoader>
 ```
 
-## Ãƒâ€“zel Hook KalÃ„Â±plarÃ„Â±
+## Özel Hook Kalıpları
 
-### State YÃƒÂ¶netimi Hook'u
+### State Yönetimi Hook'u
 
 ```typescript
 export function useToggle(initialValue = false): [boolean, () => void] {
@@ -164,11 +163,11 @@ export function useToggle(initialValue = false): [boolean, () => void] {
   return [value, toggle]
 }
 
-// KullanÃ„Â±m
+// Kullanım
 const [isOpen, toggleOpen] = useToggle()
 ```
 
-### Async Veri Ãƒâ€¡ekme Hook'u
+### Async Veri Çekme Hook'u
 
 ```typescript
 interface UseQueryOptions<T> {
@@ -186,39 +185,53 @@ export function useQuery<T>(
   const [error, setError] = useState<Error | null>(null)
   const [loading, setLoading] = useState(false)
 
+  // Çağıranlar satır içi fonksiyonlar ve nesne literalleri geçirse bile
+  // refetch'in referans olarak kararlı kalması için en güncel fetcher/options
+  // değerlerini ref'lerde tutun. Bu olmadan her render yeni bir refetch
+  // oluşturur ve aşağıdaki effect her state güncellemesinden sonra yeniden
+  // çalışır - sonsuz bir fetch döngüsü.
+  const fetcherRef = useRef(fetcher)
+  const optionsRef = useRef(options)
+  useEffect(() => {
+    fetcherRef.current = fetcher
+    optionsRef.current = options
+  })
+
   const refetch = useCallback(async () => {
     setLoading(true)
     setError(null)
 
     try {
-      const result = await fetcher()
+      const result = await fetcherRef.current()
       setData(result)
-      options?.onSuccess?.(result)
+      optionsRef.current?.onSuccess?.(result)
     } catch (err) {
       const error = err as Error
       setError(error)
-      options?.onError?.(error)
+      optionsRef.current?.onError?.(error)
     } finally {
       setLoading(false)
     }
-  }, [fetcher, options])
+  }, [])
+
+  const enabled = options?.enabled !== false
 
   useEffect(() => {
-    if (options?.enabled !== false) {
+    if (enabled) {
       refetch()
     }
-  }, [key, refetch, options?.enabled])
+  }, [key, enabled, refetch])
 
   return { data, error, loading, refetch }
 }
 
-// KullanÃ„Â±m
+// Kullanım
 const { data: markets, loading, error, refetch } = useQuery(
   'markets',
   () => fetch('/api/markets').then(r => r.json()),
   {
     onSuccess: data => console.log('Getirilen', data.length, 'market'),
-    onError: err => console.error('BaÃ…Å¸arÃ„Â±sÃ„Â±z:', err)
+    onError: err => console.error('Başarısız:', err)
   }
 )
 ```
@@ -240,7 +253,7 @@ export function useDebounce<T>(value: T, delay: number): T {
   return debouncedValue
 }
 
-// KullanÃ„Â±m
+// Kullanım
 const [searchQuery, setSearchQuery] = useState('')
 const debouncedQuery = useDebounce(searchQuery, 500)
 
@@ -251,9 +264,9 @@ useEffect(() => {
 }, [debouncedQuery])
 ```
 
-## State YÃƒÂ¶netimi KalÃ„Â±plarÃ„Â±
+## State Yönetimi Kalıpları
 
-### Context + Reducer KalÃ„Â±bÃ„Â±
+### Context + Reducer Kalıbı
 
 ```typescript
 interface State {
@@ -311,17 +324,18 @@ export function useMarkets() {
 ### Memoization
 
 ```typescript
-// PASS: PahalÃ„Â± hesaplamalar iÃƒÂ§in useMemo
+// PASS: Pahalı hesaplamalar için useMemo
+// Sıralamadan önce kopyalayın - Array.prototype.sort yerinde değiştirir
 const sortedMarkets = useMemo(() => {
-  return markets.sort((a, b) => b.volume - a.volume)
+  return [...markets].sort((a, b) => b.volume - a.volume)
 }, [markets])
 
-// PASS: Alt bileÃ…Å¸enlere geÃƒÂ§irilen fonksiyonlar iÃƒÂ§in useCallback
+// PASS: Alt bileşenlere geçirilen fonksiyonlar için useCallback
 const handleSearch = useCallback((query: string) => {
   setSearchQuery(query)
 }, [])
 
-// PASS: Pure bileÃ…Å¸enler iÃƒÂ§in React.memo
+// PASS: Pure bileşenler için React.memo
 export const MarketCard = React.memo<MarketCardProps>(({ market }) => {
   return (
     <div className="market-card">
@@ -337,7 +351,7 @@ export const MarketCard = React.memo<MarketCardProps>(({ market }) => {
 ```typescript
 import { lazy, Suspense } from 'react'
 
-// PASS: AÃ„Å¸Ã„Â±r bileÃ…Å¸enleri lazy yÃƒÂ¼kle
+// PASS: Ağır bileşenleri lazy yükle
 const HeavyChart = lazy(() => import('./HeavyChart'))
 const ThreeJsBackground = lazy(() => import('./ThreeJsBackground'))
 
@@ -356,7 +370,7 @@ export function Dashboard() {
 }
 ```
 
-### Uzun Listeler iÃƒÂ§in Virtualization
+### Uzun Listeler için Virtualization
 
 ```typescript
 import { useVirtualizer } from '@tanstack/react-virtual'
@@ -367,8 +381,8 @@ export function VirtualMarketList({ markets }: { markets: Market[] }) {
   const virtualizer = useVirtualizer({
     count: markets.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 100,  // Tahmini satÃ„Â±r yÃƒÂ¼ksekliÃ„Å¸i
-    overscan: 5  // Ekstra render edilecek ÃƒÂ¶Ã„Å¸eler
+    estimateSize: () => 100,  // Tahmini satır yüksekliği
+    overscan: 5  // Ekstra render edilecek öğeler
   })
 
   return (
@@ -400,9 +414,9 @@ export function VirtualMarketList({ markets }: { markets: Market[] }) {
 }
 ```
 
-## Form Ã„Â°Ã…Å¸leme KalÃ„Â±plarÃ„Â±
+## Form İşleme Kalıpları
 
-### DoÃ„Å¸rulamalÃ„Â± Controlled Form
+### Doğrulamalı Controlled Form
 
 ```typescript
 interface FormData {
@@ -430,17 +444,17 @@ export function CreateMarketForm() {
     const newErrors: FormErrors = {}
 
     if (!formData.name.trim()) {
-      newErrors.name = 'Ã„Â°sim gereklidir'
+      newErrors.name = 'İsim gereklidir'
     } else if (formData.name.length > 200) {
-      newErrors.name = 'Ã„Â°sim 200 karakterden az olmalÃ„Â±dÃ„Â±r'
+      newErrors.name = 'İsim 200 karakterden az olmalıdır'
     }
 
     if (!formData.description.trim()) {
-      newErrors.description = 'AÃƒÂ§Ã„Â±klama gereklidir'
+      newErrors.description = 'Açıklama gereklidir'
     }
 
     if (!formData.endDate) {
-      newErrors.endDate = 'BitiÃ…Å¸ tarihi gereklidir'
+      newErrors.endDate = 'Bitiş tarihi gereklidir'
     }
 
     setErrors(newErrors)
@@ -454,9 +468,9 @@ export function CreateMarketForm() {
 
     try {
       await createMarket(formData)
-      // BaÃ…Å¸arÃ„Â± iÃ…Å¸leme
+      // Başarı işleme
     } catch (error) {
-      // Hata iÃ…Å¸leme
+      // Hata işleme
     }
   }
 
@@ -469,15 +483,15 @@ export function CreateMarketForm() {
       />
       {errors.name && <span className="error">{errors.name}</span>}
 
-      {/* DiÃ„Å¸er alanlar */}
+      {/* Diğer alanlar */}
 
-      <button type="submit">Market OluÃ…Å¸tur</button>
+      <button type="submit">Market Oluştur</button>
     </form>
   )
 }
 ```
 
-## Error Boundary KalÃ„Â±bÃ„Â±
+## Error Boundary Kalıbı
 
 ```typescript
 interface ErrorBoundaryState {
@@ -506,7 +520,7 @@ export class ErrorBoundary extends React.Component<
     if (this.state.hasError) {
       return (
         <div className="error-fallback">
-          <h2>Bir Ã…Å¸eyler yanlÃ„Â±Ã…Å¸ gitti</h2>
+          <h2>Bir şeyler yanlış gitti</h2>
           <p>{this.state.error?.message}</p>
           <button onClick={() => this.setState({ hasError: false })}>
             Tekrar dene
@@ -519,20 +533,20 @@ export class ErrorBoundary extends React.Component<
   }
 }
 
-// KullanÃ„Â±m
+// Kullanım
 <ErrorBoundary>
   <App />
 </ErrorBoundary>
 ```
 
-## Animasyon KalÃ„Â±plarÃ„Â±
+## Animasyon Kalıpları
 
-### Framer Motion AnimasyonlarÃ„Â±
+### Framer Motion Animasyonları
 
 ```typescript
 import { motion, AnimatePresence } from 'framer-motion'
 
-// PASS: Liste animasyonlarÃ„Â±
+// PASS: Liste animasyonları
 export function AnimatedMarketList({ markets }: { markets: Market[] }) {
   return (
     <AnimatePresence>
@@ -551,7 +565,7 @@ export function AnimatedMarketList({ markets }: { markets: Market[] }) {
   )
 }
 
-// PASS: Modal animasyonlarÃ„Â±
+// PASS: Modal animasyonları
 export function Modal({ isOpen, onClose, children }: ModalProps) {
   return (
     <AnimatePresence>
@@ -579,7 +593,7 @@ export function Modal({ isOpen, onClose, children }: ModalProps) {
 }
 ```
 
-## EriÃ…Å¸ilebilirlik KalÃ„Â±plarÃ„Â±
+## Erişilebilirlik Kalıpları
 
 ### Klavye Navigasyonu
 
@@ -622,7 +636,7 @@ export function Dropdown({ options, onSelect }: DropdownProps) {
 }
 ```
 
-### Focus YÃƒÂ¶netimi
+### Focus Yönetimi
 
 ```typescript
 export function Modal({ isOpen, onClose, children }: ModalProps) {
@@ -631,13 +645,13 @@ export function Modal({ isOpen, onClose, children }: ModalProps) {
 
   useEffect(() => {
     if (isOpen) {
-      // Ã…Å¾u anki focus'lanmÃ„Â±Ã…Å¸ elementi kaydet
+      // Şu anki focus'lanmış elementi kaydet
       previousFocusRef.current = document.activeElement as HTMLElement
 
       // Modal'a focus yap
       modalRef.current?.focus()
     } else {
-      // KapatÃ„Â±rken focus'u geri yÃƒÂ¼kle
+      // Kapatırken focus'u geri yükle
       previousFocusRef.current?.focus()
     }
   }, [isOpen])
@@ -656,4 +670,4 @@ export function Modal({ isOpen, onClose, children }: ModalProps) {
 }
 ```
 
-**UnutmayÃ„Â±n**: Modern frontend kalÃ„Â±plarÃ„Â± sÃƒÂ¼rdÃƒÂ¼rÃƒÂ¼lebilir, performanslÃ„Â± kullanÃ„Â±cÃ„Â± arayÃƒÂ¼zleri saÃ„Å¸lar. Proje karmaÃ…Å¸Ã„Â±klÃ„Â±Ã„Å¸Ã„Â±nÃ„Â±za uyan kalÃ„Â±plarÃ„Â± seÃƒÂ§in.
+**Unutmayın**: Modern frontend kalıpları sürdürülebilir, performanslı kullanıcı arayüzleri sağlar. Proje karmaşıklığınıza uyan kalıpları seçin.

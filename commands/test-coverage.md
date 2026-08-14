@@ -1,3 +1,7 @@
+---
+description: Analyze coverage, identify gaps, and generate missing tests toward the target threshold.
+---
+
 # Test Coverage
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->

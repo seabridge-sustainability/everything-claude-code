@@ -12,6 +12,13 @@ const writeMode = process.argv.includes('--write');
 const ignoredDirs = new Set([
   '.git',
   'node_modules',
+  '.dmux',
+  '.next',
+  '.venv',
+  'coverage',
+  'venv',
+  // SeaBridge fork: local, gitignored working artifacts, vendored clones, and
+  // other coding-agent harness directories that are not ECC source.
   '.adal',
   '.aider-desk',
   '.augment',
@@ -21,19 +28,23 @@ const ignoredDirs = new Set([
   '.codemaker',
   '.codestudio',
   '.commandcode',
-  '.dmux',
-  '.next',
-  '.venv',
+  '.planning',
   '.venvs',
-  'coverage',
-  'external',
-  'gstack',
   'CLI-Anything',
+  'external',
+  'graphify-obsidian',
+  'graphify-out',
+  'gstack',
   'references',
   'unsloth',
   'vendor',
-  'venv',
 ]);
+
+// SeaBridge fork: locally generated evidence (scanner output, raw reports) is
+// gitignored but still lives on disk; it must not fail the unicode gate.
+const ignoredPrefixes = [
+  path.normalize('docs/reports/'),
+];
 
 const textExtensions = new Set([
   '.md',
@@ -84,7 +95,9 @@ const targetedReplacements = [
 ];
 
 function shouldSkip(entryPath) {
-  return entryPath.split(path.sep).some(part => ignoredDirs.has(part));
+  if (entryPath.split(path.sep).some(part => ignoredDirs.has(part))) return true;
+  const relative = path.relative(repoRoot, entryPath);
+  return ignoredPrefixes.some(prefix => relative.startsWith(prefix));
 }
 
 function isTextFile(filePath) {
@@ -130,7 +143,31 @@ function isDangerousInvisibleCodePoint(codePoint) {
     (codePoint >= 0x202A && codePoint <= 0x202E) ||
     (codePoint >= 0x2066 && codePoint <= 0x2069) ||
     (codePoint >= 0xFE00 && codePoint <= 0xFE0F) ||
-    (codePoint >= 0xE0100 && codePoint <= 0xE01EF)
+    (codePoint >= 0xE0100 && codePoint <= 0xE01EF) ||
+    // Unicode Tag block (U+E0000–U+E007F). Tag characters were proposed
+    // for language tagging in Unicode 3.1 and have been deprecated since
+    // Unicode 5.1, so no legitimate text uses them. They are the canonical
+    // vector for "ASCII smuggling" / "Tag smuggling" prompt injection:
+    // an attacker hides instructions inside ASCII-looking strings (PR
+    // bodies, SKILL.md, frontmatter), the LLM consumes the tag bytes,
+    // and the human reviewer sees nothing.
+    (codePoint >= 0xE0000 && codePoint <= 0xE007F) ||
+    // U+180E MONGOLIAN VOWEL SEPARATOR — formerly classified as a space
+    // separator, reclassified as a format control in Unicode 6.3; renders
+    // as zero-width and routinely abused for homograph / smuggling.
+    codePoint === 0x180E ||
+    // U+115F / U+1160 HANGUL CHOSEONG/JUNGSEONG FILLER — zero-width fillers
+    // used in Korean text shaping; abused as invisible characters.
+    codePoint === 0x115F ||
+    codePoint === 0x1160 ||
+    // U+2061–U+2064 invisible math operators (FUNCTION APPLICATION,
+    // INVISIBLE TIMES, INVISIBLE SEPARATOR, INVISIBLE PLUS). Zero-width
+    // and not used outside math typesetting; legitimate Markdown / source
+    // does not contain them.
+    (codePoint >= 0x2061 && codePoint <= 0x2064) ||
+    // U+3164 HANGUL FILLER — zero-width filler reportedly used in Discord
+    // / Twitter smuggling attacks; not used in legitimate Korean text.
+    codePoint === 0x3164
   );
 }
 

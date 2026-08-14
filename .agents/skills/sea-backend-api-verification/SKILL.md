@@ -1,4 +1,4 @@
-﻿---
+---
 name: sea-backend-api-verification
 description: Callable wrapper for sea-backend-api-verification. Load the canonical SeaBridgeAI skill body from everything-claude-code\skills\sea-backend-api-verification\SKILL.md.
 ---

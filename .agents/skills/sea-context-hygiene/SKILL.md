@@ -1,4 +1,4 @@
-﻿---
+---
 name: sea-context-hygiene
 description: Callable wrapper for sea-context-hygiene. Load the canonical SeaBridgeAI skill body from everything-claude-code\skills\sea-context-hygiene\SKILL.md.
 ---

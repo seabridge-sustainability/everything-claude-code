@@ -1,7 +1,7 @@
 ---
 name: security-agent
 description: SeaBridgeAI security reviewer for auth, tenant isolation, secrets, file uploads, data privacy, webhooks, external calls, and destructive-operation safety.
-tools: ["Read", "Grep", "Glob", "Bash"]
+tools: Read, Grep, Glob, Bash
 model: sonnet
 ---
 

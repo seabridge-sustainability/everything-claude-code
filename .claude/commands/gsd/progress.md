@@ -1,4 +1,4 @@
-﻿---
+---
 name: gsd:progress
 description: Check progress, advance workflow, or dispatch freeform intent â€” the unified GSD situational command
 argument-hint: "[--forensic | --next | --do \"task description\"]"

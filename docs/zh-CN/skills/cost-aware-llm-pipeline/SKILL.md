@@ -39,7 +39,7 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 Ã¨â€¡ÂªÃ¥Å Â¨Ã¤Â¸ÂºÃ§Â®â‚¬Ã¥Ââ€¢Ã¤Â»Â»Ã¥Å Â¡Ã©â‚¬â€°Ã¦â€¹Â©Ã¦â€ºÂ´Ã¤Â¾Â¿Ã¥Â®Å“Ã§Å¡â€žÃ¦Â¨Â¡Ã¥Å¾â€¹Ã¯Â¼Å’Ã¤Â¸ÂºÃ¥Â¤ÂÃ¦Ââ€šÃ¤Â»Â»Ã¥Å Â¡Ã¤Â¿ÂÃ§â€¢â„¢Ã¦Ëœâ€šÃ¨Â´ÂµÃ§Å¡â€žÃ¦Â¨Â¡Ã¥Å¾â€¹Ã£â‚¬â€š
 
 ```python
-MODEL_SONNET = "claude-sonnet-4-6"
+MODEL_SONNET = "claude-sonnet-5"
 MODEL_HAIKU = "claude-haiku-4-5-20251001"
 
 _SONNET_TEXT_THRESHOLD = 10_000  # chars

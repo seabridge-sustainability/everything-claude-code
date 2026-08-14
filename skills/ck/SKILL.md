@@ -1,13 +1,14 @@
 ---
 name: ck
-description: Persistent per-project memory for Claude Code. Auto-loads project context on session start, tracks sessions with git activity, and writes to native memory. Commands run deterministic Node.js scripts Ã¢â‚¬â€ behavior is consistent across model versions.
-origin: community
-version: 2.0.0
+description: Persistent per-project memory for Claude Code. Auto-loads project context on session start, tracks sessions with git activity, and writes to native memory. Commands run deterministic Node.js scripts — behavior is consistent across model versions. Use when a project needs context to survive across Claude Code sessions instead of being re-explained each time.
+metadata:
+  version: 2.0.0
+  origin: community
 author: sreedhargs89
 repo: https://github.com/sreedhargs89/context-keeper
 ---
 
-# ck Ã¢â‚¬â€ Context Keeper
+# ck — Context Keeper
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -25,7 +26,6 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
-
 You are the **Context Keeper** assistant. When the user invokes any `/ck:*` command,
 run the corresponding Node.js script and present its stdout to the user verbatim.
 Scripts live at: `~/.claude/skills/ck/commands/` (expand `~` with `$HOME`).
@@ -36,23 +36,23 @@ Scripts live at: `~/.claude/skills/ck/commands/` (expand `~` with `$HOME`).
 
 ```
 ~/.claude/ck/
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ projects.json              Ã¢â€ Â path Ã¢â€ â€™ {name, contextDir, lastUpdated}
-Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ contexts/<name>/
-    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ context.json           Ã¢â€ Â SOURCE OF TRUTH (structured JSON, v2)
-    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ CONTEXT.md             Ã¢â€ Â generated view Ã¢â‚¬â€ do not hand-edit
+├── projects.json              ← path → {name, contextDir, lastUpdated}
+└── contexts/<name>/
+    ├── context.json           ← SOURCE OF TRUTH (structured JSON, v2)
+    └── CONTEXT.md             ← generated view — do not hand-edit
 ```
 
 ---
 
 ## Commands
 
-### `/ck:init` Ã¢â‚¬â€ Register a Project
+### `/ck:init` — Register a Project
 ```bash
 node "$HOME/.claude/skills/ck/commands/init.mjs"
 ```
 The script outputs JSON with auto-detected info. Present it as a confirmation draft:
 ```
-Here's what I found Ã¢â‚¬â€ confirm or edit anything:
+Here's what I found — confirm or edit anything:
 Project:     <name>
 Description: <description>
 Stack:       <stack>
@@ -68,7 +68,7 @@ Confirmed JSON schema: `{"name":"...","path":"...","description":"...","stack":[
 
 ---
 
-### `/ck:save` Ã¢â‚¬â€ Save Session State
+### `/ck:save` — Save Session State
 **This is the only command requiring LLM analysis.** Analyze the current conversation:
 - `summary`: one sentence, max 10 words, what was accomplished
 - `leftOff`: what was actively being worked on (specific file/feature/bug)
@@ -77,7 +77,7 @@ Confirmed JSON schema: `{"name":"...","path":"...","description":"...","stack":[
 - `blockers`: array of current blockers (empty array if none)
 - `goal`: updated goal string **only if it changed this session**, else omit
 
-Show a draft summary to the user: `"Session: '<summary>' Ã¢â‚¬â€ save this? (yes / edit)"`
+Show a draft summary to the user: `"Session: '<summary>' — save this? (yes / edit)"`
 Wait for confirmation. Then pipe to save.mjs:
 ```bash
 echo '<json>' | node "$HOME/.claude/skills/ck/commands/save.mjs"
@@ -87,16 +87,16 @@ Display the script's stdout confirmation verbatim.
 
 ---
 
-### `/ck:resume [name|number]` Ã¢â‚¬â€ Full Briefing
+### `/ck:resume [name|number]` — Full Briefing
 ```bash
 node "$HOME/.claude/skills/ck/commands/resume.mjs" [arg]
 ```
 Display output verbatim. Then ask: "Continue from here? Or has anything changed?"
-If user reports changes Ã¢â€ â€™ run `/ck:save` immediately.
+If user reports changes → run `/ck:save` immediately.
 
 ---
 
-### `/ck:info [name|number]` Ã¢â‚¬â€ Quick Snapshot
+### `/ck:info [name|number]` — Quick Snapshot
 ```bash
 node "$HOME/.claude/skills/ck/commands/info.mjs" [arg]
 ```
@@ -104,15 +104,15 @@ Display output verbatim. No follow-up question.
 
 ---
 
-### `/ck:list` Ã¢â‚¬â€ Portfolio View
+### `/ck:list` — Portfolio View
 ```bash
 node "$HOME/.claude/skills/ck/commands/list.mjs"
 ```
-Display output verbatim. If user replies with a number or name Ã¢â€ â€™ run `/ck:resume`.
+Display output verbatim. If user replies with a number or name → run `/ck:resume`.
 
 ---
 
-### `/ck:forget [name|number]` Ã¢â‚¬â€ Remove a Project
+### `/ck:forget [name|number]` — Remove a Project
 First resolve the project name (run `/ck:list` if needed).
 Ask: `"This will permanently delete context for '<name>'. Are you sure? (yes/no)"`
 If yes:
@@ -123,7 +123,7 @@ Display confirmation verbatim.
 
 ---
 
-### `/ck:migrate` Ã¢â‚¬â€ Convert v1 Data to v2
+### `/ck:migrate` — Convert v1 Data to v2
 ```bash
 node "$HOME/.claude/skills/ck/commands/migrate.mjs"
 ```
@@ -132,7 +132,7 @@ For a dry run first:
 node "$HOME/.claude/skills/ck/commands/migrate.mjs" --dry-run
 ```
 Display output verbatim. Migrates all v1 CONTEXT.md + meta.json files to v2 context.json.
-Originals are backed up as `meta.json.v1-backup` Ã¢â‚¬â€ nothing is deleted.
+Originals are backed up as `meta.json.v1-backup` — nothing is deleted.
 
 ---
 
@@ -160,5 +160,5 @@ unsaved sessions, git activity since last save, and goal mismatches vs CLAUDE.md
 - Always expand `~` as `$HOME` in Bash calls.
 - Commands are case-insensitive: `/CK:SAVE`, `/ck:save`, `/Ck:Save` all work.
 - If a script exits with code 1, display its stdout as an error message.
-- Never edit `context.json` or `CONTEXT.md` directly Ã¢â‚¬â€ always use the scripts.
+- Never edit `context.json` or `CONTEXT.md` directly — always use the scripts.
 - If `projects.json` is malformed, tell the user and offer to reset it to `{}`.

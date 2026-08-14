@@ -25,7 +25,8 @@ Desktop.ini
 
 # Editor files
 .idea/
-.vscode/
+.vscode/*
+!.vscode/settings.json
 *.swp
 *.swo
 *~
@@ -43,13 +44,13 @@ yarn-error.log*
 .pnpm-debug.log*
 .yarn/
 lerna-debug.log*
+*.tgz
 
 # Build outputs
 dist/
 build/
 *.tsbuildinfo
 .cache/
-context-hub/dist/
 
 # Test coverage
 coverage/
@@ -76,6 +77,10 @@ examples/sessions/*.tmp
 # Local drafts
 marketing/
 .dmux/
+.dmux-hooks/
+.claude/settings.local.json
+.claude/worktrees/
+.claude/scheduled_tasks.lock
 
 # Temporary files
 tmp/
@@ -94,7 +99,17 @@ ecc2/target/
 # Generated lock files in tool subdirectories
 .opencode/package-lock.json
 .opencode/node_modules/
+
+# yarn is the canonical package manager for this repo (see package.json
+# "packageManager"); ignore stray lockfiles from running another manager locally
+/bun.lock
+/bun.lockb
 assets/images/security/badrudi-exploit.mp4
+
+.aider*
+
+# --- SeaBridge fork additions (do not drop on upstream merges) ---
+context-hub/dist/
 .gstack/
 
 # graphify outputs (added by graphify setup)
@@ -103,6 +118,7 @@ graphify-out/manifest.json
 graphify-out/cost.json
 graphify-out/.graphify_ast.json
 graphify-out/.graphify_extract.json
+graphify-out/graph.json
 graphify-obsidian/
 
 # Local upstream reference checkouts
@@ -122,5 +138,3 @@ configs/mcp-toolbox/tools.production.yaml
 # Local security scanner evidence can include matched secret payloads.
 docs/reports/security/agentshield/
 docs/reports/security/raw/
-
-graphify-out/graph.json

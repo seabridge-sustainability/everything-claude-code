@@ -1,8 +1,9 @@
 ---
 name: healthcare-cdss-patterns
-description: Clinical Decision Support System (CDSS) development patterns. Drug interaction checking, dose validation, clinical scoring (NEWS2, qSOFA), alert severity classification, and integration into EMR workflows.
-origin: Health1 Super Speciality Hospitals Ã¢â‚¬â€ contributed by Dr. Keyur Patel
-version: "1.0.0"
+description: Clinical Decision Support System (CDSS) development patterns. Drug interaction checking, dose validation, clinical scoring (NEWS2, qSOFA), alert severity classification, and integration into EMR workflows. Use when building clinical decision support — drug interaction checks, dose validation, clinical scoring, or alert severity.
+metadata:
+  version: "1.0.0"
+  origin: Health1 Super Speciality Hospitals — contributed by Dr. Keyur Patel
 ---
 
 # Healthcare CDSS Development Patterns
@@ -23,8 +24,7 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
-
-Patterns for building Clinical Decision Support Systems that integrate into EMR workflows. CDSS modules are patient safety critical Ã¢â‚¬â€ zero tolerance for false negatives.
+Patterns for building Clinical Decision Support Systems that integrate into EMR workflows. CDSS modules are patient safety critical — zero tolerance for false negatives.
 
 ## When to Use
 
@@ -41,19 +41,19 @@ The CDSS engine is a **pure function library with zero side effects**. Input cli
 
 Three primary modules:
 
-1. **`checkInteractions(newDrug, currentMeds, allergies)`** Ã¢â‚¬â€ Checks a new drug against current medications and known allergies. Returns severity-sorted `InteractionAlert[]`. Uses `DrugInteractionPair` data model.
-2. **`validateDose(drug, dose, route, weight, age, renalFunction)`** Ã¢â‚¬â€ Validates a prescribed dose against weight-based, age-adjusted, and renal-adjusted rules. Returns `DoseValidationResult`.
-3. **`calculateNEWS2(vitals)`** Ã¢â‚¬â€ National Early Warning Score 2 from `NEWS2Input`. Returns `NEWS2Result` with total score, risk level, and escalation guidance.
+1. **`checkInteractions(newDrug, currentMeds, allergies)`** — Checks a new drug against current medications and known allergies. Returns severity-sorted `InteractionAlert[]`. Uses `DrugInteractionPair` data model.
+2. **`validateDose(drug, dose, route, weight, age, renalFunction)`** — Validates a prescribed dose against weight-based, age-adjusted, and renal-adjusted rules. Returns `DoseValidationResult`.
+3. **`calculateNEWS2(vitals)`** — National Early Warning Score 2 from `NEWS2Input`. Returns `NEWS2Result` with total score, risk level, and escalation guidance.
 
 ```
 EMR UI
-  Ã¢â€ â€œ (user enters data)
+  ↓ (user enters data)
 CDSS Engine (pure functions, no side effects)
-  Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Drug Interaction Checker
-  Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Dose Validator
-  Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Clinical Scoring (NEWS2, qSOFA, etc.)
-  Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Alert Classifier
-  Ã¢â€ â€œ (returns alerts)
+  ├── Drug Interaction Checker
+  ├── Dose Validator
+  ├── Clinical Scoring (NEWS2, qSOFA, etc.)
+  └── Alert Classifier
+  ↓ (returns alerts)
 EMR UI (displays alerts inline, blocks if critical)
 ```
 
@@ -194,7 +194,7 @@ Critical alerts must NEVER be auto-dismissed or implemented as toast notificatio
 ### Testing CDSS (Zero Tolerance for False Negatives)
 
 ```typescript
-describe('CDSS Ã¢â‚¬â€ Patient Safety', () => {
+describe('CDSS — Patient Safety', () => {
   INTERACTION_PAIRS.forEach(({ drugA, drugB, severity }) => {
     it(`detects ${drugA} + ${drugB} (${severity})`, () => {
       const alerts = checkInteractions(drugA, [drugB], []);

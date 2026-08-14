@@ -19,6 +19,8 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 
 Multi-model iÃ…Å¸birlikÃƒÂ§i execution - Plandan prototype al Ã¢â€ â€™ Claude refactor edip implement eder Ã¢â€ â€™ Multi-model audit ve teslimat.
 
+> **Ön koşul:** Bu komut, temel ECC kurulumunun parçası **olmayan** harici `ccg-workflow` runtime'ını gerektirir. Bu komutun bağımlı olduğu `~/.claude/bin/codeagent-wrapper` ve `~/.claude/.ccg/prompts/*` rol dosyalarını sağlamak için `npx ccg-workflow` komutuyla başlatın. Bu runtime olmadan bu komut düzgün çalışmaz.
+
 $ARGUMENTS
 
 ---

@@ -1,4 +1,4 @@
-﻿# SeaBridgeAI Curated Spec Kit
+# SeaBridgeAI Curated Spec Kit
 
 This directory contains the SeaBridgeAI curated integration of GitHub Spec Kit.
 It preserves the core spec-driven workflow while avoiding full CLI/vendor bloat,

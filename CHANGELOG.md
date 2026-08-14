@@ -16,6 +16,88 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
+## Unreleased
+
+### Changed
+
+- Default MCP connector set reduced to a single connector (`chrome-devtools`) per the new connector policy (`docs/MCP-CONNECTOR-POLICY.md`). The six previous defaults (`github`, `context7`, `exa`, `memory`, `playwright`, `sequential-thinking`) were retired after the June 2026 audit: their jobs are covered by skills wrapping CLIs/REST APIs (`github-ops`, `documentation-lookup`, `exa-search`, e2e skills) or by harness-native features (memory, extended thinking, web search). All six remain opt-in via `mcp-configs/mcp-servers.json`.
+
+### Fixed
+
+- `ecc memory` writes and `--body-file` reads failed on Windows under Node 22.12-22.16 and 24.0-24.1. libuv resolved path-based `stat()`/`lstat()` through `GetFileInformationByName` without setting the volume serial, while `fstat()` reported it, so the memory vault's TOCTOU guard rejected every operation. Fixed upstream in libuv 1.51.0; the guard no longer depends on the runtime's patch level. The guard's stat calls now request `BigInt` values, so Windows file IDs past `Number.MAX_SAFE_INTEGER` can no longer collapse two distinct files into one identity.
+
+## 2.0.0 - 2026-06-09
+
+### Added
+
+- Discord community launch: server + GitHub PR/issue/release feed, `release-announce.yml` workflow (announce + pin + Discussions cross-post), and a dependency-free community bot (`scripts/discord/ecc-bot.mjs`) with `/ecc`, `/help`, `/skill`, `/docs`, `/release`.
+- `orch-*` orchestrator skill family and dynamic workflow team orchestration.
+- `kubernetes-patterns` skill, worktree-lifecycle service, MCP inventory (`ecc.mcp.v1`), codex-worktree and opencode session adapters.
+
+### Fixed
+
+- Plugin hooks silently no-oped on Node 21+ (`require.main` undefined under `node -e`).
+- Windows reliability: `CLAUDE_PLUGIN_ROOT` normalization, stdin prompt passing, symlink/chmod test guards.
+- Session-end `$`-sequence corruption, project-detect boundary matching, install manifest gaps, corrupted legacy shim truncation.
+
+### Changed
+
+- Version graduated to 2.0.0 stable across package, plugin, marketplace, OpenCode, and agent metadata.
+- Smaller default OpenCode install surface; `rules/zh` removed from the always-loaded default install.
+
+## 2.0.0-rc.1 - 2026-04-28
+
+### Highlights
+
+- Adds the public ECC 2.0 release-candidate surface for the Hermes operator story.
+- Documents ECC as the reusable cross-harness substrate across Claude Code, Codex, Cursor, OpenCode, and Gemini.
+- Adds a sanitized Hermes import skill surface instead of publishing private operator state.
+
+### Release Surface
+
+- Updated package, plugin, marketplace, OpenCode, agent, and README metadata to `2.0.0-rc.1`.
+- Added `docs/releases/2.0.0-rc.1/` with release notes, social drafts, launch checklist, handoff notes, and demo prompts.
+- Added `docs/architecture/cross-harness.md` and regression coverage for the ECC/Hermes boundary.
+- Kept `ecc2/` versioning independent for now; it remains an alpha control-plane scaffold unless release engineering decides otherwise.
+
+### Notes
+
+- This is a release candidate, not a GA claim for the full ECC 2.0 control-plane roadmap.
+- Prerelease npm publishing should use the `next` dist-tag unless release engineering explicitly chooses otherwise.
+
+## 1.10.0 - 2026-04-05
+
+### Highlights
+
+- Public release surface synced to the live repo after multiple weeks of OSS growth and backlog merges.
+- Operator workflow lane expanded with voice, graph-ranking, billing, workspace, and outbound skills.
+- Media generation lane expanded with Manim and Remotion-first launch tooling.
+- ECC 2.0 alpha control-plane binary now builds locally from `ecc2/` and exposes the first usable CLI/TUI surface.
+
+### Release Surface
+
+- Updated plugin, marketplace, Codex, OpenCode, and agent metadata to `1.10.0`.
+- Synced published counts to the live OSS surface: 38 agents, 156 skills, 72 commands.
+- Refreshed top-level install-facing docs and marketplace descriptions to match current repo state.
+
+### New Workflow Lanes
+
+- `brand-voice` — canonical source-derived writing-style system.
+- `social-graph-ranker` — weighted warm-intro graph ranking primitive.
+- `connections-optimizer` — network pruning/addition workflow on top of graph ranking.
+- `customer-billing-ops`, `google-workspace-ops`, `project-flow-ops`, `workspace-surface-audit`.
+- `manim-video`, `remotion-video-creation`, `nestjs-patterns`.
+
+### ECC 2.0 Alpha
+
+- `cargo build --manifest-path ecc2/Cargo.toml` passes on the repository baseline.
+- `ecc-tui` currently exposes `dashboard`, `start`, `sessions`, `status`, `stop`, `resume`, and `daemon`.
+- The alpha is real and usable for local experimentation, but the broader control-plane roadmap remains incomplete and should not be treated as GA.
+
+### Notes
+
+- The Claude plugin remains limited by platform-level rules distribution constraints; the selective install / OSS path is still the most reliable full install.
+- This release is a repo-surface correction and ecosystem sync, not a claim that the full ECC 2.0 roadmap is complete.
 
 ## 1.9.0 - 2026-03-20
 
@@ -28,40 +110,40 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 
 ### New Agents
 
-- `typescript-reviewer` Ã¢â‚¬â€ TypeScript/JavaScript code review specialist (#647)
-- `pytorch-build-resolver` Ã¢â‚¬â€ PyTorch runtime, CUDA, and training error resolution (#549)
-- `java-build-resolver` Ã¢â‚¬â€ Maven/Gradle build error resolution (#538)
-- `java-reviewer` Ã¢â‚¬â€ Java and Spring Boot code review (#528)
-- `kotlin-reviewer` Ã¢â‚¬â€ Kotlin/Android/KMP code review (#309)
-- `kotlin-build-resolver` Ã¢â‚¬â€ Kotlin/Gradle build errors (#309)
-- `rust-reviewer` Ã¢â‚¬â€ Rust code review (#523)
-- `rust-build-resolver` Ã¢â‚¬â€ Rust build error resolution (#523)
-- `docs-lookup` Ã¢â‚¬â€ Documentation and API reference research (#529)
+- `typescript-reviewer` — TypeScript/JavaScript code review specialist (#647)
+- `pytorch-build-resolver` — PyTorch runtime, CUDA, and training error resolution (#549)
+- `java-build-resolver` — Maven/Gradle build error resolution (#538)
+- `java-reviewer` — Java and Spring Boot code review (#528)
+- `kotlin-reviewer` — Kotlin/Android/KMP code review (#309)
+- `kotlin-build-resolver` — Kotlin/Gradle build errors (#309)
+- `rust-reviewer` — Rust code review (#523)
+- `rust-build-resolver` — Rust build error resolution (#523)
+- `docs-lookup` — Documentation and API reference research (#529)
 
 ### New Skills
 
-- `pytorch-patterns` Ã¢â‚¬â€ PyTorch deep learning workflows (#550)
-- `documentation-lookup` Ã¢â‚¬â€ API reference and library doc research (#529)
-- `bun-runtime` Ã¢â‚¬â€ Bun runtime patterns (#529)
-- `nextjs-turbopack` Ã¢â‚¬â€ Next.js Turbopack workflows (#529)
-- `mcp-server-patterns` Ã¢â‚¬â€ MCP server design patterns (#531)
-- `data-scraper-agent` Ã¢â‚¬â€ AI-powered public data collection (#503)
-- `team-builder` Ã¢â‚¬â€ Team composition skill (#501)
-- `ai-regression-testing` Ã¢â‚¬â€ AI regression test workflows (#433)
-- `claude-devfleet` Ã¢â‚¬â€ Multi-agent orchestration (#505)
-- `blueprint` Ã¢â‚¬â€ Multi-session construction planning
-- `everything-claude-code` Ã¢â‚¬â€ Self-referential ECC skill (#335)
-- `prompt-optimizer` Ã¢â‚¬â€ Prompt optimization skill (#418)
+- `pytorch-patterns` — PyTorch deep learning workflows (#550)
+- `documentation-lookup` — API reference and library doc research (#529)
+- `bun-runtime` — Bun runtime patterns (#529)
+- `nextjs-turbopack` — Next.js Turbopack workflows (#529)
+- `mcp-server-patterns` — MCP server design patterns (#531)
+- `data-scraper-agent` — AI-powered public data collection (#503)
+- `team-builder` — Team composition skill (#501)
+- `ai-regression-testing` — AI regression test workflows (#433)
+- `claude-devfleet` — Multi-agent orchestration (#505)
+- `blueprint` — Multi-session construction planning
+- `everything-claude-code` — Self-referential ECC skill (#335)
+- `prompt-optimizer` — Prompt optimization skill (#418)
 - 8 Evos operational domain skills (#290)
 - 3 Laravel skills (#420)
 - VideoDB skills (#301)
 
 ### New Commands
 
-- `/docs` Ã¢â‚¬â€ Documentation lookup (#530)
-- `/aside` Ã¢â‚¬â€ Side conversation (#407)
-- `/prompt-optimize` Ã¢â‚¬â€ Prompt optimization (#418)
-- `/resume-session`, `/save-session` Ã¢â‚¬â€ Session management
+- `/docs` — Documentation lookup (#530)
+- `/aside` — Side conversation (#407)
+- `/prompt-optimize` — Prompt optimization (#418)
+- `/resume-session`, `/save-session` — Session management
 - `learn-eval` improvements with checklist-based holistic verdict
 
 ### New Rules
@@ -96,7 +178,7 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 - Observer lazy-start logic (#508)
 - Observer 5-layer loop prevention guard (#399)
 - Hook portability and Windows .cmd support
-- Biome hook optimization Ã¢â‚¬â€ eliminated npx overhead (#359)
+- Biome hook optimization — eliminated npx overhead (#359)
 - InsAIts security hook made opt-in (#370)
 - Windows spawnSync export fix (#431)
 - UTF-8 encoding fix for instinct CLI (#353)
@@ -104,21 +186,21 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 
 ### Translations
 
-- Korean (ko-KR) translation Ã¢â‚¬â€ README, agents, commands, skills, rules (#392)
+- Korean (ko-KR) translation — README, agents, commands, skills, rules (#392)
 - Chinese (zh-CN) documentation sync (#428)
 
 ### Credits
 
-- @ymdvsymd Ã¢â‚¬â€ observer sandbox and worktree fixes
-- @pythonstrup Ã¢â‚¬â€ biome hook optimization
-- @Nomadu27 Ã¢â‚¬â€ InsAIts security hook
-- @hahmee Ã¢â‚¬â€ Korean translation
-- @zdocapp Ã¢â‚¬â€ Chinese translation sync
-- @cookiee339 Ã¢â‚¬â€ Kotlin ecosystem
-- @pangerlkr Ã¢â‚¬â€ CI workflow fixes
-- @0xrohitgarg Ã¢â‚¬â€ VideoDB skills
-- @nocodemf Ã¢â‚¬â€ Evos operational skills
-- @swarnika-cmd Ã¢â‚¬â€ community contributions
+- @ymdvsymd — observer sandbox and worktree fixes
+- @pythonstrup — biome hook optimization
+- @Nomadu27 — InsAIts security hook
+- @hahmee — Korean translation
+- @zdocapp — Chinese translation sync
+- @cookiee339 — Kotlin ecosystem
+- @pangerlkr — CI workflow fixes
+- @0xrohitgarg — VideoDB skills
+- @nocodemf — Evos operational skills
+- @swarnika-cmd — community contributions
 
 ## 1.8.0 - 2026-03-04
 

@@ -1,4 +1,4 @@
-﻿# GSD Scope Control Checklist
+# GSD Scope Control Checklist
 
 - [ ] Original user request is restated.
 - [ ] Every requirement is represented, explicitly deferred, or explicitly out of scope.

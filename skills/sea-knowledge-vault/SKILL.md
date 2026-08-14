@@ -1,4 +1,4 @@
-﻿---
+---
 name: sea-knowledge-vault
 description: SeaBridgeAI knowledge-vault skill for Markdown notes, wikilinks, frontmatter, canvas/base files, validation, and source-preserving research or incident notes.
 ---

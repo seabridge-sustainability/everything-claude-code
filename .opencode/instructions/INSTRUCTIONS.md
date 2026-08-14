@@ -1,4 +1,4 @@
-# Everything Claude Code - OpenCode Instructions
+# ECC - OpenCode Instructions
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule

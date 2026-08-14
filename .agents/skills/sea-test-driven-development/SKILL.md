@@ -1,4 +1,4 @@
-﻿---
+---
 name: sea-test-driven-development
 description: Callable wrapper for sea-test-driven-development. Load the canonical SeaBridgeAI skill body from everything-claude-code\skills\sea-test-driven-development\SKILL.md.
 ---

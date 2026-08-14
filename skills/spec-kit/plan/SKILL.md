@@ -1,4 +1,4 @@
-﻿---
+---
 name: speckit-plan
 description: Create technical implementation artifacts from a completed feature spec.
 ---

@@ -1,4 +1,4 @@
-﻿---
+---
 name: sea-skill-creator-protocol
 description: SeaBridgeAI skill creation protocol adapted from Superpowers writing-skills and Codex skill-creator for canonical skills, wrappers, validation, and cross-agent compatibility.
 ---

@@ -1,4 +1,4 @@
-﻿# Goal Protocol Diagnostics
+# Goal Protocol Diagnostics
 
 Generated: 2026-05-17 12:04:08 -04:00
 
@@ -925,5 +925,5 @@ No empty scanned files detected.
 ## Notes
 
 - This scanner audits instruction and protocol coverage; it does not prove behavioral compliance by itself.
-- endor, external, dependency, build, and runtime output folders are skipped to avoid treating imported references as active policy.
+- endor, external, dependency, build, and runtime output folders are skipped to avoid treating imported references as active policy.
 - JSON/TOML files are read only; this script does not modify them.

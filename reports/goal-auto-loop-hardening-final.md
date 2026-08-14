@@ -1,4 +1,4 @@
-﻿# Goal Auto-Loop Hardening Final Report
+# Goal Auto-Loop Hardening Final Report
 
 Date: 2026-05-17
 

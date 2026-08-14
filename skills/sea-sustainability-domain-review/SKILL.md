@@ -1,4 +1,4 @@
-﻿---
+---
 name: sea-sustainability-domain-review
 description: SeaBridgeAI sustainability-domain review for ESG, GHG accounting, LCA, climate and nature risk, procurement, targets, due diligence, reporting, disclosure, and utility workflows.
 ---

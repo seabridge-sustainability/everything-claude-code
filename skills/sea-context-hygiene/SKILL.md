@@ -1,4 +1,4 @@
-﻿---
+---
 name: sea-context-hygiene
 description: SeaBridgeAI context hygiene for long sessions, large logs, Playwright artifacts, multi-agent handoffs, markdown state, compaction, and source-preserving summaries.
 ---

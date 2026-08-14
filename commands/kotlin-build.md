@@ -183,7 +183,7 @@ The agent will stop and report if:
 
 - `/kotlin-test` - Run tests after build succeeds
 - `/kotlin-review` - Review code quality
-- `/verify` - Full verification loop
+- `verification-loop` skill - Full verification loop
 
 ## Related
 

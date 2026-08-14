@@ -16,13 +16,12 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
-
 Hooks are event-driven automations that fire before or after Claude Code tool executions. They enforce code quality, catch mistakes early, and automate repetitive checks.
 
 ## How Hooks Work
 
 ```
-User request Ã¢â€ â€™ Claude picks a tool Ã¢â€ â€™ PreToolUse hook runs Ã¢â€ â€™ Tool executes Ã¢â€ â€™ PostToolUse hook runs
+User request → Claude picks a tool → PreToolUse hook runs → Tool executes → PostToolUse hook runs
 ```
 
 - **PreToolUse** hooks run before the tool executes. They can **block** (exit code 2) or **warn** (stderr without blocking).
@@ -33,17 +32,35 @@ User request Ã¢â€ â€™ Claude picks a tool Ã¢â€ â€™ PreTool
 
 ## Hooks in This Plugin
 
+Memory persistence lifecycle definitions live in `hooks/memory-persistence/`.
+The executable hook graph remains `hooks/hooks.json`; the memory persistence directory is the stable contract for SessionStart, PreCompact, observation, activity tracking, and SessionEnd behavior.
+
+## Installing These Hooks Manually
+
+For Claude Code manual installs, do not paste the raw repo `hooks.json` into `~/.claude/settings.json` or copy it directly into `~/.claude/hooks/hooks.json`. The checked-in file is plugin/repo-oriented and is meant to be installed through the ECC installer or loaded as a plugin.
+
+Use the installer instead so hook commands are rewritten against your actual Claude root:
+
+```bash
+bash ./install.sh --target claude --modules hooks-runtime
+```
+
+```powershell
+pwsh -File .\install.ps1 --target claude --modules hooks-runtime
+```
+
+That installs resolved hooks to `~/.claude/hooks/hooks.json`. On Windows, the Claude config root is `%USERPROFILE%\\.claude`.
+
 ### PreToolUse Hooks
 
 | Hook | Matcher | Behavior | Exit Code |
 |------|---------|----------|-----------|
-| **Dev server blocker** | `Bash` | Blocks `npm run dev` etc. outside tmux Ã¢â‚¬â€ ensures log access | 2 (blocks) |
+| **Dev server blocker** | `Bash` | Blocks `npm run dev` etc. outside tmux — ensures log access | 2 (blocks) |
 | **Tmux reminder** | `Bash` | Suggests tmux for long-running commands (npm test, cargo build, docker) | 0 (warns) |
 | **Git push reminder** | `Bash` | Reminds to review changes before `git push` | 0 (warns) |
 | **Pre-commit quality check** | `Bash` | Runs quality checks before `git commit`: lints staged files, validates commit message format when provided via `-m/--message`, detects console.log/debugger/secrets | 2 (blocks critical) / 0 (warns) |
 | **Doc file warning** | `Write` | Warns about non-standard `.md`/`.txt` files (allows README, CLAUDE, CONTRIBUTING, CHANGELOG, LICENSE, SKILL, docs/, skills/); cross-platform path handling | 0 (warns) |
 | **Strategic compact** | `Edit\|Write` | Suggests manual `/compact` at logical intervals (every ~50 tool calls) | 0 (warns) |
-| **InsAIts security monitor (opt-in)** | `Bash\|Write\|Edit\|MultiEdit` | Optional security scan for high-signal tool inputs. Disabled unless `ECC_ENABLE_INSAITS=1`. Blocks on critical findings, warns on non-critical, and writes audit log to `.insaits_audit_session.jsonl`. Requires `pip install insa-its`. [Details](../scripts/hooks/insaits-security-monitor.py) | 2 (blocks critical) / 0 (warns) |
 
 ### PostToolUse Hooks
 
@@ -52,6 +69,7 @@ User request Ã¢â€ â€™ Claude picks a tool Ã¢â€ â€™ PreTool
 | **PR logger** | `Bash` | Logs PR URL and review command after `gh pr create` |
 | **Build analysis** | `Bash` | Background analysis after build commands (async, non-blocking) |
 | **Quality gate** | `Edit\|Write\|MultiEdit` | Runs fast quality checks after edits |
+| **Design quality check** | `Edit\|Write\|MultiEdit` | Warns when frontend edits drift toward generic template-looking UI |
 | **Prettier format** | `Edit` | Auto-formats JS/TS files with Prettier after edits |
 | **TypeScript check** | `Edit` | Runs `tsc --noEmit` after editing `.ts`/`.tsx` files |
 | **console.log warning** | `Edit` | Warns about `console.log` statements in edited files |
@@ -61,6 +79,7 @@ User request Ã¢â€ â€™ Claude picks a tool Ã¢â€ â€™ PreTool
 | Hook | Event | What It Does |
 |------|-------|-------------|
 | **Session start** | `SessionStart` | Loads previous context and detects package manager |
+| **Plan Canvas sessions** | `SessionStart` | Surfaces open Plan Canvas browser reviews so a fresh session can resume the loop |
 | **Pre-compact** | `PreCompact` | Saves state before context compaction |
 | **Console.log audit** | `Stop` | Checks all modified files for `console.log` after each response |
 | **Session summary** | `Stop` | Persists session state when transcript path is available |
@@ -94,17 +113,45 @@ Remove or comment out the hook entry in `hooks.json`. If installed as a plugin, 
 Use environment variables to control hook behavior without editing `hooks.json`:
 
 ```bash
+# Master switch. Explicit environment values override plugin preferences.
+export ECC_HOOKS_ENABLED=true
+
 # minimal | standard | strict (default: standard)
 export ECC_HOOK_PROFILE=standard
 
 # Disable specific hook IDs (comma-separated)
 export ECC_DISABLED_HOOKS="pre:bash:tmux-reminder,post:edit:typecheck"
+
+# Disable only GateGuard during setup or recovery
+export ECC_GATEGUARD=off
+
+# Cap SessionStart additional context (default: 8000 chars)
+export ECC_SESSION_START_MAX_CHARS=4000
+
+# Disable SessionStart additional context entirely
+export ECC_SESSION_START_CONTEXT=off
+
+# Keep context/scope/loop warnings but suppress API-rate cost estimates
+export ECC_CONTEXT_MONITOR_COST_WARNINGS=off
 ```
 
-Profiles:
-- `minimal` Ã¢â‚¬â€ keep essential lifecycle and safety hooks only.
-- `standard` Ã¢â‚¬â€ default; balanced quality + safety checks.
-- `strict` Ã¢â‚¬â€ enables additional reminders and stricter guardrails.
+Windows PowerShell:
+
+```powershell
+[Environment]::SetEnvironmentVariable('ECC_CONTEXT_MONITOR_COST_WARNINGS', 'off', 'User')
+```
+
+Claude setup-only value:
+- `off` — disables local ECC hook work through `ecc setup`; it is not a runtime hook profile.
+
+Runtime hook profiles:
+- `minimal` — keep essential lifecycle and safety hooks only.
+- `standard` — default; balanced quality + safety checks.
+- `strict` — enables additional reminders and stricter guardrails.
+
+The Claude plugin exposes the same choices as the personal `hooks_enabled` and
+`hook_profile` settings. Run `ecc setup --mode claude-plugin` to install or
+update the plugin and change those preferences.
 
 ### Writing Your Own Hook
 
@@ -136,9 +183,9 @@ process.stdin.on('end', () => {
 ```
 
 **Exit codes:**
-- `0` Ã¢â‚¬â€ Success (continue execution)
-- `2` Ã¢â‚¬â€ Block the tool call (PreToolUse only)
-- Other non-zero Ã¢â‚¬â€ Error (logged but does not block)
+- `0` — Success (continue execution)
+- `2` — Block the tool call (PreToolUse only)
+- Other non-zero — Error (logged but does not block)
 
 ### Hook Input Schema
 
@@ -229,10 +276,10 @@ Async hooks run in the background. They cannot block tool execution.
 
 ## Cross-Platform Notes
 
-Hook logic is implemented in Node.js scripts for cross-platform behavior on Windows, macOS, and Linux. A small number of shell wrappers are retained for continuous-learning observer hooks; those wrappers are profile-gated and have Windows-safe fallback behavior.
+Hook logic is implemented in Node.js scripts for cross-platform behavior on Windows, macOS, and Linux. The continuous-learning observer is exposed as a Node-mode hook and delegates to its existing `observe.sh` implementation through a profile-gated runner with Windows-safe fallback behavior.
 
 ## Related
 
-- [rules/common/hooks.md](../rules/common/hooks.md) Ã¢â‚¬â€ Hook architecture guidelines
-- [skills/strategic-compact/](../skills/strategic-compact/) Ã¢â‚¬â€ Strategic compaction skill
-- [scripts/hooks/](../scripts/hooks/) Ã¢â‚¬â€ Hook script implementations
+- [rules/common/hooks.md](../rules/common/hooks.md) — Hook architecture guidelines
+- [skills/strategic-compact/](../skills/strategic-compact/) — Strategic compaction skill
+- [scripts/hooks/](../scripts/hooks/) — Hook script implementations

@@ -1,4 +1,4 @@
-﻿---
+---
 name: gsd:discuss-phase
 description: Gather phase context through adaptive questioning before planning.
 argument-hint: "<phase> [--all] [--auto] [--chain] [--batch] [--analyze] [--text] [--power]"

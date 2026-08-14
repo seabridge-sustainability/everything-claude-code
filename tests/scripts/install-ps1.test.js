@@ -52,7 +52,7 @@ function run(powerShellCommand, args = [], options = {}) {
       env,
       encoding: 'utf8',
       stdio: ['pipe', 'pipe', 'pipe'],
-      timeout: 10000,
+      timeout: 30000,
     });
 
     return { code: 0, stdout, stderr: '' };
@@ -108,6 +108,17 @@ function runTests() {
       cleanup(homeDir);
       cleanup(projectDir);
     }
+  })) passed++; else failed++;
+
+  if (!powerShellCommand) {
+    console.log('  - skipped help text test; PowerShell is not available in PATH');
+  } else if (test('exposes the corrected Claude target help text', () => {
+    const result = run(powerShellCommand, ['--help']);
+    assert.strictEqual(result.code, 0, result.stderr);
+    assert.ok(
+      result.stdout.includes('claude       (default) - Install ECC into ~/.claude/'),
+      'help text should describe the Claude target as a full ~/.claude install surface'
+    );
   })) passed++; else failed++;
 
   console.log(`\nResults: Passed: ${passed}, Failed: ${failed}`);

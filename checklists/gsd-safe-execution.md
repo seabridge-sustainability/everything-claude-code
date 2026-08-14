@@ -1,4 +1,4 @@
-﻿# GSD Safe Execution Checklist
+# GSD Safe Execution Checklist
 
 Canonical source: `skills/sea-gsd-controlled-execution/SKILL.md` ("Controlled
 Auto Mode Pattern") — if this list and the skill ever disagree, the skill wins.

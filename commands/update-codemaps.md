@@ -1,3 +1,7 @@
+---
+description: Scan project structure and generate token-lean architecture codemaps.
+---
+
 # Update Codemaps
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->

@@ -1,4 +1,4 @@
-# Workflow - Multi-Model Ã„Â°Ã…Å¸birlikÃƒÂ§i GeliÃ…Å¸tirme
+# Workflow - Multi-Model İşbirlikçi Geliştirme
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -16,48 +16,49 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
+Multi-model işbirlikçi geliştirme iş akışı (Research → Ideation → Plan → Execute → Optimize → Review), akıllı yönlendirme ile: Frontend → Gemini, Backend → Codex.
 
-Multi-model iÃ…Å¸birlikÃƒÂ§i geliÃ…Å¸tirme iÃ…Å¸ akÃ„Â±Ã…Å¸Ã„Â± (Research Ã¢â€ â€™ Ideation Ã¢â€ â€™ Plan Ã¢â€ â€™ Execute Ã¢â€ â€™ Optimize Ã¢â€ â€™ Review), akÃ„Â±llÃ„Â± yÃƒÂ¶nlendirme ile: Frontend Ã¢â€ â€™ Gemini, Backend Ã¢â€ â€™ Codex.
+> **Ön koşul:** Bu komut, temel ECC kurulumunun parçası **olmayan** harici `ccg-workflow` runtime'ını gerektirir. Bu komutun bağımlı olduğu `~/.claude/bin/codeagent-wrapper` ve `~/.claude/.ccg/prompts/*` rol dosyalarını sağlamak için `npx ccg-workflow` komutuyla başlatın. Bu runtime olmadan bu komut düzgün çalışmaz.
 
-Kalite kontrol noktalarÃ„Â±, MCP servisleri ve multi-model iÃ…Å¸birliÃ„Å¸i ile yapÃ„Â±landÃ„Â±rÃ„Â±lmÃ„Â±Ã…Å¸ geliÃ…Å¸tirme iÃ…Å¸ akÃ„Â±Ã…Å¸Ã„Â±.
+Kalite kontrol noktaları, MCP servisleri ve multi-model işbirliği ile yapılandırılmış geliştirme iş akışı.
 
-## KullanÃ„Â±m
+## Kullanım
 
 ```bash
-/workflow <task aÃƒÂ§Ã„Â±klamasÃ„Â±>
+/workflow <task açıklaması>
 ```
 
 ## Context
 
-- GeliÃ…Å¸tirilecek gÃƒÂ¶rev: $ARGUMENTS
-- Kalite kontrol noktalarÃ„Â±yla 6 fazlÃ„Â± yapÃ„Â±landÃ„Â±rÃ„Â±lmÃ„Â±Ã…Å¸ iÃ…Å¸ akÃ„Â±Ã…Å¸Ã„Â±
-- Multi-model iÃ…Å¸birliÃ„Å¸i: Codex (backend) + Gemini (frontend) + Claude (orkestrasyon)
-- MCP servis entegrasyonu (ace-tool, isteÃ„Å¸e baÃ„Å¸lÃ„Â±) geliÃ…Å¸miÃ…Å¸ yetenekler iÃƒÂ§in
+- Geliştirilecek görev: $ARGUMENTS
+- Kalite kontrol noktalarıyla 6 fazlı yapılandırılmış iş akışı
+- Multi-model işbirliği: Codex (backend) + Gemini (frontend) + Claude (orkestrasyon)
+- MCP servis entegrasyonu (ace-tool, isteğe bağlı) gelişmiş yetenekler için
 
-## RolÃƒÂ¼nÃƒÂ¼z
+## Rolünüz
 
-**OrkestratÃƒÂ¶r**sÃƒÂ¼nÃƒÂ¼z, multi-model iÃ…Å¸birlikÃƒÂ§i sistemi koordine ediyorsunuz (Research Ã¢â€ â€™ Ideation Ã¢â€ â€™ Plan Ã¢â€ â€™ Execute Ã¢â€ â€™ Optimize Ã¢â€ â€™ Review). Deneyimli geliÃ…Å¸tiriciler iÃƒÂ§in kÃ„Â±sa ve profesyonel iletiÃ…Å¸im kurun.
+**Orkestratör**sünüz, multi-model işbirlikçi sistemi koordine ediyorsunuz (Research → Ideation → Plan → Execute → Optimize → Review). Deneyimli geliştiriciler için kısa ve profesyonel iletişim kurun.
 
-**Ã„Â°Ã…Å¸birlikÃƒÂ§i Modeller**:
-- **ace-tool MCP** (isteÃ„Å¸e baÃ„Å¸lÃ„Â±) Ã¢â‚¬â€œ Code retrieval + Prompt enhancement
-- **Codex** Ã¢â‚¬â€œ Backend logic, algoritmalar, debugging (**Backend otoritesi, gÃƒÂ¼venilir**)
-- **Gemini** Ã¢â‚¬â€œ Frontend UI/UX, gÃƒÂ¶rsel tasarÃ„Â±m (**Frontend uzmanÃ„Â±, backend gÃƒÂ¶rÃƒÂ¼Ã…Å¸leri sadece referans iÃƒÂ§in**)
-- **Claude (self)** Ã¢â‚¬â€œ Orkestrasyon, planlama, execution, teslimat
+**İşbirlikçi Modeller**:
+- **ace-tool MCP** (isteğe bağlı) – Code retrieval + Prompt enhancement
+- **Codex** – Backend logic, algoritmalar, debugging (**Backend otoritesi, güvenilir**)
+- **Gemini** – Frontend UI/UX, görsel tasarım (**Frontend uzmanı, backend görüşleri sadece referans için**)
+- **Claude (self)** – Orkestrasyon, planlama, execution, teslimat
 
 ---
 
-## Multi-Model Ãƒâ€¡aÃ„Å¸rÃ„Â± Spesifikasyonu
+## Multi-Model Çağrı Spesifikasyonu
 
-**Ãƒâ€¡aÃ„Å¸rÃ„Â± sÃƒÂ¶zdizimi** (parallel: `run_in_background: true`, sequential: `false`):
+**Çağrı sözdizimi** (parallel: `run_in_background: true`, sequential: `false`):
 
 ```
-# Yeni session ÃƒÂ§aÃ„Å¸rÃ„Â±sÃ„Â±
+# Yeni session çağrısı
 Bash({
   command: "~/.claude/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend <codex|gemini> {{GEMINI_MODEL_FLAG}}- \"$PWD\" <<'EOF'
 ROLE_FILE: <role prompt path>
 <TASK>
 Requirement: <enhanced requirement (veya enhance edilmediyse $ARGUMENTS)>
-Context: <ÃƒÂ¶nceki fazlardan proje context'i ve analiz>
+Context: <önceki fazlardan proje context'i ve analiz>
 </TASK>
 OUTPUT: Expected output format
 EOF",
@@ -66,13 +67,13 @@ EOF",
   description: "Brief description"
 })
 
-# Session devam ettirme ÃƒÂ§aÃ„Å¸rÃ„Â±sÃ„Â±
+# Session devam ettirme çağrısı
 Bash({
   command: "~/.claude/bin/codeagent-wrapper {{LITE_MODE_FLAG}}--backend <codex|gemini> {{GEMINI_MODEL_FLAG}}resume <SESSION_ID> - \"$PWD\" <<'EOF'
 ROLE_FILE: <role prompt path>
 <TASK>
 Requirement: <enhanced requirement (veya enhance edilmediyse $ARGUMENTS)>
-Context: <ÃƒÂ¶nceki fazlardan proje context'i ve analiz>
+Context: <önceki fazlardan proje context'i ve analiz>
 </TASK>
 OUTPUT: Expected output format
 EOF",
@@ -82,8 +83,8 @@ EOF",
 })
 ```
 
-**Model Parametre NotlarÃ„Â±**:
-- `{{GEMINI_MODEL_FLAG}}`: `--backend gemini` kullanÃ„Â±rken, `--gemini-model gemini-3-pro-preview` ile deÃ„Å¸iÃ…Å¸tir (trailing space not edin); codex iÃƒÂ§in boÃ…Å¸ string kullan
+**Model Parametre Notları**:
+- `{{GEMINI_MODEL_FLAG}}`: `--backend gemini` kullanırken, `--gemini-model gemini-3-pro-preview` ile değiştir (trailing space not edin); codex için boş string kullan
 
 **Role Prompts**:
 
@@ -93,9 +94,9 @@ EOF",
 | Planning | `~/.claude/.ccg/prompts/codex/architect.md` | `~/.claude/.ccg/prompts/gemini/architect.md` |
 | Review | `~/.claude/.ccg/prompts/codex/reviewer.md` | `~/.claude/.ccg/prompts/gemini/reviewer.md` |
 
-**Session Reuse**: Her ÃƒÂ§aÃ„Å¸rÃ„Â± `SESSION_ID: xxx` dÃƒÂ¶ndÃƒÂ¼rÃƒÂ¼r, sonraki fazlar iÃƒÂ§in `resume xxx` subcommand kullan (not: `resume`, `--resume` deÃ„Å¸il).
+**Session Reuse**: Her çağrı `SESSION_ID: xxx` döndürür, sonraki fazlar için `resume xxx` subcommand kullan (not: `resume`, `--resume` değil).
 
-**Parallel Ãƒâ€¡aÃ„Å¸rÃ„Â±lar**: BaÃ…Å¸latmak iÃƒÂ§in `run_in_background: true` kullan, sonuÃƒÂ§larÃ„Â± `TaskOutput` ile bekle. **Bir sonraki faza geÃƒÂ§meden ÃƒÂ¶nce tÃƒÂ¼m modellerin dÃƒÂ¶nmesini MUTLAKA bekle**.
+**Parallel Çağrılar**: Başlatmak için `run_in_background: true` kullan, sonuçları `TaskOutput` ile bekle. **Bir sonraki faza geçmeden önce tüm modellerin dönmesini MUTLAKA bekle**.
 
 **Background Task'leri Bekle** (max timeout 600000ms = 10 dakika kullan):
 
@@ -103,24 +104,24 @@ EOF",
 TaskOutput({ task_id: "<task_id>", block: true, timeout: 600000 })
 ```
 
-**Ãƒâ€“NEMLÃ„Â°**:
-- `timeout: 600000` belirtilmeli, aksi takdirde varsayÃ„Â±lan 30 saniye erken timeout'a neden olur.
-- 10 dakika sonra hala tamamlanmamÃ„Â±Ã…Å¸sa, `TaskOutput` ile polling'e devam et, **ASLA process'i ÃƒÂ¶ldÃƒÂ¼rme**.
-- Bekleme timeout nedeniyle atlanÃ„Â±rsa, **MUTLAKA `AskUserQuestion` ÃƒÂ§aÃ„Å¸Ã„Â±rarak kullanÃ„Â±cÃ„Â±ya beklemeye devam etmek veya task'i ÃƒÂ¶ldÃƒÂ¼rmek isteyip istemediÃ„Å¸ini sor. Asla doÃ„Å¸rudan ÃƒÂ¶ldÃƒÂ¼rme.**
+**ÖNEMLİ**:
+- `timeout: 600000` belirtilmeli, aksi takdirde varsayılan 30 saniye erken timeout'a neden olur.
+- 10 dakika sonra hala tamamlanmamışsa, `TaskOutput` ile polling'e devam et, **ASLA process'i öldürme**.
+- Bekleme timeout nedeniyle atlanırsa, **MUTLAKA `AskUserQuestion` çağırarak kullanıcıya beklemeye devam etmek veya task'i öldürmek isteyip istemediğini sor. Asla doğrudan öldürme.**
 
 ---
 
-## Ã„Â°letiÃ…Å¸im YÃƒÂ¶nergeleri
+## İletişim Yönergeleri
 
-1. YanÃ„Â±tlara mode etiketi `[Mode: X]` ile baÃ…Å¸la, ilk `[Mode: Research]`.
-2. KatÃ„Â± sÃ„Â±ra takip et: `Research Ã¢â€ â€™ Ideation Ã¢â€ â€™ Plan Ã¢â€ â€™ Execute Ã¢â€ â€™ Optimize Ã¢â€ â€™ Review`.
-3. Her faz tamamlandÃ„Â±ktan sonra kullanÃ„Â±cÃ„Â± onayÃ„Â± iste.
-4. Skor < 7 veya kullanÃ„Â±cÃ„Â± onaylamadÃ„Â±Ã„Å¸Ã„Â±nda zorla durdur.
-5. GerektiÃ„Å¸inde kullanÃ„Â±cÃ„Â± etkileÃ…Å¸imi iÃƒÂ§in `AskUserQuestion` tool kullan (ÃƒÂ¶rn., onay/seÃƒÂ§im/approval).
+1. Yanıtlara mode etiketi `[Mode: X]` ile başla, ilk `[Mode: Research]`.
+2. Katı sıra takip et: `Research → Ideation → Plan → Execute → Optimize → Review`.
+3. Her faz tamamlandıktan sonra kullanıcı onayı iste.
+4. Skor < 7 veya kullanıcı onaylamadığında zorla durdur.
+5. Gerektiğinde kullanıcı etkileşimi için `AskUserQuestion` tool kullan (örn., onay/seçim/approval).
 
-## Harici Orkestrasyon Ne Zaman KullanÃ„Â±lÃ„Â±r
+## Harici Orkestrasyon Ne Zaman Kullanılır
 
-Ã„Â°Ã…Å¸ paralel worker'lar arasÃ„Â±nda bÃƒÂ¶lÃƒÂ¼nmesi gerektiÃ„Å¸inde harici tmux/worktree orkestrasyonu kullan; bu worker'larÃ„Â±n izole git state'i, baÃ„Å¸Ã„Â±msÃ„Â±z terminalleri veya ayrÃ„Â± build/test ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±rmasÃ„Â± gerekir. Hafif analiz, planlama veya review iÃƒÂ§in in-process subagent'larÃ„Â± kullan; burada ana session tek yazar olarak kalÃ„Â±r.
+İş paralel worker'lar arasında bölünmesi gerektiğinde harici tmux/worktree orkestrasyonu kullan; bu worker'ların izole git state'i, bağımsız terminalleri veya ayrı build/test çalıştırması gerekir. Hafif analiz, planlama veya review için in-process subagent'ları kullan; burada ana session tek yazar olarak kalır.
 
 ```bash
 node scripts/orchestrate-worktrees.js .claude/plan/workflow-e2e-test.json --execute
@@ -130,79 +131,79 @@ node scripts/orchestrate-worktrees.js .claude/plan/workflow-e2e-test.json --exec
 
 ## Execution Workflow
 
-**Task AÃƒÂ§Ã„Â±klamasÃ„Â±**: $ARGUMENTS
+**Task Açıklaması**: $ARGUMENTS
 
 ### Phase 1: Research & Analysis
 
-`[Mode: Research]` - Requirement'larÃ„Â± anla ve context topla:
+`[Mode: Research]` - Requirement'ları anla ve context topla:
 
-1. **Prompt Enhancement** (ace-tool MCP mevcutsa): `mcp__ace-tool__enhance_prompt` ÃƒÂ§aÃ„Å¸Ã„Â±r, **orijinal $ARGUMENTS'Ã„Â± tÃƒÂ¼m sonraki Codex/Gemini ÃƒÂ§aÃ„Å¸rÃ„Â±larÃ„Â± iÃƒÂ§in enhanced sonuÃƒÂ§la deÃ„Å¸iÃ…Å¸tir**. Mevcut deÃ„Å¸ilse, `$ARGUMENTS`'Ã„Â± olduÃ„Å¸u gibi kullan.
-2. **Context Retrieval** (ace-tool MCP mevcutsa): `mcp__ace-tool__search_context` ÃƒÂ§aÃ„Å¸Ã„Â±r. Mevcut deÃ„Å¸ilse, built-in tool'larÃ„Â± kullan: dosya keÃ…Å¸fi iÃƒÂ§in `Glob`, sembol aramasÃ„Â± iÃƒÂ§in `Grep`, context toplama iÃƒÂ§in `Read`, daha derin keÃ…Å¸if iÃƒÂ§in `Task` (Explore agent).
-3. **Requirement TamamlÃ„Â±lÃ„Â±k Skoru** (0-10):
-   - Hedef netliÃ„Å¸i (0-3), Beklenen sonuÃƒÂ§ (0-3), Kapsam sÃ„Â±nÃ„Â±rlarÃ„Â± (0-2), KÃ„Â±sÃ„Â±tlamalar (0-2)
-   - Ã¢â€°Â¥7: Devam et | <7: Dur, aÃƒÂ§Ã„Â±klayÃ„Â±cÃ„Â± sorular sor
+1. **Prompt Enhancement** (ace-tool MCP mevcutsa): `mcp__ace-tool__enhance_prompt` çağır, **orijinal $ARGUMENTS'ı tüm sonraki Codex/Gemini çağrıları için enhanced sonuçla değiştir**. Mevcut değilse, `$ARGUMENTS`'ı olduğu gibi kullan.
+2. **Context Retrieval** (ace-tool MCP mevcutsa): `mcp__ace-tool__search_context` çağır. Mevcut değilse, built-in tool'ları kullan: dosya keşfi için `Glob`, sembol araması için `Grep`, context toplama için `Read`, daha derin keşif için `Task` (Explore agent).
+3. **Requirement Tamamlılık Skoru** (0-10):
+   - Hedef netliği (0-3), Beklenen sonuç (0-3), Kapsam sınırları (0-2), Kısıtlamalar (0-2)
+   - ≥7: Devam et | <7: Dur, açıklayıcı sorular sor
 
 ### Phase 2: Solution Ideation
 
 `[Mode: Ideation]` - Multi-model parallel analiz:
 
-**Parallel Ãƒâ€¡aÃ„Å¸rÃ„Â±lar** (`run_in_background: true`):
-- Codex: Analyzer prompt kullan, teknik fizibilite, ÃƒÂ§ÃƒÂ¶zÃƒÂ¼mler, riskler ÃƒÂ§Ã„Â±ktÃ„Â±la
-- Gemini: Analyzer prompt kullan, UI fizibilite, ÃƒÂ§ÃƒÂ¶zÃƒÂ¼mler, UX deÃ„Å¸erlendirmesi ÃƒÂ§Ã„Â±ktÃ„Â±la
+**Parallel Çağrılar** (`run_in_background: true`):
+- Codex: Analyzer prompt kullan, teknik fizibilite, çözümler, riskler çıktıla
+- Gemini: Analyzer prompt kullan, UI fizibilite, çözümler, UX değerlendirmesi çıktıla
 
-`TaskOutput` ile sonuÃƒÂ§larÃ„Â± bekle. **SESSION_ID'yi kaydet** (`CODEX_SESSION` ve `GEMINI_SESSION`).
+`TaskOutput` ile sonuçları bekle. **SESSION_ID'yi kaydet** (`CODEX_SESSION` ve `GEMINI_SESSION`).
 
-**YukarÃ„Â±daki `Multi-Model Ãƒâ€¡aÃ„Å¸rÃ„Â± Spesifikasyonu`'ndaki `Ãƒâ€“NEMLÃ„Â°` talimatlarÃ„Â± takip et**
+**Yukarıdaki `Multi-Model Çağrı Spesifikasyonu`'ndaki `ÖNEMLİ` talimatları takip et**
 
-Her iki analizi sentezle, ÃƒÂ§ÃƒÂ¶zÃƒÂ¼m karÃ…Å¸Ã„Â±laÃ…Å¸tÃ„Â±rmasÃ„Â± ÃƒÂ§Ã„Â±ktÃ„Â±la (en az 2 seÃƒÂ§enek), kullanÃ„Â±cÃ„Â± seÃƒÂ§imini bekle.
+Her iki analizi sentezle, çözüm karşılaştırması çıktıla (en az 2 seçenek), kullanıcı seçimini bekle.
 
 ### Phase 3: Detailed Planning
 
-`[Mode: Plan]` - Multi-model iÃ…Å¸birlikÃƒÂ§i planlama:
+`[Mode: Plan]` - Multi-model işbirlikçi planlama:
 
-**Parallel Ãƒâ€¡aÃ„Å¸rÃ„Â±lar** (`resume <SESSION_ID>` ile session devam ettir):
-- Codex: Architect prompt + `resume $CODEX_SESSION` kullan, backend mimarisi ÃƒÂ§Ã„Â±ktÃ„Â±la
-- Gemini: Architect prompt + `resume $GEMINI_SESSION` kullan, frontend mimarisi ÃƒÂ§Ã„Â±ktÃ„Â±la
+**Parallel Çağrılar** (`resume <SESSION_ID>` ile session devam ettir):
+- Codex: Architect prompt + `resume $CODEX_SESSION` kullan, backend mimarisi çıktıla
+- Gemini: Architect prompt + `resume $GEMINI_SESSION` kullan, frontend mimarisi çıktıla
 
-`TaskOutput` ile sonuÃƒÂ§larÃ„Â± bekle.
+`TaskOutput` ile sonuçları bekle.
 
-**YukarÃ„Â±daki `Multi-Model Ãƒâ€¡aÃ„Å¸rÃ„Â± Spesifikasyonu`'ndaki `Ãƒâ€“NEMLÃ„Â°` talimatlarÃ„Â± takip et**
+**Yukarıdaki `Multi-Model Çağrı Spesifikasyonu`'ndaki `ÖNEMLİ` talimatları takip et**
 
-**Claude Sentezi**: Codex backend planÃ„Â± + Gemini frontend planÃ„Â±nÃ„Â± benimsle, kullanÃ„Â±cÃ„Â± onayÃ„Â±ndan sonra `.claude/plan/task-name.md`'ye kaydet.
+**Claude Sentezi**: Codex backend planı + Gemini frontend planını benimsle, kullanıcı onayından sonra `.claude/plan/task-name.md`'ye kaydet.
 
 ### Phase 4: Implementation
 
-`[Mode: Execute]` - Kod geliÃ…Å¸tirme:
+`[Mode: Execute]` - Kod geliştirme:
 
-- Onaylanan planÃ„Â± kesinlikle takip et
-- Mevcut proje kod standartlarÃ„Â±nÃ„Â± takip et
-- Ãƒâ€“nemli kilometre taÃ…Å¸larÃ„Â±nda geri bildirim iste
+- Onaylanan planı kesinlikle takip et
+- Mevcut proje kod standartlarını takip et
+- Önemli kilometre taşlarında geri bildirim iste
 
 ### Phase 5: Code Optimization
 
 `[Mode: Optimize]` - Multi-model parallel review:
 
-**Parallel Ãƒâ€¡aÃ„Å¸rÃ„Â±lar**:
-- Codex: Reviewer prompt kullan, gÃƒÂ¼venlik, performans, hata iÃ…Å¸leme ÃƒÂ¼zerine odaklan
-- Gemini: Reviewer prompt kullan, accessibility, tasarÃ„Â±m tutarlÃ„Â±lÃ„Â±Ã„Å¸Ã„Â± ÃƒÂ¼zerine odaklan
+**Parallel Çağrılar**:
+- Codex: Reviewer prompt kullan, güvenlik, performans, hata işleme üzerine odaklan
+- Gemini: Reviewer prompt kullan, accessibility, tasarım tutarlılığı üzerine odaklan
 
-`TaskOutput` ile sonuÃƒÂ§larÃ„Â± bekle. Review geri bildirimlerini entegre et, kullanÃ„Â±cÃ„Â± onayÃ„Â±ndan sonra optimizasyonu ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r.
+`TaskOutput` ile sonuçları bekle. Review geri bildirimlerini entegre et, kullanıcı onayından sonra optimizasyonu çalıştır.
 
-**YukarÃ„Â±daki `Multi-Model Ãƒâ€¡aÃ„Å¸rÃ„Â± Spesifikasyonu`'ndaki `Ãƒâ€“NEMLÃ„Â°` talimatlarÃ„Â± takip et**
+**Yukarıdaki `Multi-Model Çağrı Spesifikasyonu`'ndaki `ÖNEMLİ` talimatları takip et**
 
 ### Phase 6: Quality Review
 
-`[Mode: Review]` - Nihai deÃ„Å¸erlendirme:
+`[Mode: Review]` - Nihai değerlendirme:
 
-- Plana karÃ…Å¸Ã„Â± tamamlÃ„Â±lÃ„Â±Ã„Å¸Ã„Â± kontrol et
-- Fonksiyonaliteyi doÃ„Å¸rulamak iÃƒÂ§in test'leri ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
-- SorunlarÃ„Â± ve ÃƒÂ¶nerileri raporla
-- Nihai kullanÃ„Â±cÃ„Â± onayÃ„Â± iste
+- Plana karşı tamamlılığı kontrol et
+- Fonksiyonaliteyi doğrulamak için test'leri çalıştır
+- Sorunları ve önerileri raporla
+- Nihai kullanıcı onayı iste
 
 ---
 
 ## Ana Kurallar
 
-1. Faz sÃ„Â±rasÃ„Â± atlanamaz (kullanÃ„Â±cÃ„Â± aÃƒÂ§Ã„Â±kÃƒÂ§a talimat vermedikÃƒÂ§e)
-2. Harici modellerin **sÃ„Â±fÃ„Â±r dosya sistemi yazma eriÃ…Å¸imi**, tÃƒÂ¼m deÃ„Å¸iÃ…Å¸iklikler Claude tarafÃ„Â±ndan
-3. Skor < 7 veya kullanÃ„Â±cÃ„Â± onaylamadÃ„Â±Ã„Å¸Ã„Â±nda **zorla durdur**
+1. Faz sırası atlanamaz (kullanıcı açıkça talimat vermedikçe)
+2. Harici modellerin **sıfır dosya sistemi yazma erişimi**, tüm değişiklikler Claude tarafından
+3. Skor < 7 veya kullanıcı onaylamadığında **zorla durdur**

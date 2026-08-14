@@ -1,4 +1,4 @@
-﻿# REQUIREMENTS
+# REQUIREMENTS
 
 - Module:
 - Repo:

@@ -1,4 +1,4 @@
-﻿# Per-Repo Cross-Agent System Validation Report
+# Per-Repo Cross-Agent System Validation Report
 
 Date: 2026-05-08
 SYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1
