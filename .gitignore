@@ -138,3 +138,5 @@ configs/mcp-toolbox/tools.production.yaml
 # Local security scanner evidence can include matched secret payloads.
 docs/reports/security/agentshield/
 docs/reports/security/raw/
+# Stray directory some tests create when ECC_AGENT_DATA_HOME is unset
+undefined/
