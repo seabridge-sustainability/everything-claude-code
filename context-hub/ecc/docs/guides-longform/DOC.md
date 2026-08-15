@@ -3,13 +3,20 @@ name: guides-longform
 description: "The longform guide covering token optimization, memory, evals, research, and advanced agent workflows."
 metadata:
   languages: "english"
-  versions: "1.9.0"
+  versions: "2.2.0"
   revision: 1
-  updated-on: "2026-04-02"
+  updated-on: "2026-07-06"
   source: official
   tags: "ecc,guide,longform"
 ---
 # ECC Longform Guide
+
+> Generated from ECC canonical English docs. Do not edit directly; run `npm run context-hub:sync`.
+> Canonical source: `the-longform-guide.md`
+
+---
+
+# The Longform Guide to Everything Claude Code
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -27,13 +34,6 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
-
-> Generated from ECC canonical English docs. Do not edit directly; run `npm run context-hub:sync`.
-> Canonical source: `the-longform-guide.md`
-
----
-
-# The Longform Guide to Everything Claude Code
 
 ![Header: The Longform Guide to Everything Claude Code](./assets/images/longform/01-header.png)
 

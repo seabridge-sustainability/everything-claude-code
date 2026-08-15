@@ -3,13 +3,20 @@ name: core-soul
 description: "Core identity, principles, and cross-harness philosophy for Everything Claude Code."
 metadata:
   languages: "english"
-  versions: "1.9.0"
+  versions: "2.2.0"
   revision: 1
-  updated-on: "2026-04-02"
+  updated-on: "2026-07-06"
   source: official
   tags: "ecc,identity,principles"
 ---
 # ECC Soul
+
+> Generated from ECC canonical English docs. Do not edit directly; run `npm run context-hub:sync`.
+> Canonical source: `SOUL.md`
+
+---
+
+# Soul
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -27,13 +34,6 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
-
-> Generated from ECC canonical English docs. Do not edit directly; run `npm run context-hub:sync`.
-> Canonical source: `SOUL.md`
-
----
-
-# Soul
 
 ## Core Identity
 Everything Claude Code (ECC) is a production-ready AI coding plugin with 30 specialized agents, 136 skills, 60 commands, and automated hook workflows for software development.

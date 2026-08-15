@@ -18,7 +18,6 @@ const {
   getLearnedSkillsDir,
   ensureDir,
   readFile,
-  countInFile,
   log
 } = require('../lib/utils');
 

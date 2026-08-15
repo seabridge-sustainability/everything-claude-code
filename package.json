@@ -469,10 +469,17 @@
     "build:opencode": "node scripts/build-opencode.js",
     "prepack": "npm run build:opencode",
     "dashboard": "python3 ./ecc_dashboard.py",
-    "dashboard:web": "node scripts/dashboard-web.js"
+    "dashboard:web": "node scripts/dashboard-web.js",
+    "context-hub:sync": "node scripts/context-hub.js sync",
+    "context-hub:validate": "node scripts/context-hub.js validate",
+    "context-hub:build": "node scripts/context-hub.js build",
+    "harness:check": "powershell -ExecutionPolicy Bypass -File scripts/check-harness.ps1",
+    "harness:agents": "powershell -ExecutionPolicy Bypass -File scripts/check-agent-runtime-guardrails.ps1"
   },
   "dependencies": {
+    "@ai-sdk/openai-compatible": "^2.0.41",
     "@iarna/toml": "2.2.5",
+    "@open-gitagent/gitagent": "^0.2.0",
     "ajv": "8.20.0",
     "js-yaml": "4.3.1",
     "sql.js": "1.14.1"
@@ -490,6 +497,7 @@
   },
   "devDependencies": {
     "@eslint/js": "9.39.2",
+    "@gsd-build/sdk": "^0.1.0",
     "@opencode-ai/plugin": "1.17.3",
     "@types/node": "26.1.2",
     "c8": "11.0.0",

@@ -3,14 +3,14 @@
   "aliases": {
     "__proto__": {
       "sessionPath": "/evil/path",
-      "createdAt": "2026-08-14T03:47:42.904Z",
+      "createdAt": "2026-08-14T04:04:20.798Z",
       "title": "Prototype Pollution Attempt"
     },
     "normal": {
       "sessionPath": "/normal/path",
-      "createdAt": "2026-08-14T03:47:42.904Z",
+      "createdAt": "2026-08-14T04:04:20.798Z",
       "title": "Normal Alias"
     }
   },
-  "metadata": { "totalCount": 2, "lastUpdated": "2026-08-14T03:47:42.904Z" }
+  "metadata": { "totalCount": 2, "lastUpdated": "2026-08-14T04:04:20.798Z" }
 }

@@ -84,14 +84,6 @@ const ENTRY_DEFINITIONS = Object.freeze([
   },
   {
     kind: 'doc',
-    name: 'commands-docs',
-    title: 'ECC /docs Router',
-    description: 'The source-aware `/docs` command contract for routing ECC-internal docs to Context Hub and external docs to Context7.',
-    sourcePath: 'commands/docs.md',
-    tags: ['ecc', 'commands', 'docs-router'],
-  },
-  {
-    kind: 'doc',
     name: 'agents-docs-lookup',
     title: 'ECC Docs Lookup Agent',
     description: 'Agent instructions for routing ECC-internal documentation to Context Hub and external APIs to Context7.',

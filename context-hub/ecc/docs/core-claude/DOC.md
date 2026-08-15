@@ -3,13 +3,126 @@ name: core-claude
 description: "Claude Code specific guidance for working in the ECC repository."
 metadata:
   languages: "english"
-  versions: "1.9.0"
+  versions: "2.2.0"
   revision: 1
-  updated-on: "2026-04-02"
+  updated-on: "2026-08-14"
   source: official
   tags: "ecc,claude-code,instructions"
 ---
 # ECC Claude Guidance
+
+> Generated from ECC canonical English docs. Do not edit directly; run `npm run context-hub:sync`.
+> Canonical source: `CLAUDE.md`
+
+---
+
+# CLAUDE.md
+
+<!-- SEABRIDGE_GOAL_PROTOCOL_START -->
+## /goal Default Operating Mode
+
+All SeaBridgeAI coding-agent tasks default to /goal.
+
+Before implementation, establish a persistent execution goal, Definition of Done, validation plan, affected systems, dependencies, risks, expected artifacts, and likely edge cases. Continue the execution loop until the DoD is validated or a hard blocker is documented.
+
+### /goal and Auto-Loop Are the Same Mode
+
+/goal is the user-facing command; auto-loop is the autonomous persistent execution behavior. The agent must not return early after code generation, must not claim completion until validation passes, and must keep working until the Definition of Done is satisfied or a hard blocker is proven. If the task is multi-phase (touches more than 2 files, adds a dependency, requires a schema/migration change, or spans more than one repo), state the expected phases and validation steps before starting. If a non-trivial task finishes unusually quickly, include evidence explaining why it was genuinely small or already validated.
+
+Claude Code boundary: `/goal` is a UI slash command, not a callable skill. Agents
+must never invoke `Skill(goal)`. If the user includes `/goal`, treat it as the
+goal protocol wrapper and continue. If slash-command execution is unavailable,
+apply the protocol manually or use the exact skill name `goal-default`.
+
+Canonical protocol: C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md
+
+Compact form: C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL_SHORT.md
+
+Do not claim completion from code edits, generated files, or partial tests. Completion requires validated behavior, checked integrations, regression coverage proportional to risk, and documented skipped checks or blockers.
+
+### Completion Evidence Required
+
+Every final report must include files changed, commands run, tests run, validation results, errors encountered, fixes applied, unverified items, remaining risks, and whether the Definition of Done is satisfied. If no tests were run, state why tests were not run, what validation was substituted, and what risk remains. The phrase "complete" is prohibited unless accompanied by validation evidence.
+
+### Anti-Stuck Loop Rule
+
+Timeout/stagnation rule: if a command or approach fails twice, do not repeat it blindly. Inspect logs, change strategy, isolate the problem, reduce scope, use a different validation path, and document the blocker if unresolved. If a process hangs or becomes a hung process, stop it safely, check logs, run a smaller command, verify the environment, and continue with an alternate route.
+
+<!-- SEABRIDGE_GOAL_PROTOCOL_END -->
+
+
+## SeaBridgeAI Central System With Embedded Superpowers And GSD
+
+SYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1
+
+Canonical path: C:\Users\adelm\SeaBridgeAI\everything-claude-code
+
+Superpowers is embedded as an adapted local methodology through the SeaBridgeAI sea-* skills. Claude Code also has user-scope local plugin `superpowers@superpowers-dev` installed from the ECC vendor marketplace. Reference clone: `vendor\superpowers`. Do not add, update, remove, or reinstall Superpowers globally or through a marketplace unless explicitly approved.
+
+GSD / Get Shit Done is embedded as a controlled local reference and adapted workflow layer through `sea-gsd-controlled-execution`. Reference clone: `external\get-shit-done`. Do not run `npx get-shit-done-cc@latest`, install globally, enable yolo/autonomous mode, auto-commit, auto-push, or auto-create PRs unless explicitly approved.
+
+Mandatory gates: local-only development unless approved; no GitHub push unless approved; no commit unless requested; no global install or marketplace install unless approved; no paid/live provider calls unless approved; no fabricated sustainability data; verify endpoint/database/source/auth/tenant behavior before frontend or product claims; verify before completion.
+
+## Instruction Precedence And Load Order
+
+The single canonical precedence and load-order statement lives in
+`AGENTS_SYSTEM.md` ("Instruction Precedence And Load Order"). Follow it exactly;
+this file adds no competing ordering.
+
+## Skill Selection Default
+
+Discover skills dynamically from `AGENT_SKILLS.md`, `.agents/skills/`,
+`skills/`, `.claude/skills/`, `workflows/`, and `checklists/`. Do not maintain
+copied catalogs in product repos.
+
+Load at most ONE skill per task by default. A task is simple (no skill needed)
+when it touches at most 2 files, adds no dependency, and involves none of:
+auth, tenant isolation, billing, migrations, security, production data,
+destructive operations, AI grounding, or sustainability-data provenance. When
+unsure which skill applies, load only `sea-skill-map` and follow its routing.
+State it when no skill was needed.
+
+Procedural defaults: `sea-task-queue-execution` for queued issues or AFK
+implementation units, `sea-teach-loop` for stateful teaching,
+`sea-error-recovery-loop` after failed tasks or verification. Portable
+invocations: `#skill/grill-me`, `#skill/ubiquitous-language`,
+`#skill/improve-codebase-architecture`, or `Use skill: <name>`.
+
+## Goal Protocol Default
+
+For non-trivial SeaBridgeAI work, `/goal` is the default operating contract.
+Use `goal-default` to frame the user request with Definition of Done, validation
+plan, risks, dependencies, scope, blockers, and artifacts, then continue until
+validated or blocked. Do not call a skill named `goal`; use `goal-default` or
+read the protocol directly. Canonical protocol:
+`C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+(compact form: `protocols\GOAL_PROTOCOL_SHORT.md`).
+
+`/goal` sits above Spec Kit and GSD: Spec Kit owns formal specs; GSD owns
+long-running execution state and UAT. `/goal` never authorizes commits, pushes,
+installs, live/paid calls, destructive actions, migrations, or production data
+changes.
+
+## SeaBridgeAI Central Coding-Agent Layer
+
+For SeaBridgeAI work across backend, frontend, OpenSeaBri, autoresearch,
+`_upstream`, and future repos, load:
+`C:\Users\adelm\SeaBridgeAI\everything-claude-code\SEABRIDGE_CODING_AGENT_SYSTEM.md`
+
+Use the matching `repo-integrations/`, `skills/sea-*`, `.agents/skills/sea-*`,
+`workflows/`, and `checklists/` files. Do not duplicate long shared guidance
+into product repos.
+
+Apply the canonical Ponytail-inspired minimalism guardrail in
+`AGENTS_SYSTEM.md`: understand first, reuse before writing, prefer deletion,
+standard library, native platform features, and already-installed dependencies,
+protect safety and data integrity, and verify non-trivial changes.
+
+Apply the canonical LLM Wiki / Knowledge Vault protocol in `AGENTS_SYSTEM.md`
+for durable non-sensitive Markdown knowledge. Route memory questions through
+`agent-memory`, ingestion decisions through `knowledge-ops`, note edits through
+`sea-knowledge-vault`, and compiled OpenKB/PageIndex work through
+`openkb-knowledge-base` only when explicitly requested or already configured.
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -27,13 +140,6 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
-
-> Generated from ECC canonical English docs. Do not edit directly; run `npm run context-hub:sync`.
-> Canonical source: `CLAUDE.md`
-
----
-
-# CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -56,21 +162,17 @@ node tests/scripts/context-hub.test.js
 
 ## Architecture
 
-The project is organized into several core components:
-
 - **agents/** - Specialized subagents for delegation (planner, code-reviewer, tdd-guide, etc.)
 - **skills/** - Workflow definitions and domain knowledge (coding standards, patterns, testing)
 - **commands/** - Slash commands invoked by users (/tdd, /plan, /e2e, etc.)
 - **hooks/** - Trigger-based automations (session persistence, pre/post-tool hooks)
 - **rules/** - Always-follow guidelines (security, coding style, testing requirements)
 - **mcp-configs/** - MCP server configurations for external integrations
-- **scripts/** - Cross-platform Node.js utilities for hooks, setup, and Context Hub sync/build tasks
+- **scripts/** - Cross-platform utilities for hooks, setup, guardrail checks, and Context Hub tasks
 - **context-hub/** - Repo-local Context Hub content derived from the canonical English docs
 - **tests/** - Test suite for scripts and utilities
 
 ## Documentation Retrieval Order
-
-When working inside ECC, use this order:
 
 1. Read the local repo file directly if the answer is already in the workspace.
 2. Use ECC's local Context Hub bundle for ECC-specific guides, commands, policies, and workflows.
@@ -81,14 +183,10 @@ When working inside ECC, use this order:
 ## Context Hub Commands
 
 ```bash
-npm run context-hub:sync
-npm run context-hub:validate
-npm run context-hub:build
+npm run context-hub:sync       # refreshes context-hub/ecc/... plus the repo root llms.txt
+npm run context-hub:validate   # npx -y @aisuite/chub build context-hub --validate-only
+npm run context-hub:build      # builds context-hub/dist for local chub search / chub get
 ```
-
-- `context-hub:sync` refreshes `context-hub/ecc/...` plus the repo root `llms.txt`.
-- `context-hub:validate` runs `npx -y @aisuite/chub build context-hub --validate-only`.
-- `context-hub:build` builds `context-hub/dist` for local `chub search` and `chub get` usage.
 
 ## Key Commands
 
@@ -110,26 +208,41 @@ npm run context-hub:build
 - Skill placement: Curated in skills/; generated/imported under ~/.claude/skills/. See docs/SKILL-PLACEMENT-POLICY.md
 - Hook format: JSON with matcher conditions and command/notification hooks
 - Context Hub content is generated from the canonical English docs; update the source docs first, then run `npm run context-hub:sync`
-- Optional convenience install for humans and agents: `npm install -g @aisuite/chub`
+- Optional convenience use for humans and agents: prefer `npx -y @aisuite/chub`; global installs require explicit approval.
 
 ## Contributing
 
-Follow the formats in CONTRIBUTING.md:
-- Agents: Markdown with frontmatter (name, description, tools, model)
-- Skills: Clear sections (When to Use, How It Works, Examples)
-- Commands: Markdown with description frontmatter
-- Hooks: JSON with matcher and hooks array
+Follow the formats in CONTRIBUTING.md: agents (Markdown + frontmatter), skills
+(When to Use / How It Works / Examples), commands (Markdown + description
+frontmatter), hooks (JSON with matcher and hooks array). File naming: lowercase
+with hyphens (e.g. `python-reviewer.md`, `tdd-workflow.md`).
 
-File naming: lowercase with hyphens (e.g. `python-reviewer.md`, `tdd-workflow.md`)
-
-## Skills
-
-Use the following skills when working on related files:
+## Skills For ECC Files
 
 | File(s) | Skill |
 |---------|-------|
 | `README.md` | `/readme` |
 | `.github/workflows/*.yml` | `/ci-workflow` |
-| `commands/docs.md`, `agents/docs-lookup.md`, `skills/documentation-lookup/SKILL.md` | `documentation-lookup` |
+| `agents/docs-lookup.md`, `skills/documentation-lookup/SKILL.md` | `documentation-lookup` |
+| Memory/session continuity, project recall, backend memory questions | `agent-memory` |
+| Secondary browser inspection alongside Playwright | `vibe-check` |
+| Google Cloud, Firebase, Gemini API, or Google Cloud WAF work | matching `google/skills` skill |
+| Design artifact generation (prototypes, decks, mobile apps, operations docs) | `open-design` |
 
 When spawning subagents, always pass conventions from the respective skill into the agent's prompt.
+
+## Roster And Tooling Pointers
+
+- Specialized subagents, GSD lifecycle commands, and gstack skills:
+  `docs/tools/ECC_AGENT_ROSTER.md`. Load only when delegating or when a
+  `/gsd-*` or gstack command is requested.
+- rtk, caveman, codeburn, designlang, Open Design, Vibium, Google Agent Skills,
+  token-availability retry loops, memory routing, graphify, paper2agent:
+  `docs/tools/ECC_TOOLING_REFERENCE.md`. Load only when the specific tool is
+  needed.
+
+Hard rules that always apply: global/marketplace installs require explicit
+approval; token-retry loops are opt-in only; Playwright remains canonical for
+repeatable SeaBridgeAI browser QA; `graphify-out/GRAPH_REPORT.md` is the entry
+point for architecture questions in this repo, and run `graphify update .`
+after modifying code files.

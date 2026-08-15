@@ -3,13 +3,18 @@ name: core-codex
 description: "Codex-specific guidance for ECC, including skills discovery and source-aware documentation routing."
 metadata:
   languages: "english"
-  versions: "1.9.0"
+  versions: "2.2.0"
   revision: 1
-  updated-on: "2026-04-02"
+  updated-on: "2026-08-14"
   source: official
   tags: "ecc,codex,instructions"
 ---
 # ECC Codex Guidance
+
+> Generated from ECC canonical English docs. Do not edit directly; run `npm run context-hub:sync`.
+> Canonical source: `.codex/AGENTS.md`
+
+---
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -26,25 +31,21 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 6. Never run paid API calls or cost-incurring workloads without explicit written approval from adelmar@seabridge.ai.
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
-
-
-> Generated from ECC canonical English docs. Do not edit directly; run `npm run context-hub:sync`.
-> Canonical source: `.codex/AGENTS.md`
-
----
-
 # ECC for Codex CLI
 
 This supplements the root `AGENTS.md` with Codex-specific guidance.
+
+For repo navigation, surface ownership, and PR diff packet guidance, read
+`docs/CODEX-NAVIGATION-GUIDE.md` after this supplement.
 
 ## Model Recommendations
 
 | Task Type | Recommended Model |
 |-----------|------------------|
-| Routine coding, tests, formatting | GPT 5.4 |
-| Complex features, architecture | GPT 5.4 |
-| Debugging, refactoring | GPT 5.4 |
-| Security review | GPT 5.4 |
+| Routine coding, tests, formatting | GPT 5.5 |
+| Complex features, architecture | GPT 5.5 |
+| Debugging, refactoring | GPT 5.5 |
+| Security review | GPT 5.5 |
 
 ## Skills Discovery
 
@@ -52,30 +53,40 @@ Skills are auto-loaded from `.agents/skills/`. Each skill contains:
 - `SKILL.md` - Detailed instructions and workflow
 - `agents/openai.yaml` - Codex interface metadata
 
-Available skills:
-- tdd-workflow - Test-driven development with 80%+ coverage
-- security-review - Comprehensive security checklist
-- coding-standards - Universal coding standards
-- frontend-patterns - React/Next.js patterns
-- frontend-slides - Viewport-safe HTML presentations and PPTX-to-web conversion
-- article-writing - Long-form writing from notes and voice references
-- content-engine - Platform-native social content and repurposing
-- market-research - Source-attributed market and competitor research
-- investor-materials - Decks, memos, models, and one-pagers
-- investor-outreach - Personalized investor outreach and follow-ups
-- backend-patterns - API design, database, caching
-- e2e-testing - Playwright E2E tests
-- eval-harness - Eval-driven development
-- strategic-compact - Context management
-- api-design - REST API design patterns
-- verification-loop - Build, test, lint, typecheck, security
-- deep-research - Multi-source research with firecrawl and exa MCPs
-- exa-search - Neural search via Exa MCP for web, code, and companies
-- claude-api - Anthropic Claude API patterns and SDKs
-- x-api - X/Twitter API integration for posting, threads, and analytics
-- crosspost - Multi-platform content distribution
-- fal-ai-media - AI image/video/audio generation via fal.ai
-- dmux-workflows - Multi-agent orchestration with dmux
+Do not rely on a static catalog here: discover the current skill surface by
+listing `.agents/skills/` (and `skills/` for canonical `sea-*` bodies), or use
+`sea-skill-map` / `docs/SKILL_ROUTING_REFERENCE.md` for routing. Load at most
+one skill per task per the skill-selection rule in `AGENTS_SYSTEM.md`.
+
+## Google Skills Boundary
+
+Official Google Agent Skills from `google/skills` are installed under
+`.agents/skills` and copied across supported ECC agent skill folders. Use the
+matching Google skill before implementing Google Cloud, Firebase, Gemini API, or
+Google Cloud Well-Architected Framework work. These skills do not authorize live
+cloud mutations, paid workloads, IAM changes, deployments, or secret handling;
+SeaBridgeAI approval and cost controls still apply.
+
+The installer reported Snyk high risk for `alloydb-basics` and
+`cloud-sql-basics`, medium risk for `firebase-basics`, `gemini-api`, and
+`gke-basics`, and low risk for the rest. Review the relevant `SKILL.md` before
+use.
+
+## Vibium Boundary
+
+Vibium is installed as user/ECC-level tooling, not product runtime. Use the
+`vibe-check` skill or `scripts/vibium.ps1` when the user wants a second pair of
+browser eyes in addition to Playwright. Playwright remains canonical for
+repeatable SeaBridgeAI QA/regression testing.
+
+Safe checks:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File C:\Users\adelm\SeaBridgeAI\everything-claude-code\scripts\vibium.ps1 --version
+```
+
+The skill installer flagged the upstream skill as high risk in Snyk; review the
+skill before use and keep browser captures/state out of committed source.
 
 ## Documentation Retrieval Order
 
@@ -119,6 +130,12 @@ The sync script (`scripts/sync-ecc-to-codex.sh`) uses a Node-based TOML parser t
 - **`--update-mcp`** - explicitly replaces all ECC-managed servers with the latest recommended config (safely removes subtables like `[mcp_servers.supabase.env]`).
 - **User config is always preserved** - custom servers, args, env vars, and credentials outside ECC-managed sections are never touched.
 
+## External Action Boundaries
+
+Treat networked tools as read-only by default. Search, inspect, and draft freely within the user's requested scope, but require explicit user approval before posting, publishing, pushing, merging, opening paid jobs, dispatching remote agents, changing third-party resources, or modifying credentials.
+
+When approval is ambiguous, produce a local plan or draft artifact instead of taking the external action. Preserve user config and private state unless the user specifically asks for a scoped change.
+
 ## Multi-Agent Support
 
 Codex now supports multi-agent workflows behind the experimental `features.multi_agent` flag.
@@ -142,12 +159,12 @@ Sample role configs in this repo:
 | Skills | Skills loaded via plugin | `.agents/skills/` directory |
 | Commands | `/slash` commands | Instruction-based |
 | Agents | Subagent Task tool | Multi-agent via `/agent` and `[agents.<name>]` roles |
-| Security | Hook-based enforcement | Instruction + sandbox |
+| Security | Hook-based enforcement | Instruction-based security + sandbox |
 | MCP | Full support | Supported via `config.toml` and `codex mcp add` |
 
-## Security Without Hooks
+## Security Hooks
 
-Since Codex lacks hooks, security enforcement is instruction-based:
+Runtime preflight guardrails are not configured in SeaBridgeAI Codex projects. Keep instruction-based security active across runtime surfaces and sandboxes.
 1. Always validate inputs at system boundaries
 2. Never hardcode secrets - use environment variables
 3. Run `npm audit` / `pip audit` before committing

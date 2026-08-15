@@ -34,7 +34,6 @@
 ## Policies
 
 - [ecc/policy-contributing](context-hub/ecc/docs/policy-contributing/DOC.md): Contribution rules for agents, skills, commands, docs, and documentation routing within ECC.
-- [ecc/commands-docs](context-hub/ecc/docs/commands-docs/DOC.md): The source-aware `/docs` command contract for routing ECC-internal docs to Context Hub and external docs to Context7.
 - [ecc/agents-docs-lookup](context-hub/ecc/docs/agents-docs-lookup/DOC.md): Agent instructions for routing ECC-internal documentation to Context Hub and external APIs to Context7.
 
 ## Skills

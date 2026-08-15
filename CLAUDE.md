@@ -205,7 +205,7 @@ with hyphens (e.g. `python-reviewer.md`, `tdd-workflow.md`).
 |---------|-------|
 | `README.md` | `/readme` |
 | `.github/workflows/*.yml` | `/ci-workflow` |
-| `commands/docs.md`, `agents/docs-lookup.md`, `skills/documentation-lookup/SKILL.md` | `documentation-lookup` |
+| `agents/docs-lookup.md`, `skills/documentation-lookup/SKILL.md` | `documentation-lookup` |
 | Memory/session continuity, project recall, backend memory questions | `agent-memory` |
 | Secondary browser inspection alongside Playwright | `vibe-check` |
 | Google Cloud, Firebase, Gemini API, or Google Cloud WAF work | matching `google/skills` skill |

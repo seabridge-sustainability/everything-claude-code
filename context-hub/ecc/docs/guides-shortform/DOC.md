@@ -3,13 +3,20 @@ name: guides-shortform
 description: "The shorthand guide covering setup, foundations, philosophy, and practical ECC workflows."
 metadata:
   languages: "english"
-  versions: "1.9.0"
+  versions: "2.2.0"
   revision: 1
-  updated-on: "2026-04-02"
+  updated-on: "2026-08-14"
   source: official
   tags: "ecc,guide,shortform"
 ---
 # ECC Shorthand Guide
+
+> Generated from ECC canonical English docs. Do not edit directly; run `npm run context-hub:sync`.
+> Canonical source: `the-shortform-guide.md`
+
+---
+
+# The Shorthand Guide to Everything Claude Code
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -27,13 +34,6 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
-
-> Generated from ECC canonical English docs. Do not edit directly; run `npm run context-hub:sync`.
-> Canonical source: `the-shortform-guide.md`
-
----
-
-# The Shorthand Guide to Everything Claude Code
 
 ![Header: Anthropic Hackathon Winner - Tips & Tricks for Claude Code](./assets/images/shortform/00-header.png)
 
@@ -61,24 +61,24 @@ Use this order:
 
 ## Skills and Commands
 
-Skills operate like rules, constricted to certain scopes and workflows. They're shorthand to prompts when you need to execute a particular workflow.
+Skills are the primary workflow surface. They act like scoped workflow bundles: reusable prompts, structure, supporting files, and codemaps when you need a particular execution pattern.
 
-After a long session of coding with Opus 4.5, you want to clean out dead code and loose .md files? Run `/refactor-clean`. Need testing? `/tdd`, `/e2e`, `/test-coverage`. Skills can also include codemaps - a way for Claude to quickly navigate your codebase without burning context on exploration.
+After a long session of coding with Opus 4.5, you want to clean out dead code and loose .md files? Run `/refactor-clean`. Need testing? `/tdd`, `/e2e`, `/test-coverage`. Those slash entries are convenient, but the real durable unit is the underlying skill. Skills can also include codemaps - a way for Claude to quickly navigate your codebase without burning context on exploration.
 
 ![Terminal showing chained commands](./assets/images/shortform/02-chaining-commands.jpeg)
 *Chaining commands together*
 
-Commands are skills executed via slash commands. They overlap but are stored differently:
+ECC still ships a `commands/` layer, but it is best thought of as legacy slash-entry compatibility during migration. The durable logic should live in skills.
 
-- **Skills**: `~/.claude/skills/` - broader workflow definitions
-- **Commands**: `~/.claude/commands/` - quick executable prompts
+- **Skills**: `~/.claude/skills/` - canonical workflow definitions
+- **Commands**: `~/.claude/commands/` - legacy slash-entry shims when you still need them
 
 ```bash
 # Example skill structure
 ~/.claude/skills/
   pmx-guidelines.md      # Project-specific patterns
   coding-standards.md    # Language best practices
-  tdd-workflow/          # Multi-file skill with README.md
+  tdd-workflow/          # Multi-file skill with SKILL.md
   security-review/       # Checklist-based skill
 ```
 
@@ -200,7 +200,7 @@ Your 200k context window before compacting might only be 70k with too many tools
 # Check enabled MCPs
 /mcp
 
-# Disable unused ones in ~/.claude.json under projects.disabledMcpServers
+# Disable unused ones in ~/.claude/settings.json or in the current repo's .mcp.json
 ```
 
 ---
@@ -262,7 +262,7 @@ git worktree add ../feature-branch feature-branch
 
 Stream and watch logs/bash processes Claude runs:
 
-<https://github.com/user-attachments/assets/shortform/07-tmux-video.mp4>
+[Watch: tmux session streaming a long-running command (video)](./assets/images/shortform/07-tmux-video.mp4)
 
 ```bash
 tmux new -s dev
@@ -343,7 +343,7 @@ This is also a viable choice and works well with Claude Code. You can use it in 
 
 ```markdown
 ralph-wiggum@claude-code-plugins       # Loop automation
-frontend-design@claude-code-plugins    # UI/UX patterns
+frontend-patterns@claude-code-plugins  # UI/UX patterns
 commit-commands@claude-code-plugins    # Git workflow
 security-guidance@claude-code-plugins  # Security checks
 pr-review-toolkit@claude-code-plugins  # PR automation

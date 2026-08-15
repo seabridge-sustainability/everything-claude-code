@@ -3,13 +3,158 @@ name: core-agents
 description: "Canonical agent instructions, routing rules, testing standards, and development workflow for ECC agents."
 metadata:
   languages: "english"
-  versions: "1.9.0"
+  versions: "2.2.0"
   revision: 1
-  updated-on: "2026-04-02"
+  updated-on: "2026-08-14"
   source: official
   tags: "ecc,agents,instructions"
 ---
 # ECC Agent Instructions
+
+> Generated from ECC canonical English docs. Do not edit directly; run `npm run context-hub:sync`.
+> Canonical source: `AGENTS.md`
+
+---
+
+# Everything Claude Code (ECC) — Agent Instructions
+
+This is a **production-ready AI coding plugin** providing 75 specialized agents, 376 skills, 96 commands, and automated hook workflows for software development.
+
+**Version:** 2.2.0
+
+## Project Structure
+
+```
+agents/          — 75 specialized subagents
+skills/          — 376 workflow skills and domain knowledge
+commands/        — 96 slash commands
+hooks/           — Trigger-based automations
+rules/           — Always-follow guidelines (common + per-language)
+```
+
+<!-- SEABRIDGE_GOAL_PROTOCOL_START -->
+## /goal Default Operating Mode
+
+All SeaBridgeAI coding-agent tasks default to /goal.
+
+Before implementation, establish a persistent execution goal, Definition of Done, validation plan, affected systems, dependencies, risks, expected artifacts, and likely edge cases. Continue the execution loop until the DoD is validated or a hard blocker is documented.
+
+### /goal and Auto-Loop Are the Same Mode
+
+/goal is the user-facing command; auto-loop is the autonomous persistent execution behavior. The agent must not return early after code generation, must not claim completion until validation passes, and must keep working until the Definition of Done is satisfied or a hard blocker is proven. If the task is multi-phase (touches more than 2 files, adds a dependency, requires a schema/migration change, or spans more than one repo), state the expected phases and validation steps before starting. If a non-trivial task finishes unusually quickly, include evidence explaining why it was genuinely small or already validated.
+
+Claude Code boundary: `/goal` is a UI slash command, not a callable skill. Agents
+must never invoke `Skill(goal)`. If the user includes `/goal`, treat it as the
+goal protocol wrapper and continue. If slash-command execution is unavailable,
+apply the protocol manually or use the exact skill name `goal-default`.
+
+Canonical protocol: C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md
+
+Compact form: C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL_SHORT.md
+
+Do not claim completion from code edits, generated files, or partial tests. Completion requires validated behavior, checked integrations, regression coverage proportional to risk, and documented skipped checks or blockers.
+
+### Completion Evidence Required
+
+Every final report must include files changed, commands run, tests run, validation results, errors encountered, fixes applied, unverified items, remaining risks, and whether the Definition of Done is satisfied. If no tests were run, state why tests were not run, what validation was substituted, and what risk remains. The phrase "complete" is prohibited unless accompanied by validation evidence.
+
+### Anti-Stuck Loop Rule
+
+Timeout/stagnation rule: if a command or approach fails twice, do not repeat it blindly. Inspect logs, change strategy, isolate the problem, reduce scope, use a different validation path, and document the blocker if unresolved. If a process hangs or becomes a hung process, stop it safely, check logs, run a smaller command, verify the environment, and continue with an alternate route.
+
+<!-- SEABRIDGE_GOAL_PROTOCOL_END -->
+
+
+## SeaBridgeAI Central System With Embedded Superpowers And GSD
+
+SYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1
+
+Canonical path: C:\Users\adelm\SeaBridgeAI\everything-claude-code
+
+Superpowers is embedded as an adapted local methodology through the SeaBridgeAI sea-* skills. Claude Code also has user-scope local plugin `superpowers@superpowers-dev` installed from the ECC vendor marketplace. Reference clone: `vendor\superpowers`. Do not add, update, remove, or reinstall Superpowers globally or through a marketplace unless explicitly approved.
+
+GSD / Get Shit Done is embedded as a controlled local reference and adapted workflow layer through `sea-gsd-controlled-execution`. Reference clone: `external\get-shit-done`. Do not run `npx get-shit-done-cc@latest`, install globally, enable yolo/autonomous mode, auto-commit, auto-push, or auto-create PRs unless explicitly approved.
+
+Mandatory gates: local-only development unless approved; no GitHub push unless approved; no commit unless requested; no global install or marketplace install unless approved; no paid/live provider calls unless approved; no fabricated sustainability data; verify endpoint/database/source/auth/tenant behavior before frontend or product claims; verify before completion.
+
+Claude Code, Codex, Gemini, OpenCode, Cursor, GitHub Copilot CLI, and future coding agents must use the same SYSTEM_ID, canonical path, dynamic skill retrieval policy, workflows, and checklists. Product repos should point here rather than duplicating divergent guidance.
+
+## Instruction Precedence And Load Order
+
+The single canonical precedence and load-order statement lives in
+`AGENTS_SYSTEM.md` ("Instruction Precedence And Load Order"). Follow it exactly;
+this file adds no competing ordering. Summary: Tier-1 safety rules first, then
+explicit user/session instructions, then repo-local files, then ECC canonical
+files, then skills/workflows/checklists.
+
+## Skill Selection Default
+
+Discover skills dynamically from `AGENT_SKILLS.md`, `.agents/skills/`,
+`skills/`, `.claude/skills/`, `workflows/`, and `checklists/`. Do not maintain
+copied catalogs in product repos.
+
+Load at most ONE skill per task by default. A task is simple (no skill needed)
+when it touches at most 2 files, adds no dependency, and involves none of:
+auth, tenant isolation, billing, migrations, security, production data,
+destructive operations, AI grounding, or sustainability-data provenance. When
+unsure which skill applies, load only `sea-skill-map` and follow its routing.
+State it when no skill was needed.
+
+Procedural defaults: `sea-task-queue-execution` for queued issues or AFK
+implementation units, `sea-teach-loop` for stateful teaching,
+`sea-error-recovery-loop` after failed tasks or verification. Portable
+invocations: `#skill/grill-me`, `#skill/ubiquitous-language`,
+`#skill/improve-codebase-architecture`, or `Use skill: <name>`.
+
+## SeaBridge Git Integration Discipline
+
+- Integration branches are fixed for ManageESG product work: backend
+  `seabridge_development`, frontend `development`. Do not create feature
+  branches, PRs, or new repos without explicit user approval.
+- `main` (backend) and the equivalent live branch (frontend) are
+  live/production. Never push, commit, merge, or otherwise modify them unless
+  the user explicitly requests that specific change in that session.
+- Always run `git status --short --branch` and `git fetch --prune` before work,
+  before integration, and before final reporting.
+- If isolation is required, use a short-lived isolated git worktree from the
+  latest remote tip, integrate there, rebase onto the latest remote tip,
+  fast-forward push, and remove the worktree. Never force-push.
+- Concurrent agent sessions may be active in backend and frontend. Never
+  clobber uncommitted working-tree changes; inspect and preserve them before
+  acting.
+- Environment defaults: Windows + PowerShell; backend Python is
+  `.\venv\Scripts\python.exe`; loguru formatting uses `{}` placeholders, not
+  `%s`; `.env` is gitignored and normally exists only in the main repo, so test
+  worktrees may need a local ignored copy; first GitHub push may require
+  interactive credential setup, then cached credentials can be reused.
+
+## Goal Protocol Default
+
+For non-trivial SeaBridgeAI work, `/goal` is the default operating contract.
+Use `goal-default` to frame the user request with Definition of Done, validation
+plan, risks, dependencies, scope, blockers, and artifacts, then continue until
+validated or blocked. Do not call a skill named `goal`; use `goal-default` or
+read the protocol directly. Canonical protocol:
+`C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+(compact form: `protocols\GOAL_PROTOCOL_SHORT.md`).
+
+`/goal` sits above Spec Kit and GSD: Spec Kit owns formal specs; GSD owns
+long-running execution state and UAT. `/goal` never authorizes commits, pushes,
+installs, live/paid calls, destructive actions, migrations, or production data
+changes.
+
+## SeaBridgeAI Central Coding-Agent Layer
+
+For SeaBridgeAI work across backend, frontend, OpenSeaBri, autoresearch,
+`_upstream`, and future repos, load the shared entrypoint:
+`C:\Users\adelm\SeaBridgeAI\everything-claude-code\SEABRIDGE_CODING_AGENT_SYSTEM.md`
+
+Then use the relevant `repo-integrations/`, `skills/sea-*`, `.agents/skills/sea-*`,
+`workflows/`, and `checklists/` files. Keep reusable guidance here in ECC;
+product repos should only carry lightweight pointers and repo-specific overrides.
+For optional GBrain checks and code-lookup planning, use `skills/gbrain/SKILL.md`
+and `scripts/gbrain-workspace.ps1`; it is intentionally check/plan first and does
+not initialize a brain or index sources by default.
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -27,29 +172,40 @@ Never authorize deletion of repositories, source folders, databases, or infrastr
 7. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later. Never store secrets in code, docs, logs, or commits.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
+## Coding-Agent Principles (Always Applied)
 
-> Generated from ECC canonical English docs. Do not edit directly; run `npm run context-hub:sync`.
-> Canonical source: `AGENTS.md`
+Canonical text lives in this repo's `AGENTS_SYSTEM.md` under "Coding-Agent
+Principles (Always Applied)". Follow it as mandatory behavioral guardrails —
+Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven
+Execution, and the five-gate execution discipline (evidence before reasoning,
+adversarial reasoning, verification before completion, calibrated reporting).
+Only the user may explicitly relax them for a specific task. Full playbook:
+`everything-claude-code/.claude/skills/karpathy-guidelines/SKILL.md`.
 
----
+## Ponytail Minimalism Pointer
 
-# Everything Claude Code (ECC) Ã¢â‚¬â€ Agent Instructions
+Apply the canonical Ponytail-inspired minimalism guardrail in
+`AGENTS_SYSTEM.md`: understand first, reuse before writing, prefer deletion,
+standard library, native platform features, and already-installed dependencies,
+protect safety and data integrity, and verify non-trivial changes.
 
-This is a **production-ready AI coding plugin** providing 30 specialized agents, 136 skills, 60 commands, and automated hook workflows for software development.
+## LLM Wiki / Knowledge Vault Pointer
 
-**Version:** 1.9.0
+Apply the canonical LLM Wiki / Knowledge Vault protocol in `AGENTS_SYSTEM.md`
+for durable non-sensitive Markdown knowledge. Route memory questions through
+`agent-memory`, ingestion decisions through `knowledge-ops`, note edits through
+`sea-knowledge-vault`, and compiled OpenKB/PageIndex work through
+`openkb-knowledge-base` only when explicitly requested or already configured.
 
 ## Core Principles
 
-1. **Agent-First** Ã¢â‚¬â€ Delegate to specialized agents for domain tasks
-2. **Test-Driven** Ã¢â‚¬â€ Write tests before implementation, 80%+ coverage required
-3. **Security-First** Ã¢â‚¬â€ Never compromise on security; validate all inputs
-4. **Immutability** Ã¢â‚¬â€ Always create new objects, never mutate existing ones
-5. **Plan Before Execute** Ã¢â‚¬â€ Plan complex features before writing code
+1. **Agent-First** — Delegate to specialized agents for domain tasks
+2. **Test-Driven** — Write tests before implementation, 80%+ coverage required
+3. **Security-First** — Never compromise on security; validate all inputs
+4. **Immutability** — Always create new objects, never mutate existing ones
+5. **Plan Before Execute** — Plan complex features before writing code
 
 ## Documentation Retrieval Order
-
-When documentation is needed, follow this order:
 
 1. Local repo file if the answer is already in the checked-out workspace.
 2. ECC's local Context Hub bundle via `chub` for ECC-specific guides, commands, playbooks, and policies.
@@ -57,51 +213,27 @@ When documentation is needed, follow this order:
 4. Context7 only for third-party libraries, frameworks, SDKs, and APIs.
 5. `llms.txt` or web browsing only as fallback paths.
 
-## Available Agents
+## Specialized Agents And Lifecycle Commands
 
-| Agent | Purpose | When to Use |
-|-------|---------|-------------|
-| planner | Implementation planning | Complex features, refactoring |
-| architect | System design and scalability | Architectural decisions |
-| tdd-guide | Test-driven development | New features, bug fixes |
-| code-reviewer | Code quality and maintainability | After writing/modifying code |
-| security-reviewer | Vulnerability detection | Before commits, sensitive code |
-| build-error-resolver | Fix build/type errors | When build fails |
-| e2e-runner | End-to-end Playwright testing | Critical user flows |
-| refactor-cleaner | Dead code cleanup | Code maintenance |
-| doc-updater | Documentation and codemaps | Updating docs |
-| docs-lookup | Source-aware documentation routing | ECC workflow docs and library/API documentation questions |
-| cpp-reviewer | C++ code review | C++ projects |
-| cpp-build-resolver | C++ build errors | C++ build failures |
-| go-reviewer | Go code review | Go projects |
-| go-build-resolver | Go build errors | Go build failures |
-| kotlin-reviewer | Kotlin code review | Kotlin/Android/KMP projects |
-| kotlin-build-resolver | Kotlin/Gradle build errors | Kotlin build failures |
-| database-reviewer | PostgreSQL/Supabase specialist | Schema design, query optimization |
-| python-reviewer | Python code review | Python projects |
-| java-reviewer | Java and Spring Boot code review | Java/Spring Boot projects |
-| java-build-resolver | Java/Maven/Gradle build errors | Java build failures |
-| chief-of-staff | Communication triage and drafts | Multi-channel email, Slack, LINE, Messenger |
-| loop-operator | Autonomous loop execution | Run loops safely, monitor stalls, intervene |
-| harness-optimizer | Harness config tuning | Reliability, cost, throughput |
-| rust-reviewer | Rust code review | Rust projects |
-| rust-build-resolver | Rust build errors | Rust build failures |
-| pytorch-build-resolver | PyTorch runtime/CUDA/training errors | PyTorch build/training failures |
-| typescript-reviewer | TypeScript/JavaScript code review | TypeScript/JavaScript projects |
+The full roster of ECC subagents (planner, code-reviewer, tdd-guide,
+security-reviewer, language reviewers/build resolvers, loop-operator,
+harness-optimizer, chief-of-staff, and the GSD lifecycle agents and commands)
+lives in `docs/tools/ECC_AGENT_ROSTER.md`. Load it only when delegating or when
+a `/gsd-*` or gstack command is requested.
 
-## Agent Orchestration
+## Installed Tooling Pointer
 
-Use agents proactively without user prompt:
-- Complex feature requests Ã¢â€ â€™ **planner**
-- Code just written/modified Ã¢â€ â€™ **code-reviewer**
-- Bug fix or new feature Ã¢â€ â€™ **tdd-guide**
-- Architectural decision Ã¢â€ â€™ **architect**
-- Security-sensitive code Ã¢â€ â€™ **security-reviewer**
-- Multi-channel communication triage Ã¢â€ â€™ **chief-of-staff**
-- Autonomous loops / loop monitoring Ã¢â€ â€™ **loop-operator**
-- Harness config reliability and cost Ã¢â€ â€™ **harness-optimizer**
+Details for rtk, caveman, codeburn, designlang, Open Design, Vibium, Google
+Agent Skills, token-availability retry loops, memory routing, graphify, and the
+paper2agent suite live in `docs/tools/ECC_TOOLING_REFERENCE.md`. Load that file
+only when the specific tool is needed. Hard rules that always apply:
 
-Use parallel execution for independent operations Ã¢â‚¬â€ launch multiple agents simultaneously.
+- Global installs and marketplace installs require explicit approval.
+- Token-retry loops (`scripts/agent-token-retry.ps1`) are opt-in only.
+- Playwright remains canonical for repeatable SeaBridgeAI browser QA; Vibium is
+  secondary inspection only.
+- Google Cloud auth/IAM/deployment work keeps SeaBridgeAI approval and cost
+  controls in force.
 
 ## Security Guidelines
 
@@ -117,7 +249,7 @@ Use parallel execution for independent operations Ã¢â‚¬â€ launch mult
 
 **Secret management:** NEVER hardcode secrets. Use environment variables or a secret manager. Validate required secrets at startup. Rotate any exposed secrets immediately.
 
-**If security issue found:** STOP Ã¢â€ â€™ use security-reviewer agent Ã¢â€ â€™ fix CRITICAL issues Ã¢â€ â€™ rotate exposed secrets Ã¢â€ â€™ review codebase for similar issues.
+**If security issue found:** STOP → use security-reviewer agent → fix CRITICAL issues → rotate exposed secrets → review codebase for similar issues.
 
 ## Coding Style
 
@@ -129,45 +261,21 @@ Use parallel execution for independent operations Ã¢â‚¬â€ launch mult
 
 **Input validation:** Validate all user input at system boundaries. Use schema-based validation. Fail fast with clear messages. Never trust external data.
 
-**Code quality checklist:**
-- Functions small (<50 lines), files focused (<800 lines)
-- No deep nesting (>4 levels)
-- Proper error handling, no hardcoded values
-- Readable, well-named identifiers
+**Code quality checklist:** functions small (<50 lines), files focused (<800 lines), no deep nesting (>4 levels), proper error handling, no hardcoded values, readable well-named identifiers.
 
 ## Testing Requirements
 
-**Minimum coverage: 80%**
+**Minimum coverage: 80%.** Test types: unit (functions, utilities, components), integration (API endpoints, database operations), E2E (critical user flows).
 
-Test types (all required):
-1. **Unit tests** Ã¢â‚¬â€ Individual functions, utilities, components
-2. **Integration tests** Ã¢â‚¬â€ API endpoints, database operations
-3. **E2E tests** Ã¢â‚¬â€ Critical user flows
-
-**TDD workflow (mandatory):**
-1. Write test first (RED) Ã¢â‚¬â€ test should FAIL
-2. Write minimal implementation (GREEN) Ã¢â‚¬â€ test should PASS
-3. Refactor (IMPROVE) Ã¢â‚¬â€ verify coverage 80%+
-
-Troubleshoot failures: check test isolation Ã¢â€ â€™ verify mocks Ã¢â€ â€™ fix implementation (not tests, unless tests are wrong).
+**TDD workflow:** write failing test first (RED) → minimal implementation (GREEN) → refactor (IMPROVE, keep coverage 80%+). Troubleshoot failures: check test isolation → verify mocks → fix implementation (not tests, unless tests are wrong).
 
 ## Development Workflow
 
-1. **Plan** Ã¢â‚¬â€ Use planner agent, identify dependencies and risks, break into phases
-2. **TDD** Ã¢â‚¬â€ Use tdd-guide agent, write tests first, implement, refactor
-3. **Review** Ã¢â‚¬â€ Use code-reviewer agent immediately, address CRITICAL/HIGH issues
-4. **Capture knowledge in the right place**
-   - Personal debugging notes, preferences, and temporary context Ã¢â€ â€™ auto memory
-   - Team/project knowledge (architecture decisions, API changes, runbooks) Ã¢â€ â€™ the project's existing docs structure
-   - If the current task already produces the relevant docs or code comments, do not duplicate the same information elsewhere
-   - If there is no obvious project doc location, ask before creating a new top-level file
-5. **Commit** Ã¢â‚¬â€ Conventional commits format, comprehensive PR summaries
-
-## Git Workflow
-
-**Commit format:** `<type>: <description>` Ã¢â‚¬â€ Types: feat, fix, refactor, docs, test, chore, perf, ci
-
-**PR workflow:** Analyze full commit history Ã¢â€ â€™ draft comprehensive summary Ã¢â€ â€™ include test plan Ã¢â€ â€™ push with `-u` flag.
+1. **Plan** — Use planner agent, identify dependencies and risks, break into phases
+2. **TDD** — Use tdd-guide agent, write tests first, implement, refactor
+3. **Review** — Use code-reviewer agent immediately, address CRITICAL/HIGH issues
+4. **Capture knowledge in the right place** — personal notes → auto memory; team/project knowledge → the project's existing docs structure; do not duplicate; if no obvious location, ask before creating a new top-level file
+5. **Commit when explicitly approved** — Conventional commits format (`<type>: <description>`; feat, fix, refactor, docs, test, chore, perf, ci), comprehensive PR summaries; push only after the separate push approval gate is satisfied
 
 ## Architecture Patterns
 
@@ -175,31 +283,17 @@ Troubleshoot failures: check test isolation Ã¢â€ â€™ verify mocks Ã�
 
 **Repository pattern:** Encapsulate data access behind standard interface (findAll, findById, create, update, delete). Business logic depends on abstract interface, not storage mechanism.
 
-**Skeleton projects:** Search for battle-tested templates, evaluate with parallel agents (security, extensibility, relevance), clone best match, iterate within proven structure.
-
-## Performance
-
-**Context management:** Avoid last 20% of context window for large refactoring and multi-file features. Lower-sensitivity tasks (single edits, docs, simple fixes) tolerate higher utilization.
-
-**Build troubleshooting:** Use build-error-resolver agent Ã¢â€ â€™ analyze errors Ã¢â€ â€™ fix incrementally Ã¢â€ â€™ verify after each fix.
+**Context management:** Avoid last 20% of context window for large refactoring and multi-file features. Lower-sensitivity tasks tolerate higher utilization.
 
 ## Project Structure
 
 ```
-agents/          Ã¢â‚¬â€ 30 specialized subagents
-skills/          Ã¢â‚¬â€ 136 workflow skills and domain knowledge
-commands/        Ã¢â‚¬â€ 60 slash commands
-hooks/           Ã¢â‚¬â€ Trigger-based automations
-rules/           Ã¢â‚¬â€ Always-follow guidelines (common + per-language)
-scripts/         Ã¢â‚¬â€ Cross-platform Node.js utilities
-mcp-configs/     Ã¢â‚¬â€ 14 MCP server configurations
-tests/           Ã¢â‚¬â€ Test suite
+agents/          - specialized subagents
+skills/          - workflow skills and domain knowledge
+commands/        - slash commands
+hooks/           - trigger-based automations
+rules/           - always-follow guidelines (common + per-language)
+scripts/         - cross-platform utilities and guardrail checks
+mcp-configs/     - MCP server configurations
+tests/           - test suite
 ```
-
-## Success Metrics
-
-- All tests pass with 80%+ coverage
-- No security vulnerabilities
-- Code is readable and maintainable
-- Performance is acceptable
-- User requirements are met
