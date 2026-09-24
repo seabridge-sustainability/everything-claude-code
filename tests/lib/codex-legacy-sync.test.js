@@ -4,6 +4,7 @@ const assert = require('assert');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+const { isSymlinkPermissionError, SYMLINK_SKIP_REASON } = require('../symlink-support');
 
 const {
   beginLegacySyncState,
@@ -28,6 +29,7 @@ function test(name, fn) {
     console.log(`  ✓ ${name}`);
     return true;
   } catch (error) {
+    if (isSymlinkPermissionError(error)) { console.log(`  SKIP ${name} (${SYMLINK_SKIP_REASON})`); return true; }
     console.log(`  ✗ ${name}`);
     console.log(`    Error: ${error.message}`);
     return false;

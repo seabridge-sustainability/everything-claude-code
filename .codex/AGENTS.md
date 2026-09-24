@@ -138,12 +138,12 @@ Sample role configs in this repo:
 | Skills | Skills loaded via plugin | Native plugin skills and repo `.agents/skills/` |
 | Commands | `/slash` commands | Instruction-based |
 | Agents | Subagent Task tool | Multi-agent via `/agent` and `[agents.<name>]` roles |
-| Security | Hook-based enforcement | Instruction-based security + sandbox |
+| Security | Hook profiles + sandbox | Trusted hook subset + instruction + sandbox |
 | MCP | Full support | Supported via `config.toml` and `codex mcp add` |
 
-## Security Hooks
+## Security with Narrower Hooks
 
-Runtime preflight guardrails are not configured in SeaBridgeAI Codex projects. Keep instruction-based security active across runtime surfaces and sandboxes.
+Codex supports a narrower native hook subset than Claude Code, with explicit trust in `/hooks`. Treat those reviewed hooks as one layer alongside instructions and the sandbox. SeaBridgeAI projects configure no runtime preflight hooks today, so the approval gates in the repo `AGENTS.md` safety block remain the enforcement: commits, pushes, installs, paid calls and destructive actions need explicit approval.
 1. Always validate inputs at system boundaries
 2. Never hardcode secrets - use environment variables
 3. Run `npm audit` / `pip audit` before committing

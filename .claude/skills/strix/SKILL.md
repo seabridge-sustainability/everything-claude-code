@@ -69,7 +69,7 @@ Run from `C:\Users\adelm\SeaBridgeAI\autoresearch\strix\`, or use the full path:
 .\strix\strix.ps1 -Target backend -Headless
 
 # Use a different LLM model
-.\strix\strix.ps1 -Target backend -Model "anthropic/claude-opus-4-6"
+.\strix\strix.ps1 -Target backend -Model "anthropic/claude-opus-5-5"
 ```
 
 (paths above assume the current directory is `autoresearch\`; adjust if running from elsewhere)
@@ -80,7 +80,7 @@ Run from `C:\Users\adelm\SeaBridgeAI\autoresearch\strix\`, or use the full path:
 
 | Variable | Value | Purpose |
 |----------|-------|---------|
-| `STRIX_LLM` | `anthropic/claude-sonnet-4-6` | LLM provider (default) |
+| `STRIX_LLM` | `anthropic/claude-sonnet-5` | LLM provider (default) |
 | `LLM_API_KEY` | `$ANTHROPIC_API_KEY` | API key passed to LiteLLM |
 | `STRIX_SCAN_MODE` | `quick`, `standard`, or `deep` | Scan depth (default: `deep`) |
 
@@ -98,7 +98,7 @@ uv sync --no-dev
 ## Manual Run (direct CLI)
 
 ```powershell
-$env:STRIX_LLM = "anthropic/claude-sonnet-4-6"
+$env:STRIX_LLM = "anthropic/claude-sonnet-5"
 $env:LLM_API_KEY = $env:ANTHROPIC_API_KEY
 cd C:\Users\adelm\SeaBridgeAI\autoresearch\strix
 uv run strix --target "C:\Users\adelm\SeaBridgeAI\manageesg-backend"

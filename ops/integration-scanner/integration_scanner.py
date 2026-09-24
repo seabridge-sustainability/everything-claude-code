@@ -18,9 +18,9 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 ALLOWED_LICENSES = {"MIT", "Apache-2.0", "CC-BY-4.0", "CC-BY", "ODbL"}
 DEFAULT_CHANNEL = "#integrations-radar"
 DEFAULT_MODELS: dict[str, str] = {
-    "anthropic": "claude-sonnet-4-20250514",
+    "anthropic": "claude-sonnet-5",
     "openai": "gpt-4o",
-    "litellm": "claude-sonnet-4-20250514",
+    "litellm": "claude-sonnet-5",
 }
 GITHUB_API = "https://api.github.com"
 REPORT_THRESHOLD = 6.5

@@ -1,6 +1,6 @@
 ---
 name: sea-security-reviewer
-description: Review SeaBridgeAI changes for security risks: secrets, auth, tenant isolation, unsafe tools, MCP/agent config, prompt injection, uploads, billing, and production data exposure.
+description: "Review SeaBridgeAI changes for security risks: secrets, auth, tenant isolation, unsafe tools, MCP/agent config, prompt injection, uploads, billing, and production data exposure."
 ---
 
 # SeaBridgeAI Security Reviewer

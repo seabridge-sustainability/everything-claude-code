@@ -33,3 +33,6 @@
 *.gz binary
 *.woff binary
 *.woff2 binary
+
+# Hashed Fusion assets: provenance.json pins their SHA-256 over LF bytes (tests/ci/fusion-bundle.test.js)
+skills/video-editing/assets/fusion/** text eol=lf

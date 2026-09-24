@@ -7,6 +7,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { spawnSync } = require('child_process');
+const { isSymlinkPermissionError, SYMLINK_SKIP_REASON } = require('../symlink-support');
 
 const {
   createStateStore,
@@ -24,6 +25,7 @@ async function test(name, fn) {
     console.log(`  \u2713 ${name}`);
     return true;
   } catch (error) {
+    if (isSymlinkPermissionError(error)) { console.log(`  SKIP ${name} (${SYMLINK_SKIP_REASON})`); return true; }
     console.log(`  \u2717 ${name}`);
     console.log(`    Error: ${error.message}`);
     return false;

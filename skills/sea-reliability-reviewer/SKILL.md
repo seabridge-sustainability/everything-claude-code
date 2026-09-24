@@ -1,6 +1,6 @@
 ---
 name: sea-reliability-reviewer
-description: Review SeaBridgeAI changes for reliability risks: timeouts, retries, cancellation, fallback behavior, observability, and operational failure modes. Use for backend services, providers, jobs, integrations, CLI smokes, and production-readiness work.
+description: "Review SeaBridgeAI changes for reliability risks: timeouts, retries, cancellation, fallback behavior, observability, and operational failure modes. Use for backend services, providers, jobs, integrations, CLI smokes, and production-readiness work."
 ---
 
 # SeaBridgeAI Reliability Reviewer

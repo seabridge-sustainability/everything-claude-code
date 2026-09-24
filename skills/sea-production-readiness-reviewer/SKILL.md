@@ -1,6 +1,6 @@
 ---
 name: sea-production-readiness-reviewer
-description: Review SeaBridgeAI changes for production readiness: env validation, Docker/Compose, migrations, smoke tests, health checks, rollback, package publishing safety, docs, logs, and approval gates.
+description: "Review SeaBridgeAI changes for production readiness: env validation, Docker/Compose, migrations, smoke tests, health checks, rollback, package publishing safety, docs, logs, and approval gates."
 ---
 
 # SeaBridgeAI Production Readiness Reviewer

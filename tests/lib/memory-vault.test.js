@@ -5,6 +5,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { spawnSync } = require('child_process');
+const { isSymlinkPermissionError, SYMLINK_SKIP_REASON } = require('../symlink-support');
 
 const {
   MAX_DIAGNOSTICS,
@@ -34,6 +35,7 @@ function test(name, fn) {
     console.log(`  PASS ${name}`);
     passed += 1;
   } catch (error) {
+    if (isSymlinkPermissionError(error)) { console.log(`  SKIP ${name} (${SYMLINK_SKIP_REASON})`); return; }
     console.log(`  FAIL ${name}`);
     console.log(`    ${error.stack || error.message}`);
     failed += 1;

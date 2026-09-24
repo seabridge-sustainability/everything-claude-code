@@ -69,7 +69,7 @@ Config is at `~/.deepagents/config.toml`. Current default: `anthropic:claude-son
 To override for a session:
 ```bash
 deepagents --model openai:gpt-4o
-deepagents --model anthropic:claude-opus-4-6
+deepagents --model anthropic:claude-opus-5-5
 ```
 
 ---
@@ -132,7 +132,7 @@ from langchain_anthropic import ChatAnthropic
 
 # Spawn a sub-agent for a delegated task
 sub_agent = create_deep_agent(
-    model=ChatAnthropic(model="claude-sonnet-4-6"),
+    model=ChatAnthropic(model="claude-sonnet-5"),
     system_prompt="You are an ESG data analyst...",
     tools=[my_custom_tool],
 )

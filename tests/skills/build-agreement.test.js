@@ -11,6 +11,7 @@ const scriptPath = path.join(repoRoot, 'skills/master-agreement-generator/script
 const templatePath = path.join(repoRoot, 'skills/master-agreement-generator/references/master-template.example.md');
 const specPath = path.join(repoRoot, 'skills/master-agreement-generator/references/spec.example.json');
 const builder = require(scriptPath);
+const { isSymlinkPermissionError, SYMLINK_SKIP_REASON } = require('../symlink-support');
 
 let passed = 0;
 let failed = 0;
@@ -21,6 +22,7 @@ function test(name, fn) {
     console.log(`  ✓ ${name}`);
     passed += 1;
   } catch (error) {
+    if (isSymlinkPermissionError(error)) { console.log(`  SKIP ${name} (${SYMLINK_SKIP_REASON})`); return; }
     console.log(`  ✗ ${name}`);
     console.log(`    Error: ${error.message}`);
     failed += 1;

@@ -109,7 +109,7 @@ Task file: $task_file
 $(cat "$task_file")
 EOF
 
-if codex exec -p yolo -m gpt-4o --color never -C "$(pwd)" -o "$output_file" - < "$prompt_file"; then
+if codex exec --ask-for-approval "$APPROVAL_POLICY" -m gpt-5.6-sol --color never -C "$(pwd)" -o "$output_file" - < "$prompt_file"; then
   {
     echo "# Handoff"
     echo

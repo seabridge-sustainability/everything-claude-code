@@ -101,7 +101,7 @@ npm run catalog:check                 # documented agent/skill/command counts
 
 **Secret management:** NEVER hardcode secrets. Use environment variables or a secret manager. Validate required secrets at startup. Rotate any exposed secrets immediately.
 
-**If security issue found:** STOP → use security-reviewer agent → fix CRITICAL issues → rotate exposed secrets → review codebase for similar issues.
+**If security issue found:** STOP → use ecc:security-reviewer agent → fix CRITICAL issues → rotate exposed secrets → review codebase for similar issues.
 
 ## Coding Style
 
@@ -123,9 +123,9 @@ npm run catalog:check                 # documented agent/skill/command counts
 
 ## Development Workflow
 
-1. **Plan** — Use planner agent, identify dependencies and risks, break into phases
-2. **TDD** — Use tdd-guide agent, write tests first, implement, refactor
-3. **Review** — Use code-reviewer agent immediately, address CRITICAL/HIGH issues
+1. **Plan** — Use ecc:planner agent, identify dependencies and risks, break into phases
+2. **TDD** — Use ecc:tdd-guide agent, write tests first, implement, refactor
+3. **Review** — Use ecc:code-reviewer agent immediately, address CRITICAL/HIGH issues
 4. **Capture knowledge in the right place** — personal notes → auto memory; team/project knowledge → the project's existing docs structure; do not duplicate; if no obvious location, ask before creating a new top-level file
 5. **Commit when explicitly approved** — Conventional commits format (`<type>: <description>`; feat, fix, refactor, docs, test, chore, perf, ci), comprehensive PR summaries; push only after the separate push approval gate is satisfied
 

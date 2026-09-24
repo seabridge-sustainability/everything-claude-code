@@ -7,6 +7,7 @@ const path = require('path');
 const { spawn, spawnSync } = require('child_process');
 const { PassThrough } = require('stream');
 const { pathToFileURL } = require('url');
+const { isSymlinkPermissionError, SYMLINK_SKIP_REASON } = require('../symlink-support');
 
 const SERVER = path.join(__dirname, '..', '..', 'scripts', 'memory-mcp.mjs');
 const {
@@ -24,6 +25,7 @@ async function test(name, fn) {
     console.log(`  PASS ${name}`);
     passed += 1;
   } catch (error) {
+    if (isSymlinkPermissionError(error)) { console.log(`  SKIP ${name} (${SYMLINK_SKIP_REASON})`); return; }
     console.log(`  FAIL ${name}`);
     console.log(`    ${error.mcpDiagnostic ? JSON.stringify(error.mcpDiagnostic) : error.stack || error.message}`);
     failed += 1;

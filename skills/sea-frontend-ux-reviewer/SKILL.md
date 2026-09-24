@@ -1,6 +1,6 @@
 ---
 name: sea-frontend-ux-reviewer
-description: Review SeaBridgeAI frontend changes for UX and implementation guardrails: loading/error/empty states, route visibility, API typing, accessibility basics, responsive layout, and production console leakage.
+description: "Review SeaBridgeAI frontend changes for UX and implementation guardrails: loading/error/empty states, route visibility, API typing, accessibility basics, responsive layout, and production console leakage."
 ---
 
 # SeaBridgeAI Frontend UX Reviewer

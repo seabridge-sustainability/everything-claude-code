@@ -1,6 +1,6 @@
 ---
 name: sea-architecture-reviewer
-description: Review SeaBridgeAI changes for architecture quality: coupling, module depth, boundaries, duplicated business logic, testability, interfaces, and cross-repo contract drift.
+description: "Review SeaBridgeAI changes for architecture quality: coupling, module depth, boundaries, duplicated business logic, testability, interfaces, and cross-repo contract drift."
 ---
 
 # SeaBridgeAI Architecture Reviewer
