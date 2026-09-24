@@ -35,17 +35,43 @@ $canonBlockLf = $canonBlock -replace "`r`n", "`n"
 $markerRegex = [regex]("(?s)" + [regex]::Escape($startMarker) + ".*?" + [regex]::Escape($endMarker))
 $legacyRegex = [regex]"(?s)## Safety And Authorization Rule.*?7\. Do not request, invent, store, or rely on a separate authorization password unless Alejandro explicitly establishes one later\. Never store secrets in code, docs, logs, or commits\."
 
-$exclude = '\\node_modules\\|\\external\\|\\vendor\\|\\_upstream\\|\\\.git\\|\\graphify\\|\\docs\\reports\\|\\\.venv|\\venv\\'
+# Worktrees and run checkouts belong to other (possibly live) sessions: never stamp into them.
+$exclude = '\\node_modules\\|\\external\\|\\vendor\\|\\_upstream\\|\\\.git\\|\\graphify\\|\\docs\\reports\\|\\\.venv|\\venv\\|\\\.claude\\worktrees\\|\\\.wt[^\\]*\\|\\artifacts\\agent-runs\\|\\\.worktrees\\|\\\.qa-snapshots\\|\\\.next\\|\\\.playwright-agent\\|\\\.mypy_cache\\|\\__pycache__\\'
 
 $drift = @()
 $updated = 0
 $adopted = 0
 
+# Walk with pruning: excluded trees (worktrees, run checkouts, node_modules,
+# venvs, mirrors) are never entered, so a check takes seconds instead of
+# enumerating millions of files first. Symlinked/junction directories are
+# skipped (their targets are walked directly). The `_upstream` root holds
+# third-party mirrors, so only its own top-level files are scanned; the old
+# full-path exclude also matched that root itself, so it was never synced.
+function Get-MdFiles([string]$Root) {
+  $shallow = $Root -match '\\_upstream\\?$'
+  $stack = New-Object System.Collections.Stack
+  $stack.Push($Root)
+  while ($stack.Count -gt 0) {
+    $dir = $stack.Pop()
+    try { foreach ($f in [System.IO.Directory]::EnumerateFiles($dir, '*.md')) { $f } } catch { }
+    if ($shallow) { continue }
+    try {
+      foreach ($sub in [System.IO.Directory]::EnumerateDirectories($dir)) {
+        if (([System.IO.File]::GetAttributes($sub) -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) { continue }
+        if (($sub + '\') -match $exclude) { continue }
+        $stack.Push($sub)
+      }
+    } catch { }
+  }
+}
+
 foreach ($root in $Roots) {
-  Get-ChildItem $root -Recurse -Include *.md -File -Force -ErrorAction SilentlyContinue |
-    Where-Object { $_.FullName -notmatch $exclude -and $_.FullName -ne $CanonicalFile } |
+  Get-MdFiles $root |
+    Where-Object { $_ -notmatch $exclude -or $root -match '\\_upstream\\?$' } |
+    Where-Object { $_ -ne $CanonicalFile } |
     ForEach-Object {
-      $path = $_.FullName
+      $path = $_
       $bytes = [System.IO.File]::ReadAllBytes($path)
       $hasBom = ($bytes.Length -ge 3 -and $bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF)
       $text = [System.Text.Encoding]::UTF8.GetString($bytes)

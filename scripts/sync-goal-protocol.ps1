@@ -16,65 +16,36 @@ $MarkerStart = "<!-- SEABRIDGE_GOAL_PROTOCOL_START -->"
 $MarkerEnd = "<!-- SEABRIDGE_GOAL_PROTOCOL_END -->"
 
 function New-GoalBlock {
+    # Revision 2026-09-24: one compact block replaces the /goal + auto-loop +
+    # completion-evidence + anti-stuck sections. The -Include* switches are kept
+    # for caller compatibility and no longer change the output; their content is
+    # folded into the bullets below. Rationale:
+    # docs/reports/agent-system-review/2026-09-24-agent-system-modernization.md
     $parts = New-Object System.Collections.Generic.List[string]
     $parts.Add($MarkerStart)
-    $parts.Add("## /goal Default Operating Mode")
+    $parts.Add("## Goal Protocol Default")
     $parts.Add("")
-    $parts.Add("All SeaBridgeAI coding-agent tasks default to `/goal`.")
+    $parts.Add("For non-trivial work, settle what done means and how you will prove it before editing, then keep going until it is proven or you reach a real blocker. ``/goal`` in a prompt asks for exactly this.")
     $parts.Add("")
-    $parts.Add("Before implementation, establish a persistent execution goal, Definition of Done, validation plan, affected systems, dependencies, risks, expected artifacts, and likely edge cases. Continue the execution loop until the DoD is validated or a hard blocker is documented.")
+    $parts.Add("- **Scope from evidence.** Build what the request needs, grounded in the current code, git history, tests, and the current plan. Do not invent product functionality or sustainability, emissions, climate, or financial data; preserve source, provenance, and units. Treat memory, handoffs, and old summaries as leads to verify, not facts.")
+    $parts.Add("- **Done means** the requested behavior works, tests that would catch its failure pass, there are no unexplained regressions, and you know the state of the tree. Scale checks to risk: tenant isolation, auth, persistence, AI grounding, and cross-repo contracts warrant broader tests. Do not re-run checks nothing has changed since.")
+    $parts.Add("- **When stuck,** change strategy after two failures of the same approach. Keep working on independent parts; stop only at an approval boundary or an external dependency, and name it.")
+    $parts.Add("- **Report** what changed, how it was verified, what remains or is risky, and any check you skipped and why. Never call unverified work done.")
     $parts.Add("")
-
-    if ($IncludeAutoLoop) {
-        $parts.Add("### /goal and Auto-Loop Are the Same Mode")
-        $parts.Add("")
-        $parts.Add("/goal is the user-facing command; auto-loop is the autonomous persistent execution behavior. The agent must not return early after code generation, must not claim completion until validation passes, and must keep working until the Definition of Done is satisfied or a hard blocker is proven. If the task is multi-phase (touches more than 2 files, adds a dependency, requires a schema/migration change, or spans more than one repo), state the expected phases and validation steps before starting. If a non-trivial task finishes unusually quickly, include evidence explaining why it was genuinely small or already validated.")
-        $parts.Add("")
-    }
-
-    $parts.Add("Canonical protocol: C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md")
-    $parts.Add("")
-    $parts.Add("Compact form: C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL_SHORT.md")
-    $parts.Add("")
-    $parts.Add("Do not claim completion from code edits, generated files, or partial tests. Completion requires validated behavior, checked integrations, regression coverage proportional to risk, and documented skipped checks or blockers.")
-    $parts.Add("")
-
-    if ($IncludeCompletionEvidence) {
-        $parts.Add("### Completion Evidence Required")
-        $parts.Add("")
-        $parts.Add("Every final report must include files changed, commands run, tests run, validation results, errors encountered, fixes applied, unverified items, remaining risks, and whether the Definition of Done is satisfied. If no tests were run, state why tests were not run, what validation was substituted, and what risk remains. The phrase `"complete`" is prohibited unless accompanied by validation evidence.")
-        $parts.Add("")
-    }
-
-    if ($IncludeAntiStuckRules) {
-        $parts.Add("### Anti-Stuck Loop Rule")
-        $parts.Add("")
-        $parts.Add("Timeout/stagnation rule: if a command or approach fails twice, do not repeat it blindly. Inspect logs, change strategy, isolate the problem, reduce scope, use a different validation path, and document the blocker if unresolved. If a process hangs or becomes a hung process, stop it safely, check logs, run a smaller command, verify the environment, and continue with an alternate route.")
-        $parts.Add("")
-    }
-
+    $parts.Add("Full protocol, for long multi-phase work: C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md")
     $parts.Add($MarkerEnd)
     return ($parts -join "`r`n")
 }
 
 $GoalBlock = New-GoalBlock
 
-<#
-$MarkerStart
-## /goal Default Operating Mode
-
-All SeaBridgeAI coding-agent tasks default to `/goal`.
-
-Before implementation, establish a persistent execution goal, Definition of Done, validation plan, affected systems, dependencies, risks, expected artifacts, and likely edge cases. Continue the execution loop until the DoD is validated or a hard blocker is documented.
-
-Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
-
-Compact form: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL_SHORT.md`
-
-Do not claim completion from code edits, generated files, or partial tests. Completion requires validated behavior, checked integrations, regression coverage proportional to risk, and documented skipped checks or blockers.
-$MarkerEnd
-"@
-#>
+# A CLAUDE.md that imports AGENTS.md (a line that is exactly `@AGENTS.md`)
+# already receives the block through the import; stamping it again would load
+# it twice. Such files get any stale block removed instead.
+function Test-ImportsAgents {
+    param([string]$Text)
+    return [regex]::IsMatch($Text, '(?m)^@AGENTS\.md\s*$')
+}
 
 function Test-AgentInstructionFile {
     param([string]$Path)
@@ -148,7 +119,13 @@ foreach ($file in $files) {
         $old = [System.IO.File]::ReadAllText($path, [System.Text.Encoding]::UTF8)
     }
 
-    $new = Update-Content -Existing $old -FileName $file
+    if ($file -eq "CLAUDE.md" -and (Test-ImportsAgents $old)) {
+        $pattern = '(\r?\n)*' + [regex]::Escape($MarkerStart) + ".*?" + [regex]::Escape($MarkerEnd)
+        $new = [regex]::Replace($old, $pattern, "", [System.Text.RegularExpressions.RegexOptions]::Singleline)
+    }
+    else {
+        $new = Update-Content -Existing $old -FileName $file
+    }
     $changed = (-not $exists) -or ($old -ne $new)
 
     $report += [pscustomobject]@{

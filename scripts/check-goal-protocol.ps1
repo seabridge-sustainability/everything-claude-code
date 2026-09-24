@@ -39,6 +39,16 @@ foreach ($check in $checks) {
     }
 
     $match = Select-String -LiteralPath $fullPath -Pattern $check.Pattern -SimpleMatch -Quiet
+    # A CLAUDE.md that imports its sibling AGENTS.md (`@AGENTS.md` on its own
+    # line) receives the block through Claude Code's import; accept it when the
+    # imported AGENTS.md carries the pattern.
+    if (-not $match -and ([System.IO.Path]::GetFileName($fullPath) -eq "CLAUDE.md")) {
+        $sibling = Join-Path (Split-Path -Parent $fullPath) "AGENTS.md"
+        $imports = Select-String -LiteralPath $fullPath -Pattern '^@AGENTS\.md\s*$' -Quiet
+        if ($imports -and (Test-Path -LiteralPath $sibling)) {
+            $match = Select-String -LiteralPath $sibling -Pattern $check.Pattern -SimpleMatch -Quiet
+        }
+    }
     if (-not $match) {
         $failures += "Missing pattern '$($check.Pattern)' in $($check.Path)"
     }

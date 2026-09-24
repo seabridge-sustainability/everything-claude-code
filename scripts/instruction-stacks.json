@@ -1,0 +1,19 @@
+{
+ "Claude Code / backend root (and any nested dir)": [
+  ["{BE}/CLAUDE.md", "auto"], ["{BE}/AGENTS.md", "auto"],
+  ["{MEM}/c--Users-adelm-SeaBridgeAI-manageesg-backend/memory/MEMORY.md", "auto"]],
+ "Codex / backend root": [["{BE}/AGENTS.md", "auto"]],
+ "Claude Code / frontend root (and any nested dir)": [
+  ["{FE}/CLAUDE.md", "auto"], ["{FE}/AGENTS.md", "auto"], ["{FE}/.claude/rules/berry.md", "auto"],
+  ["{MEM}/C--Users-adelm-SeaBridgeAI-manageesg-frontend/memory/MEMORY.md", "auto"]],
+ "Codex / frontend root": [["{FE}/AGENTS.md", "auto"]],
+ "Claude Code / autoresearch": [
+  ["C:/Users/adelm/SeaBridgeAI/autoresearch/CLAUDE.md", "auto"], ["C:/Users/adelm/SeaBridgeAI/autoresearch/AGENTS.md", "auto"],
+  ["C:/Users/adelm/SeaBridgeAI/autoresearch/.claude/rules/berry.md", "auto"],
+  ["{MEM}/C--Users-adelm-SeaBridgeAI-autoresearch/memory/MEMORY.md", "auto"]],
+ "Codex / autoresearch": [["C:/Users/adelm/SeaBridgeAI/autoresearch/AGENTS.md", "auto"]],
+ "Claude Code / ECC": [["{ECC}/CLAUDE.md", "auto"], ["{MEM}/C--Users-adelm-SeaBridgeAI-everything-claude-code/memory/MEMORY.md", "auto"]],
+ "Codex / ECC": [["{ECC}/AGENTS.md", "auto"]],
+ "Claude Code / _upstream": [["C:/Users/adelm/SeaBridgeAI/_upstream/CLAUDE.md", "auto"]],
+ "Codex / _upstream": [["C:/Users/adelm/SeaBridgeAI/_upstream/AGENTS.md", "auto"]]
+}

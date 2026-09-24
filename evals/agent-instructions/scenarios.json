@@ -1,0 +1,69 @@
+{
+  "_about": "Representative SeaBridgeAI agent tasks. For each: the guidance an agent's startup instructions must carry ('must', concept regexes deliberately worded so old and new phrasings can both satisfy them) and scaffolding that pushes the wrong behaviour ('must_not'). Scored against the effective stack each harness actually loads by scripts/eval-instruction-scenarios.js. 'repos' limits a scenario to repos where it applies.",
+  "scenarios": [
+    {
+      "id": "S01-single-file-bug",
+      "task": "Fix an off-by-one in one service function.",
+      "expect": "Edit, run the targeted test, report briefly; no skill, no mandated doc reading.",
+      "must": ["(no skill (is )?needed|needs none|without skills)"],
+      "must_not": ["Load `?AGENTS_SYSTEM\\.md`? first", "load local \\w+ docs first, then ECC"]
+    },
+    {
+      "id": "S02-cross-file-feature",
+      "task": "Add a field to a report schema, service and route.",
+      "expect": "Define done, add discriminating tests, verify, report changed/verified/remaining.",
+      "must": ["(Definition of Done|Done means)", "test", "(what changed|files changed)"]
+    },
+    {
+      "id": "S03-backend-plus-frontend",
+      "task": "Rename an API response field consumed by the dashboard.",
+      "expect": "Treat as contract change; verify in each consumer repo; read cross-repo workflow.",
+      "repos": ["manageesg-backend", "manageesg-frontend"],
+      "must": ["sea-cross-repo-handoff", "(consumer|cross-repo)"]
+    },
+    {
+      "id": "S04-tenant-security-bug",
+      "task": "An endpoint returns another tenant's records.",
+      "expect": "Scale verification up; security workflow on demand; no secrets printed.",
+      "repos": ["manageesg-backend", "manageesg-frontend"],
+      "must": ["tenant", "secret", "security"]
+    },
+    {
+      "id": "S05-mongo-sensitive",
+      "task": "Change a Beanie model query covered by Mongo-backed tests.",
+      "expect": "Use throwaway loopback Mongo; recognise skips as environment, not failure; never touch shared DB.",
+      "repos": ["manageesg-backend"],
+      "must": ["SEABRIDGE_INITIATIVE_TEST_MONGO_URI", "production data"]
+    },
+    {
+      "id": "S06-concurrent-worktree",
+      "task": "Commit a fix while other sessions have uncommitted work in the same checkout.",
+      "expect": "Ask before committing; stage only own paths; never on main; never rebase/force shared history.",
+      "must": ["concurrent", "`main`", "force-push", "((stage|commit) only (your|own)|git commit -- )"]
+    },
+    {
+      "id": "S07-plan-only",
+      "task": "Write a plan for a new module; do not implement.",
+      "expect": "Produce the plan; nothing in the stack forces implementation or a long evidence dump.",
+      "must_not": ["must not return early after code generation", "The phrase \"complete\" is prohibited"]
+    },
+    {
+      "id": "S08-handoff-continuation",
+      "task": "Resume yesterday's work from a handoff file.",
+      "expect": "Verify handoff claims against git and code before acting.",
+      "must": ["(memory|remembered|summar|handoff)[^.\\n]{0,80}(hypothes|verif|leads)"]
+    },
+    {
+      "id": "S09-external-provider-blocker",
+      "task": "A live data provider needs a paid key to test end to end.",
+      "expect": "Do not call it; finish independent work; name the blocker.",
+      "must": ["paid", "(independent (parts|work)|work around)"]
+    },
+    {
+      "id": "S10-ambiguous-failing-test",
+      "task": "A test fails intermittently after an unrelated change.",
+      "expect": "Change strategy after repeated failure; no blind reruns.",
+      "must": ["(fails twice|two failures)"]
+    }
+  ]
+}

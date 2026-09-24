@@ -278,14 +278,14 @@ unless explicitly approved.
 
 ## Mandatory Skill Triggers
 
-Tie-break rule: when several triggers match, load only the single most specific
-one (a domain/reviewer trigger beats a generic workflow trigger); `goal-default`
-is a framing contract, not a competing skill, and applies alongside whichever
-skill wins. When still unsure, load only `sea-skill-map`.
+Revised 2026-09-24: these are on-demand routes, not defaults. Small or
+single-file work needs no skill. When a task matches, read the single most
+specific skill (a domain/reviewer skill beats a generic workflow skill). The
+goal contract is already in every repo's `AGENTS.md` (Goal Protocol Default),
+so `goal-default` does not need loading. When unsure, read `sea-skill-map`.
 
-- Non-trivial work default contract: goal-default.
 - Choosing procedural skills without context bloat: sea-skill-map.
-- Default non-trivial work: sea-senior-dev-workflow.
+- Long, multi-phase work that benefits from an explicit plan/TDD/review cadence: sea-senior-dev-workflow.
 - Queued issues, tickets, AFK implementation units, or scoped task execution: sea-task-queue-execution.
 - Broad or ambiguous feature design: sea-brainstorming-and-spec-refinement.
 - Large, multi-lane, or multi-repo work: sea-task-orchestration.
@@ -295,7 +295,7 @@ skill wins. When still unsure, load only `sea-skill-map`.
 - Before saying done, fixed, passing, wired, production-ready, or safe: sea-verification-before-completion.
 - Review requests or review feedback: sea-code-review-response.
 - Risky or parallel feature work with dirty worktrees: sea-git-worktree-isolation.
-- Independent subagent lanes only after explicit subagent authorization: sea-parallel-agent-dispatch.
+- Independent parallel lanes where isolated context or parallelism clearly pays for the setup: sea-parallel-agent-dispatch.
 - Before merge, PR, push, commit, cleanup, or branch completion: sea-finishing-development-branch.
 - Backend routes, schemas, services, databases, auth, tenant isolation, and frontend contracts: sea-backend-api-verification.
 - Frontend dashboards, charts, routes, filters, AI panels, and browser QA: sea-frontend-design.
