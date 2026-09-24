@@ -1,6 +1,6 @@
 ---
 name: strix
-description: Strix — autonomous AI security pentesting agents. Use to run OWASP Top 10 / vulnerability scans against the SeaBridgeAI backend (FastAPI) and frontend (Next.js) using real exploit validation via Docker sandbox. Recommended model: anthropic/claude-sonnet-4-6.
+description: Strix — autonomous AI security pentesting agents. Use to run OWASP Top 10 / vulnerability scans against the SeaBridgeAI backend (FastAPI) and frontend (Next.js) using real exploit validation via Docker sandbox. Recommended model: anthropic/claude-sonnet-5.
 triggers:
   - "security scan"
   - "pentest"
