@@ -4,8 +4,12 @@ param(
   [string]$Scope = "production-ui",
   [string[]]$Files,
   [string[]]$BlockingRules,
-  [switch]$FailOnFinding
+  [switch]$FailOnFinding,
+  # Also scan worktrees, run checkouts, snapshots and symlinked trees (slow; see pruned-walk.ps1).
+  [switch]$FullScan
 )
+
+. (Join-Path $PSScriptRoot "pruned-walk.ps1")
 
 $ErrorActionPreference = "Stop"
 $findings = New-Object System.Collections.Generic.List[object]
@@ -42,13 +46,19 @@ if (-not (Test-Path $RepoPath)) {
   throw "Repo path not found: $RepoPath"
 }
 
+# Directory exclusions applied to file paths below; also used to prune the walk.
+$frontendDirExcludes = @(
+  '\\(node_modules|dist|build|\.next|coverage|test-results|playwright-report|\.qa-snapshots)\\',
+  '\\(design_handoff|design-references|storybook-static)\\'
+)
+
 $frontFiles = if ($Files -and $Files.Count -gt 0) {
   $Files | ForEach-Object {
     $candidate = if ([System.IO.Path]::IsPathRooted($_)) { $_ } else { Join-Path $RepoPath $_ }
     if (Test-Path -LiteralPath $candidate) { Get-Item -LiteralPath $candidate }
   } | Where-Object { $_.Extension -in @(".ts",".tsx",".js",".jsx") }
 } else {
-  Get-ChildItem -Path $RepoPath -Recurse -Include *.ts,*.tsx,*.js,*.jsx -File -ErrorAction SilentlyContinue
+  Get-SeaBridgePrunedFiles -Root $RepoPath -Include '*.ts','*.tsx','*.js','*.jsx' -EquivalentPrune $frontendDirExcludes -ExtraPrune $(if ($FullScan) { @() } else { @($script:SeaBridgeExtraPrune) }) -FollowReparse:$FullScan
 }
 
 $frontFiles = $frontFiles | Where-Object {

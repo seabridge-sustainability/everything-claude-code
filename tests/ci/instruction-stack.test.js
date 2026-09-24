@@ -87,4 +87,20 @@ test('stale phrases, budget, Codex cap, broken paths, and duplication all fire',
   assert.match(claude, /CLAUDE\.md duplicates AGENTS\.md/);
 });
 
+test('a safety block duplicated by an always-loaded rules file fails', () => {
+  const repo = fixture({
+    'AGENTS.md': GOOD_AGENTS,
+    'CLAUDE.md': 'SYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1\n@AGENTS.md\n',
+    '.claude/rules/tool.md': `# tool\n\n${SAFETY}\n`,
+  });
+  const claude = lib.checkRepo(repo, repo, 16384).find((r) => r.harness === 'claude');
+  assert.ok(claude.failures.some((f) => f.includes('safety block loaded 2 times')), claude.failures.join('\n'));
+});
+
+test('~/ paths resolve against the home directory', () => {
+  const repo = fixture({ 'AGENTS.md': GOOD_AGENTS + '\nSee `~/.definitely-missing-dir/x.md` here.\n' });
+  const refs = lib.brokenPathRefs(fs.readFileSync(path.join(repo, 'AGENTS.md'), 'utf8'), repo, repo);
+  assert.deepStrictEqual(refs, ['~/.definitely-missing-dir/x.md']);
+});
+
 console.log(`instruction-stack: ${passed} passed`);

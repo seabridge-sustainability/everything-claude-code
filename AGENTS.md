@@ -49,6 +49,7 @@ Full protocol, for long multi-phase work: C:\Users\adelm\SeaBridgeAI\everything-
 
 ## SeaBridgeAI Layer
 
+- Normal work in this repo lands on `main` (the fork's working branch); commits and pushes need explicit approval.
 - ECC is the shared coding-agent system for the SeaBridgeAI repos. Product repos carry only a short `AGENTS.md` (the safety block, goal block, repo facts) and point here for skills. The design record is `docs/reports/agent-system-review/2026-09-24-agent-system-modernization.md`, and `AGENTS_SYSTEM.md` is a reference map, not a startup read.
 - **The canonical blocks are generated, not hand-edited.** The safety block lives in `protocols/SAFETY_AUTHORIZATION_RULE.md` and is propagated by `scripts/sync-safety-rule.ps1` (`-Check` detects drift). The goal block's text lives in `scripts/sync-goal-protocol.ps1` and is applied with `scripts/sync-goal-protocol-all.ps1 -Apply`. After changing either, run `node scripts/check-instruction-stack.js` and `node scripts/eval-instruction-scenarios.js`.
 - SeaBridge skills are `skills/sea-*` and `seabridge-esg`, with thin wrappers in `.agents/skills/`. Read one only when the task matches (`sea-skill-map` routes when unsure); small or single-file work needs none.

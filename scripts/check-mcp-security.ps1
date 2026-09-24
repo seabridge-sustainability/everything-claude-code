@@ -12,8 +12,12 @@ param(
     "C:\Users\adelm\SeaBridgeAI\autoresearch"
   ),
   [switch]$FailOnHigh,
-  [switch]$IncludeTemplates
+  [switch]$IncludeTemplates,
+  # Also scan worktrees, run checkouts, snapshots and symlinked trees (slow; see pruned-walk.ps1).
+  [switch]$FullScan
 )
+
+. (Join-Path $PSScriptRoot "pruned-walk.ps1")
 
 $ErrorActionPreference = "SilentlyContinue"
 $HighCount = 0
@@ -58,10 +62,14 @@ foreach ($root in $Paths) {
   }
 
   Section $root
-  $files = Get-ChildItem -LiteralPath $root -Recurse -File -Force |
+  $excludeCore = "\\(node_modules|\.git|dist|build|\.next|graphify-out|venv|\.venv|venv312|venv312_backup|site-packages|__pycache__)\\"
+  $excludeTemplates = "\\(external|vendor|references|examples|example|samples|sample|demo|demos|tutorial|tutorials|guide|guides|cookbook|playground|docs[\\/](ja-JP|ko-KR|pt-BR|tr|zh-CN|zh-TW)|\.claude[\\/]skills)\\"
+  $equivalent = @($excludeCore) + $(if ($IncludeTemplates) { @() } else { @($excludeTemplates) })
+  $extra = if ($FullScan) { @() } else { @($script:SeaBridgeExtraPrune) }
+  $files = Get-SeaBridgePrunedFiles -Root $root -Include $targetNames -EquivalentPrune $equivalent -ExtraPrune $extra -IncludeHidden -FollowReparse:$FullScan |
     Where-Object {
-      $_.FullName -notmatch "\\(node_modules|\.git|dist|build|\.next|graphify-out|venv|\.venv|venv312|venv312_backup|site-packages|__pycache__)\\" -and
-      ($IncludeTemplates -or $_.FullName -notmatch "\\(external|vendor|references|examples|example|samples|sample|demo|demos|tutorial|tutorials|guide|guides|cookbook|playground|docs[\\/](ja-JP|ko-KR|pt-BR|tr|zh-CN|zh-TW)|\.claude[\\/]skills)\\") -and
+      $_.FullName -notmatch $excludeCore -and
+      ($IncludeTemplates -or $_.FullName -notmatch $excludeTemplates) -and
       ($targetNames -contains $_.Name)
     }
 

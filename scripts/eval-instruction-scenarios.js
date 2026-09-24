@@ -16,7 +16,8 @@ const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
 
-const WORKSPACE = path.resolve(__dirname, '..', '..');
+const WORKSPACE = process.env.SEABRIDGE_WORKSPACE || path.resolve(__dirname, '..', '..');
+const SCENARIOS = path.resolve(__dirname, '..', 'evals', 'agent-instructions', 'scenarios.json');
 const REPOS = ['manageesg-backend', 'manageesg-frontend', 'autoresearch'];
 
 function reader(repo, ref) {
@@ -24,7 +25,7 @@ function reader(repo, ref) {
     rel = rel.replace(/\\/g, '/');
     if (!ref) {
       const p = path.join(repo, rel);
-      return fs.existsSync(p) ? fs.readFileSync(p, 'utf8').replace(/^﻿/, '') : null;
+      return fs.existsSync(p) ? fs.readFileSync(p, 'utf8').replace(/^\uFEFF/, '') : null;
     }
     try {
       return execFileSync('git', ['-C', repo, 'show', `${ref}:${rel}`], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
@@ -79,7 +80,7 @@ function stacks(repoName, ref) {
 function main(argv) {
   const refIdx = argv.indexOf('--ref');
   const ref = refIdx >= 0 ? argv[refIdx + 1] : null;
-  const { scenarios } = JSON.parse(fs.readFileSync(path.join(WORKSPACE, 'everything-claude-code', 'evals', 'agent-instructions', 'scenarios.json'), 'utf8'));
+  const { scenarios } = JSON.parse(fs.readFileSync(SCENARIOS, 'utf8'));
   const rows = [];
   for (const repo of REPOS) {
     for (const [harness, text] of Object.entries(stacks(repo, ref))) {

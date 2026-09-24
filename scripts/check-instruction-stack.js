@@ -42,7 +42,7 @@ const STALE = [
 ];
 
 function readText(file) {
-  return fs.readFileSync(file, 'utf8').replace(/^﻿/, '');
+  return fs.readFileSync(file, 'utf8').replace(/^\uFEFF/, '');
 }
 
 /** Remove fenced blocks and inline code so imports/paths inside them are ignored. */
@@ -113,10 +113,12 @@ function brokenPathRefs(text, repo, workspace) {
   while ((m = re.exec(text)) !== null) {
     let ref = m[1].replace(/[),.;:]+$/, '');
     if (/[<>*{}|$]|^https?:|^--?|^\.\\venv|\(|=/.test(ref)) continue;
+    const home = /^~[\\/]/.test(ref);
     const abs = /^[A-Za-z]:\\/.test(ref);
     if (!abs && !/[\\/]/.test(ref)) continue;
     if (!abs && !/\.(md|json|jsonc|toml|ps1|js|mjs|py|ts|tsx|yaml|yml|txt)$|[\\/]$/.test(ref)) continue;
-    const candidates = abs ? [ref] : [path.join(repo, ref), path.join(workspace, ref), path.join(workspace, 'everything-claude-code', ref)];
+    const candidates = home ? [path.join(process.env.USERPROFILE || process.env.HOME || '~', ref.slice(2))]
+      : abs ? [ref] : [path.join(repo, ref), path.join(workspace, ref), path.join(workspace, 'everything-claude-code', ref)];
     if (!candidates.some((c) => fs.existsSync(c))) broken.push(ref);
   }
   return [...new Set(broken)];
@@ -139,6 +141,8 @@ function checkRepo(repo, workspace, budget) {
     if (s.harness === 'codex' && bytes > CODEX_CAP) failures.push(`exceeds Codex 32 KiB cap (${bytes} B): the tail is silently truncated`);
     if (bytes > budget) failures.push(`exceeds budget ${budget} B (${bytes} B)`);
     for (const r of REQUIRED) if (!r.re.test(s.text)) failures.push(`missing invariant: ${r.id}`);
+    const blocks = (s.text.match(/<!-- SEABRIDGE_SAFETY_RULE_START -->/g) || []).length;
+    if (blocks > 1) failures.push(`safety block loaded ${blocks} times (drop the copies from always-loaded rules files)`);
     for (const st of STALE) if (st.re.test(s.text)) failures.push(`stale phrase ${st.re}: ${st.why}`);
     for (const miss of s.missing) failures.push(`broken @import: ${miss}`);
     for (const ref of brokenPathRefs(s.text, repo, workspace)) failures.push(`broken path reference: ${ref}`);
@@ -152,14 +156,20 @@ const REPOS = [
   { name: 'manageesg-backend', budget: 16 * 1024 },
   { name: 'manageesg-frontend', budget: 16 * 1024 },
   { name: 'autoresearch', budget: 16 * 1024 },
+  { name: 'openseabri', budget: 16 * 1024 },
+  { name: 'climada-stack', budget: 16 * 1024 },
+  { name: '_upstream', budget: 16 * 1024 },
+  // ECC itself: always the checkout this script runs from (works in a worktree).
+  // Larger budget: the plugin's own dev repo also loads its language rules.
+  { name: 'everything-claude-code', self: true, budget: 24 * 1024 },
 ];
 
 function main(argv) {
   const wsIdx = argv.indexOf('--workspace');
-  const workspace = wsIdx >= 0 ? argv[wsIdx + 1] : path.resolve(__dirname, '..', '..');
+  const workspace = wsIdx >= 0 ? argv[wsIdx + 1] : (process.env.SEABRIDGE_WORKSPACE || path.resolve(__dirname, '..', '..'));
   const all = [];
   for (const r of REPOS) {
-    const repo = path.join(workspace, r.name);
+    const repo = r.self ? path.resolve(__dirname, '..') : path.join(workspace, r.name);
     if (fs.existsSync(repo)) all.push(...checkRepo(repo, workspace, r.budget));
   }
   if (argv.includes('--json')) {

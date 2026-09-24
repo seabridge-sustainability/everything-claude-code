@@ -3,8 +3,12 @@ param(
   [string[]]$Files,
   [string]$PublicRouteAllowlistPath = "C:\Users\adelm\SeaBridgeAI\everything-claude-code\manifests\harness\backend-public-routes.json",
   [string[]]$BlockingRules,
-  [switch]$FailOnFinding
+  [switch]$FailOnFinding,
+  # Also scan worktrees, run checkouts, snapshots and symlinked trees (slow; see pruned-walk.ps1).
+  [switch]$FullScan
 )
+
+. (Join-Path $PSScriptRoot "pruned-walk.ps1")
 
 $ErrorActionPreference = "Stop"
 $findings = New-Object System.Collections.Generic.List[object]
@@ -78,21 +82,27 @@ if (-not (Test-Path $RepoPath)) {
   throw "Repo path not found: $RepoPath"
 }
 
+# File-path exclusions; also used to prune the walk (a directory matching one holds only excluded files).
+$backendExcludes = @(
+  '\\(\.venv|venv|venv312|site-packages|node_modules|__pycache__|\.ruff_cache|\.mypy_cache)\\',
+  '\\(\.uv-cache|\.venv-win|build|dist|mindsdb)\\',
+  '\\(\.agents|\.claude|\.openhands)\\',
+  '\\data\\skills\\',
+  '\\tests?\\'
+)
+
 $pythonFiles = if ($Files -and $Files.Count -gt 0) {
   $Files | ForEach-Object {
     $candidate = if ([System.IO.Path]::IsPathRooted($_)) { $_ } else { Join-Path $RepoPath $_ }
     if (Test-Path -LiteralPath $candidate) { Get-Item -LiteralPath $candidate }
   } | Where-Object { $_.Extension -eq ".py" }
 } else {
-  Get-ChildItem -Path $RepoPath -Recurse -Include *.py -File -ErrorAction SilentlyContinue
+  Get-SeaBridgePrunedFiles -Root $RepoPath -Include '*.py' -EquivalentPrune $backendExcludes -ExtraPrune $(if ($FullScan) { @() } else { @($script:SeaBridgeExtraPrune) }) -FollowReparse:$FullScan
 }
 
 $pythonFiles = $pythonFiles | Where-Object {
-    ($_.FullName -notmatch '\\(\.venv|venv|venv312|site-packages|node_modules|__pycache__|\.ruff_cache|\.mypy_cache)\\') -and
-    ($_.FullName -notmatch '\\(\.uv-cache|\.venv-win|build|dist|mindsdb)\\') -and
-    ($_.FullName -notmatch '\\(\.agents|\.claude|\.openhands)\\') -and
-    ($_.FullName -notmatch '\\data\\skills\\') -and
-    ($_.FullName -notmatch '\\tests?\\')
+    $path = $_.FullName
+    -not ($backendExcludes | Where-Object { $path -match $_ })
 }
 
 foreach ($file in $pythonFiles) {
