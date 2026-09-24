@@ -228,3 +228,50 @@ climada-stack, _upstream, everything-claude-code (branches unchanged). Backend
 and frontend working trees also hold other sessions' uncommitted work; commit
 only the paths listed in §3 (`git commit -- <paths>`), from a worktree on the
 remote tip for the diverged backend branch.
+
+## Follow-up 2026-09-24 (landing, upstream sync, open items)
+
+**Landed (committed; pushed as listed in the session's final report).**
+
+| Repo | Commits |
+|---|---|
+| everything-claude-code | `83761226e` modernization, `ef7ee6109` U+FEFF fix, `40178f60f` upstream merge (407 commits, `c9de8f5b2..e482e5794`) + Superpowers v6.4.1 (`b670180`), `cb82b5684` phase 3, `1d693d87d` skipped-item resolution + model ids + Windows test fixes, `388309de3` join with main |
+| manageesg-backend | `32078e720`, `d7fa12943`, `d5740481e` (worktree C:/wtagent, rebased onto origin) |
+| manageesg-frontend | `4e3312c7`, `58e95801` |
+| autoresearch | `8715507`, `8096521`, `b78b2cd` |
+| openseabri | `96e84cd`, `824aed1`, `c2bcd39` |
+| climada-stack | `892f3e6`, `8cc3d44` |
+| _upstream | `a554050`, `bf0ca83`, `0ff3dad` (six reference mirrors bumped; four hidden gitlink drifts recorded) |
+
+**Upstream merge decisions.** Upstream's `ecc:` agent prefixes and Codex hook wording
+adopted with SeaBridge policy kept; `.opencode/opencode.json` now follows upstream
+(default agent `build`, no pinned models anywhere, NVIDIA NIM kept as a selectable
+provider) — this removed the stale `claude-opus-4-5`/`claude-sonnet-4-5` pins rather
+than renaming them, because `opencode-config.test.js` forbids agent model pins;
+`orchestrate-codex-worker.sh` takes upstream's `--ask-for-approval` fix (the kept
+side still ran `codex exec -p yolo`) with `gpt-5.6-sol`.
+
+**Models.** Claude tooling paths on `claude-sonnet-5` (autoresearch skill optimizer
+with text-block extraction, Strix default, ECC integration scanner, openseabri
+improver/research loop with thinking disabled for small budgets); three smoke calls
+returned text. Backend product defaults stay on `claude-sonnet-4-6` (supported to
+≥ Feb 2027) pending a staged migration (centralise → thinking-safe parsing → env
+switch in dev); only the retiring `claude-sonnet-4-5` fallback was moved. Codex
+stays on `gpt-5.6-sol` (no GPT-6 model in the local cache yet).
+
+**Verification.** Instruction stacks 14/14 PASS; scenario eval 52/52; checker tests
+8/8; ECC ps1 validators, safety `-Check`, upstream-reference guardrails PASS.
+ECC suite: pre-merge worktree 56 failures / 20 files → merged 112 / 31 → after
+fixes 51 / 16 (4 files still failing that passed pre-merge, all classified:
+upstream's own plan-canvas and control-pane code on Windows, npm packing, and a
+NODE_PATH artefact). Validators: check-harness 166 s (previously never finished),
+check-mcp-security 20 s (455 s with -FullScan), frontend guardrails 6 s (84 s
+original), backend guardrails 159 s. Fresh-session probes (Claude Haiku, Codex
+0.150) correct in every changed repo.
+
+**Open items.** See `2026-09-24-recommendations.md` (plugins: 13 disabled via
+`claude plugin disable <name>@synced` on 2026-09-24; effort defaults; npm codex CLI;
+mirror pins) and `../harness/2026-09-24-triage.md` (746 unbaselined findings,
+top 10 to fix). The ECC main checkout still has another session's dirty
+`tests/ci/supply-chain-watch-workflow.test.js`; until it is resolved the checkout
+stays on the pre-merge commit and `vendor/superpowers` there stays at v5.1.0.
