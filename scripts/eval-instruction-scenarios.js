@@ -24,7 +24,7 @@ function reader(repo, ref) {
     rel = rel.replace(/\\/g, '/');
     if (!ref) {
       const p = path.join(repo, rel);
-      return fs.existsSync(p) ? fs.readFileSync(p, 'utf8').replace(/^﻿/, '') : null;
+      return fs.existsSync(p) ? fs.readFileSync(p, 'utf8').replace(/^\uFEFF/, '') : null;
     }
     try {
       return execFileSync('git', ['-C', repo, 'show', `${ref}:${rel}`], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });

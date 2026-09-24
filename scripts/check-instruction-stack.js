@@ -42,7 +42,7 @@ const STALE = [
 ];
 
 function readText(file) {
-  return fs.readFileSync(file, 'utf8').replace(/^﻿/, '');
+  return fs.readFileSync(file, 'utf8').replace(/^\uFEFF/, '');
 }
 
 /** Remove fenced blocks and inline code so imports/paths inside them are ignored. */
