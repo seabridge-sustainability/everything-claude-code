@@ -4,6 +4,7 @@
  */
 
 const assert = require('assert');
+const childProcess = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
@@ -15,6 +16,8 @@ const WORKFLOW_PATH = path.join(
   'workflows',
   'supply-chain-watch.yml',
 );
+const REPO_ROOT = path.join(__dirname, '..', '..');
+const GITMODULES_PATH = path.join(REPO_ROOT, '.gitmodules');
 
 function test(name, fn) {
   try {
@@ -47,6 +50,28 @@ function run() {
     assert.match(source, /persist-credentials: false/);
     assert.doesNotMatch(source, /id-token:\s*write/);
     assert.doesNotMatch(source, /actions\/cache@/);
+  })) passed++; else failed++;
+
+  if (test('declares every tracked submodule so checkout remains functional', () => {
+    assert.ok(fs.existsSync(GITMODULES_PATH), '.gitmodules must exist');
+    const gitlinks = childProcess.execFileSync(
+      'git',
+      ['ls-files', '--stage'],
+      { cwd: REPO_ROOT, encoding: 'utf8' },
+    )
+      .split(/\r?\n/)
+      .filter((line) => line.startsWith('160000 '))
+      .map((line) => line.split('\t')[1]);
+    const submodulePaths = childProcess.execFileSync(
+      'git',
+      ['config', '--file', GITMODULES_PATH, '--get-regexp', '^submodule\\..*\\.path$'],
+      { cwd: REPO_ROOT, encoding: 'utf8' },
+    )
+      .split(/\r?\n/)
+      .filter(Boolean)
+      .map((line) => line.split(/\s+/, 2)[1]);
+
+    assert.deepStrictEqual([...submodulePaths].sort(), [...gitlinks].sort());
   })) passed++; else failed++;
 
   if (test('installs without lifecycle scripts and verifies registry signatures', () => {
