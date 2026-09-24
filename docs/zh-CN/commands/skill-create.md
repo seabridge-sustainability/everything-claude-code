@@ -1,7 +1,7 @@
 ---
 name: skill-create
-description: Ã¥Ë†â€ Ã¦Å¾ÂÃ¦Å“Â¬Ã¥Å“Â°GitÃ¥Å½â€ Ã¥ÂÂ²Ã¤Â»Â¥Ã¦ÂÂÃ¥Ââ€“Ã§Â¼â€“Ã§Â ÂÃ¦Â¨Â¡Ã¥Â¼ÂÃ¥Â¹Â¶Ã§â€Å¸Ã¦Ë†ÂSKILL.mdÃ¦â€“â€¡Ã¤Â»Â¶Ã£â‚¬â€šSkill Creator GitHubÃ¥Âºâ€Ã§â€Â¨Ã§Å¡â€žÃ¦Å“Â¬Ã¥Å“Â°Ã§â€°Ë†Ã¦Å“Â¬Ã£â‚¬â€š
-allowed_tools: ["Bash", "Read", "Write", "Grep", "Glob"]
+description: 分析本地Git历史以提取编码模式并生成SKILL.md文件。Skill Creator GitHub应用的本地版本。
+allowed-tools: ["Bash", "Read", "Write", "Grep", "Glob"]
 ---
 
 # /skill-create - Ã¦Å“Â¬Ã¥Å“Â°Ã¦Å â‚¬Ã¨Æ’Â½Ã§â€Å¸Ã¦Ë†Â

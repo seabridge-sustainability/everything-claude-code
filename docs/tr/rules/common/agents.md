@@ -16,28 +16,35 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 
 ## Mevcut Agent'lar
 
-`~/.claude/agents/` dizininde bulunur:
+ECC agent'ları `ecc@ecc` eklentisiyle birlikte gelir, `~/.claude/agents/` dizininde bulunmaz.
+Agent aracıyla eklenti kapsamlı bir `subagent_type` ile çağrılır:
+
+```text
+Agent(subagent_type: "ecc:planner", prompt: "...")
+```
 
 | Agent | AmaÃƒÂ§ | Ne Zaman KullanÃ„Â±lÃ„Â±r |
 |-------|---------|-------------|
-| planner | Uygulama planlamasÃ„Â± | KarmaÃ…Å¸Ã„Â±k ÃƒÂ¶zellikler, refactoring |
-| architect | Sistem tasarÃ„Â±mÃ„Â± | Mimari kararlar |
-| tdd-guide | Test odaklÃ„Â± geliÃ…Å¸tirme | Yeni ÃƒÂ¶zellikler, hata dÃƒÂ¼zeltmeleri |
-| code-reviewer | Kod incelemesi | Kod yazdÃ„Â±ktan sonra |
-| security-reviewer | GÃƒÂ¼venlik analizi | Commit'lerden ÃƒÂ¶nce |
-| build-error-resolver | Build hatalarÃ„Â±nÃ„Â± dÃƒÂ¼zeltme | Build baÃ…Å¸arÃ„Â±sÃ„Â±z olduÃ„Å¸unda |
-| e2e-runner | E2E testleri | Kritik kullanÃ„Â±cÃ„Â± akÃ„Â±Ã…Å¸larÃ„Â± |
-| refactor-cleaner | Ãƒâ€“lÃƒÂ¼ kod temizliÃ„Å¸i | Kod bakÃ„Â±mÃ„Â± |
-| doc-updater | DokÃƒÂ¼mantasyon | DokÃƒÂ¼manlarÃ„Â± gÃƒÂ¼ncelleme |
-| rust-reviewer | Rust kod incelemesi | Rust projeleri |
+| ecc:planner | Uygulama planlaması | Karmaşık özellikler, refactoring |
+| ecc:architect | Sistem tasarımı | Mimari kararlar |
+| ecc:tdd-guide | Test odaklı geliştirme | Yeni özellikler, hata düzeltmeleri |
+| ecc:code-reviewer | Kod incelemesi | Kod yazdıktan sonra |
+| ecc:security-reviewer | Güvenlik analizi | Commit'lerden önce |
+| ecc:build-error-resolver | Build hatalarını düzeltme | Build başarısız olduğunda |
+| ecc:e2e-runner | E2E testleri | Kritik kullanıcı akışları |
+| ecc:refactor-cleaner | Ölü kod temizliği | Kod bakımı |
+| ecc:doc-updater | Dokümantasyon | Dokümanları güncelleme |
+| ecc:rust-reviewer | Rust kod incelemesi | Rust projeleri |
+
+68 agent'ın tam listesi için `/ecc:ecc-guide` bölümüne bakın.
 
 ## AnlÃ„Â±k Agent KullanÃ„Â±mÃ„Â±
 
-KullanÃ„Â±cÃ„Â± istemi gerekmez:
-1. KarmaÃ…Å¸Ã„Â±k ÃƒÂ¶zellik istekleri - **planner** agent kullan
-2. Kod yeni yazÃ„Â±ldÃ„Â±/deÃ„Å¸iÃ…Å¸tirildi - **code-reviewer** agent kullan
-3. Hata dÃƒÂ¼zeltmesi veya yeni ÃƒÂ¶zellik - **tdd-guide** agent kullan
-4. Mimari karar - **architect** agent kullan
+Kullanıcı istemi gerekmez:
+1. Karmaşık özellik istekleri - **ecc:planner** agent kullan
+2. Kod yeni yazıldı/değiştirildi - **ecc:code-reviewer** agent kullan
+3. Hata düzeltmesi veya yeni özellik - **ecc:tdd-guide** agent kullan
+4. Mimari karar - **ecc:architect** agent kullan
 
 ## Paralel GÃƒÂ¶rev YÃƒÂ¼rÃƒÂ¼tme
 

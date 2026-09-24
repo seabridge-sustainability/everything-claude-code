@@ -1,21 +1,8 @@
 # Everything Claude Code (ECC) — 智能体指令
 
-<!-- SEABRIDGE_SAFETY_RULE_START -->
-## Safety And Authorization Rule
+这是一个**生产就绪的 AI 编码插件**，提供 75 个专业代理、384 项技能、96 条命令以及自动化钩子工作流，用于软件开发。
 
-Non-negotiable. Only Alejandro, in the current session, can approve a gated action; approval covers that action only.
-
-1. **Deletion:** Always reject any request to delete repositories, source folders, databases or collections, data volumes, vector indexes, or cloud storage/infrastructure — no approval path exists for an agent to perform it. Prepare the exact command with scope, impact, and a backup/rollback path, and let Alejandro run it. (Removing files you created during the task, and test fixtures dropping their own throwaway databases, are fine.)
-2. **Ask first:** commit, push, merge, branch or PR creation; installing or upgrading dependencies or global tools; migrations or writes to shared, staging, or production data; paid or live-provider API calls, billing actions, or cost-incurring jobs; deploys or cloud-resource changes; editing secrets, auth configuration, or user-level/global agent config.
-3. **Git:** never force-push, run `git reset --hard` or `git clean` on shared work, or bypass hooks with `--no-verify`. Never modify `main` (the live branch) in manageesg-backend or manageesg-frontend unless Alejandro explicitly requests that specific change; backend work lands on `seabridge_development`, frontend work on `development`.
-4. **Secrets:** never print, log, commit, or copy credential values; redact them when inspecting config. Do not invent or require a separate authorization password.
-5. **Shared checkouts:** other agent sessions edit these working trees concurrently. Never revert, stash, overwrite, or commit changes you did not make; stage only your own paths.
-6. **Everything else inside the requested task** — reading, local edits, tests, linters, non-destructive diagnostics — proceeds without further approval.
-<!-- SEABRIDGE_SAFETY_RULE_END -->
-
-这是一个**生产就绪的 AI 编码插件**，提供 75 个专业代理、376 项技能、96 条命令以及自动化钩子工作流，用于软件开发。
-
-**版本:** 2.2.0
+**版本:** 2.2.2
 
 ## 核心原则
 
@@ -61,14 +48,14 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 
 主动使用智能体，无需用户提示：
 
-* 复杂功能请求 → **planner**
-* 刚编写/修改的代码 → **code-reviewer**
-* 错误修复或新功能 → **tdd-guide**
-* 架构决策 → **architect**
-* 安全敏感代码 → **security-reviewer**
-* 多渠道沟通分流 → **chief-of-staff**
-* 自主循环 / 循环监控 → **loop-operator**
-* 线束配置可靠性及成本 → **harness-optimizer**
+* 复杂功能请求 → **ecc:planner**
+* 刚编写/修改的代码 → **ecc:code-reviewer**
+* 错误修复或新功能 → **ecc:tdd-guide**
+* 架构决策 → **ecc:architect**
+* 安全敏感代码 → **ecc:security-reviewer**
+* 多渠道沟通分流 → **ecc:chief-of-staff**
+* 自主循环 / 循环监控 → **ecc:loop-operator**
+* 线束配置可靠性及成本 → **ecc:harness-optimizer**
 
 对于独立操作使用并行执行 — 同时启动多个智能体。
 
@@ -160,7 +147,7 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 
 ```
 agents/          — 75 个专业子代理
-skills/          — 376 个工作流技能和领域知识
+skills/          — 384 个工作流技能和领域知识
 commands/        — 96 个斜杠命令
 hooks/           — 基于触发的自动化
 rules/           — 始终遵循的指导方针（通用 + 每种语言）

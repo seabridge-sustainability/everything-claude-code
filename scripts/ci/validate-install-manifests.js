@@ -18,9 +18,7 @@ const PROFILES_SCHEMA_PATH = path.join(REPO_ROOT, 'schemas/install-profiles.sche
 const COMPONENTS_SCHEMA_PATH = path.join(REPO_ROOT, 'schemas/install-components.schema.json');
 const CURATED_SKILLS_DIR = path.join(REPO_ROOT, 'skills');
 // Empty by default; add only curated skills that are intentionally unshipped.
-const INTENTIONALLY_UNSHIPPED_SKILL_IDS = new Set([
-  'skill-comply', // meta/measurement dev-skill; ships committed .pyc artifacts and a nested .gitignore, revisit after packaging cleanup
-]);
+const INTENTIONALLY_UNSHIPPED_SKILL_IDS = new Set([]);
 // SeaBridge fork: skills/ also carries SeaBridge-internal and vendored skills
 // that are used from this workspace directly and are not part of ECC's
 // selective-install packaging. Every `sea-*` skill is fork-internal by

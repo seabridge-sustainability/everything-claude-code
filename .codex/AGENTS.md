@@ -133,9 +133,9 @@ Sample role configs in this repo:
 
 | Feature | Claude Code | Codex CLI |
 |---------|------------|-----------|
-| Hooks | 8+ event types | Not yet supported |
+| Hooks | 8+ event types | Reviewed native subset with explicit trust in `/hooks` |
 | Context file | CLAUDE.md + AGENTS.md | AGENTS.md only |
-| Skills | Skills loaded via plugin | `.agents/skills/` directory |
+| Skills | Skills loaded via plugin | Native plugin skills and repo `.agents/skills/` |
 | Commands | `/slash` commands | Instruction-based |
 | Agents | Subagent Task tool | Multi-agent via `/agent` and `[agents.<name>]` roles |
 | Security | Hook-based enforcement | Instruction-based security + sandbox |

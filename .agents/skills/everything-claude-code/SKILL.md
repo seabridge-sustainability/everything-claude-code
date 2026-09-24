@@ -1,6 +1,7 @@
 ---
 name: everything-claude-code
 description: Development conventions and patterns for everything-claude-code. JavaScript project with conventional commits.
+license: MIT
 ---
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->

@@ -212,7 +212,6 @@
     "cpp-reviewer": {
       "description": "Expert C++ code reviewer specializing in memory safety, modern C++ idioms, concurrency, and performance. Use for all C++ code changes.",
       "mode": "subagent",
-      "model": "anthropic/claude-opus-4-5",
       "prompt": "{file:prompts/agents/cpp-reviewer.txt}",
       "tools": {
         "read": true,
@@ -224,7 +223,6 @@
     "cpp-build-resolver": {
       "description": "C++ build, CMake, and compilation error resolution specialist. Fixes build errors, linker issues, and template errors with minimal changes.",
       "mode": "subagent",
-      "model": "anthropic/claude-opus-4-5",
       "prompt": "{file:prompts/agents/cpp-build-resolver.txt}",
       "tools": {
         "read": true,
@@ -236,7 +234,6 @@
     "docs-lookup": {
       "description": "Documentation specialist using Context7 MCP to fetch current library and API documentation with code examples.",
       "mode": "subagent",
-      "model": "anthropic/claude-sonnet-4-5",
       "prompt": "{file:prompts/agents/docs-lookup.txt}",
       "tools": {
         "read": true,
@@ -248,7 +245,6 @@
     "harness-optimizer": {
       "description": "Analyze and improve the local agent harness configuration for reliability, cost, and throughput.",
       "mode": "subagent",
-      "model": "anthropic/claude-sonnet-4-5",
       "prompt": "{file:prompts/agents/harness-optimizer.txt}",
       "tools": {
         "read": true,
@@ -259,7 +255,6 @@
     "java-reviewer": {
       "description": "Expert Java and Spring Boot code reviewer specializing in layered architecture, JPA patterns, security, and concurrency.",
       "mode": "subagent",
-      "model": "anthropic/claude-opus-4-5",
       "prompt": "{file:prompts/agents/java-reviewer.txt}",
       "tools": {
         "read": true,
@@ -271,7 +266,6 @@
     "java-build-resolver": {
       "description": "Java/Maven/Gradle build, compilation, and dependency error resolution specialist. Fixes build errors with minimal changes.",
       "mode": "subagent",
-      "model": "anthropic/claude-opus-4-5",
       "prompt": "{file:prompts/agents/java-build-resolver.txt}",
       "tools": {
         "read": true,
@@ -283,7 +277,6 @@
     "kotlin-reviewer": {
       "description": "Kotlin and Android/KMP code reviewer. Reviews Kotlin code for idiomatic patterns, coroutine safety, Compose best practices.",
       "mode": "subagent",
-      "model": "anthropic/claude-opus-4-5",
       "prompt": "{file:prompts/agents/kotlin-reviewer.txt}",
       "tools": {
         "read": true,
@@ -295,7 +288,6 @@
     "kotlin-build-resolver": {
       "description": "Kotlin/Gradle build, compilation, and dependency error resolution specialist. Fixes Kotlin build errors with minimal changes.",
       "mode": "subagent",
-      "model": "anthropic/claude-opus-4-5",
       "prompt": "{file:prompts/agents/kotlin-build-resolver.txt}",
       "tools": {
         "read": true,
@@ -307,7 +299,6 @@
     "loop-operator": {
       "description": "Operate autonomous agent loops, monitor progress, and intervene safely when loops stall.",
       "mode": "subagent",
-      "model": "anthropic/claude-sonnet-4-5",
       "prompt": "{file:prompts/agents/loop-operator.txt}",
       "tools": {
         "read": true,
@@ -318,7 +309,6 @@
     "php-reviewer": {
       "description": "Expert PHP code reviewer specializing in PSR-12 compliance, PHP type system, Eloquent ORM patterns, security, and performance.",
       "mode": "subagent",
-      "model": "anthropic/claude-opus-4-5",
       "prompt": "{file:prompts/agents/php-reviewer.txt}",
       "tools": {
         "read": true,
@@ -330,7 +320,6 @@
     "python-reviewer": {
       "description": "Expert Python code reviewer specializing in PEP 8 compliance, Pythonic idioms, type hints, security, and performance.",
       "mode": "subagent",
-      "model": "anthropic/claude-opus-4-5",
       "prompt": "{file:prompts/agents/python-reviewer.txt}",
       "tools": {
         "read": true,
@@ -342,7 +331,6 @@
     "rust-reviewer": {
       "description": "Expert Rust code reviewer specializing in idiomatic Rust, ownership, lifetimes, concurrency, and performance.",
       "mode": "subagent",
-      "model": "anthropic/claude-opus-4-5",
       "prompt": "{file:prompts/agents/rust-reviewer.txt}",
       "tools": {
         "read": true,
@@ -354,7 +342,6 @@
     "rust-build-resolver": {
       "description": "Rust build, Cargo, and compilation error resolution specialist. Fixes Rust build errors with minimal changes.",
       "mode": "subagent",
-      "model": "anthropic/claude-opus-4-5",
       "prompt": "{file:prompts/agents/rust-build-resolver.txt}",
       "tools": {
         "read": true,

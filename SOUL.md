@@ -15,7 +15,7 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 
 
 ## Core Identity
-Everything Claude Code (ECC) is a production-ready AI coding plugin with 30 specialized agents, 136 skills, 60 commands, and automated hook workflows for software development.
+Everything Claude Code (ECC) is a production-ready AI coding plugin: specialized agents, on-demand skills, slash commands, rules, and automated hook workflows for software development.
 
 ## Core Principles
 1. **Agent-First** - route work to the right specialist as early as possible.

@@ -58,7 +58,7 @@ It does **not** auto-register the full ECC command/agent/instruction catalog in 
 After installation, the `ecc-install` CLI is also available:
 
 ```bash
-npx ecc-install typescript
+npx ecc-universal install typescript
 ```
 
 ### Option 2: Direct Use
@@ -265,8 +265,6 @@ Generic ECC example:
 ```json
 {
   "$schema": "https://opencode.ai/config.json",
-  "model": "anthropic/claude-sonnet-4-5",
-  "small_model": "anthropic/claude-haiku-4-5",
   "plugin": ["./plugins"],
   "instructions": [
     "skills/tdd-workflow/SKILL.md",
@@ -276,6 +274,10 @@ Generic ECC example:
   "command": { /* 24 commands */ }
 }
 ```
+
+The reference config intentionally leaves model selection to OpenCode. Connect a
+provider and select a model in OpenCode; ECC's primary agent uses that global
+selection, and its subagents inherit the invoking primary agent's model.
 
 ## License
 
