@@ -1,0 +1,36 @@
+[submodule "external/agentshield"]
+	path = external/agentshield
+	url = https://github.com/affaan-m/agentshield.git
+[submodule "external/get-shit-done"]
+	path = external/get-shit-done
+	url = https://github.com/gsd-build/get-shit-done.git
+[submodule "external/local-deep-research"]
+	path = external/local-deep-research
+	url = https://github.com/LearningCircuit/local-deep-research.git
+[submodule "external/mcp-toolbox"]
+	path = external/mcp-toolbox
+	url = https://github.com/googleapis/mcp-toolbox.git
+[submodule "external/unsloth"]
+	path = external/unsloth
+	url = https://github.com/unslothai/unsloth.git
+[submodule "plugins/CLI-Anything"]
+	path = plugins/CLI-Anything
+	url = https://github.com/HKUDS/CLI-Anything.git
+[submodule "references/agent-skills"]
+	path = references/agent-skills
+	url = https://github.com/addyosmani/agent-skills.git
+[submodule "references/awesome-llm-apps"]
+	path = references/awesome-llm-apps
+	url = https://github.com/Shubhamsaboo/awesome-llm-apps.git
+[submodule "references/gbrain"]
+	path = references/gbrain
+	url = https://github.com/garrytan/gbrain.git
+[submodule "references/text-to-cad"]
+	path = references/text-to-cad
+	url = https://github.com/earthtojake/text-to-cad.git
+[submodule "unsloth"]
+	path = unsloth
+	url = https://github.com/unslothai/unsloth.git
+[submodule "vendor/superpowers"]
+	path = vendor/superpowers
+	url = https://github.com/obra/Superpowers.git
