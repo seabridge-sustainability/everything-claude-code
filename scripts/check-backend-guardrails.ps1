@@ -88,7 +88,9 @@ $backendExcludes = @(
   '\\(\.uv-cache|\.venv-win|build|dist|mindsdb)\\',
   '\\(\.agents|\.claude|\.openhands)\\',
   '\\data\\skills\\',
-  '\\tests?\\'
+  '\\tests?\\',
+  # One-off evidence and report scripts are not production code (37% of the 2026-09-24 scan).
+  '\\docs\\reports\\'
 )
 
 $pythonFiles = if ($Files -and $Files.Count -gt 0) {

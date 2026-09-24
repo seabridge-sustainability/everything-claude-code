@@ -10,7 +10,7 @@
     },
     {
       "file": "app/api/v1/endpoints/share_viewer\\.py$",
-      "route_pattern": "^\\{token\\}/",
+      "route_pattern": "^/\\{token\\}/",
       "reason": "Share viewer uses opaque share tokens in the path rather than authenticated user sessions."
     },
     {
@@ -24,7 +24,7 @@
       "reason": "OSS connector list endpoint is intentionally public metadata."
     },
     {
-      "file": "seabridge-dev/api/app/routes/openseabri\\.py$",
+      "file": "app/api/openseabri_routes\\.py$",
       "route_pattern": "^/mcp/servers$",
       "reason": "OpenSeaBri MCP server catalog is public metadata, not a tenant data mutation endpoint."
     }
