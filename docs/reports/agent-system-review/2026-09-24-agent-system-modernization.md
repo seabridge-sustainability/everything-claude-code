@@ -275,3 +275,12 @@ mirror pins) and `../harness/2026-09-24-triage.md` (746 unbaselined findings,
 top 10 to fix). The ECC main checkout still has another session's dirty
 `tests/ci/supply-chain-watch-workflow.test.js`; until it is resolved the checkout
 stays on the pre-merge commit and `vendor/superpowers` there stays at v5.1.0.
+
+### Follow-up 2 (2026-09-24, evening): remaining gaps closed and pushed
+
+- **Pushed:** ECC main `67b82119f` (upstream merge, fixes, harness allowlist fix, strix description); backend `seabridge_development` `7044bdfe9` (subprocess timeouts, MCP read-route rate limiter, caveman default off the retiring 4-5, current Claude models priced and listed) on top of `eb3279614` (single Claude default + thinking-safe text extraction); frontend `development` `6ffed1c5` (proxy timeout + client-abort propagation, JWKS timeout, icon-button names); autoresearch, openseabri, climada-stack, _upstream as before.
+- **ECC main checkout** fast-forwarded; the other session's `.gitmodules` + submodule test committed as its own commit (it passed and matched the 12 gitlinks); `vendor/superpowers` now at `b670180` (v6.4.1 + hook disabled). Worktree C:/wtecc removed.
+- **Harness triage:** 8 of the top 10 fixed (the MapBox third-party geocoder and supplier-editable buyer fields need product decisions); allowlist regexes corrected; `docs\reports` excluded from the backend scan.
+- **Plugins:** 13 org-synced plugins disabled for this user (`claude plugin disable <name>@synced`).
+- **_upstream:** `ignore=dirty` removed for the four mirrors whose drift was recorded, so future drift shows in `git status`.
+- **Still open:** stage 3 of the backend model migration (set `LLM_CLAUDE_MODEL=claude-sonnet-5` in the dev task definition, then smoke the flows listed in the backend migration notes); PageIndex re-evaluation against the bumped mirror (breaking import changes); GRESB `analyze_document` LLM call has no explicit timeout; backend guardrails `-FullScan` comparison did not finish (equivalence is proven on the frontend and MCP scanners).
