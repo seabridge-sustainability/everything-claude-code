@@ -284,3 +284,83 @@ stays on the pre-merge commit and `vendor/superpowers` there stays at v5.1.0.
 - **Plugins:** 13 org-synced plugins disabled for this user (`claude plugin disable <name>@synced`).
 - **_upstream:** `ignore=dirty` removed for the four mirrors whose drift was recorded, so future drift shows in `git status`.
 - **Still open:** stage 3 of the backend model migration (set `LLM_CLAUDE_MODEL=claude-sonnet-5` in the dev task definition, then smoke the flows listed in the backend migration notes); PageIndex re-evaluation against the bumped mirror (breaking import changes); GRESB `analyze_document` LLM call has no explicit timeout. Backend guardrails `-FullScan` did not finish (>80 min); the default scan took 159 s, and equivalence was proven on the frontend (3,308 = 3,308) and MCP (22 = 22).
+
+### Follow-up 3 (2026-09-24, final open-item iteration)
+
+- **Product decisions applied:** the nature-risk map no longer sends property
+  addresses from the browser to Nominatim; without stored coordinates it asks
+  the user to draw an AOI or add verified coordinates. Supplier `tier` and
+  procurement `annual_spend` are buyer-owned: the portal UI no longer offers
+  spend editing and the backend ignores and safely logs attempted writes to
+  either field. The behavioral backend guard was mutation-tested (unsafe
+  mapping restored -> test failed; guard restored -> test passed).
+- **Provider/runtime hardening:** GRESB document analysis now has a bounded,
+  configurable 120-second provider timeout and two retries. Claude Sonnet 5
+  rejects the previously universal `temperature` parameter, so the shared LLM
+  factory omits it for Sonnet 5 and Opus 5.5; a live 16-input/4-output-token
+  Sonnet 5 call then passed. Compliance and GeoAI real-flow smokes also passed
+  without degraded output or unintended tool use.
+- **PageIndex:** re-evaluated pin `037a7dba` / package 0.2.10 in an isolated
+  environment: 13 upstream tests passed, backend adapter tests passed, and a
+  no-provider SeaBridge markdown probe retained hierarchy and source text. The
+  new `{doc_name, line_count, structure}` return shape is compatible with the
+  adapter. PageIndex remains experimental because its dependency surface grew.
+- **Plugins:** legal and product-management are disabled, bringing the applied
+  total to 15 org-synced plugins; both remain available for on-demand enablement.
+- **Guardrails:** clean-worktree default and `-FullScan` inputs are identical.
+  Before optimization both produced 53 identical findings in 174-175 seconds;
+  the one-read implementation remained finding-for-finding equivalent and cut
+  both modes to about 144-147 seconds. A final current-tree pass again produced
+  53 findings in both modes. The earlier 80+ minute run was shared-checkout
+  generated-artifact traversal, not a FullScan correctness gap.
+- **Deployment efficiency:** overlapping Dev workflows were racing on the
+  mutable `latest` image. Backend commit `68e106426` adds a branch-scoped
+  concurrency group with `cancel-in-progress: true`; its contract test was
+  mutation-tested and all repository hooks passed. Test and security workflows
+  remain independent.
+- **Stage-3 model rollout:** backend `1a36d4de1` makes Claude Sonnet 5 the code
+  default after 197 no-override routing, cost, token-meter, DD, ISSB, reporting,
+  GRESB, GeoAI, and AI Manager tests passed. A clean-default live call imported
+  the worktree selector, selected `claude-sonnet-5`, returned the expected answer,
+  and metered 15 input / 4 output tokens. Dev ECS service
+  `managesg-dev31-ghgfr4-service-7r07wpw2` remains on active task definition
+  `managesg-dev3-ghgfr4:677` with `LLM_CLAUDE_MODEL=claude-sonnet-5`; inactive
+  rollback revision `:678` is registered with an explicit
+  `LLM_CLAUDE_MODEL=claude-sonnet-4-6` override.
+- **CI reliability:** backend `3c9ad5256` removes an accidental dependency from
+  the offline disclosure census to production `Settings` by deferring application
+  logger construction until an actual runtime warning. The exact no-`.env`
+  subprocess command now has a regression test; 127 affected catalog, binding,
+  census, and fact tests passed with one database-dependent skip. The repository
+  hooks and pre-push CVE audit passed. The catalog-drift workflow is correctly
+  fail-closed but its `FRONTEND_REPO_TOKEN` repository secret has never been
+  configured. GitHub rejected the preferred read-only deploy key because deploy
+  keys are disabled for the frontend repository; a fine-grained frontend
+  Contents:Read token or an organization policy change is therefore still needed.
+- **Security-scan efficiency:** `7b630065b` replaces the per-push full historical
+  baseline audit, which expanded generated hashes into millions of report lines
+  and hit its ten-minute timeout, with `detect-secrets-hook` over the complete
+  pushed/PR delta. It is pinned to the baseline's detect-secrets 1.5.0, runs
+  without external candidate verification, and remains fail-closed. A workflow
+  contract test covers those properties. Security-workflow-only changes no longer
+  trigger an application deployment. GitHub run `36095010936` passed all three
+  security jobs; the repaired secret gate finished in 20 seconds and the entire
+  workflow in under one minute. GitHub's forced Node 24 compatibility mode still
+  emits non-blocking Node 20 action deprecation notices for the pinned official
+  actions, which should be upgraded in a separate dependency-maintenance pass.
+- **Pushed:** frontend `development` contains `abfd44e7`; backend
+  `seabridge_development` is `f5c3f5aad` after concurrent climate commits,
+  containing safety/runtime `5d78fc042`, deploy concurrency `68e106426`, Sonnet
+  5 default `1a36d4de1`, offline census fix `3c9ad5256`, and bounded secret scan
+  `7b630065b`.
+- **Final rollout evidence:** on backend tip `f5c3f5aad`, GitHub security run
+  `36095331247`, backend-tests run `36095331272`, and Deploy Dev run
+  `36095331164` all passed. Deploy preflight took 24m26s and build/deploy 8m0s,
+  including full grouped tests, the real Mongo no-skip assertion, known-failure
+  comparison, image build/push, ECS stabilization, task count, and API smoke.
+  The live `managesg-dev` task is RUNNING on task definition `:677`; its image
+  digest `sha256:06ee9b37db4dcc5bd936adbbafc549fd1ba94c3cca85c5d5b0572c677005d579`
+  exactly matches ECR tags `latest` and `dev-f5c3f5aadbedff996e97c95c0a44e1186156a5d8`.
+  Task definition `:677` selects `claude-sonnet-5`; Dev health returned HTTP 200
+  with `status=ready` and `database_ready=true`. Rollback definition `:678`
+  remains ACTIVE but unused with its explicit `claude-sonnet-4-6` override.

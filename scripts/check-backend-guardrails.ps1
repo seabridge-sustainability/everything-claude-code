@@ -107,8 +107,12 @@ $pythonFiles = $pythonFiles | Where-Object {
     -not ($backendExcludes | Where-Object { $path -match $_ })
 }
 
+$secretPatterns = '(sk-[A-Za-z0-9]{20,}|hf_[A-Za-z0-9]{20,}|ghp_[A-Za-z0-9]{20,}|xox[baprs]-[A-Za-z0-9-]{20,}|AKIA[0-9A-Z]{16}|BEGIN (RSA|OPENSSH|PRIVATE) KEY)'
 foreach ($file in $pythonFiles) {
-  $lines = Get-Content -LiteralPath $file.FullName
+  # The .NET reader avoids one PowerShell provider/cmdlet pipeline per source
+  # file. On the backend's ~2,800-file scan this preserves line semantics while
+  # materially reducing guardrail startup and traversal overhead.
+  $lines = [System.IO.File]::ReadAllLines($file.FullName)
   $fileText = $lines -join "`n"
   $hasRouterLevelAuth = $fileText -match 'APIRouter\s*\([\s\S]{0,500}dependencies\s*=\s*\[[\s\S]{0,300}Depends\s*\('
   for ($i = 0; $i -lt $lines.Count; $i++) {
@@ -136,14 +140,9 @@ foreach ($file in $pythonFiles) {
         Add-Finding "backend.route-auth-boundary" "low" $file.FullName $lineNo "Route decorator near handler without visible Depends auth or router-level dependency; verify public exemption or auth dependency." $routePath
       }
     }
-  }
-}
-
-$secretPatterns = '(sk-[A-Za-z0-9]{20,}|hf_[A-Za-z0-9]{20,}|ghp_[A-Za-z0-9]{20,}|xox[baprs]-[A-Za-z0-9-]{20,}|AKIA[0-9A-Z]{16}|BEGIN (RSA|OPENSSH|PRIVATE) KEY)'
-foreach ($file in $pythonFiles) {
-  $matches = Select-String -LiteralPath $file.FullName -Pattern $secretPatterns -AllMatches -ErrorAction SilentlyContinue
-  foreach ($match in $matches) {
-    Add-Finding "security.secret-pattern" "high" $file.FullName $match.LineNumber "Potential secret pattern in source; inspect without printing value."
+    if ($line -match $secretPatterns) {
+      Add-Finding "security.secret-pattern" "high" $file.FullName $lineNo "Potential secret pattern in source; inspect without printing value."
+    }
   }
 }
 

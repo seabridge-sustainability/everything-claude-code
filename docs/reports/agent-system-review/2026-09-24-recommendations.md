@@ -1,8 +1,9 @@
 # Agent Environment — Recommendations (2026-09-24)
 
-Recommendations only: nothing in this document was applied to account or user
-settings. Evidence comes from the 2026-09-24 baseline, modernization and
-follow-up work (`2026-09-24-agent-system-*.md` in this folder).
+Recommendations and recorded decisions from the 2026-09-24 baseline,
+modernization, and follow-up work (`2026-09-24-agent-system-*.md` in this
+folder). Applied user-setting changes are called out explicitly and are
+reversible.
 
 ## (a) Org-synced claude.ai plugins
 
@@ -31,26 +32,28 @@ Code's 1,536-character cap per skill), i.e. the cost when descriptions load.
 | operations | ≈510 | **disable** | operations/process docs |
 | cowork-plugin-management | ≈130 | **disable** | plugin authoring |
 | slack-by-salesforce | ≈110 | **disable** | Slack workflows (the Slack MCP connector itself is separate) |
-| legal | ≈570 | disable, or keep for vendor/licence checks | occasional licence review |
+| legal | ≈570 | **disable** | occasional licence review; enable only for a specific legal task |
 | engineering | ≈545 | **keep** | review/debug/ADR skills overlap ECC but are useful |
 | data | ≈650 | **keep** | SQL and data viz, overlaps ESG analytics |
 | design | ≈390 | **keep** | accessibility review for the frontend |
 | pdf-viewer | ≈110 + 3 MCP tool names | **keep** | DD and utility-bill PDFs |
-| product-management | ≈480 | keep only if used | specs/roadmaps; ECC Spec Kit covers specs |
+| product-management | ≈480 | **disable** | specs/roadmaps; ECC Spec Kit covers routine engineering specs |
 
-Disabling the "disable" rows removes ≈15,700 of the ≈18,300 description-level
-tokens (≈1,100 of the ≈1,500 name-only tokens) and the Shopify instructions block.
+Disabling the "disable" rows removes ≈16,750 of the ≈18,300 description-level
+tokens (roughly four-fifths of the name-only listing) and the Shopify
+instructions block.
 
 Stale duplicates: `design`, `legal`, `human-resources`, `operations` also exist as
 un-suffixed directories under `~/.claude/plugins/synced/<bucket>/` without a
 `.meta.json`; only the `~g3` generations are active. They cost nothing but can be
 cleaned up with the plugins.
 
-**Applied 2026-09-24:** the 13 "disable" rows were disabled for this user with
+**Applied 2026-09-24:** all 15 "disable" rows were disabled for this user with
 `claude plugin disable <name>@synced` (`~/.claude/settings.json` backed up to
 `settings.json.bak-2026-09-24-plugins`); `claude plugin list` shows them
-`disabled`. Undo any one with `claude plugin enable <name>@synced`. legal and
-product-management were left enabled.
+`disabled`. Legal and product-management were disabled in the final pass after
+their product decision; re-enable either on demand with
+`claude plugin enable <name>@synced`.
 
 **How to disable**
 
@@ -128,7 +131,7 @@ must move together.
 |---|---|---:|---|---|
 | nanobot | 5853d5df | 2,312 | `openseabri/imports/manifest.json:25`, `openseabri/UPSTREAM_SYNC.md` | **keep-pinned** — code is imported into OpenSeaBri; bump only through `IMPORT_POLICY.md` with a diff review |
 | awesome-deepseek-agent | 5c11e014 | 92 | `openseabri/imports/manifest.json:34`, `UPSTREAM_SYNC.md`, `LICENSES/awesome-deepseek-agent.txt` | **keep-pinned** — licence file records the pinned revision |
-| PageIndex | dcda5656 | 198 | `manageesg-backend/docs/pageindex_evaluation.md:13` | propose-bump — evaluation-only; re-run the evaluation note on the new tip |
+| PageIndex | 037a7dba | current at review | `manageesg-backend/docs/pageindex_evaluation.md` | **keep experimental** — 0.2.10 re-evaluation passed, but dependency expansion remains an adoption risk |
 | openwork | ebbaa916 (release branch) | 5,471 behind `dev` | `manageesg-backend/docs/cloud_work/UPSTREAM_DECISION_NOTE.md:9` | keep-pinned — pinned to a release tag the Cloud Work decision was based on |
 | docuseal | 744d45d2 (tag 2.5.2) | 368 | none | propose-bump — reference only |
 | multica | de356561 | 2,635 | none | propose-bump — reference only |
