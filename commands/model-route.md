@@ -20,9 +20,25 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 
 Recommend the best model tier for the current task by complexity, cost, and infrastructure.
 
+When `JEV_ENABLED=true`, use `scripts/jev-route.js` as a typed second opinion
+for ambiguous routing. Deterministic safety rules remain authoritative: security,
+tenant isolation, secrets, production changes, and approval-gated work may never
+be downgraded by Jev. Low-confidence, timeout, disabled, and shadow-mode results
+fall back to the routing table below.
+
 ## Usage
 
 `/model-route [task-description] [--budget low|med|high] [--local]`
+
+Dependency-free Jev example (the key must already be in the process environment):
+
+```powershell
+'{"kind":"task","state":"Fix a failing parser test","sensitive":true}' |
+  node scripts/jev-route.js
+```
+
+Supported `kind` values are `task`, `error`, and `reviewers`. The script redacts
+common credential shapes, caps state size, and never prints the raw state or key.
 
 ## Routing Tiers
 

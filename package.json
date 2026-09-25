@@ -477,6 +477,8 @@
     "harness:adapters": "node scripts/harness-adapter-compliance.js",
     "harness:audit": "node scripts/harness-audit.js",
     "harness:eval": "node scripts/eval-harness.js",
+    "jev:route": "node scripts/jev-route.js",
+    "jev:benchmark": "node scripts/jev-benchmark.js",
     "observability:ready": "node scripts/observability-readiness.js",
     "operator:dashboard": "node scripts/operator-readiness-dashboard.js",
     "preview-pack:smoke": "node scripts/preview-pack-smoke.js",
