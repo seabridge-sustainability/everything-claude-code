@@ -24,13 +24,18 @@ Select the smallest useful procedural skill set for a task.
 
 | Situation | Skill |
 |---|---|
-| Scoped task or issue | `sea-task-queue-execution` |
+| Small, obvious, low-risk edit | No skill |
+| Multi-item execution queue | `sea-task-queue-execution` |
 | Ambiguous design | `grill-me` or `sea-brainstorming-and-spec-refinement` |
 | Behavior change | `sea-test-driven-development` |
 | Failure or regression | `sea-systematic-debugging`, then `sea-error-recovery-loop` |
 | Completion claim | `sea-verification-before-completion` |
 | Architecture/refactor | `improve-codebase-architecture`, `sea-architecture-reviewer` |
 | Review or PR feedback | `sea-code-review-response`, reviewer skills |
+| Auth, tenant, secret, or high-risk boundary | `sea-security-reviewer` |
+| AI claims, citations, provenance, or evals | `sea-ai-grounding-reviewer`, `sea-ai-data-integrity` |
+| Sustainability, emissions, climate, GIS, or LCA | `sea-sustainability-domain-review` |
+| Shared checkout or worktree operation | `sea-git-worktree-isolation` |
 | Docs drift | docs workflow plus `sea-verification-before-completion` |
 | Teaching or learning state | `sea-teach-loop` |
 | Long context/handoff | `sea-context-hygiene` |
@@ -38,16 +43,5 @@ Select the smallest useful procedural skill set for a task.
 ## Guardrails
 
 Do not load every skill. Do not copy skill bodies into product repos. Do not
-install upstream skills or plugins unless explicitly approved.
-
-<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_START -->
-## /goal Inheritance
-
-This skill inherits the SeaBridgeAI `/goal` default protocol. Before
-implementation or review, establish the persistent goal, Definition of Done,
-validation plan, affected systems, dependencies, risks, and expected artifacts.
-Continue through validation and fixes until the DoD is satisfied or a hard
-blocker is documented.
-
-Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
-<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_END -->
+install upstream skills or plugins unless explicitly approved. This router does
+not add ceremony beyond the task's existing goal and repository instructions.

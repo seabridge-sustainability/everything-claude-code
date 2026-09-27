@@ -8,6 +8,7 @@
  *                frontmatter. (AGENTS.md is read only when no CLAUDE.md exists.)
  *   Codex:       AGENTS.md from the git root (cwd = root); 32 KiB combined cap,
  *                truncated silently past it.
+ *   Gemini:      GEMINI.md with @path imports expanded.
  *
  * Checks per effective stack: size budget, required invariants, stale phrases,
  * broken path references, and text duplicated between CLAUDE.md and AGENTS.md.
@@ -101,6 +102,11 @@ function effectiveStacks(repo) {
     const exp = expandImports(claudeEntry);
     for (const r of alwaysLoadedRules(repo)) { exp.files.push(r); exp.text += '\n' + readText(r); }
     stacks.push({ harness: 'claude', files: exp.files, missing: exp.missing, text: exp.text });
+  }
+  const gemini = path.join(repo, 'GEMINI.md');
+  if (fs.existsSync(gemini)) {
+    const exp = expandImports(gemini);
+    stacks.push({ harness: 'gemini', files: exp.files, missing: exp.missing, text: exp.text });
   }
   return stacks;
 }

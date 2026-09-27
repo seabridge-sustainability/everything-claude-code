@@ -1,11 +1,11 @@
 ---
 name: cross-session-resume
-description: Callable wrapper for cross-session-resume. Load the canonical SeaBridgeAI skill body from everything-claude-code\skills\cross-session-resume\SKILL.md.
+description: "Use when an agent workflow must resume after restart, compaction, channel switch, or human handoff with checkpoints, validation logs, artifacts, and safe next actions."
 ---
 
 # cross-session-resume
 
-Canonical skill:
-C:\Users\adelm\SeaBridgeAI\everything-claude-code\skills\cross-session-resume\SKILL.md
-
-Use this wrapper only for skill discovery. Follow the canonical skill body above; do not copy or fork behavior here.
+Load and follow the canonical skill body at
+[skills/cross-session-resume/SKILL.md](../../../skills/cross-session-resume/SKILL.md).
+Resolve this path relative to this wrapper so worktrees and plugin installs
+use their own checked-out version. Do not copy or fork behavior here.

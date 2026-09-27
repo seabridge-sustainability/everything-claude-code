@@ -1,19 +1,11 @@
 ---
 name: sea-evidence-lineage
-description: Callable wrapper for sea-evidence-lineage. Load the canonical SeaBridgeAI skill body from everything-claude-code\skills\sea-evidence-lineage\SKILL.md.
+description: "Trace a SeaBridgeAI EvidenceObject or AI-generated claim back to its source and forward to every module that links/consumes it."
 ---
 
 # sea-evidence-lineage
 
-Canonical skill:
-C:\Users\adelm\SeaBridgeAI\everything-claude-code\skills\sea-evidence-lineage\SKILL.md
-
-Use this wrapper only for skill discovery. Follow the canonical skill body above; do not copy or fork behavior here.
-
-<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_START -->
-## /goal Inheritance
-
-This skill inherits the SeaBridgeAI `/goal` default protocol. Before implementation or review, establish the persistent goal, Definition of Done, validation plan, affected systems, dependencies, risks, and expected artifacts. Continue through validation and fixes until the DoD is satisfied or a hard blocker is documented.
-
-Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
-<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_END -->
+Load and follow the canonical skill body at
+[skills/sea-evidence-lineage/SKILL.md](../../../skills/sea-evidence-lineage/SKILL.md).
+Resolve this path relative to this wrapper so worktrees and plugin installs
+use their own checked-out version. Do not copy or fork behavior here.

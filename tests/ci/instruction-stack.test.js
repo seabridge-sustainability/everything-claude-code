@@ -144,7 +144,7 @@ test('generated adapters and Context Hub retain the canonical goal contract', ()
     '<!-- SEABRIDGE_GOAL_PROTOCOL_END -->',
   );
 
-  for (const name of ['CODEX.md', 'GEMINI.md', 'OPENCODE.md']) {
+  for (const name of ['CODEX.md', 'OPENCODE.md']) {
     const adapter = fs.readFileSync(path.join(root, name), 'utf8');
     assert.strictEqual(
       markerBlock(
@@ -160,6 +160,11 @@ test('generated adapters and Context Hub retain the canonical goal contract', ()
   const claude = fs.readFileSync(path.join(root, 'CLAUDE.md'), 'utf8');
   assert.match(claude, /^@AGENTS\.md\s*$/m);
   assert.doesNotMatch(claude, /SEABRIDGE_GOAL_PROTOCOL_START/);
+
+  const gemini = fs.readFileSync(path.join(root, 'GEMINI.md'), 'utf8');
+  assert.match(gemini, /^@\.\/AGENTS\.md\s*$/m);
+  assert.doesNotMatch(gemini, /SEABRIDGE_GOAL_PROTOCOL_START/);
+  assert.doesNotMatch(gemini, /AGENTS_SYSTEM|vendor\/superpowers\/GEMINI/);
 
   const contextAgents = fs.readFileSync(
     path.join(root, 'context-hub', 'ecc', 'docs', 'core-agents', 'DOC.md'),

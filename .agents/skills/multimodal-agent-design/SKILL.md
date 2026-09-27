@@ -1,11 +1,11 @@
 ---
 name: multimodal-agent-design
-description: Callable wrapper for multimodal-agent-design. Load the canonical SeaBridgeAI skill body from everything-claude-code\skills\multimodal-agent-design\SKILL.md.
+description: "Use when designing or reviewing image input, image generation, generated artifacts, visual explainers, media previews, or multimodal provider routing for SeaBridgeAI/OpenSeaBri agents."
 ---
 
 # multimodal-agent-design
 
-Canonical skill:
-C:\Users\adelm\SeaBridgeAI\everything-claude-code\skills\multimodal-agent-design\SKILL.md
-
-Use this wrapper only for skill discovery. Follow the canonical skill body above; do not copy or fork behavior here.
+Load and follow the canonical skill body at
+[skills/multimodal-agent-design/SKILL.md](../../../skills/multimodal-agent-design/SKILL.md).
+Resolve this path relative to this wrapper so worktrees and plugin installs
+use their own checked-out version. Do not copy or fork behavior here.

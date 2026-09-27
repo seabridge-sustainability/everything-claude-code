@@ -14,8 +14,9 @@
  *
  * Frontmatter findings default to WARN so CI does not break while
  * pre-existing data defects are being cleaned up out of band (see #1663).
- * Pass `--strict` or set `CI_STRICT_SKILLS=1` to promote frontmatter
- * findings to errors (exit 1).
+ * Pass `--strict-canonical` to fail on curated skills/ findings while keeping
+ * the existing localized-doc backlog advisory. Pass `--strict` or set
+ * `CI_STRICT_SKILLS=1` to promote every frontmatter finding to an error.
  *
  * Structural findings (missing/empty SKILL.md) are always errors.
  *
@@ -32,6 +33,8 @@ const SKILLS_DIR = path.join(__dirname, '../../skills');
 const DOCS_DIR = path.join(__dirname, '../../docs');
 
 const STRICT = process.argv.includes('--strict') || process.env.CI_STRICT_SKILLS === '1';
+const REQUIRE_CANONICAL_FRONTMATTER = process.argv.includes('--strict-canonical');
+const STRICT_CANONICAL = STRICT || REQUIRE_CANONICAL_FRONTMATTER;
 
 /**
  * Parse the leading YAML frontmatter of a markdown document.
@@ -335,8 +338,18 @@ function validateSkills() {
   let warnCount = 0;
   let validCount = 0;
 
-  const reportFrontmatterFinding = msg => {
+  const reportDocsFinding = msg => {
     if (STRICT) {
+      console.error(`ERROR: ${msg}`);
+      hasErrors = true;
+    } else {
+      console.warn(`WARN: ${msg}`);
+      warnCount++;
+    }
+  };
+
+  const reportCanonicalFinding = msg => {
+    if (STRICT_CANONICAL) {
       console.error(`ERROR: ${msg}`);
       hasErrors = true;
     } else {
@@ -350,7 +363,10 @@ function validateSkills() {
     const dirs = entries.filter(e => e.isDirectory() && !e.name.startsWith('.')).map(e => e.name);
 
     for (const dir of dirs) {
-      const { fatal } = validateSkillDir(dir, SKILLS_DIR, reportFrontmatterFinding);
+      const skillMd = path.join(SKILLS_DIR, dir, 'SKILL.md');
+      const { fatal } = REQUIRE_CANONICAL_FRONTMATTER
+        ? validateSkillFile(skillMd, `${dir}/SKILL.md`, reportCanonicalFinding, { requireFrontmatter: true })
+        : validateSkillDir(dir, SKILLS_DIR, reportCanonicalFinding);
       if (fatal) {
         hasErrors = true;
         continue;
@@ -360,7 +376,7 @@ function validateSkills() {
   }
 
   for (const { skillMd, label } of docsSkillFiles) {
-    const { fatal } = validateSkillFile(skillMd, label, reportFrontmatterFinding, { requireFrontmatter: true });
+    const { fatal } = validateSkillFile(skillMd, label, reportDocsFinding, { requireFrontmatter: true });
     if (fatal) {
       hasErrors = true;
       continue;

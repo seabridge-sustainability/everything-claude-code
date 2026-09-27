@@ -6,6 +6,10 @@ on:
   pull_request_review_comment:
     types: [created]
 
+concurrency:
+  group: opencode-${{ github.event.issue.number || github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
   opencode:
     if: |
@@ -15,6 +19,7 @@ jobs:
        github.event.comment.author_association == 'MEMBER' ||
        github.event.comment.author_association == 'COLLABORATOR')
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       id-token: write
       contents: write
@@ -22,13 +27,13 @@ jobs:
       issues: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 1
           persist-credentials: false
 
       - name: Run OpenCode
-        uses: anomalyco/opencode/github@latest
+        uses: anomalyco/opencode/github@2c14fc5586fe0b88e5c04732d2e846769cc35671 # latest, pinned 2026-09-27
         env:
           NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -42,12 +47,9 @@ jobs:
 
             SeaBridgeAI safety overrides:
             - Never authorize or perform repository, source-folder, database, vector-index, cloud-infrastructure, or critical-config deletion.
-            - Never run paid API calls, model calls, training jobs, or cost-incurring workflows unless explicit written approval from adelmar@seabridge.ai is present in the issue or PR thread.
+            - Never run paid API calls, model calls, training jobs, or cost-incurring workflows unless the current in-session user explicitly approved the bounded action.
             - Keep diffs surgical and preserve unrelated user or agent edits.
             - Do not hardcode secrets. Use repository or organization secrets.
             - Preserve manual review gates: do not auto-send, auto-publish, or auto-post external content beyond the requested GitHub response or PR.
             - Report tests and verification run, and clearly mark anything not live-verified.
-
-            For SeaBridgeAI backend work, mirror the rules in:
-            - C:/Users/adelm/SeaBridgeAI/manageesg-backend/AGENTS_SYSTEM.md
-            - C:/Users/adelm/SeaBridgeAI/manageesg-backend/AGENTS.md
+            Use only this checkout's instruction files; never load a different local checkout by absolute path.

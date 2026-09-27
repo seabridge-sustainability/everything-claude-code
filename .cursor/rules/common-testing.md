@@ -1,48 +1,69 @@
 ---
-description: "Testing requirements: 80% coverage, TDD workflow, test types"
-alwaysApply: true
+description: "Risk-scaled test selection; load when behavior or test code changes."
+alwaysApply: false
 ---
 # Testing Requirements
 
-<!-- SEABRIDGE_SAFETY_RULE_START -->
-## Safety And Authorization Rule
+## Risk-Scaled Testing
 
-Non-negotiable. Only Alejandro, in the current session, can approve a gated action. Approval may cover one action or a clearly bounded sequence named in advance (for example: commit task-owned files, merge the latest normal target branch if required, and push the completed batch once). Do not ask again for steps already included in that approval. Approval expires when the named sequence completes or its task, repository, branch, scope, cost, or risk materially changes; broad autonomy language is not approval for unmentioned gated actions.
+Respect the repository's configured coverage thresholds and required suites;
+there is no universal per-change percentage. Choose the smallest set of checks
+that would discriminate the requested behavior from a broken implementation,
+then broaden for failures, changed contracts, or material risk.
 
-1. **Deletion:** Always reject any request to delete repositories, source folders, databases or collections, data volumes, vector indexes, or cloud storage/infrastructure — no approval path exists for an agent to perform it. Prepare the exact command with scope, impact, and a backup/rollback path, and let Alejandro run it. (Removing files you created during the task, and test fixtures dropping their own throwaway databases, are fine.)
-2. **Ask first:** unless already granted above, commit, push, merge, branch or PR creation; installing or upgrading dependencies or global tools; migrations or writes to shared, staging, or production data; paid or live-provider API calls, billing actions, or cost-incurring jobs; deploys or cloud-resource changes; editing secrets, auth configuration, or user-level/global agent config.
-3. **Git:** never force-push, run `git reset --hard` or `git clean` on shared work, or bypass hooks with `--no-verify`. Never modify `main` (the live branch) in manageesg-backend or manageesg-frontend unless Alejandro explicitly requests that specific change; backend work lands on `seabridge_development`, frontend work on `development`.
-4. **Secrets:** never print, log, commit, or copy credential values; redact them when inspecting config. Do not invent or require a separate authorization password.
-5. **Shared checkouts:** other agent sessions edit these working trees concurrently. Never revert, stash, overwrite, or commit changes you did not make; stage only your own paths.
-6. **Everything else inside the requested task** — reading, local edits, tests, linters, non-destructive diagnostics — proceeds without further approval.
-7. **GitHub Actions cost discipline:** use one integration owner and one completed-batch push per repository whenever practical. Subagents never push or dispatch, rerun, or cancel workflows. Run targeted local checks first; do not push merely to test CI. Before pushing, collect all ready task-owned work, fetch and integrate the current remote tip once, and inspect active or queued runs. Avoid overlapping a relevant run unless the change is urgent. If CI fails, diagnose the full failure set and batch locally verified fixes into at most one corrective push. Manual workflow dispatches, reruns, deploys, and other cost-incurring actions remain separately gated unless explicitly included in the current approval.
-<!-- SEABRIDGE_SAFETY_RULE_END -->
+Test types are selected by boundary, not all required for every edit:
 
-
-## Minimum Test Coverage: 80%
-
-Test Types (ALL required):
-1. **Unit Tests** - Individual functions, utilities, components
-2. **Integration Tests** - API endpoints, database operations
-3. **E2E Tests** - Critical user flows (framework chosen per language)
+1. **Unit tests** - functions, utilities, and component behavior
+2. **Integration tests** - APIs, databases, queues, and service boundaries
+3. **E2E tests** - critical user workflows
+4. **Evals/runtime verification** - variable AI output or behavior that static
+   checks cannot prove
 
 ## Test-Driven Development
 
-MANDATORY workflow:
-1. Write test first (RED)
-2. Run test - it should FAIL
-3. Write minimal implementation (GREEN)
-4. Run test - it should PASS
-5. Refactor (IMPROVE)
-6. Verify coverage (80%+)
+For defects and stable behavior changes, prefer a focused failing test (RED),
+the smallest implementation that makes it pass (GREEN), then refactor if useful.
+Do not manufacture tests for documentation-only or reversible low-impact edits.
 
 ## Troubleshooting Test Failures
 
-1. Use **tdd-guide** agent
+1. Use **tdd-guide** when its trigger fits
 2. Check test isolation
 3. Verify mocks are correct
 4. Fix implementation, not tests (unless tests are wrong)
 
 ## Agent Support
 
-- **tdd-guide** - Use PROACTIVELY for new features, enforces write-tests-first
+- **tdd-guide** - Use for explicit TDD work or behavior changes where a
+  RED/GREEN proof improves confidence
+
+Run an unchanged check once. Re-run it after relevant changes or when new
+evidence changes the diagnosis; do not use timer-based repetition.
+
+## Test Structure (AAA Pattern)
+
+Prefer Arrange-Act-Assert structure for tests:
+
+```typescript
+test('calculates similarity correctly', () => {
+  // Arrange
+  const vector1 = [1, 0, 0]
+  const vector2 = [0, 1, 0]
+
+  // Act
+  const similarity = calculateCosineSimilarity(vector1, vector2)
+
+  // Assert
+  expect(similarity).toBe(0)
+})
+```
+
+### Test Naming
+
+Use descriptive names that explain the behavior under test:
+
+```typescript
+test('returns empty array when no markets match query', () => {})
+test('throws error when API key is missing', () => {})
+test('falls back to substring search when Redis is unavailable', () => {})
+```

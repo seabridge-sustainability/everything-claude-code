@@ -44,7 +44,7 @@ foreach ($repo in $RepoPaths) {
   }
 }
 
-$central = "C:\Users\adelm\SeaBridgeAI\everything-claude-code"
+$central = Split-Path -Parent $PSScriptRoot
 if (Test-Path "$central\scripts\check-canonical-skills.ps1") {
   & "$central\scripts\check-canonical-skills.ps1" `
     -MattPocockSnapshotPath "$central\references\matt-pocock-skills" | Out-Host

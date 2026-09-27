@@ -1,101 +1,12 @@
 {
   "mcpServers": {
-    "berry": {
-      "command": "C:/Users/adelm/AppData/Roaming/Python/Python314/Scripts/berry.exe",
-      "args": [
-        "mcp",
-        "--server",
-        "classic"
-      ],
-      "env": {
-        "BERRY_SERVICE_URL": "${BERRY_SERVICE_URL}",
-        "OPENAI_API_KEY": "${OPENAI_API_KEY}",
-        "OPENAI_BASE_URL": "${OPENAI_BASE_URL}",
-        "STRAWBERRY_SERVICE_URL": "${STRAWBERRY_SERVICE_URL}"
-      }
+    "chrome-devtools": {
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "chrome-devtools-mcp@1.10.1"]
     },
     "github": {
       "command": "cmd",
-      "args": [
-        "/c",
-        "npx",
-        "-y",
-        "@modelcontextprotocol/server-github"
-      ]
-    },
-    "context7": {
-      "command": "cmd",
-      "args": [
-        "/c",
-        "npx",
-        "-y",
-        "@upstash/context7-mcp@2.1.4"
-      ]
-    },
-    "exa": {
-      "type": "http",
-      "url": "https://mcp.exa.ai/mcp"
-    },
-    "memory": {
-      "command": "cmd",
-      "args": [
-        "/c",
-        "npx",
-        "-y",
-        "@modelcontextprotocol/server-memory"
-      ]
-    },
-    "playwright": {
-      "command": "cmd",
-      "args": [
-        "/c",
-        "npx",
-        "-y",
-        "@playwright/mcp@0.0.68",
-        "--extension"
-      ]
-    },
-    "sequential-thinking": {
-      "command": "cmd",
-      "args": [
-        "/c",
-        "npx",
-        "-y",
-        "@modelcontextprotocol/server-sequential-thinking"
-      ]
-    },
-    "gitnexus": {
-      "command": "cmd",
-      "args": ["/c", "npx", "-y", "gitnexus@latest", "mcp"],
-      "cwd": "C:/Users/adelm/SeaBridgeAI/everything-claude-code"
-    },
-    "gbrain": {
-      "command": "powershell",
-      "args": [
-        "-NoProfile",
-        "-ExecutionPolicy",
-        "Bypass",
-        "-File",
-        "C:/Users/adelm/SeaBridgeAI/everything-claude-code/scripts/gbrain.ps1",
-        "serve"
-      ],
-      "description": "Optional local GBrain stdio MCP server for SeaBridgeAI coding-agent memory and code lookup"
-    },
-    "falkordb": {
-      "command": "cmd",
-      "args": [
-        "/c",
-        "npx",
-        "-y",
-        "@falkordb/mcpserver@latest"
-      ],
-      "env": {
-        "FALKORDB_HOST": "localhost",
-        "FALKORDB_PORT": "6380",
-        "FALKORDB_USERNAME": "",
-        "FALKORDB_PASSWORD": ""
-      },
-      "description": "Query cross-repo graphify knowledge graphs via OpenCypher"
+      "args": ["/c", "npx", "-y", "@modelcontextprotocol/server-github@2025.4.8"]
     }
   }
 }

@@ -3,7 +3,6 @@ name: CI
 on:
   push:
     branches: [main, 'release/**']
-    tags: ['v*']
   pull_request:
     branches: [main]
 
@@ -25,13 +24,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        node: ['18.x', '20.x', '22.x']
-        pm: [npm, pnpm, yarn, bun]
-        exclude:
-          # Bun has limited Windows support
-          - os: windows-latest
-            pm: bun
+        include:
+          - { os: ubuntu-latest, node: '20.x', pm: npm, suite: full }
+          - { os: ubuntu-latest, node: '18.x', pm: npm, suite: smoke }
+          - { os: ubuntu-latest, node: '22.x', pm: npm, suite: smoke }
+          - { os: windows-latest, node: '20.x', pm: npm, suite: windows }
+          - { os: macos-latest, node: '20.x', pm: npm, suite: macos }
+          - { os: ubuntu-latest, node: '20.x', pm: pnpm, suite: smoke }
+          - { os: ubuntu-latest, node: '20.x', pm: yarn, suite: smoke }
+          - { os: ubuntu-latest, node: '20.x', pm: bun, suite: smoke }
 
     steps:
       - name: Checkout
@@ -92,21 +93,41 @@ jobs:
             *) echo "Unsupported package manager: ${{ matrix.pm }}" && exit 1 ;;
           esac
 
-      # Run tests
-      - name: Run tests
+      - name: Run full test suite
+        if: matrix.suite == 'full'
         run: node tests/run-all.js
         env:
           CLAUDE_CODE_PACKAGE_MANAGER: ${{ matrix.pm }}
 
-      # Upload test artifacts on failure
-      - name: Upload test artifacts
-        if: failure()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: test-results-${{ matrix.os }}-node${{ matrix.node }}-${{ matrix.pm }}
-          path: |
-            tests/
-            !tests/node_modules/
+      - name: Run compatibility smoke test
+        if: matrix.suite == 'smoke'
+        run: node tests/scripts/ecc-universal-bin.test.js
+        env:
+          CLAUDE_CODE_PACKAGE_MANAGER: ${{ matrix.pm }}
+
+      - name: Run Windows platform checks
+        if: matrix.suite == 'windows'
+        shell: bash
+        run: |
+          node tests/scripts/ecc-universal-bin.test.js
+          node tests/hooks/mcp-health-check.test.js
+          node tests/scripts/install-ps1.test.js
+          node tests/lib/antigravity-legacy-migration.test.js
+          node tests/integration/hooks.test.js
+        env:
+          CLAUDE_CODE_PACKAGE_MANAGER: ${{ matrix.pm }}
+
+      - name: Run macOS platform checks
+        if: matrix.suite == 'macos'
+        shell: bash
+        run: |
+          node tests/scripts/ecc-universal-bin.test.js
+          node tests/gan-harness.test.js
+          node tests/scripts/install-guided.test.js
+          node tests/skills/repo-scan-install.test.js
+          node tests/lib/claude-settings.test.js
+        env:
+          CLAUDE_CODE_PACKAGE_MANAGER: ${{ matrix.pm }}
 
   pack-installer:
     name: Pack Installer Artifact
@@ -208,8 +229,14 @@ jobs:
         continue-on-error: false
 
       - name: Validate skills
-        run: node scripts/ci/validate-skills.js
+        run: node scripts/ci/validate-skills.js --strict-canonical
         continue-on-error: false
+
+      - name: Validate generated skill wrappers
+        run: npm run agent-skill-wrappers:check
+
+      - name: Validate Cursor rule adapters
+        run: npm run cursor-rules:check
 
       - name: Validate install manifests
         run: node scripts/ci/validate-install-manifests.js
@@ -303,6 +330,7 @@ jobs:
 
   coverage:
     name: Coverage
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 10
 

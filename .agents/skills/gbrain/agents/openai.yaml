@@ -1,7 +1,7 @@
 interface:
   display_name: "GBrain"
-  short_description: "Operate GBrain for brain-first retrieval, OpenClaw/Hermes routing, and minion jobs"
+  short_description: "Operate GBrain retrieval, routing, and minion jobs"
   brand_color: "#7C3AED"
-  default_prompt: "Use GBrain for brain-first lookup and OpenClaw/Hermes skill routing"
+  default_prompt: "Use $gbrain for brain-first lookup and skill routing"
 policy:
   allow_implicit_invocation: true

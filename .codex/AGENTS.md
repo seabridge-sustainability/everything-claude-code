@@ -35,8 +35,8 @@ Skills are auto-loaded from `.agents/skills/`. Each skill contains:
 
 Do not rely on a static catalog here: discover the current skill surface by
 listing `.agents/skills/` (and `skills/` for canonical `sea-*` bodies), or use
-`sea-skill-map` / `docs/SKILL_ROUTING_REFERENCE.md` for routing. Load at most
-one skill per task per the skill-selection rule in `AGENTS_SYSTEM.md`.
+`sea-skill-map` / `docs/SKILL_ROUTING_REFERENCE.md` for routing. Load the
+minimum applicable set; explicit and mandatory triggers win.
 
 ## Google Skills Boundary
 

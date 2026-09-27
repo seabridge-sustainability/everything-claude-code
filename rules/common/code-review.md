@@ -21,19 +21,15 @@ Code review ensures quality, security, and maintainability before code is merged
 
 ## When to Review
 
-**MANDATORY review triggers:**
-
-- After writing or modifying code
-- Before any commit to shared branches
-- When security-sensitive code is changed (auth, payments, user data)
-- When architectural changes are made
-- Before merging pull requests
+Use a dedicated review for non-trivial changes, high-risk boundaries, material
+architecture changes, or before a pull request requires it. The implementing
+agent may directly review small, obvious, low-risk changes.
 
 **Pre-Review Requirements:**
 
 Before requesting review, ensure:
 
-- All automated checks (CI/CD) are passing
+- Relevant local checks are passing; do not push merely to discover failures
 - Merge conflicts are resolved
 - Branch is up to date with target branch
 
@@ -48,12 +44,12 @@ Before marking code complete:
 - [ ] Errors are handled explicitly
 - [ ] No hardcoded secrets or credentials
 - [ ] No console.log or debug statements
-- [ ] Tests exist for new functionality
-- [ ] Test coverage meets 80% minimum
+- [ ] Stable changed behavior has a discriminating test where practical
+- [ ] Repository-owned coverage requirements are met
 
 ## Security Review Triggers
 
-**STOP and use security-reviewer agent when:**
+Use the security-reviewer when the changed boundary includes:
 
 - Authentication or authorization code
 - User input handling
@@ -89,11 +85,10 @@ Use these agents for code review:
 
 ```
 1. Run git diff to understand changes
-2. Check security checklist first
-3. Review code quality checklist
-4. Run relevant tests
-5. Verify coverage >= 80%
-6. Use appropriate agent for detailed review
+2. Apply the checks relevant to the touched boundary
+3. Run focused tests and runtime verification
+4. Verify repository-owned coverage or performance budgets when applicable
+5. Use a specialist only when its trigger fits
 ```
 
 ## Common Issues to Catch

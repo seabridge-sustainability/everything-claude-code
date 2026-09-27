@@ -1,4 +1,8 @@
-# Security Guidelines
+---
+description: "SeaBridgeAI safety, authorization, goal, and context-efficiency baseline"
+alwaysApply: true
+---
+# SeaBridgeAI Agent Baseline
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -14,33 +18,19 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 7. **GitHub Actions cost discipline:** use one integration owner and one completed-batch push per repository whenever practical. Subagents never push or dispatch, rerun, or cancel workflows. Run targeted local checks first; do not push merely to test CI. Before pushing, collect all ready task-owned work, fetch and integrate the current remote tip once, and inspect active or queued runs. Avoid overlapping a relevant run unless the change is urgent. If CI fails, diagnose the full failure set and batch locally verified fixes into at most one corrective push. Manual workflow dispatches, reruns, deploys, and other cost-incurring actions remain separately gated unless explicitly included in the current approval.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
+<!-- SEABRIDGE_GOAL_PROTOCOL_START -->
+## Goal Protocol Default
 
-## Risk-Scoped Security Checks
+For non-trivial work, settle what done means and how you will prove it before editing, then keep going until it is proven or you reach a real blocker. `/goal` in a prompt asks for exactly this.
 
-Every change must avoid introducing secrets. Apply the remaining checks to the
-boundaries actually touched:
+- **Scope from evidence.** Build what the request needs, grounded in the current code, git history, tests, and the current plan. Do not invent product functionality or sustainability, emissions, climate, or financial data; preserve source, provenance, and units. Treat memory, handoffs, and old summaries as leads to verify, not facts.
+- **Done means** the requested behavior works, tests that would catch its failure pass, there are no unexplained regressions, and you know the state of the tree. Scale checks to risk: tenant isolation, auth, persistence, AI grounding, and cross-repo contracts warrant broader tests. Do not re-run checks nothing has changed since.
+- **Verify behavior, not only code.** Static checks may be necessary, but they may not prove the changed workflow. For observable UI, API, mobile, CLI, or integration behavior, use the available browser, terminal, endpoint client, simulator, or equivalent runtime surface and inspect the result. Judge it against existing performance budgets, accessibility rules, and design-system constraints; do not invent a passing threshold. Turn a repeated manual QA sequence into a narrowly triggered skill or script with setup, evidence, and failure handling.
+- **When stuck,** change strategy after two failures of the same approach. Keep working on independent parts; stop only at an approval boundary or an external dependency, and name it.
+- **Report** what changed, how it was verified, what remains or is risky, and any check you skipped and why. Never call unverified work done.
 
-- Validate untrusted input at system boundaries.
-- Use parameterized database operations where queries changed.
-- Review XSS and CSRF controls for affected browser-facing flows.
-- Verify authentication, authorization, tenant isolation, and rate limiting
-  for affected protected or abuse-sensitive endpoints.
-- Keep errors and logs free of sensitive data.
+Full protocol, for long multi-phase work: C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md
+<!-- SEABRIDGE_GOAL_PROTOCOL_END -->
 
-## Secret Management
-
-- NEVER hardcode secrets in source code
-- ALWAYS use environment variables or a secret manager
-- Validate that required secrets are present at startup
-- If a secret may have been exposed, stop further propagation, report the
-  affected scope without printing the value, and ask the credential owner to
-  rotate it. Secret/auth configuration changes remain approval-gated.
-
-## Security Response Protocol
-
-If security issue found:
-1. Stop the unsafe path and preserve evidence without exposing the secret
-2. Use **security-reviewer** when the issue is material or cross-cutting
-3. Fix critical issues within the authorized task
-4. Escalate owner-only rotation or infrastructure actions
-5. Search the relevant boundary for the same defect pattern
+Load the minimum applicable skill and rule set. Prefer focused local checks;
+broaden only for changed contracts, failures, or material risk.

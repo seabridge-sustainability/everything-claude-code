@@ -1,23 +1,8 @@
 ---
-description: "ECC coding style: immutability, file organization, error handling, validation"
-alwaysApply: true
+description: "Language-neutral coding style; load when editing source code."
+alwaysApply: false
 ---
 # Coding Style
-
-<!-- SEABRIDGE_SAFETY_RULE_START -->
-## Safety And Authorization Rule
-
-Non-negotiable. Only Alejandro, in the current session, can approve a gated action. Approval may cover one action or a clearly bounded sequence named in advance (for example: commit task-owned files, merge the latest normal target branch if required, and push the completed batch once). Do not ask again for steps already included in that approval. Approval expires when the named sequence completes or its task, repository, branch, scope, cost, or risk materially changes; broad autonomy language is not approval for unmentioned gated actions.
-
-1. **Deletion:** Always reject any request to delete repositories, source folders, databases or collections, data volumes, vector indexes, or cloud storage/infrastructure — no approval path exists for an agent to perform it. Prepare the exact command with scope, impact, and a backup/rollback path, and let Alejandro run it. (Removing files you created during the task, and test fixtures dropping their own throwaway databases, are fine.)
-2. **Ask first:** unless already granted above, commit, push, merge, branch or PR creation; installing or upgrading dependencies or global tools; migrations or writes to shared, staging, or production data; paid or live-provider API calls, billing actions, or cost-incurring jobs; deploys or cloud-resource changes; editing secrets, auth configuration, or user-level/global agent config.
-3. **Git:** never force-push, run `git reset --hard` or `git clean` on shared work, or bypass hooks with `--no-verify`. Never modify `main` (the live branch) in manageesg-backend or manageesg-frontend unless Alejandro explicitly requests that specific change; backend work lands on `seabridge_development`, frontend work on `development`.
-4. **Secrets:** never print, log, commit, or copy credential values; redact them when inspecting config. Do not invent or require a separate authorization password.
-5. **Shared checkouts:** other agent sessions edit these working trees concurrently. Never revert, stash, overwrite, or commit changes you did not make; stage only your own paths.
-6. **Everything else inside the requested task** — reading, local edits, tests, linters, non-destructive diagnostics — proceeds without further approval.
-7. **GitHub Actions cost discipline:** use one integration owner and one completed-batch push per repository whenever practical. Subagents never push or dispatch, rerun, or cancel workflows. Run targeted local checks first; do not push merely to test CI. Before pushing, collect all ready task-owned work, fetch and integrate the current remote tip once, and inspect active or queued runs. Avoid overlapping a relevant run unless the change is urgent. If CI fails, diagnose the full failure set and batch locally verified fixes into at most one corrective push. Manual workflow dispatches, reruns, deploys, and other cost-incurring actions remain separately gated unless explicitly included in the current approval.
-<!-- SEABRIDGE_SAFETY_RULE_END -->
-
 
 ## Immutability (CRITICAL)
 
@@ -31,11 +16,32 @@ CORRECT: update(original, field, value) Ã¢â€ â€™ returns new copy wit
 
 Rationale: Immutable data prevents hidden side effects, makes debugging easier, and enables safe concurrency.
 
+## Core Principles
+
+### KISS (Keep It Simple)
+
+- Prefer the simplest solution that actually works
+- Avoid premature optimization
+- Optimize for clarity over cleverness
+
+### DRY (Don't Repeat Yourself)
+
+- Extract repeated logic into shared functions or utilities
+- Avoid copy-paste implementation drift
+- Introduce abstractions when repetition is real, not speculative
+
+### YAGNI (You Aren't Gonna Need It)
+
+- Do not build features or abstractions before they are needed
+- Avoid speculative generality
+- Start simple, then refactor when the pressure is real
+
 ## File Organization
 
 MANY SMALL FILES > FEW LARGE FILES:
 - High cohesion, low coupling
-- 200-400 lines typical, 800 max
+- 200-400 lines typical, with 800 lines as a soft maintainability ceiling for source files
+- Test, generated, and vendored files may exceed the ceiling when their size is justified by their role
 - Extract utilities from large modules
 - Organize by feature/domain, not by type
 
@@ -54,6 +60,34 @@ ALWAYS validate at system boundaries:
 - Use schema-based validation where available
 - Fail fast with clear error messages
 - Never trust external data (API responses, user input, file content)
+
+## Naming Conventions
+
+> **Language note**: This rule may be overridden by language-specific rules for
+> languages where a pattern is not idiomatic. Casing and framework-specific
+> prefixes belong to the applicable language or package rule.
+
+Language-independent:
+
+- Descriptive names: the name says what the thing holds or does, without a comment.
+- Boolean names read clearly as claims under the applicable language or package
+  convention.
+- Where the language draws the distinction, constants and types are visually
+  distinct from ordinary values in the form its language or package rule defines.
+
+## Code Smells to Avoid
+
+### Deep Nesting
+
+Prefer early returns over nested conditionals once the logic starts stacking.
+
+### Magic Numbers
+
+Use named constants for meaningful thresholds, delays, and limits.
+
+### Long Functions
+
+Split large functions into focused pieces with clear responsibilities.
 
 ## Code Quality Checklist
 

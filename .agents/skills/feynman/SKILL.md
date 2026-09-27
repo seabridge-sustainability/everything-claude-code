@@ -1,17 +1,11 @@
 ---
 name: feynman
-description: Callable wrapper for the exact skill name feynman. Load the canonical SeaBridgeAI skill body from everything-claude-code\skills\feynman\SKILL.md.
+description: "Feynman — cited research briefs and multi-agent deep research for ESG/sustainability topics. Use for TNFD/CSRD/GRESB-style literature questions needing a cited answer, or deep multi-source investigation. Distinct from ECC's generic `deep-research` skill (firecrawl/exa web search) — this one is Feynman's own research agent."
 ---
 
 # feynman
 
-Canonical skill:
-`C:\Users\adelm\SeaBridgeAI\everything-claude-code\skills\feynman\SKILL.md`
-
-Use this wrapper only for skill discovery. Follow the canonical skill body above;
-do not copy or fork behavior here.
-
-Note: sibling paths under this directory (`alpha-research/`, `deep-research/`,
-`docker/`, etc.) are Feynman's own bundled product-skill library, vendored for
-reference — they are source-owned by Feynman, not SeaBridge-authored ECC skills.
-Use this file, not those, when an agent looks up the `feynman` skill.
+Load and follow the canonical skill body at
+[skills/feynman/SKILL.md](../../../skills/feynman/SKILL.md).
+Resolve this path relative to this wrapper so worktrees and plugin installs
+use their own checked-out version. Do not copy or fork behavior here.

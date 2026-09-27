@@ -1,5 +1,5 @@
 param(
-  [string]$EccPath = "C:\Users\adelm\SeaBridgeAI\everything-claude-code",
+  [string]$EccPath = (Split-Path -Parent $PSScriptRoot),
   [switch]$Advisory
 )
 
@@ -52,13 +52,20 @@ foreach ($dir in $wrapperDirs) {
     continue
   }
   $content = Get-Content -Raw -Path $wrapperFile
-  if ($content -notmatch "Canonical skill:") {
-    $failures += "wrapper missing 'Canonical skill:' pointer: .agents\skills\$($dir.Name)\SKILL.md"
+  if ($content -notmatch "\.\./\.\./\.\./skills/$([regex]::Escape($dir.Name))/SKILL\.md") {
+    $failures += "wrapper missing checkout-relative canonical pointer: .agents\skills\$($dir.Name)\SKILL.md"
   }
   $body = Join-Path $EccPath "skills\$($dir.Name)\SKILL.md"
   if (-not (Test-Path $body)) {
     $failures += "wrapper has no canonical body: skills\$($dir.Name)\SKILL.md"
   }
+}
+
+# The generated-wrapper checker also compares trigger metadata and the two
+# generic TDD/verification adapters that previously drifted from their source.
+& node (Join-Path $EccPath "scripts\sync-agent-skill-wrappers.js") --check
+if ($LASTEXITCODE -ne 0) {
+  $failures += "generated agent skill wrappers differ from canonical skills"
 }
 
 # 3. Every sea-* canonical body must have a wrapper (AGENTS_SYSTEM.md rule:

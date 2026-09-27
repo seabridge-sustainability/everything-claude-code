@@ -1,3 +1,8 @@
+---
+name: swarms
+description: "Use when the user explicitly requests the local Swarms multi-agent integration workflow."
+---
+
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
 

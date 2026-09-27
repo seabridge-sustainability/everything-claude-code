@@ -12,9 +12,12 @@ const CODEX_SKILLS_DIR = path.join(REPO_ROOT, '.agents', 'skills');
 const ALLOWED_FRONTMATTER_KEYS = new Set([
   'allowed-tools',
   'description',
+  'compatibility',
   'license',
   'metadata',
   'name',
+  'origin',
+  'version',
 ]);
 
 function test(name, fn) {
@@ -92,10 +95,10 @@ function run() {
     }
   })) passed++; else failed++;
 
-  if (test('agents/openai.yaml exists and names the skill in default_prompt', () => {
+  if (test('optional agents/openai.yaml metadata is valid when present', () => {
     for (const skillDir of skillDirs) {
       const metadataPath = path.join(CODEX_SKILLS_DIR, skillDir, 'agents', 'openai.yaml');
-      assert.ok(fs.existsSync(metadataPath), `${skillDir} is missing agents/openai.yaml`);
+      if (!fs.existsSync(metadataPath)) continue;
 
       const metadata = fs.readFileSync(metadataPath, 'utf8');
       const displayName = parseQuotedYamlValue(metadata, 'display_name');

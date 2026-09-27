@@ -15,17 +15,13 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-## Skeleton Projects
+## Pattern Selection
 
-When implementing new functionality:
-1. Search for battle-tested skeleton projects
-2. Use parallel agents to evaluate options:
-   - Security assessment
-   - Extensibility analysis
-   - Relevance scoring
-   - Implementation planning
-3. Clone best match as foundation
-4. Iterate within proven structure
+Start with established local patterns and dependencies. Search external
+reference implementations only when the repository has a concrete design gap.
+Before importing code, verify provenance, license compatibility, maintenance,
+security, and architectural fit. Do not clone an external skeleton or spawn a
+review team by default.
 
 ## Design Patterns
 

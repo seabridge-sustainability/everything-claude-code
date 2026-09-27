@@ -40,12 +40,12 @@ function New-GoalBlock {
 
 $GoalBlock = New-GoalBlock
 
-# A CLAUDE.md that imports AGENTS.md (a line that is exactly `@AGENTS.md`)
-# already receives the block through the import; stamping it again would load
-# it twice. Such files get any stale block removed instead.
+# An adapter that imports AGENTS.md already receives the block through the
+# import; stamping it again would load it twice. Such files get any stale block
+# removed instead.
 function Test-ImportsAgents {
     param([string]$Text)
-    return [regex]::IsMatch($Text, '(?m)^@AGENTS\.md\s*$')
+    return [regex]::IsMatch($Text, '(?m)^@(?:\./)?AGENTS\.md\s*$')
 }
 
 function Test-AgentInstructionFile {
@@ -120,7 +120,7 @@ foreach ($file in $files) {
         $old = [System.IO.File]::ReadAllText($path, [System.Text.Encoding]::UTF8)
     }
 
-    if ($file -eq "CLAUDE.md" -and (Test-ImportsAgents $old)) {
+    if (Test-ImportsAgents $old) {
         $pattern = '(\r?\n)*' + [regex]::Escape($MarkerStart) + ".*?" + [regex]::Escape($MarkerEnd)
         $new = [regex]::Replace($old, $pattern, "", [System.Text.RegularExpressions.RegexOptions]::Singleline)
     }

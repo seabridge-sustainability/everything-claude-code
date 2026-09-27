@@ -1,11 +1,11 @@
 ---
 name: persistent-goal-execution
-description: Callable wrapper for persistent-goal-execution. Load the canonical SeaBridgeAI skill body from everything-claude-code\skills\persistent-goal-execution\SKILL.md.
+description: "Use when designing or reviewing long-running agent work that needs persisted goals, definitions of done, subtasks, blockers, validation evidence, or cross-session continuity."
 ---
 
 # persistent-goal-execution
 
-Canonical skill:
-C:\Users\adelm\SeaBridgeAI\everything-claude-code\skills\persistent-goal-execution\SKILL.md
-
-Use this wrapper only for skill discovery. Follow the canonical skill body above; do not copy or fork behavior here.
+Load and follow the canonical skill body at
+[skills/persistent-goal-execution/SKILL.md](../../../skills/persistent-goal-execution/SKILL.md).
+Resolve this path relative to this wrapper so worktrees and plugin installs
+use their own checked-out version. Do not copy or fork behavior here.

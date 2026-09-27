@@ -25,7 +25,7 @@
   "hooks": "./hooks/codex-hooks.json",
   "interface": {
     "displayName": "ECC",
-    "shortDescription": "281 ECC skills plus MCP configs for TDD, security, code review, and autonomous development.",
+    "shortDescription": "Selective ECC engineering skills, guarded workflows, and an opt-out browser connector.",
     "longDescription": "ECC is a harness-native operator system for Codex and adjacent agent harnesses. It packages reusable skills, MCP configs, TDD workflows, security scanning, code review, architecture decisions, operator workflows, and release gates in one installable plugin.",
     "developerName": "Affaan Mustafa",
     "category": "Coding",
@@ -41,10 +41,6 @@
     "composerIcon": "./assets/ecc-icon.svg",
     "logo": "./assets/hero.png",
     "screenshots": [],
-    "defaultPrompt": [
-      "Use the tdd-workflow skill to write tests before implementation.",
-      "Use the security-review skill to scan for OWASP Top 10 vulnerabilities.",
-      "Use the verification-loop skill to verify correctness before shipping changes."
-    ]
+    "defaultPrompt": "Use only the smallest relevant ECC skill set. Define the outcome, verify changed behavior in proportion to risk, and follow repository-owned safety, test, and delivery rules."
   }
 }

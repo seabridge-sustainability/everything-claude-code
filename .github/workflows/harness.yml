@@ -2,17 +2,43 @@ name: Harness Engineering
 
 on:
   pull_request:
+    paths:
+      - 'AGENTS.md'
+      - 'CLAUDE.md'
+      - '.agents/**'
+      - 'agents/**'
+      - 'skills/**'
+      - 'scripts/check-*'
+      - '.github/workflows/harness.yml'
   push:
     branches:
       - main
       - master
       - develop
+    paths:
+      - 'AGENTS.md'
+      - 'CLAUDE.md'
+      - '.agents/**'
+      - 'agents/**'
+      - 'skills/**'
+      - 'scripts/check-*'
+      - '.github/workflows/harness.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
   harness:
     runs-on: windows-latest
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Validate canonical ECC skills
         shell: pwsh

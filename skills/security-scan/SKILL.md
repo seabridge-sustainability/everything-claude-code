@@ -44,16 +44,19 @@ Audit your Claude Code configuration for security issues using [AgentShield](htt
 
 ## Prerequisites
 
-AgentShield must be installed. Check and install if needed:
+Use an already installed AgentShield executable for the default read-only scan.
+Installing a package or allowing `npx` to acquire one requires explicit
+approval. If it is unavailable, continue with the repository's local static
+checks and report the missing optional scanner.
 
 ```bash
 # Check if installed
 npx ecc-agentshield --version
 
-# Install globally (recommended)
+# Install globally (approval required)
 npm install -g ecc-agentshield
 
-# Or run directly via npx (no install needed)
+# npx may download a package (approval required unless already cached/installed)
 npx ecc-agentshield scan .
 ```
 
@@ -92,6 +95,9 @@ npx ecc-agentshield scan --format html > security-report.html
 
 ### Auto-Fix
 
+This writes configuration and is not part of a read-only scan. Confirm the
+exact files and obtain approval before using it.
+
 Apply safe fixes automatically (only fixes marked as auto-fixable):
 
 ```bash
@@ -104,6 +110,9 @@ This will:
 - Never modify manual-only suggestions
 
 ### Opus 4.6 Deep Analysis
+
+This is a paid live-provider call. It requires separate explicit approval and
+must never print, read back, or log the credential value.
 
 Run the adversarial three-agent pipeline for deeper analysis:
 

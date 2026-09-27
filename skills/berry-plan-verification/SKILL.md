@@ -1,10 +1,6 @@
 ---
 name: berry-plan-verification
-description: |
-  Integrates Berry hallucination detection into /plan mode.
-  Before finalizing any plan, verify each reasoning step with audit_trace_budget
-  and each factual claim with detect_hallucination. Use this skill whenever
-  creating implementation plans, architecture designs, or multi-step proposals.
+description: "Use only when the user explicitly requests Berry-backed evidence verification for a plan or factual claim."
 origin: ECC
 version: 1.0.0
 ---

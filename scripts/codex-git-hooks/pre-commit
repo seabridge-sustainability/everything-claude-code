@@ -28,17 +28,16 @@ scan_added_lines() {
   local file="$1"
   local name="$2"
   local regex="$3"
-  local added_lines
+  local added_lines="$4"
   local hits
-
-  added_lines="$(git diff --cached -U0 -- "$file" | awk '/^\+\+\+ /{next} /^\+/{print substr($0,2)}')"
   if [[ -z "$added_lines" ]]; then
     return 0
   fi
 
   if hits="$(printf '%s\n' "$added_lines" | rg -n --pcre2 "$regex" 2>/dev/null)"; then
-    printf '\n[ECC pre-commit] Potential secret detected (%s) in %s\n' "$name" "$file" >&2
-    printf '%s\n' "$hits" | head -n 3 >&2
+    local line_numbers
+    line_numbers="$(printf '%s\n' "$hits" | cut -d: -f1 | head -n 3 | paste -sd, -)"
+    printf '\n[ECC pre-commit] Potential secret detected (%s) in %s at added line(s) %s; value redacted\n' "$name" "$file" "$line_numbers" >&2
     has_findings=1
   fi
 }
@@ -52,12 +51,13 @@ while IFS= read -r file; do
       ;;
   esac
 
-  scan_added_lines "$file" "OpenAI key" 'sk-[A-Za-z0-9]{20,}'
-  scan_added_lines "$file" "GitHub classic token" 'ghp_[A-Za-z0-9]{36}'
-  scan_added_lines "$file" "GitHub fine-grained token" 'github_pat_[A-Za-z0-9_]{20,}'
-  scan_added_lines "$file" "AWS access key" 'AKIA[0-9A-Z]{16}'
-  scan_added_lines "$file" "private key block" '-----BEGIN (RSA|EC|OPENSSH|DSA|PRIVATE) KEY-----'
-  scan_added_lines "$file" "generic credential assignment" "(?i)\\b(api[_-]?key|secret|password|token)\\b\\s*[:=]\\s*['\\\"][^'\\\"]{12,}['\\\"]"
+  added_lines="$(git diff --cached -U0 -- "$file" | awk '/^\+\+\+ /{next} /^\+/{print substr($0,2)}')"
+  scan_added_lines "$file" "OpenAI key" 'sk-[A-Za-z0-9]{20,}' "$added_lines"
+  scan_added_lines "$file" "GitHub classic token" 'ghp_[A-Za-z0-9]{36}' "$added_lines"
+  scan_added_lines "$file" "GitHub fine-grained token" 'github_pat_[A-Za-z0-9_]{20,}' "$added_lines"
+  scan_added_lines "$file" "AWS access key" 'AKIA[0-9A-Z]{16}' "$added_lines"
+  scan_added_lines "$file" "private key block" '-----BEGIN (RSA|EC|OPENSSH|DSA|PRIVATE) KEY-----' "$added_lines"
+  scan_added_lines "$file" "generic credential assignment" "(?i)\\b(api[_-]?key|secret|password|token)\\b\\s*[:=]\\s*['\\\"][^'\\\"]{12,}['\\\"]" "$added_lines"
 done <<< "$staged_files"
 
 if [[ "$has_findings" -eq 1 ]]; then

@@ -1,12 +1,11 @@
 ---
 name: seabridge-esg
-description: Callable wrapper for the exact skill name seabridge-esg. Load the canonical SeaBridgeAI skill body from everything-claude-code\skills\seabridge-esg\SKILL.md.
+description: "SeaBridgeAI project conventions for deepagents. ESG data models, LangGraph agent patterns, FastAPI endpoint structure, and cross-repo layout for manageesg-backend and manageesg-frontend."
 ---
 
 # seabridge-esg
 
-Canonical skill:
-`C:\Users\adelm\SeaBridgeAI\everything-claude-code\skills\seabridge-esg\SKILL.md`
-
-Use this wrapper only for skill discovery. Follow the canonical skill body above;
-do not copy or fork behavior here.
+Load and follow the canonical skill body at
+[skills/seabridge-esg/SKILL.md](../../../skills/seabridge-esg/SKILL.md).
+Resolve this path relative to this wrapper so worktrees and plugin installs
+use their own checked-out version. Do not copy or fork behavior here.

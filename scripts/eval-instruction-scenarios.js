@@ -8,7 +8,9 @@
  * delivered (or that harmful scaffolding is gone), not that a model follows it —
  * pair it with fresh-session probes (see evals/agent-instructions/README.md).
  *
- * Usage: node scripts/eval-instruction-scenarios.js [--ref <git-ref>] [--json]
+ * Usage: node scripts/eval-instruction-scenarios.js [--workspace <path>]
+ *        [--ref <git-ref>] [--json]
+ *        [--advisory] [--allow-missing]
  *   --ref reads every instruction file at that commit (e.g. HEAD for "before").
  */
 
@@ -16,8 +18,31 @@ const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
 
-const WORKSPACE = process.env.SEABRIDGE_WORKSPACE || path.resolve(__dirname, '..', '..');
-const SCENARIOS = path.resolve(__dirname, '..', 'evals', 'agent-instructions', 'scenarios.json');
+function optionValue(argv, name) {
+  const index = argv.indexOf(name);
+  return index >= 0 ? argv[index + 1] : null;
+}
+
+function defaultWorkspace() {
+  const repoRoot = path.resolve(__dirname, '..');
+  try {
+    const commonDir = execFileSync(
+      'git',
+      ['-C', repoRoot, 'rev-parse', '--path-format=absolute', '--git-common-dir'],
+      { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }
+    ).trim();
+    return path.dirname(path.dirname(commonDir));
+  } catch {
+    return path.resolve(repoRoot, '..');
+  }
+}
+
+const CLI_ARGS = process.argv.slice(2);
+const WORKSPACE = path.resolve(
+  optionValue(CLI_ARGS, '--workspace') || process.env.SEABRIDGE_WORKSPACE || defaultWorkspace()
+);
+const SCENARIOS = process.env.SEABRIDGE_INSTRUCTION_SCENARIOS
+  || path.resolve(__dirname, '..', 'evals', 'agent-instructions', 'scenarios.json');
 const REPOS = ['manageesg-backend', 'manageesg-frontend', 'autoresearch'];
 
 function reader(repo, ref) {
@@ -78,12 +103,16 @@ function stacks(repoName, ref) {
 }
 
 function main(argv) {
-  const refIdx = argv.indexOf('--ref');
-  const ref = refIdx >= 0 ? argv[refIdx + 1] : null;
+  const ref = optionValue(argv, '--ref');
   const { scenarios } = JSON.parse(fs.readFileSync(SCENARIOS, 'utf8'));
   const rows = [];
+  const missingTargets = [];
   for (const repo of REPOS) {
-    for (const [harness, text] of Object.entries(stacks(repo, ref))) {
+    const repoStacks = stacks(repo, ref);
+    for (const harness of ['codex', 'claude']) {
+      if (!repoStacks[harness]) missingTargets.push(repo + ' / ' + harness);
+    }
+    for (const [harness, text] of Object.entries(repoStacks)) {
       for (const s of scenarios) {
         if (s.repos && !s.repos.includes(repo)) continue;
         const missing = (s.must || []).filter((p) => !new RegExp(p, 'i').test(text));
@@ -92,7 +121,13 @@ function main(argv) {
       }
     }
   }
-  if (argv.includes('--json')) { process.stdout.write(JSON.stringify(rows, null, 1) + '\n'); return 0; }
+  const failed = rows.some((row) => !row.pass);
+  const missingFailed = missingTargets.length > 0 && !argv.includes('--allow-missing');
+  const exitCode = (failed || missingFailed) && !argv.includes('--advisory') ? 1 : 0;
+  if (argv.includes('--json')) {
+    process.stdout.write(JSON.stringify({ rows, missingTargets }, null, 1) + '\n');
+    return exitCode;
+  }
   const key = (r) => `${r.repo} / ${r.harness}`;
   const groups = {};
   for (const r of rows) (groups[key(r)] ||= []).push(r);
@@ -104,8 +139,11 @@ function main(argv) {
     console.log(`  ${k.padEnd(34)} ${p}/${rs.length}  ${rs.filter((r) => !r.pass).map((r) => r.scenario.slice(0, 3)).join(' ')}`);
   }
   console.log(`  TOTAL ${pass}/${rows.length}`);
+  if (missingTargets.length) console.log('  MISSING ' + missingTargets.join(', '));
   if (argv.includes('--verbose')) for (const r of rows.filter((x) => !x.pass)) console.log(`    ${key(r)} ${r.scenario}: missing=${JSON.stringify(r.missing)} harmful=${JSON.stringify(r.harmful)}`);
-  return 0;
+  return exitCode;
 }
+
+module.exports = { defaultWorkspace, main };
 
 if (require.main === module) process.exit(main(process.argv.slice(2)));

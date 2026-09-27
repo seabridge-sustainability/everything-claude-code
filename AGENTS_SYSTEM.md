@@ -80,7 +80,8 @@ Primary lookup surfaces:
 - `checklists/`
 
 Use the smallest skill/workflow/checklist set that materially improves the task.
-Do not load every skill. Default: load at most ONE skill per task. A task is
+Do not load every skill. Explicit and mandatory triggers win; compound work may
+need more than one narrowly relevant skill. A task is
 simple (no skill needed) when it touches at most 2 files, adds no dependency,
 and involves none of: auth, tenant isolation, billing, migrations, security,
 production data, destructive operations, AI grounding, or sustainability-data

@@ -1,19 +1,11 @@
 ---
 name: sea-marketplace-production-gating
-description: Callable wrapper for sea-marketplace-production-gating. Load the canonical SeaBridgeAI skill body from everything-claude-code\skills\sea-marketplace-production-gating\SKILL.md.
+description: "Keep SeaBridgeAI marketplace demo/seed/bootstrap behavior environment-gated out of production, not just role-gated."
 ---
 
 # sea-marketplace-production-gating
 
-Canonical skill:
-C:\Users\adelm\SeaBridgeAI\everything-claude-code\skills\sea-marketplace-production-gating\SKILL.md
-
-Use this wrapper only for skill discovery. Follow the canonical skill body above; do not copy or fork behavior here.
-
-<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_START -->
-## /goal Inheritance
-
-This skill inherits the SeaBridgeAI `/goal` default protocol. Before implementation or review, establish the persistent goal, Definition of Done, validation plan, affected systems, dependencies, risks, and expected artifacts. Continue through validation and fixes until the DoD is satisfied or a hard blocker is documented.
-
-Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
-<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_END -->
+Load and follow the canonical skill body at
+[skills/sea-marketplace-production-gating/SKILL.md](../../../skills/sea-marketplace-production-gating/SKILL.md).
+Resolve this path relative to this wrapper so worktrees and plugin installs
+use their own checked-out version. Do not copy or fork behavior here.

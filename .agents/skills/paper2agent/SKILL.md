@@ -1,12 +1,11 @@
 ---
 name: paper2agent
-description: Callable wrapper for the exact skill name paper2agent. Load the canonical SeaBridgeAI skill body from everything-claude-code\skills\paper2agent\SKILL.md.
+description: "Paper2Agent / Paper2AgentBench — convert a research-paper's code repo into an interactive MCP-backed agent, and benchmark it against official evaluations. Manual opt-in only — runs can take 30 minutes to 3+ hours and may incur API costs."
 ---
 
 # paper2agent
 
-Canonical skill:
-`C:\Users\adelm\SeaBridgeAI\everything-claude-code\skills\paper2agent\SKILL.md`
-
-Use this wrapper only for skill discovery. Follow the canonical skill body above;
-do not copy or fork behavior here.
+Load and follow the canonical skill body at
+[skills/paper2agent/SKILL.md](../../../skills/paper2agent/SKILL.md).
+Resolve this path relative to this wrapper so worktrees and plugin installs
+use their own checked-out version. Do not copy or fork behavior here.

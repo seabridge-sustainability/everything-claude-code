@@ -1,11 +1,11 @@
 ---
 name: provider-fallback-review
-description: Callable wrapper for provider-fallback-review. Load the canonical SeaBridgeAI skill body from everything-claude-code\skills\provider-fallback-review\SKILL.md.
+description: "Use when designing, reviewing, or testing provider/model fallback, timeout, retry, degraded mode, or multi-provider routing for SeaBridgeAI and OpenSeaBri agents."
 ---
 
 # provider-fallback-review
 
-Canonical skill:
-C:\Users\adelm\SeaBridgeAI\everything-claude-code\skills\provider-fallback-review\SKILL.md
-
-Use this wrapper only for skill discovery. Follow the canonical skill body above; do not copy or fork behavior here.
+Load and follow the canonical skill body at
+[skills/provider-fallback-review/SKILL.md](../../../skills/provider-fallback-review/SKILL.md).
+Resolve this path relative to this wrapper so worktrees and plugin installs
+use their own checked-out version. Do not copy or fork behavior here.

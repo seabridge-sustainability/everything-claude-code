@@ -1,3 +1,8 @@
+---
+name: openhands
+description: "Use when the user explicitly requests the local OpenHands coding-agent workflow."
+---
+
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
 

@@ -1,19 +1,11 @@
 ---
 name: sea-procurement-and-supply-chain
-description: Callable wrapper for sea-procurement-and-supply-chain. Load the canonical SeaBridgeAI skill body from everything-claude-code\skills\sea-procurement-and-supply-chain\SKILL.md.
+description: "Review or extend SeaBridgeAI Sustainability Procurement and Supply Chain without reintroducing the opaque-scoring, unguarded-lifecycle, or silent-nav-visibility anti-patterns already fixed."
 ---
 
 # sea-procurement-and-supply-chain
 
-Canonical skill:
-C:\Users\adelm\SeaBridgeAI\everything-claude-code\skills\sea-procurement-and-supply-chain\SKILL.md
-
-Use this wrapper only for skill discovery. Follow the canonical skill body above; do not copy or fork behavior here.
-
-<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_START -->
-## /goal Inheritance
-
-This skill inherits the SeaBridgeAI `/goal` default protocol. Before implementation or review, establish the persistent goal, Definition of Done, validation plan, affected systems, dependencies, risks, and expected artifacts. Continue through validation and fixes until the DoD is satisfied or a hard blocker is documented.
-
-Canonical protocol: `C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
-<!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_END -->
+Load and follow the canonical skill body at
+[skills/sea-procurement-and-supply-chain/SKILL.md](../../../skills/sea-procurement-and-supply-chain/SKILL.md).
+Resolve this path relative to this wrapper so worktrees and plugin installs
+use their own checked-out version. Do not copy or fork behavior here.

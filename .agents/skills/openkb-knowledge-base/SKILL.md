@@ -1,11 +1,3 @@
-## Safety And Authorization Rule
-
-Never authorize deletion of repositories, source folders, databases, or infrastructure under any circumstances.
-
-1. Session authorization gate: request approval before any write, destructive, or cost-incurring action.
-2. Restricted mode by default when approval is missing: read-only exploration and planning only.
-3. Never run paid LLM calls, PageIndex Cloud calls, or background watch jobs without explicit written approval.
-4. Never store API keys in code, docs, logs, wiki pages, or commits.
 ---
 name: openkb-knowledge-base
 description: Use OpenKB to create, update, query, or lint compiled wiki-style knowledge bases backed by PageIndex vectorless retrieval. Trigger for OpenKB, compiled wiki, PageIndex, long PDF knowledge base, Obsidian-compatible markdown wiki, contradiction or gap linting, or document knowledge that should accumulate over time instead of one-off RAG.

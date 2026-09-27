@@ -1,13 +1,11 @@
 ---
 name: goal-default
-description: Callable wrapper for the exact skill name goal-default. Load the canonical SeaBridgeAI skill body from everything-claude-code\skills\goal-default\SKILL.md. Do not invoke Skill(goal); /goal is a user-facing Claude Code slash command.
+description: "Defines the SeaBridgeAI goal protocol as the default execution wrapper for coding-agent tasks. Invoke this skill only by the exact name goal-default. Do not invoke Skill(goal); /goal is a user-facing Claude Code slash command, not a callable skill."
 ---
 
 # goal-default
 
-Canonical skill:
-`C:\Users\adelm\SeaBridgeAI\everything-claude-code\skills\goal-default\SKILL.md`
-
-Use this wrapper only for skill discovery. Follow the canonical skill body above;
-do not copy or fork behavior here. Invoke this skill only as `goal-default`, not
-`goal`.
+Load and follow the canonical skill body at
+[skills/goal-default/SKILL.md](../../../skills/goal-default/SKILL.md).
+Resolve this path relative to this wrapper so worktrees and plugin installs
+use their own checked-out version. Do not copy or fork behavior here.

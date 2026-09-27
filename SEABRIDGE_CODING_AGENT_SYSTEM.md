@@ -83,7 +83,7 @@ Execution steps for a task:
 1. Confirm SYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1 and this canonical path.
 2. Establish the `/goal` frame for non-trivial work.
 3. Read the matching ECC repo integration file under repo-integrations/.
-4. Load the smallest relevant canonical skills/sea-*/SKILL.md or same-name .agents/skills/sea-*/SKILL.md wrapper (default: at most one skill; see the skill-selection rule in AGENTS_SYSTEM.md).
+4. Load the minimum applicable canonical skills/sea-*/SKILL.md or same-name .agents/skills/sea-*/SKILL.md wrappers; explicit and mandatory triggers win.
 5. Use matching workflows/ and checklists/ when they exist.
 6. Implement only scoped changes.
 7. Verify before completion claims.

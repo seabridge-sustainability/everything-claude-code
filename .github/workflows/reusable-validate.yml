@@ -54,7 +54,7 @@ jobs:
         run: node scripts/ci/validate-commands.js
 
       - name: Validate skills
-        run: node scripts/ci/validate-skills.js
+        run: node scripts/ci/validate-skills.js --strict-canonical
 
       - name: Validate install manifests
         run: node scripts/ci/validate-install-manifests.js
