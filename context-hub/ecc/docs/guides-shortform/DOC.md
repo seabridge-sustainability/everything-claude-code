@@ -3,9 +3,9 @@ name: guides-shortform
 description: "The shorthand guide covering setup, foundations, philosophy, and practical ECC workflows."
 metadata:
   languages: "english"
-  versions: "2.2.0"
+  versions: "2.2.2"
   revision: 1
-  updated-on: "2026-08-14"
+  updated-on: "2026-09-27"
   source: official
   tags: "ecc,guide,shortform"
 ---
@@ -469,7 +469,7 @@ affoon:~ ctx:65% Opus 4.5 19:52
 - [Interactive Mode](https://code.claude.com/docs/en/interactive-mode)
 - [Memory System](https://code.claude.com/docs/en/memory)
 - [Subagents](https://code.claude.com/docs/en/sub-agents)
-- [MCP Overview](https://code.claude.com/docs/en/mcp-overview)
+- [MCP Overview](https://code.claude.com/docs/en/mcp)
 
 ---
 

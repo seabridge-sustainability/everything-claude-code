@@ -42,6 +42,7 @@ For non-trivial work, settle what done means and how you will prove it before ed
 
 - **Scope from evidence.** Build what the request needs, grounded in the current code, git history, tests, and the current plan. Do not invent product functionality or sustainability, emissions, climate, or financial data; preserve source, provenance, and units. Treat memory, handoffs, and old summaries as leads to verify, not facts.
 - **Done means** the requested behavior works, tests that would catch its failure pass, there are no unexplained regressions, and you know the state of the tree. Scale checks to risk: tenant isolation, auth, persistence, AI grounding, and cross-repo contracts warrant broader tests. Do not re-run checks nothing has changed since.
+- **Verify behavior, not only code.** Static checks may be necessary, but they may not prove the changed workflow. For observable UI, API, mobile, CLI, or integration behavior, use the available browser, terminal, endpoint client, simulator, or equivalent runtime surface and inspect the result. Judge it against existing performance budgets, accessibility rules, and design-system constraints; do not invent a passing threshold. Turn a repeated manual QA sequence into a narrowly triggered skill or script with setup, evidence, and failure handling.
 - **When stuck,** change strategy after two failures of the same approach. Keep working on independent parts; stop only at an approval boundary or an external dependency, and name it.
 - **Report** what changed, how it was verified, what remains or is risky, and any check you skipped and why. Never call unverified work done.
 
@@ -68,10 +69,12 @@ npm run catalog:check                 # documented agent/skill/command counts
 
 ## Core Principles
 
-1. **Agent-First** — Delegate to specialized agents for domain tasks
-2. **Test-Driven** — Write tests before implementation, 80%+ coverage required
+For SeaBridgeAI work, the risk-scaled Goal Protocol above supersedes generic rules that would require delegation, TDD, full-suite runs, or a fixed coverage percentage for every change. Use those techniques only when their trigger, repository policy, or risk profile calls for them.
+
+1. **Outcome-First** — Define the requested result and the evidence that will prove it
+2. **Risk-Scaled Verification** — Use focused checks first; broaden only for failures, changed contracts, or material risk
 3. **Security-First** — Never compromise on security; validate all inputs
-4. **Immutability** — Always create new objects, never mutate existing ones
+4. **Targeted Change** — Prefer the smallest coherent change and preserve established architecture
 5. **Plan Before Execute** — Plan complex features before writing code
 
 ## Documentation Retrieval Order
@@ -85,7 +88,7 @@ npm run catalog:check                 # documented agent/skill/command counts
 ## Specialized Agents And Tooling
 
 - The full roster of ECC subagents, GSD lifecycle agents and commands, and gstack skills is in `docs/tools/ECC_AGENT_ROSTER.md`. Load it only when delegating or when a `/gsd-*` or gstack command is requested.
-- rtk, caveman, codeburn, designlang, Open Design, Vibium, Google Agent Skills, token-retry loops, memory routing, graphify and paper2agent are documented in `docs/tools/ECC_TOOLING_REFERENCE.md`. Load it only when the specific tool is needed. Token-retry loops are opt-in only. Playwright is canonical for SeaBridge browser QA; Vibium is secondary inspection.
+- rtk, caveman, codeburn, designlang, Open Design, Vibium, Google Agent Skills, token-retry loops, memory routing, graphify and paper2agent are documented in `docs/tools/ECC_TOOLING_REFERENCE.md`. Model/prompt/skill changes use `docs/tools/MODEL_PROMPTING_AND_SKILL_POLICY.md`. Load either reference only when its subject is needed. Token-retry loops are opt-in only. Playwright is canonical for SeaBridge browser QA; Vibium is secondary inspection.
 - For architecture questions start at `graphify-out/GRAPH_REPORT.md`.
 
 ## Security Guidelines
@@ -118,17 +121,18 @@ npm run catalog:check                 # documented agent/skill/command counts
 
 ## Testing Requirements
 
-**Minimum coverage: 80%.** Test types: unit (functions, utilities, components), integration (API endpoints, database operations), E2E (critical user flows).
+Respect each repository's existing CI and coverage thresholds; there is no universal per-change percentage. Test types include unit (functions, utilities, components), integration (API endpoints, database operations), and E2E (critical user flows).
 
-**TDD workflow:** write failing test first (RED) → minimal implementation (GREEN) → refactor (IMPROVE, keep coverage 80%+). Troubleshoot failures: check test isolation → verify mocks → fix implementation (not tests, unless tests are wrong).
+**TDD workflow:** for defects and stable behavior changes, prefer a discriminating failing test (RED) → minimal implementation (GREEN) → refactor (IMPROVE). Do not manufacture tests for documentation-only or reversible low-impact edits. Troubleshoot failures by checking isolation and mocks before changing a valid test.
 
 ## Development Workflow
 
-1. **Plan** — Use ecc:planner agent, identify dependencies and risks, break into phases
-2. **TDD** — Use ecc:tdd-guide agent, write tests first, implement, refactor
-3. **Review** — Use ecc:code-reviewer agent immediately, address CRITICAL/HIGH issues
-4. **Capture knowledge in the right place** — personal notes → auto memory; team/project knowledge → the project's existing docs structure; do not duplicate; if no obvious location, ask before creating a new top-level file
-5. **Commit when explicitly approved** — Conventional commits format (`<type>: <description>`; feat, fix, refactor, docs, test, chore, perf, ci), comprehensive PR summaries; push only after the separate push approval gate is satisfied
+1. **Frame** — For complex work, identify dependencies, risks, Definition of Done, and proof; a small obvious edit needs no ceremony
+2. **Implement** — Use a matching skill or specialist only when its trigger fits; add focused tests for stable behavior changes
+3. **Verify** — Run proportional code checks and observe changed behavior through the actual runtime surface when available
+4. **Review** — Review non-trivial or high-risk diffs; address material findings and rerun only affected checks
+5. **Capture knowledge in the right place** — personal notes → auto memory; team/project knowledge → the project's existing docs structure; do not duplicate; if no obvious location, ask before creating a new top-level file
+6. **Commit when explicitly approved** — Conventional commits format (`<type>: <description>`; feat, fix, refactor, docs, test, chore, perf, ci), comprehensive PR summaries; push only after the separate push approval gate is satisfied
 
 ## Contributing Formats
 

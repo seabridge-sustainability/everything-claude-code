@@ -3,7 +3,7 @@ name: documentation-lookup
 description: "Documentation routing skill for ECC internal docs via Context Hub and third-party APIs via Context7."
 metadata:
   revision: 1
-  updated-on: "2026-08-14"
+  updated-on: "2026-09-27"
   source: official
   tags: "ecc,skills,documentation,docs-router"
 ---

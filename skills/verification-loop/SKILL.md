@@ -1,12 +1,12 @@
 ---
 name: verification-loop
-description: "A comprehensive verification system for Claude Code sessions. Use when verifying a Claude Code session's work before claiming it is complete."
+description: Verify observable behavior through the real UI, API, CLI, simulator, or agent fixture when tests and linters cannot prove the requested workflow. Use after such a change or before claiming it complete.
 license: MIT
 metadata:
   origin: ECC
 ---
 
-# Verification Loop Skill
+# Verification Loop
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -22,123 +22,75 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 7. **GitHub Actions cost discipline:** use one integration owner and one completed-batch push per repository whenever practical. Subagents never push or dispatch, rerun, or cancel workflows. Run targeted local checks first; do not push merely to test CI. Before pushing, collect all ready task-owned work, fetch and integrate the current remote tip once, and inspect active or queued runs. Avoid overlapping a relevant run unless the change is urgent. If CI fails, diagnose the full failure set and batch locally verified fixes into at most one corrective push. Manual workflow dispatches, reruns, deploys, and other cost-incurring actions remain separately gated unless explicitly included in the current approval.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
+## Outcome
 
-A comprehensive verification system for Claude Code sessions.
+Produce evidence that the changed behavior works in its real execution surface,
+not merely that its source compiles. Use the smallest verification ladder that
+can disprove the change and broaden only when risk or a failure warrants it.
 
-## When to Use
+## 1. Define Proof Before Running Tools
 
-Invoke this skill:
-- After completing a feature or significant code change
-- Before creating a PR
-- When you want to ensure quality gates pass
-- After refactoring
+Write a short verification contract:
 
-## Verification Phases
+- changed behavior and affected boundary;
+- representative happy path and material failure or empty state;
+- existing measurable criteria that apply;
+- safest runtime surface and test data;
+- evidence to retain;
+- constraints that make a check unavailable or unsafe.
 
-### Phase 1: Build Verification
-```bash
-# Check if project builds
-npm run build 2>&1 | tail -20
-# OR
-pnpm build 2>&1 | tail -20
-```
+Do not invent a performance, accessibility, visual, security, or domain
+threshold. Use the repository's established budget or baseline. If none exists,
+record a baseline or report that criterion as `INCONCLUSIVE`.
 
-If build fails, STOP and fix before continuing.
+## 2. Run The Minimum Sufficient Ladder
 
-### Phase 2: Type Check
-```bash
-set -o pipefail
-# TypeScript projects
-npx --no-install tsc --noEmit 2>&1 | head -30
+1. Run the focused unit, type, lint, contract, or build check that best detects
+   the changed behavior.
+2. Exercise the actual runtime surface when the outcome is observable.
+3. Inspect relevant secondary evidence such as console errors, network failures,
+   response schema, logs, accessibility output, screenshots, or generated files.
+4. Fix failures and rerun only the affected checks.
+5. Broaden to integration, E2E, security, or full-suite validation only for the
+   changed boundary, unexplained regression, or material blast radius.
 
-# Python projects
-pyright . 2>&1 | head -30
-```
+Do not run verification on a timer. Do not rerun an unchanged green check, and
+do not invoke every available reviewer or skill. Wait for running tools to
+finish before deciding that work is incomplete.
 
-Report all type errors. Fix critical ones before continuing.
+Load [runtime-verification.md](references/runtime-verification.md) for the
+surface-specific checklist and evidence rules.
 
-### Phase 3: Lint Check
-```bash
-# JavaScript/TypeScript
-npm run lint 2>&1 | head -30
+## 3. Convert Repeated Manual QA Into A Reusable Check
 
-# Python
-ruff check . 2>&1 | head -30
-```
+Codify a manual sequence when it is non-trivial and either recurs or catches a
+real defect. Prefer extending an existing test, script, or narrowly triggered
+skill. Record:
 
-### Phase 4: Test Suite
-```bash
-# Run tests with coverage
-npm run test -- --coverage 2>&1 | tail -50
+- one specific job and trigger;
+- safe setup, fixtures, credential requirements (never values), and cleanup;
+- exact actions or bounded judgment;
+- objective pass/fail evidence plus a rubric for subjective checks;
+- what to do after failure;
+- artifact and baseline locations;
+- approval, data, and cost boundaries.
 
-# Check coverage threshold
-# Target: 80% minimum
-```
+Keep a one-off observation in the task report. Do not create a broad skill for
+every manual click path.
 
-Report:
-- Total tests: X
-- Passed: X
-- Failed: X
-- Coverage: X%
-
-### Phase 5: Security Scan
-```bash
-# Check for secrets
-grep -rn "sk-" --include="*.ts" --include="*.js" . 2>/dev/null | head -10
-grep -rn "api_key" --include="*.ts" --include="*.js" . 2>/dev/null | head -10
-
-# Check for console.log
-grep -rn "console.log" --include="*.ts" --include="*.tsx" src/ 2>/dev/null | head -10
-```
-
-### Phase 6: Diff Review
-```bash
-# Show what changed
-git diff --stat
-git diff HEAD~1 --name-only
-```
-
-Review each changed file for:
-- Unintended changes
-- Missing error handling
-- Potential edge cases
-
-## Output Format
-
-After running all phases, produce a verification report:
-
-```
-VERIFICATION REPORT
-==================
-
-Build:     [PASS/FAIL]
-Types:     [PASS/FAIL] (X errors)
-Lint:      [PASS/FAIL] (X warnings)
-Tests:     [PASS/FAIL] (X/Y passed, Z% coverage)
-Security:  [PASS/FAIL] (X issues)
-Diff:      [X files changed]
-
-Overall:   [READY/NOT READY] for PR
-
-Issues to Fix:
-1. ...
-2. ...
-```
-
-## Continuous Mode
-
-For long sessions, run verification every 15 minutes or after major changes:
+## 4. Report Evidence
 
 ```markdown
-Set a mental checkpoint:
-- After completing each function
-- After finishing a component
-- Before moving to next task
-
-Run: /verify
+## Verification
+- Contract: [behavior and criteria]
+- Static/focused checks: [command -> result]
+- Runtime surface: [browser/API/CLI/simulator/fixture -> observation]
+- Measured criteria: [budget/baseline -> value and verdict]
+- Artifacts: [paths to screenshots, logs, traces, or reports]
+- Fix-and-rerun: [failure -> fix -> affected check]
+- Unverified/inconclusive: [reason and residual risk]
+- Verdict: READY | NOT READY | INCONCLUSIVE
 ```
 
-## Integration with Hooks
-
-This skill complements PostToolUse hooks but provides deeper verification.
-Hooks catch issues immediately; this skill provides comprehensive review.
+`READY` requires fresh evidence for every material acceptance criterion.
+Never convert a skipped or unavailable runtime check into a pass.

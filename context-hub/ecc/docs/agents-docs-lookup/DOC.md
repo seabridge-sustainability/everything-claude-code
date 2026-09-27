@@ -3,9 +3,9 @@ name: agents-docs-lookup
 description: "Agent instructions for routing ECC-internal documentation to Context Hub and external APIs to Context7."
 metadata:
   languages: "english"
-  versions: "2.2.0"
+  versions: "2.2.2"
   revision: 1
-  updated-on: "2026-08-14"
+  updated-on: "2026-09-27"
   source: official
   tags: "ecc,agents,docs-router"
 ---

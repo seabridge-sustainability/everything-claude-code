@@ -1123,7 +1123,7 @@ Skills are the primary workflow surface. They can be invoked directly, suggested
 2. Write failing tests (RED)
 3. Implement minimal code (GREEN)
 4. Refactor (IMPROVE)
-5. Verify 80%+ coverage
+5. Verify the repository's configured coverage threshold
 ```
 
 ### Hooks

@@ -108,6 +108,9 @@ function buildExpectedPublishPaths(repoRoot) {
     "docs/COMMAND-AGENT-MAP.md",
     "docs/ROADMAP.md",
     "docs/design/ecc-memory-vault.md",
+    "docs/SPECKIT_SEABRIDGE_PRESET.md",
+    "docs/tools",
+    "protocols",
     "assets/images/sponsors",
   ]
   const exclusionPaths = [
@@ -228,6 +231,9 @@ function main() {
         "docs/COMMAND-AGENT-MAP.md",
         "docs/ROADMAP.md",
         "docs/design/ecc-memory-vault.md",
+        "docs/tools/MODEL_PROMPTING_AND_SKILL_POLICY.md",
+        "protocols/GOAL_PROTOCOL.md",
+        "skills/verification-loop/references/runtime-verification.md",
         "schemas/install-state.schema.json",
         "schemas/memory.schema.json",
         "skills/backend-patterns/SKILL.md",

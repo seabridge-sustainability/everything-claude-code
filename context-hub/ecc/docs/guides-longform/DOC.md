@@ -3,9 +3,9 @@ name: guides-longform
 description: "The longform guide covering token optimization, memory, evals, research, and advanced agent workflows."
 metadata:
   languages: "english"
-  versions: "2.2.0"
+  versions: "2.2.2"
   revision: 1
-  updated-on: "2026-07-06"
+  updated-on: "2026-09-27"
   source: official
   tags: "ecc,guide,longform"
 ---

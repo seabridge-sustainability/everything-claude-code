@@ -40,17 +40,23 @@ Agent(subagent_type: "ecc:planner", prompt: "...")
 
 For the full roster of 68 agents, see `/ecc:ecc-guide`.
 
-## Immediate Agent Usage
+## Selective Agent Usage
 
-No user prompt needed:
-1. Complex feature requests - Use **ecc:planner** agent
-2. Code just written/modified - Use **ecc:code-reviewer** agent
-3. Bug fix or new feature - Use **ecc:tdd-guide** agent
-4. Architectural decision - Use **ecc:architect** agent
+- Use **ecc:planner** for complex, multi-phase work whose dependencies or
+  Definition of Done are not already clear.
+- Use **ecc:architect** for material architectural decisions or cross-system
+  tradeoffs.
+- Use **ecc:tdd-guide** when the user or repository requires TDD, or when a
+  defect or stable behavior change benefits from a RED/GREEN proof.
+- Use **ecc:code-reviewer** for non-trivial or high-risk diffs. Small, obvious,
+  low-risk edits can be reviewed directly by the implementing agent.
 
 ## Parallel Task Execution
 
-ALWAYS use parallel Task execution for independent operations:
+Use parallel tasks only for genuinely independent, non-overlapping work when
+the runtime and user instructions permit it. Keep one integration owner who
+collects the results and verifies the combined change. Work directly for small
+or tightly coupled tasks.
 
 ```markdown
 # GOOD: Parallel execution

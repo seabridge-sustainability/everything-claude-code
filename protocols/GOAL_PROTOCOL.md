@@ -74,6 +74,31 @@ Use validation proportional to risk and blast radius:
 - Security validation where applicable.
 - Agent, evaluator, judge, QA, or reviewer workflow where available.
 
+Passing static checks does not by itself prove an observable workflow. When the
+change affects a UI, API, mobile flow, CLI, background integration, or generated
+artifact, use the closest available runtime surface that can disprove it:
+
+- Web UI: open the changed page, exercise the interaction, inspect console and
+  relevant network failures, and capture the changed states or screenshots.
+- API or service: call the changed endpoint or command and inspect the actual
+  status, schema, side effects, logs, and failure path using test data.
+- Mobile or desktop UI: exercise the changed path in a simulator, emulator, or
+  safe local application surface and inspect the rendered and interactive state.
+- Agent or generated artifact: run a representative fixture and judge the
+  output against an explicit rubric, deterministic checks, or a known-good
+  example; use repeated trials when variance matters.
+
+Use the project's existing measurable criteria: performance budgets and
+baselines, accessibility rules, design tokens and component rules, contracts,
+security policies, and domain invariants. If a required baseline or environment
+does not exist, report the result as unverified or inconclusive; never invent a
+threshold and call it a pass.
+
+When a non-trivial manual QA sequence recurs or catches a real defect, codify it
+in the narrowest existing skill, script, or test. Record its trigger, safe setup,
+steps, pass/fail evidence, failure response, and artifact location. Keep a
+one-off check in the task report rather than creating a broad generic skill.
+
 ### Regression Requirements
 
 - Existing features remain operational.
@@ -113,7 +138,10 @@ Run this loop until the DoD is satisfied or a hard blocker exists:
 9. Re-verify.
 10. Complete.
 
-Do not stop at first compile, first green focused test, or first apparently working manual check. Continue until validation matches the risk profile and the real workflow behaves correctly.
+Do not stop at first compile or first green focused test when the risk profile
+requires more evidence. Conversely, do not run every available suite or repeat
+unchanged checks: stop broadening once the acceptance criteria and material
+risks are covered and the real workflow behaves correctly.
 
 If something fails, debug it, identify the root cause, fix it, rerun validation, and continue automatically within approved local scope.
 
@@ -192,6 +220,9 @@ For multi-phase tasks (per the Multi-Phase Complexity Trigger above), the agent 
 - Next action.
 - Validation status.
 
+Keep updates concise and tied to phase changes, findings, or blockers. Do not
+emit repetitive status messages or interrupt tool work that is still running.
+
 ## 5. Self-Correction Requirement
 
 Actively look for:
@@ -233,7 +264,9 @@ Examples:
 - Agent workflow verification.
 - Security checks.
 
-If a judge, verifier, reviewer agent, QA workflow, harness check, or review skill exists and applies, invoke it, review feedback, address failures, and rerun validation.
+If a judge, verifier, reviewer agent, QA workflow, harness check, or review skill
+exists and its trigger applies, invoke it, review feedback, address failures,
+and rerun the affected validation. Do not invoke every verifier by default.
 
 ## 7. No False Completion
 

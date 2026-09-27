@@ -21,6 +21,13 @@ const SAFETY = [
 const GOOD_AGENTS = `# Repo\n\nSYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1\n\n${SAFETY}\n\n## Goal Protocol Default\n\nDone means tested.\n`;
 const LONG = 'This sentence is deliberately longer than sixty characters so it counts as a duplicate.';
 
+function markerBlock(text, start, end) {
+  const pattern = new RegExp(`${start}[\\s\\S]*?${end}`);
+  const match = text.replace(/\r\n/g, '\n').match(pattern);
+  assert.ok(match, `missing generated block ${start}`);
+  return match[0];
+}
+
 function fixture(files) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'instr-stack-'));
   for (const [rel, text] of Object.entries(files)) {
@@ -111,6 +118,94 @@ test('canonical safety rule supports bounded approval and controls Actions cost'
   assert.match(canonical, /Subagents never push or dispatch, rerun, or cancel workflows/);
   assert.match(canonical, /inspect active or queued runs/);
   assert.match(canonical, /at most one corrective push/);
+});
+
+test('default instructions require runtime evidence without unconditional test expansion', () => {
+  const agents = fs.readFileSync(path.resolve(__dirname, '..', '..', 'AGENTS.md'), 'utf8');
+  const goalSync = fs.readFileSync(path.resolve(__dirname, '..', '..', 'scripts', 'sync-goal-protocol.ps1'), 'utf8');
+  for (const text of [agents, goalSync]) {
+    assert.match(text, /Verify behavior, not only code/);
+    assert.match(text, /(browser|terminal).*(endpoint client|simulator)/s);
+    assert.match(text, /performance budgets/);
+    assert.match(text, /accessibility rules/);
+    assert.match(text, /design-system constraints/);
+    assert.match(text, /repeated manual QA sequence/);
+  }
+  assert.doesNotMatch(agents, /Minimum coverage:\s*80%/);
+  assert.match(agents, /no universal per-change percentage/);
+});
+
+test('generated adapters and Context Hub retain the canonical goal contract', () => {
+  const root = path.resolve(__dirname, '..', '..');
+  const agents = fs.readFileSync(path.join(root, 'AGENTS.md'), 'utf8');
+  const expected = markerBlock(
+    agents,
+    '<!-- SEABRIDGE_GOAL_PROTOCOL_START -->',
+    '<!-- SEABRIDGE_GOAL_PROTOCOL_END -->',
+  );
+
+  for (const name of ['CODEX.md', 'GEMINI.md', 'OPENCODE.md']) {
+    const adapter = fs.readFileSync(path.join(root, name), 'utf8');
+    assert.strictEqual(
+      markerBlock(
+        adapter,
+        '<!-- SEABRIDGE_GOAL_PROTOCOL_START -->',
+        '<!-- SEABRIDGE_GOAL_PROTOCOL_END -->',
+      ),
+      expected,
+      `${name} must match the canonical AGENTS.md goal block`,
+    );
+  }
+
+  const claude = fs.readFileSync(path.join(root, 'CLAUDE.md'), 'utf8');
+  assert.match(claude, /^@AGENTS\.md\s*$/m);
+  assert.doesNotMatch(claude, /SEABRIDGE_GOAL_PROTOCOL_START/);
+
+  const contextAgents = fs.readFileSync(
+    path.join(root, 'context-hub', 'ecc', 'docs', 'core-agents', 'DOC.md'),
+    'utf8',
+  );
+  assert.match(contextAgents, /Verify behavior, not only code/);
+  assert.doesNotMatch(contextAgents, /Minimum coverage:\s*80%/);
+});
+
+test('model and skill policy is routed on demand and covers the evidence lifecycle', () => {
+  const agents = fs.readFileSync(path.resolve(__dirname, '..', '..', 'AGENTS.md'), 'utf8');
+  const policyPath = path.resolve(__dirname, '..', '..', 'docs', 'tools', 'MODEL_PROMPTING_AND_SKILL_POLICY.md');
+  const policy = fs.readFileSync(policyPath, 'utf8');
+  assert.match(agents, /MODEL_PROMPTING_AND_SKILL_POLICY\.md/);
+  assert.match(policy, /Keep prompts lean and outcome-based/);
+  assert.match(policy, /Calibrate effort and model by evaluation/);
+  assert.match(policy, /One job, one trigger/);
+  assert.match(policy, /Build a verification loop/);
+  assert.match(policy, /Walk down the models/);
+  assert.match(policy, /bike method/i);
+  assert.match(policy, /GPT-6 Astra\/Sol/);
+  assert.match(policy, /GPT-5\.6/);
+  assert.match(policy, /Claude Opus 5\.5/);
+  assert.match(policy, /Claude Fable 5\.1/);
+});
+
+test('generic orchestration and TDD guidance remains risk-scaled', () => {
+  const root = path.resolve(__dirname, '..', '..');
+  const files = [
+    'rules/common/agents.md',
+    'rules/common/development-workflow.md',
+    'rules/common/testing.md',
+    'agents/tdd-guide.md',
+    'skills/tdd-workflow/SKILL.md',
+  ];
+  const text = files
+    .map((name) => fs.readFileSync(path.join(root, name), 'utf8'))
+    .join('\n');
+
+  assert.match(text, /risk-scaled/i);
+  assert.match(text, /repository(?:'s|-owned| configured) coverage/i);
+  assert.match(text, /genuinely independent, non-overlapping work/);
+  assert.doesNotMatch(text, /ALWAYS use parallel Task execution/);
+  assert.doesNotMatch(text, /Minimum Test Coverage:\s*80%/);
+  assert.doesNotMatch(text, /create a checkpoint commit immediately/);
+  assert.doesNotMatch(text, /Use PROACTIVELY/);
 });
 
 console.log(`instruction-stack: ${passed} passed`);

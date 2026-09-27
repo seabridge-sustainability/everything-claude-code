@@ -17,43 +17,46 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 
 > This file extends [common/git-workflow.md](./git-workflow.md) with the full feature development process that happens before git operations.
 
-The Feature Implementation Workflow describes the development pipeline: research, planning, TDD, code review, and then committing to git.
+The Feature Implementation Workflow is risk-scaled. Use only the steps that
+help prove the requested outcome; a small, established edit needs less ceremony
+than a novel or high-risk feature.
 
 ## Feature Implementation Workflow
 
-0. **Research & Reuse** _(mandatory before any new implementation)_
-   - **GitHub code search first:** Run `gh search repos` and `gh search code` to find existing implementations, templates, and patterns before writing anything new.
-   - **Library docs second:** Use Context7 or primary vendor docs to confirm API behavior, package usage, and version-specific details before implementing.
-   - **Exa only when the first two are insufficient:** Use Exa for broader web research or discovery after GitHub search and primary docs.
-   - **Check package registries:** Search npm, PyPI, crates.io, and other registries before writing utility code. Prefer battle-tested libraries over hand-rolled solutions.
-   - **Search for adaptable implementations:** Look for open-source projects that solve 80%+ of the problem and can be forked, ported, or wrapped.
-   - Prefer adopting or porting a proven approach over writing net-new code when it meets the requirement.
+0. **Research & Reuse**
+   - Start with the repository's own patterns, history, and tests.
+   - For unfamiliar or version-sensitive dependencies, consult primary vendor
+     documentation. Broader code or registry search is optional and should have
+     a concrete question; it is not required for routine edits.
+   - Prefer an established local or well-supported library pattern when it
+     meets the requirement without adding unnecessary dependencies.
 
-1. **Plan First**
-   - Use **planner** agent to create implementation plan
-   - Generate planning docs before coding: PRD, architecture, system_design, tech_doc, task_list
-   - Identify dependencies and risks
-   - Break down into phases
+1. **Plan Proportionally**
+   - For complex or high-risk work, define dependencies, risks, phases,
+     Definition of Done, and proof before editing.
+   - Use a planner agent or durable planning document only when the work needs
+     one. Do not create planning artifacts for a small, obvious change.
 
-2. **TDD Approach**
-   - Use **tdd-guide** agent
-   - Write tests first (RED)
-   - Implement to pass tests (GREEN)
-   - Refactor (IMPROVE)
-   - Verify 80%+ coverage
+2. **Focused Test Approach**
+   - For defects and stable behavior changes, prefer a discriminating failing
+     test (RED), the smallest passing change (GREEN), then refactor if useful.
+   - Select unit, integration, E2E, eval, or runtime checks from the changed
+     boundary and risk. Respect the repository's coverage policy; do not impose
+     a universal percentage or manufacture tests for documentation-only edits.
 
 3. **Code Review**
-   - Use **code-reviewer** agent immediately after writing code
-   - Address CRITICAL and HIGH issues
-   - Fix MEDIUM issues when possible
+   - Review non-trivial or high-risk diffs, using a reviewer agent when an
+     independent pass materially improves confidence.
+   - Address material findings, then rerun only the affected checks.
 
 4. **Commit & Push**
-   - Detailed commit messages
-   - Follow conventional commits format
-   - See [git-workflow.md](./git-workflow.md) for commit message format and PR process
+   - Commit and push only when the current approval covers them.
+   - Batch completed task-owned work into one push per repository when practical.
+   - Run focused local checks first; never push merely to use CI as a test runner.
+   - Follow conventional commits and [git-workflow.md](./git-workflow.md).
 
 5. **Pre-Review Checks**
-   - Verify all automated checks (CI/CD) are passing
-   - Resolve any merge conflicts
-   - Ensure branch is up to date with target branch
-   - Only request review after these checks pass
+   - Verify the checks and runtime evidence appropriate to the change.
+   - Confirm the branch relationship and resolve any in-scope conflicts safely.
+   - Report unrelated or unavailable checks instead of repeatedly rerunning
+     unchanged work.

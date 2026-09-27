@@ -3,9 +3,9 @@ name: policy-contributing
 description: "Contribution rules for agents, skills, commands, docs, and documentation routing within ECC."
 metadata:
   languages: "english"
-  versions: "2.2.0"
+  versions: "2.2.2"
   revision: 1
-  updated-on: "2026-08-14"
+  updated-on: "2026-09-27"
   source: official
   tags: "ecc,contributing,policy"
 ---

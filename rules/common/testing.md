@@ -15,33 +15,41 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-## Minimum Test Coverage: 80%
+## Risk-Scaled Testing
 
-Test Types (ALL required):
-1. **Unit Tests** - Individual functions, utilities, components
-2. **Integration Tests** - API endpoints, database operations
-3. **E2E Tests** - Critical user flows (framework chosen per language)
+Respect the repository's configured coverage thresholds and required suites;
+there is no universal per-change percentage. Choose the smallest set of checks
+that would discriminate the requested behavior from a broken implementation,
+then broaden for failures, changed contracts, or material risk.
+
+Test types are selected by boundary, not all required for every edit:
+
+1. **Unit tests** - functions, utilities, and component behavior
+2. **Integration tests** - APIs, databases, queues, and service boundaries
+3. **E2E tests** - critical user workflows
+4. **Evals/runtime verification** - variable AI output or behavior that static
+   checks cannot prove
 
 ## Test-Driven Development
 
-MANDATORY workflow:
-1. Write test first (RED)
-2. Run test - it should FAIL
-3. Write minimal implementation (GREEN)
-4. Run test - it should PASS
-5. Refactor (IMPROVE)
-6. Verify coverage (80%+)
+For defects and stable behavior changes, prefer a focused failing test (RED),
+the smallest implementation that makes it pass (GREEN), then refactor if useful.
+Do not manufacture tests for documentation-only or reversible low-impact edits.
 
 ## Troubleshooting Test Failures
 
-1. Use **tdd-guide** agent
+1. Use **tdd-guide** when its trigger fits
 2. Check test isolation
 3. Verify mocks are correct
 4. Fix implementation, not tests (unless tests are wrong)
 
 ## Agent Support
 
-- **tdd-guide** - Use PROACTIVELY for new features, enforces write-tests-first
+- **tdd-guide** - Use for explicit TDD work or behavior changes where a
+  RED/GREEN proof improves confidence
+
+Run an unchanged check once. Re-run it after relevant changes or when new
+evidence changes the diagnosis; do not use timer-based repetition.
 
 ## Test Structure (AAA Pattern)
 
