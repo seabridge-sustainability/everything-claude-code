@@ -173,7 +173,7 @@ function runTests() {
     );
   })) passed++; else failed++;
 
-  if (test('CI runs for release branches and version tags before release workflows execute', () => {
+  if (test('CI covers release branches without duplicating main-tip CI on version tags', () => {
     const pushBlockMatch = normalizedCiWorkflowSource.match(/on:\n\s+push:\n([\s\S]*?)\n\s+pull_request:/);
     const pushBlock = pushBlockMatch ? pushBlockMatch[1] : '';
 
@@ -183,10 +183,10 @@ function runTests() {
       /branches:\s*\[[^\]]*main[^\]]*['"]release\/\*\*['"][^\]]*\]/,
       'ci.yml push branches should include release/**'
     );
-    assert.match(
+    assert.doesNotMatch(
       pushBlock,
       /tags:\s*\[[^\]]*['"]v\*['"][^\]]*\]/,
-      'ci.yml push tags should include v*'
+      'ci.yml should not repeat the full suite for a tag whose commit already passed main CI'
     );
   })) passed++; else failed++;
 
