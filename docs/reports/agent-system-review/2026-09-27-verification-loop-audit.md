@@ -49,10 +49,11 @@ guidance.
 
 ## Scope Notes
 
-- Product repository `AGENTS.md` files are generated from the canonical short
-  block. They should be synchronized through the existing script in isolated
-  product worktrees after the ECC change is committed and the product branches
-  are ready for a single batched push.
+- Product repository `AGENTS.md` files were synchronized in isolated worktrees
+  and pushed with Actions-skipping documentation commits: backend
+  `seabridge_development` at `ad9a16fff` and frontend `development` at
+  `69668029`. The frontend copy also received the canonical bounded-approval
+  and GitHub Actions cost-discipline safety block.
 - No model, dependency, user-level configuration, live API, deployment, or paid
   evaluation change is part of this update.
 - The policy intentionally does not add every vendor recommendation to startup
