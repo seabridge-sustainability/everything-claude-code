@@ -103,4 +103,14 @@ test('~/ paths resolve against the home directory', () => {
   assert.deepStrictEqual(refs, ['~/.definitely-missing-dir/x.md']);
 });
 
+test('canonical safety rule supports bounded approval and controls Actions cost', () => {
+  const canonical = fs.readFileSync(path.resolve(__dirname, '..', '..', 'protocols', 'SAFETY_AUTHORIZATION_RULE.md'), 'utf8');
+  assert.match(canonical, /clearly bounded sequence named in advance/);
+  assert.match(canonical, /Do not ask again for steps already included/);
+  assert.match(canonical, /one integration owner and one completed-batch push per repository/);
+  assert.match(canonical, /Subagents never push or dispatch, rerun, or cancel workflows/);
+  assert.match(canonical, /inspect active or queued runs/);
+  assert.match(canonical, /at most one corrective push/);
+});
+
 console.log(`instruction-stack: ${passed} passed`);
