@@ -79,6 +79,12 @@ function getSpawnInvocation(command, args, platform = process.platform) {
   };
 }
 
+function getArchiveCommand(platform = process.platform, environment = process.env) {
+  if (platform !== 'win32') return 'tar';
+  const windowsRoot = environment.SystemRoot || environment.WINDIR || 'C:\\Windows';
+  return path.join(windowsRoot, 'System32', 'tar.exe');
+}
+
 function withPathPrefix(environment, prefix) {
   const nextEnvironment = { ...environment };
   const pathKey = Object.keys(nextEnvironment)
@@ -170,7 +176,7 @@ function prepareLocalPackedProject(packageManager) {
     });
   }
   fs.mkdirSync(modulesDirectory, { recursive: true });
-  run('tar', ['-xzf', fixture.archivePath, '-C', modulesDirectory], {
+  run(getArchiveCommand(), ['-xzf', fixture.archivePath, '-C', modulesDirectory], {
     cwd: projectDirectory,
     timeout: archiveExtractionTimeoutMs,
   });
@@ -306,6 +312,11 @@ test('Windows package shims use one safely quoted command line', () => {
     () => getSpawnInvocation('npm', ['pack', 'C:\\Temp & unsafe'], 'win32'),
     /unsafe for cmd\.exe/
   );
+  assert.strictEqual(
+    getArchiveCommand('win32', { SystemRoot: 'D:\\Windows' }),
+    path.join('D:\\Windows', 'System32', 'tar.exe')
+  );
+  assert.strictEqual(getArchiveCommand('linux', {}), 'tar');
 });
 
 test('published package exposes ecc and ecc-universal through scripts/ecc.js', () => {
