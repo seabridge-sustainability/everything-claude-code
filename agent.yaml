@@ -4,10 +4,8 @@ version: 2.2.2
 description: "Initial gitagent export surface for ECC's shared skill catalog, governance, and identity. Native agents, commands, and hooks remain authoritative in the repository while manifest coverage expands."
 author: affaan-m
 license: MIT
-model:
-  preferred: claude-opus-4-6
-  fallback:
-    - claude-sonnet-4-6
+# Model selection is runtime-owned and eval-driven; do not pin a provider model
+# in this portable export surface.
 skills:
   - agent-architecture-audit
   - agent-eval

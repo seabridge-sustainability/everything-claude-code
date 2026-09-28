@@ -1,3 +1,4 @@
+const fs = require('fs');
 const path = require('path');
 
 const {
@@ -8,7 +9,7 @@ const {
   normalizeRelativePath,
 } = require('./helpers');
 
-const SUPPORTED_SOURCE_PREFIXES = ['rules', 'commands', 'agents', 'skills'];
+const SUPPORTED_SOURCE_PREFIXES = ['rules', 'commands', 'agents', 'skills', '.agents', 'AGENTS.md'];
 
 function supportsAntigravitySourcePath(sourceRelativePath) {
   const normalizedPath = normalizeRelativePath(sourceRelativePath);
@@ -49,6 +50,26 @@ module.exports = createInstallTargetAdapter({
         .filter(supportsAntigravitySourcePath)
         .flatMap(sourceRelativePath => {
           const normalizedSourcePath = normalizeRelativePath(sourceRelativePath);
+
+          if (normalizedSourcePath === 'AGENTS.md') {
+            return [createManagedScaffoldOperation(
+              module.id,
+              normalizedSourcePath,
+              path.join(targetRoot, 'AGENTS.md'),
+              'preserve-relative-path'
+            )];
+          }
+
+          if (normalizedSourcePath === '.agents') {
+            const baseline = path.join(input.repoRoot || '', '.agents', 'rules', 'seabridge-agent-baseline.md');
+            if (!input.repoRoot || !fs.existsSync(baseline)) return [];
+            return [createManagedScaffoldOperation(
+              module.id,
+              '.agents/rules/seabridge-agent-baseline.md',
+              path.join(targetRoot, 'rules', 'seabridge-agent-baseline.md'),
+              'preserve-relative-path'
+            )];
+          }
 
           if (
             normalizedSourcePath === 'rules'

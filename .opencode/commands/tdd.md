@@ -1,5 +1,5 @@
 ---
-description: Enforce TDD workflow with 80%+ coverage
+description: Run an explicit TDD workflow using repository-owned coverage thresholds
 agent: tdd-guide
 subtask: true
 ---
@@ -56,18 +56,18 @@ RED Ã¢â€ â€™ GREEN Ã¢â€ â€™ REFACTOR Ã¢â€ â€™ R
 - Run tests - verify they still PASS
 
 ### Step 5: Check Coverage
-- Target: 80% minimum
-- 100% for critical business logic
-- Add more tests if needed
+- Meet the repository's configured threshold when one exists
+- Prioritize meaningful tests for critical business logic and failure paths
+- Add tests only when they improve confidence in the changed behavior
 
 ## Coverage Requirements
 
 | Code Type | Minimum |
 |-----------|---------|
-| Standard code | 80% |
-| Financial calculations | 100% |
-| Authentication logic | 100% |
-| Security-critical code | 100% |
+| Standard code | Repository-configured threshold |
+| Financial calculations | Risk-scaled domain and boundary coverage |
+| Authentication logic | Relevant authorization and failure paths |
+| Security-critical code | Relevant abuse cases and regression paths |
 
 ## Test Types to Include
 

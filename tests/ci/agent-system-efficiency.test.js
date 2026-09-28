@@ -6,6 +6,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { spawnSync } = require('child_process');
+const { behaviorFailures } = require('../../scripts/lib/skill-behavior');
 
 const root = path.resolve(__dirname, '..', '..');
 let passed = 0;
@@ -33,7 +34,7 @@ test('default MCP surface keeps only the requested browser and GitHub integratio
   }
 });
 
-test('Cursor loads one compact baseline and generated rules are on demand', () => {
+test('Cursor uses native AGENTS discovery and generated rules are on demand', () => {
   const result = spawnSync(process.execPath, ['scripts/sync-cursor-rules.js', '--check'], {
     cwd: root,
     encoding: 'utf8',
@@ -41,10 +42,8 @@ test('Cursor loads one compact baseline and generated rules are on demand', () =
   assert.strictEqual(result.status, 0, result.stderr);
   const files = fs.readdirSync(path.join(root, '.cursor', 'rules')).filter((name) => /\.(?:md|mdc)$/.test(name));
   const always = files.filter((name) => /alwaysApply:\s*true/.test(read(path.join('.cursor/rules', name))));
-  assert.deepStrictEqual(always, ['sea-base.md']);
-  const loaded = read('.cursor/rules/sea-base.md');
-  assert.match(loaded, /Safety And Authorization Rule/);
-  assert.match(loaded, /Goal Protocol Default/);
+  assert.deepStrictEqual(always, []);
+  assert.ok(!files.includes('sea-base.md'));
 });
 
 test('Codex wrapper skills resolve relative to the active checkout', () => {
@@ -60,6 +59,22 @@ test('Codex wrapper skills resolve relative to the active checkout', () => {
   }
   assert.doesNotMatch(read('.agents/skills/tdd-workflow/SKILL.md'), /80%|ALL required/);
   assert.doesNotMatch(read('.agents/skills/verification-loop/SKILL.md'), /every 15 minutes/);
+  for (const name of ['tdd-workflow', 'verification-loop']) {
+    assert.deepStrictEqual(behaviorFailures(name, read(path.join('skills', name, 'SKILL.md'))), []);
+  }
+  for (const name of ['requesting-code-review', 'receiving-code-review', 'verification-before-completion']) {
+    assert.deepStrictEqual(behaviorFailures(name, read(path.join('skills', name, 'SKILL.md'))), []);
+  }
+  for (const entry of fs.readdirSync(path.join(root, '.agents', 'skills'), { withFileTypes: true })) {
+    if (!entry.isDirectory() || !entry.name.startsWith('sea-')) continue;
+    assert.doesNotMatch(read(path.join('.agents', 'skills', entry.name, 'SKILL.md')), /C:\\Users\\adelm\\SeaBridgeAI\\everything-claude-code/);
+  }
+});
+
+test('skill behavior parity rejects stale mandates and missing fallbacks', () => {
+  assert.ok(behaviorFailures('tdd-workflow', 'Minimum Test Coverage: 80%').length > 0);
+  assert.ok(behaviorFailures('verification-loop', 'Run every 15 minutes').length > 0);
+  assert.ok(behaviorFailures('requesting-code-review', 'Use an optional upstream file.').length > 0);
 });
 
 test('Gemini adapter imports only the canonical startup instructions', () => {

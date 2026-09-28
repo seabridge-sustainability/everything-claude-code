@@ -8,7 +8,12 @@ description: Local wrapper for upstream Superpowers verification-before-completi
 Canonical upstream Superpowers skill:
 [vendor/superpowers/skills/verification-before-completion/SKILL.md](../../vendor/superpowers/skills/verification-before-completion/SKILL.md)
 
-This is a local wrapper only. Follow the upstream skill body at the relative path above. If the submodule file is unavailable, do not install or fetch it; use the closest maintained SeaBridgeAI/ECC workflow and report that the optional upstream methodology was unavailable. Apply these SeaBridgeAI overrides:
+This is a local wrapper only. Follow the upstream skill body at the relative
+path above. If that file is unavailable, do not install or fetch it: use the
+maintained local
+[skills/verification-loop/SKILL.md](../verification-loop/SKILL.md), require
+fresh behavior evidence, and report that the optional upstream methodology was
+unavailable. Apply these SeaBridgeAI overrides:
 
 - No GitHub push unless explicitly approved.
 - No commit unless explicitly requested.

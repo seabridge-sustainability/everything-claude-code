@@ -101,7 +101,9 @@ if (-not (Test-Path -LiteralPath $TargetRepo -PathType Container)) {
 }
 
 $required = @("AGENTS.md", "CLAUDE.md")
-$optional = @("CODEX.md", "GEMINI.md", "OPENCODE.md")
+# Codex and OpenCode discover root AGENTS.md natively; their legacy navigation
+# notes must stay thin and must not receive another copy of the goal block.
+$optional = @("GEMINI.md")
 $files = @()
 $files += $required
 if ($IncludeOptionalAgentFiles) {

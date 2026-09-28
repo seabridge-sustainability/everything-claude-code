@@ -9,6 +9,8 @@
  *   Codex:       AGENTS.md from the git root (cwd = root); 32 KiB combined cap,
  *                truncated silently past it.
  *   Gemini:      GEMINI.md with @path imports expanded.
+ *   Other ECC adapters: manifest-declared canonical, import, or generated
+ *                embedded entrypoints for every advertised coding-agent runtime.
  *
  * Checks per effective stack: size budget, required invariants, stale phrases,
  * broken path references, and text duplicated between CLAUDE.md and AGENTS.md.
@@ -23,6 +25,8 @@ const path = require('path');
 
 const CODEX_CAP = 32 * 1024;
 const MAX_IMPORT_DEPTH = 4;
+const ROOT = path.resolve(__dirname, '..');
+const ADAPTER_MANIFEST = path.join(ROOT, 'manifests', 'instruction-adapters.json');
 
 const REQUIRED = [
   { id: 'system-id', re: /SEABRIDGE_AGENT_SYSTEM_V1/ },
@@ -40,7 +44,18 @@ const STALE = [
   { re: /Load `?AGENTS_SYSTEM\.md`? first/i, why: 'prose-mandated reads were ignored in 20 of 21 sessions; use @AGENTS.md' },
   { re: /do not support (event )?hooks/i, why: 'Codex supports hooks (features.hooks)' },
   { re: /Use `?\/compact`? automatically/i, why: 'agents cannot invoke /compact; the harness auto-compacts' },
+  { re: /Minimum Test Coverage:\s*80%|Target:\s*80% minimum|Coverage\s*>?=\s*80%/i, why: 'coverage thresholds belong to the repository' },
+  { re: /Use immediately after writing or modifying code/i, why: 'reviews are risk-scaled, not mandatory after every edit' },
 ];
+
+function loadAdapterRegistry(repo = ROOT) {
+  const manifestPath = repo === ROOT ? ADAPTER_MANIFEST : path.join(repo, 'manifests', 'instruction-adapters.json');
+  const parsed = JSON.parse(readText(manifestPath));
+  if (!Array.isArray(parsed.adapters) || !Array.isArray(parsed.installTargets)) {
+    throw new Error('Invalid manifests/instruction-adapters.json');
+  }
+  return parsed;
+}
 
 function readText(file) {
   return fs.readFileSync(file, 'utf8').replace(/^\uFEFF/, '');
@@ -92,11 +107,34 @@ function alwaysLoadedRules(repo) {
   return found;
 }
 
-function effectiveStacks(repo) {
+function expandOptionalEntry(entry) {
+  if (fs.statSync(entry).isFile()) return expandImports(entry);
+  const files = [];
+  const missing = [];
+  let text = '';
+  (function walk(dir) {
+    for (const item of fs.readdirSync(dir, { withFileTypes: true })) {
+      const absolute = path.join(dir, item.name);
+      if (item.isDirectory()) walk(absolute);
+      else if (/\.mdc?$/.test(item.name)) {
+        const exp = expandImports(absolute);
+        files.push(...exp.files); missing.push(...exp.missing); text += '\n' + exp.text;
+      }
+    }
+  })(entry);
+  return { files, missing, text };
+}
+
+function legacyEffectiveStacks(repo) {
   const stacks = [];
   const agents = path.join(repo, 'AGENTS.md');
   const claude = path.join(repo, 'CLAUDE.md');
-  if (fs.existsSync(agents)) stacks.push({ harness: 'codex', files: [agents], missing: [], text: readText(agents) });
+  const agentsText = fs.existsSync(agents) ? readText(agents) : '';
+  // These runtimes natively discover root AGENTS.md. Keep separate harness
+  // results so a product adapter cannot silently disappear from reports.
+  for (const harness of ['codex', 'opencode', 'cursor', 'qwen', 'kiro', 'windsurf']) {
+    if (fs.existsSync(agents)) stacks.push({ harness, mode: 'canonical', files: [agents], missing: [], text: agentsText });
+  }
   const claudeEntry = fs.existsSync(claude) ? claude : (fs.existsSync(agents) ? agents : null);
   if (claudeEntry) {
     const exp = expandImports(claudeEntry);
@@ -108,7 +146,89 @@ function effectiveStacks(repo) {
     const exp = expandImports(gemini);
     stacks.push({ harness: 'gemini', files: exp.files, missing: exp.missing, text: exp.text });
   }
+  const optional = [
+    ['copilot', '.github/copilot-instructions.md'],
+    ['cline', '.clinerules'],
+    ['antigravity', '.agents/rules/seabridge-agent-baseline.md'],
+  ];
+  for (const [harness, relativePath] of optional) {
+    const entry = path.join(repo, relativePath);
+    if (!fs.existsSync(entry)) continue;
+    const exp = expandOptionalEntry(entry);
+    const ownText = exp.text;
+    // Compact product adapters may explicitly delegate to the root contract.
+    // Model that declared load without requiring another embedded copy.
+    if (agentsText && /AGENTS\.md/i.test(ownText) && /read|follow|canonical|authoritative/i.test(ownText)) {
+      exp.files.push(agents); exp.text += '\n' + agentsText;
+    }
+    stacks.push({ harness, mode: 'declared', files: exp.files, missing: exp.missing, text: exp.text, ownText });
+  }
+  // Native AGENTS runtimes can also load legacy always-on carriers. Include
+  // those files in the effective stack so duplicate safety blocks and stale
+  // mandates are visible rather than hidden by native discovery.
+  const cursorRules = path.join(repo, '.cursor', 'rules');
+  if (fs.existsSync(cursorRules)) {
+    const cursor = stacks.find(stack => stack.harness === 'cursor');
+    for (const name of fs.readdirSync(cursorRules)) {
+      if (!/\.mdc?$/.test(name)) continue;
+      const file = path.join(cursorRules, name);
+      const text = readText(file);
+      if (!/alwaysApply:\s*true/.test(text) || !cursor) continue;
+      cursor.files.push(file); cursor.text += '\n' + text;
+    }
+  }
+  for (const [harness, relativePath] of [['windsurf', '.windsurfrules']]) {
+    const file = path.join(repo, relativePath);
+    const stack = stacks.find(candidate => candidate.harness === harness);
+    if (stack && fs.existsSync(file)) { stack.files.push(file); stack.text += '\n' + readText(file); }
+  }
+  const kiroSteering = path.join(repo, '.kiro', 'steering');
+  const kiro = stacks.find(stack => stack.harness === 'kiro');
+  if (kiro && fs.existsSync(kiroSteering)) {
+    for (const name of fs.readdirSync(kiroSteering)) {
+      if (!name.endsWith('.md')) continue;
+      const file = path.join(kiroSteering, name);
+      const text = readText(file);
+      if (!/inclusion:\s*(?:auto|always)/.test(text)) continue;
+      kiro.files.push(file); kiro.text += '\n' + text;
+    }
+  }
   return stacks;
+}
+
+function effectiveStacks(repo) {
+  // Product repositories retain the compact Codex/Claude/Gemini discovery
+  // check. ECC itself owns the complete cross-harness registry.
+  if (!fs.existsSync(path.join(repo, 'manifests', 'instruction-adapters.json'))) {
+    return legacyEffectiveStacks(repo);
+  }
+
+  const registry = loadAdapterRegistry(repo);
+  return registry.adapters.map(adapter => {
+    const entry = path.join(repo, adapter.entry);
+    if (!fs.existsSync(entry)) {
+      return { harness: adapter.id, mode: adapter.mode, files: [], missing: [adapter.entry], text: '' };
+    }
+    if (adapter.mode === 'import') {
+      const exp = expandImports(entry);
+      return { harness: adapter.id, mode: adapter.mode, files: exp.files, missing: exp.missing, text: exp.text };
+    }
+    return { harness: adapter.id, mode: adapter.mode, files: [entry], missing: [], text: readText(entry), config: adapter.config, installEntry: adapter.installEntry };
+  });
+}
+
+function markerBlock(text, start, end) {
+  const from = text.indexOf(start);
+  const to = text.indexOf(end, from);
+  return from >= 0 && to >= 0 ? text.slice(from, to + end.length) : null;
+}
+
+function canonicalBlocks(repo) {
+  const text = readText(path.join(repo, 'AGENTS.md'));
+  return [
+    ['<!-- SEABRIDGE_SAFETY_RULE_START -->', '<!-- SEABRIDGE_SAFETY_RULE_END -->'],
+    ['<!-- SEABRIDGE_GOAL_PROTOCOL_START -->', '<!-- SEABRIDGE_GOAL_PROTOCOL_END -->'],
+  ].map(([start, end]) => markerBlock(text, start, end));
 }
 
 /** Backticked path-like references that should exist (repo-relative or absolute). */
@@ -119,12 +239,15 @@ function brokenPathRefs(text, repo, workspace) {
   while ((m = re.exec(text)) !== null) {
     let ref = m[1].replace(/[),.;:]+$/, '');
     if (/[<>*{}|$]|^https?:|^--?|^\.\\venv|\(|=/.test(ref)) continue;
+    if (/^(?:artifacts|logs|docs\/reports|graphify\/output)[\\/]/.test(ref)) continue;
     const home = /^~[\\/]/.test(ref);
     const abs = /^[A-Za-z]:\\/.test(ref);
     if (!abs && !/[\\/]/.test(ref)) continue;
-    if (!abs && !/\.(md|json|jsonc|toml|ps1|js|mjs|py|ts|tsx|yaml|yml|txt)$|[\\/]$/.test(ref)) continue;
+    // Output directories may be created on demand and need not exist in a
+    // detached validation checkout. Validate concrete file references only.
+    if (!abs && !/\.(md|json|jsonc|toml|ps1|js|mjs|py|ts|tsx|yaml|yml|txt)$/.test(ref)) continue;
     const candidates = home ? [path.join(process.env.USERPROFILE || process.env.HOME || '~', ref.slice(2))]
-      : abs ? [ref] : [path.join(repo, ref), path.join(workspace, ref), path.join(workspace, 'everything-claude-code', ref)];
+      : abs ? [ref] : [path.join(repo, ref), path.join(workspace, ref), path.join(workspace, 'everything-claude-code', ref), path.join(ROOT, ref)];
     if (!candidates.some((c) => fs.existsSync(c))) broken.push(ref);
   }
   return [...new Set(broken)];
@@ -141,6 +264,8 @@ function duplicatedLines(repo) {
 
 function checkRepo(repo, workspace, budget) {
   const results = [];
+  const isEcc = fs.existsSync(path.join(repo, 'manifests', 'instruction-adapters.json'));
+  const expectedBlocks = isEcc ? canonicalBlocks(repo) : [];
   for (const s of effectiveStacks(repo)) {
     const bytes = Buffer.byteLength(s.text, 'utf8');
     const failures = [];
@@ -151,9 +276,55 @@ function checkRepo(repo, workspace, budget) {
     if (blocks > 1) failures.push(`safety block loaded ${blocks} times (drop the copies from always-loaded rules files)`);
     for (const st of STALE) if (st.re.test(s.text)) failures.push(`stale phrase ${st.re}: ${st.why}`);
     for (const miss of s.missing) failures.push(`broken @import: ${miss}`);
+    if (s.mode === 'embedded') {
+      const actualBlocks = [
+        markerBlock(s.text, '<!-- SEABRIDGE_SAFETY_RULE_START -->', '<!-- SEABRIDGE_SAFETY_RULE_END -->'),
+        markerBlock(s.text, '<!-- SEABRIDGE_GOAL_PROTOCOL_START -->', '<!-- SEABRIDGE_GOAL_PROTOCOL_END -->'),
+      ];
+      actualBlocks.forEach((actual, index) => {
+        if (actual !== expectedBlocks[index]) failures.push(`embedded canonical block ${index + 1} drifted from AGENTS.md`);
+      });
+    }
+    if (s.config) {
+      const configPath = path.join(repo, s.config);
+      if (!fs.existsSync(configPath)) failures.push(`missing adapter config: ${s.config}`);
+      else if (!/"instructions"\s*:\s*\[[\s\S]*?"AGENTS\.md"/.test(readText(configPath))) {
+        failures.push(`${s.config} does not load AGENTS.md`);
+      }
+    }
+    if (s.installEntry) {
+      const installPath = path.join(repo, s.installEntry);
+      if (!fs.existsSync(installPath)) failures.push(`missing install entry: ${s.installEntry}`);
+      else if (!/@\.\/AGENTS\.md/.test(readText(installPath))) failures.push(`${s.installEntry} does not import its installed AGENTS.md`);
+    }
+    if (s.harness === 'copilot' && s.mode === 'declared') {
+      for (const [label, pattern] of [
+        ['approval boundary', /(?:ask before|approval)/i],
+        ['prohibited git operations', /force-push|reset --hard|git clean/i],
+        ['risk-scaled testing', /fixed coverage|risk|proportion/i],
+        ['Actions cost discipline', /GitHub Actions cost|completed-batch push|batch/i],
+      ]) if (!pattern.test(s.ownText || '')) failures.push(`Copilot compact adapter missing ${label}`);
+    }
     for (const ref of brokenPathRefs(s.text, repo, workspace)) failures.push(`broken path reference: ${ref}`);
     if (s.harness === 'claude') for (const d of duplicatedLines(repo)) failures.push(`CLAUDE.md duplicates AGENTS.md: "${d.slice(0, 70)}…"`);
     results.push({ repo: path.basename(repo), harness: s.harness, bytes, files: s.files.map((f) => path.relative(repo, f) || f), failures });
+  }
+  if (isEcc) {
+    const registry = loadAdapterRegistry(repo);
+    const modules = JSON.parse(readText(path.join(repo, 'manifests', 'install-modules.json'))).modules;
+    const agentsCore = modules.find(module => module.id === 'agents-core');
+    const failures = [];
+    if (!agentsCore || !agentsCore.paths.includes('AGENTS.md')) failures.push('agents-core does not install AGENTS.md');
+    for (const target of registry.installTargets) {
+      if (!agentsCore || !agentsCore.targets.includes(target)) failures.push(`agents-core missing install target: ${target}`);
+    }
+    results.push({
+      repo: path.basename(repo),
+      harness: 'installer',
+      bytes: 0,
+      files: ['manifests/instruction-adapters.json', 'manifests/install-modules.json'],
+      failures,
+    });
   }
   return results;
 }
@@ -189,6 +360,6 @@ function main(argv) {
   return all.some((r) => r.failures.length) ? 1 : 0;
 }
 
-module.exports = { expandImports, stripCode, alwaysLoadedRules, effectiveStacks, brokenPathRefs, duplicatedLines, checkRepo, REQUIRED, STALE, CODEX_CAP };
+module.exports = { loadAdapterRegistry, expandImports, stripCode, alwaysLoadedRules, legacyEffectiveStacks, effectiveStacks, markerBlock, canonicalBlocks, brokenPathRefs, duplicatedLines, checkRepo, REQUIRED, STALE, CODEX_CAP };
 
 if (require.main === module) process.exit(main(process.argv.slice(2)));

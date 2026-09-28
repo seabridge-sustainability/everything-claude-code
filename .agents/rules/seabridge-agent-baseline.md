@@ -1,8 +1,9 @@
 ---
-description: "SeaBridgeAI safety, authorization, goal, and context-efficiency baseline"
-alwaysApply: true
+description: SeaBridgeAI canonical safety, goal, and verification contract
 ---
 # SeaBridgeAI Agent Baseline
+
+SYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -32,5 +33,6 @@ For non-trivial work, settle what done means and how you will prove it before ed
 Full protocol, for long multi-phase work: C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md
 <!-- SEABRIDGE_GOAL_PROTOCOL_END -->
 
-Load the minimum applicable skill and rule set. Prefer focused local checks;
-broaden only for changed contracts, failures, or material risk.
+Load task-specific skills and large references only when their trigger fits.
+Use focused local checks first and broaden validation only for changed contracts, failures, or material risk.
+Repository rules and configured thresholds override generic examples.

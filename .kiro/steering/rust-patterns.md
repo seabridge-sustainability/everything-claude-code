@@ -99,7 +99,7 @@ pub trait OrderRepository: Send + Sync {
 - Unit tests in `#[cfg(test)]` modules in the same file
 - Integration tests in `tests/` directory
 - Use `rstest` for parameterized tests, `mockall` for trait mocking
-- Target 80%+ coverage with `cargo llvm-cov`
+- Apply the repository's configured coverage threshold with `cargo llvm-cov`
 
 ```rust
 #[cfg(test)]

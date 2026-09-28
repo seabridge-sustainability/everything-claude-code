@@ -45,10 +45,13 @@ function test(name, fn) {
   console.log(`  ok  ${name}`);
 }
 
-test('clean repo with @AGENTS.md import passes for both harnesses', () => {
+test('clean repo covers native AGENTS runtimes plus Claude import', () => {
   const repo = fixture({ 'AGENTS.md': GOOD_AGENTS, 'CLAUDE.md': '# Claude\n\nSYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1\n\n@AGENTS.md\n' });
   const res = lib.checkRepo(repo, repo, 16384);
-  assert.deepStrictEqual(res.map((r) => r.harness).sort(), ['claude', 'codex']);
+  assert.deepStrictEqual(
+    res.map((r) => r.harness).sort(),
+    ['claude', 'codex', 'cursor', 'kiro', 'opencode', 'qwen', 'windsurf'].sort(),
+  );
   for (const r of res) assert.deepStrictEqual(r.failures, [], `${r.harness}: ${r.failures}`);
   assert.ok(res.find((r) => r.harness === 'claude').files.includes('AGENTS.md'), 'import was not expanded');
 });
@@ -135,7 +138,7 @@ test('default instructions require runtime evidence without unconditional test e
   assert.match(agents, /no universal per-change percentage/);
 });
 
-test('generated adapters and Context Hub retain the canonical goal contract', () => {
+test('thin navigation files do not duplicate the canonical goal contract', () => {
   const root = path.resolve(__dirname, '..', '..');
   const agents = fs.readFileSync(path.join(root, 'AGENTS.md'), 'utf8');
   const expected = markerBlock(
@@ -144,17 +147,10 @@ test('generated adapters and Context Hub retain the canonical goal contract', ()
     '<!-- SEABRIDGE_GOAL_PROTOCOL_END -->',
   );
 
-  for (const name of ['CODEX.md', 'OPENCODE.md']) {
+  for (const name of ['CODEX.md', 'OPENCODE.md', 'CODING_AGENTS.md', '.codex/AGENTS.md']) {
     const adapter = fs.readFileSync(path.join(root, name), 'utf8');
-    assert.strictEqual(
-      markerBlock(
-        adapter,
-        '<!-- SEABRIDGE_GOAL_PROTOCOL_START -->',
-        '<!-- SEABRIDGE_GOAL_PROTOCOL_END -->',
-      ),
-      expected,
-      `${name} must match the canonical AGENTS.md goal block`,
-    );
+    assert.doesNotMatch(adapter, /SEABRIDGE_GOAL_PROTOCOL_START/);
+    assert.match(adapter, /AGENTS\.md/);
   }
 
   const claude = fs.readFileSync(path.join(root, 'CLAUDE.md'), 'utf8');
@@ -172,6 +168,54 @@ test('generated adapters and Context Hub retain the canonical goal contract', ()
   );
   assert.match(contextAgents, /Verify behavior, not only code/);
   assert.doesNotMatch(contextAgents, /Minimum coverage:\s*80%/);
+});
+
+test('registry covers every advertised runtime and all effective ECC adapters pass', () => {
+  const root = path.resolve(__dirname, '..', '..');
+  const registry = lib.loadAdapterRegistry(root);
+  const expected = [
+    'codex', 'claude', 'gemini', 'opencode', 'copilot', 'cursor', 'qwen',
+    'antigravity', 'kiro', 'cline', 'windsurf', 'hermes', 'kimi',
+    'openclaw', 'adal', 'joycode', 'codebuddy', 'zed',
+  ];
+  assert.deepStrictEqual(registry.adapters.map(adapter => adapter.id).sort(), expected.sort());
+  const results = lib.checkRepo(root, path.dirname(root), 64 * 1024);
+  for (const result of results) assert.deepStrictEqual(result.failures, [], `${result.harness}: ${result.failures.join('; ')}`);
+});
+
+test('embedded adapter drift is rejected (negative control)', () => {
+  const repo = fixture({
+    'AGENTS.md': GOOD_AGENTS,
+    'manifests/instruction-adapters.json': JSON.stringify({
+      version: 1,
+      canonical: 'AGENTS.md',
+      adapters: [
+        { id: 'codex', entry: 'AGENTS.md', mode: 'canonical' },
+        { id: 'copilot', entry: '.github/copilot-instructions.md', mode: 'embedded' },
+      ],
+      installTargets: [],
+    }),
+    'manifests/install-modules.json': JSON.stringify({ modules: [{ id: 'agents-core', paths: ['AGENTS.md'], targets: [] }] }),
+    '.github/copilot-instructions.md': GOOD_AGENTS.replace('2. **Ask first:** commit, push.', '2. Approval is optional.'),
+  });
+  const copilot = lib.checkRepo(repo, repo, 64 * 1024).find(result => result.harness === 'copilot');
+  assert.ok(copilot.failures.some(failure => failure.includes('embedded canonical block')));
+  assert.ok(copilot.failures.some(failure => failure.includes('ask-first-list')));
+});
+
+test('missing advertised installer target is rejected (negative control)', () => {
+  const repo = fixture({
+    'AGENTS.md': GOOD_AGENTS,
+    'manifests/instruction-adapters.json': JSON.stringify({
+      version: 1,
+      canonical: 'AGENTS.md',
+      adapters: [{ id: 'codex', entry: 'AGENTS.md', mode: 'canonical' }],
+      installTargets: ['gemini'],
+    }),
+    'manifests/install-modules.json': JSON.stringify({ modules: [{ id: 'agents-core', paths: ['AGENTS.md'], targets: [] }] }),
+  });
+  const installer = lib.checkRepo(repo, repo, 64 * 1024).find(result => result.harness === 'installer');
+  assert.ok(installer.failures.includes('agents-core missing install target: gemini'));
 });
 
 test('model and skill policy is routed on demand and covers the evidence lifecycle', () => {

@@ -4,6 +4,7 @@
 const fs = require('fs');
 const path = require('path');
 const yaml = require('js-yaml');
+const { behaviorFailures } = require('./lib/skill-behavior');
 
 const root = path.resolve(__dirname, '..');
 const wrappersRoot = path.join(root, '.agents', 'skills');
@@ -63,6 +64,13 @@ for (const entry of fs.readdirSync(wrappersRoot, { withFileTypes: true })) {
   const canonical = path.join(root, 'skills', entry.name, 'SKILL.md');
   if (!fs.existsSync(wrapper) || !fs.existsSync(canonical)) continue;
   const canonicalCurrent = fs.readFileSync(canonical, 'utf8');
+  const behaviorDrift = behaviorFailures(entry.name, canonicalCurrent);
+  if (behaviorDrift.length > 0) {
+    drift = true;
+    for (const failure of behaviorDrift) {
+      console.error('[agent-skill-wrappers] behavior drift: ' + path.relative(root, canonical) + ': ' + failure);
+    }
+  }
   const canonicalExpected = normalizedCanonicalPointers(entry.name, canonicalCurrent);
   if (canonicalExpected !== canonicalCurrent) {
     drift = true;

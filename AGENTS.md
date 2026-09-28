@@ -93,15 +93,12 @@ For SeaBridgeAI work, the risk-scaled Goal Protocol above supersedes generic rul
 
 ## Security Guidelines
 
-**Before ANY commit:**
-- No hardcoded secrets (API keys, passwords, tokens)
-- All user inputs validated
-- SQL injection prevention (parameterized queries)
-- XSS prevention (sanitized HTML)
-- CSRF protection enabled
-- Authentication/authorization verified
-- Rate limiting on all endpoints
-- Error messages don't leak sensitive data
+Apply security checks to the changed boundary and its realistic abuse cases. Every
+change must avoid introducing or exposing secrets. Auth, tenant isolation,
+authorization, untrusted input, storage, external calls, and security-sensitive
+output require focused verification when they are in scope; do not manufacture
+irrelevant CSRF, XSS, rate-limit, or database work for changes that do not touch
+those boundaries.
 
 **Secret management:** NEVER hardcode secrets. Use environment variables or a secret manager. Validate required secrets at startup. Rotate any exposed secrets immediately.
 
@@ -109,15 +106,22 @@ For SeaBridgeAI work, the risk-scaled Goal Protocol above supersedes generic rul
 
 ## Coding Style
 
-**Immutability (CRITICAL):** Always create new objects, never mutate. Return new copies with changes applied.
+Prefer immutable data at shared state, concurrency, React state, and other
+boundaries where mutation creates correctness risk. Local mutation is acceptable
+when it is idiomatic, contained, and clearer.
 
-**File organization:** Many small files over few large ones. 200-400 lines typical, 800 max. Organize by feature/domain, not by type. High cohesion, low coupling.
+Keep files and functions cohesive and reviewable. Split them when responsibilities,
+testability, or maintainability justify it; line counts are signals, not universal
+limits. Organize by the repository's established feature/domain conventions.
 
 **Error handling:** Handle errors at every level. Provide user-friendly messages in UI code. Log detailed context server-side. Never silently swallow errors.
 
 **Input validation:** Validate all user input at system boundaries. Use schema-based validation. Fail fast with clear messages. Never trust external data.
 
-**Code quality checklist:** functions small (<50 lines), files focused (<800 lines), no deep nesting (>4 levels), proper error handling, no hardcoded values, readable well-named identifiers.
+**Code quality checklist:** readable names, focused responsibilities, relevant
+error handling, no unexplained hardcoded values, and complexity appropriate to the
+repository. Refactor when complexity impairs correctness or reviewability rather
+than to satisfy arbitrary numeric limits.
 
 ## Testing Requirements
 

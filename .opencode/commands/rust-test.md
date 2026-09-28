@@ -30,7 +30,7 @@ Apply test-driven development with Rust idioms:
 1. **Define types** - Structs, enums, traits
 2. **Write tests** - Unit tests in `#[cfg(test)]` modules
 3. **Implement minimal code** - Pass the tests
-4. **Check coverage** - Target 80%+
+4. **Check coverage** - Compare against the repository's configured threshold
 
 ## TDD Cycle for Rust
 
@@ -84,7 +84,7 @@ pub fn process(input: &Input) -> Result<Output, Error> {
 ### Step 5: Check Coverage
 ```bash
 cargo llvm-cov
-cargo llvm-cov --fail-under-lines 80
+cargo llvm-cov                        # add --fail-under-lines only when configured by the repository
 ```
 
 ## Rust Testing Commands

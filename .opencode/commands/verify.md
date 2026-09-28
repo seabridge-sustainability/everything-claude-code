@@ -31,7 +31,7 @@ Execute comprehensive verification:
 3. **Unit Tests**: `npm test`
 4. **Integration Tests**: `npm run test:integration` (if available)
 5. **Build**: `npm run build`
-6. **Coverage Check**: Verify 80%+ coverage
+6. **Coverage Check**: Verify the repository's configured threshold when coverage is relevant
 
 ## Verification Checklist
 
@@ -44,7 +44,7 @@ Execute comprehensive verification:
 
 ### Tests
 - [ ] All tests passing
-- [ ] Coverage >= 80%
+- [ ] Repository-owned coverage requirements are satisfied
 - [ ] Edge cases covered
 - [ ] Error conditions tested
 
@@ -71,7 +71,7 @@ Execute comprehensive verification:
 | TypeScript | PASS:/FAIL: | [details] |
 | Lint | PASS:/FAIL: | [details] |
 | Tests | PASS:/FAIL: | [details] |
-| Coverage | PASS:/FAIL: | XX% (target: 80%) |
+| Coverage | PASS:/FAIL: | measured result and configured target |
 | Build | PASS:/FAIL: | [details] |
 
 ### Action Items

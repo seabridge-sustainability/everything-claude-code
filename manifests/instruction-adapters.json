@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "canonical": "AGENTS.md",
+  "adapters": [
+    { "id": "codex", "entry": "AGENTS.md", "mode": "canonical" },
+    { "id": "claude", "entry": "CLAUDE.md", "mode": "import", "imports": "AGENTS.md" },
+    { "id": "gemini", "entry": "GEMINI.md", "mode": "import", "imports": "AGENTS.md" },
+    { "id": "opencode", "entry": "AGENTS.md", "mode": "canonical", "config": ".opencode/opencode.json" },
+    { "id": "copilot", "entry": ".github/copilot-instructions.md", "mode": "embedded" },
+    { "id": "cursor", "entry": "AGENTS.md", "mode": "canonical" },
+    { "id": "qwen", "entry": "AGENTS.md", "mode": "canonical", "installEntry": ".qwen/QWEN.md" },
+    { "id": "antigravity", "entry": ".agents/rules/seabridge-agent-baseline.md", "mode": "embedded" },
+    { "id": "kiro", "entry": "AGENTS.md", "mode": "canonical" },
+    { "id": "cline", "entry": ".clinerules", "mode": "embedded" },
+    { "id": "windsurf", "entry": "AGENTS.md", "mode": "canonical" },
+    { "id": "hermes", "entry": "AGENTS.md", "mode": "canonical" },
+    { "id": "kimi", "entry": "AGENTS.md", "mode": "canonical" },
+    { "id": "openclaw", "entry": "AGENTS.md", "mode": "canonical" },
+    { "id": "adal", "entry": "AGENTS.md", "mode": "canonical" },
+    { "id": "joycode", "entry": "AGENTS.md", "mode": "canonical" },
+    { "id": "codebuddy", "entry": "AGENTS.md", "mode": "canonical" },
+    { "id": "zed", "entry": "AGENTS.md", "mode": "canonical" }
+  ],
+  "installTargets": [
+    "claude", "claude-project", "cursor", "antigravity", "codex", "gemini",
+    "opencode", "codebuddy", "joycode", "qwen", "zed", "hermes",
+    "openclaw", "kimi", "adal"
+  ]
+}

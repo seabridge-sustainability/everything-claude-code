@@ -19,16 +19,6 @@ const mappings = {
   testing: 'Risk-scaled test selection; load when behavior or test code changes.',
 };
 
-function escapeRegExp(value) {
-  return value.replace(/[.*+?^$()|[\]\\]/g, '\\$&');
-}
-
-function block(text, start, end) {
-  const match = text.match(new RegExp(escapeRegExp(start) + '[\\s\\S]*?' + escapeRegExp(end)));
-  if (!match) throw new Error('Missing canonical block ' + start);
-  return match[0];
-}
-
 function stripSafety(text) {
   return text
     .replace(/<!-- SEABRIDGE_SAFETY_RULE_START -->[\s\S]*?<!-- SEABRIDGE_SAFETY_RULE_END -->\s*/g, '')
@@ -36,24 +26,7 @@ function stripSafety(text) {
     .trim();
 }
 
-const agents = fs.readFileSync(path.join(root, 'AGENTS.md'), 'utf8').replace(/\r\n/g, '\n');
-const base = [
-  '---',
-  'description: "SeaBridgeAI safety, authorization, goal, and context-efficiency baseline"',
-  'alwaysApply: true',
-  '---',
-  '# SeaBridgeAI Agent Baseline',
-  '',
-  block(agents, '<!-- SEABRIDGE_SAFETY_RULE_START -->', '<!-- SEABRIDGE_SAFETY_RULE_END -->'),
-  '',
-  block(agents, '<!-- SEABRIDGE_GOAL_PROTOCOL_START -->', '<!-- SEABRIDGE_GOAL_PROTOCOL_END -->'),
-  '',
-  'Load the minimum applicable skill and rule set. Prefer focused local checks;',
-  'broaden only for changed contracts, failures, or material risk.',
-  '',
-].join('\n');
-
-const expected = new Map([['sea-base.md', base]]);
+const expected = new Map();
 for (const [name, description] of Object.entries(mappings)) {
   const source = fs.readFileSync(path.join(root, 'rules', 'common', name + '.md'), 'utf8');
   expected.set(
@@ -63,6 +36,12 @@ for (const [name, description] of Object.entries(mappings)) {
 }
 
 let drift = false;
+const legacyBase = path.join(cursorDir, 'sea-base.md');
+if (fs.existsSync(legacyBase)) {
+  drift = true;
+  if (!check) fs.unlinkSync(legacyBase);
+  else console.error('[cursor-rules] redundant native-AGENTS carrier: ' + path.relative(root, legacyBase));
+}
 for (const [name, content] of expected) {
   const target = path.join(cursorDir, name);
   const current = fs.existsSync(target) ? fs.readFileSync(target, 'utf8').replace(/\r\n/g, '\n') : null;

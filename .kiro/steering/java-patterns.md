@@ -91,7 +91,7 @@ public class OrderNotFoundException extends RuntimeException {
 - JUnit 5 with AssertJ for fluent assertions
 - Mockito for mocking dependencies
 - Testcontainers for integration tests
-- Target 80%+ coverage with JaCoCo
+- Apply the repository's configured JaCoCo threshold when coverage is relevant
 
 ```java
 @Test

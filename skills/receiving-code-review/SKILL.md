@@ -8,7 +8,13 @@ description: Local wrapper for upstream Superpowers receiving-code-review. Use w
 Canonical upstream Superpowers skill:
 [vendor/superpowers/skills/receiving-code-review/SKILL.md](../../vendor/superpowers/skills/receiving-code-review/SKILL.md)
 
-This is a local wrapper only. Follow the upstream skill body at the relative path above. If the submodule file is unavailable, do not install or fetch it; use the closest maintained SeaBridgeAI/ECC workflow and report that the optional upstream methodology was unavailable. Apply these SeaBridgeAI overrides:
+This is a local wrapper only. Follow the upstream skill body at the relative
+path above. If that file is unavailable, do not install or fetch it: use the
+maintained local review workflow in
+[skills/sea-senior-dev-workflow/SKILL.md](../sea-senior-dev-workflow/SKILL.md),
+validate feedback against repository evidence before changing code, and report
+that the optional upstream methodology was unavailable. Apply these SeaBridgeAI
+overrides:
 
 - No GitHub push unless explicitly approved.
 - No commit unless explicitly requested.

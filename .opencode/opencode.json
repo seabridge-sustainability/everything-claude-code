@@ -73,7 +73,7 @@
       }
     },
     "code-reviewer": {
-      "description": "Expert code review specialist. Reviews code for quality, security, and maintainability. Use immediately after writing or modifying code.",
+      "description": "Code review specialist for non-trivial, high-risk, or explicitly requested reviews.",
       "mode": "subagent",
       "prompt": "{file:prompts/agents/code-reviewer.txt}",
       "tools": {
@@ -95,7 +95,7 @@
       }
     },
     "tdd-guide": {
-      "description": "Test-Driven Development specialist enforcing write-tests-first methodology. Use when writing new features, fixing bugs, or refactoring code. Ensures 80%+ test coverage.",
+      "description": "Focused TDD specialist for explicit TDD work and stable behavior changes; follows repository-owned coverage requirements.",
       "mode": "subagent",
       "prompt": "{file:prompts/agents/tdd-guide.txt}",
       "tools": {
@@ -342,7 +342,7 @@
       "subtask": true
     },
     "tdd": {
-      "description": "Enforce TDD workflow with 80%+ test coverage",
+      "description": "Run a focused TDD workflow using repository-owned thresholds",
       "template": "{file:commands/tdd.md}\n\n$ARGUMENTS",
       "agent": "tdd-guide",
       "subtask": true

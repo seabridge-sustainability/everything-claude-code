@@ -537,9 +537,17 @@ function runTests() {
       )),
       'Should flatten common rules for antigravity'
     );
+    assert.ok(plan.operations.some(operation => (
+      operation.sourceRelativePath === 'AGENTS.md'
+      && operation.destinationPath === path.join(projectRoot, '.agents', 'AGENTS.md')
+    )), 'Should install the canonical contract into the Antigravity root');
+    assert.ok(plan.operations.some(operation => (
+      normalizedRelativePath(operation.sourceRelativePath) === '.agents/rules/seabridge-agent-baseline.md'
+      && operation.destinationPath === path.join(projectRoot, '.agents', 'rules', 'seabridge-agent-baseline.md')
+    )), 'Should install the compact Antigravity compatibility carrier');
     assert.ok(
-      plan.operations.every(operation => !['.agents', 'AGENTS.md'].includes(operation.sourceRelativePath)),
-      'Should exclude Codex-only .agents metadata and root AGENTS.md'
+      plan.operations.every(operation => operation.sourceRelativePath !== '.agents'),
+      'Should not copy the whole Codex-specific .agents metadata tree'
     );
   })) passed++; else failed++;
 

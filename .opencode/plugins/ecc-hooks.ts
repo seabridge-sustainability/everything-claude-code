@@ -547,9 +547,9 @@ export const ECCHooksPlugin: ECCHooksPluginFn = async ({
         "- Agents: 13 specialized (planner, architect, tdd-guide, code-reviewer, security-reviewer, build-error-resolver, e2e-runner, refactor-cleaner, doc-updater, go-reviewer, go-build-resolver, database-reviewer, python-reviewer)",
         "",
         "## Key Principles",
-        "- TDD: write tests first, 80%+ coverage",
-        "- Immutability: never mutate, always return new copies",
-        "- Security: validate inputs, no hardcoded secrets",
+        "- Verification: scale tests and runtime evidence to the changed boundary",
+        "- Coverage: follow repository-owned thresholds; do not invent percentages",
+        "- Security: never expose secrets; verify auth, tenancy, and input boundaries when in scope",
         "",
       ]
 

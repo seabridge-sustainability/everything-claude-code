@@ -477,6 +477,8 @@
     "command-registry:check": "node scripts/ci/generate-command-registry.js --check",
     "cursor-rules:sync": "node scripts/sync-cursor-rules.js",
     "cursor-rules:check": "node scripts/sync-cursor-rules.js --check",
+    "instruction-adapters:sync": "node scripts/sync-instruction-adapters.js --write",
+    "instruction-adapters:check": "node scripts/sync-instruction-adapters.js",
     "agent-skill-wrappers:sync": "node scripts/sync-agent-skill-wrappers.js",
     "agent-skill-wrappers:check": "node scripts/sync-agent-skill-wrappers.js --check",
     "lint": "eslint . && markdownlint '**/*.md' --ignore node_modules",

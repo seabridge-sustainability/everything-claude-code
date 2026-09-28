@@ -1,5 +1,5 @@
 ---
-description: Enforce TDD workflow for Rust. Write tests first, then implement. Verify 80%+ coverage with cargo-llvm-cov.
+description: Run an explicit Rust TDD workflow and apply repository-owned coverage requirements.
 ---
 
 # Rust TDD Command
@@ -28,7 +28,7 @@ This command enforces test-driven development methodology for Rust code using `#
 3. **Run Tests**: Verify tests fail for the right reason
 4. **Implement Code**: Write minimal code to pass (GREEN)
 5. **Refactor**: Improve while keeping tests green
-6. **Check Coverage**: Ensure 80%+ coverage with cargo-llvm-cov
+6. **Check Coverage**: Compare cargo-llvm-cov output with the repository's configured threshold
 
 ## When to Use
 
@@ -291,7 +291,7 @@ cargo test --no-fail-fast
 |-----------|--------|
 | Critical business logic | 100% |
 | Public API | 90%+ |
-| General code | 80%+ |
+| General code | Repository-configured threshold |
 | Generated / FFI bindings | Exclude |
 
 ## TDD Best Practices
