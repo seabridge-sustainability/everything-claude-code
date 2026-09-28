@@ -70,8 +70,7 @@ ruff check . 2>&1 | head -30
 # Run tests with coverage
 npm run test -- --coverage 2>&1 | tail -50
 
-# Check coverage threshold
-# Target: 80% minimum
+# Compare coverage with the repository's configured threshold when relevant
 ```
 
 Report:
@@ -124,9 +123,9 @@ Issues to Fix:
 2. ...
 ```
 
-## Continuous Mode
+## Iterative Mode
 
-For long sessions, run verification every 15 minutes or after major changes:
+Run verification after a meaningful behavior change or failure, not on a timer:
 
 ```markdown
 Set a mental checkpoint:

@@ -22,7 +22,7 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-TDD guidance for Spring Boot services with 80%+ coverage (unit + integration).
+TDD guidance for Spring Boot services with risk-scaled unit or integration checks and repository-owned coverage requirements.
 
 ## When to Use
 

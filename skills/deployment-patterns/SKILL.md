@@ -410,7 +410,7 @@ npx prisma migrate resolve --rolled-back <migration-name>
 Before any production deployment:
 
 ### Application
-- [ ] All tests pass (unit, integration, E2E)
+- [ ] Risk-scaled checks for changed boundaries pass; use E2E only for critical flows
 - [ ] No hardcoded secrets in code or config files
 - [ ] Error handling covers all edge cases
 - [ ] Logging is structured (JSON) and does not contain PII

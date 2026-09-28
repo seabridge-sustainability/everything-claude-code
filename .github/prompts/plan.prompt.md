@@ -18,7 +18,7 @@ Before writing any code for this feature/task, produce a structured plan.
    - Phase 3: API / integration layer + integration tests
    - Phase 4: UI / consumer layer + E2E tests
 5. **Identify risks** — note anything that could block progress or cause regressions.
-6. **Define done** — list the exact acceptance criteria (tests passing, coverage ≥ 80%, no lint errors, docs updated).
+6. **Define done** — list the exact, risk-scaled acceptance criteria (relevant tests passing, repository-owned coverage requirements met when applicable, no new lint errors, docs updated when needed).
 
 ## Output Format
 
@@ -44,7 +44,7 @@ Before writing any code for this feature/task, produce a structured plan.
 - [Risk and mitigation]
 
 ## Definition of Done
-- [ ] All tests pass (≥80% coverage)
+- [ ] Relevant tests pass and repository-owned coverage requirements are met
 - [ ] No new lint errors
 - [ ] Docs updated if public API changed
 ```

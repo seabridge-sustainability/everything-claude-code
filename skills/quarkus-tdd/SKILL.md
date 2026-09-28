@@ -7,7 +7,7 @@ metadata:
 
 # Quarkus TDD Workflow
 
-TDD guidance for Quarkus 3.x services with 80%+ coverage (unit + integration). Optimized for event-driven architectures with Apache Camel.
+TDD guidance for Quarkus 3.x services with risk-scaled unit or integration checks and repository-owned coverage requirements. Optimized for event-driven architectures with Apache Camel.
 
 ## When to Use
 
@@ -25,7 +25,7 @@ TDD guidance for Quarkus 3.x services with 80%+ coverage (unit + integration). O
 1. Write tests first (they should fail)
 2. Implement minimal code to pass
 3. Refactor with tests green
-4. Enforce coverage with JaCoCo (80%+ target)
+4. Compare JaCoCo coverage with the repository's configured threshold when applicable
 
 ## Unit Tests with @Nested Organization
 
@@ -758,7 +758,7 @@ mvn jacoco:check
 - Test edge cases (empty collections, boundary values, negative IDs, blank strings)
 - Test exception scenarios comprehensively
 - Mock all external dependencies (repositories, services, Camel endpoints)
-- Aim for 80%+ line coverage, 70%+ branch coverage
+- Apply repository-owned coverage requirements and prioritize changed critical branches
 
 ### Assertions
 - **Prefer AssertJ** (`assertThat`) over JUnit assertions for value checks

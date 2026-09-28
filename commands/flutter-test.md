@@ -103,7 +103,7 @@ $ flutter test test/widget/cart_page_test.dart
 ```
 $ flutter test --coverage
 All 44 tests passed.
-Coverage: 84.2% (target: 80%)
+Coverage: [measured value] (repository target: [configured threshold])
 ```
 
 ## Summary

@@ -118,4 +118,4 @@ The pipeline carries no hidden state — the planning docs *are* the handoff:
 - Gate 1 (plan) and Gate 2 (commit) were both honored
 - `security-reviewer` ran iff a security trigger was touched
 - commits are conventional and scoped to one logical change
-- new / changed behavior has tests; coverage ≥ 80% per `rules/common/testing.md`
+- new / changed behavior has risk-scaled tests; repository-owned coverage requirements are met

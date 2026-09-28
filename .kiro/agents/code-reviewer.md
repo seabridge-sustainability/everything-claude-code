@@ -13,7 +13,7 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 ---
 name: code-reviewer
-description: Expert code review specialist. Proactively reviews code for quality, security, and maintainability. Use immediately after writing or modifying code. MUST BE USED for all code changes.
+description: Expert reviewer for non-trivial, high-risk, or explicitly requested review of quality, security, and maintainability.
 allowedTools:
   - read
   - shell

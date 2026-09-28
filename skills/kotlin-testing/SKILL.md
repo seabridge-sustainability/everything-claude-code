@@ -40,7 +40,7 @@ Comprehensive Kotlin testing patterns for writing reliable, maintainable tests f
 4. **Run tests (RED)** Ã¢â‚¬â€ Verify the test fails with the expected error
 5. **Implement code (GREEN)** Ã¢â‚¬â€ Write minimal code to pass the test
 6. **Refactor** Ã¢â‚¬â€ Improve the implementation while keeping tests green
-7. **Check coverage** Ã¢â‚¬â€ Run `./gradlew koverHtmlReport` and verify 80%+ coverage
+7. **Check coverage** Ã¢â‚¬â€ Compare Kover output with the repository's configured threshold when relevant
 
 ## Examples
 
@@ -693,7 +693,7 @@ kover {
         }
         verify {
             rule {
-                minBound(80) // Fail build below 80% coverage
+                minBound(projectCoverageThreshold) // Use the repository-owned threshold
             }
         }
     }
@@ -722,9 +722,9 @@ kover {
 
 | Code Type | Target |
 |-----------|--------|
-| Critical business logic | 100% |
-| Public APIs | 90%+ |
-| General code | 80%+ |
+| Critical business logic | Cover material branches and failure modes |
+| Public APIs | Cover changed contracts and boundaries |
+| General code | Cover changed behavior proportionate to risk |
 | Generated / config code | Exclude |
 
 ### Ktor testApplication Testing

@@ -1,6 +1,6 @@
 ---
 name: php-reviewer
-description: Expert PHP code reviewer specializing in PSR-12 compliance, PHP type system, Eloquent ORM patterns, security, and performance. Use for all PHP code changes. MUST BE USED for PHP projects.
+description: Expert PHP reviewer for non-trivial, high-risk, or explicitly requested review of type safety, ORM behavior, security, and performance.
 tools: Read, Grep, Glob, Bash
 model: sonnet
 ---

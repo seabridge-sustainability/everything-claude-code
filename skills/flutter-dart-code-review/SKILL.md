@@ -216,7 +216,7 @@ class UserError extends UserState {
 - [ ] **Golden tests**: Pixel-perfect comparisons for design-critical UI components
 
 ### Coverage targets:
-- [ ] Aim for 80%+ line coverage on business logic
+- [ ] Apply the repository's configured threshold and cover changed business-logic branches
 - [ ] All state transitions have corresponding tests (loading Ã¢â€ â€™ success, loading Ã¢â€ â€™ error, retry, etc.)
 - [ ] Edge cases tested: empty states, error states, loading states, boundary values
 

@@ -257,4 +257,76 @@ test('generic orchestration and TDD guidance remains risk-scaled', () => {
   assert.doesNotMatch(text, /Use PROACTIVELY/);
 });
 
+test('reachable agent surfaces reject fixed coverage, timed verification, and eager review mandates', () => {
+  const root = path.resolve(__dirname, '..', '..');
+  const roots = [
+    '.github/prompts',
+    '.kiro/agents',
+    '.kiro/skills',
+    '.kiro/steering',
+    '.opencode/commands',
+    '.opencode/prompts',
+    '.agents/skills',
+    'agents',
+    'commands',
+    'skills',
+  ];
+  const files = [];
+  function collect(directory) {
+    for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+      const absolute = path.join(directory, entry.name);
+      if (entry.isDirectory()) collect(absolute);
+      else if (/\.(?:md|json|txt)$/i.test(entry.name)) files.push(absolute);
+    }
+  }
+  for (const relative of roots) collect(path.join(root, relative));
+
+  const forbidden = [
+    /coverage[^\r\n]{0,60}(?:80%|>=\s*80|\u2265\s*80)/i,
+    /(?:80%|>=\s*80|\u2265\s*80)[^\r\n]{0,60}coverage/i,
+    /(?:run\s+)?verification every 15 minutes/i,
+    /Use immediately after writing or modifying code/i,
+    /MUST BE USED for all[^\r\n]*/i,
+  ];
+  const negativeControls = [
+    'Coverage target: 80%',
+    '80%+ coverage is required',
+    'Run verification every 15 minutes',
+    'Use immediately after writing or modifying code',
+    'MUST BE USED for all code changes',
+  ];
+  forbidden.forEach((pattern, index) => {
+    assert.match(negativeControls[index], pattern, `inactive drift detector: ${pattern}`);
+  });
+  const failures = [];
+  for (const file of files) {
+    const source = fs.readFileSync(file, 'utf8');
+    for (const pattern of forbidden) {
+      if (pattern.test(source)) failures.push(`${path.relative(root, file)}: ${pattern}`);
+    }
+  }
+  assert.deepStrictEqual(failures, []);
+
+  // Reviewer confidence filtering is useful and is not a coverage mandate.
+  const reviewer = fs.readFileSync(path.join(root, '.kiro', 'agents', 'code-reviewer.md'), 'utf8');
+  assert.match(reviewer, />80% (?:sure|confiden)/i);
+});
+
+test('Kiro generated Markdown and JSON agent descriptions stay in parity', () => {
+  const root = path.resolve(__dirname, '..', '..', '.kiro', 'agents');
+  const agents = [
+    'code-reviewer', 'cpp-reviewer', 'django-reviewer', 'fsharp-reviewer',
+    'go-reviewer', 'java-reviewer', 'planner', 'python-reviewer',
+    'react-reviewer', 'rust-reviewer', 'swift-reviewer', 'tdd-guide',
+    'typescript-reviewer',
+  ];
+  for (const name of agents) {
+    const markdown = fs.readFileSync(path.join(root, `${name}.md`), 'utf8');
+    const match = markdown.match(/^description:\s*(.+)$/m);
+    assert.ok(match, `${name}.md is missing a description`);
+    const json = JSON.parse(fs.readFileSync(path.join(root, `${name}.json`), 'utf8'));
+    assert.strictEqual(json.description, match[1].trim(), `${name} JSON/Markdown description drift`);
+  }
+});
+
 console.log(`instruction-stack: ${passed} passed`);

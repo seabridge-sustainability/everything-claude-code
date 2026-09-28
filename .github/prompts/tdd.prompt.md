@@ -23,7 +23,7 @@ Follow the RED → GREEN → IMPROVE cycle strictly. Do not write implementation
 ### 3. IMPROVE — Refactor
 - Clean up duplication, naming, structure.
 - Keep all tests passing after each change.
-- Check coverage: target **≥ 80%**.
+- Check coverage against the repository's configured threshold when coverage is relevant.
 
 ## Test Layer Checklist
 
@@ -35,7 +35,7 @@ Follow the RED → GREEN → IMPROVE cycle strictly. Do not write implementation
 
 Before marking the feature done:
 - [ ] All tests pass
-- [ ] Coverage ≥ 80%
+- [ ] Repository-owned coverage requirements are met when applicable
 - [ ] No skipped/commented-out tests
 - [ ] Edge cases covered: empty input, nulls, boundary values, error paths
 

@@ -304,7 +304,7 @@ With mature agentic workflows, teams typically see:
 - 40-60% reduction in time to feature
 - 50-70% reduction in bug density
 - 30-50% reduction in review cycles
-- 80%+ test coverage (up from 40-60%)
+- Repository-owned coverage threshold, with changed critical branches covered
 - 90%+ reduction in security issues reaching production
 
 ## Conclusion

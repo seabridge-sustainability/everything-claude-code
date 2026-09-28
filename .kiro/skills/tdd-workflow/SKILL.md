@@ -1,8 +1,9 @@
 ---
 name: tdd-workflow
 description: >
-  Use this skill when writing new features, fixing bugs, or refactoring code.
-  Enforces test-driven development with 80%+ coverage including unit, integration, and E2E tests.
+  Use for explicit TDD work or stable behavior changes that benefit from a
+  focused RED/GREEN proof. Select test levels by risk and apply repository-owned
+  coverage requirements.
 metadata:
   origin: ECC
   version: "1.0"
@@ -38,13 +39,14 @@ This skill ensures all code development follows TDD principles with comprehensiv
 ## Core Principles
 
 ### 1. Tests BEFORE Code
-ALWAYS write tests first, then implement code to make tests pass.
+Within this workflow, write the focused test first, then implement the smallest
+change that makes it pass.
 
 ### 2. Coverage Requirements
-- Minimum 80% coverage (unit + integration + E2E)
-- All edge cases covered
-- Error scenarios tested
-- Boundary conditions verified
+- Respect the repository's configured threshold; do not impose a universal percentage.
+- Cover edge, error, and boundary cases implicated by the changed contract.
+- Select unit, integration, E2E, eval, or runtime checks by boundary and risk;
+  every type is not required for every change.
 
 ### 3. Test Types
 
@@ -132,7 +134,7 @@ Improve code quality while keeping tests green:
 ### Step 7: Verify Coverage
 ```bash
 npm run test:coverage
-# Verify 80%+ coverage achieved
+# Compare with the repository's configured threshold when coverage is relevant
 ```
 
 ## Testing Patterns
@@ -404,7 +406,7 @@ npm test && npm run lint
 
 ## Best Practices
 
-1. **Write Tests First** - Always TDD
+1. **Write Tests First When TDD Fits** - Use a focused RED/GREEN proof
 2. **One Assert Per Test** - Focus on single behavior
 3. **Descriptive Test Names** - Explain what's tested
 4. **Arrange-Act-Assert** - Clear test structure
@@ -417,10 +419,10 @@ npm test && npm run lint
 
 ## Success Metrics
 
-- 80%+ code coverage achieved
+- Repository-owned coverage requirements met when applicable
 - All tests passing (green)
 - No skipped or disabled tests
-- Fast test execution (< 30s for unit tests)
+- Test execution remains proportionate to the changed boundary
 - E2E tests cover critical user flows
 - Tests catch bugs before production
 

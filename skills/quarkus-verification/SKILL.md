@@ -15,7 +15,7 @@ Run before PRs, after major changes, and pre-deploy.
 - After major refactoring or dependency upgrades
 - Pre-deployment verification for staging or production
 - Running full build → lint → test → security scan → native compilation pipeline
-- Validating test coverage meets thresholds (80%+)
+- Validating test coverage against repository-owned thresholds
 - Testing native image compatibility
 
 ## Phase 1: Build
@@ -63,7 +63,7 @@ mvn clean test
 # Generate coverage report
 mvn jacoco:report
 
-# Enforce coverage threshold (80%)
+# Enforce the repository-configured coverage threshold
 mvn jacoco:check
 
 # Or with Gradle
@@ -160,8 +160,8 @@ class UserResourceTest {
 ### Coverage Report
 
 Check `target/site/jacoco/index.html` for detailed coverage:
-- Overall line coverage (target: 80%+)
-- Branch coverage (target: 70%+)
+- Overall line coverage (repository-configured target)
+- Branch coverage (repository-configured target)
 - Identify uncovered critical paths
 
 ## Phase 4: Security Scanning
@@ -372,7 +372,7 @@ curl http://localhost:8080/q/openapi -o openapi.json
 
 ### Testing
 - [ ] All tests pass
-- [ ] Code coverage ≥ 80%
+- [ ] Repository-owned coverage requirements are met
 - [ ] Integration tests with real database
 - [ ] Security tests pass
 - [ ] Performance within acceptable limits
@@ -472,7 +472,7 @@ jobs:
 - Run verification loop before every PR
 - Automate in CI/CD pipeline
 - Fix issues immediately; don't accumulate debt
-- Keep coverage above 80%
+- Keep coverage at or above the repository-configured threshold
 - Update dependencies regularly
 - Test native compilation periodically
 - Monitor performance trends

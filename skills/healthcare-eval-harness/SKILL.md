@@ -217,6 +217,6 @@ jq '{
 | Clinical Workflow | 22 | 21 | 1 | 95.5% PASS |
 | Integration | 6 | 6 | 0 | PASS |
 
-### Coverage: 84% (target: 80%+)
+### Coverage: 84% (target: repository-configured threshold)
 ### Verdict: SAFE TO DEPLOY
 ```

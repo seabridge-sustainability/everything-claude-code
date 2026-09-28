@@ -56,8 +56,8 @@ def add(a, b):
 
 ### Coverage Requirements
 
-- **Target**: 80%+ code coverage
-- **Critical paths**: 100% coverage required
+- **Target**: the repository's configured coverage threshold when applicable
+- **Critical paths**: cover material branches and failure modes
 - Use `pytest --cov` to measure coverage
 
 ```bash
@@ -660,7 +660,7 @@ class TestUserService:
 - **Use fixtures**: Eliminate duplication with fixtures
 - **Mock external dependencies**: Don't depend on external services
 - **Test edge cases**: Empty inputs, None values, boundary conditions
-- **Aim for 80%+ coverage**: Focus on critical paths
+- **Apply repository-owned coverage requirements**: Focus on changed critical paths
 - **Keep tests fast**: Use marks to separate slow tests
 
 ### DON'T

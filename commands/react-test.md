@@ -217,13 +217,14 @@ expect(await axe(container)).toHaveNoViolations();
 
 | Layer | Target |
 |---|---|
-| Pure utilities | >=90% |
-| Custom hooks | >=85% |
-| Presentational components | >=80% |
-| Container components | >=70% |
-| Pages | E2E covered separately |
+| Pure utilities | Cover changed logic and material branches |
+| Custom hooks | Cover state transitions and failure paths |
+| Presentational components | Cover observable behavior and accessibility |
+| Container components | Cover changed service and state boundaries |
+| Pages | Use E2E only for critical user flows |
 
-Configure in `vitest.config.ts` / `jest.config.js` to enforce thresholds in CI.
+Honor thresholds already configured in `vitest.config.ts` / `jest.config.js`;
+do not invent a universal percentage for every repository.
 
 ## Anti-Patterns to Avoid
 

@@ -40,7 +40,7 @@ Comprehensive Rust testing patterns for writing reliable, maintainable tests fol
 4. **Run tests (RED)** Ã¢â‚¬â€ Verify the test fails with the expected error
 5. **Implement (GREEN)** Ã¢â‚¬â€ Write minimal code to pass
 6. **Refactor** Ã¢â‚¬â€ Improve while keeping tests green
-7. **Check coverage** Ã¢â‚¬â€ Use cargo-llvm-cov, target 80%+
+7. **Check coverage** Ã¢â‚¬â€ Compare cargo-llvm-cov with the repository's configured threshold when relevant
 
 ## TDD Workflow for Rust
 
@@ -450,9 +450,9 @@ cargo llvm-cov --fail-under-lines 80  # Fail if below threshold
 
 | Code Type | Target |
 |-----------|--------|
-| Critical business logic | 100% |
-| Public API | 90%+ |
-| General code | 80%+ |
+| Critical business logic | Cover material branches and failure modes |
+| Public API | Cover changed contracts and boundaries |
+| General code | Cover changed behavior proportionate to risk |
 | Generated / FFI bindings | Exclude |
 
 ## Testing Commands

@@ -28,7 +28,7 @@ This command enforces test-driven development methodology for C++ code using Goo
 3. **Run Tests**: Verify tests fail for the right reason
 4. **Implement Code**: Write minimal code to pass (GREEN)
 5. **Refactor**: Improve while keeping tests green
-6. **Check Coverage**: Ensure 80%+ coverage
+6. **Check Coverage**: Compare coverage with the repository's configured threshold when relevant
 
 ## When to Use
 
@@ -233,9 +233,9 @@ genhtml coverage.info --output-directory coverage_html
 
 | Code Type | Target |
 |-----------|--------|
-| Critical business logic | 100% |
-| Public APIs | 90%+ |
-| General code | 80%+ |
+| Critical business logic | Cover material branches and failure modes |
+| Public APIs | Cover changed contracts and boundaries |
+| General code | Cover changed behavior proportionate to risk |
 | Generated code | Exclude |
 
 ## TDD Best Practices

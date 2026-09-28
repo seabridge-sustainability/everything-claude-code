@@ -175,7 +175,7 @@ No specific test framework detected Ã¢â‚¬â€ use the repository's exis
 
 ### Coverage
 
-This project has coverage reporting configured. Aim for 80%+ coverage.
+Use the project's configured coverage threshold and select checks by changed boundary and risk.
 
 
 ## Error Handling

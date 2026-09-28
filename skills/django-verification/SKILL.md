@@ -125,11 +125,11 @@ Coverage targets:
 
 | Component | Target |
 |-----------|--------|
-| Models | 90%+ |
-| Serializers | 85%+ |
-| Views | 80%+ |
-| Services | 90%+ |
-| Overall | 80%+ |
+| Models | Cover changed invariants and persistence behavior |
+| Serializers | Cover changed validation and representation |
+| Views | Cover changed request, auth, and response boundaries |
+| Services | Cover changed business logic and failure paths |
+| Overall | Apply the repository-configured threshold |
 
 ## Phase 5: Security Scan
 
@@ -384,7 +384,7 @@ NEXT STEPS:
 ## Pre-Deployment Checklist
 
 - [ ] All tests passing
-- [ ] Coverage Ã¢â€°Â¥ 80%
+- [ ] Repository-owned coverage requirements are met
 - [ ] No security vulnerabilities
 - [ ] No unapplied migrations
 - [ ] DEBUG = False in production settings

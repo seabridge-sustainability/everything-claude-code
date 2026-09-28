@@ -65,7 +65,7 @@ Both formats are included for maximum compatibility.
 |-------|-------------|
 | `planner` | Expert planning specialist for complex features and refactoring. Read-only tools for safe analysis. |
 | `code-reviewer` | Senior code reviewer ensuring quality and security. Reviews code for CRITICAL security issues, code quality, React/Next.js patterns, and performance. |
-| `tdd-guide` | Test-Driven Development specialist enforcing write-tests-first methodology. Ensures 80%+ test coverage with comprehensive test suites. |
+| `tdd-guide` | Focused TDD specialist for explicit TDD work; applies repository-owned coverage requirements and risk-scaled test selection. |
 | `security-reviewer` | Security vulnerability detection and remediation specialist. Flags secrets, SSRF, injection, unsafe crypto, and OWASP Top 10 vulnerabilities. |
 | `architect` | Software architecture specialist for system design, scalability, and technical decision-making. Read-only tools for safe analysis. |
 | `build-error-resolver` | Build and TypeScript error resolution specialist. Fixes build/type errors with minimal diffs, no architectural changes. |
@@ -114,7 +114,7 @@ Skills are on-demand workflows invocable via the `/` menu in chat.
 
 | Skill | Description |
 |-------|-------------|
-| `tdd-workflow` | Enforces test-driven development with 80%+ coverage including unit, integration, and E2E tests. Use when writing new features or fixing bugs. |
+| `tdd-workflow` | Provides a focused RED/GREEN proof when TDD fits; selects unit, integration, E2E, eval, or runtime checks by risk. |
 | `coding-standards` | Universal coding standards and best practices for TypeScript, JavaScript, React, and Node.js. Use when starting projects, reviewing code, or refactoring. |
 | `security-review` | Comprehensive security checklist and patterns. Use when adding authentication, handling user input, creating API endpoints, or working with secrets. |
 | `verification-loop` | Comprehensive verification system that runs build, type check, lint, tests, security scan, and diff review. Use after completing features or before creating PRs. |
@@ -174,7 +174,7 @@ Steering files provide always-on rules and context that shape how the agent work
 |------|-----------|-------------|
 | `coding-style.md` | auto | Core coding style rules: immutability, file organization, error handling, and code quality standards. Loaded in every conversation. |
 | `security.md` | auto | Security best practices including mandatory checks, secret management, and security response protocol. Loaded in every conversation. |
-| `testing.md` | auto | Testing requirements: 80% coverage minimum, TDD workflow, and test types (unit, integration, E2E). Loaded in every conversation. |
+| `testing.md` | auto | Risk-scaled testing and repository-owned coverage requirements. Loaded in every conversation. |
 | `development-workflow.md` | auto | Development process, PR workflow, and collaboration patterns. Loaded in every conversation. |
 | `git-workflow.md` | auto | Git commit conventions, branching strategies, and version control best practices. Loaded in every conversation. |
 | `patterns.md` | auto | Common design patterns and architectural principles. Loaded in every conversation. |

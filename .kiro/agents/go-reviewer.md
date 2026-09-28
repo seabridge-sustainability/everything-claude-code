@@ -13,7 +13,7 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 ---
 name: go-reviewer
-description: Expert Go code reviewer specializing in idiomatic Go, concurrency patterns, error handling, and performance. Use for all Go code changes. MUST BE USED for Go projects.
+description: Expert Go reviewer for non-trivial, high-risk, or explicitly requested review of concurrency, error handling, correctness, and performance.
 allowedTools:
   - read
   - shell

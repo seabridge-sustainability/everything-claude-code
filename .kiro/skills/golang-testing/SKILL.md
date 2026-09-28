@@ -170,8 +170,8 @@ go tool cover -html=coverage.out
 ### Coverage Thresholds
 
 ```bash
-# Fail if coverage below 80%
-go test -cover ./... | grep -E 'coverage: [0-7][0-9]\.[0-9]%' && exit 1
+# Report coverage; enforce only the repository-configured threshold
+go test -cover ./...
 ```
 
 ## Benchmarking

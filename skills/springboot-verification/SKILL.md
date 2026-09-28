@@ -58,7 +58,7 @@ Gradle (if configured):
 
 ```bash
 mvn -T 4 test
-mvn jacoco:report   # verify 80%+ coverage
+mvn jacoco:report   # compare with the repository's configured threshold
 # or
 ./gradlew test jacocoTestReport
 ```

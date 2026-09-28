@@ -1,6 +1,6 @@
 ---
 name: planner
-description: Expert planning specialist for complex features and refactoring. Use PROACTIVELY when users request feature implementation, architectural changes, or complex refactoring. Automatically activated for planning tasks.
+description: Planning specialist for complex features, architectural changes, and refactoring.
 allowedTools:
   - read
 ---
@@ -189,7 +189,7 @@ Stripe Checkout, and webhook events keep subscription status in sync.
 - [ ] Webhook correctly syncs subscription status
 - [ ] Free users cannot access Pro features
 - [ ] Downgrade/cancellation works correctly
-- [ ] All tests pass with 80%+ coverage
+- [ ] Relevant tests pass and repository-owned coverage requirements are met
 ```
 
 ## When Planning Refactors

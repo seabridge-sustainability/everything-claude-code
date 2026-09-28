@@ -423,7 +423,7 @@ done_testing;
 - **Use `prove -l`**: Always include lib/ in `@INC`
 - **Name tests clearly**: `'user login with invalid password fails'`
 - **Test edge cases**: Empty strings, undef, zero, boundary values
-- **Aim for 80%+ coverage**: Focus on business logic paths
+- **Apply repository-owned coverage requirements**: Focus on changed business-logic paths
 - **Keep tests fast**: Mock I/O, use in-memory databases
 
 ### DON'T

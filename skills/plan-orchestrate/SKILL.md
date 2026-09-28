@@ -61,7 +61,7 @@ Why this matters: under the plugin install, agents register as `ecc:tdd-guide`. 
 General:
 - `planner` — requirement restatement, risk decomposition, step planning
 - `architect` — architecture, system design, refactor proposals
-- `tdd-guide` — write tests → implement → 80%+ coverage
+- `tdd-guide` — focused RED/GREEN proof → repository-owned coverage requirements
 - `code-reviewer` — generic code review
 - `security-reviewer` — security audit, OWASP, secret leakage
 - `refactor-cleaner` — dead code, duplicates, knip-class cleanup
