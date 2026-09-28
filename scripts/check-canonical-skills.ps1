@@ -1,10 +1,19 @@
 param(
-  [string]$EccPath = "C:\Users\adelm\SeaBridgeAI\everything-claude-code",
-  [string]$MattPocockSnapshotPath = "C:\Users\adelm\SeaBridgeAI\everything-claude-code\references\matt-pocock-skills",
+  [string]$EccPath = "",
+  [string]$MattPocockSnapshotPath = "",
   [switch]$SkipRepoPointers
 )
 
 $ErrorActionPreference = "Stop"
+
+if ([string]::IsNullOrWhiteSpace($EccPath)) {
+  $EccPath = Split-Path -Parent $PSScriptRoot
+}
+if ([string]::IsNullOrWhiteSpace($MattPocockSnapshotPath)) {
+  $MattPocockSnapshotPath = Join-Path $EccPath "references\matt-pocock-skills"
+}
+$EccPath = [IO.Path]::GetFullPath($EccPath)
+$MattPocockSnapshotPath = [IO.Path]::GetFullPath($MattPocockSnapshotPath)
 
 $required = @(
   "$MattPocockSnapshotPath\skills\productivity\grill-me\SKILL.md",
@@ -35,25 +44,28 @@ foreach ($wrapper in $registry.active_wrappers) {
   if (-not (Test-Path $wrapperPath)) {
     throw "Wrapper missing: $($wrapper.wrapper)"
   }
-  $relativeSource = ($wrapper.source -replace [regex]::Escape("C:\Users\adelm\SeaBridgeAI\everything-claude-code\references\matt-pocock-skills\"), "")
-  if ($relativeSource -eq $wrapper.source) {
-    $relativeSource = ($wrapper.source -replace [regex]::Escape("C:\Users\adelm\SeaBridgeAI\everything-claude-code\references\matt-pocock-skills"), "").TrimStart('\')
+  $normalizedSource = $wrapper.source -replace '\\', '/'
+  $sourceMarker = '/references/matt-pocock-skills/'
+  $markerIndex = $normalizedSource.IndexOf($sourceMarker, [System.StringComparison]::OrdinalIgnoreCase)
+  if ($markerIndex -lt 0) {
+    throw "Source is outside the canonical snapshot: $($wrapper.source)"
   }
+  $relativeSource = $normalizedSource.Substring($markerIndex + $sourceMarker.Length) -replace '/', [IO.Path]::DirectorySeparatorChar
   $sourcePath = Join-Path $MattPocockSnapshotPath $relativeSource
   if (-not (Test-Path $sourcePath)) {
     throw "Source missing: $($wrapper.source)"
   }
 }
 
-$deprecatedRepoPointers = @(
-  "C:\Users\adelm\SeaBridgeAI\manageesg-backend\AGENT_SKILLS.md",
-  "C:\Users\adelm\SeaBridgeAI\manageesg-frontend\AGENT_SKILLS.md",
-  "C:\Users\adelm\SeaBridgeAI\openseabri\AGENT_SKILLS.md",
-  "C:\Users\adelm\SeaBridgeAI\_upstream\AGENT_SKILLS.md",
-  "C:\Users\adelm\SeaBridgeAI\autoresearch\AGENT_SKILLS.md"
-)
-
 if (-not $SkipRepoPointers) {
+  $workspaceRoot = Split-Path -Parent $EccPath
+  $deprecatedRepoPointers = @(
+    (Join-Path $workspaceRoot "manageesg-backend\AGENT_SKILLS.md"),
+    (Join-Path $workspaceRoot "manageesg-frontend\AGENT_SKILLS.md"),
+    (Join-Path $workspaceRoot "openseabri\AGENT_SKILLS.md"),
+    (Join-Path $workspaceRoot "_upstream\AGENT_SKILLS.md"),
+    (Join-Path $workspaceRoot "autoresearch\AGENT_SKILLS.md")
+  )
   foreach ($path in $deprecatedRepoPointers) {
     if (Test-Path $path) {
       throw "Deprecated repo-local skill pointer should be removed: $path"

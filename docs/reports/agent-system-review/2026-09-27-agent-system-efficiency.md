@@ -92,7 +92,7 @@ integrity issues without weakening the canonical safety contract.
 
 - Instruction registry: 19/19 checks, including adapter and product-drift
   negative controls.
-- Agent-system efficiency: 8/8.
+- Agent-system efficiency: 9/9.
 - Behavioral-eval contract: 39/39; dry planning is free, the hard nine-run
   ceiling is config-independent, and uncapped harnesses require explicit
   soft-budget acknowledgement.

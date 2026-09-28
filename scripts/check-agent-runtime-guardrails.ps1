@@ -1,20 +1,26 @@
 param(
-  [string[]]$RepoPaths = @(
-    "C:\Users\adelm\SeaBridgeAI\everything-claude-code",
-    "C:\Users\adelm\SeaBridgeAI\manageesg-backend",
-    "C:\Users\adelm\SeaBridgeAI\manageesg-frontend",
-    "C:\Users\adelm\SeaBridgeAI\openseabri",
-    "C:\Users\adelm\SeaBridgeAI\climada-stack",
-    "C:\Users\adelm\SeaBridgeAI\autoresearch",
-    "C:\Users\adelm\SeaBridgeAI\.falkordb-data",
-    "C:\Users\adelm\SeaBridgeAI\_upstream",
-    "C:\Users\adelm\SeaBridgeAI\SeaBridgeAI"
-  ),
+  [string[]]$RepoPaths = @(),
   [switch]$FailOnFinding
 )
 
 $ErrorActionPreference = "Stop"
 $findings = New-Object System.Collections.Generic.List[object]
+$central = Split-Path -Parent $PSScriptRoot
+$workspace = Split-Path -Parent $central
+
+if ($RepoPaths.Count -eq 0) {
+  $RepoPaths = @(
+    $central,
+    (Join-Path $workspace "manageesg-backend"),
+    (Join-Path $workspace "manageesg-frontend"),
+    (Join-Path $workspace "openseabri"),
+    (Join-Path $workspace "climada-stack"),
+    (Join-Path $workspace "autoresearch"),
+    (Join-Path $workspace ".falkordb-data"),
+    (Join-Path $workspace "_upstream"),
+    (Join-Path $workspace "SeaBridgeAI")
+  )
+}
 
 function Add-Finding($Rule, $Severity, $File, $Line, $Message) {
   $findings.Add([pscustomobject]@{
@@ -44,9 +50,9 @@ foreach ($repo in $RepoPaths) {
   }
 }
 
-$central = Split-Path -Parent $PSScriptRoot
 if (Test-Path "$central\scripts\check-canonical-skills.ps1") {
   & "$central\scripts\check-canonical-skills.ps1" `
+    -EccPath $central `
     -MattPocockSnapshotPath "$central\references\matt-pocock-skills" | Out-Host
 }
 

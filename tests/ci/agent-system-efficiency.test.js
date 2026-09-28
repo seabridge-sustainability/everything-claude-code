@@ -166,4 +166,13 @@ test('instruction scenario evaluator fails closed with advisory opt-out', () => 
   fs.rmSync(workspace, { recursive: true, force: true });
 });
 
+test('PowerShell harness checks resolve the active checkout', () => {
+  const runtime = read('scripts/check-agent-runtime-guardrails.ps1');
+  const canonical = read('scripts/check-canonical-skills.ps1');
+  assert.match(runtime, /-EccPath \$central/);
+  assert.doesNotMatch(runtime, /-SkipRepoPointers/);
+  assert.doesNotMatch(runtime, /C:\\Users\\adelm/);
+  assert.doesNotMatch(canonical, /C:\\Users\\adelm/);
+});
+
 console.log('agent-system-efficiency: ' + passed + ' passed');

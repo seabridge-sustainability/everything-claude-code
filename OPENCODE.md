@@ -1,5 +1,7 @@
 # SeaBridgeAI OpenCode Compatibility Note
 
+SYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1
+
 OpenCode loads the canonical repository contract from `AGENTS.md`; the managed
 `.opencode/opencode.json` names that file explicitly. This file is a navigation
 aid only and must not duplicate the contract.

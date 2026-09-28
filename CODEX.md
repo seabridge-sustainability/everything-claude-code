@@ -1,5 +1,7 @@
 # SeaBridgeAI Codex Compatibility Note
 
+SYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1
+
 Codex loads the canonical repository contract from `AGENTS.md` automatically.
 This file is a navigation aid only; do not duplicate policy here.
 
