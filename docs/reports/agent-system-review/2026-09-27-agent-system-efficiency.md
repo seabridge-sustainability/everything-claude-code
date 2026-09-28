@@ -145,3 +145,7 @@ scope 40/40, instruction stack 20/20, skill routing 26/26, package-lock parity
 901 skill directories, 70 generated wrappers were current, and all 37 install
 modules, 84 install components, and seven profiles validated. No paid provider
 call was made.
+
+Markdown lint now checks only files changed by the current commit (and local
+working-tree changes). This keeps the historical imported catalog backlog from
+blocking unrelated work while preserving a strict gate on every edited document.

@@ -481,7 +481,7 @@
     "instruction-adapters:check": "node scripts/sync-instruction-adapters.js",
     "agent-skill-wrappers:sync": "node scripts/sync-agent-skill-wrappers.js",
     "agent-skill-wrappers:check": "node scripts/sync-agent-skill-wrappers.js --check",
-    "lint": "eslint . && markdownlint '**/*.md' --ignore node_modules",
+    "lint": "eslint . && node scripts/lint-markdown-changed.js",
     "harness:adapters": "node scripts/harness-adapter-compliance.js",
     "harness:audit": "node scripts/harness-audit.js",
     "harness:eval": "node scripts/eval-harness.js",
