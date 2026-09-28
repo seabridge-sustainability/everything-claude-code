@@ -10,6 +10,7 @@ const DEFAULT_CONFIG = path.join(ROOT, 'evals', 'agent-behavior', 'scenarios.jso
 const DEFAULT_OUTPUT_DIR = path.join(ROOT, 'artifacts', 'agent-runs', 'behavior-evals');
 const APPROVAL_ENV = 'SEABRIDGE_AGENT_EVAL_APPROVED';
 const HARD_MAX_RUNS_PER_BATCH = 9;
+const DEFAULT_BUDGET_USD = 5;
 
 function optionValue(args, name) {
   const index = args.indexOf(name);
@@ -273,7 +274,7 @@ function renderPlan(config, selected, runs, budgetUsd) {
     budgetUsd: budgetUsd || null,
     perRunBudgetUsd: perRun,
     softBudgetHarnesses: selected.harnesses.filter(harness => !buildCommand(harness, '', perRun || 0).hardCostCap),
-    note: 'No model was called. Codex and Gemini do not expose a hard CLI cost cap; live use requires --allow-soft-budget in addition to approval. The code-level batch limit cannot be raised by config.'
+    note: `No model was called. The USD ${DEFAULT_BUDGET_USD} total is the conservative default when --budget-usd is omitted; a lower explicit ceiling wins. Codex and Gemini do not expose a hard CLI cost cap, so live use requires --allow-soft-budget in addition to approval. The code-level batch limit cannot be raised by config.`
   };
 }
 
@@ -379,7 +380,7 @@ function main(args = process.argv.slice(2)) {
   const selected = select(config, optionValue(args, '--harness'), optionValue(args, '--scenario'));
   const runs = positiveInteger(optionValue(args, '--runs') || '1', '--runs');
   const budgetRaw = optionValue(args, '--budget-usd');
-  const budgetUsd = budgetRaw === null ? null : positiveNumber(budgetRaw, '--budget-usd');
+  const budgetUsd = budgetRaw === null ? DEFAULT_BUDGET_USD : positiveNumber(budgetRaw, '--budget-usd');
   const plan = renderPlan(config, selected, runs, budgetUsd);
 
   if (!args.includes('--run')) {
@@ -411,6 +412,7 @@ if (require.main === module) {
 }
 
 module.exports = {
+  DEFAULT_BUDGET_USD,
   buildCommand,
   buildReport,
   confinedOutputPath,

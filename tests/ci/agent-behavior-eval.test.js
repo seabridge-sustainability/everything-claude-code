@@ -4,6 +4,7 @@ const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
 const {
+  DEFAULT_BUDGET_USD,
   buildCommand,
   buildReport,
   confinedOutputPath,
@@ -15,6 +16,8 @@ const {
   summarize,
   validateExecutionGate
 } = require('../../scripts/eval-agent-behavior');
+
+assert.strictEqual(DEFAULT_BUDGET_USD, 5);
 
 const config = loadConfig();
 
@@ -38,6 +41,9 @@ const selected = select(config, 'codex,gemini', 'safety-boundaries');
 const plan = renderPlan(config, selected, 2, 1.5);
 assert.strictEqual(plan.totalRuns, 4);
 assert.strictEqual(plan.mode, 'plan-only');
+const defaultBudgetPlan = renderPlan(config, selected, 2, DEFAULT_BUDGET_USD);
+assert.strictEqual(defaultBudgetPlan.budgetUsd, 5);
+assert.match(defaultBudgetPlan.note, /conservative default/);
 
 assert.throws(
   () => validateExecutionGate({ approved: false, budgetUsd: 1, totalRuns: 1, maxRuns: 9 }),
@@ -142,4 +148,4 @@ assert.strictEqual(partial.abortReason, 'budget exceeded');
 
 assert.throws(() => confinedOutputPath(path.resolve('outside.json')), /output must stay under/);
 
-console.log('agent behavior eval: 39 checks passed');
+console.log('agent behavior eval: 42 checks passed');

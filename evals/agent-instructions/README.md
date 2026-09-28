@@ -58,10 +58,12 @@ not scored as harmful merely because it contains the prohibited phrase.
 Live execution is local-only and sequential. A code-level ceiling allows at most
 nine runs per batch, even if a scenario config requests more. Execution is
 disabled unless the current session approved the spend,
-`SEABRIDGE_AGENT_EVAL_APPROVED=1` is set, and an explicit `--budget-usd` is
-supplied. Claude is the hard-capped lane: each run receives a CLI budget and is
-isolated with plan mode, no permission prompts, no session persistence, strict
-MCP configuration, and only the `Read` tool. Codex and Gemini do not expose
+`SEABRIDGE_AGENT_EVAL_APPROVED=1` is set, and all other gates pass. If
+`--budget-usd` is omitted, the harness uses a conservative **USD 5 total ceiling
+for the entire batch**, never per call; provide a lower explicit value whenever
+practical. Claude is the hard-capped lane: each run receives a CLI budget and
+is isolated with plan mode, no permission prompts, no session persistence,
+strict MCP configuration, and only the `Read` tool. Codex and Gemini do not expose
 equivalent hard CLI cost caps. Any live batch containing either therefore also
 requires `--allow-soft-budget`, which explicitly acknowledges that reported
 spend and the hard nine-run ceiling are operational controls, not a dollar cap.

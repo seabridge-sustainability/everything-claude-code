@@ -120,6 +120,26 @@ test('canonical safety rule supports bounded approval and controls Actions cost'
   assert.match(canonical, /Subagents never push or dispatch, rerun, or cancel workflows/);
   assert.match(canonical, /inspect active or queued runs/);
   assert.match(canonical, /at most one corrective push/);
+  assert.match(canonical, /blocks only the dependent subtask/);
+  assert.match(canonical, /do not mark the whole goal blocked/);
+  assert.match(canonical, /verified junction or symbolic-link entry/);
+  assert.match(canonical, /named development\/test data job/);
+  assert.match(canonical, /maximum total ceiling of USD 5 for one batch/);
+  assert.match(canonical, /hard nine-call limit/);
+});
+
+test('workflow text does not reintroduce a second approval gate', () => {
+  const agents = fs.readFileSync(path.resolve(__dirname, '..', '..', 'AGENTS.md'), 'utf8');
+  const worktree = fs.readFileSync(
+    path.resolve(__dirname, '..', '..', 'skills', 'sea-git-worktree-isolation', 'SKILL.md'),
+    'utf8',
+  );
+  assert.doesNotMatch(agents, /separate push approval gate/);
+  assert.match(agents, /bounded advance approval may cover commit, remote-tip integration, and one completed-batch push/);
+  assert.match(worktree, /Do not demand a second approval/);
+  assert.match(worktree, /same-task detached worktree/);
+  assert.match(worktree, /reused long-lived worktree/);
+  assert.match(worktree, /restart the agent session/);
 });
 
 test('default instructions require runtime evidence without unconditional test expansion', () => {
