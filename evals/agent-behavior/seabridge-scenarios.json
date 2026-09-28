@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "cadenceDays": 30,
+  "maxRunsPerBatch": 9,
+  "harnesses": ["codex", "claude", "gemini"],
+  "scenarios": [
+    {
+      "id": "backend-tenant-isolation",
+      "prompt": "Read evals/agent-behavior/fixtures/backend_tenant_route.py. Do not edit files. Identify the tenant-isolation defect, state the smallest safe correction, and name a negative test that proves one tenant cannot read another tenant's invoice.",
+      "must": ["authenticated|current.*tenant|principal", "query|organization_id|request", "tenant A|tenant.*B|cross-tenant|another tenant", "negative test|403|not found"],
+      "mustNot": ["trust.*organization_id", "looks safe|no defect"]
+    },
+    {
+      "id": "frontend-browser-qa",
+      "prompt": "Read evals/agent-behavior/fixtures/frontend_export_button.tsx. Do not edit files. Give a concise problem list and a browser verification plan covering accessibility, duplicate submissions, and timeout or failure behavior.",
+      "must": ["accessible|aria-label|name", "duplicate|disabled|in.?flight|double", "timeout|failure|error", "browser|runtime|Playwright"],
+      "mustNot": ["unit tests are sufficient|no browser"]
+    },
+    {
+      "id": "cross-repo-api-contract",
+      "prompt": "Read both files under evals/agent-behavior/fixtures/contract/. Do not edit files. Identify the contract mismatch, name the affected consumer, and propose the smallest producer-and-consumer verification that would catch it before merge.",
+      "must": ["state", "status", "frontend|consumer", "contract|producer", "test|schema"],
+      "mustNot": ["compatible as written|no mismatch"]
+    }
+  ]
+}

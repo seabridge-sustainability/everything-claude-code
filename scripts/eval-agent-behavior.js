@@ -207,7 +207,7 @@ function renderPlan(config, selected, runs, budgetUsd) {
   };
 }
 
-function runBatch({ config, selected, runs, budgetUsd, outputPath }) {
+function runBatch({ config, configPath, selected, runs, budgetUsd, outputPath }) {
   const totalRuns = selected.harnesses.length * selected.scenarios.length * runs;
   const perRunBudgetUsd = budgetUsd / totalRuns;
   const results = [];
@@ -250,7 +250,7 @@ function runBatch({ config, selected, runs, budgetUsd, outputPath }) {
   const report = {
     schemaVersion: 1,
     createdAt: new Date().toISOString(),
-    config: path.relative(ROOT, DEFAULT_CONFIG).replace(/\\/g, '/'),
+    config: path.relative(ROOT, configPath).replace(/\\/g, '/'),
     approvedBudgetUsd: budgetUsd,
     summary: summarize(results),
     results
@@ -261,7 +261,8 @@ function runBatch({ config, selected, runs, budgetUsd, outputPath }) {
 }
 
 function main(args = process.argv.slice(2)) {
-  const config = loadConfig(optionValue(args, '--config') || DEFAULT_CONFIG);
+  const configPath = path.resolve(optionValue(args, '--config') || DEFAULT_CONFIG);
+  const config = loadConfig(configPath);
   const selected = select(config, optionValue(args, '--harness'), optionValue(args, '--scenario'));
   const runs = positiveInteger(optionValue(args, '--runs') || '1', '--runs');
   const budgetRaw = optionValue(args, '--budget-usd');
@@ -280,7 +281,7 @@ function main(args = process.argv.slice(2)) {
     maxRuns: config.maxRunsPerBatch
   });
   const outputPath = confinedOutputPath(optionValue(args, '--output'));
-  const report = runBatch({ config, selected, runs, budgetUsd, outputPath });
+  const report = runBatch({ config, configPath, selected, runs, budgetUsd, outputPath });
   process.stdout.write(`${JSON.stringify({ output: path.relative(ROOT, outputPath), summary: report.summary }, null, 2)}\n`);
   return report.summary.passed === report.summary.runs ? 0 : 1;
 }

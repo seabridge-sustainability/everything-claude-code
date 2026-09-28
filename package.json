@@ -486,6 +486,8 @@
     "harness:audit": "node scripts/harness-audit.js",
     "harness:eval": "node scripts/eval-harness.js",
     "agent-behavior:plan": "node scripts/eval-agent-behavior.js --plan",
+    "agent-behavior:seabridge-plan": "node scripts/eval-agent-behavior.js --plan --config evals/agent-behavior/seabridge-scenarios.json",
+    "agent-behavior:report": "node scripts/agent-behavior-report.js",
     "agent-behavior:test": "node --test tests/ci/agent-behavior-eval.test.js",
     "skills:encoding:check": "node scripts/repair-localized-skill-encoding.js --check",
     "jev:route": "node scripts/jev-route.js",

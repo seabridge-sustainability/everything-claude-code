@@ -39,6 +39,11 @@ assert.match(agentEval, /not ordinary code verification/i);
 assert.match(agentEval, /requires current-session approval/i);
 assert.ok(lineCount('skills/agent-eval/SKILL.md') < 100);
 
+const pythonTesting = read('skills/python-testing/SKILL.md');
+assert.ok(lineCount('skills/python-testing/SKILL.md') < 60);
+assert.match(pythonTesting, /Load details only when needed/);
+assert.ok(fs.existsSync(path.join(root, 'skills', 'python-testing', 'references', 'pytest-patterns.md')));
+
 const btw = read('.agents/skills/btw/SKILL.md');
 assert.ok(lineCount('.agents/skills/btw/SKILL.md') < 30);
 assert.doesNotMatch(btw, /SEABRIDGE_SAFETY_RULE_START/);
@@ -47,4 +52,4 @@ assert.doesNotMatch(btw, /[\u0080-\u024f]/u);
 assert.ok(!fs.existsSync(path.join(root, 'skills', 'frontend-design', 'SKILL.md')));
 assert.ok(!fs.existsSync(path.join(root, '.agents', 'skills', 'frontend-design', 'SKILL.md')));
 
-console.log('skill routing hygiene: 19 checks passed');
+console.log('skill routing hygiene: 22 checks passed');

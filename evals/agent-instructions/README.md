@@ -57,6 +57,16 @@ explicit `--budget-usd` is supplied. Claude receives a hard per-run CLI budget;
 Codex and Gemini do not expose equivalent hard CLI caps, so their guard is the
 approved total plus the run-count ceiling.
 
+The SeaBridgeAI pack uses three read-only repository fixtures for backend tenant
+isolation, frontend browser QA, and a backend/frontend response-contract mismatch.
+It is a separate nine-run batch so policy and implementation probes are never
+silently combined into an 18-call spend.
+
+```powershell
+npm run agent-behavior:seabridge-plan
+node scripts/eval-agent-behavior.js --plan --config evals/agent-behavior/seabridge-scenarios.json --budget-usd 3
+```
+
 ```powershell
 $env:SEABRIDGE_AGENT_EVAL_APPROVED='1' # set only after current-session approval
 node scripts/eval-agent-behavior.js --run --runs 1 --budget-usd 3
@@ -66,6 +76,18 @@ Reports go to ignored `artifacts/agent-runs/behavior-evals/`. Run the probe afte
 an instruction-system or model change, and otherwise no more than every 30 days.
 Do not schedule it in GitHub Actions: unattended model calls would spend quota
 and defeat the Actions cost policy.
+
+After one or more approved batches, render the ROI comparison locally:
+
+```powershell
+npm run agent-behavior:report
+node scripts/agent-behavior-report.js --json
+```
+
+The report compares pass rate, time per successful task, tool calls, retries,
+tokens, and cost per success. Cost per success stays `unknown` unless every
+successful run for that harness supplied provider cost telemetry; missing cost is
+never treated as zero.
 
 ## Future model upgrade checklist
 

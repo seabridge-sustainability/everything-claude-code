@@ -26,6 +26,8 @@ node scripts/check-instruction-stack.js
 node scripts/eval-instruction-scenarios.js
 npm run agent-behavior:test
 npm run agent-behavior:plan
+npm run agent-behavior:seabridge-plan
+npm run agent-behavior:report
 ```
 
 Live Codex, Claude, and Gemini probes use
@@ -33,6 +35,10 @@ Live Codex, Claude, and Gemini probes use
 nine runs per batch, and require both an approved budget and the explicit
 `SEABRIDGE_AGENT_EVAL_APPROVED=1` acknowledgement. Do not put live probes in
 GitHub Actions.
+
+Use the separate SeaBridgeAI scenario pack for tenant isolation, browser QA, and
+cross-repo contract reasoning. Aggregate completed local runs with the ROI report;
+it leaves cost-per-success unknown when provider cost telemetry is incomplete.
 
 ## Implementation comparisons
 

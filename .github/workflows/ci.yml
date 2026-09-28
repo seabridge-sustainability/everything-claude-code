@@ -16,64 +16,86 @@ permissions:
   contents: read
 
 jobs:
+  scope:
+    name: Detect expensive CI scope
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    outputs:
+      compatibility: ${{ steps.scope.outputs.compatibility }}
+      platform: ${{ steps.scope.outputs.platform }}
+      packed: ${{ steps.scope.outputs.packed }}
+    steps:
+      - name: Checkout history for path classification
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Classify changed paths
+        id: scope
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.sha }}
+        run: node scripts/ci/detect-ci-scope.js --base "$BASE_SHA" --head "$HEAD_SHA" --github-output "$GITHUB_OUTPUT"
+
   test:
-    name: Test (${{ matrix.os }}, Node ${{ matrix.node }}, ${{ matrix.pm }})
-    runs-on: ${{ matrix.os }}
+    name: Full test (Ubuntu, Node 20, npm)
+    runs-on: ubuntu-latest
     timeout-minutes: 20
-
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - { os: ubuntu-latest, node: '20.x', pm: npm, suite: full }
-          - { os: ubuntu-latest, node: '18.x', pm: npm, suite: smoke }
-          - { os: ubuntu-latest, node: '22.x', pm: npm, suite: smoke }
-          - { os: windows-latest, node: '20.x', pm: npm, suite: windows }
-          - { os: macos-latest, node: '20.x', pm: npm, suite: macos }
-          - { os: ubuntu-latest, node: '20.x', pm: pnpm, suite: smoke }
-          - { os: ubuntu-latest, node: '20.x', pm: yarn, suite: smoke }
-          - { os: ubuntu-latest, node: '20.x', pm: bun, suite: smoke }
-
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - name: Setup Node.js 20
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '20.x'
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+      - name: Run full test suite
+        run: node tests/run-all.js
+        env:
+          CLAUDE_CODE_PACKAGE_MANAGER: npm
 
+  compatibility:
+    name: Compatibility (Node ${{ matrix.node }}, ${{ matrix.pm }})
+    needs: scope
+    if: needs.scope.outputs.compatibility == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { node: '18.x', pm: npm }
+          - { node: '22.x', pm: npm }
+          - { node: '20.x', pm: pnpm }
+          - { node: '20.x', pm: yarn }
+          - { node: '20.x', pm: bun }
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Setup Node.js ${{ matrix.node }}
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: ${{ matrix.node }}
-
-      # Package manager setup
       - name: Setup pnpm
-        if: matrix.pm == 'pnpm' && matrix.node != '18.x'
+        if: matrix.pm == 'pnpm'
         uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
         with:
-          # Keep an explicit pnpm major because this repo's packageManager is Yarn.
           version: 10
-
-      - name: Setup pnpm (via Corepack)
-        if: matrix.pm == 'pnpm' && matrix.node == '18.x'
-        shell: bash
-        run: |
-          corepack enable
-          corepack prepare pnpm@9 --activate
-
-      - name: Setup Yarn (via Corepack)
+      - name: Setup Yarn
         if: matrix.pm == 'yarn'
         shell: bash
         run: |
           corepack enable
           corepack prepare yarn@stable --activate
-
       - name: Setup Bun
         if: matrix.pm == 'bun'
         uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
-
-      # Install dependencies
-      # COREPACK_ENABLE_STRICT=0 allows pnpm to install even though
-      # package.json declares "packageManager": "yarn@..."
       - name: Install dependencies
         shell: bash
         env:
@@ -83,28 +105,39 @@ jobs:
         run: |
           case "${{ matrix.pm }}" in
             npm) npm ci --ignore-scripts ;;
-            # pnpm v10 can fail CI on ignored native build scripts
-            # (for example msgpackr-extract) even though this repo is Yarn-native
-            # and pnpm is only exercised here as a compatibility lane.
             pnpm) pnpm install --ignore-scripts --config.strict-dep-builds=false --no-frozen-lockfile ;;
-            # Yarn Berry (v4+) removed --ignore-engines; engine checking is no longer a core feature
             yarn) yarn install --mode=skip-build ;;
             bun) bun install --ignore-scripts ;;
             *) echo "Unsupported package manager: ${{ matrix.pm }}" && exit 1 ;;
           esac
-
-      - name: Run full test suite
-        if: matrix.suite == 'full'
-        run: node tests/run-all.js
-        env:
-          CLAUDE_CODE_PACKAGE_MANAGER: ${{ matrix.pm }}
-
       - name: Run compatibility smoke test
-        if: matrix.suite == 'smoke'
         run: node tests/scripts/ecc-universal-bin.test.js
         env:
           CLAUDE_CODE_PACKAGE_MANAGER: ${{ matrix.pm }}
 
+  platform:
+    name: Platform (${{ matrix.os }})
+    needs: scope
+    if: needs.scope.outputs.platform == 'true'
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: windows-latest, suite: windows }
+          - { os: macos-latest, suite: macos }
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Setup Node.js 20
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '20.x'
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
       - name: Run Windows platform checks
         if: matrix.suite == 'windows'
         shell: bash
@@ -114,9 +147,6 @@ jobs:
           node tests/scripts/install-ps1.test.js
           node tests/lib/antigravity-legacy-migration.test.js
           node tests/integration/hooks.test.js
-        env:
-          CLAUDE_CODE_PACKAGE_MANAGER: ${{ matrix.pm }}
-
       - name: Run macOS platform checks
         if: matrix.suite == 'macos'
         shell: bash
@@ -126,11 +156,11 @@ jobs:
           node tests/scripts/install-guided.test.js
           node tests/skills/repo-scan-install.test.js
           node tests/lib/claude-settings.test.js
-        env:
-          CLAUDE_CODE_PACKAGE_MANAGER: ${{ matrix.pm }}
 
   pack-installer:
     name: Pack Installer Artifact
+    needs: scope
+    if: needs.scope.outputs.packed == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     outputs:
@@ -166,7 +196,8 @@ jobs:
 
   packed-install-lifecycle:
     name: Packed Install (${{ matrix.os }})
-    needs: pack-installer
+    needs: [scope, pack-installer]
+    if: needs.scope.outputs.packed == 'true'
     runs-on: ${{ matrix.os }}
     timeout-minutes: 15
     strategy:

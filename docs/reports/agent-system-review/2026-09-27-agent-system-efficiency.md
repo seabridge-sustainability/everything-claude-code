@@ -64,9 +64,10 @@ integrity issues without weakening the canonical safety contract.
 
 - Instruction registry: 18/18 checks, including negative controls.
 - Agent-system efficiency: 8/8.
-- Behavioral-eval contract: 18/18; dry plan produced nine bounded runs and the
+- Behavioral-eval contract: 24/24; dry plan produced nine bounded runs and the
   unapproved live path failed before any provider call.
-- Skill routing: 19/19.
+- Behavioral ROI report: 9/9; CI scope classifier: 16/16.
+- Skill routing: 22/22.
 - Localized encoding: 518/518; strict validator: 901 skill directories, zero
   warnings.
 - Installer apply: 45/45; Claude scope migration: 16/16; OpenCode migration:
@@ -81,3 +82,32 @@ Static and local behavioral tests prove instruction delivery and enforcement,
 not perfect compliance by every future vendor model. The nine-run live replay is
 therefore the final empirical layer. It should run periodically, with an approved
 budget, rather than on every commit. No paid model call was made in this change.
+
+## Proof and ROI follow-up
+
+The follow-up iteration added the remaining evidence and cost-control surfaces:
+
+- a separate nine-run SeaBridgeAI scenario pack for backend tenant isolation,
+  frontend browser QA, and backend/frontend API contracts;
+- realistic read-only fixtures so the replay measures repository reasoning rather
+  than only instruction recall;
+- a local ROI report for pass rate, time per successful task, tool calls, retries,
+  tokens, provider cost coverage, and cost per successful task;
+- fail-honest cost reporting: missing provider telemetry is `unknown`, never zero;
+- changed-path classification that keeps the full Ubuntu suite as the default but
+  provisions package-manager, Windows/macOS, and packed-installer lanes only when
+  the affected compatibility, platform, or package surfaces change;
+- a fail-safe rule that enables every expensive lane when the commit range cannot
+  be classified;
+- conversion of the 832-line `python-testing` entrypoint into a compact router,
+  with detailed pytest examples retained as an on-demand reference.
+
+The live replay remains local, manual, capped at nine calls, and protected by an
+explicit current-session approval flag plus a positive dollar ceiling. It is not
+scheduled in GitHub Actions.
+
+Final verification for this follow-up: the complete Windows repository suite
+passed 4,743/4,743 tests, the strict validator accepted all 901 skill
+directories, 70 generated wrappers were current, and all 37 install modules,
+84 install components, and seven profiles validated. No paid provider call was
+made.

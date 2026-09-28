@@ -170,7 +170,8 @@ test('pull-request CI packs once and exports the exact installer artifact identi
 test('pull-request CI runs the same packed installer on Linux, macOS, and Windows', () => {
   const source = load('.github/workflows/ci.yml');
   const lifecycle = jobBlock(source, 'packed-install-lifecycle', 'validate');
-  assert.match(lifecycle, /needs:\s*pack-installer/);
+  assert.match(lifecycle, /needs:\s*\[scope, pack-installer\]/);
+  assert.match(lifecycle, /if:\s*needs\.scope\.outputs\.packed == 'true'/);
   assert.match(lifecycle, /os:\s*\[ubuntu-latest, macos-latest, windows-latest\]/);
   assert.match(lifecycle, /node-version:\s*['"]20\.x['"]/);
   assert.match(lifecycle, /name:\s*ecc-ci-installer-artifact/);

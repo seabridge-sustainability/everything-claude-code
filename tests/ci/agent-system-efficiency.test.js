@@ -86,7 +86,12 @@ test('Gemini adapter imports only the canonical startup instructions', () => {
 test('CI has one full suite lane and bounded compatibility coverage', () => {
   const ci = read('.github/workflows/ci.yml');
   assert.strictEqual((ci.match(/node tests\/run-all\.js/g) || []).length, 1);
-  assert.strictEqual((ci.match(/suite: (?:full|smoke|windows|macos)/g) || []).length, 8);
+  assert.match(ci, /name: Detect expensive CI scope/);
+  assert.match(ci, /compatibility:[\s\S]*needs: scope[\s\S]*needs\.scope\.outputs\.compatibility == 'true'/);
+  assert.match(ci, /platform:[\s\S]*needs: scope[\s\S]*needs\.scope\.outputs\.platform == 'true'/);
+  assert.strictEqual((ci.match(/- \{ node: '[^']+', pm: (?:npm|pnpm|yarn|bun) \}/g) || []).length, 5);
+  assert.strictEqual((ci.match(/- \{ os: (?:windows|macos)-latest, suite: (?:windows|macos) \}/g) || []).length, 2);
+  assert.match(ci, /pack-installer:[\s\S]*needs: scope[\s\S]*needs\.scope\.outputs\.packed == 'true'/);
   assert.match(ci, /node tests\/scripts\/ecc-universal-bin\.test\.js/);
   assert.match(ci, /suite == 'windows'[\s\S]*mcp-health-check\.test\.js[\s\S]*install-ps1\.test\.js/);
   assert.match(ci, /suite == 'macos'[\s\S]*gan-harness\.test\.js[\s\S]*install-guided\.test\.js/);
