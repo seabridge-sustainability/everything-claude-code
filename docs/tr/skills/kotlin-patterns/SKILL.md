@@ -1,10 +1,10 @@
 ---
 name: kotlin-patterns
-description: Coroutine'ler, null safety ve DSL builder'lar ile saÃ„Å¸lam, verimli ve sÃƒÂ¼rdÃƒÂ¼rÃƒÂ¼lebilir Kotlin uygulamalarÃ„Â± oluÃ…Å¸turmak iÃƒÂ§in idiomatic Kotlin kalÃ„Â±plarÃ„Â±, en iyi uygulamalar ve konvansiyonlar.
+description: Coroutine'ler, null safety ve DSL builder'lar ile sağlam, verimli ve sürdürülebilir Kotlin uygulamaları oluşturmak için idiomatic Kotlin kalıpları, en iyi uygulamalar ve konvansiyonlar.
 origin: ECC
 ---
 
-# Kotlin GeliÃ…Å¸tirme KalÃ„Â±plarÃ„Â±
+# Kotlin Geliştirme Kalıpları
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -21,23 +21,23 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-SaÃ„Å¸lam, verimli ve sÃƒÂ¼rdÃƒÂ¼rÃƒÂ¼lebilir uygulamalar oluÃ…Å¸turmak iÃƒÂ§in idiomatic Kotlin kalÃ„Â±plarÃ„Â± ve en iyi uygulamalar.
+Sağlam, verimli ve sürdürülebilir uygulamalar oluşturmak için idiomatic Kotlin kalıpları ve en iyi uygulamalar.
 
-## Ne Zaman KullanÃ„Â±lÃ„Â±r
+## Ne Zaman Kullanılır
 
 - Yeni Kotlin kodu yazarken
 - Kotlin kodunu incelerken
 - Mevcut Kotlin kodunu refactor ederken
-- Kotlin modÃƒÂ¼lleri veya kÃƒÂ¼tÃƒÂ¼phaneleri tasarlarken
-- Gradle Kotlin DSL build'lerini yapÃ„Â±landÃ„Â±rÃ„Â±rken
+- Kotlin modülleri veya kütüphaneleri tasarlarken
+- Gradle Kotlin DSL build'lerini yapılandırırken
 
-## NasÃ„Â±l Ãƒâ€¡alÃ„Â±Ã…Å¸Ã„Â±r
+## Nasıl Çalışır
 
-Bu skill yedi temel alanda idiomatic Kotlin konvansiyonlarÃ„Â±nÃ„Â± uygular: tip sistemi ve safe-call operatÃƒÂ¶rleri kullanarak null safety, `val` ve data class'larda `copy()` ile immutability, exhaustive tip hiyerarÃ…Å¸ileri iÃƒÂ§in sealed class'lar ve interface'ler, coroutine'ler ve `Flow` ile yapÃ„Â±landÃ„Â±rÃ„Â±lmÃ„Â±Ã…Å¸ eÃ…Å¸zamanlÃ„Â±lÃ„Â±k, inheritance olmadan davranÃ„Â±Ã…Å¸ eklemek iÃƒÂ§in extension fonksiyonlar, `@DslMarker` ve lambda receiver'lar kullanarak tip gÃƒÂ¼venli DSL builder'lar, ve build yapÃ„Â±landÃ„Â±rmasÃ„Â± iÃƒÂ§in Gradle Kotlin DSL.
+Bu skill yedi temel alanda idiomatic Kotlin konvansiyonlarını uygular: tip sistemi ve safe-call operatörleri kullanarak null safety, `val` ve data class'larda `copy()` ile immutability, exhaustive tip hiyerarşileri için sealed class'lar ve interface'ler, coroutine'ler ve `Flow` ile yapılandırılmış eşzamanlılık, inheritance olmadan davranış eklemek için extension fonksiyonlar, `@DslMarker` ve lambda receiver'lar kullanarak tip güvenli DSL builder'lar, ve build yapılandırması için Gradle Kotlin DSL.
 
-## Ãƒâ€“rnekler
+## Örnekler
 
-**Elvis operatÃƒÂ¶rÃƒÂ¼ ile null safety:**
+**Elvis operatörü ile null safety:**
 ```kotlin
 fun getUserEmail(userId: String): String {
     val user = userRepository.findById(userId)
@@ -45,7 +45,7 @@ fun getUserEmail(userId: String): String {
 }
 ```
 
-**Exhaustive sonuÃƒÂ§lar iÃƒÂ§in sealed class:**
+**Exhaustive sonuçlar için sealed class:**
 ```kotlin
 sealed class Result<out T> {
     data class Success<T>(val data: T) : Result<T>()
@@ -54,7 +54,7 @@ sealed class Result<out T> {
 }
 ```
 
-**async/await ile yapÃ„Â±landÃ„Â±rÃ„Â±lmÃ„Â±Ã…Å¸ eÃ…Å¸zamanlÃ„Â±lÃ„Â±k:**
+**async/await ile yapılandırılmış eşzamanlılık:**
 ```kotlin
 suspend fun fetchUserWithPosts(userId: String): UserProfile =
     coroutineScope {
@@ -64,63 +64,63 @@ suspend fun fetchUserWithPosts(userId: String): UserProfile =
     }
 ```
 
-## Temel Ã„Â°lkeler
+## Temel İlkeler
 
 ### 1. Null Safety
 
-Kotlin'in tip sistemi nullable ve non-nullable tipleri ayÃ„Â±rÃ„Â±r. Tam olarak kullanÃ„Â±n.
+Kotlin'in tip sistemi nullable ve non-nullable tipleri ayırır. Tam olarak kullanın.
 
 ```kotlin
-// Ã„Â°yi: VarsayÃ„Â±lan olarak non-nullable tipler kullan
+// İyi: Varsayılan olarak non-nullable tipler kullan
 fun getUser(id: String): User {
     return userRepository.findById(id)
         ?: throw UserNotFoundException("User $id not found")
 }
 
-// Ã„Â°yi: Safe call'lar ve Elvis operatÃƒÂ¶rÃƒÂ¼
+// İyi: Safe call'lar ve Elvis operatörü
 fun getUserEmail(userId: String): String {
     val user = userRepository.findById(userId)
     return user?.email ?: "unknown@example.com"
 }
 
-// KÃƒÂ¶tÃƒÂ¼: Nullable tipleri zorla aÃƒÂ§ma
+// Kötü: Nullable tipleri zorla açma
 fun getUserEmail(userId: String): String {
     val user = userRepository.findById(userId)
-    return user!!.email // null ise NPE fÃ„Â±rlatÃ„Â±r
+    return user!!.email // null ise NPE fırlatır
 }
 ```
 
-### 2. VarsayÃ„Â±lan Olarak Immutability
+### 2. Varsayılan Olarak Immutability
 
-`var` yerine `val` tercih edin, mutable koleksiyonlar yerine immutable olanlarÃ„Â±.
+`var` yerine `val` tercih edin, mutable koleksiyonlar yerine immutable olanları.
 
 ```kotlin
-// Ã„Â°yi: Immutable veri
+// İyi: Immutable veri
 data class User(
     val id: String,
     val name: String,
     val email: String,
 )
 
-// Ã„Â°yi: copy() ile dÃƒÂ¶nÃƒÂ¼Ã…Å¸tÃƒÂ¼rme
+// İyi: copy() ile dönüştürme
 fun updateEmail(user: User, newEmail: String): User =
     user.copy(email = newEmail)
 
-// Ã„Â°yi: Immutable koleksiyonlar
+// İyi: Immutable koleksiyonlar
 val users: List<User> = listOf(user1, user2)
 val filtered = users.filter { it.email.isNotBlank() }
 
-// KÃƒÂ¶tÃƒÂ¼: Mutable state
-var currentUser: User? = null // Mutable global state'ten kaÃƒÂ§Ã„Â±n
-val mutableUsers = mutableListOf<User>() // GerÃƒÂ§ekten gerekmedikÃƒÂ§e kaÃƒÂ§Ã„Â±n
+// Kötü: Mutable state
+var currentUser: User? = null // Mutable global state'ten kaçın
+val mutableUsers = mutableListOf<User>() // Gerçekten gerekmedikçe kaçın
 ```
 
-### 3. Expression Body'ler ve Tek Ã„Â°fadeli Fonksiyonlar
+### 3. Expression Body'ler ve Tek İfadeli Fonksiyonlar
 
-KÃ„Â±sa, okunabilir fonksiyonlar iÃƒÂ§in expression body'ler kullanÃ„Â±n.
+Kısa, okunabilir fonksiyonlar için expression body'ler kullanın.
 
 ```kotlin
-// Ã„Â°yi: Expression body
+// İyi: Expression body
 fun isAdult(age: Int): Boolean = age >= 18
 
 fun formatFullName(first: String, last: String): String =
@@ -129,7 +129,7 @@ fun formatFullName(first: String, last: String): String =
 fun User.displayName(): String =
     name.ifBlank { email.substringBefore('@') }
 
-// Ã„Â°yi: Expression olarak when
+// İyi: Expression olarak when
 fun statusMessage(code: Int): String = when (code) {
     200 -> "OK"
     404 -> "Not Found"
@@ -137,25 +137,25 @@ fun statusMessage(code: Int): String = when (code) {
     else -> "Unknown status: $code"
 }
 
-// KÃƒÂ¶tÃƒÂ¼: Gereksiz block body
+// Kötü: Gereksiz block body
 fun isAdult(age: Int): Boolean {
     return age >= 18
 }
 ```
 
-### 4. Value Objeler Ã„Â°ÃƒÂ§in Data Class'lar
+### 4. Value Objeler İçin Data Class'lar
 
-Ãƒâ€“ncelikle veri tutan tipler iÃƒÂ§in data class'lar kullanÃ„Â±n.
+Öncelikle veri tutan tipler için data class'lar kullanın.
 
 ```kotlin
-// Ã„Â°yi: copy, equals, hashCode, toString ile data class
+// İyi: copy, equals, hashCode, toString ile data class
 data class CreateUserRequest(
     val name: String,
     val email: String,
     val role: Role = Role.USER,
 )
 
-// Ã„Â°yi: Tip gÃƒÂ¼venliÃ„Å¸i iÃƒÂ§in value class (runtime'da sÃ„Â±fÃ„Â±r maliyet)
+// İyi: Tip güvenliği için value class (runtime'da sıfır maliyet)
 @JvmInline
 value class UserId(val value: String) {
     init {
@@ -175,10 +175,10 @@ fun getUser(id: UserId): User = userRepository.findById(id)
 
 ## Sealed Class'lar ve Interface'ler
 
-### KÃ„Â±sÃ„Â±tlÃ„Â± HiyerarÃ…Å¸ileri Modelleme
+### Kısıtlı Hiyerarşileri Modelleme
 
 ```kotlin
-// Ã„Â°yi: Exhaustive when iÃƒÂ§in sealed class
+// İyi: Exhaustive when için sealed class
 sealed class Result<out T> {
     data class Success<T>(val data: T) : Result<T>()
     data class Failure(val error: AppError) : Result<Nothing>()
@@ -198,7 +198,7 @@ fun <T> Result<T>.getOrThrow(): T = when (this) {
 }
 ```
 
-### API YanÃ„Â±tlarÃ„Â± Ã„Â°ÃƒÂ§in Sealed Interface'ler
+### API Yanıtları İçin Sealed Interface'ler
 
 ```kotlin
 sealed interface ApiError {
@@ -226,28 +226,28 @@ fun ApiError.toStatusCode(): Int = when (this) {
 
 ## Scope Fonksiyonlar
 
-### Her Birini Ne Zaman KullanmalÃ„Â±
+### Her Birini Ne Zaman Kullanmalı
 
 ```kotlin
-// let: Nullable'Ã„Â± veya scope edilmiÃ…Å¸ sonucu dÃƒÂ¶nÃƒÂ¼Ã…Å¸tÃƒÂ¼r
+// let: Nullable'ı veya scope edilmiş sonucu dönüştür
 val length: Int? = name?.let { it.trim().length }
 
-// apply: Bir nesneyi yapÃ„Â±landÃ„Â±r (nesneyi dÃƒÂ¶ndÃƒÂ¼rÃƒÂ¼r)
+// apply: Bir nesneyi yapılandır (nesneyi döndürür)
 val user = User().apply {
     name = "Alice"
     email = "alice@example.com"
 }
 
-// also: Yan etkiler (nesneyi dÃƒÂ¶ndÃƒÂ¼rÃƒÂ¼r)
+// also: Yan etkiler (nesneyi döndürür)
 val user = createUser(request).also { logger.info("Created user: ${it.id}") }
 
-// run: Receiver ile block ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r (sonucu dÃƒÂ¶ndÃƒÂ¼rÃƒÂ¼r)
+// run: Receiver ile block çalıştır (sonucu döndürür)
 val result = connection.run {
     prepareStatement(sql)
     executeQuery()
 }
 
-// with: run'Ã„Â±n extension olmayan formu
+// with: run'ın extension olmayan formu
 val csv = with(StringBuilder()) {
     appendLine("name,email")
     users.forEach { appendLine("${it.name},${it.email}") }
@@ -260,7 +260,7 @@ val csv = with(StringBuilder()) {
 ### Inheritance Olmadan Fonksiyonalite Ekleme
 
 ```kotlin
-// Ã„Â°yi: Domain'e ÃƒÂ¶zgÃƒÂ¼ extension'lar
+// İyi: Domain'e özgü extension'lar
 fun String.toSlug(): String =
     lowercase()
         .replace(Regex("[^a-z0-9\\s-]"), "")
@@ -270,12 +270,12 @@ fun String.toSlug(): String =
 fun Instant.toLocalDate(zone: ZoneId = ZoneId.systemDefault()): LocalDate =
     atZone(zone).toLocalDate()
 
-// Ã„Â°yi: Koleksiyon extension'larÃ„Â±
+// İyi: Koleksiyon extension'ları
 fun <T> List<T>.second(): T = this[1]
 
 fun <T> List<T>.secondOrNull(): T? = getOrNull(1)
 
-// Ã„Â°yi: Scope edilmiÃ…Å¸ extension'lar (global namespace'i kirletmez)
+// İyi: Scope edilmiş extension'lar (global namespace'i kirletmez)
 class UserService {
     private fun User.isActive(): Boolean =
         status == Status.ACTIVE && lastLogin.isAfter(Instant.now().minus(30, ChronoUnit.DAYS))
@@ -286,10 +286,10 @@ class UserService {
 
 ## Coroutine'ler
 
-### YapÃ„Â±landÃ„Â±rÃ„Â±lmÃ„Â±Ã…Å¸ EÃ…Å¸zamanlÃ„Â±lÃ„Â±k
+### Yapılandırılmış Eşzamanlılık
 
 ```kotlin
-// Ã„Â°yi: coroutineScope ile yapÃ„Â±landÃ„Â±rÃ„Â±lmÃ„Â±Ã…Å¸ eÃ…Å¸zamanlÃ„Â±lÃ„Â±k
+// İyi: coroutineScope ile yapılandırılmış eşzamanlılık
 suspend fun fetchUserWithPosts(userId: String): UserProfile =
     coroutineScope {
         val userDeferred = async { userService.getUser(userId) }
@@ -301,7 +301,7 @@ suspend fun fetchUserWithPosts(userId: String): UserProfile =
         )
     }
 
-// Ã„Â°yi: child'lar baÃ„Å¸Ã„Â±msÃ„Â±z baÃ…Å¸arÃ„Â±sÃ„Â±z olabildiÃ„Å¸inde supervisorScope
+// İyi: child'lar bağımsız başarısız olabildiğinde supervisorScope
 suspend fun fetchDashboard(userId: String): Dashboard =
     supervisorScope {
         val user = async { userService.getUser(userId) }
@@ -328,10 +328,10 @@ suspend fun fetchDashboard(userId: String): Dashboard =
     }
 ```
 
-### Reactive Stream'ler Ã„Â°ÃƒÂ§in Flow
+### Reactive Stream'ler İçin Flow
 
 ```kotlin
-// Ã„Â°yi: Uygun hata iÃ…Å¸leme ile cold flow
+// İyi: Uygun hata işleme ile cold flow
 fun observeUsers(): Flow<List<User>> = flow {
     while (currentCoroutineContext().isActive) {
         val users = userRepository.findAll()
@@ -343,7 +343,7 @@ fun observeUsers(): Flow<List<User>> = flow {
     emit(emptyList())
 }
 
-// Ã„Â°yi: Flow operatÃƒÂ¶rleri
+// İyi: Flow operatörleri
 fun searchUsers(query: Flow<String>): Flow<List<User>> =
     query
         .debounce(300.milliseconds)
@@ -355,10 +355,10 @@ fun searchUsers(query: Flow<String>): Flow<List<User>> =
 
 ## DSL Builder'lar
 
-### Tip GÃƒÂ¼venli Builder'lar
+### Tip Güvenli Builder'lar
 
 ```kotlin
-// Ã„Â°yi: @DslMarker ile DSL
+// İyi: @DslMarker ile DSL
 @DslMarker
 annotation class HtmlDsl
 
@@ -379,7 +379,7 @@ class HTML {
 
 fun html(init: HTML.() -> Unit): HTML = HTML().apply(init)
 
-// KullanÃ„Â±m
+// Kullanım
 val page = html {
     head { title("My Page") }
     body {
@@ -391,10 +391,10 @@ val page = html {
 
 ## Gradle Kotlin DSL
 
-### build.gradle.kts YapÃ„Â±landÃ„Â±rmasÃ„Â±
+### build.gradle.kts Yapılandırması
 
 ```kotlin
-// En son versiyonlarÃ„Â± kontrol et: https://kotlinlang.org/docs/releases.html
+// En son versiyonları kontrol et: https://kotlinlang.org/docs/releases.html
 plugins {
     kotlin("jvm") version "2.3.10"
     kotlin("plugin.serialization") version "2.3.10"
@@ -448,12 +448,12 @@ detekt {
 }
 ```
 
-## Hata Ã„Â°Ã…Å¸leme KalÃ„Â±plarÃ„Â±
+## Hata İşleme Kalıpları
 
-### Domain OperasyonlarÃ„Â± Ã„Â°ÃƒÂ§in Result Tipi
+### Domain Operasyonları İçin Result Tipi
 
 ```kotlin
-// Ã„Â°yi: Kotlin'in Result'Ã„Â±nÃ„Â± veya ÃƒÂ¶zel sealed class kullan
+// İyi: Kotlin'in Result'ını veya özel sealed class kullan
 suspend fun createUser(request: CreateUserRequest): Result<User> = runCatching {
     require(request.name.isNotBlank()) { "Name cannot be blank" }
     require('@' in request.email) { "Invalid email format" }
@@ -467,7 +467,7 @@ suspend fun createUser(request: CreateUserRequest): Result<User> = runCatching {
     user
 }
 
-// Ã„Â°yi: Result'larÃ„Â± zincirle
+// İyi: Result'ları zincirle
 val displayName = createUser(request)
     .map { it.name }
     .getOrElse { "Unknown" }
@@ -476,7 +476,7 @@ val displayName = createUser(request)
 ### require, check, error
 
 ```kotlin
-// Ã„Â°yi: Net mesajlarla ÃƒÂ¶n koÃ…Å¸ullar
+// İyi: Net mesajlarla ön koşullar
 fun withdraw(account: Account, amount: Money): Account {
     require(amount.value > 0) { "Amount must be positive: $amount" }
     check(account.balance >= amount) { "Insufficient balance: ${account.balance} < $amount" }
@@ -485,66 +485,66 @@ fun withdraw(account: Account, amount: Money): Account {
 }
 ```
 
-## HÃ„Â±zlÃ„Â± Referans: Kotlin Ã„Â°diyomlarÃ„Â±
+## Hızlı Referans: Kotlin İdiyomları
 
-| Ã„Â°diyom | AÃƒÂ§Ã„Â±klama |
+| İdiyom | Açıklama |
 |-------|-------------|
-| `val` over `var` | Immutable deÃ„Å¸iÃ…Å¸kenleri tercih et |
-| `data class` | equals/hashCode/copy ile value objeler iÃƒÂ§in |
-| `sealed class/interface` | KÃ„Â±sÃ„Â±tlÃ„Â± tip hiyerarÃ…Å¸ileri iÃƒÂ§in |
-| `value class` | SÃ„Â±fÃ„Â±r maliyetli tip gÃƒÂ¼venli sarmalayÃ„Â±cÃ„Â±lar iÃƒÂ§in |
+| `val` over `var` | Immutable değişkenleri tercih et |
+| `data class` | equals/hashCode/copy ile value objeler için |
+| `sealed class/interface` | Kısıtlı tip hiyerarşileri için |
+| `value class` | Sıfır maliyetli tip güvenli sarmalayıcılar için |
 | Expression `when` | Exhaustive pattern matching |
-| Safe call `?.` | Null-safe member eriÃ…Å¸imi |
-| Elvis `?:` | Nullable'lar iÃƒÂ§in varsayÃ„Â±lan deÃ„Å¸er |
-| `let`/`apply`/`also`/`run`/`with` | Temiz kod iÃƒÂ§in scope fonksiyonlar |
-| Extension fonksiyonlar | Inheritance olmadan davranÃ„Â±Ã…Å¸ ekle |
-| `copy()` | Data class'larda immutable gÃƒÂ¼ncellemeler |
-| `require`/`check` | Ãƒâ€“n koÃ…Å¸ul assertion'larÃ„Â± |
-| Coroutine `async`/`await` | YapÃ„Â±landÃ„Â±rÃ„Â±lmÃ„Â±Ã…Å¸ concurrent execution |
+| Safe call `?.` | Null-safe member erişimi |
+| Elvis `?:` | Nullable'lar için varsayılan değer |
+| `let`/`apply`/`also`/`run`/`with` | Temiz kod için scope fonksiyonlar |
+| Extension fonksiyonlar | Inheritance olmadan davranış ekle |
+| `copy()` | Data class'larda immutable güncellemeler |
+| `require`/`check` | Ön koşul assertion'ları |
+| Coroutine `async`/`await` | Yapılandırılmış concurrent execution |
 | `Flow` | Cold reactive stream'ler |
 | `sequence` | Lazy evaluation |
 | Delegation `by` | Inheritance olmadan implementasyonu yeniden kullan |
 
-## KaÃƒÂ§Ã„Â±nÃ„Â±lmasÃ„Â± Gereken Anti-KalÃ„Â±plar
+## Kaçınılması Gereken Anti-Kalıplar
 
 ```kotlin
-// KÃƒÂ¶tÃƒÂ¼: Nullable tipleri zorla aÃƒÂ§ma
+// Kötü: Nullable tipleri zorla açma
 val name = user!!.name
 
-// KÃƒÂ¶tÃƒÂ¼: Java'dan platform tipi sÃ„Â±zÃ„Â±ntÃ„Â±sÃ„Â±
-fun getLength(s: String) = s.length // GÃƒÂ¼venli
-fun getLength(s: String?) = s?.length ?: 0 // Java'dan null'larÃ„Â± iÃ…Å¸le
+// Kötü: Java'dan platform tipi sızıntısı
+fun getLength(s: String) = s.length // Güvenli
+fun getLength(s: String?) = s?.length ?: 0 // Java'dan null'ları işle
 
-// KÃƒÂ¶tÃƒÂ¼: Mutable data class'lar
+// Kötü: Mutable data class'lar
 data class MutableUser(var name: String, var email: String)
 
-// KÃƒÂ¶tÃƒÂ¼: Kontrol akÃ„Â±Ã…Å¸Ã„Â± iÃƒÂ§in exception kullanma
+// Kötü: Kontrol akışı için exception kullanma
 try {
     val user = findUser(id)
 } catch (e: NotFoundException) {
-    // Beklenen durumlar iÃƒÂ§in exception kullanma
+    // Beklenen durumlar için exception kullanma
 }
 
-// Ã„Â°yi: Nullable dÃƒÂ¶nÃƒÂ¼Ã…Å¸ veya Result kullan
+// İyi: Nullable dönüş veya Result kullan
 val user: User? = findUserOrNull(id)
 
-// KÃƒÂ¶tÃƒÂ¼: Coroutine scope'u gÃƒÂ¶rmezden gelme
-GlobalScope.launch { /* GlobalScope'tan kaÃƒÂ§Ã„Â±n */ }
+// Kötü: Coroutine scope'u görmezden gelme
+GlobalScope.launch { /* GlobalScope'tan kaçın */ }
 
-// Ã„Â°yi: YapÃ„Â±landÃ„Â±rÃ„Â±lmÃ„Â±Ã…Å¸ eÃ…Å¸zamanlÃ„Â±lÃ„Â±k kullan
+// İyi: Yapılandırılmış eşzamanlılık kullan
 coroutineScope {
-    launch { /* Uygun Ã…Å¸ekilde scope edilmiÃ…Å¸ */ }
+    launch { /* Uygun şekilde scope edilmiş */ }
 }
 
-// KÃƒÂ¶tÃƒÂ¼: Derin iÃƒÂ§ iÃƒÂ§e scope fonksiyonlar
+// Kötü: Derin iç içe scope fonksiyonlar
 user?.let { u ->
     u.address?.let { a ->
         a.city?.let { c -> process(c) }
     }
 }
 
-// Ã„Â°yi: DoÃ„Å¸rudan null-safe zincir
+// İyi: Doğrudan null-safe zincir
 user?.address?.city?.let { process(it) }
 ```
 
-**HatÃ„Â±rla**: Kotlin kodu kÃ„Â±sa ama okunabilir olmalÃ„Â±. GÃƒÂ¼venlik iÃƒÂ§in tip sisteminden yararlanÃ„Â±n, immutability tercih edin ve eÃ…Å¸zamanlÃ„Â±lÃ„Â±k iÃƒÂ§in coroutine'ler kullanÃ„Â±n. Ã…Å¾ÃƒÂ¼pheye dÃƒÂ¼Ã…Å¸tÃƒÂ¼Ã„Å¸ÃƒÂ¼nÃƒÂ¼zde, derleyicinin size yardÃ„Â±m etmesine izin verin.
+**Hatırla**: Kotlin kodu kısa ama okunabilir olmalı. Güvenlik için tip sisteminden yararlanın, immutability tercih edin ve eşzamanlılık için coroutine'ler kullanın. Şüpheye düştüğünüzde, derleyicinin size yardım etmesine izin verin.

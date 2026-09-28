@@ -21,43 +21,43 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-pytest, TDD metodolojisi ve en iyi uygulamalar kullanarak Python uygulamalarÃ„Â± iÃƒÂ§in kapsamlÃ„Â± test stratejileri.
+pytest, TDD metodolojisi ve en iyi uygulamalar kullanarak Python uygulamaları için kapsamlı test stratejileri.
 
-## Ne Zaman EtkinleÃ…Å¸tirmeli
+## Ne Zaman Etkinleştirmeli
 
 - Yeni Python kodu yazarken (TDD'yi takip et: red, green, refactor)
-- Python projeleri iÃƒÂ§in test suite'leri tasarlarken
-- Python test coverage'Ã„Â±nÃ„Â± gÃƒÂ¶zden geÃƒÂ§irirken
-- Test altyapÃ„Â±sÃ„Â±nÃ„Â± kurarken
+- Python projeleri için test suite'leri tasarlarken
+- Python test coverage'ını gözden geçirirken
+- Test altyapısını kurarken
 
 ## Temel Test Felsefesi
 
 ### Test-Driven Development (TDD)
 
-Her zaman TDD dÃƒÂ¶ngÃƒÂ¼sÃƒÂ¼nÃƒÂ¼ takip edin:
+Her zaman TDD döngüsünü takip edin:
 
-1. **RED**: Ã„Â°stenen davranÃ„Â±Ã…Å¸ iÃƒÂ§in baÃ…Å¸arÃ„Â±sÃ„Â±z bir test yaz
-2. **GREEN**: Testi geÃƒÂ§irmek iÃƒÂ§in minimal kod yaz
-3. **REFACTOR**: Testleri yeÃ…Å¸il tutarken kodu iyileÃ…Å¸tir
+1. **RED**: İstenen davranış için başarısız bir test yaz
+2. **GREEN**: Testi geçirmek için minimal kod yaz
+3. **REFACTOR**: Testleri yeşil tutarken kodu iyileştir
 
 ```python
-# AdÃ„Â±m 1: BaÃ…Å¸arÃ„Â±sÃ„Â±z test yaz (RED)
+# Adım 1: Başarısız test yaz (RED)
 def test_add_numbers():
     result = add(2, 3)
     assert result == 5
 
-# AdÃ„Â±m 2: Minimal implementasyon yaz (GREEN)
+# Adım 2: Minimal implementasyon yaz (GREEN)
 def add(a, b):
     return a + b
 
-# AdÃ„Â±m 3: Gerekirse refactor et (REFACTOR)
+# Adım 3: Gerekirse refactor et (REFACTOR)
 ```
 
 ### Coverage Gereksinimleri
 
-- **Hedef**: 80%+ kod coverage'Ã„Â±
+- **Hedef**: 80%+ kod coverage'ı
 - **Kritik yollar**: 100% coverage gereklidir
-- Coverage'Ã„Â± ÃƒÂ¶lÃƒÂ§mek iÃƒÂ§in `pytest --cov` kullanÃ„Â±n
+- Coverage'ı ölçmek için `pytest --cov` kullanın
 
 ```bash
 pytest --cov=mypackage --cov-report=term-missing --cov-report=html
@@ -65,7 +65,7 @@ pytest --cov=mypackage --cov-report=term-missing --cov-report=html
 
 ## pytest Temelleri
 
-### Temel Test YapÃ„Â±sÃ„Â±
+### Temel Test Yapısı
 
 ```python
 import pytest
@@ -75,7 +75,7 @@ def test_addition():
     assert 2 + 2 == 4
 
 def test_string_uppercase():
-    """String bÃƒÂ¼yÃƒÂ¼k harf yapma testi."""
+    """String büyük harf yapma testi."""
     text = "hello"
     assert text.upper() == "HELLO"
 
@@ -90,35 +90,35 @@ def test_list_append():
 ### Assertion'lar
 
 ```python
-# EÃ…Å¸itlik
+# Eşitlik
 assert result == expected
 
-# EÃ…Å¸itsizlik
+# Eşitsizlik
 assert result != unexpected
 
-# DoÃ„Å¸ruluk deÃ„Å¸eri
+# Doğruluk değeri
 assert result  # Truthy
 assert not result  # Falsy
 assert result is True  # Tam olarak True
 assert result is False  # Tam olarak False
 assert result is None  # Tam olarak None
 
-# ÃƒÅ“yelik
+# Üyelik
 assert item in collection
 assert item not in collection
 
-# KarÃ…Å¸Ã„Â±laÃ…Å¸tÃ„Â±rmalar
+# Karşılaştırmalar
 assert result > 0
 assert 0 <= result <= 100
 
-# Tip kontrolÃƒÂ¼
+# Tip kontrolü
 assert isinstance(result, str)
 
-# Exception testi (tercih edilen yaklaÃ…Å¸Ã„Â±m)
+# Exception testi (tercih edilen yaklaşım)
 with pytest.raises(ValueError):
     raise ValueError("error message")
 
-# Exception mesajÃ„Â±nÃ„Â± kontrol et
+# Exception mesajını kontrol et
 with pytest.raises(ValueError, match="invalid input"):
     raise ValueError("invalid input provided")
 
@@ -130,14 +130,14 @@ assert str(exc_info.value) == "error message"
 
 ## Fixture'lar
 
-### Temel Fixture KullanÃ„Â±mÃ„Â±
+### Temel Fixture Kullanımı
 
 ```python
 import pytest
 
 @pytest.fixture
 def sample_data():
-    """Ãƒâ€“rnek veri saÃ„Å¸layan fixture."""
+    """Örnek veri sağlayan fixture."""
     return {"name": "Alice", "age": 30}
 
 def test_sample_data(sample_data):
@@ -157,28 +157,28 @@ def database():
     db.create_tables()
     db.insert_test_data()
 
-    yield db  # Teste saÃ„Å¸la
+    yield db  # Teste sağla
 
     # Teardown
     db.close()
 
 def test_database_query(database):
-    """VeritabanÃ„Â± operasyonlarÃ„Â±nÃ„Â± test et."""
+    """Veritabanı operasyonlarını test et."""
     result = database.query("SELECT * FROM users")
     assert len(result) > 0
 ```
 
-### Fixture Scope'larÃ„Â±
+### Fixture Scope'ları
 
 ```python
-# Function scope (varsayÃ„Â±lan) - her test iÃƒÂ§in ÃƒÂ§alÃ„Â±Ã…Å¸Ã„Â±r
+# Function scope (varsayılan) - her test için çalışır
 @pytest.fixture
 def temp_file():
     with open("temp.txt", "w") as f:
         yield f
     os.remove("temp.txt")
 
-# Module scope - modÃƒÂ¼l baÃ…Å¸Ã„Â±na bir kez ÃƒÂ§alÃ„Â±Ã…Å¸Ã„Â±r
+# Module scope - modül başına bir kez çalışır
 @pytest.fixture(scope="module")
 def module_db():
     db = Database(":memory:")
@@ -186,7 +186,7 @@ def module_db():
     yield db
     db.close()
 
-# Session scope - test oturumu baÃ…Å¸Ã„Â±na bir kez ÃƒÂ§alÃ„Â±Ã…Å¸Ã„Â±r
+# Session scope - test oturumu başına bir kez çalışır
 @pytest.fixture(scope="session")
 def shared_resource():
     resource = ExpensiveResource()
@@ -203,7 +203,7 @@ def number(request):
     return request.param
 
 def test_numbers(number):
-    """Test her parametre iÃƒÂ§in 3 kez ÃƒÂ§alÃ„Â±Ã…Å¸Ã„Â±r."""
+    """Test her parametre için 3 kez çalışır."""
     assert number > 0
 ```
 
@@ -223,22 +223,22 @@ def test_user_admin_interaction(user, admin):
     assert admin.can_manage(user)
 ```
 
-### Autouse Fixture'larÃ„Â±
+### Autouse Fixture'ları
 
 ```python
 @pytest.fixture(autouse=True)
 def reset_config():
-    """Her testten ÃƒÂ¶nce otomatik olarak ÃƒÂ§alÃ„Â±Ã…Å¸Ã„Â±r."""
+    """Her testten önce otomatik olarak çalışır."""
     Config.reset()
     yield
     Config.cleanup()
 
 def test_without_fixture_call():
-    # reset_config otomatik olarak ÃƒÂ§alÃ„Â±Ã…Å¸Ã„Â±r
+    # reset_config otomatik olarak çalışır
     assert Config.get_setting("debug") is False
 ```
 
-### PaylaÃ…Å¸Ã„Â±lan Fixture'lar iÃƒÂ§in Conftest.py
+### Paylaşılan Fixture'lar için Conftest.py
 
 ```python
 # tests/conftest.py
@@ -246,14 +246,14 @@ import pytest
 
 @pytest.fixture
 def client():
-    """TÃƒÂ¼m testler iÃƒÂ§in paylaÃ…Å¸Ã„Â±lan fixture."""
+    """Tüm testler için paylaşılan fixture."""
     app = create_app(testing=True)
     with app.test_client() as client:
         yield client
 
 @pytest.fixture
 def auth_headers(client):
-    """API testi iÃƒÂ§in auth header'larÃ„Â± oluÃ…Å¸tur."""
+    """API testi için auth header'ları oluştur."""
     response = client.post("/api/login", json={
         "username": "test",
         "password": "test"
@@ -273,7 +273,7 @@ def auth_headers(client):
     ("PyThOn", "PYTHON"),
 ])
 def test_uppercase(input, expected):
-    """Test farklÃ„Â± input'larla 3 kez ÃƒÂ§alÃ„Â±Ã…Å¸Ã„Â±r."""
+    """Test farklı input'larla 3 kez çalışır."""
     assert input.upper() == expected
 ```
 
@@ -309,7 +309,7 @@ def test_email_validation(input, expected):
 ```python
 @pytest.fixture(params=["sqlite", "postgresql", "mysql"])
 def db(request):
-    """Birden fazla veritabanÃ„Â± backend'ine karÃ…Å¸Ã„Â± test."""
+    """Birden fazla veritabanı backend'ine karşı test."""
     if request.param == "sqlite":
         return Database(":memory:")
     elif request.param == "postgresql":
@@ -318,50 +318,50 @@ def db(request):
         return Database("mysql://localhost/test")
 
 def test_database_operations(db):
-    """Test her veritabanÃ„Â± iÃƒÂ§in 3 kez ÃƒÂ§alÃ„Â±Ã…Å¸Ã„Â±r."""
+    """Test her veritabanı için 3 kez çalışır."""
     result = db.query("SELECT 1")
     assert result is not None
 ```
 
-## Marker'lar ve Test SeÃƒÂ§imi
+## Marker'lar ve Test Seçimi
 
-### Ãƒâ€“zel Marker'lar
+### Özel Marker'lar
 
 ```python
-# YavaÃ…Å¸ testleri iÃ…Å¸aretle
+# Yavaş testleri işaretle
 @pytest.mark.slow
 def test_slow_operation():
     time.sleep(5)
 
-# Entegrasyon testlerini iÃ…Å¸aretle
+# Entegrasyon testlerini işaretle
 @pytest.mark.integration
 def test_api_integration():
     response = requests.get("https://api.example.com")
     assert response.status_code == 200
 
-# Unit testleri iÃ…Å¸aretle
+# Unit testleri işaretle
 @pytest.mark.unit
 def test_unit_logic():
     assert calculate(2, 3) == 5
 ```
 
-### Belirli Testleri Ãƒâ€¡alÃ„Â±Ã…Å¸tÃ„Â±rma
+### Belirli Testleri Çalıştırma
 
 ```bash
-# Sadece hÃ„Â±zlÃ„Â± testleri ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
+# Sadece hızlı testleri çalıştır
 pytest -m "not slow"
 
-# Sadece entegrasyon testlerini ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
+# Sadece entegrasyon testlerini çalıştır
 pytest -m integration
 
-# Entegrasyon veya yavaÃ…Å¸ testleri ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
+# Entegrasyon veya yavaş testleri çalıştır
 pytest -m "integration or slow"
 
-# Unit olarak iÃ…Å¸aretlenmiÃ…Å¸ ama yavaÃ…Å¸ olmayan testleri ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
+# Unit olarak işaretlenmiş ama yavaş olmayan testleri çalıştır
 pytest -m "unit and not slow"
 ```
 
-### pytest.ini'de Marker'larÃ„Â± YapÃ„Â±landÃ„Â±rma
+### pytest.ini'de Marker'ları Yapılandırma
 
 ```ini
 [pytest]
@@ -374,14 +374,14 @@ markers =
 
 ## Mocking ve Patching
 
-### FonksiyonlarÃ„Â± Mocking
+### Fonksiyonları Mocking
 
 ```python
 from unittest.mock import patch, Mock
 
 @patch("mypackage.external_api_call")
 def test_with_mock(api_call_mock):
-    """Mock'lanmÃ„Â±Ã…Å¸ harici API ile test."""
+    """Mock'lanmış harici API ile test."""
     api_call_mock.return_value = {"status": "success"}
 
     result = my_function()
@@ -390,12 +390,12 @@ def test_with_mock(api_call_mock):
     assert result["status"] == "success"
 ```
 
-### DÃƒÂ¶nÃƒÂ¼Ã…Å¸ DeÃ„Å¸erlerini Mocking
+### Dönüş Değerlerini Mocking
 
 ```python
 @patch("mypackage.Database.connect")
 def test_database_connection(connect_mock):
-    """Mock'lanmÃ„Â±Ã…Å¸ veritabanÃ„Â± baÃ„Å¸lantÃ„Â±sÃ„Â± ile test."""
+    """Mock'lanmış veritabanı bağlantısı ile test."""
     connect_mock.return_value = MockConnection()
 
     db = Database()
@@ -404,12 +404,12 @@ def test_database_connection(connect_mock):
     connect_mock.assert_called_once_with("localhost")
 ```
 
-### Exception'larÃ„Â± Mocking
+### Exception'ları Mocking
 
 ```python
 @patch("mypackage.api_call")
 def test_api_error_handling(api_call_mock):
-    """Mock'lanmÃ„Â±Ã…Å¸ exception ile hata iÃ…Å¸leme testi."""
+    """Mock'lanmış exception ile hata işleme testi."""
     api_call_mock.side_effect = ConnectionError("Network error")
 
     with pytest.raises(ConnectionError):
@@ -418,12 +418,12 @@ def test_api_error_handling(api_call_mock):
     api_call_mock.assert_called_once()
 ```
 
-### Context Manager'larÃ„Â± Mocking
+### Context Manager'ları Mocking
 
 ```python
 @patch("builtins.open", new_callable=mock_open)
 def test_file_reading(mock_file):
-    """Mock'lanmÃ„Â±Ã…Å¸ open ile dosya okuma testi."""
+    """Mock'lanmış open ile dosya okuma testi."""
     mock_file.return_value.read.return_value = "file content"
 
     result = read_file("test.txt")
@@ -437,21 +437,21 @@ def test_file_reading(mock_file):
 ```python
 @patch("mypackage.DBConnection", autospec=True)
 def test_autospec(db_mock):
-    """API yanlÃ„Â±Ã…Å¸ kullanÃ„Â±mÃ„Â±nÃ„Â± yakalamak iÃƒÂ§in autospec ile test."""
+    """API yanlış kullanımını yakalamak için autospec ile test."""
     db = db_mock.return_value
     db.query("SELECT * FROM users")
 
-    # DBConnection query metodu yoksa bu baÃ…Å¸arÃ„Â±sÃ„Â±z olur
+    # DBConnection query metodu yoksa bu başarısız olur
     db_mock.assert_called_once()
 ```
 
-### Mock Class Instance'larÃ„Â±
+### Mock Class Instance'ları
 
 ```python
 class TestUserService:
     @patch("mypackage.UserRepository")
     def test_create_user(self, repo_mock):
-        """Mock'lanmÃ„Â±Ã…Å¸ repository ile kullanÃ„Â±cÃ„Â± oluÃ…Å¸turma testi."""
+        """Mock'lanmış repository ile kullanıcı oluşturma testi."""
         repo_mock.return_value.save.return_value = User(id=1, name="Alice")
 
         service = UserService(repo_mock.return_value)
@@ -466,14 +466,14 @@ class TestUserService:
 ```python
 @pytest.fixture
 def mock_config():
-    """Property'li bir mock oluÃ…Å¸tur."""
+    """Property'li bir mock oluştur."""
     config = Mock()
     type(config).debug = PropertyMock(return_value=True)
     type(config).api_key = PropertyMock(return_value="test-key")
     return config
 
 def test_with_mock_config(mock_config):
-    """Mock'lanmÃ„Â±Ã…Å¸ config property'leri ile test."""
+    """Mock'lanmış config property'leri ile test."""
     assert mock_config.debug is True
     assert mock_config.api_key == "test-key"
 ```
@@ -503,7 +503,7 @@ async def test_async_with_fixture(async_client):
 ```python
 @pytest.fixture
 async def async_client():
-    """Asenkron test client saÃ„Å¸layan asenkron fixture."""
+    """Asenkron test client sağlayan asenkron fixture."""
     app = create_app()
     async with app.test_client() as client:
         yield client
@@ -515,7 +515,7 @@ async def test_api_endpoint(async_client):
     assert response.status_code == 200
 ```
 
-### Asenkron FonksiyonlarÃ„Â± Mocking
+### Asenkron Fonksiyonları Mocking
 
 ```python
 @pytest.mark.asyncio
@@ -530,18 +530,18 @@ async def test_async_mock(api_call_mock):
     assert result["status"] == "ok"
 ```
 
-## Exception'larÃ„Â± Test Etme
+## Exception'ları Test Etme
 
-### Beklenen Exception'larÃ„Â± Test Etme
+### Beklenen Exception'ları Test Etme
 
 ```python
 def test_divide_by_zero():
-    """SÃ„Â±fÃ„Â±ra bÃƒÂ¶lmenin ZeroDivisionError raise ettiÃ„Å¸ini test et."""
+    """Sıfıra bölmenin ZeroDivisionError raise ettiğini test et."""
     with pytest.raises(ZeroDivisionError):
         divide(10, 0)
 
 def test_custom_exception():
-    """Mesaj ile ÃƒÂ¶zel exception testi."""
+    """Mesaj ile özel exception testi."""
     with pytest.raises(ValueError, match="invalid input"):
         validate_input("invalid")
 ```
@@ -550,7 +550,7 @@ def test_custom_exception():
 
 ```python
 def test_exception_with_details():
-    """Ãƒâ€“zel niteliklerle exception testi."""
+    """Özel niteliklerle exception testi."""
     with pytest.raises(CustomError) as exc_info:
         raise CustomError("error", code=400)
 
@@ -560,14 +560,14 @@ def test_exception_with_details():
 
 ## Yan Etkileri Test Etme
 
-### Dosya OperasyonlarÃ„Â±nÃ„Â± Test Etme
+### Dosya Operasyonlarını Test Etme
 
 ```python
 import tempfile
 import os
 
 def test_file_processing():
-    """GeÃƒÂ§ici dosya ile dosya iÃ…Å¸leme testi."""
+    """Geçici dosya ile dosya işleme testi."""
     with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.txt') as f:
         f.write("test content")
         temp_path = f.name
@@ -579,11 +579,11 @@ def test_file_processing():
         os.unlink(temp_path)
 ```
 
-### pytest'in tmp_path Fixture'Ã„Â± ile Test Etme
+### pytest'in tmp_path Fixture'ı ile Test Etme
 
 ```python
 def test_with_tmp_path(tmp_path):
-    """pytest'in built-in geÃƒÂ§ici yol fixture'Ã„Â±nÃ„Â± kullanarak test."""
+    """pytest'in built-in geçici yol fixture'ını kullanarak test."""
     test_file = tmp_path / "test.txt"
     test_file.write_text("hello world")
 
@@ -596,7 +596,7 @@ def test_with_tmp_path(tmp_path):
 
 ```python
 def test_with_tmpdir(tmpdir):
-    """pytest'in tmpdir fixture'Ã„Â±nÃ„Â± kullanarak test."""
+    """pytest'in tmpdir fixture'ını kullanarak test."""
     test_file = tmpdir.join("test.txt")
     test_file.write("data")
 
@@ -606,74 +606,74 @@ def test_with_tmpdir(tmpdir):
 
 ## Test Organizasyonu
 
-### Dizin YapÃ„Â±sÃ„Â±
+### Dizin Yapısı
 
 ```
 tests/
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ conftest.py                 # PaylaÃ…Å¸Ã„Â±lan fixture'lar
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ __init__.py
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ unit/                       # Unit testler
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ __init__.py
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ test_models.py
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ test_utils.py
-Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ test_services.py
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ integration/                # Entegrasyon testleri
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ __init__.py
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ test_api.py
-Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ test_database.py
-Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ e2e/                        # End-to-end testler
-    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ __init__.py
-    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ test_user_flow.py
+├── conftest.py                 # Paylaşılan fixture'lar
+├── __init__.py
+├── unit/                       # Unit testler
+│   ├── __init__.py
+│   ├── test_models.py
+│   ├── test_utils.py
+│   └── test_services.py
+├── integration/                # Entegrasyon testleri
+│   ├── __init__.py
+│   ├── test_api.py
+│   └── test_database.py
+└── e2e/                        # End-to-end testler
+    ├── __init__.py
+    └── test_user_flow.py
 ```
 
-### Test Class'larÃ„Â±
+### Test Class'ları
 
 ```python
 class TestUserService:
-    """Ã„Â°lgili testleri bir class'ta grupla."""
+    """İlgili testleri bir class'ta grupla."""
 
     @pytest.fixture(autouse=True)
     def setup(self):
-        """Bu class'taki her testten ÃƒÂ¶nce ÃƒÂ§alÃ„Â±Ã…Å¸an setup."""
+        """Bu class'taki her testten önce çalışan setup."""
         self.service = UserService()
 
     def test_create_user(self):
-        """KullanÃ„Â±cÃ„Â± oluÃ…Å¸turma testi."""
+        """Kullanıcı oluşturma testi."""
         user = self.service.create_user("Alice")
         assert user.name == "Alice"
 
     def test_delete_user(self):
-        """KullanÃ„Â±cÃ„Â± silme testi."""
+        """Kullanıcı silme testi."""
         user = User(id=1, name="Bob")
         self.service.delete_user(user)
         assert not self.service.user_exists(1)
 ```
 
-## En Ã„Â°yi Uygulamalar
+## En İyi Uygulamalar
 
 ### YAPIN
 
-- **TDD'yi takip edin**: Koddan ÃƒÂ¶nce testleri yazÃ„Â±n (red-green-refactor)
-- **Bir Ã…Å¸eyi test edin**: Her test tek bir davranÃ„Â±Ã…Å¸Ã„Â± doÃ„Å¸rulamalÃ„Â±
-- **AÃƒÂ§Ã„Â±klayÃ„Â±cÃ„Â± isimler kullanÃ„Â±n**: `test_user_login_with_invalid_credentials_fails`
-- **Fixture'larÃ„Â± kullanÃ„Â±n**: TekrarÃ„Â± fixture'larla ortadan kaldÃ„Â±rÃ„Â±n
-- **Harici baÃ„Å¸Ã„Â±mlÃ„Â±lÃ„Â±klarÃ„Â± mock'layÃ„Â±n**: Harici servislere baÃ„Å¸Ã„Â±mlÃ„Â± olmayÃ„Â±n
-- **Kenar durumlarÃ„Â± test edin**: BoÃ…Å¸ input'lar, None deÃ„Å¸erleri, sÃ„Â±nÃ„Â±r koÃ…Å¸ullarÃ„Â±
-- **%80+ coverage hedefleyin**: Kritik yollara odaklanÃ„Â±n
-- **Testleri hÃ„Â±zlÃ„Â± tutun**: YavaÃ…Å¸ testleri ayÃ„Â±rmak iÃƒÂ§in marker'lar kullanÃ„Â±n
+- **TDD'yi takip edin**: Koddan önce testleri yazın (red-green-refactor)
+- **Bir şeyi test edin**: Her test tek bir davranışı doğrulamalı
+- **Açıklayıcı isimler kullanın**: `test_user_login_with_invalid_credentials_fails`
+- **Fixture'ları kullanın**: Tekrarı fixture'larla ortadan kaldırın
+- **Harici bağımlılıkları mock'layın**: Harici servislere bağımlı olmayın
+- **Kenar durumları test edin**: Boş input'lar, None değerleri, sınır koşulları
+- **%80+ coverage hedefleyin**: Kritik yollara odaklanın
+- **Testleri hızlı tutun**: Yavaş testleri ayırmak için marker'lar kullanın
 
 ### YAPMAYIN
 
-- **Ã„Â°mplementasyonu test etmeyin**: DavranÃ„Â±Ã…Å¸Ã„Â± test edin, iÃƒÂ§ yapÃ„Â±yÃ„Â± deÃ„Å¸il
-- **Testlerde karmaÃ…Å¸Ã„Â±k koÃ…Å¸ullar kullanmayÃ„Â±n**: Testleri basit tutun
-- **Test hatalarÃ„Â±nÃ„Â± gÃƒÂ¶z ardÃ„Â± etmeyin**: TÃƒÂ¼m testler geÃƒÂ§meli
-- **Third-party kodu test etmeyin**: KÃƒÂ¼tÃƒÂ¼phanelerin ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±Ã„Å¸Ã„Â±na gÃƒÂ¼venin
-- **Testler arasÃ„Â± state paylaÃ…Å¸mayÃ„Â±n**: Testler baÃ„Å¸Ã„Â±msÃ„Â±z olmalÃ„Â±
-- **Testlerde exception yakalamayÃ„Â±n**: `pytest.raises` kullanÃ„Â±n
-- **Print statement'larÃ„Â± kullanmayÃ„Â±n**: Assertion'larÃ„Â± ve pytest ÃƒÂ§Ã„Â±ktÃ„Â±sÃ„Â±nÃ„Â± kullanÃ„Â±n
-- **Ãƒâ€¡ok kÃ„Â±rÃ„Â±lgan testler yazmayÃ„Â±n**: AÃ…Å¸Ã„Â±rÃ„Â± spesifik mock'lardan kaÃƒÂ§Ã„Â±nÃ„Â±n
+- **İmplementasyonu test etmeyin**: Davranışı test edin, iç yapıyı değil
+- **Testlerde karmaşık koşullar kullanmayın**: Testleri basit tutun
+- **Test hatalarını göz ardı etmeyin**: Tüm testler geçmeli
+- **Third-party kodu test etmeyin**: Kütüphanelerin çalıştığına güvenin
+- **Testler arası state paylaşmayın**: Testler bağımsız olmalı
+- **Testlerde exception yakalamayın**: `pytest.raises` kullanın
+- **Print statement'ları kullanmayın**: Assertion'ları ve pytest çıktısını kullanın
+- **Çok kırılgan testler yazmayın**: Aşırı spesifik mock'lardan kaçının
 
-## YaygÃ„Â±n Desenler
+## Yaygın Desenler
 
 ### API Endpoint'lerini Test Etme (FastAPI/Flask)
 
@@ -697,12 +697,12 @@ def test_create_user(client):
     assert response.json["name"] == "Alice"
 ```
 
-### VeritabanÃ„Â± OperasyonlarÃ„Â±nÃ„Â± Test Etme
+### Veritabanı Operasyonlarını Test Etme
 
 ```python
 @pytest.fixture
 def db_session():
-    """Test veritabanÃ„Â± oturumu oluÃ…Å¸tur."""
+    """Test veritabanı oturumu oluştur."""
     session = Session(bind=engine)
     session.begin_nested()
     yield session
@@ -718,7 +718,7 @@ def test_create_user(db_session):
     assert retrieved.email == "alice@example.com"
 ```
 
-### Class MetodlarÃ„Â±nÃ„Â± Test Etme
+### Class Metodlarını Test Etme
 
 ```python
 class TestCalculator:
@@ -734,7 +734,7 @@ class TestCalculator:
             calculator.divide(10, 0)
 ```
 
-## pytest YapÃ„Â±landÃ„Â±rmasÃ„Â±
+## pytest Yapılandırması
 
 ### pytest.ini
 
@@ -777,55 +777,55 @@ markers = [
 ]
 ```
 
-## Testleri Ãƒâ€¡alÃ„Â±Ã…Å¸tÃ„Â±rma
+## Testleri Çalıştırma
 
 ```bash
-# TÃƒÂ¼m testleri ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
+# Tüm testleri çalıştır
 pytest
 
-# Belirli dosyayÃ„Â± ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
+# Belirli dosyayı çalıştır
 pytest tests/test_utils.py
 
-# Belirli testi ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
+# Belirli testi çalıştır
 pytest tests/test_utils.py::test_function
 
-# Verbose ÃƒÂ§Ã„Â±ktÃ„Â± ile ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
+# Verbose çıktı ile çalıştır
 pytest -v
 
-# Coverage ile ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
+# Coverage ile çalıştır
 pytest --cov=mypackage --cov-report=html
 
-# Sadece hÃ„Â±zlÃ„Â± testleri ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
+# Sadece hızlı testleri çalıştır
 pytest -m "not slow"
 
-# Ã„Â°lk hataya kadar ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
+# İlk hataya kadar çalıştır
 pytest -x
 
-# N hataya kadar ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
+# N hataya kadar çalıştır
 pytest --maxfail=3
 
-# Son baÃ…Å¸arÃ„Â±sÃ„Â±z testleri ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
+# Son başarısız testleri çalıştır
 pytest --lf
 
-# Pattern ile testleri ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
+# Pattern ile testleri çalıştır
 pytest -k "test_user"
 
-# Hatada debugger ile ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
+# Hatada debugger ile çalıştır
 pytest --pdb
 ```
 
-## HÃ„Â±zlÃ„Â± Referans
+## Hızlı Referans
 
-| Desen | KullanÃ„Â±m |
+| Desen | Kullanım |
 |-------|----------|
-| `pytest.raises()` | Beklenen exception'larÃ„Â± test et |
-| `@pytest.fixture()` | Yeniden kullanÃ„Â±labilir test fixture'larÃ„Â± oluÃ…Å¸tur |
-| `@pytest.mark.parametrize()` | Birden fazla input ile testleri ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r |
-| `@pytest.mark.slow` | YavaÃ…Å¸ testleri iÃ…Å¸aretle |
-| `pytest -m "not slow"` | YavaÃ…Å¸ testleri atla |
-| `@patch()` | FonksiyonlarÃ„Â± ve class'larÃ„Â± mock'la |
-| `tmp_path` fixture | Otomatik geÃƒÂ§ici dizin |
-| `pytest --cov` | Coverage raporu oluÃ…Å¸tur |
+| `pytest.raises()` | Beklenen exception'ları test et |
+| `@pytest.fixture()` | Yeniden kullanılabilir test fixture'ları oluştur |
+| `@pytest.mark.parametrize()` | Birden fazla input ile testleri çalıştır |
+| `@pytest.mark.slow` | Yavaş testleri işaretle |
+| `pytest -m "not slow"` | Yavaş testleri atla |
+| `@patch()` | Fonksiyonları ve class'ları mock'la |
+| `tmp_path` fixture | Otomatik geçici dizin |
+| `pytest --cov` | Coverage raporu oluştur |
 | `assert` | Basit ve okunabilir assertion'lar |
 
-**UnutmayÃ„Â±n**: Testler de koddur. Temiz, okunabilir ve bakÃ„Â±mÃ„Â± kolay tutun. Ã„Â°yi testler hata yakalar; harika testler hatalarÃ„Â± ÃƒÂ¶nler.
+**Unutmayın**: Testler de koddur. Temiz, okunabilir ve bakımı kolay tutun. İyi testler hata yakalar; harika testler hataları önler.

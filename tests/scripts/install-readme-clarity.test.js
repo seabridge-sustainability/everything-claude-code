@@ -252,8 +252,8 @@ function runTests() {
       'README should not present the legacy Codex sync as the primary setup'
     );
     assert.ok(
-      codexAgents.includes('Reviewed native subset with explicit trust in `/hooks`'),
-      'Packaged Codex guidance should describe the shipped trusted hook subset'
+      codexAgents.includes('The root `AGENTS.md` is canonical'),
+      'Packaged Codex guidance should defer shared policy to the canonical root instructions'
     );
     assert.ok(
       !/not yet supported|codex lacks hooks|security without hooks/i.test(codexAgents),

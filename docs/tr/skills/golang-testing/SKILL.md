@@ -1,6 +1,6 @@
 ---
 name: golang-testing
-description: Table-driven testler, subtestler, benchmark'lar, fuzzing ve test coverage iÃƒÂ§eren Go test desenleri. TDD metodolojisi ile idiomatic Go uygulamalarÃ„Â±nÃ„Â± takip eder.
+description: Table-driven testler, subtestler, benchmark'lar, fuzzing ve test coverage içeren Go test desenleri. TDD metodolojisi ile idiomatic Go uygulamalarını takip eder.
 origin: ECC
 ---
 
@@ -21,31 +21,31 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-TDD metodolojisini takip eden gÃƒÂ¼venilir, bakÃ„Â±mÃ„Â± kolay testler yazmak iÃƒÂ§in kapsamlÃ„Â± Go test desenleri.
+TDD metodolojisini takip eden güvenilir, bakımı kolay testler yazmak için kapsamlı Go test desenleri.
 
-## Ne Zaman EtkinleÃ…Å¸tirmeli
+## Ne Zaman Etkinleştirmeli
 
-- Yeni Go fonksiyonlarÃ„Â± veya metodlarÃ„Â± yazarken
+- Yeni Go fonksiyonları veya metodları yazarken
 - Mevcut koda test coverage eklerken
-- Performans-kritik kod iÃƒÂ§in benchmark'lar oluÃ…Å¸tururken
-- Input validation iÃƒÂ§in fuzz testler implement ederken
+- Performans-kritik kod için benchmark'lar oluştururken
+- Input validation için fuzz testler implement ederken
 - Go projelerinde TDD workflow'u takip ederken
 
-## Go iÃƒÂ§in TDD Workflow'u
+## Go için TDD Workflow'u
 
-### RED-GREEN-REFACTOR DÃƒÂ¶ngÃƒÂ¼sÃƒÂ¼
+### RED-GREEN-REFACTOR Döngüsü
 
 ```
-RED     Ã¢â€ â€™ Ãƒâ€“nce baÃ…Å¸arÃ„Â±sÃ„Â±z bir test yaz
-GREEN   Ã¢â€ â€™ Testi geÃƒÂ§irmek iÃƒÂ§in minimal kod yaz
-REFACTOR Ã¢â€ â€™ Testleri yeÃ…Å¸il tutarken kodu iyileÃ…Å¸tir
-REPEAT  Ã¢â€ â€™ Sonraki gereksinimle devam et
+RED     → Önce başarısız bir test yaz
+GREEN   → Testi geçirmek için minimal kod yaz
+REFACTOR → Testleri yeşil tutarken kodu iyileştir
+REPEAT  → Sonraki gereksinimle devam et
 ```
 
-### Go'da AdÃ„Â±m AdÃ„Â±m TDD
+### Go'da Adım Adım TDD
 
 ```go
-// AdÃ„Â±m 1: Interface/signature'Ã„Â± tanÃ„Â±mla
+// Adım 1: Interface/signature'ı tanımla
 // calculator.go
 package calculator
 
@@ -53,7 +53,7 @@ func Add(a, b int) int {
     panic("not implemented") // Placeholder
 }
 
-// AdÃ„Â±m 2: BaÃ…Å¸arÃ„Â±sÃ„Â±z test yaz (RED)
+// Adım 2: Başarısız test yaz (RED)
 // calculator_test.go
 package calculator
 
@@ -67,26 +67,26 @@ func TestAdd(t *testing.T) {
     }
 }
 
-// AdÃ„Â±m 3: Testi ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r - FAIL'i doÃ„Å¸rula
+// Adım 3: Testi çalıştır - FAIL'i doğrula
 // $ go test
 // --- FAIL: TestAdd (0.00s)
 // panic: not implemented
 
-// AdÃ„Â±m 4: Minimal kodu implement et (GREEN)
+// Adım 4: Minimal kodu implement et (GREEN)
 func Add(a, b int) int {
     return a + b
 }
 
-// AdÃ„Â±m 5: Testi ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r - PASS'i doÃ„Å¸rula
+// Adım 5: Testi çalıştır - PASS'i doğrula
 // $ go test
 // PASS
 
-// AdÃ„Â±m 6: Gerekirse refactor et, testlerin hala geÃƒÂ§tiÃ„Å¸ini doÃ„Å¸rula
+// Adım 6: Gerekirse refactor et, testlerin hala geçtiğini doğrula
 ```
 
 ## Table-Driven Testler
 
-Go testleri iÃƒÂ§in standart desen. Minimal kodla kapsamlÃ„Â± coverage saÃ„Å¸lar.
+Go testleri için standart desen. Minimal kodla kapsamlı coverage sağlar.
 
 ```go
 func TestAdd(t *testing.T) {
@@ -114,7 +114,7 @@ func TestAdd(t *testing.T) {
 }
 ```
 
-### Hata DurumlarÃ„Â± ile Table-Driven Testler
+### Hata Durumları ile Table-Driven Testler
 
 ```go
 func TestParseConfig(t *testing.T) {
@@ -142,7 +142,7 @@ func TestParseConfig(t *testing.T) {
         {
             name:  "minimal config",
             input: `{}`,
-            want:  &Config{}, // SÃ„Â±fÃ„Â±r deÃ„Å¸er config
+            want:  &Config{}, // Sıfır değer config
         },
     }
 
@@ -171,11 +171,11 @@ func TestParseConfig(t *testing.T) {
 
 ## Subtestler ve Sub-benchmark'lar
 
-### Ã„Â°lgili Testleri Organize Etme
+### İlgili Testleri Organize Etme
 
 ```go
 func TestUser(t *testing.T) {
-    // TÃƒÂ¼m subtestler tarafÃ„Â±ndan paylaÃ…Å¸Ã„Â±lan setup
+    // Tüm subtestler tarafından paylaşılan setup
     db := setupTestDB(t)
 
     t.Run("Create", func(t *testing.T) {
@@ -223,9 +223,9 @@ func TestParallel(t *testing.T) {
     }
 
     for _, tt := range tests {
-        tt := tt // Range deÃ„Å¸iÃ…Å¸kenini yakala
+        tt := tt // Range değişkenini yakala
         t.Run(tt.name, func(t *testing.T) {
-            t.Parallel() // Subtestleri paralel ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
+            t.Parallel() // Subtestleri paralel çalıştır
             result := Process(tt.input)
             // assertion'lar...
             _ = result
@@ -234,25 +234,25 @@ func TestParallel(t *testing.T) {
 }
 ```
 
-## Test Helper'larÃ„Â±
+## Test Helper'ları
 
 ### Helper Fonksiyonlar
 
 ```go
 func setupTestDB(t *testing.T) *sql.DB {
-    t.Helper() // Bunu helper fonksiyon olarak iÃ…Å¸aretle
+    t.Helper() // Bunu helper fonksiyon olarak işaretle
 
     db, err := sql.Open("sqlite3", ":memory:")
     if err != nil {
         t.Fatalf("failed to open database: %v", err)
     }
 
-    // Test bittiÃ„Å¸inde temizlik
+    // Test bittiğinde temizlik
     t.Cleanup(func() {
         db.Close()
     })
 
-    // Migration'larÃ„Â± ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
+    // Migration'ları çalıştır
     if _, err := db.Exec(schema); err != nil {
         t.Fatalf("failed to create schema: %v", err)
     }
@@ -275,21 +275,21 @@ func assertEqual[T comparable](t *testing.T, got, want T) {
 }
 ```
 
-### GeÃƒÂ§ici Dosyalar ve Dizinler
+### Geçici Dosyalar ve Dizinler
 
 ```go
 func TestFileProcessing(t *testing.T) {
-    // GeÃƒÂ§ici dizin oluÃ…Å¸tur - otomatik olarak temizlenir
+    // Geçici dizin oluştur - otomatik olarak temizlenir
     tmpDir := t.TempDir()
 
-    // Test dosyasÃ„Â± oluÃ…Å¸tur
+    // Test dosyası oluştur
     testFile := filepath.Join(tmpDir, "test.txt")
     err := os.WriteFile(testFile, []byte("test content"), 0644)
     if err != nil {
         t.Fatalf("failed to create test file: %v", err)
     }
 
-    // Testi ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
+    // Testi çalıştır
     result, err := ProcessFile(testFile)
     if err != nil {
         t.Fatalf("ProcessFile failed: %v", err)
@@ -302,7 +302,7 @@ func TestFileProcessing(t *testing.T) {
 
 ## Golden File'lar
 
-`testdata/` iÃƒÂ§inde saklanan beklenen ÃƒÂ§Ã„Â±ktÃ„Â± dosyalarÃ„Â±na karÃ…Å¸Ã„Â± test etme.
+`testdata/` içinde saklanan beklenen çıktı dosyalarına karşı test etme.
 
 ```go
 var update = flag.Bool("update", false, "update golden files")
@@ -323,7 +323,7 @@ func TestRender(t *testing.T) {
             golden := filepath.Join("testdata", tt.name+".golden")
 
             if *update {
-                // Golden dosyayÃ„Â± gÃƒÂ¼ncelle: go test -update
+                // Golden dosyayı güncelle: go test -update
                 err := os.WriteFile(golden, got, 0644)
                 if err != nil {
                     t.Fatalf("failed to update golden file: %v", err)
@@ -345,10 +345,10 @@ func TestRender(t *testing.T) {
 
 ## Interface'ler ile Mocking
 
-### Interface TabanlÃ„Â± Mocking
+### Interface Tabanlı Mocking
 
 ```go
-// BaÃ„Å¸Ã„Â±mlÃ„Â±lÃ„Â±klar iÃƒÂ§in interface tanÃ„Â±mlayÃ„Â±n
+// Bağımlılıklar için interface tanımlayın
 type UserRepository interface {
     GetUser(id string) (*User, error)
     SaveUser(user *User) error
@@ -360,10 +360,10 @@ type PostgresUserRepository struct {
 }
 
 func (r *PostgresUserRepository) GetUser(id string) (*User, error) {
-    // GerÃƒÂ§ek veritabanÃ„Â± sorgusu
+    // Gerçek veritabanı sorgusu
 }
 
-// Testler iÃƒÂ§in mock implementasyon
+// Testler için mock implementasyon
 type MockUserRepository struct {
     GetUserFunc  func(id string) (*User, error)
     SaveUserFunc func(user *User) error
@@ -407,18 +407,18 @@ func TestUserService(t *testing.T) {
 ```go
 func BenchmarkProcess(b *testing.B) {
     data := generateTestData(1000)
-    b.ResetTimer() // Setup sÃƒÂ¼resini sayma
+    b.ResetTimer() // Setup süresini sayma
 
     for i := 0; i < b.N; i++ {
         Process(data)
     }
 }
 
-// Ãƒâ€¡alÃ„Â±Ã…Å¸tÃ„Â±r: go test -bench=BenchmarkProcess -benchmem
-// Ãƒâ€¡Ã„Â±ktÃ„Â±: BenchmarkProcess-8   10000   105234 ns/op   4096 B/op   10 allocs/op
+// Çalıştır: go test -bench=BenchmarkProcess -benchmem
+// Çıktı: BenchmarkProcess-8   10000   105234 ns/op   4096 B/op   10 allocs/op
 ```
 
-### FarklÃ„Â± Boyutlarla Benchmark
+### Farklı Boyutlarla Benchmark
 
 ```go
 func BenchmarkSort(b *testing.B) {
@@ -430,7 +430,7 @@ func BenchmarkSort(b *testing.B) {
             b.ResetTimer()
 
             for i := 0; i < b.N; i++ {
-                // Zaten sÃ„Â±ralanmÃ„Â±Ã…Å¸ veriyi sÃ„Â±ralamaktan kaÃƒÂ§Ã„Â±nmak iÃƒÂ§in kopya oluÃ…Å¸tur
+                // Zaten sıralanmış veriyi sıralamaktan kaçınmak için kopya oluştur
                 tmp := make([]int, len(data))
                 copy(tmp, data)
                 sort.Ints(tmp)
@@ -440,7 +440,7 @@ func BenchmarkSort(b *testing.B) {
 }
 ```
 
-### Bellek Tahsis Benchmark'larÃ„Â±
+### Bellek Tahsis Benchmark'ları
 
 ```go
 func BenchmarkStringConcat(b *testing.B) {
@@ -491,11 +491,11 @@ func FuzzParseJSON(f *testing.F) {
         err := json.Unmarshal([]byte(input), &result)
 
         if err != nil {
-            // Rastgele input iÃƒÂ§in geÃƒÂ§ersiz JSON beklenebilir
+            // Rastgele input için geçersiz JSON beklenebilir
             return
         }
 
-        // Parsing baÃ…Å¸arÃ„Â±lÃ„Â±ysa, yeniden encoding ÃƒÂ§alÃ„Â±Ã…Å¸malÃ„Â±
+        // Parsing başarılıysa, yeniden encoding çalışmalı
         _, err = json.Marshal(result)
         if err != nil {
             t.Errorf("Marshal failed after successful Unmarshal: %v", err)
@@ -503,10 +503,10 @@ func FuzzParseJSON(f *testing.F) {
     })
 }
 
-// Ãƒâ€¡alÃ„Â±Ã…Å¸tÃ„Â±r: go test -fuzz=FuzzParseJSON -fuzztime=30s
+// Çalıştır: go test -fuzz=FuzzParseJSON -fuzztime=30s
 ```
 
-### Birden Ãƒâ€¡ok Input ile Fuzz Testi
+### Birden Çok Input ile Fuzz Testi
 
 ```go
 func FuzzCompare(f *testing.F) {
@@ -517,12 +517,12 @@ func FuzzCompare(f *testing.F) {
     f.Fuzz(func(t *testing.T, a, b string) {
         result := Compare(a, b)
 
-        // Ãƒâ€“zellik: Compare(a, a) her zaman 0'a eÃ…Å¸it olmalÃ„Â±
+        // Özellik: Compare(a, a) her zaman 0'a eşit olmalı
         if a == b && result != 0 {
             t.Errorf("Compare(%q, %q) = %d; want 0", a, b, result)
         }
 
-        // Ãƒâ€“zellik: Compare(a, b) ve Compare(b, a) zÃ„Â±t iÃ…Å¸arete sahip olmalÃ„Â±
+        // Özellik: Compare(a, b) ve Compare(b, a) zıt işarete sahip olmalı
         reverse := Compare(b, a)
         if (result > 0 && reverse >= 0) || (result < 0 && reverse <= 0) {
             if result != 0 || reverse != 0 {
@@ -536,19 +536,19 @@ func FuzzCompare(f *testing.F) {
 
 ## Test Coverage
 
-### Coverage Ãƒâ€¡alÃ„Â±Ã…Å¸tÃ„Â±rma
+### Coverage Çalıştırma
 
 ```bash
 # Temel coverage
 go test -cover ./...
 
-# Coverage profili oluÃ…Å¸tur
+# Coverage profili oluştur
 go test -coverprofile=coverage.out ./...
 
-# Coverage'Ã„Â± tarayÃ„Â±cÃ„Â±da gÃƒÂ¶rÃƒÂ¼ntÃƒÂ¼le
+# Coverage'ı tarayıcıda görüntüle
 go tool cover -html=coverage.out
 
-# Fonksiyona gÃƒÂ¶re coverage gÃƒÂ¶rÃƒÂ¼ntÃƒÂ¼le
+# Fonksiyona göre coverage görüntüle
 go tool cover -func=coverage.out
 
 # Race detection ile coverage
@@ -559,17 +559,17 @@ go test -race -coverprofile=coverage.out ./...
 
 | Kod Tipi | Hedef |
 |----------|-------|
-| Kritik iÃ…Å¸ mantÃ„Â±Ã„Å¸Ã„Â± | 100% |
+| Kritik iş mantığı | 100% |
 | Public API'ler | 90%+ |
 | Genel kod | 80%+ |
-| OluÃ…Å¸turulan kod | HariÃƒÂ§ tut |
+| Oluşturulan kod | Hariç tut |
 
-### OluÃ…Å¸turulan Kodu Coverage'dan HariÃƒÂ§ Tutma
+### Oluşturulan Kodu Coverage'dan Hariç Tutma
 
 ```go
 //go:generate mockgen -source=interface.go -destination=mock_interface.go
 
-// Coverage profile'Ã„Â±nda, build tag'leri ile hariÃƒÂ§ tut:
+// Coverage profile'ında, build tag'leri ile hariç tut:
 // go test -cover -tags=!generate ./...
 ```
 
@@ -577,11 +577,11 @@ go test -race -coverprofile=coverage.out ./...
 
 ```go
 func TestHealthHandler(t *testing.T) {
-    // Request oluÃ…Å¸tur
+    // Request oluştur
     req := httptest.NewRequest(http.MethodGet, "/health", nil)
     w := httptest.NewRecorder()
 
-    // Handler'Ã„Â± ÃƒÂ§aÃ„Å¸Ã„Â±r
+    // Handler'ı çağır
     HealthHandler(w, req)
 
     // Response'u kontrol et
@@ -656,65 +656,65 @@ func TestAPIHandler(t *testing.T) {
 }
 ```
 
-## Test KomutlarÃ„Â±
+## Test Komutları
 
 ```bash
-# TÃƒÂ¼m testleri ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
+# Tüm testleri çalıştır
 go test ./...
 
-# Verbose ÃƒÂ§Ã„Â±ktÃ„Â± ile testleri ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
+# Verbose çıktı ile testleri çalıştır
 go test -v ./...
 
-# Belirli bir testi ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
+# Belirli bir testi çalıştır
 go test -run TestAdd ./...
 
-# Pattern ile eÃ…Å¸leÃ…Å¸en testleri ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
+# Pattern ile eşleşen testleri çalıştır
 go test -run "TestUser/Create" ./...
 
-# Race detector ile testleri ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
+# Race detector ile testleri çalıştır
 go test -race ./...
 
-# Coverage ile testleri ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
+# Coverage ile testleri çalıştır
 go test -cover -coverprofile=coverage.out ./...
 
-# Sadece kÃ„Â±sa testleri ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
+# Sadece kısa testleri çalıştır
 go test -short ./...
 
-# Timeout ile testleri ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
+# Timeout ile testleri çalıştır
 go test -timeout 30s ./...
 
-# Benchmark'larÃ„Â± ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
+# Benchmark'ları çalıştır
 go test -bench=. -benchmem ./...
 
-# Fuzzing ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
+# Fuzzing çalıştır
 go test -fuzz=FuzzParse -fuzztime=30s ./...
 
-# Test ÃƒÂ§alÃ„Â±Ã…Å¸ma sayÃ„Â±sÃ„Â± (flaky test tespiti iÃƒÂ§in)
+# Test çalışma sayısı (flaky test tespiti için)
 go test -count=10 ./...
 ```
 
-## En Ã„Â°yi Uygulamalar
+## En İyi Uygulamalar
 
 **YAPIN:**
-- Testleri Ãƒâ€“NCE yazÃ„Â±n (TDD)
-- KapsamlÃ„Â± coverage iÃƒÂ§in table-driven testler kullanÃ„Â±n
-- Ã„Â°mplementasyon deÃ„Å¸il davranÃ„Â±Ã…Å¸ test edin
-- Helper fonksiyonlarda `t.Helper()` kullanÃ„Â±n
-- BaÃ„Å¸Ã„Â±msÃ„Â±z testler iÃƒÂ§in `t.Parallel()` kullanÃ„Â±n
-- KaynaklarÃ„Â± `t.Cleanup()` ile temizleyin
-- Senaryoyu aÃƒÂ§Ã„Â±klayan anlamlÃ„Â± test isimleri kullanÃ„Â±n
+- Testleri ÖNCE yazın (TDD)
+- Kapsamlı coverage için table-driven testler kullanın
+- İmplementasyon değil davranış test edin
+- Helper fonksiyonlarda `t.Helper()` kullanın
+- Bağımsız testler için `t.Parallel()` kullanın
+- Kaynakları `t.Cleanup()` ile temizleyin
+- Senaryoyu açıklayan anlamlı test isimleri kullanın
 
 **YAPMAYIN:**
-- Private fonksiyonlarÃ„Â± doÃ„Å¸rudan test etmeyin (public API ÃƒÂ¼zerinden test edin)
-- Testlerde `time.Sleep()` kullanmayÃ„Â±n (channel'lar veya condition'lar kullanÃ„Â±n)
-- Flaky testleri gÃƒÂ¶z ardÃ„Â± etmeyin (dÃƒÂ¼zeltin veya kaldÃ„Â±rÃ„Â±n)
-- Her Ã…Å¸eyi mocklamayÃ„Â±n (mÃƒÂ¼mkÃƒÂ¼n olduÃ„Å¸unda integration testlerini tercih edin)
-- Hata yolu testini atlamayÃ„Â±n
+- Private fonksiyonları doğrudan test etmeyin (public API üzerinden test edin)
+- Testlerde `time.Sleep()` kullanmayın (channel'lar veya condition'lar kullanın)
+- Flaky testleri göz ardı etmeyin (düzeltin veya kaldırın)
+- Her şeyi mocklamayın (mümkün olduğunda integration testlerini tercih edin)
+- Hata yolu testini atlamayın
 
 ## CI/CD ile Entegrasyon
 
 ```yaml
-# GitHub Actions ÃƒÂ¶rneÃ„Å¸i
+# GitHub Actions örneği
 test:
   runs-on: ubuntu-latest
   steps:
@@ -732,4 +732,4 @@ test:
         awk -F'%' '{if ($1 < 80) exit 1}'
 ```
 
-**UnutmayÃ„Â±n**: Testler dokÃƒÂ¼mantasyondur. Kodunuzun nasÃ„Â±l kullanÃ„Â±lmasÃ„Â± gerektiÃ„Å¸ini gÃƒÂ¶sterirler. Testleri aÃƒÂ§Ã„Â±k yazÃ„Â±n ve gÃƒÂ¼ncel tutun.
+**Unutmayın**: Testler dokümantasyondur. Kodunuzun nasıl kullanılması gerektiğini gösterirler. Testleri açık yazın ve güncel tutun.

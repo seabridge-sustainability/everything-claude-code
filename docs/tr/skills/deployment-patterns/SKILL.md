@@ -1,10 +1,10 @@
 ---
 name: deployment-patterns
-description: Deployment iÃ…Å¸ akÃ„Â±Ã…Å¸larÃ„Â±, CI/CD pipeline kalÃ„Â±plarÃ„Â±, Docker konteynerizasyonu, saÃ„Å¸lÃ„Â±k kontrolleri, rollback stratejileri ve web uygulamalarÃ„Â± iÃƒÂ§in ÃƒÂ¼retim hazÃ„Â±rlÃ„Â±Ã„Å¸Ã„Â± kontrol listeleri.
+description: Deployment iş akışları, CI/CD pipeline kalıpları, Docker konteynerizasyonu, sağlık kontrolleri, rollback stratejileri ve web uygulamaları için üretim hazırlığı kontrol listeleri.
 origin: ECC
 ---
 
-# Deployment KalÃ„Â±plarÃ„Â±
+# Deployment Kalıpları
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -21,67 +21,67 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-ÃƒÅ“retim deployment iÃ…Å¸ akÃ„Â±Ã…Å¸larÃ„Â± ve CI/CD en iyi uygulamalarÃ„Â±.
+Üretim deployment iş akışları ve CI/CD en iyi uygulamaları.
 
-## Ne Zaman AktifleÃ…Å¸tirmeli
+## Ne Zaman Aktifleştirmeli
 
-- CI/CD pipeline'larÃ„Â± kurarken
-- Bir uygulamayÃ„Â± Docker'ize ederken
+- CI/CD pipeline'ları kurarken
+- Bir uygulamayı Docker'ize ederken
 - Deployment stratejisi planlarken (blue-green, canary, rolling)
-- SaÃ„Å¸lÃ„Â±k kontrolleri ve hazÃ„Â±rlÃ„Â±k probe'larÃ„Â± uygularken
-- ÃƒÅ“retim yayÃ„Â±nÃ„Â±na hazÃ„Â±rlanÃ„Â±rken
-- Ortama ÃƒÂ¶zgÃƒÂ¼ ayarlarÃ„Â± yapÃ„Â±landÃ„Â±rÃ„Â±rken
+- Sağlık kontrolleri ve hazırlık probe'ları uygularken
+- Üretim yayınına hazırlanırken
+- Ortama özgü ayarları yapılandırırken
 
 ## Deployment Stratejileri
 
-### Rolling Deployment (VarsayÃ„Â±lan)
+### Rolling Deployment (Varsayılan)
 
-Instance'larÃ„Â± kademeli olarak deÃ„Å¸iÃ…Å¸tir Ã¢â‚¬â€ rollout sÃ„Â±rasÃ„Â±nda eski ve yeni versiyonlar birlikte ÃƒÂ§alÃ„Â±Ã…Å¸Ã„Â±r.
+Instance'ları kademeli olarak değiştir — rollout sırasında eski ve yeni versiyonlar birlikte çalışır.
 
 ```
-Instance 1: v1 Ã¢â€ â€™ v2  (ÃƒÂ¶nce gÃƒÂ¼ncelle)
-Instance 2: v1        (hala v1 ÃƒÂ§alÃ„Â±Ã…Å¸Ã„Â±yor)
-Instance 3: v1        (hala v1 ÃƒÂ§alÃ„Â±Ã…Å¸Ã„Â±yor)
+Instance 1: v1 → v2  (önce güncelle)
+Instance 2: v1        (hala v1 çalışıyor)
+Instance 3: v1        (hala v1 çalışıyor)
 
 Instance 1: v2
-Instance 2: v1 Ã¢â€ â€™ v2  (ikinci olarak gÃƒÂ¼ncelle)
+Instance 2: v1 → v2  (ikinci olarak güncelle)
 Instance 3: v1
 
 Instance 1: v2
 Instance 2: v2
-Instance 3: v1 Ã¢â€ â€™ v2  (son olarak gÃƒÂ¼ncelle)
+Instance 3: v1 → v2  (son olarak güncelle)
 ```
 
-**ArtÃ„Â±larÃ„Â±:** SÃ„Â±fÃ„Â±r kesinti, kademeli rollout
-**Eksileri:** Ã„Â°ki versiyon aynÃ„Â± anda ÃƒÂ§alÃ„Â±Ã…Å¸Ã„Â±r Ã¢â‚¬â€ geriye uyumlu deÃ„Å¸iÃ…Å¸iklikler gerektirir
-**Ne zaman kullanÃ„Â±lÃ„Â±r:** Standart deployment'lar, geriye uyumlu deÃ„Å¸iÃ…Å¸iklikler
+**Artıları:** Sıfır kesinti, kademeli rollout
+**Eksileri:** İki versiyon aynı anda çalışır — geriye uyumlu değişiklikler gerektirir
+**Ne zaman kullanılır:** Standart deployment'lar, geriye uyumlu değişiklikler
 
 ### Blue-Green Deployment
 
-Ã„Â°ki ÃƒÂ¶zdeÃ…Å¸ ortam ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r. TrafiÃ„Å¸i atomik olarak deÃ„Å¸iÃ…Å¸tir.
+İki özdeş ortam çalıştır. Trafiği atomik olarak değiştir.
 
 ```
-Blue  (v1) Ã¢â€ Â trafik
-Green (v2)   boÃ…Å¸ta, yeni versiyon ÃƒÂ§alÃ„Â±Ã…Å¸Ã„Â±yor
+Blue  (v1) ← trafik
+Green (v2)   boşta, yeni versiyon çalışıyor
 
-# DoÃ„Å¸rulamadan sonra:
-Blue  (v1)   boÃ…Å¸ta (yedek haline gelir)
-Green (v2) Ã¢â€ Â trafik
+# Doğrulamadan sonra:
+Blue  (v1)   boşta (yedek haline gelir)
+Green (v2) ← trafik
 ```
 
-**ArtÃ„Â±larÃ„Â±:** AnÃ„Â±nda rollback (blue'ya geri dÃƒÂ¶n), temiz geÃƒÂ§iÃ…Å¸
-**Eksileri:** Deployment sÃ„Â±rasÃ„Â±nda 2x altyapÃ„Â± gerektirir
-**Ne zaman kullanÃ„Â±lÃ„Â±r:** Kritik servisler, sorunlara sÃ„Â±fÃ„Â±r tolerans
+**Artıları:** Anında rollback (blue'ya geri dön), temiz geçiş
+**Eksileri:** Deployment sırasında 2x altyapı gerektirir
+**Ne zaman kullanılır:** Kritik servisler, sorunlara sıfır tolerans
 
 ### Canary Deployment
 
-Ãƒâ€“nce trafiÃ„Å¸in kÃƒÂ¼ÃƒÂ§ÃƒÂ¼k bir yÃƒÂ¼zdesini yeni versiyona yÃƒÂ¶nlendir.
+Önce trafiğin küçük bir yüzdesini yeni versiyona yönlendir.
 
 ```
 v1: %95 trafik
 v2:  %5 trafik  (canary)
 
-# Metrikler iyi gÃƒÂ¶rÃƒÂ¼nÃƒÂ¼yorsa:
+# Metrikler iyi görünüyorsa:
 v1: %50 trafik
 v2: %50 trafik
 
@@ -89,16 +89,16 @@ v2: %50 trafik
 v2: %100 trafik
 ```
 
-**ArtÃ„Â±larÃ„Â±:** Tam rollout'tan ÃƒÂ¶nce gerÃƒÂ§ek trafikle sorunlarÃ„Â± yakalar
-**Eksileri:** Trafik bÃƒÂ¶lme altyapÃ„Â±sÃ„Â±, izleme gerektirir
-**Ne zaman kullanÃ„Â±lÃ„Â±r:** YÃƒÂ¼ksek trafikli servisler, riskli deÃ„Å¸iÃ…Å¸iklikler, feature flag'ler
+**Artıları:** Tam rollout'tan önce gerçek trafikle sorunları yakalar
+**Eksileri:** Trafik bölme altyapısı, izleme gerektirir
+**Ne zaman kullanılır:** Yüksek trafikli servisler, riskli değişiklikler, feature flag'ler
 
 ## Docker
 
 ### Multi-Stage Dockerfile (Node.js)
 
 ```dockerfile
-# Stage 1: BaÃ„Å¸Ã„Â±mlÃ„Â±lÃ„Â±klarÃ„Â± yÃƒÂ¼kle
+# Stage 1: Bağımlılıkları yükle
 FROM node:22-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
@@ -180,24 +180,24 @@ HEALTHCHECK --interval=30s --timeout=3s CMD python -c "import urllib.request; ur
 CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "4"]
 ```
 
-### Docker En Ã„Â°yi UygulamalarÃ„Â±
+### Docker En İyi Uygulamaları
 
 ```
-# Ã„Â°YÃ„Â° uygulamalar
-- Belirli versiyon tag'leri kullanÃ„Â±n (node:22-alpine, node:latest deÃ„Å¸il)
-- Image boyutunu minimize etmek iÃƒÂ§in multi-stage build'ler
-- Root olmayan kullanÃ„Â±cÃ„Â± olarak ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
-- Ãƒâ€“nce baÃ„Å¸Ã„Â±mlÃ„Â±lÃ„Â±k dosyalarÃ„Â±nÃ„Â± kopyalayÃ„Â±n (layer caching)
-- node_modules, .git, test'leri hariÃƒÂ§ tutmak iÃƒÂ§in .dockerignore kullanÃ„Â±n
-- HEALTHCHECK talimatÃ„Â± ekleyin
-- docker-compose veya k8s'te kaynak limitleri ayarlayÃ„Â±n
+# İYİ uygulamalar
+- Belirli versiyon tag'leri kullanın (node:22-alpine, node:latest değil)
+- Image boyutunu minimize etmek için multi-stage build'ler
+- Root olmayan kullanıcı olarak çalıştır
+- Önce bağımlılık dosyalarını kopyalayın (layer caching)
+- node_modules, .git, test'leri hariç tutmak için .dockerignore kullanın
+- HEALTHCHECK talimatı ekleyin
+- docker-compose veya k8s'te kaynak limitleri ayarlayın
 
-# KÃƒâ€“TÃƒÅ“ uygulamalar
-- Root olarak ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±rmak
+# KÖTÜ uygulamalar
+- Root olarak çalıştırmak
 - :latest tag'lerini kullanmak
-- TÃƒÂ¼m repo'yu tek COPY layer'da kopyalamak
-- Production image'de dev baÃ„Å¸Ã„Â±mlÃ„Â±lÃ„Â±klarÃ„Â±nÃ„Â± yÃƒÂ¼klemek
-- Image'de secret'larÃ„Â± saklamak (env var veya secrets manager kullanÃ„Â±n)
+- Tüm repo'yu tek COPY layer'da kopyalamak
+- Production image'de dev bağımlılıklarını yüklemek
+- Image'de secret'ları saklamak (env var veya secrets manager kullanın)
 ```
 
 ## CI/CD Pipeline
@@ -259,34 +259,34 @@ jobs:
     steps:
       - name: Deploy to production
         run: |
-          # Platforma ÃƒÂ¶zgÃƒÂ¼ deployment komutu
+          # Platforma özgü deployment komutu
           # Railway: railway up
           # Vercel: vercel --prod
           # K8s: kubectl set image deployment/app app=ghcr.io/${{ github.repository }}:${{ github.sha }}
           echo "Deploying ${{ github.sha }}"
 ```
 
-### Pipeline AÃ…Å¸amalarÃ„Â±
+### Pipeline Aşamaları
 
 ```
-PR aÃƒÂ§Ã„Â±ldÃ„Â±Ã„Å¸Ã„Â±nda:
-  lint Ã¢â€ â€™ typecheck Ã¢â€ â€™ unit tests Ã¢â€ â€™ integration tests Ã¢â€ â€™ preview deploy
+PR açıldığında:
+  lint → typecheck → unit tests → integration tests → preview deploy
 
-Main'e merge edildiÃ„Å¸inde:
-  lint Ã¢â€ â€™ typecheck Ã¢â€ â€™ unit tests Ã¢â€ â€™ integration tests Ã¢â€ â€™ build image Ã¢â€ â€™ deploy staging Ã¢â€ â€™ smoke tests Ã¢â€ â€™ deploy production
+Main'e merge edildiğinde:
+  lint → typecheck → unit tests → integration tests → build image → deploy staging → smoke tests → deploy production
 ```
 
-## SaÃ„Å¸lÃ„Â±k Kontrolleri
+## Sağlık Kontrolleri
 
-### SaÃ„Å¸lÃ„Â±k KontrolÃƒÂ¼ Endpoint'i
+### Sağlık Kontrolü Endpoint'i
 
 ```typescript
-// Basit saÃ„Å¸lÃ„Â±k kontrolÃƒÂ¼
+// Basit sağlık kontrolü
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "ok" });
 });
 
-// DetaylÃ„Â± saÃ„Å¸lÃ„Â±k kontrolÃƒÂ¼ (dahili izleme iÃƒÂ§in)
+// Detaylı sağlık kontrolü (dahili izleme için)
 app.get("/health/detailed", async (req, res) => {
   const checks = {
     database: await checkDatabase(),
@@ -315,7 +315,7 @@ async function checkDatabase(): Promise<HealthCheck> {
 }
 ```
 
-### Kubernetes Probe'larÃ„Â±
+### Kubernetes Probe'ları
 
 ```yaml
 livenessProbe:
@@ -340,27 +340,27 @@ startupProbe:
     port: 3000
   initialDelaySeconds: 0
   periodSeconds: 5
-  failureThreshold: 30    # 30 * 5s = 150s max baÃ…Å¸latma sÃƒÂ¼resi
+  failureThreshold: 30    # 30 * 5s = 150s max başlatma süresi
 ```
 
-## Ortam YapÃ„Â±landÃ„Â±rmasÃ„Â±
+## Ortam Yapılandırması
 
-### Twelve-Factor App KalÃ„Â±bÃ„Â±
+### Twelve-Factor App Kalıbı
 
 ```bash
-# TÃƒÂ¼m yapÃ„Â±landÃ„Â±rma ortam deÃ„Å¸iÃ…Å¸kenleri ile Ã¢â‚¬â€ asla kodda deÃ„Å¸il
+# Tüm yapılandırma ortam değişkenleri ile — asla kodda değil
 DATABASE_URL=postgres://user:pass@host:5432/db
 REDIS_URL=redis://host:6379/0
-API_KEY=${API_KEY}           # secrets manager tarafÃ„Â±ndan enjekte edilir
+API_KEY=${API_KEY}           # secrets manager tarafından enjekte edilir
 LOG_LEVEL=info
 PORT=3000
 
-# Ortama ÃƒÂ¶zgÃƒÂ¼ davranÃ„Â±Ã…Å¸
+# Ortama özgü davranış
 NODE_ENV=production          # veya staging, development
-APP_ENV=production           # aÃƒÂ§Ã„Â±k uygulama ortamÃ„Â±
+APP_ENV=production           # açık uygulama ortamı
 ```
 
-### YapÃ„Â±landÃ„Â±rma Validasyonu
+### Yapılandırma Validasyonu
 
 ```typescript
 import { z } from "zod";
@@ -374,69 +374,69 @@ const envSchema = z.object({
   LOG_LEVEL: z.enum(["debug", "info", "warn", "error"]).default("info"),
 });
 
-// BaÃ…Å¸langÃ„Â±ÃƒÂ§ta validasyon yap Ã¢â‚¬â€ yapÃ„Â±landÃ„Â±rma yanlÃ„Â±Ã…Å¸sa hÃ„Â±zlÃ„Â± baÃ…Å¸arÃ„Â±sÃ„Â±z ol
+// Başlangıçta validasyon yap — yapılandırma yanlışsa hızlı başarısız ol
 export const env = envSchema.parse(process.env);
 ```
 
 ## Rollback Stratejisi
 
-### AnÃ„Â±nda Rollback
+### Anında Rollback
 
 ```bash
-# Docker/Kubernetes: ÃƒÂ¶nceki image'a iÃ…Å¸aret et
+# Docker/Kubernetes: önceki image'a işaret et
 kubectl rollout undo deployment/app
 
-# Vercel: ÃƒÂ¶nceki deployment'Ã„Â± yÃƒÂ¼kselt
+# Vercel: önceki deployment'ı yükselt
 vercel rollback
 
-# Railway: ÃƒÂ¶nceki commit'i tekrar deploy et
+# Railway: önceki commit'i tekrar deploy et
 railway up --commit <previous-sha>
 
-# VeritabanÃ„Â±: migration'Ã„Â± rollback et (geri alÃ„Â±nabilirse)
+# Veritabanı: migration'ı rollback et (geri alınabilirse)
 npx prisma migrate resolve --rolled-back <migration-name>
 ```
 
 ### Rollback Kontrol Listesi
 
-- [ ] Ãƒâ€“nceki image/artifact mevcut ve tag'lenmiÃ…Å¸
-- [ ] VeritabanÃ„Â± migration'larÃ„Â± geriye uyumlu (yÃ„Â±kÃ„Â±cÃ„Â± deÃ„Å¸iÃ…Å¸iklik yok)
-- [ ] Feature flag'ler deploy olmadan yeni ÃƒÂ¶zellikleri devre dÃ„Â±Ã…Å¸Ã„Â± bÃ„Â±rakabilir
-- [ ] Hata oranÃ„Â± artÃ„Â±Ã…Å¸larÃ„Â± iÃƒÂ§in izleme alarmlarÃ„Â± yapÃ„Â±landÃ„Â±rÃ„Â±lmÃ„Â±Ã…Å¸
-- [ ] Rollback ÃƒÂ¼retim yayÃ„Â±nÃ„Â±ndan ÃƒÂ¶nce staging'de test edilmiÃ…Å¸
+- [ ] Önceki image/artifact mevcut ve tag'lenmiş
+- [ ] Veritabanı migration'ları geriye uyumlu (yıkıcı değişiklik yok)
+- [ ] Feature flag'ler deploy olmadan yeni özellikleri devre dışı bırakabilir
+- [ ] Hata oranı artışları için izleme alarmları yapılandırılmış
+- [ ] Rollback üretim yayınından önce staging'de test edilmiş
 
-## ÃƒÅ“retim HazÃ„Â±rlÃ„Â±Ã„Å¸Ã„Â± Kontrol Listesi
+## Üretim Hazırlığı Kontrol Listesi
 
-Herhangi bir ÃƒÂ¼retim deployment'Ã„Â±ndan ÃƒÂ¶nce:
+Herhangi bir üretim deployment'ından önce:
 
 ### Uygulama
-- [ ] TÃƒÂ¼m testler geÃƒÂ§iyor (unit, integration, E2E)
-- [ ] Kodda veya yapÃ„Â±landÃ„Â±rma dosyalarÃ„Â±nda hardcode edilmiÃ…Å¸ secret yok
-- [ ] Hata iÃ…Å¸leme tÃƒÂ¼m edge case'leri kapsÃ„Â±yor
-- [ ] Loglama yapÃ„Â±landÃ„Â±rÃ„Â±lmÃ„Â±Ã…Å¸ (JSON) ve PII iÃƒÂ§ermiyor
-- [ ] SaÃ„Å¸lÃ„Â±k kontrolÃƒÂ¼ endpoint'i anlamlÃ„Â± durum dÃƒÂ¶ndÃƒÂ¼rÃƒÂ¼yor
+- [ ] Tüm testler geçiyor (unit, integration, E2E)
+- [ ] Kodda veya yapılandırma dosyalarında hardcode edilmiş secret yok
+- [ ] Hata işleme tüm edge case'leri kapsıyor
+- [ ] Loglama yapılandırılmış (JSON) ve PII içermiyor
+- [ ] Sağlık kontrolü endpoint'i anlamlı durum döndürüyor
 
-### AltyapÃ„Â±
-- [ ] Docker image yeniden ÃƒÂ¼retilebilir Ã…Å¸ekilde build oluyor (sabitlenmiÃ…Å¸ versiyonlar)
-- [ ] Ortam deÃ„Å¸iÃ…Å¸kenleri dokÃƒÂ¼mante edilmiÃ…Å¸ ve baÃ…Å¸langÃ„Â±ÃƒÂ§ta validate ediliyor
-- [ ] Kaynak limitleri ayarlanmÃ„Â±Ã…Å¸ (CPU, bellek)
-- [ ] Horizontal scaling yapÃ„Â±landÃ„Â±rÃ„Â±lmÃ„Â±Ã…Å¸ (min/max instance'lar)
-- [ ] TÃƒÂ¼m endpoint'lerde SSL/TLS etkin
+### Altyapı
+- [ ] Docker image yeniden üretilebilir şekilde build oluyor (sabitlenmiş versiyonlar)
+- [ ] Ortam değişkenleri dokümante edilmiş ve başlangıçta validate ediliyor
+- [ ] Kaynak limitleri ayarlanmış (CPU, bellek)
+- [ ] Horizontal scaling yapılandırılmış (min/max instance'lar)
+- [ ] Tüm endpoint'lerde SSL/TLS etkin
 
-### Ã„Â°zleme
-- [ ] Uygulama metrikleri export ediliyor (istek oranÃ„Â±, gecikme, hatalar)
-- [ ] Hata oranÃ„Â± > eÃ…Å¸ik iÃƒÂ§in alarmlar yapÃ„Â±landÃ„Â±rÃ„Â±lmÃ„Â±Ã…Å¸
-- [ ] Log toplama kurulmuÃ…Å¸ (yapÃ„Â±landÃ„Â±rÃ„Â±lmÃ„Â±Ã…Å¸ loglar, aranabilir)
-- [ ] SaÃ„Å¸lÃ„Â±k endpoint'inde uptime izleme
+### İzleme
+- [ ] Uygulama metrikleri export ediliyor (istek oranı, gecikme, hatalar)
+- [ ] Hata oranı > eşik için alarmlar yapılandırılmış
+- [ ] Log toplama kurulmuş (yapılandırılmış loglar, aranabilir)
+- [ ] Sağlık endpoint'inde uptime izleme
 
-### GÃƒÂ¼venlik
-- [ ] BaÃ„Å¸Ã„Â±mlÃ„Â±lÃ„Â±klar CVE'ler iÃƒÂ§in taranmÃ„Â±Ã…Å¸
-- [ ] CORS sadece izin verilen origin'ler iÃƒÂ§in yapÃ„Â±landÃ„Â±rÃ„Â±lmÃ„Â±Ã…Å¸
-- [ ] Halka aÃƒÂ§Ã„Â±k endpoint'lerde hÃ„Â±z sÃ„Â±nÃ„Â±rlama etkin
-- [ ] Kimlik doÃ„Å¸rulama ve yetkilendirme doÃ„Å¸rulanmÃ„Â±Ã…Å¸
-- [ ] GÃƒÂ¼venlik header'larÃ„Â± ayarlanmÃ„Â±Ã…Å¸ (CSP, HSTS, X-Frame-Options)
+### Güvenlik
+- [ ] Bağımlılıklar CVE'ler için taranmış
+- [ ] CORS sadece izin verilen origin'ler için yapılandırılmış
+- [ ] Halka açık endpoint'lerde hız sınırlama etkin
+- [ ] Kimlik doğrulama ve yetkilendirme doğrulanmış
+- [ ] Güvenlik header'ları ayarlanmış (CSP, HSTS, X-Frame-Options)
 
 ### Operasyonlar
-- [ ] Rollback planÃ„Â± dokÃƒÂ¼mante edilmiÃ…Å¸ ve test edilmiÃ…Å¸
-- [ ] VeritabanÃ„Â± migration'Ã„Â± ÃƒÂ¼retim boyutundaki veriye karÃ…Å¸Ã„Â± test edilmiÃ…Å¸
-- [ ] YaygÃ„Â±n hata senaryolarÃ„Â± iÃƒÂ§in runbook
-- [ ] NÃƒÂ¶bet rotasyonu ve yÃƒÂ¼kseltme yolu tanÃ„Â±mlanmÃ„Â±Ã…Å¸
+- [ ] Rollback planı dokümante edilmiş ve test edilmiş
+- [ ] Veritabanı migration'ı üretim boyutundaki veriye karşı test edilmiş
+- [ ] Yaygın hata senaryoları için runbook
+- [ ] Nöbet rotasyonu ve yükseltme yolu tanımlanmış

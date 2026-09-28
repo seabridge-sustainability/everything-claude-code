@@ -1,10 +1,10 @@
 ---
 name: kotlin-coroutines-flows
-description: KotlinÃ¥ÂÂÃ§Â¨â€¹Ã¤Â¸Å½FlowÃ¥Å“Â¨AndroidÃ¥â€™Å’KMPÃ¤Â¸Â­Ã§Å¡â€žÃ¦Â¨Â¡Ã¥Â¼ÂÃ¢â‚¬â€Ã¢â‚¬â€Ã§Â»â€œÃ¦Å¾â€žÃ¥Å’â€“Ã¥Â¹Â¶Ã¥Ââ€˜Ã£â‚¬ÂFlowÃ¦â€œÂÃ¤Â½Å“Ã§Â¬Â¦Ã£â‚¬ÂStateFlowÃ£â‚¬ÂÃ©â€â„¢Ã¨Â¯Â¯Ã¥Â¤â€žÃ§Ââ€ Ã¥â€™Å’Ã¦Âµâ€¹Ã¨Â¯â€¢Ã£â‚¬â€š
+description: Kotlin协程与Flow在Android和KMP中的模式——结构化并发、Flow操作符、StateFlow、错误处理和测试。
 origin: ECC
 ---
 
-# Kotlin Ã¥ÂÂÃ§Â¨â€¹Ã¤Â¸Å½ Flow
+# Kotlin 协程与 Flow
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -21,44 +21,44 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-Ã©â‚¬â€šÃ§â€Â¨Ã¤ÂºÅ½ Android Ã¥â€™Å’ Kotlin Ã¥Â¤Å¡Ã¥Â¹Â³Ã¥ÂÂ°Ã©Â¡Â¹Ã§â€ºÂ®Ã§Å¡â€žÃ§Â»â€œÃ¦Å¾â€žÃ¥Å’â€“Ã¥Â¹Â¶Ã¥Ââ€˜Ã¦Â¨Â¡Ã¥Â¼ÂÃ£â‚¬ÂÃ¥Å¸ÂºÃ¤ÂºÅ½ Flow Ã§Å¡â€žÃ¥â€œÂÃ¥Âºâ€Ã¥Â¼ÂÃ¦ÂµÂÃ¤Â»Â¥Ã¥ÂÅ Ã¥ÂÂÃ§Â¨â€¹Ã¦Âµâ€¹Ã¨Â¯â€¢Ã£â‚¬â€š
+适用于 Android 和 Kotlin 多平台项目的结构化并发模式、基于 Flow 的响应式流以及协程测试。
 
-## Ã¤Â½â€¢Ã¦â€”Â¶Ã¥ÂÂ¯Ã§â€Â¨
+## 何时启用
 
-* Ã¤Â½Â¿Ã§â€Â¨ Kotlin Ã¥ÂÂÃ§Â¨â€¹Ã§Â¼â€“Ã¥â€ â„¢Ã¥Â¼â€šÃ¦Â­Â¥Ã¤Â»Â£Ã§Â Â
-* Ã¤Â½Â¿Ã§â€Â¨ FlowÃ£â‚¬ÂStateFlow Ã¦Ë†â€“ SharedFlow Ã¥Â®Å¾Ã§Å½Â°Ã¥â€œÂÃ¥Âºâ€Ã¥Â¼ÂÃ¦â€¢Â°Ã¦ÂÂ®
-* Ã¥Â¤â€žÃ§Ââ€ Ã¥Â¹Â¶Ã¥Ââ€˜Ã¦â€œÂÃ¤Â½Å“Ã¯Â¼Ë†Ã¥Â¹Â¶Ã¨Â¡Å’Ã¥Å Â Ã¨Â½Â½Ã£â‚¬ÂÃ©ËœÂ²Ã¦Å â€“Ã£â‚¬ÂÃ©â€¡ÂÃ¨Â¯â€¢Ã¯Â¼â€°
-* Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¥ÂÂÃ§Â¨â€¹Ã¥â€™Å’ Flow
-* Ã§Â®Â¡Ã§Ââ€ Ã¥ÂÂÃ§Â¨â€¹Ã¤Â½Å“Ã§â€Â¨Ã¥Å¸Å¸Ã¤Â¸Å½Ã¥Ââ€“Ã¦Â¶Ë†
+* 使用 Kotlin 协程编写异步代码
+* 使用 Flow、StateFlow 或 SharedFlow 实现响应式数据
+* 处理并发操作（并行加载、防抖、重试）
+* 测试协程和 Flow
+* 管理协程作用域与取消
 
-## Ã§Â»â€œÃ¦Å¾â€žÃ¥Å’â€“Ã¥Â¹Â¶Ã¥Ââ€˜
+## 结构化并发
 
-### Ã¤Â½Å“Ã§â€Â¨Ã¥Å¸Å¸Ã¥Â±â€šÃ§ÂºÂ§
+### 作用域层级
 
 ```
 Application
-  Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ viewModelScope (ViewModel)
-        Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ coroutineScope { } (Ã§Â»â€œÃ¦Å¾â€žÃ¥Å’â€“Ã¥Â­ÂÃ¤Â½Å“Ã§â€Â¨Ã¥Å¸Å¸)
-              Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ async { } (Ã¥Â¹Â¶Ã¥Ââ€˜Ã¤Â»Â»Ã¥Å Â¡)
-              Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ async { } (Ã¥Â¹Â¶Ã¥Ââ€˜Ã¤Â»Â»Ã¥Å Â¡)
+  └── viewModelScope (ViewModel)
+        └── coroutineScope { } (结构化子作用域)
+              ├── async { } (并发任务)
+              └── async { } (并发任务)
 ```
 
-Ã¥Â§â€¹Ã§Â»Ë†Ã¤Â½Â¿Ã§â€Â¨Ã§Â»â€œÃ¦Å¾â€žÃ¥Å’â€“Ã¥Â¹Â¶Ã¥Ââ€˜Ã¢â‚¬â€Ã¢â‚¬â€Ã§Â»ÂÃ¤Â¸ÂÃ¤Â½Â¿Ã§â€Â¨ `GlobalScope`Ã¯Â¼Å¡
+始终使用结构化并发——绝不使用 `GlobalScope`：
 
 ```kotlin
 // BAD
 GlobalScope.launch { fetchData() }
 
-// GOOD Ã¢â‚¬â€ scoped to ViewModel lifecycle
+// GOOD — scoped to ViewModel lifecycle
 viewModelScope.launch { fetchData() }
 
-// GOOD Ã¢â‚¬â€ scoped to composable lifecycle
+// GOOD — scoped to composable lifecycle
 LaunchedEffect(key) { fetchData() }
 ```
 
-### Ã¥Â¹Â¶Ã¨Â¡Å’Ã¥Ë†â€ Ã¨Â§Â£
+### 并行分解
 
-Ã¤Â½Â¿Ã§â€Â¨ `coroutineScope` + `async` Ã¥Â¤â€žÃ§Ââ€ Ã¥Â¹Â¶Ã¨Â¡Å’Ã¥Â·Â¥Ã¤Â½Å“Ã¯Â¼Å¡
+使用 `coroutineScope` + `async` 处理并行工作：
 
 ```kotlin
 suspend fun loadDashboard(): Dashboard = coroutineScope {
@@ -75,7 +75,7 @@ suspend fun loadDashboard(): Dashboard = coroutineScope {
 
 ### SupervisorScope
 
-Ã¥Â½â€œÃ¥Â­ÂÃ¥ÂÂÃ§Â¨â€¹Ã¥Â¤Â±Ã¨Â´Â¥Ã¤Â¸ÂÃ¥Âºâ€Ã¥Ââ€“Ã¦Â¶Ë†Ã¥ÂÅ’Ã§ÂºÂ§Ã¥ÂÂÃ§Â¨â€¹Ã¦â€”Â¶Ã¯Â¼Å’Ã¤Â½Â¿Ã§â€Â¨ `supervisorScope`Ã¯Â¼Å¡
+当子协程失败不应取消同级协程时，使用 `supervisorScope`：
 
 ```kotlin
 suspend fun syncAll() = supervisorScope {
@@ -85,9 +85,9 @@ suspend fun syncAll() = supervisorScope {
 }
 ```
 
-## Flow Ã¦Â¨Â¡Ã¥Â¼Â
+## Flow 模式
 
-### Cold Flow Ã¢â‚¬â€Ã¢â‚¬â€ Ã¤Â¸â‚¬Ã¦Â¬Â¡Ã¦â‚¬Â§Ã¦â€œÂÃ¤Â½Å“Ã¥Ë†Â°Ã¦ÂµÂÃ§Å¡â€žÃ¨Â½Â¬Ã¦ÂÂ¢
+### Cold Flow —— 一次性操作到流的转换
 
 ```kotlin
 fun observeItems(): Flow<List<Item>> = flow {
@@ -98,7 +98,7 @@ fun observeItems(): Flow<List<Item>> = flow {
 }
 ```
 
-### Ã§â€Â¨Ã¤ÂºÅ½ UI Ã§Å Â¶Ã¦â‚¬ÂÃ§Å¡â€ž StateFlow
+### 用于 UI 状态的 StateFlow
 
 ```kotlin
 class DashboardViewModel(
@@ -113,9 +113,9 @@ class DashboardViewModel(
 }
 ```
 
-`WhileSubscribed(5_000)` Ã¤Â¼Å¡Ã¥Å“Â¨Ã¦Å“â‚¬Ã¥ÂÅ½Ã¤Â¸â‚¬Ã¤Â¸ÂªÃ¨Â®Â¢Ã©Ëœâ€¦Ã¨â‚¬â€¦Ã§Â¦Â»Ã¥Â¼â‚¬Ã¥ÂÅ½Ã¯Â¼Å’Ã¤Â¿ÂÃ¦Å’ÂÃ¤Â¸Å Ã¦Â¸Â¸Ã¦Â´Â»Ã¥Å Â¨ 5 Ã§Â§â€™Ã¢â‚¬â€Ã¢â‚¬â€Ã¥ÂÂ¯Ã¥Å“Â¨Ã©â€¦ÂÃ§Â½Â®Ã¦â€ºÂ´Ã¦â€Â¹Ã¦â€”Â¶Ã¥Â­ËœÃ¦Â´Â»Ã¨â‚¬Å’Ã¦â€”Â Ã©Å“â‚¬Ã©â€¡ÂÃ¥ÂÂ¯Ã£â‚¬â€š
+`WhileSubscribed(5_000)` 会在最后一个订阅者离开后，保持上游活动 5 秒——可在配置更改时存活而无需重启。
 
-### Ã§Â»â€žÃ¥ÂË†Ã¥Â¤Å¡Ã¤Â¸Âª Flow
+### 组合多个 Flow
 
 ```kotlin
 val uiState: StateFlow<HomeState> = combine(
@@ -127,7 +127,7 @@ val uiState: StateFlow<HomeState> = combine(
 }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeState())
 ```
 
-### Flow Ã¦â€œÂÃ¤Â½Å“Ã§Â¬Â¦
+### Flow 操作符
 
 ```kotlin
 // Debounce search input
@@ -150,7 +150,7 @@ fun fetchWithRetry(): Flow<Data> = flow { emit(api.fetch()) }
     }
 ```
 
-### Ã§â€Â¨Ã¤ÂºÅ½Ã¤Â¸â‚¬Ã¦Â¬Â¡Ã¦â‚¬Â§Ã¤Âºâ€¹Ã¤Â»Â¶Ã§Å¡â€ž SharedFlow
+### 用于一次性事件的 SharedFlow
 
 ```kotlin
 class ItemListViewModel : ViewModel() {
@@ -181,7 +181,7 @@ LaunchedEffect(Unit) {
 }
 ```
 
-## Ã¨Â°Æ’Ã¥ÂºÂ¦Ã¥â„¢Â¨
+## 调度器
 
 ```kotlin
 // CPU-intensive work
@@ -190,17 +190,17 @@ withContext(Dispatchers.Default) { parseJson(largePayload) }
 // IO-bound work
 withContext(Dispatchers.IO) { database.query() }
 
-// Main thread (UI) Ã¢â‚¬â€ default in viewModelScope
+// Main thread (UI) — default in viewModelScope
 withContext(Dispatchers.Main) { updateUi() }
 ```
 
-Ã¥Å“Â¨ KMP Ã¤Â¸Â­Ã¯Â¼Å’Ã¤Â½Â¿Ã§â€Â¨ `Dispatchers.Default` Ã¥â€™Å’ `Dispatchers.Main`Ã¯Â¼Ë†Ã¥Å“Â¨Ã¦â€°â‚¬Ã¦Å“â€°Ã¥Â¹Â³Ã¥ÂÂ°Ã¤Â¸Å Ã¥ÂÂ¯Ã§â€Â¨Ã¯Â¼â€°Ã£â‚¬â€š`Dispatchers.IO` Ã¤Â»â€¦Ã©â‚¬â€šÃ§â€Â¨Ã¤ÂºÅ½ JVM/AndroidÃ¢â‚¬â€Ã¢â‚¬â€Ã¥Å“Â¨Ã¥â€¦Â¶Ã¤Â»â€“Ã¥Â¹Â³Ã¥ÂÂ°Ã¤Â¸Å Ã¤Â½Â¿Ã§â€Â¨ `Dispatchers.Default` Ã¦Ë†â€“Ã©â‚¬Å¡Ã¨Â¿â€¡Ã¤Â¾ÂÃ¨Âµâ€“Ã¦Â³Â¨Ã¥â€¦Â¥Ã¦ÂÂÃ¤Â¾â€ºÃ£â‚¬â€š
+在 KMP 中，使用 `Dispatchers.Default` 和 `Dispatchers.Main`（在所有平台上可用）。`Dispatchers.IO` 仅适用于 JVM/Android——在其他平台上使用 `Dispatchers.Default` 或通过依赖注入提供。
 
-## Ã¥Ââ€“Ã¦Â¶Ë†
+## 取消
 
-### Ã¥ÂÂÃ¤Â½Å“Ã¥Â¼ÂÃ¥Ââ€“Ã¦Â¶Ë†
+### 协作式取消
 
-Ã©â€¢Â¿Ã¦â€”Â¶Ã©â€”Â´Ã¨Â¿ÂÃ¨Â¡Å’Ã§Å¡â€žÃ¥Â¾ÂªÃ§Å½Â¯Ã¥Â¿â€¦Ã©Â¡Â»Ã¦Â£â‚¬Ã¦Å¸Â¥Ã¥Ââ€“Ã¦Â¶Ë†Ã§Å Â¶Ã¦â‚¬ÂÃ¯Â¼Å¡
+长时间运行的循环必须检查取消状态：
 
 ```kotlin
 suspend fun processItems(items: List<Item>) = coroutineScope {
@@ -211,7 +211,7 @@ suspend fun processItems(items: List<Item>) = coroutineScope {
 }
 ```
 
-### Ã¤Â½Â¿Ã§â€Â¨ try/finally Ã¨Â¿â€ºÃ¨Â¡Å’Ã¦Â¸â€¦Ã§Ââ€ 
+### 使用 try/finally 进行清理
 
 ```kotlin
 viewModelScope.launch {
@@ -225,9 +225,9 @@ viewModelScope.launch {
 }
 ```
 
-## Ã¦Âµâ€¹Ã¨Â¯â€¢
+## 测试
 
-### Ã¤Â½Â¿Ã§â€Â¨ Turbine Ã¦Âµâ€¹Ã¨Â¯â€¢ StateFlow
+### 使用 Turbine 测试 StateFlow
 
 ```kotlin
 @Test
@@ -249,7 +249,7 @@ fun `search updates item list`() = runTest {
 }
 ```
 
-### Ã¤Â½Â¿Ã§â€Â¨ TestDispatcher Ã¦Âµâ€¹Ã¨Â¯â€¢
+### 使用 TestDispatcher 测试
 
 ```kotlin
 @Test
@@ -268,7 +268,7 @@ fun `parallel load completes correctly`() = runTest {
 }
 ```
 
-### Ã¦Â¨Â¡Ã¦â€¹Å¸ Flow
+### 模拟 Flow
 
 ```kotlin
 class FakeItemRepository : ItemRepository {
@@ -284,16 +284,16 @@ class FakeItemRepository : ItemRepository {
 }
 ```
 
-## Ã¥Âºâ€Ã©ÂÂ¿Ã¥â€¦ÂÃ§Å¡â€žÃ¥ÂÂÃ¦Â¨Â¡Ã¥Â¼Â
+## 应避免的反模式
 
-* Ã¤Â½Â¿Ã§â€Â¨ `GlobalScope`Ã¢â‚¬â€Ã¢â‚¬â€Ã¤Â¼Å¡Ã¥Â¯Â¼Ã¨â€¡Â´Ã¥ÂÂÃ§Â¨â€¹Ã¦Â³â€žÃ¦Â¼ÂÃ¯Â¼Å’Ã¤Â¸â€Ã¦â€”Â Ã¦Â³â€¢Ã§Â»â€œÃ¦Å¾â€žÃ¥Å’â€“Ã¥Ââ€“Ã¦Â¶Ë†
-* Ã¥Å“Â¨Ã¦Â²Â¡Ã¦Å“â€°Ã¤Â½Å“Ã§â€Â¨Ã¥Å¸Å¸Ã§Å¡â€žÃ¦Æ’â€¦Ã¥â€ ÂµÃ¤Â¸â€¹Ã¤ÂºÅ½ `init {}` Ã¤Â¸Â­Ã¦â€Â¶Ã©â€ºâ€  FlowÃ¢â‚¬â€Ã¢â‚¬â€Ã¥Âºâ€Ã¤Â½Â¿Ã§â€Â¨ `viewModelScope.launch`
-* Ã¥Â°â€  `MutableStateFlow` Ã¤Â¸Å½Ã¥ÂÂ¯Ã¥ÂËœÃ©â€ºâ€ Ã¥ÂË†Ã¤Â¸â‚¬Ã¨ÂµÂ·Ã¤Â½Â¿Ã§â€Â¨Ã¢â‚¬â€Ã¢â‚¬â€Ã¥Â§â€¹Ã§Â»Ë†Ã¤Â½Â¿Ã§â€Â¨Ã¤Â¸ÂÃ¥ÂÂ¯Ã¥ÂËœÃ¥â€°Â¯Ã¦Å“Â¬Ã¯Â¼Å¡`_state.update { it.copy(list = it.list + newItem) }`
-* Ã¦Ââ€¢Ã¨Å½Â· `CancellationException`Ã¢â‚¬â€Ã¢â‚¬â€Ã¥Âºâ€Ã¨Â®Â©Ã¥â€¦Â¶Ã¤Â¼Â Ã¦â€™Â­Ã¤Â»Â¥Ã¥Â®Å¾Ã§Å½Â°Ã¦Â­Â£Ã§Â¡Â®Ã§Å¡â€žÃ¥Ââ€“Ã¦Â¶Ë†
-* Ã¤Â½Â¿Ã§â€Â¨ `flowOn(Dispatchers.Main)` Ã¨Â¿â€ºÃ¨Â¡Å’Ã¦â€Â¶Ã©â€ºâ€ Ã¢â‚¬â€Ã¢â‚¬â€Ã¦â€Â¶Ã©â€ºâ€ Ã¨Â°Æ’Ã¥ÂºÂ¦Ã¥â„¢Â¨Ã¦ËœÂ¯Ã¨Â°Æ’Ã§â€Â¨Ã¦â€“Â¹Ã§Å¡â€žÃ¨Â°Æ’Ã¥ÂºÂ¦Ã¥â„¢Â¨
-* Ã¥Å“Â¨ `@Composable` Ã¤Â¸Â­Ã¥Ë†â€ºÃ¥Â»Âº `Flow` Ã¨â‚¬Å’Ã¤Â¸ÂÃ¤Â½Â¿Ã§â€Â¨ `remember`Ã¢â‚¬â€Ã¢â‚¬â€Ã¦Â¯ÂÃ¦Â¬Â¡Ã©â€¡ÂÃ§Â»â€žÃ©Æ’Â½Ã¤Â¼Å¡Ã©â€¡ÂÃ¦â€“Â°Ã¥Ë†â€ºÃ¥Â»Âº Flow
+* 使用 `GlobalScope`——会导致协程泄漏，且无法结构化取消
+* 在没有作用域的情况下于 `init {}` 中收集 Flow——应使用 `viewModelScope.launch`
+* 将 `MutableStateFlow` 与可变集合一起使用——始终使用不可变副本：`_state.update { it.copy(list = it.list + newItem) }`
+* 捕获 `CancellationException`——应让其传播以实现正确的取消
+* 使用 `flowOn(Dispatchers.Main)` 进行收集——收集调度器是调用方的调度器
+* 在 `@Composable` 中创建 `Flow` 而不使用 `remember`——每次重组都会重新创建 Flow
 
-## Ã¥Ââ€šÃ¨â‚¬Æ’
+## 参考
 
-Ã¥â€¦Â³Ã¤ÂºÅ½ Flow Ã¥Å“Â¨ UI Ã¥Â±â€šÃ§Å¡â€žÃ¦Â¶Ë†Ã¨Â´Â¹Ã¯Â¼Å’Ã¨Â¯Â·Ã¥Ââ€šÃ©Ëœâ€¦Ã¦Å â‚¬Ã¨Æ’Â½Ã¯Â¼Å¡`compose-multiplatform-patterns`Ã£â‚¬â€š
-Ã¥â€¦Â³Ã¤ÂºÅ½Ã¥ÂÂÃ§Â¨â€¹Ã¥Å“Â¨Ã¥Ââ€žÃ¥Â±â€šÃ¤Â¸Â­Ã§Å¡â€žÃ©â‚¬â€šÃ§â€Â¨Ã¤Â½ÂÃ§Â½Â®Ã¯Â¼Å’Ã¨Â¯Â·Ã¥Ââ€šÃ©Ëœâ€¦Ã¦Å â‚¬Ã¨Æ’Â½Ã¯Â¼Å¡`android-clean-architecture`Ã£â‚¬â€š
+关于 Flow 在 UI 层的消费，请参阅技能：`compose-multiplatform-patterns`。
+关于协程在各层中的适用位置，请参阅技能：`android-clean-architecture`。

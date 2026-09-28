@@ -4,7 +4,7 @@ description: Test-driven development for Spring Boot using JUnit 5, Mockito, Moc
 origin: ECC
 ---
 
-# Spring Boot TDD Ã„Â°Ã…Å¸ AkÃ„Â±Ã…Å¸Ã„Â±
+# Spring Boot TDD İş Akışı
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -21,20 +21,20 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-80%+ kapsam (unit + integration) ile Spring Boot servisleri iÃƒÂ§in TDD rehberi.
+80%+ kapsam (unit + integration) ile Spring Boot servisleri için TDD rehberi.
 
-## Ne Zaman KullanÃ„Â±lÃ„Â±r
+## Ne Zaman Kullanılır
 
-- Yeni ÃƒÂ¶zellikler veya endpoint'ler
-- Bug dÃƒÂ¼zeltmeleri veya refactoring'ler
-- Veri eriÃ…Å¸im mantÃ„Â±Ã„Å¸Ã„Â± veya gÃƒÂ¼venlik kurallarÃ„Â± ekleme
+- Yeni özellikler veya endpoint'ler
+- Bug düzeltmeleri veya refactoring'ler
+- Veri erişim mantığı veya güvenlik kuralları ekleme
 
-## Ã„Â°Ã…Å¸ AkÃ„Â±Ã…Å¸Ã„Â±
+## İş Akışı
 
-1) Ãƒâ€“nce testleri yazÃ„Â±n (baÃ…Å¸arÃ„Â±sÃ„Â±z olmalÃ„Â±lar)
-2) GeÃƒÂ§mek iÃƒÂ§in minimal kod uygulayÃ„Â±n
-3) Testleri yeÃ…Å¸il tutarken refactor edin
-4) KapsamÃ„Â± zorlayÃ„Â±n (JaCoCo)
+1) Önce testleri yazın (başarısız olmalılar)
+2) Geçmek için minimal kod uygulayın
+3) Testleri yeşil tutarken refactor edin
+4) Kapsamı zorlayın (JaCoCo)
 
 ## Unit Testler (JUnit 5 + Mockito)
 
@@ -59,10 +59,10 @@ class MarketServiceTest {
 
 Desenler:
 - Arrange-Act-Assert
-- KÃ„Â±smi mock'lardan kaÃƒÂ§Ã„Â±nÃ„Â±n; aÃƒÂ§Ã„Â±k stubbing tercih edin
-- Varyantlar iÃƒÂ§in `@ParameterizedTest` kullanÃ„Â±n
+- Kısmi mock'lardan kaçının; açık stubbing tercih edin
+- Varyantlar için `@ParameterizedTest` kullanın
 
-## Web KatmanÃ„Â± Testleri (MockMvc)
+## Web Katmanı Testleri (MockMvc)
 
 ```java
 @WebMvcTest(MarketController.class)
@@ -125,8 +125,8 @@ class MarketRepositoryTest {
 
 ## Testcontainers
 
-- Production'Ã„Â± yansÃ„Â±tmak iÃƒÂ§in Postgres/Redis iÃƒÂ§in yeniden kullanÃ„Â±labilir container'lar kullanÃ„Â±n
-- JDBC URL'lerini Spring context'e enjekte etmek iÃƒÂ§in `@DynamicPropertySource` ile baÃ„Å¸layÃ„Â±n
+- Production'ı yansıtmak için Postgres/Redis için yeniden kullanılabilir container'lar kullanın
+- JDBC URL'lerini Spring context'e enjekte etmek için `@DynamicPropertySource` ile bağlayın
 
 ## Kapsam (JaCoCo)
 
@@ -151,11 +151,11 @@ Maven snippet:
 
 ## Assertion'lar
 
-- Okunabilirlik iÃƒÂ§in AssertJ'yi (`assertThat`) tercih edin
-- JSON yanÃ„Â±tlarÃ„Â± iÃƒÂ§in `jsonPath` kullanÃ„Â±n
-- Exception'lar iÃƒÂ§in: `assertThatThrownBy(...)`
+- Okunabilirlik için AssertJ'yi (`assertThat`) tercih edin
+- JSON yanıtları için `jsonPath` kullanın
+- Exception'lar için: `assertThatThrownBy(...)`
 
-## Test Veri Builder'larÃ„Â±
+## Test Veri Builder'ları
 
 ```java
 class MarketBuilder {
@@ -165,9 +165,9 @@ class MarketBuilder {
 }
 ```
 
-## CI KomutlarÃ„Â±
+## CI Komutları
 
 - Maven: `mvn -T 4 test` veya `mvn verify`
 - Gradle: `./gradlew test jacocoTestReport`
 
-**UnutmayÃ„Â±n**: Testleri hÃ„Â±zlÃ„Â±, izole ve deterministik tutun. Uygulama detaylarÃ„Â±nÃ„Â± deÃ„Å¸il, davranÃ„Â±Ã…Å¸Ã„Â± test edin.
+**Unutmayın**: Testleri hızlı, izole ve deterministik tutun. Uygulama detaylarını değil, davranışı test edin.

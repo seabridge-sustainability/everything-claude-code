@@ -1,10 +1,10 @@
 ---
 name: django-patterns
-description: DRF ile Django mimari desenleri, REST API tasarÃ„Â±mÃ„Â±, ORM en iyi uygulamalarÃ„Â±, caching, signal'ler, middleware ve production-grade Django uygulamalarÃ„Â±.
+description: DRF ile Django mimari desenleri, REST API tasarımı, ORM en iyi uygulamaları, caching, signal'ler, middleware ve production-grade Django uygulamaları.
 origin: ECC
 ---
 
-# Django GeliÃ…Å¸tirme Desenleri
+# Django Geliştirme Desenleri
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -21,48 +21,48 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-Ãƒâ€“lÃƒÂ§eklenebilir, bakÃ„Â±mÃ„Â± kolay uygulamalar iÃƒÂ§in production-grade Django mimari desenleri.
+Ölçeklenebilir, bakımı kolay uygulamalar için production-grade Django mimari desenleri.
 
-## Ne Zaman EtkinleÃ…Å¸tirmeli
+## Ne Zaman Etkinleştirmeli
 
-- Django web uygulamalarÃ„Â± oluÃ…Å¸tururken
+- Django web uygulamaları oluştururken
 - Django REST Framework API'leri tasarlarken
-- Django ORM ve modeller ile ÃƒÂ§alÃ„Â±Ã…Å¸Ã„Â±rken
-- Django proje yapÃ„Â±sÃ„Â±nÃ„Â± kurarken
+- Django ORM ve modeller ile çalışırken
+- Django proje yapısını kurarken
 - Caching, signal'ler, middleware implement ederken
 
-## Proje YapÃ„Â±sÃ„Â±
+## Proje Yapısı
 
-### Ãƒâ€“nerilen DÃƒÂ¼zen
+### Önerilen Düzen
 
 ```
 myproject/
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ config/
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ __init__.py
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ settings/
-Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ __init__.py
-Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ base.py          # Base ayarlar
-Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ development.py   # Dev ayarlarÃ„Â±
-Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ production.py    # Production ayarlarÃ„Â±
-Ã¢â€â€š   Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ test.py          # Test ayarlarÃ„Â±
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ urls.py
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ wsgi.py
-Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ asgi.py
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ manage.py
-Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ apps/
-    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ __init__.py
-    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ users/
-    Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ __init__.py
-    Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ models.py
-    Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ views.py
-    Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ serializers.py
-    Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ urls.py
-    Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ permissions.py
-    Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ filters.py
-    Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ services.py
-    Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ tests/
-    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ products/
-        Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ ...
+├── config/
+│   ├── __init__.py
+│   ├── settings/
+│   │   ├── __init__.py
+│   │   ├── base.py          # Base ayarlar
+│   │   ├── development.py   # Dev ayarları
+│   │   ├── production.py    # Production ayarları
+│   │   └── test.py          # Test ayarları
+│   ├── urls.py
+│   ├── wsgi.py
+│   └── asgi.py
+├── manage.py
+└── apps/
+    ├── __init__.py
+    ├── users/
+    │   ├── __init__.py
+    │   ├── models.py
+    │   ├── views.py
+    │   ├── serializers.py
+    │   ├── urls.py
+    │   ├── permissions.py
+    │   ├── filters.py
+    │   ├── services.py
+    │   └── tests/
+    └── products/
+        └── ...
 ```
 
 ### Split Settings Deseni
@@ -165,9 +165,9 @@ LOGGING = {
 }
 ```
 
-## Model TasarÃ„Â±m Desenleri
+## Model Tasarım Desenleri
 
-### Model En Ã„Â°yi UygulamalarÃ„Â±
+### Model En İyi Uygulamaları
 
 ```python
 from django.db import models
@@ -175,7 +175,7 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 class User(AbstractUser):
-    """AbstractUser'Ã„Â± extend eden ÃƒÂ¶zel kullanÃ„Â±cÃ„Â± modeli."""
+    """AbstractUser'ı extend eden özel kullanıcı modeli."""
     email = models.EmailField(unique=True)
     phone = models.CharField(max_length=20, blank=True)
     birth_date = models.DateField(null=True, blank=True)
@@ -196,7 +196,7 @@ class User(AbstractUser):
         return f"{self.first_name} {self.last_name}".strip()
 
 class Product(models.Model):
-    """Uygun alan yapÃ„Â±landÃ„Â±rmasÃ„Â± ile Product modeli."""
+    """Uygun alan yapılandırması ile Product modeli."""
     name = models.CharField(max_length=200)
     slug = models.SlugField(unique=True, max_length=250)
     description = models.TextField(blank=True)
@@ -240,32 +240,32 @@ class Product(models.Model):
         super().save(*args, **kwargs)
 ```
 
-### QuerySet En Ã„Â°yi UygulamalarÃ„Â±
+### QuerySet En İyi Uygulamaları
 
 ```python
 from django.db import models
 
 class ProductQuerySet(models.QuerySet):
-    """Product modeli iÃƒÂ§in ÃƒÂ¶zel QuerySet."""
+    """Product modeli için özel QuerySet."""
 
     def active(self):
-        """Sadece aktif ÃƒÂ¼rÃƒÂ¼nleri dÃƒÂ¶ndÃƒÂ¼r."""
+        """Sadece aktif ürünleri döndür."""
         return self.filter(is_active=True)
 
     def with_category(self):
-        """N+1 sorgularÃ„Â±nÃ„Â± ÃƒÂ¶nlemek iÃƒÂ§in iliÃ…Å¸kili kategoriyi seÃƒÂ§."""
+        """N+1 sorgularını önlemek için ilişkili kategoriyi seç."""
         return self.select_related('category')
 
     def with_tags(self):
-        """Many-to-many iliÃ…Å¸kisi iÃƒÂ§in tag'leri prefetch et."""
+        """Many-to-many ilişkisi için tag'leri prefetch et."""
         return self.prefetch_related('tags')
 
     def in_stock(self):
-        """Stok > 0 olan ÃƒÂ¼rÃƒÂ¼nleri dÃƒÂ¶ndÃƒÂ¼r."""
+        """Stok > 0 olan ürünleri döndür."""
         return self.filter(stock__gt=0)
 
     def search(self, query):
-        """Ã„Â°sim veya aÃƒÂ§Ã„Â±klamaya gÃƒÂ¶re ÃƒÂ¼rÃƒÂ¼nleri ara."""
+        """İsim veya açıklamaya göre ürünleri ara."""
         return self.filter(
             models.Q(name__icontains=query) |
             models.Q(description__icontains=query)
@@ -274,34 +274,34 @@ class ProductQuerySet(models.QuerySet):
 class Product(models.Model):
     # ... alanlar ...
 
-    objects = ProductQuerySet.as_manager()  # Ãƒâ€“zel QuerySet kullan
+    objects = ProductQuerySet.as_manager()  # Özel QuerySet kullan
 
-# KullanÃ„Â±m
+# Kullanım
 Product.objects.active().with_category().in_stock()
 ```
 
-### Manager MetodlarÃ„Â±
+### Manager Metodları
 
 ```python
 class ProductManager(models.Manager):
-    """KarmaÃ…Å¸Ã„Â±k sorgular iÃƒÂ§in ÃƒÂ¶zel manager."""
+    """Karmaşık sorgular için özel manager."""
 
     def get_or_none(self, **kwargs):
-        """DoesNotExist yerine nesne veya None dÃƒÂ¶ndÃƒÂ¼r."""
+        """DoesNotExist yerine nesne veya None döndür."""
         try:
             return self.get(**kwargs)
         except self.model.DoesNotExist:
             return None
 
     def create_with_tags(self, name, price, tag_names):
-        """Ã„Â°liÃ…Å¸kili tag'lerle ÃƒÂ¼rÃƒÂ¼n oluÃ…Å¸tur."""
+        """İlişkili tag'lerle ürün oluştur."""
         product = self.create(name=name, price=price)
         tags = [Tag.objects.get_or_create(name=name)[0] for name in tag_names]
         product.tags.set(tags)
         return product
 
     def bulk_update_stock(self, product_ids, quantity):
-        """Birden fazla ÃƒÂ¼rÃƒÂ¼n iÃƒÂ§in toplu stok gÃƒÂ¼ncellemesi."""
+        """Birden fazla ürün için toplu stok güncellemesi."""
         return self.filter(id__in=product_ids).update(stock=quantity)
 
 # Model'de
@@ -320,7 +320,7 @@ from django.contrib.auth.password_validation import validate_password
 from .models import Product, User
 
 class ProductSerializer(serializers.ModelSerializer):
-    """Product modeli iÃƒÂ§in serializer."""
+    """Product modeli için serializer."""
 
     category_name = serializers.CharField(source='category.name', read_only=True)
     average_rating = serializers.FloatField(read_only=True)
@@ -336,26 +336,26 @@ class ProductSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'slug', 'created_at']
 
     def get_discount_price(self, obj):
-        """Uygulanabilirse indirimli fiyatÃ„Â± hesapla."""
+        """Uygulanabilirse indirimli fiyatı hesapla."""
         if hasattr(obj, 'discount') and obj.discount:
             return obj.price * (1 - obj.discount.percent / 100)
         return obj.price
 
     def validate_price(self, value):
-        """FiyatÃ„Â±n negatif olmadÃ„Â±Ã„Å¸Ã„Â±ndan emin ol."""
+        """Fiyatın negatif olmadığından emin ol."""
         if value < 0:
             raise serializers.ValidationError("Price cannot be negative.")
         return value
 
 class ProductCreateSerializer(serializers.ModelSerializer):
-    """ÃƒÅ“rÃƒÂ¼n oluÃ…Å¸turmak iÃƒÂ§in serializer."""
+    """Ürün oluşturmak için serializer."""
 
     class Meta:
         model = Product
         fields = ['name', 'description', 'price', 'stock', 'category']
 
     def validate(self, data):
-        """Birden fazla alan iÃƒÂ§in ÃƒÂ¶zel validation."""
+        """Birden fazla alan için özel validation."""
         if data['price'] > 10000 and data['stock'] > 100:
             raise serializers.ValidationError(
                 "Cannot have high-value products with large stock."
@@ -363,7 +363,7 @@ class ProductCreateSerializer(serializers.ModelSerializer):
         return data
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
-    """KullanÃ„Â±cÃ„Â± kaydÃ„Â± iÃƒÂ§in serializer."""
+    """Kullanıcı kaydı için serializer."""
 
     password = serializers.CharField(
         write_only=True,
@@ -378,7 +378,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         fields = ['email', 'username', 'password', 'password_confirm']
 
     def validate(self, data):
-        """Ã…Å¾ifrelerin eÃ…Å¸leÃ…Å¸tiÃ„Å¸ini doÃ„Å¸rula."""
+        """Şifrelerin eşleştiğini doğrula."""
         if data['password'] != data['password_confirm']:
             raise serializers.ValidationError({
                 "password_confirm": "Password fields didn't match."
@@ -386,7 +386,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        """Hash'lenmiÃ…Å¸ Ã…Å¸ifre ile kullanÃ„Â±cÃ„Â± oluÃ…Å¸tur."""
+        """Hash'lenmiş şifre ile kullanıcı oluştur."""
         validated_data.pop('password_confirm')
         password = validated_data.pop('password')
         user = User.objects.create(**validated_data)
@@ -410,7 +410,7 @@ from .filters import ProductFilter
 from .services import ProductService
 
 class ProductViewSet(viewsets.ModelViewSet):
-    """Product modeli iÃƒÂ§in ViewSet."""
+    """Product modeli için ViewSet."""
 
     queryset = Product.objects.select_related('category').prefetch_related('tags')
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
@@ -421,25 +421,25 @@ class ProductViewSet(viewsets.ModelViewSet):
     ordering = ['-created_at']
 
     def get_serializer_class(self):
-        """Action'a gÃƒÂ¶re uygun serializer dÃƒÂ¶ndÃƒÂ¼r."""
+        """Action'a göre uygun serializer döndür."""
         if self.action == 'create':
             return ProductCreateSerializer
         return ProductSerializer
 
     def perform_create(self, serializer):
-        """KullanÃ„Â±cÃ„Â± baÃ„Å¸lamÃ„Â± ile kaydet."""
+        """Kullanıcı bağlamı ile kaydet."""
         serializer.save(created_by=self.request.user)
 
     @action(detail=False, methods=['get'])
     def featured(self, request):
-        """Ãƒâ€“ne ÃƒÂ§Ã„Â±kan ÃƒÂ¼rÃƒÂ¼nleri dÃƒÂ¶ndÃƒÂ¼r."""
+        """Öne çıkan ürünleri döndür."""
         featured = self.queryset.filter(is_featured=True)[:10]
         serializer = self.get_serializer(featured, many=True)
         return Response(serializer.data)
 
     @action(detail=True, methods=['post'])
     def purchase(self, request, pk=None):
-        """Bir ÃƒÂ¼rÃƒÂ¼n satÃ„Â±n al."""
+        """Bir ürün satın al."""
         product = self.get_object()
         service = ProductService()
         result = service.purchase(product, request.user)
@@ -447,14 +447,14 @@ class ProductViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
     def my_products(self, request):
-        """Mevcut kullanÃ„Â±cÃ„Â± tarafÃ„Â±ndan oluÃ…Å¸turulan ÃƒÂ¼rÃƒÂ¼nleri dÃƒÂ¶ndÃƒÂ¼r."""
+        """Mevcut kullanıcı tarafından oluşturulan ürünleri döndür."""
         products = self.queryset.filter(created_by=request.user)
         page = self.paginate_queryset(products)
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
 ```
 
-### Ãƒâ€“zel Action'lar
+### Özel Action'lar
 
 ```python
 from rest_framework.decorators import api_view, permission_classes
@@ -464,7 +464,7 @@ from rest_framework.response import Response
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def add_to_cart(request):
-    """KullanÃ„Â±cÃ„Â± sepetine ÃƒÂ¼rÃƒÂ¼n ekle."""
+    """Kullanıcı sepetine ürün ekle."""
     product_id = request.data.get('product_id')
     quantity = request.data.get('quantity', 1)
 
@@ -495,12 +495,12 @@ from django.db import transaction
 from .models import Order, OrderItem
 
 class OrderService:
-    """SipariÃ…Å¸ ilgili iÃ…Å¸ mantÃ„Â±Ã„Å¸Ã„Â± iÃƒÂ§in service layer."""
+    """Sipariş ilgili iş mantığı için service layer."""
 
     @staticmethod
     @transaction.atomic
     def create_order(user, cart: Cart) -> Order:
-        """Sepetten sipariÃ…Å¸ oluÃ…Å¸tur."""
+        """Sepetten sipariş oluştur."""
         order = Order.objects.create(
             user=user,
             total_price=cart.total_price
@@ -521,8 +521,8 @@ class OrderService:
 
     @staticmethod
     def process_payment(order: Order, payment_data: dict) -> bool:
-        """SipariÃ…Å¸ iÃƒÂ§in ÃƒÂ¶demeyi iÃ…Å¸le."""
-        # Ãƒâ€“deme gateway entegrasyonu
+        """Sipariş için ödemeyi işle."""
+        # Ödeme gateway entegrasyonu
         payment = PaymentGateway.charge(
             amount=order.total_price,
             token=payment_data['token']
@@ -531,7 +531,7 @@ class OrderService:
         if payment.success:
             order.status = Order.Status.PAID
             order.save()
-            # Onay email'i gÃƒÂ¶nder
+            # Onay email'i gönder
             OrderService.send_confirmation_email(order)
             return True
 
@@ -539,8 +539,8 @@ class OrderService:
 
     @staticmethod
     def send_confirmation_email(order: Order):
-        """SipariÃ…Å¸ onay email'i gÃƒÂ¶nder."""
-        # Email gÃƒÂ¶nderme mantÃ„Â±Ã„Å¸Ã„Â±
+        """Sipariş onay email'i gönder."""
+        # Email gönderme mantığı
         pass
 ```
 
@@ -564,17 +564,17 @@ class ProductListView(generic.ListView):
 ```django
 {% load cache %}
 {% cache 500 sidebar %}
-    ... pahalÃ„Â± sidebar iÃƒÂ§eriÃ„Å¸i ...
+    ... pahalı sidebar içeriği ...
 {% endcache %}
 ```
 
-### DÃƒÂ¼Ã…Å¸ÃƒÂ¼k Seviye Caching
+### Düşük Seviye Caching
 
 ```python
 from django.core.cache import cache
 
 def get_featured_products():
-    """Caching ile ÃƒÂ¶ne ÃƒÂ§Ã„Â±kan ÃƒÂ¼rÃƒÂ¼nleri getir."""
+    """Caching ile öne çıkan ürünleri getir."""
     cache_key = 'featured_products'
     products = cache.get(cache_key)
 
@@ -618,13 +618,13 @@ User = get_user_model()
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
-    """KullanÃ„Â±cÃ„Â± oluÃ…Å¸turulduÃ„Å¸unda profil oluÃ…Å¸tur."""
+    """Kullanıcı oluşturulduğunda profil oluştur."""
     if created:
         Profile.objects.create(user=instance)
 
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
-    """KullanÃ„Â±cÃ„Â± kaydedildiÃ„Å¸inde profili kaydet."""
+    """Kullanıcı kaydedildiğinde profili kaydet."""
     instance.profile.save()
 
 # apps/users/apps.py
@@ -635,13 +635,13 @@ class UsersConfig(AppConfig):
     name = 'apps.users'
 
     def ready(self):
-        """Uygulama hazÃ„Â±r olduÃ„Å¸unda signal'leri import et."""
+        """Uygulama hazır olduğunda signal'leri import et."""
         import apps.users.signals
 ```
 
 ## Middleware
 
-### Ãƒâ€“zel Middleware
+### Özel Middleware
 
 ```python
 # middleware/active_user_middleware.py
@@ -649,24 +649,24 @@ import time
 from django.utils.deprecation import MiddlewareMixin
 
 class ActiveUserMiddleware(MiddlewareMixin):
-    """Aktif kullanÃ„Â±cÃ„Â±larÃ„Â± takip etmek iÃƒÂ§in middleware."""
+    """Aktif kullanıcıları takip etmek için middleware."""
 
     def process_request(self, request):
-        """Gelen request'i iÃ…Å¸le."""
+        """Gelen request'i işle."""
         if request.user.is_authenticated:
-            # Son aktif zamanÃ„Â± gÃƒÂ¼ncelle
+            # Son aktif zamanı güncelle
             request.user.last_active = timezone.now()
             request.user.save(update_fields=['last_active'])
 
 class RequestLoggingMiddleware(MiddlewareMixin):
-    """Request'leri loglamak iÃƒÂ§in middleware."""
+    """Request'leri loglamak için middleware."""
 
     def process_request(self, request):
-        """Request baÃ…Å¸langÃ„Â±ÃƒÂ§ zamanÃ„Â±nÃ„Â± logla."""
+        """Request başlangıç zamanını logla."""
         request.start_time = time.time()
 
     def process_response(self, request, response):
-        """Request sÃƒÂ¼resini logla."""
+        """Request süresini logla."""
         if hasattr(request, 'start_time'):
             duration = time.time() - request.start_time
             logger.info(f'{request.method} {request.path} - {response.status_code} - {duration:.3f}s')
@@ -675,27 +675,27 @@ class RequestLoggingMiddleware(MiddlewareMixin):
 
 ## Performans Optimizasyonu
 
-### N+1 Sorgu Ãƒâ€“nleme
+### N+1 Sorgu Önleme
 
 ```python
-# KÃƒÂ¶tÃƒÂ¼ - N+1 sorgularÃ„Â±
+# Kötü - N+1 sorguları
 products = Product.objects.all()
 for product in products:
-    print(product.category.name)  # Her ÃƒÂ¼rÃƒÂ¼n iÃƒÂ§in ayrÃ„Â± sorgu
+    print(product.category.name)  # Her ürün için ayrı sorgu
 
-# Ã„Â°yi - select_related ile tek sorgu
+# İyi - select_related ile tek sorgu
 products = Product.objects.select_related('category').all()
 for product in products:
     print(product.category.name)
 
-# Ã„Â°yi - Many-to-many iÃƒÂ§in prefetch
+# İyi - Many-to-many için prefetch
 products = Product.objects.prefetch_related('tags').all()
 for product in products:
     for tag in product.tags.all():
         print(tag.name)
 ```
 
-### VeritabanÃ„Â± Ã„Â°ndeksleme
+### Veritabanı İndeksleme
 
 ```python
 class Product(models.Model):
@@ -715,13 +715,13 @@ class Product(models.Model):
 ### Toplu Operasyonlar
 
 ```python
-# Toplu oluÃ…Å¸turma
+# Toplu oluşturma
 Product.objects.bulk_create([
     Product(name=f'Product {i}', price=10.00)
     for i in range(1000)
 ])
 
-# Toplu gÃƒÂ¼ncelleme
+# Toplu güncelleme
 products = Product.objects.all()[:100]
 for product in products:
     product.is_active = True
@@ -731,19 +731,19 @@ Product.objects.bulk_update(products, ['is_active'])
 Product.objects.filter(stock=0).delete()
 ```
 
-## HÃ„Â±zlÃ„Â± Referans
+## Hızlı Referans
 
-| Desen | AÃƒÂ§Ã„Â±klama |
+| Desen | Açıklama |
 |-------|----------|
-| Split settings | AyrÃ„Â± dev/prod/test ayarlarÃ„Â± |
-| Ãƒâ€“zel QuerySet | Yeniden kullanÃ„Â±labilir sorgu metodlarÃ„Â± |
-| Service Layer | Ã„Â°Ã…Å¸ mantÃ„Â±Ã„Å¸Ã„Â± ayrÃ„Â±mÃ„Â± |
+| Split settings | Ayrı dev/prod/test ayarları |
+| Özel QuerySet | Yeniden kullanılabilir sorgu metodları |
+| Service Layer | İş mantığı ayrımı |
 | ViewSet | REST API endpoint'leri |
-| Serializer validation | Request/response dÃƒÂ¶nÃƒÂ¼Ã…Å¸ÃƒÂ¼mÃƒÂ¼ |
+| Serializer validation | Request/response dönüşümü |
 | select_related | Foreign key optimizasyonu |
 | prefetch_related | Many-to-many optimizasyonu |
-| Cache first | PahalÃ„Â± operasyonlarÃ„Â± cache'le |
-| Signal'ler | Olay gÃƒÂ¼dÃƒÂ¼mlÃƒÂ¼ aksiyonlar |
-| Middleware | Request/response iÃ…Å¸leme |
+| Cache first | Pahalı operasyonları cache'le |
+| Signal'ler | Olay güdümlü aksiyonlar |
+| Middleware | Request/response işleme |
 
-UnutmayÃ„Â±n: Django birÃƒÂ§ok kÃ„Â±sayol saÃ„Å¸lar, ancak production uygulamalarÃ„Â± iÃƒÂ§in yapÃ„Â± ve organizasyon kÃ„Â±sa koddan daha ÃƒÂ¶nemlidir. BakÃ„Â±mÃ„Â± kolay olacak Ã…Å¸ekilde oluÃ…Å¸turun.
+Unutmayın: Django birçok kısayol sağlar, ancak production uygulamaları için yapı ve organizasyon kısa koddan daha önemlidir. Bakımı kolay olacak şekilde oluşturun.

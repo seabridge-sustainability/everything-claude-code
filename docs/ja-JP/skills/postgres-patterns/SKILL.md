@@ -3,7 +3,7 @@ name: postgres-patterns
 description: PostgreSQL database patterns for query optimization, schema design, indexing, and security. Based on Supabase best practices.
 ---
 
-# PostgreSQL Ã£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³
+# PostgreSQL パターン
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -20,64 +20,64 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-PostgreSQLÃ£Æ’â„¢Ã£â€šÂ¹Ã£Æ’Ë†Ã£Æ’â€”Ã£Æ’Â©Ã£â€šÂ¯Ã£Æ’â€ Ã£â€šÂ£Ã£â€šÂ¹Ã£ÂÂ®Ã£â€šÂ¯Ã£â€šÂ¤Ã£Æ’Æ’Ã£â€šÂ¯Ã£Æ’ÂªÃ£Æ’â€¢Ã£â€šÂ¡Ã£Æ’Â¬Ã£Æ’Â³Ã£â€šÂ¹Ã£â‚¬â€šÃ¨Â©Â³Ã§Â´Â°Ã£ÂÂªÃ£â€šÂ¬Ã£â€šÂ¤Ã£Æ’â‚¬Ã£Æ’Â³Ã£â€šÂ¹Ã£ÂÂ«Ã£ÂÂ¤Ã£Ââ€žÃ£ÂÂ¦Ã£ÂÂ¯Ã£â‚¬Â`database-reviewer` Ã£â€šÂ¨Ã£Æ’Â¼Ã£â€šÂ¸Ã£â€šÂ§Ã£Æ’Â³Ã£Æ’Ë†Ã£â€šâ€™Ã¤Â½Â¿Ã§â€Â¨Ã£Ââ€”Ã£ÂÂ¦Ã£ÂÂÃ£ÂÂ Ã£Ââ€¢Ã£Ââ€žÃ£â‚¬â€š
+PostgreSQLベストプラクティスのクイックリファレンス。詳細なガイダンスについては、`database-reviewer` エージェントを使用してください。
 
-## Ã¨ÂµÂ·Ã¥â€¹â€¢Ã£â€šÂ¿Ã£â€šÂ¤Ã£Æ’Å¸Ã£Æ’Â³Ã£â€šÂ°
+## 起動タイミング
 
-- SQLÃ£â€šÂ¯Ã£â€šÂ¨Ã£Æ’ÂªÃ£ÂÂ¾Ã£ÂÅ¸Ã£ÂÂ¯Ã£Æ’Å¾Ã£â€šÂ¤Ã£â€šÂ°Ã£Æ’Â¬Ã£Æ’Â¼Ã£â€šÂ·Ã£Æ’Â§Ã£Æ’Â³Ã£ÂÂ®Ã¤Â½Å“Ã¦Ë†ÂÃ¦â„¢â€š
-- Ã£Æ’â€¡Ã£Æ’Â¼Ã£â€šÂ¿Ã£Æ’â„¢Ã£Æ’Â¼Ã£â€šÂ¹Ã£â€šÂ¹Ã£â€šÂ­Ã£Æ’Â¼Ã£Æ’Å¾Ã£ÂÂ®Ã¨Â¨Â­Ã¨Â¨Ë†Ã¦â„¢â€š
-- Ã¤Â½Å½Ã©â‚¬Å¸Ã£â€šÂ¯Ã£â€šÂ¨Ã£Æ’ÂªÃ£ÂÂ®Ã£Æ’Ë†Ã£Æ’Â©Ã£Æ’â€“Ã£Æ’Â«Ã£â€šÂ·Ã£Æ’Â¥Ã£Æ’Â¼Ã£Æ’â€ Ã£â€šÂ£Ã£Æ’Â³Ã£â€šÂ°Ã¦â„¢â€š
-- Row Level SecurityÃ£ÂÂ®Ã¥Â®Å¸Ã¨Â£â€¦Ã¦â„¢â€š
-- Ã£â€šÂ³Ã£Æ’ÂÃ£â€šÂ¯Ã£â€šÂ·Ã£Æ’Â§Ã£Æ’Â³Ã£Æ’â€”Ã£Æ’Â¼Ã£Æ’ÂªÃ£Æ’Â³Ã£â€šÂ°Ã£ÂÂ®Ã¨Â¨Â­Ã¥Â®Å¡Ã¦â„¢â€š
+- SQLクエリまたはマイグレーションの作成時
+- データベーススキーマの設計時
+- 低速クエリのトラブルシューティング時
+- Row Level Securityの実装時
+- コネクションプーリングの設定時
 
-## Ã£â€šÂ¯Ã£â€šÂ¤Ã£Æ’Æ’Ã£â€šÂ¯Ã£Æ’ÂªÃ£Æ’â€¢Ã£â€šÂ¡Ã£Æ’Â¬Ã£Æ’Â³Ã£â€šÂ¹
+## クイックリファレンス
 
-### Ã£â€šÂ¤Ã£Æ’Â³Ã£Æ’â€¡Ã£Æ’Æ’Ã£â€šÂ¯Ã£â€šÂ¹Ã£Æ’ÂÃ£Æ’Â¼Ã£Æ’Ë†Ã£â€šÂ·Ã£Æ’Â¼Ã£Æ’Ë†
+### インデックスチートシート
 
-| Ã£â€šÂ¯Ã£â€šÂ¨Ã£Æ’ÂªÃ£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³ | Ã£â€šÂ¤Ã£Æ’Â³Ã£Æ’â€¡Ã£Æ’Æ’Ã£â€šÂ¯Ã£â€šÂ¹Ã£â€šÂ¿Ã£â€šÂ¤Ã£Æ’â€” | Ã¤Â¾â€¹ |
+| クエリパターン | インデックスタイプ | 例 |
 |--------------|------------|---------|
-| `WHERE col = value` | B-treeÃ¯Â¼Ë†Ã£Æ’â€¡Ã£Æ’â€¢Ã£â€šÂ©Ã£Æ’Â«Ã£Æ’Ë†Ã¯Â¼â€° | `CREATE INDEX idx ON t (col)` |
+| `WHERE col = value` | B-tree（デフォルト） | `CREATE INDEX idx ON t (col)` |
 | `WHERE col > value` | B-tree | `CREATE INDEX idx ON t (col)` |
-| `WHERE a = x AND b > y` | Ã¨Â¤â€¡Ã¥ÂË† | `CREATE INDEX idx ON t (a, b)` |
+| `WHERE a = x AND b > y` | 複合 | `CREATE INDEX idx ON t (a, b)` |
 | `WHERE jsonb @> '{}'` | GIN | `CREATE INDEX idx ON t USING gin (col)` |
 | `WHERE tsv @@ query` | GIN | `CREATE INDEX idx ON t USING gin (col)` |
-| Ã¦â„¢â€šÃ§Â³Â»Ã¥Ë†â€”Ã§Â¯â€žÃ¥â€ºÂ² | BRIN | `CREATE INDEX idx ON t USING brin (col)` |
+| 時系列範囲 | BRIN | `CREATE INDEX idx ON t USING brin (col)` |
 
-### Ã£Æ’â€¡Ã£Æ’Â¼Ã£â€šÂ¿Ã£â€šÂ¿Ã£â€šÂ¤Ã£Æ’â€”Ã£â€šÂ¯Ã£â€šÂ¤Ã£Æ’Æ’Ã£â€šÂ¯Ã£Æ’ÂªÃ£Æ’â€¢Ã£â€šÂ¡Ã£Æ’Â¬Ã£Æ’Â³Ã£â€šÂ¹
+### データタイプクイックリファレンス
 
-| Ã§â€Â¨Ã©â‚¬â€ | Ã¦Â­Â£Ã£Ââ€”Ã£Ââ€žÃ£â€šÂ¿Ã£â€šÂ¤Ã£Æ’â€” | Ã©ÂÂ¿Ã£Ââ€˜Ã£â€šâ€¹Ã£ÂÂ¹Ã£ÂÂ |
+| 用途 | 正しいタイプ | 避けるべき |
 |----------|-------------|-------|
-| ID | `bigint` | `int`Ã£â‚¬ÂÃ£Æ’Â©Ã£Æ’Â³Ã£Æ’â‚¬Ã£Æ’Â UUID |
-| Ã¦â€“â€¡Ã¥Â­â€”Ã¥Ë†â€” | `text` | `varchar(255)` |
-| Ã£â€šÂ¿Ã£â€šÂ¤Ã£Æ’Â Ã£â€šÂ¹Ã£â€šÂ¿Ã£Æ’Â³Ã£Æ’â€” | `timestamptz` | `timestamp` |
-| Ã©â€¡â€˜Ã©Â¡Â | `numeric(10,2)` | `float` |
-| Ã£Æ’â€¢Ã£Æ’Â©Ã£â€šÂ° | `boolean` | `varchar`Ã£â‚¬Â`int` |
+| ID | `bigint` | `int`、ランダムUUID |
+| 文字列 | `text` | `varchar(255)` |
+| タイムスタンプ | `timestamptz` | `timestamp` |
+| 金額 | `numeric(10,2)` | `float` |
+| フラグ | `boolean` | `varchar`、`int` |
 
-### Ã¤Â¸â‚¬Ã¨Ë†Â¬Ã§Å¡â€žÃ£ÂÂªÃ£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³
+### 一般的なパターン
 
-**Ã¨Â¤â€¡Ã¥ÂË†Ã£â€šÂ¤Ã£Æ’Â³Ã£Æ’â€¡Ã£Æ’Æ’Ã£â€šÂ¯Ã£â€šÂ¹Ã£ÂÂ®Ã©Â â€ Ã¥ÂºÂ:**
+**複合インデックスの順序:**
 ```sql
--- Ã§Â­â€°Ã¤Â¾Â¡Ã¥Ë†â€”Ã£â€šâ€™Ã¦Å“â‚¬Ã¥Ë†ÂÃ£ÂÂ«Ã£â‚¬ÂÃ¦Â¬Â¡Ã£ÂÂ«Ã§Â¯â€žÃ¥â€ºÂ²Ã¥Ë†â€”
+-- 等価列を最初に、次に範囲列
 CREATE INDEX idx ON orders (status, created_at);
--- Ã¦Â¬Â¡Ã£ÂÂ®Ã¥Â Â´Ã¥ÂË†Ã£ÂÂ«Ã¦Â©Å¸Ã¨Æ’Â½: WHERE status = 'pending' AND created_at > '2024-01-01'
+-- 次の場合に機能: WHERE status = 'pending' AND created_at > '2024-01-01'
 ```
 
-**Ã£â€šÂ«Ã£Æ’ÂÃ£Æ’ÂªÃ£Æ’Â³Ã£â€šÂ°Ã£â€šÂ¤Ã£Æ’Â³Ã£Æ’â€¡Ã£Æ’Æ’Ã£â€šÂ¯Ã£â€šÂ¹:**
+**カバリングインデックス:**
 ```sql
 CREATE INDEX idx ON users (email) INCLUDE (name, created_at);
--- SELECT email, name, created_at Ã£ÂÂ®Ã£Æ’â€ Ã£Æ’Â¼Ã£Æ’â€“Ã£Æ’Â«Ã¦Â¤Å“Ã§Â´Â¢Ã£â€šâ€™Ã¥â€ºÅ¾Ã©ÂÂ¿
+-- SELECT email, name, created_at のテーブル検索を回避
 ```
 
-**Ã©Æ’Â¨Ã¥Ë†â€ Ã£â€šÂ¤Ã£Æ’Â³Ã£Æ’â€¡Ã£Æ’Æ’Ã£â€šÂ¯Ã£â€šÂ¹:**
+**部分インデックス:**
 ```sql
 CREATE INDEX idx ON users (email) WHERE deleted_at IS NULL;
--- Ã£â€šË†Ã£â€šÅ Ã¥Â°ÂÃ£Ââ€¢Ã£ÂÂªÃ£â€šÂ¤Ã£Æ’Â³Ã£Æ’â€¡Ã£Æ’Æ’Ã£â€šÂ¯Ã£â€šÂ¹Ã£â‚¬ÂÃ£â€šÂ¢Ã£â€šÂ¯Ã£Æ’â€ Ã£â€šÂ£Ã£Æ’â€“Ã£Æ’Â¦Ã£Æ’Â¼Ã£â€šÂ¶Ã£Æ’Â¼Ã£ÂÂ®Ã£ÂÂ¿Ã£â€šâ€™Ã¥ÂÂ«Ã£â€šâ‚¬
+-- より小さなインデックス、アクティブユーザーのみを含む
 ```
 
-**RLSÃ£Æ’ÂÃ£Æ’ÂªÃ£â€šÂ·Ã£Æ’Â¼Ã¯Â¼Ë†Ã¦Å“â‚¬Ã©ÂÂ©Ã¥Å’â€“Ã¯Â¼â€°:**
+**RLSポリシー（最適化）:**
 ```sql
 CREATE POLICY policy ON orders
-  USING ((SELECT auth.uid()) = user_id);  -- SELECTÃ£ÂÂ§Ã£Æ’Â©Ã£Æ’Æ’Ã£Æ’â€”Ã¯Â¼Â
+  USING ((SELECT auth.uid()) = user_id);  -- SELECTでラップ！
 ```
 
 **UPSERT:**
@@ -88,13 +88,13 @@ ON CONFLICT (user_id, key)
 DO UPDATE SET value = EXCLUDED.value;
 ```
 
-**Ã£â€šÂ«Ã£Æ’Â¼Ã£â€šÂ½Ã£Æ’Â«Ã£Æ’Å¡Ã£Æ’Â¼Ã£â€šÂ¸Ã£Æ’ÂÃ£Æ’Â¼Ã£â€šÂ·Ã£Æ’Â§Ã£Æ’Â³:**
+**カーソルページネーション:**
 ```sql
 SELECT * FROM products WHERE id > $last_id ORDER BY id LIMIT 20;
--- O(1) vs OFFSET Ã£ÂÂ¯ O(n)
+-- O(1) vs OFFSET は O(n)
 ```
 
-**Ã£â€šÂ­Ã£Æ’Â¥Ã£Æ’Â¼Ã¥â€¡Â¦Ã§Ââ€ :**
+**キュー処理:**
 ```sql
 UPDATE jobs SET status = 'processing'
 WHERE id = (
@@ -104,10 +104,10 @@ WHERE id = (
 ) RETURNING *;
 ```
 
-### Ã£â€šÂ¢Ã£Æ’Â³Ã£Æ’ÂÃ£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³Ã¦Â¤Å“Ã¥â€¡Âº
+### アンチパターン検出
 
 ```sql
--- Ã£â€šÂ¤Ã£Æ’Â³Ã£Æ’â€¡Ã£Æ’Æ’Ã£â€šÂ¯Ã£â€šÂ¹Ã£ÂÂ®Ã£ÂÂªÃ£Ââ€žÃ¥Â¤â€“Ã©Æ’Â¨Ã£â€šÂ­Ã£Æ’Â¼Ã£â€šâ€™Ã¦Â¤Å“Ã§Â´Â¢
+-- インデックスのない外部キーを検索
 SELECT conrelid::regclass, a.attname
 FROM pg_constraint c
 JOIN pg_attribute a ON a.attrelid = c.conrelid AND a.attnum = ANY(c.conkey)
@@ -117,45 +117,45 @@ WHERE c.contype = 'f'
     WHERE i.indrelid = c.conrelid AND a.attnum = ANY(i.indkey)
   );
 
--- Ã¤Â½Å½Ã©â‚¬Å¸Ã£â€šÂ¯Ã£â€šÂ¨Ã£Æ’ÂªÃ£â€šâ€™Ã¦Â¤Å“Ã§Â´Â¢
+-- 低速クエリを検索
 SELECT query, mean_exec_time, calls
 FROM pg_stat_statements
 WHERE mean_exec_time > 100
 ORDER BY mean_exec_time DESC;
 
--- Ã£Æ’â€ Ã£Æ’Â¼Ã£Æ’â€“Ã£Æ’Â«Ã¨â€šÂ¥Ã¥Â¤Â§Ã¥Å’â€“Ã£â€šâ€™Ã£Æ’ÂÃ£â€šÂ§Ã£Æ’Æ’Ã£â€šÂ¯
+-- テーブル肥大化をチェック
 SELECT relname, n_dead_tup, last_vacuum
 FROM pg_stat_user_tables
 WHERE n_dead_tup > 1000
 ORDER BY n_dead_tup DESC;
 ```
 
-### Ã¨Â¨Â­Ã¥Â®Å¡Ã£Æ’â€ Ã£Æ’Â³Ã£Æ’â€”Ã£Æ’Â¬Ã£Æ’Â¼Ã£Æ’Ë†
+### 設定テンプレート
 
 ```sql
--- Ã¦Å½Â¥Ã§Â¶Å¡Ã¥Ë†Â¶Ã©â„¢ÂÃ¯Â¼Ë†RAMÃ£ÂÂ«Ã¥Â¿Å“Ã£ÂËœÃ£ÂÂ¦Ã¨ÂªÂ¿Ã¦â€¢Â´Ã¯Â¼â€°
+-- 接続制限（RAMに応じて調整）
 ALTER SYSTEM SET max_connections = 100;
 ALTER SYSTEM SET work_mem = '8MB';
 
--- Ã£â€šÂ¿Ã£â€šÂ¤Ã£Æ’Â Ã£â€šÂ¢Ã£â€šÂ¦Ã£Æ’Ë†
+-- タイムアウト
 ALTER SYSTEM SET idle_in_transaction_session_timeout = '30s';
 ALTER SYSTEM SET statement_timeout = '30s';
 
--- Ã£Æ’Â¢Ã£Æ’â€¹Ã£â€šÂ¿Ã£Æ’ÂªÃ£Æ’Â³Ã£â€šÂ°
+-- モニタリング
 CREATE EXTENSION IF NOT EXISTS pg_stat_statements;
 
--- Ã£â€šÂ»Ã£â€šÂ­Ã£Æ’Â¥Ã£Æ’ÂªÃ£Æ’â€ Ã£â€šÂ£Ã£Æ’â€¡Ã£Æ’â€¢Ã£â€šÂ©Ã£Æ’Â«Ã£Æ’Ë†
+-- セキュリティデフォルト
 REVOKE ALL ON SCHEMA public FROM public;
 
 SELECT pg_reload_conf();
 ```
 
-## Ã©â€“Â¢Ã©â‚¬Â£
+## 関連
 
-- Agent: `database-reviewer` - Ã¥Â®Å’Ã¥â€¦Â¨Ã£ÂÂªÃ£Æ’â€¡Ã£Æ’Â¼Ã£â€šÂ¿Ã£Æ’â„¢Ã£Æ’Â¼Ã£â€šÂ¹Ã£Æ’Â¬Ã£Æ’â€œÃ£Æ’Â¥Ã£Æ’Â¼Ã£Æ’Â¯Ã£Æ’Â¼Ã£â€šÂ¯Ã£Æ’â€¢Ã£Æ’Â­Ã£Æ’Â¼
-- Skill: `clickhouse-io` - ClickHouseÃ¥Ë†â€ Ã¦Å¾ÂÃ£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³
-- Skill: `backend-patterns` - APIÃ£ÂÂ¨Ã£Æ’ÂÃ£Æ’Æ’Ã£â€šÂ¯Ã£â€šÂ¨Ã£Æ’Â³Ã£Æ’â€°Ã£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³
+- Agent: `database-reviewer` - 完全なデータベースレビューワークフロー
+- Skill: `clickhouse-io` - ClickHouse分析パターン
+- Skill: `backend-patterns` - APIとバックエンドパターン
 
 ---
 
-*[Supabase Agent Skills](Supabase Agent Skills (credit: Supabase team))Ã¯Â¼Ë†MITÃ£Æ’Â©Ã£â€šÂ¤Ã£â€šÂ»Ã£Æ’Â³Ã£â€šÂ¹Ã¯Â¼â€°Ã£ÂÂ«Ã¥Å¸ÂºÃ£ÂÂ¥Ã£ÂÂ*
+*[Supabase Agent Skills](Supabase Agent Skills (credit: Supabase team))（MITライセンス）に基づく*

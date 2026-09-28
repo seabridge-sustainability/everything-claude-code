@@ -3,7 +3,7 @@ name: postgres-patterns
 description: PostgreSQL database patterns for query optimization, schema design, indexing, and security. Based on Supabase best practices.
 ---
 
-# PostgreSQL Ã¦Â¨Â¡Ã¥Â¼Â
+# PostgreSQL 模式
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -20,67 +20,67 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-PostgreSQL Ã¦Å“â‚¬Ã¤Â½Â³Ã¥Â¯Â¦Ã¥â€¹â„¢Ã¥Â¿Â«Ã©â‚¬Å¸Ã¥ÂÆ’Ã¨â‚¬Æ’Ã£â‚¬â€šÃ¨Â©Â³Ã§Â´Â°Ã¦Å’â€¡Ã¥Ââ€”Ã¨Â«â€¹Ã¤Â½Â¿Ã§â€Â¨ `database-reviewer` agentÃ£â‚¬â€š
+PostgreSQL 最佳實務快速參考。詳細指南請使用 `database-reviewer` agent。
 
-## Ã¤Â½â€¢Ã¦â„¢â€šÃ¥â€¢Å¸Ã§â€Â¨
+## 何時啟用
 
-- Ã¦â€™Â°Ã¥Â¯Â« SQL Ã¦Å¸Â¥Ã¨Â©Â¢Ã¦Ë†â€“ migrations
-- Ã¨Â¨Â­Ã¨Â¨Ë†Ã¨Â³â€¡Ã¦â€“â„¢Ã¥ÂºÂ« schema
-- Ã§â€“â€˜Ã©â€ºÂ£Ã¦Å½â€™Ã¨Â§Â£Ã¦â€¦Â¢Ã¦Å¸Â¥Ã¨Â©Â¢
-- Ã¥Â¯Â¦Ã¤Â½Å“ Row Level Security
-- Ã¨Â¨Â­Ã¥Â®Å¡Ã©â‚¬Â£Ã§Â·Å¡Ã¦Â±Â 
+- 撰寫 SQL 查詢或 migrations
+- 設計資料庫 schema
+- 疑難排解慢查詢
+- 實作 Row Level Security
+- 設定連線池
 
-## Ã¥Â¿Â«Ã©â‚¬Å¸Ã¥ÂÆ’Ã¨â‚¬Æ’
+## 快速參考
 
-### Ã§Â´Â¢Ã¥Â¼â€¢Ã©â‚¬Å¸Ã¦Å¸Â¥Ã¨Â¡Â¨
+### 索引速查表
 
-| Ã¦Å¸Â¥Ã¨Â©Â¢Ã¦Â¨Â¡Ã¥Â¼Â | Ã§Â´Â¢Ã¥Â¼â€¢Ã©Â¡Å¾Ã¥Å¾â€¹ | Ã§Â¯â€žÃ¤Â¾â€¹ |
+| 查詢模式 | 索引類型 | 範例 |
 |---------|---------|------|
-| `WHERE col = value` | B-treeÃ¯Â¼Ë†Ã©Â ÂÃ¨Â¨Â­Ã¯Â¼â€° | `CREATE INDEX idx ON t (col)` |
+| `WHERE col = value` | B-tree（預設） | `CREATE INDEX idx ON t (col)` |
 | `WHERE col > value` | B-tree | `CREATE INDEX idx ON t (col)` |
-| `WHERE a = x AND b > y` | Ã¨Â¤â€¡Ã¥ÂË† | `CREATE INDEX idx ON t (a, b)` |
+| `WHERE a = x AND b > y` | 複合 | `CREATE INDEX idx ON t (a, b)` |
 | `WHERE jsonb @> '{}'` | GIN | `CREATE INDEX idx ON t USING gin (col)` |
 | `WHERE tsv @@ query` | GIN | `CREATE INDEX idx ON t USING gin (col)` |
-| Ã¦â„¢â€šÃ©â€“â€œÃ¥ÂºÂÃ¥Ë†â€”Ã§Â¯â€žÃ¥Å“Â | BRIN | `CREATE INDEX idx ON t USING brin (col)` |
+| 時間序列範圍 | BRIN | `CREATE INDEX idx ON t USING brin (col)` |
 
-### Ã¨Â³â€¡Ã¦â€“â„¢Ã©Â¡Å¾Ã¥Å¾â€¹Ã¥Â¿Â«Ã©â‚¬Å¸Ã¥ÂÆ’Ã¨â‚¬Æ’
+### 資料類型快速參考
 
-| Ã¤Â½Â¿Ã§â€Â¨Ã¦Æ’â€¦Ã¦Â³Â | Ã¦Â­Â£Ã§Â¢ÂºÃ©Â¡Å¾Ã¥Å¾â€¹ | Ã©ÂÂ¿Ã¥â€¦Â |
+| 使用情況 | 正確類型 | 避免 |
 |---------|---------|------|
-| IDs | `bigint` | `int`Ã£â‚¬ÂÃ©Å¡Â¨Ã¦Â©Å¸ UUID |
-| Ã¥Â­â€”Ã¤Â¸Â² | `text` | `varchar(255)` |
-| Ã¦â„¢â€šÃ©â€“â€œÃ¦Ë†Â³ | `timestamptz` | `timestamp` |
-| Ã©â€¡â€˜Ã©Â¡Â | `numeric(10,2)` | `float` |
-| Ã¦â€”â€”Ã¦Â¨â„¢ | `boolean` | `varchar`Ã£â‚¬Â`int` |
+| IDs | `bigint` | `int`、隨機 UUID |
+| 字串 | `text` | `varchar(255)` |
+| 時間戳 | `timestamptz` | `timestamp` |
+| 金額 | `numeric(10,2)` | `float` |
+| 旗標 | `boolean` | `varchar`、`int` |
 
-### Ã¥Â¸Â¸Ã¨Â¦â€¹Ã¦Â¨Â¡Ã¥Â¼Â
+### 常見模式
 
-**Ã¨Â¤â€¡Ã¥ÂË†Ã§Â´Â¢Ã¥Â¼â€¢Ã©Â â€ Ã¥ÂºÂÃ¯Â¼Å¡**
+**複合索引順序：**
 ```sql
--- Ã§Â­â€°Ã¥â‚¬Â¼Ã¦Â¬â€žÃ¤Â½ÂÃ¥â€žÂªÃ¥â€¦Ë†Ã¯Â¼Å’Ã§â€žÂ¶Ã¥Â¾Å’Ã¦ËœÂ¯Ã§Â¯â€žÃ¥Å“ÂÃ¦Â¬â€žÃ¤Â½Â
+-- 等值欄位優先，然後是範圍欄位
 CREATE INDEX idx ON orders (status, created_at);
--- Ã©ÂÂ©Ã§â€Â¨Ã¦â€“Â¼Ã¯Â¼Å¡WHERE status = 'pending' AND created_at > '2024-01-01'
+-- 適用於：WHERE status = 'pending' AND created_at > '2024-01-01'
 ```
 
-**Ã¨Â¦â€ Ã¨â€œâ€¹Ã§Â´Â¢Ã¥Â¼â€¢Ã¯Â¼Å¡**
+**覆蓋索引：**
 ```sql
 CREATE INDEX idx ON users (email) INCLUDE (name, created_at);
--- Ã©ÂÂ¿Ã¥â€¦Â SELECT email, name, created_at Ã¦â„¢â€šÃ§Å¡â€žÃ¨Â¡Â¨Ã¦Â Â¼Ã¦Å¸Â¥Ã¨Â©Â¢
+-- 避免 SELECT email, name, created_at 時的表格查詢
 ```
 
-**Ã©Æ’Â¨Ã¥Ë†â€ Ã§Â´Â¢Ã¥Â¼â€¢Ã¯Â¼Å¡**
+**部分索引：**
 ```sql
 CREATE INDEX idx ON users (email) WHERE deleted_at IS NULL;
--- Ã¦â€ºÂ´Ã¥Â°ÂÃ§Å¡â€žÃ§Â´Â¢Ã¥Â¼â€¢Ã¯Â¼Å’Ã¥ÂÂªÃ¥Å’â€¦Ã¥ÂÂ«Ã¦Â´Â»Ã¨ÂºÂÃ¤Â½Â¿Ã§â€Â¨Ã¨â‚¬â€¦
+-- 更小的索引，只包含活躍使用者
 ```
 
-**RLS Ã¦â€Â¿Ã§Â­â€“Ã¯Â¼Ë†Ã¥â€žÂªÃ¥Å’â€“Ã¯Â¼â€°Ã¯Â¼Å¡**
+**RLS 政策（優化）：**
 ```sql
 CREATE POLICY policy ON orders
-  USING ((SELECT auth.uid()) = user_id);  -- Ã§â€Â¨ SELECT Ã¥Å’â€¦Ã¨Â£ÂÃ¯Â¼Â
+  USING ((SELECT auth.uid()) = user_id);  -- 用 SELECT 包裝！
 ```
 
-**UPSERTÃ¯Â¼Å¡**
+**UPSERT：**
 ```sql
 INSERT INTO settings (user_id, key, value)
 VALUES (123, 'theme', 'dark')
@@ -88,13 +88,13 @@ ON CONFLICT (user_id, key)
 DO UPDATE SET value = EXCLUDED.value;
 ```
 
-**Ã¦Â¸Â¸Ã¦Â¨â„¢Ã¥Ë†â€ Ã©Â ÂÃ¯Â¼Å¡**
+**游標分頁：**
 ```sql
 SELECT * FROM products WHERE id > $last_id ORDER BY id LIMIT 20;
--- O(1) vs OFFSET Ã¦ËœÂ¯ O(n)
+-- O(1) vs OFFSET 是 O(n)
 ```
 
-**Ã¤Â½â€¡Ã¥Ë†â€”Ã¨â„¢â€¢Ã§Ââ€ Ã¯Â¼Å¡**
+**佇列處理：**
 ```sql
 UPDATE jobs SET status = 'processing'
 WHERE id = (
@@ -104,10 +104,10 @@ WHERE id = (
 ) RETURNING *;
 ```
 
-### Ã¥ÂÂÃ¦Â¨Â¡Ã¥Â¼ÂÃ¥ÂÂµÃ¦Â¸Â¬
+### 反模式偵測
 
 ```sql
--- Ã¦â€°Â¾Ã¥â€¡ÂºÃ¦Å“ÂªÃ¥Â»ÂºÃ§Â´Â¢Ã¥Â¼â€¢Ã§Å¡â€žÃ¥Â¤â€“Ã©ÂÂµ
+-- 找出未建索引的外鍵
 SELECT conrelid::regclass, a.attname
 FROM pg_constraint c
 JOIN pg_attribute a ON a.attrelid = c.conrelid AND a.attnum = ANY(c.conkey)
@@ -117,45 +117,45 @@ WHERE c.contype = 'f'
     WHERE i.indrelid = c.conrelid AND a.attnum = ANY(i.indkey)
   );
 
--- Ã¦â€°Â¾Ã¥â€¡ÂºÃ¦â€¦Â¢Ã¦Å¸Â¥Ã¨Â©Â¢
+-- 找出慢查詢
 SELECT query, mean_exec_time, calls
 FROM pg_stat_statements
 WHERE mean_exec_time > 100
 ORDER BY mean_exec_time DESC;
 
--- Ã¦ÂªÂ¢Ã¦Å¸Â¥Ã¨Â¡Â¨Ã¦Â Â¼Ã¨â€ Â¨Ã¨â€žÂ¹
+-- 檢查表格膨脹
 SELECT relname, n_dead_tup, last_vacuum
 FROM pg_stat_user_tables
 WHERE n_dead_tup > 1000
 ORDER BY n_dead_tup DESC;
 ```
 
-### Ã¨Â¨Â­Ã¥Â®Å¡Ã§Â¯â€žÃ¦Å“Â¬
+### 設定範本
 
 ```sql
--- Ã©â‚¬Â£Ã§Â·Å¡Ã©â„¢ÂÃ¥Ë†Â¶Ã¯Â¼Ë†Ã¤Â¾Â RAM Ã¨ÂªÂ¿Ã¦â€¢Â´Ã¯Â¼â€°
+-- 連線限制（依 RAM 調整）
 ALTER SYSTEM SET max_connections = 100;
 ALTER SYSTEM SET work_mem = '8MB';
 
--- Ã©â‚¬Â¾Ã¦â„¢â€š
+-- 逾時
 ALTER SYSTEM SET idle_in_transaction_session_timeout = '30s';
 ALTER SYSTEM SET statement_timeout = '30s';
 
--- Ã§â€ºÂ£Ã¦Å½Â§
+-- 監控
 CREATE EXTENSION IF NOT EXISTS pg_stat_statements;
 
--- Ã¥Â®â€°Ã¥â€¦Â¨Ã©Â ÂÃ¨Â¨Â­Ã¥â‚¬Â¼
+-- 安全預設值
 REVOKE ALL ON SCHEMA public FROM public;
 
 SELECT pg_reload_conf();
 ```
 
-## Ã§â€ºÂ¸Ã©â€”Å“
+## 相關
 
-- AgentÃ¯Â¼Å¡`database-reviewer` - Ã¥Â®Å’Ã¦â€¢Â´Ã¨Â³â€¡Ã¦â€“â„¢Ã¥ÂºÂ«Ã¥Â¯Â©Ã¦Å¸Â¥Ã¥Â·Â¥Ã¤Â½Å“Ã¦ÂµÂÃ§Â¨â€¹
-- SkillÃ¯Â¼Å¡`clickhouse-io` - ClickHouse Ã¥Ë†â€ Ã¦Å¾ÂÃ¦Â¨Â¡Ã¥Â¼Â
-- SkillÃ¯Â¼Å¡`backend-patterns` - API Ã¥â€™Å’Ã¥Â¾Å’Ã§Â«Â¯Ã¦Â¨Â¡Ã¥Â¼Â
+- Agent：`database-reviewer` - 完整資料庫審查工作流程
+- Skill：`clickhouse-io` - ClickHouse 分析模式
+- Skill：`backend-patterns` - API 和後端模式
 
 ---
 
-*Ã¥Å¸ÂºÃ¦â€“Â¼ [Supabase Agent Skills](Supabase Agent Skills (credit: Supabase team))Ã¯Â¼Ë†MIT Ã¦Å½Ë†Ã¦Â¬Å Ã¯Â¼â€°*
+*基於 [Supabase Agent Skills](Supabase Agent Skills (credit: Supabase team))（MIT 授權）*

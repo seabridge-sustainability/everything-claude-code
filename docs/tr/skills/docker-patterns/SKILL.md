@@ -1,10 +1,10 @@
 ---
 name: docker-patterns
-description: Yerel geliÃ…Å¸tirme, konteyner gÃƒÂ¼venliÃ„Å¸i, aÃ„Å¸, volume stratejileri ve multi-servis orkestrasyon iÃƒÂ§in Docker ve Docker Compose kalÃ„Â±plarÃ„Â±.
+description: Yerel geliştirme, konteyner güvenliği, ağ, volume stratejileri ve multi-servis orkestrasyon için Docker ve Docker Compose kalıpları.
 origin: ECC
 ---
 
-# Docker KalÃ„Â±plarÃ„Â±
+# Docker Kalıpları
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -21,19 +21,19 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-Konteynerize edilmiÃ…Å¸ geliÃ…Å¸tirme iÃƒÂ§in Docker ve Docker Compose en iyi uygulamalarÃ„Â±.
+Konteynerize edilmiş geliştirme için Docker ve Docker Compose en iyi uygulamaları.
 
-## Ne Zaman AktifleÃ…Å¸tirmeli
+## Ne Zaman Aktifleştirmeli
 
-- Yerel geliÃ…Å¸tirme iÃƒÂ§in Docker Compose kurarken
-- Ãƒâ€¡ok konteynerli mimariler tasarlarken
-- Konteyner aÃ„Å¸ veya volume sorunlarÃ„Â±nÃ„Â± giderirken
-- Dockerfile'larÃ„Â± gÃƒÂ¼venlik ve boyut iÃƒÂ§in incelerken
-- Yerel geliÃ…Å¸tirmeden konteynerize iÃ…Å¸ akÃ„Â±Ã…Å¸Ã„Â±na geÃƒÂ§erken
+- Yerel geliştirme için Docker Compose kurarken
+- Çok konteynerli mimariler tasarlarken
+- Konteyner ağ veya volume sorunlarını giderirken
+- Dockerfile'ları güvenlik ve boyut için incelerken
+- Yerel geliştirmeden konteynerize iş akışına geçerken
 
-## Yerel GeliÃ…Å¸tirme iÃƒÂ§in Docker Compose
+## Yerel Geliştirme için Docker Compose
 
-### Standart Web UygulamasÃ„Â± Stack'i
+### Standart Web Uygulaması Stack'i
 
 ```yaml
 # docker-compose.yml
@@ -41,12 +41,12 @@ services:
   app:
     build:
       context: .
-      target: dev                     # Multi-stage Dockerfile'Ã„Â±n dev aÃ…Å¸amasÃ„Â±nÃ„Â± kullan
+      target: dev                     # Multi-stage Dockerfile'ın dev aşamasını kullan
     ports:
       - "3000:3000"
     volumes:
-      - .:/app                        # Hot reload iÃƒÂ§in bind mount
-      - /app/node_modules             # Anonim volume -- konteyner baÃ„Å¸Ã„Â±mlÃ„Â±lÃ„Â±klarÃ„Â±nÃ„Â± korur
+      - .:/app                        # Hot reload için bind mount
+      - /app/node_modules             # Anonim volume -- konteyner bağımlılıklarını korur
     environment:
       - DATABASE_URL=postgres://postgres:postgres@db:5432/app_dev
       - REDIS_URL=redis://redis:6379/0
@@ -93,16 +93,16 @@ volumes:
   redisdata:
 ```
 
-### GeliÃ…Å¸tirme vs ÃƒÅ“retim Dockerfile
+### Geliştirme vs Üretim Dockerfile
 
 ```dockerfile
-# AÃ…Å¸ama: baÃ„Å¸Ã„Â±mlÃ„Â±lÃ„Â±klar
+# Aşama: bağımlılıklar
 FROM node:22-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 
-# AÃ…Å¸ama: dev (hot reload, debug araÃƒÂ§larÃ„Â±)
+# Aşama: dev (hot reload, debug araçları)
 FROM node:22-alpine AS dev
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
@@ -110,14 +110,14 @@ COPY . .
 EXPOSE 3000
 CMD ["npm", "run", "dev"]
 
-# AÃ…Å¸ama: build
+# Aşama: build
 FROM node:22-alpine AS build
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npm run build && npm prune --production
 
-# AÃ…Å¸ama: production (minimal image)
+# Aşama: production (minimal image)
 FROM node:22-alpine AS production
 WORKDIR /app
 RUN addgroup -g 1001 -S appgroup && adduser -S appuser -u 1001
@@ -131,10 +131,10 @@ HEALTHCHECK --interval=30s --timeout=3s CMD wget -qO- http://localhost:3000/heal
 CMD ["node", "dist/server.js"]
 ```
 
-### Override DosyalarÃ„Â±
+### Override Dosyaları
 
 ```yaml
-# docker-compose.override.yml (otomatik yÃƒÂ¼klenir, sadece dev ayarlarÃ„Â±)
+# docker-compose.override.yml (otomatik yüklenir, sadece dev ayarları)
 services:
   app:
     environment:
@@ -143,7 +143,7 @@ services:
     ports:
       - "9229:9229"                   # Node.js debugger
 
-# docker-compose.prod.yml (ÃƒÂ¼retim iÃƒÂ§in aÃƒÂ§Ã„Â±kÃƒÂ§a)
+# docker-compose.prod.yml (üretim için açıkça)
 services:
   app:
     build:
@@ -157,25 +157,25 @@ services:
 ```
 
 ```bash
-# GeliÃ…Å¸tirme (override'Ã„Â± otomatik yÃƒÂ¼kler)
+# Geliştirme (override'ı otomatik yükler)
 docker compose up
 
-# ÃƒÅ“retim
+# Üretim
 docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 ```
 
-## AÃ„Å¸ (Networking)
+## Ağ (Networking)
 
-### Servis KeÃ…Å¸fi
+### Servis Keşfi
 
-AynÃ„Â± Compose aÃ„Å¸Ã„Â±ndaki servisler servis adÃ„Â±yla ÃƒÂ§ÃƒÂ¶zÃƒÂ¼mlenir:
+Aynı Compose ağındaki servisler servis adıyla çözümlenir:
 ```
 # "app" konteynerinden:
-postgres://postgres:postgres@db:5432/app_dev    # "db" db konteynerine ÃƒÂ§ÃƒÂ¶zÃƒÂ¼mlenir
-redis://redis:6379/0                             # "redis" redis konteynerine ÃƒÂ§ÃƒÂ¶zÃƒÂ¼mlenir
+postgres://postgres:postgres@db:5432/app_dev    # "db" db konteynerine çözümlenir
+redis://redis:6379/0                             # "redis" redis konteynerine çözümlenir
 ```
 
-### Ãƒâ€“zel AÃ„Å¸lar
+### Özel Ağlar
 
 ```yaml
 services:
@@ -190,71 +190,71 @@ services:
 
   db:
     networks:
-      - backend-net              # Sadece api'den eriÃ…Å¸ilebilir, frontend'den deÃ„Å¸il
+      - backend-net              # Sadece api'den erişilebilir, frontend'den değil
 
 networks:
   frontend-net:
   backend-net:
 ```
 
-### Sadece Gereklileri AÃƒÂ§Ã„Â±Ã„Å¸a Ãƒâ€¡Ã„Â±karma
+### Sadece Gereklileri Açığa Çıkarma
 
 ```yaml
 services:
   db:
     ports:
-      - "127.0.0.1:5432:5432"   # Sadece host'tan eriÃ…Å¸ilebilir, aÃ„Å¸dan deÃ„Å¸il
-    # ÃƒÅ“retimde port'larÃ„Â± tamamen ÃƒÂ§Ã„Â±kar -- sadece Docker aÃ„Å¸Ã„Â± iÃƒÂ§inden eriÃ…Å¸ilebilir
+      - "127.0.0.1:5432:5432"   # Sadece host'tan erişilebilir, ağdan değil
+    # Üretimde port'ları tamamen çıkar -- sadece Docker ağı içinden erişilebilir
 ```
 
 ## Volume Stratejileri
 
 ```yaml
 volumes:
-  # Ã„Â°simli volume: konteyner yeniden baÃ…Å¸latmalarÃ„Â±nda kalÃ„Â±cÃ„Â±, Docker tarafÃ„Â±ndan yÃƒÂ¶netilir
+  # İsimli volume: konteyner yeniden başlatmalarında kalıcı, Docker tarafından yönetilir
   pgdata:
 
-  # Bind mount: host dizinini konteynere eÃ…Å¸ler (geliÃ…Å¸tirme iÃƒÂ§in)
+  # Bind mount: host dizinini konteynere eşler (geliştirme için)
   # - ./src:/app/src
 
-  # Anonim volume: bind mount override'Ã„Â±ndan konteyner tarafÃ„Â±ndan oluÃ…Å¸turulan iÃƒÂ§eriÃ„Å¸i korur
+  # Anonim volume: bind mount override'ından konteyner tarafından oluşturulan içeriği korur
   # - /app/node_modules
 ```
 
-### YaygÃ„Â±n KalÃ„Â±plar
+### Yaygın Kalıplar
 
 ```yaml
 services:
   app:
     volumes:
-      - .:/app                   # Kaynak kodu (hot reload iÃƒÂ§in bind mount)
-      - /app/node_modules        # Konteyner'Ã„Â±n node_modules'ÃƒÂ¼nÃƒÂ¼ host'tan koru
+      - .:/app                   # Kaynak kodu (hot reload için bind mount)
+      - /app/node_modules        # Konteyner'ın node_modules'ünü host'tan koru
       - /app/.next               # Build cache'ini koru
 
   db:
     volumes:
-      - pgdata:/var/lib/postgresql/data          # KalÃ„Â±cÃ„Â± veri
+      - pgdata:/var/lib/postgresql/data          # Kalıcı veri
       - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql  # Init scriptleri
 ```
 
-## Konteyner GÃƒÂ¼venliÃ„Å¸i
+## Konteyner Güvenliği
 
-### Dockerfile SÃ„Â±kÃ„Â±laÃ…Å¸tÃ„Â±rma
+### Dockerfile Sıkılaştırma
 
 ```dockerfile
-# 1. Belirli tag'ler kullanÃ„Â±n (:latest asla)
+# 1. Belirli tag'ler kullanın (:latest asla)
 FROM node:22.12-alpine3.20
 
-# 2. Root olmayan kullanÃ„Â±cÃ„Â± olarak ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
+# 2. Root olmayan kullanıcı olarak çalıştır
 RUN addgroup -g 1001 -S app && adduser -S app -u 1001
 USER app
 
-# 3. Capability'leri dÃƒÂ¼Ã…Å¸ÃƒÂ¼r (compose'da)
-# 4. MÃƒÂ¼mkÃƒÂ¼n olduÃ„Å¸unda salt okunur kÃƒÂ¶k dosya sistemi
-# 5. Image layer'larÃ„Â±nda secret yok
+# 3. Capability'leri düşür (compose'da)
+# 4. Mümkün olduğunda salt okunur kök dosya sistemi
+# 5. Image layer'larında secret yok
 ```
 
-### Compose GÃƒÂ¼venliÃ„Å¸i
+### Compose Güvenliği
 
 ```yaml
 services:
@@ -268,21 +268,21 @@ services:
     cap_drop:
       - ALL
     cap_add:
-      - NET_BIND_SERVICE          # Sadece < 1024 port'lara bind iÃƒÂ§in
+      - NET_BIND_SERVICE          # Sadece < 1024 port'lara bind için
 ```
 
-### Secret YÃƒÂ¶netimi
+### Secret Yönetimi
 
 ```yaml
-# Ã„Â°YÃ„Â°: Ortam deÃ„Å¸iÃ…Å¸kenleri kullanÃ„Â±n (runtime'da enjekte edilir)
+# İYİ: Ortam değişkenleri kullanın (runtime'da enjekte edilir)
 services:
   app:
     env_file:
       - .env                     # .env'i asla git'e commit etmeyin
     environment:
-      - API_KEY                  # Host ortamÃ„Â±ndan miras alÃ„Â±r
+      - API_KEY                  # Host ortamından miras alır
 
-# Ã„Â°YÃ„Â°: Docker secrets (Swarm modu)
+# İYİ: Docker secrets (Swarm modu)
 secrets:
   db_password:
     file: ./secrets/db_password.txt
@@ -292,7 +292,7 @@ services:
     secrets:
       - db_password
 
-# KÃƒâ€“TÃƒÅ“: Image'de hardcode
+# KÖTÜ: Image'de hardcode
 # ENV API_KEY=sk-proj-xxxxx      # ASLA BUNU YAPMAYIN
 ```
 
@@ -314,66 +314,66 @@ README.md
 tests/
 ```
 
-## Hata AyÃ„Â±klama
+## Hata Ayıklama
 
-### YaygÃ„Â±n Komutlar
+### Yaygın Komutlar
 
 ```bash
-# LoglarÃ„Â± gÃƒÂ¶rÃƒÂ¼ntÃƒÂ¼le
-docker compose logs -f app           # App loglarÃ„Â±nÃ„Â± takip et
-docker compose logs --tail=50 db     # db'den son 50 satÃ„Â±r
+# Logları görüntüle
+docker compose logs -f app           # App loglarını takip et
+docker compose logs --tail=50 db     # db'den son 50 satır
 
-# Ãƒâ€¡alÃ„Â±Ã…Å¸an konteynerde komut ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
+# Çalışan konteynerde komut çalıştır
 docker compose exec app sh           # app'e shell ile gir
-docker compose exec db psql -U postgres  # postgres'e baÃ„Å¸lan
+docker compose exec db psql -U postgres  # postgres'e bağlan
 
-# Ã„Â°ncele
-docker compose ps                     # Ãƒâ€¡alÃ„Â±Ã…Å¸an servisler
-docker compose top                    # Her konteynerdeki iÃ…Å¸lemler
-docker stats                          # Kaynak kullanÃ„Â±mÃ„Â±
+# İncele
+docker compose ps                     # Çalışan servisler
+docker compose top                    # Her konteynerdeki işlemler
+docker stats                          # Kaynak kullanımı
 
 # Yeniden build et
 docker compose up --build             # Image'leri yeniden build et
 docker compose build --no-cache app   # Tam rebuild'i zorla
 
 # Temizle
-docker compose down                   # Konteynerleri durdur ve kaldÃ„Â±r
-docker compose down -v                # Volume'leri de kaldÃ„Â±r (YIKÃ„Â±CÃ„Â±)
-docker system prune                   # KullanÃ„Â±lmayan image/konteynerleri kaldÃ„Â±r
+docker compose down                   # Konteynerleri durdur ve kaldır
+docker compose down -v                # Volume'leri de kaldır (YIKıCı)
+docker system prune                   # Kullanılmayan image/konteynerleri kaldır
 ```
 
-### AÃ„Å¸ SorunlarÃ„Â±nÃ„Â± Hata AyÃ„Â±klama
+### Ağ Sorunlarını Hata Ayıklama
 
 ```bash
-# Konteyner iÃƒÂ§inde DNS ÃƒÂ§ÃƒÂ¶zÃƒÂ¼mlemesini kontrol et
+# Konteyner içinde DNS çözümlemesini kontrol et
 docker compose exec app nslookup db
 
-# BaÃ„Å¸lantÃ„Â±yÃ„Â± kontrol et
+# Bağlantıyı kontrol et
 docker compose exec app wget -qO- http://api:3000/health
 
-# AÃ„Å¸Ã„Â± incele
+# Ağı incele
 docker network ls
 docker network inspect <project>_default
 ```
 
-## Anti-KalÃ„Â±plar
+## Anti-Kalıplar
 
 ```
-# KÃƒâ€“TÃƒÅ“: ÃƒÅ“retimde orkestrasyon olmadan docker compose kullanma
-# ÃƒÅ“retim ÃƒÂ§ok konteynerli iÃ…Å¸ yÃƒÂ¼kleri iÃƒÂ§in Kubernetes, ECS veya Docker Swarm kullanÃ„Â±n
+# KÖTÜ: Üretimde orkestrasyon olmadan docker compose kullanma
+# Üretim çok konteynerli iş yükleri için Kubernetes, ECS veya Docker Swarm kullanın
 
-# KÃƒâ€“TÃƒÅ“: Volume olmadan konteynerlerde veri depolama
-# Konteynerler geÃƒÂ§icidir -- volume olmadan yeniden baÃ…Å¸latmada tÃƒÂ¼m veri kaybolur
+# KÖTÜ: Volume olmadan konteynerlerde veri depolama
+# Konteynerler geçicidir -- volume olmadan yeniden başlatmada tüm veri kaybolur
 
-# KÃƒâ€“TÃƒÅ“: Root olarak ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±rma
-# Daima root olmayan bir kullanÃ„Â±cÃ„Â± oluÃ…Å¸turun ve kullanÃ„Â±n
+# KÖTÜ: Root olarak çalıştırma
+# Daima root olmayan bir kullanıcı oluşturun ve kullanın
 
-# KÃƒâ€“TÃƒÅ“: :latest tag kullanma
-# Yeniden ÃƒÂ¼retilebilir build'ler iÃƒÂ§in belirli versiyonlara sabitle
+# KÖTÜ: :latest tag kullanma
+# Yeniden üretilebilir build'ler için belirli versiyonlara sabitle
 
-# KÃƒâ€“TÃƒÅ“: TÃƒÂ¼m servisleri iÃƒÂ§eren tek dev konteyner
-# EndiÃ…Å¸eleri ayÃ„Â±rÃ„Â±n: konteyner baÃ…Å¸Ã„Â±na bir iÃ…Å¸lem
+# KÖTÜ: Tüm servisleri içeren tek dev konteyner
+# Endişeleri ayırın: konteyner başına bir işlem
 
-# KÃƒâ€“TÃƒÅ“: Secret'larÃ„Â± docker-compose.yml'e koymak
-# .env dosyalarÃ„Â± (gitignore'lanmÃ„Â±Ã…Å¸) veya Docker secrets kullanÃ„Â±n
+# KÖTÜ: Secret'ları docker-compose.yml'e koymak
+# .env dosyaları (gitignore'lanmış) veya Docker secrets kullanın
 ```

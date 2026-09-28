@@ -178,7 +178,8 @@ function runTests() {
       withEnv({ BASH: '', PATH: '' }, () => {
         const output = observeRunner.run('payload', {
           hookId: 'post:observe',
-          pluginRoot: tempRoot
+          pluginRoot: tempRoot,
+          shell: false
         });
 
         assert.strictEqual(output.exitCode, 0);

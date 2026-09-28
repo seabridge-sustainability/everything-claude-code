@@ -1,10 +1,10 @@
 ---
 name: kotlin-testing
-description: Kotest, MockK, coroutine testi, property-based testing ve Kover coverage ile Kotlin test kalÃ„Â±plarÃ„Â±. Ã„Â°diomatic Kotlin uygulamalarÃ„Â±yla TDD metodolojisini takip eder.
+description: Kotest, MockK, coroutine testi, property-based testing ve Kover coverage ile Kotlin test kalıpları. İdiomatic Kotlin uygulamalarıyla TDD metodolojisini takip eder.
 origin: ECC
 ---
 
-# Kotlin Test KalÃ„Â±plarÃ„Â±
+# Kotlin Test Kalıpları
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -21,41 +21,41 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-Kotest ve MockK ile TDD metodolojisini takip ederek gÃƒÂ¼venilir, sÃƒÂ¼rdÃƒÂ¼rÃƒÂ¼lebilir testler yazmak iÃƒÂ§in kapsamlÃ„Â± Kotlin test kalÃ„Â±plarÃ„Â±.
+Kotest ve MockK ile TDD metodolojisini takip ederek güvenilir, sürdürülebilir testler yazmak için kapsamlı Kotlin test kalıpları.
 
-## Ne Zaman KullanÃ„Â±lÃ„Â±r
+## Ne Zaman Kullanılır
 
-- Yeni Kotlin fonksiyonlarÃ„Â± veya class'lar yazarken
+- Yeni Kotlin fonksiyonları veya class'lar yazarken
 - Mevcut Kotlin koduna test coverage eklerken
 - Property-based testler uygularken
-- Kotlin projelerinde TDD iÃ…Å¸ akÃ„Â±Ã…Å¸Ã„Â±nÃ„Â± takip ederken
-- Kod coverage iÃƒÂ§in Kover yapÃ„Â±landÃ„Â±rÃ„Â±rken
+- Kotlin projelerinde TDD iş akışını takip ederken
+- Kod coverage için Kover yapılandırırken
 
-## NasÃ„Â±l Ãƒâ€¡alÃ„Â±Ã…Å¸Ã„Â±r
+## Nasıl Çalışır
 
-1. **Hedef kodu belirle** Ã¢â‚¬â€ Test edilecek fonksiyon, class veya modÃƒÂ¼lÃƒÂ¼ bul
-2. **Kotest spec yaz** Ã¢â‚¬â€ Test scope'una uygun bir spec stili seÃƒÂ§ (StringSpec, FunSpec, BehaviorSpec)
-3. **BaÃ„Å¸Ã„Â±mlÃ„Â±lÃ„Â±klarÃ„Â± mock'la** Ã¢â‚¬â€ Test edilen birimi izole etmek iÃƒÂ§in MockK kullan
-4. **Testleri ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r (RED)** Ã¢â‚¬â€ Testin beklenen hatayla baÃ…Å¸arÃ„Â±sÃ„Â±z olduÃ„Å¸unu doÃ„Å¸rula
-5. **Kodu uygula (GREEN)** Ã¢â‚¬â€ Testi geÃƒÂ§mek iÃƒÂ§in minimal kod yaz
-6. **Refactor** Ã¢â‚¬â€ Testleri yeÃ…Å¸il tutarken implementasyonu iyileÃ…Å¸tir
-7. **Coverage'Ã„Â± kontrol et** Ã¢â‚¬â€ `./gradlew koverHtmlReport` ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r ve %80+ coverage'Ã„Â± doÃ„Å¸rula
+1. **Hedef kodu belirle** — Test edilecek fonksiyon, class veya modülü bul
+2. **Kotest spec yaz** — Test scope'una uygun bir spec stili seç (StringSpec, FunSpec, BehaviorSpec)
+3. **Bağımlılıkları mock'la** — Test edilen birimi izole etmek için MockK kullan
+4. **Testleri çalıştır (RED)** — Testin beklenen hatayla başarısız olduğunu doğrula
+5. **Kodu uygula (GREEN)** — Testi geçmek için minimal kod yaz
+6. **Refactor** — Testleri yeşil tutarken implementasyonu iyileştir
+7. **Coverage'ı kontrol et** — `./gradlew koverHtmlReport` çalıştır ve %80+ coverage'ı doğrula
 
-## TDD Ã„Â°Ã…Å¸ AkÃ„Â±Ã…Å¸Ã„Â± for Kotlin
+## TDD İş Akışı for Kotlin
 
-### RED-GREEN-REFACTOR DÃƒÂ¶ngÃƒÂ¼sÃƒÂ¼
+### RED-GREEN-REFACTOR Döngüsü
 
 ```
-RED     -> Ãƒâ€“nce baÃ…Å¸arÃ„Â±sÃ„Â±z bir test yaz
-GREEN   -> Testi geÃƒÂ§mek iÃƒÂ§in minimal kod yaz
-REFACTOR -> Testleri yeÃ…Å¸il tutarken kodu iyileÃ…Å¸tir
+RED     -> Önce başarısız bir test yaz
+GREEN   -> Testi geçmek için minimal kod yaz
+REFACTOR -> Testleri yeşil tutarken kodu iyileştir
 REPEAT  -> Sonraki gereksinimle devam et
 ```
 
-### Kotlin'de AdÃ„Â±m AdÃ„Â±m TDD
+### Kotlin'de Adım Adım TDD
 
 ```kotlin
-// AdÃ„Â±m 1: Interface/signature tanÃ„Â±mla
+// Adım 1: Interface/signature tanımla
 // EmailValidator.kt
 package com.example.validator
 
@@ -63,7 +63,7 @@ fun validateEmail(email: String): Result<String> {
     TODO("not implemented")
 }
 
-// AdÃ„Â±m 2: BaÃ…Å¸arÃ„Â±sÃ„Â±z test yaz (RED)
+// Adım 2: Başarısız test yaz (RED)
 // EmailValidatorTest.kt
 package com.example.validator
 
@@ -85,12 +85,12 @@ class EmailValidatorTest : StringSpec({
     }
 })
 
-// AdÃ„Â±m 3: Testleri ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r - FAIL doÃ„Å¸rula
+// Adım 3: Testleri çalıştır - FAIL doğrula
 // $ ./gradlew test
 // EmailValidatorTest > valid email returns success FAILED
 //   kotlin.NotImplementedError: An operation is not implemented
 
-// AdÃ„Â±m 4: Minimal kodu uygula (GREEN)
+// Adım 4: Minimal kodu uygula (GREEN)
 fun validateEmail(email: String): Result<String> {
     if (email.isBlank()) return Result.failure(IllegalArgumentException("Email cannot be blank"))
     if ('@' !in email) return Result.failure(IllegalArgumentException("Email must contain @"))
@@ -99,13 +99,13 @@ fun validateEmail(email: String): Result<String> {
     return Result.success(email)
 }
 
-// AdÃ„Â±m 5: Testleri ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r - PASS doÃ„Å¸rula
+// Adım 5: Testleri çalıştır - PASS doğrula
 // $ ./gradlew test
 // EmailValidatorTest > valid email returns success PASSED
 // EmailValidatorTest > empty email returns failure PASSED
 // EmailValidatorTest > email without @ returns failure PASSED
 
-// AdÃ„Â±m 6: Gerekirse refactor et, testlerin hala geÃƒÂ§tiÃ„Å¸ini doÃ„Å¸rula
+// Adım 6: Gerekirse refactor et, testlerin hala geçtiğini doğrula
 ```
 
 ## Kotest Spec Stilleri
@@ -207,7 +207,7 @@ import io.kotest.matchers.string.*
 import io.kotest.matchers.collections.*
 import io.kotest.matchers.nulls.*
 
-// EÃ…Å¸itlik
+// Eşitlik
 result shouldBe expected
 result shouldNotBe unexpected
 
@@ -232,7 +232,7 @@ result.shouldBeNull()
 // Tipler
 result.shouldBeInstanceOf<User>()
 
-// SayÃ„Â±lar
+// Sayılar
 count shouldBeGreaterThan 0
 price shouldBeInRange 1.0..100.0
 
@@ -253,7 +253,7 @@ shouldNotThrow<Exception> {
 ```kotlin
 class UserServiceTest : FunSpec({
     val repository = mockk<UserRepository>()
-    val logger = mockk<Logger>(relaxed = true) // Relaxed: varsayÃ„Â±lanlarÃ„Â± dÃƒÂ¶ndÃƒÂ¼rÃƒÂ¼r
+    val logger = mockk<Logger>(relaxed = true) // Relaxed: varsayılanları döndürür
     val service = UserService(repository, logger)
 
     beforeTest {
@@ -298,7 +298,7 @@ class AsyncUserServiceTest : FunSpec({
 
     test("getUser with delay") {
         coEvery { repository.findById("1") } coAnswers {
-            delay(100) // Async ÃƒÂ§alÃ„Â±Ã…Å¸mayÃ„Â± simÃƒÂ¼le et
+            delay(100) // Async çalışmayı simüle et
             User(id = "1", name = "Alice")
         }
 
@@ -310,7 +310,7 @@ class AsyncUserServiceTest : FunSpec({
 
 ## Coroutine Testi
 
-### Suspend Fonksiyonlar Ã„Â°ÃƒÂ§in runTest
+### Suspend Fonksiyonlar İçin runTest
 
 ```kotlin
 import kotlinx.coroutines.test.runTest
@@ -333,7 +333,7 @@ class CoroutineServiceTest : FunSpec({
 
             shouldThrow<TimeoutCancellationException> {
                 withTimeout(100) {
-                    service.slowOperation() // > 100ms sÃƒÂ¼rer
+                    service.slowOperation() // > 100ms sürer
                 }
             }
         }
@@ -377,7 +377,7 @@ class FlowServiceTest : FunSpec({
 
             queries.emit("a")
             queries.emit("ab")
-            queries.emit("abc") // Sadece bu aramayÃ„Â± tetiklemeli
+            queries.emit("abc") // Sadece bu aramayı tetiklemeli
             advanceTimeBy(500)
 
             results shouldHaveSize 1
@@ -425,7 +425,7 @@ class PropertyTest : FunSpec({
 
 ## Kover Coverage
 
-### Gradle YapÃ„Â±landÃ„Â±rmasÃ„Â±
+### Gradle Yapılandırması
 
 ```kotlin
 // build.gradle.kts
@@ -446,26 +446,26 @@ kover {
         }
         verify {
             rule {
-                minBound(80) // %80 coverage'Ã„Â±n altÃ„Â±nda build baÃ…Å¸arÃ„Â±sÃ„Â±z
+                minBound(80) // %80 coverage'ın altında build başarısız
             }
         }
     }
 }
 ```
 
-### Coverage KomutlarÃ„Â±
+### Coverage Komutları
 
 ```bash
-# Testleri coverage ile ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
+# Testleri coverage ile çalıştır
 ./gradlew koverHtmlReport
 
-# Coverage eÃ…Å¸iklerini doÃ„Å¸rula
+# Coverage eşiklerini doğrula
 ./gradlew koverVerify
 
-# CI iÃƒÂ§in XML raporu
+# CI için XML raporu
 ./gradlew koverXmlReport
 
-# HTML raporunu gÃƒÂ¶rÃƒÂ¼ntÃƒÂ¼le (OS'nize gÃƒÂ¶re komutu kullanÃ„Â±n)
+# HTML raporunu görüntüle (OS'nize göre komutu kullanın)
 # macOS:   open build/reports/kover/html/index.html
 # Linux:   xdg-open build/reports/kover/html/index.html
 # Windows: start build/reports/kover/html/index.html
@@ -475,10 +475,10 @@ kover {
 
 | Kod Tipi | Hedef |
 |-----------|--------|
-| Kritik business mantÃ„Â±Ã„Å¸Ã„Â± | %100 |
+| Kritik business mantığı | %100 |
 | Public API'ler | %90+ |
 | Genel kod | %80+ |
-| Generated / config kodu | HariÃƒÂ§ tut |
+| Generated / config kodu | Hariç tut |
 
 ## Ktor testApplication Testi
 
@@ -517,57 +517,57 @@ class ApiRoutesTest : FunSpec({
 })
 ```
 
-## Test KomutlarÃ„Â±
+## Test Komutları
 
 ```bash
-# TÃƒÂ¼m testleri ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
+# Tüm testleri çalıştır
 ./gradlew test
 
-# Belirli test class'Ã„Â±nÃ„Â± ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
+# Belirli test class'ını çalıştır
 ./gradlew test --tests "com.example.UserServiceTest"
 
-# Belirli testi ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
+# Belirli testi çalıştır
 ./gradlew test --tests "com.example.UserServiceTest.getUser returns user when found"
 
-# Verbose ÃƒÂ§Ã„Â±ktÃ„Â± ile ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
+# Verbose çıktı ile çalıştır
 ./gradlew test --info
 
-# Coverage ile ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
+# Coverage ile çalıştır
 ./gradlew koverHtmlReport
 
-# Detekt ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r (statik analiz)
+# Detekt çalıştır (statik analiz)
 ./gradlew detekt
 
-# Ktlint ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r (formatlama kontrolÃƒÂ¼)
+# Ktlint çalıştır (formatlama kontrolü)
 ./gradlew ktlintCheck
 
-# SÃƒÂ¼rekli test
+# Sürekli test
 ./gradlew test --continuous
 ```
 
-## En Ã„Â°yi Uygulamalar
+## En İyi Uygulamalar
 
 **YAPILMASI GEREKENLER:**
-- Ãƒâ€“NCE testleri yaz (TDD)
-- Proje genelinde Kotest'in spec stillerini tutarlÃ„Â± kullan
-- Suspend fonksiyonlar iÃƒÂ§in MockK'nÃ„Â±n `coEvery`/`coVerify`'Ã„Â±nÃ„Â± kullan
-- Coroutine testi iÃƒÂ§in `runTest` kullan
-- Ã„Â°mplementasyon deÃ„Å¸il davranÃ„Â±Ã…Å¸Ã„Â± test et
-- Pure fonksiyonlar iÃƒÂ§in property-based testing kullan
-- Netlik iÃƒÂ§in `data class` test fixture'larÃ„Â± kullan
+- ÖNCE testleri yaz (TDD)
+- Proje genelinde Kotest'in spec stillerini tutarlı kullan
+- Suspend fonksiyonlar için MockK'nın `coEvery`/`coVerify`'ını kullan
+- Coroutine testi için `runTest` kullan
+- İmplementasyon değil davranışı test et
+- Pure fonksiyonlar için property-based testing kullan
+- Netlik için `data class` test fixture'ları kullan
 
 **YAPILMAMASI GEREKENLER:**
-- Test framework'lerini karÃ„Â±Ã…Å¸tÃ„Â±rma (Kotest seÃƒÂ§ ve ona sadÃ„Â±k kal)
-- Data class'larÃ„Â± mock'lama (gerÃƒÂ§ek instance'lar kullan)
+- Test framework'lerini karıştırma (Kotest seç ve ona sadık kal)
+- Data class'ları mock'lama (gerçek instance'lar kullan)
 - Coroutine testlerinde `Thread.sleep()` kullanma (`advanceTimeBy` kullan)
-- TDD'de RED fazÃ„Â±nÃ„Â± atlama
-- Private fonksiyonlarÃ„Â± doÃ„Å¸rudan test etme
-- KararsÃ„Â±z testleri gÃƒÂ¶rmezden gelme
+- TDD'de RED fazını atlama
+- Private fonksiyonları doğrudan test etme
+- Kararsız testleri görmezden gelme
 
 ## CI/CD ile Entegrasyon
 
 ```yaml
-# GitHub Actions ÃƒÂ¶rneÃ„Å¸i
+# GitHub Actions örneği
 test:
   runs-on: ubuntu-latest
   steps:
@@ -590,4 +590,4 @@ test:
         token: ${{ secrets.CODECOV_TOKEN }}
 ```
 
-**HatÃ„Â±rla**: Testler dokÃƒÂ¼mantasyondur. Kotlin kodunuzun nasÃ„Â±l kullanÃ„Â±lmasÃ„Â± gerektiÃ„Å¸ini gÃƒÂ¶sterirler. Testleri okunabilir yapmak iÃƒÂ§in Kotest'in aÃƒÂ§Ã„Â±klayÃ„Â±cÃ„Â± matcher'larÃ„Â±nÃ„Â± ve baÃ„Å¸Ã„Â±mlÃ„Â±lÃ„Â±klarÃ„Â± temiz mock'lamak iÃƒÂ§in MockK kullanÃ„Â±n.
+**Hatırla**: Testler dokümantasyondur. Kotlin kodunuzun nasıl kullanılması gerektiğini gösterirler. Testleri okunabilir yapmak için Kotest'in açıklayıcı matcher'larını ve bağımlılıkları temiz mock'lamak için MockK kullanın.

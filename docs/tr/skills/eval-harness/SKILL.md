@@ -1,6 +1,6 @@
 ---
 name: eval-harness
-description: Eval-driven development (EDD) ilkelerini uygulayan Claude Code oturumlarÃ„Â± iÃƒÂ§in formal deÃ„Å¸erlendirme ÃƒÂ§erÃƒÂ§evesi
+description: Eval-driven development (EDD) ilkelerini uygulayan Claude Code oturumları için formal değerlendirme çerçevesi
 origin: ECC
 tools: Read, Write, Edit, Bash, Grep, Glob
 ---
@@ -22,48 +22,48 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-Claude Code oturumlarÃ„Â± iÃƒÂ§in eval-driven development (EDD) ilkelerini uygulayan formal deÃ„Å¸erlendirme ÃƒÂ§erÃƒÂ§evesi.
+Claude Code oturumları için eval-driven development (EDD) ilkelerini uygulayan formal değerlendirme çerçevesi.
 
-## Ne Zaman AktifleÃ…Å¸tirmeli
+## Ne Zaman Aktifleştirmeli
 
-- AI destekli iÃ…Å¸ akÃ„Â±Ã…Å¸larÃ„Â± iÃƒÂ§in eval-driven development (EDD) kurarken
-- Claude Code gÃƒÂ¶rev tamamlama iÃƒÂ§in geÃƒÂ§ti/kaldÃ„Â± kriterleri tanÃ„Â±mlarken
-- pass@k metrikleriyle agent gÃƒÂ¼venilirliÃ„Å¸ini ÃƒÂ¶lÃƒÂ§erken
-- Prompt veya agent deÃ„Å¸iÃ…Å¸iklikleri iÃƒÂ§in regresyon test paketleri oluÃ…Å¸tururken
-- Model versiyonlarÃ„Â± arasÃ„Â±nda agent performansÃ„Â±nÃ„Â± benchmark ederken
+- AI destekli iş akışları için eval-driven development (EDD) kurarken
+- Claude Code görev tamamlama için geçti/kaldı kriterleri tanımlarken
+- pass@k metrikleriyle agent güvenilirliğini ölçerken
+- Prompt veya agent değişiklikleri için regresyon test paketleri oluştururken
+- Model versiyonları arasında agent performansını benchmark ederken
 
 ## Felsefe
 
-Eval-Driven Development, eval'larÃ„Â± "AI geliÃ…Å¸tirmenin birim testleri" olarak ele alÃ„Â±r:
-- Ã„Â°mplementasyondan Ãƒâ€“NCE beklenen davranÃ„Â±Ã…Å¸Ã„Â± tanÃ„Â±mla
-- GeliÃ…Å¸tirme sÃ„Â±rasÃ„Â±nda eval'larÃ„Â± sÃƒÂ¼rekli ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
-- Her deÃ„Å¸iÃ…Å¸iklikle regresyonlarÃ„Â± izle
-- GÃƒÂ¼venilirlik ÃƒÂ¶lÃƒÂ§ÃƒÂ¼mÃƒÂ¼ iÃƒÂ§in pass@k metriklerini kullan
+Eval-Driven Development, eval'ları "AI geliştirmenin birim testleri" olarak ele alır:
+- İmplementasyondan ÖNCE beklenen davranışı tanımla
+- Geliştirme sırasında eval'ları sürekli çalıştır
+- Her değişiklikle regresyonları izle
+- Güvenilirlik ölçümü için pass@k metriklerini kullan
 
 ## Eval Tipleri
 
-### Capability Eval'larÃ„Â±
-Claude'un daha ÃƒÂ¶nce yapamadÃ„Â±Ã„Å¸Ã„Â± bir Ã…Å¸eyi yapÃ„Â±p yapamadÃ„Â±Ã„Å¸Ã„Â±nÃ„Â± test et:
+### Capability Eval'ları
+Claude'un daha önce yapamadığı bir şeyi yapıp yapamadığını test et:
 ```markdown
 [CAPABILITY EVAL: feature-name]
-GÃƒÂ¶rev: Claude'un baÃ…Å¸armasÃ„Â± gereken Ã…Å¸eyin aÃƒÂ§Ã„Â±klamasÃ„Â±
-BaÃ…Å¸arÃ„Â± Kriterleri:
+Görev: Claude'un başarması gereken şeyin açıklaması
+Başarı Kriterleri:
   - [ ] Kriter 1
   - [ ] Kriter 2
   - [ ] Kriter 3
-Beklenen Ãƒâ€¡Ã„Â±ktÃ„Â±: Beklenen sonucun aÃƒÂ§Ã„Â±klamasÃ„Â±
+Beklenen Çıktı: Beklenen sonucun açıklaması
 ```
 
-### Regression Eval'larÃ„Â±
-DeÃ„Å¸iÃ…Å¸ikliklerin mevcut fonksiyonaliteyi bozmadÃ„Â±Ã„Å¸Ã„Â±ndan emin ol:
+### Regression Eval'ları
+Değişikliklerin mevcut fonksiyonaliteyi bozmadığından emin ol:
 ```markdown
 [REGRESSION EVAL: feature-name]
-Baseline: SHA veya checkpoint adÃ„Â±
+Baseline: SHA veya checkpoint adı
 Testler:
   - existing-test-1: PASS/FAIL
   - existing-test-2: PASS/FAIL
   - existing-test-3: PASS/FAIL
-SonuÃƒÂ§: X/Y geÃƒÂ§ti (ÃƒÂ¶nceden Y/Y)
+Sonuç: X/Y geçti (önceden Y/Y)
 ```
 
 ## Grader Tipleri
@@ -71,86 +71,86 @@ SonuÃƒÂ§: X/Y geÃƒÂ§ti (ÃƒÂ¶nceden Y/Y)
 ### 1. Code-Based Grader
 Kod kullanarak deterministik kontroller:
 ```bash
-# DosyanÃ„Â±n beklenen pattern iÃƒÂ§erip iÃƒÂ§ermediÃ„Å¸ini kontrol et
+# Dosyanın beklenen pattern içerip içermediğini kontrol et
 grep -q "export function handleAuth" src/auth.ts && echo "PASS" || echo "FAIL"
 
-# Testlerin geÃƒÂ§ip geÃƒÂ§mediÃ„Å¸ini kontrol et
+# Testlerin geçip geçmediğini kontrol et
 npm test -- --testPathPattern="auth" && echo "PASS" || echo "FAIL"
 
-# Build'in baÃ…Å¸arÃ„Â±lÃ„Â± olup olmadÃ„Â±Ã„Å¸Ã„Â±nÃ„Â± kontrol et
+# Build'in başarılı olup olmadığını kontrol et
 npm run build && echo "PASS" || echo "FAIL"
 ```
 
 ### 2. Model-Based Grader
-AÃƒÂ§Ã„Â±k uÃƒÂ§lu ÃƒÂ§Ã„Â±ktÃ„Â±larÃ„Â± deÃ„Å¸erlendirmek iÃƒÂ§in Claude kullan:
+Açık uçlu çıktıları değerlendirmek için Claude kullan:
 ```markdown
 [MODEL GRADER PROMPT]
-AÃ…Å¸aÃ„Å¸Ã„Â±daki kod deÃ„Å¸iÃ…Å¸ikliÃ„Å¸ini deÃ„Å¸erlendir:
-1. Belirtilen sorunu ÃƒÂ§ÃƒÂ¶zÃƒÂ¼yor mu?
-2. Ã„Â°yi yapÃ„Â±landÃ„Â±rÃ„Â±lmÃ„Â±Ã…Å¸ mÃ„Â±?
-3. Edge case'ler iÃ…Å¸leniyor mu?
-4. Hata iÃ…Å¸leme uygun mu?
+Aşağıdaki kod değişikliğini değerlendir:
+1. Belirtilen sorunu çözüyor mu?
+2. İyi yapılandırılmış mı?
+3. Edge case'ler işleniyor mu?
+4. Hata işleme uygun mu?
 
-Puan: 1-5 (1=kÃƒÂ¶tÃƒÂ¼, 5=mÃƒÂ¼kemmel)
-GerekÃƒÂ§e: [aÃƒÂ§Ã„Â±klama]
+Puan: 1-5 (1=kötü, 5=mükemmel)
+Gerekçe: [açıklama]
 ```
 
 ### 3. Human Grader
-Manuel inceleme iÃƒÂ§in iÃ…Å¸aretle:
+Manuel inceleme için işaretle:
 ```markdown
 [HUMAN REVIEW REQUIRED]
-DeÃ„Å¸iÃ…Å¸iklik: Neyin deÃ„Å¸iÃ…Å¸tiÃ„Å¸inin aÃƒÂ§Ã„Â±klamasÃ„Â±
+Değişiklik: Neyin değiştiğinin açıklaması
 Sebep: Neden insan incelemesi gerekli
-Risk Seviyesi: DÃƒÅ“Ã…Å¾ÃƒÅ“K/ORTA/YÃƒÅ“KSEK
+Risk Seviyesi: DÜŞÜK/ORTA/YÜKSEK
 ```
 
 ## Metrikler
 
 ### pass@k
-"k denemede en az bir baÃ…Å¸arÃ„Â±"
-- pass@1: Ã„Â°lk deneme baÃ…Å¸arÃ„Â± oranÃ„Â±
-- pass@3: 3 denemede baÃ…Å¸arÃ„Â±
+"k denemede en az bir başarı"
+- pass@1: İlk deneme başarı oranı
+- pass@3: 3 denemede başarı
 - Tipik hedef: pass@3 > %90
 
 ### pass^k
-"TÃƒÂ¼m k denemeler baÃ…Å¸arÃ„Â±lÃ„Â±"
-- GÃƒÂ¼venilirlik iÃƒÂ§in daha yÃƒÂ¼ksek ÃƒÂ§Ã„Â±ta
-- pass^3: ArdÃ„Â±Ã…Å¸Ã„Â±k 3 baÃ…Å¸arÃ„Â±
-- Kritik yollar iÃƒÂ§in kullan
+"Tüm k denemeler başarılı"
+- Güvenilirlik için daha yüksek çıta
+- pass^3: Ardışık 3 başarı
+- Kritik yollar için kullan
 
-## Eval Ã„Â°Ã…Å¸ AkÃ„Â±Ã…Å¸Ã„Â±
+## Eval İş Akışı
 
-### 1. TanÃ„Â±mla (Kodlamadan Ãƒâ€“nce)
+### 1. Tanımla (Kodlamadan Önce)
 ```markdown
 ## EVAL DEFINITION: feature-xyz
 
-### Capability Eval'larÃ„Â±
-1. Yeni kullanÃ„Â±cÃ„Â± hesabÃ„Â± oluÃ…Å¸turabilir
-2. Email formatÃ„Â±nÃ„Â± doÃ„Å¸rulayabilir
-3. Ã…Å¾ifreyi gÃƒÂ¼venli Ã…Å¸ekilde hash'leyebilir
+### Capability Eval'ları
+1. Yeni kullanıcı hesabı oluşturabilir
+2. Email formatını doğrulayabilir
+3. Şifreyi güvenli şekilde hash'leyebilir
 
-### Regression Eval'larÃ„Â±
-1. Mevcut login hala ÃƒÂ§alÃ„Â±Ã…Å¸Ã„Â±yor
-2. Oturum yÃƒÂ¶netimi deÃ„Å¸iÃ…Å¸medi
-3. Logout akÃ„Â±Ã…Å¸Ã„Â± saÃ„Å¸lam
+### Regression Eval'ları
+1. Mevcut login hala çalışıyor
+2. Oturum yönetimi değişmedi
+3. Logout akışı sağlam
 
-### BaÃ…Å¸arÃ„Â± Metrikleri
-- capability eval'lar iÃƒÂ§in pass@3 > %90
-- regression eval'lar iÃƒÂ§in pass^3 = %100
+### Başarı Metrikleri
+- capability eval'lar için pass@3 > %90
+- regression eval'lar için pass^3 = %100
 ```
 
 ### 2. Uygula
-TanÃ„Â±mlanan eval'larÃ„Â± geÃƒÂ§mek iÃƒÂ§in kod yaz.
+Tanımlanan eval'ları geçmek için kod yaz.
 
-### 3. DeÃ„Å¸erlendir
+### 3. Değerlendir
 ```bash
-# Capability eval'larÃ„Â± ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
-[Her capability eval'Ã„Â± ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r, PASS/FAIL kaydet]
+# Capability eval'ları çalıştır
+[Her capability eval'ı çalıştır, PASS/FAIL kaydet]
 
-# Regression eval'larÃ„Â± ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
+# Regression eval'ları çalıştır
 npm test -- --testPathPattern="existing"
 
-# Rapor oluÃ…Å¸tur
+# Rapor oluştur
 ```
 
 ### 4. Rapor
@@ -158,128 +158,128 @@ npm test -- --testPathPattern="existing"
 EVAL REPORT: feature-xyz
 ========================
 
-Capability Eval'larÃ„Â±:
+Capability Eval'ları:
   create-user:     PASS (pass@1)
   validate-email:  PASS (pass@2)
   hash-password:   PASS (pass@1)
-  Genel:           3/3 geÃƒÂ§ti
+  Genel:           3/3 geçti
 
-Regression Eval'larÃ„Â±:
+Regression Eval'ları:
   login-flow:      PASS
   session-mgmt:    PASS
   logout-flow:     PASS
-  Genel:           3/3 geÃƒÂ§ti
+  Genel:           3/3 geçti
 
 Metrikler:
   pass@1: %67 (2/3)
   pass@3: %100 (3/3)
 
-Durum: Ã„Â°NCELEMEYE HAZIR
+Durum: İNCELEMEYE HAZIR
 ```
 
-## Entegrasyon KalÃ„Â±plarÃ„Â±
+## Entegrasyon Kalıpları
 
-### Ã„Â°mplementasyondan Ãƒâ€“nce
+### İmplementasyondan Önce
 ```
 /eval define feature-name
 ```
-`.claude/evals/feature-name.md` konumunda eval tanÃ„Â±m dosyasÃ„Â± oluÃ…Å¸turur
+`.claude/evals/feature-name.md` konumunda eval tanım dosyası oluşturur
 
-### Ã„Â°mplementasyon SÃ„Â±rasÃ„Â±nda
+### İmplementasyon Sırasında
 ```
 /eval check feature-name
 ```
-Mevcut eval'larÃ„Â± ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±rÃ„Â±r ve durumu raporlar
+Mevcut eval'ları çalıştırır ve durumu raporlar
 
-### Ã„Â°mplementasyondan Sonra
+### İmplementasyondan Sonra
 ```
 /eval report feature-name
 ```
-Tam eval raporu oluÃ…Å¸turur
+Tam eval raporu oluşturur
 
 ## Eval Depolama
 
-Eval'larÃ„Â± projede sakla:
+Eval'ları projede sakla:
 ```
 .claude/
   evals/
-    feature-xyz.md      # Eval tanÃ„Â±mÃ„Â±
-    feature-xyz.log     # Eval ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±rma geÃƒÂ§miÃ…Å¸i
-    baseline.json       # Regression baseline'larÃ„Â±
+    feature-xyz.md      # Eval tanımı
+    feature-xyz.log     # Eval çalıştırma geçmişi
+    baseline.json       # Regression baseline'ları
 ```
 
-## En Ã„Â°yi Uygulamalar
+## En İyi Uygulamalar
 
-1. **Kodlamadan Ãƒâ€“NCE eval'larÃ„Â± tanÃ„Â±mla** - BaÃ…Å¸arÃ„Â± kriterleri hakkÃ„Â±nda net dÃƒÂ¼Ã…Å¸ÃƒÂ¼nmeyi zorlar
-2. **Eval'larÃ„Â± sÃ„Â±k ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r** - RegresyonlarÃ„Â± erken yakala
-3. **pass@k'yÃ„Â± zaman iÃƒÂ§inde izle** - GÃƒÂ¼venilirlik trendlerini gÃƒÂ¶zle
-4. **MÃƒÂ¼mkÃƒÂ¼n olduÃ„Å¸unda code grader kullan** - Deterministik > olasÃ„Â±lÃ„Â±ksal
-5. **GÃƒÂ¼venlik iÃƒÂ§in insan incelemesi** - GÃƒÂ¼venlik kontrollerini asla tam otomatikleÃ…Å¸tirme
-6. **Eval'larÃ„Â± hÃ„Â±zlÃ„Â± tut** - YavaÃ…Å¸ eval'lar ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±rÃ„Â±lmaz
-7. **Eval'larÃ„Â± kodla versiyonla** - Eval'lar birinci sÃ„Â±nÃ„Â±f artifact'lardÃ„Â±r
+1. **Kodlamadan ÖNCE eval'ları tanımla** - Başarı kriterleri hakkında net düşünmeyi zorlar
+2. **Eval'ları sık çalıştır** - Regresyonları erken yakala
+3. **pass@k'yı zaman içinde izle** - Güvenilirlik trendlerini gözle
+4. **Mümkün olduğunda code grader kullan** - Deterministik > olasılıksal
+5. **Güvenlik için insan incelemesi** - Güvenlik kontrollerini asla tam otomatikleştirme
+6. **Eval'ları hızlı tut** - Yavaş eval'lar çalıştırılmaz
+7. **Eval'ları kodla versiyonla** - Eval'lar birinci sınıf artifact'lardır
 
-## Ãƒâ€“rnek: Kimlik DoÃ„Å¸rulama Ekleme
+## Örnek: Kimlik Doğrulama Ekleme
 
 ```markdown
 ## EVAL: add-authentication
 
-### Faz 1: TanÃ„Â±mla (10 dk)
-Capability Eval'larÃ„Â±:
-- [ ] KullanÃ„Â±cÃ„Â± email/Ã…Å¸ifre ile kayÃ„Â±t olabilir
-- [ ] KullanÃ„Â±cÃ„Â± geÃƒÂ§erli kimlik bilgileriyle giriÃ…Å¸ yapabilir
-- [ ] GeÃƒÂ§ersiz kimlik bilgileri uygun hatayla reddedilir
-- [ ] Oturumlar sayfa yeniden yÃƒÂ¼klemelerinde kalÃ„Â±cÃ„Â±dÃ„Â±r
+### Faz 1: Tanımla (10 dk)
+Capability Eval'ları:
+- [ ] Kullanıcı email/şifre ile kayıt olabilir
+- [ ] Kullanıcı geçerli kimlik bilgileriyle giriş yapabilir
+- [ ] Geçersiz kimlik bilgileri uygun hatayla reddedilir
+- [ ] Oturumlar sayfa yeniden yüklemelerinde kalıcıdır
 - [ ] Logout oturumu temizler
 
-Regression Eval'larÃ„Â±:
-- [ ] Halka aÃƒÂ§Ã„Â±k rotalar hala eriÃ…Å¸ilebilir
-- [ ] API yanÃ„Â±tlarÃ„Â± deÃ„Å¸iÃ…Å¸medi
-- [ ] VeritabanÃ„Â± Ã…Å¸emasÃ„Â± uyumlu
+Regression Eval'ları:
+- [ ] Halka açık rotalar hala erişilebilir
+- [ ] API yanıtları değişmedi
+- [ ] Veritabanı şeması uyumlu
 
-### Faz 2: Uygula (deÃ„Å¸iÃ…Å¸ir)
+### Faz 2: Uygula (değişir)
 [Kod yaz]
 
-### Faz 3: DeÃ„Å¸erlendir
-Ãƒâ€¡alÃ„Â±Ã…Å¸tÃ„Â±r: /eval check add-authentication
+### Faz 3: Değerlendir
+Çalıştır: /eval check add-authentication
 
 ### Faz 4: Raporla
 EVAL REPORT: add-authentication
 ==============================
-Capability: 5/5 geÃƒÂ§ti (pass@3: %100)
-Regression: 3/3 geÃƒÂ§ti (pass^3: %100)
+Capability: 5/5 geçti (pass@3: %100)
+Regression: 3/3 geçti (pass^3: %100)
 Durum: YAYINLA
 ```
 
-## Product Eval'larÃ„Â± (v1.8)
+## Product Eval'ları (v1.8)
 
-DavranÃ„Â±Ã…Å¸ kalitesi sadece birim testlerle yakalanamadÃ„Â±Ã„Å¸Ã„Â±nda product eval'larÃ„Â± kullan.
+Davranış kalitesi sadece birim testlerle yakalanamadığında product eval'ları kullan.
 
 ### Grader Tipleri
 
 1. Code grader (deterministik assertion'lar)
-2. Rule grader (regex/Ã…Å¸ema kÃ„Â±sÃ„Â±tlamalarÃ„Â±)
+2. Rule grader (regex/şema kısıtlamaları)
 3. Model grader (LLM-as-judge rubric)
-4. Human grader (belirsiz ÃƒÂ§Ã„Â±ktÃ„Â±lar iÃƒÂ§in manuel karar)
+4. Human grader (belirsiz çıktılar için manuel karar)
 
-### pass@k KÃ„Â±lavuzu
+### pass@k Kılavuzu
 
-- `pass@1`: doÃ„Å¸rudan gÃƒÂ¼venilirlik
-- `pass@3`: kontrollÃƒÂ¼ yeniden denemeler altÃ„Â±nda pratik gÃƒÂ¼venilirlik
-- `pass^3`: kararlÃ„Â±lÃ„Â±k testi (3 ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±rmanÃ„Â±n tÃƒÂ¼mÃƒÂ¼ geÃƒÂ§meli)
+- `pass@1`: doğrudan güvenilirlik
+- `pass@3`: kontrollü yeniden denemeler altında pratik güvenilirlik
+- `pass^3`: kararlılık testi (3 çalıştırmanın tümü geçmeli)
 
-Ãƒâ€“nerilen eÃ…Å¸ikler:
-- Capability eval'larÃ„Â±: pass@3 >= 0.90
-- Regression eval'larÃ„Â±: yayÃ„Â±n-kritik yollar iÃƒÂ§in pass^3 = 1.00
+Önerilen eşikler:
+- Capability eval'ları: pass@3 >= 0.90
+- Regression eval'ları: yayın-kritik yollar için pass^3 = 1.00
 
-### Eval Anti-KalÃ„Â±plarÃ„Â±
+### Eval Anti-Kalıpları
 
-- Prompt'larÃ„Â± bilinen eval ÃƒÂ¶rneklerine overfitting yapmak
-- Sadece mutlu-yol ÃƒÂ§Ã„Â±ktÃ„Â±larÃ„Â±nÃ„Â± ÃƒÂ¶lÃƒÂ§mek
-- GeÃƒÂ§me oranlarÃ„Â±nÃ„Â± kovalamken maliyet ve gecikme kaymasÃ„Â±nÃ„Â± gÃƒÂ¶rmezden gelmek
-- YayÃ„Â±n kapÃ„Â±larÃ„Â±nda kararsÃ„Â±z grader'lara izin vermek
+- Prompt'ları bilinen eval örneklerine overfitting yapmak
+- Sadece mutlu-yol çıktılarını ölçmek
+- Geçme oranlarını kovalamken maliyet ve gecikme kaymasını görmezden gelmek
+- Yayın kapılarında kararsız grader'lara izin vermek
 
-### Minimal Eval Artifact DÃƒÂ¼zeni
+### Minimal Eval Artifact Düzeni
 
-- `.claude/evals/<feature>.md` tanÃ„Â±mÃ„Â±
-- `.claude/evals/<feature>.log` ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±rma geÃƒÂ§miÃ…Å¸i
-- `docs/releases/<version>/eval-summary.md` yayÃ„Â±n snapshot'Ã„Â±
+- `.claude/evals/<feature>.md` tanımı
+- `.claude/evals/<feature>.log` çalıştırma geçmişi
+- `docs/releases/<version>/eval-summary.md` yayın snapshot'ı

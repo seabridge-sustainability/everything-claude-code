@@ -4,7 +4,7 @@ description: Spring Security best practices for authn/authz, validation, CSRF, s
 origin: ECC
 ---
 
-# Spring Boot GÃƒÂ¼venlik Ã„Â°ncelemesi
+# Spring Boot Güvenlik İncelemesi
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -21,23 +21,23 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-Auth ekleme, giriÃ…Å¸i iÃ…Å¸leme, endpoint oluÃ…Å¸turma veya gizli bilgilerle uÃ„Å¸raÃ…Å¸Ã„Â±rken kullanÃ„Â±n.
+Auth ekleme, girişi işleme, endpoint oluşturma veya gizli bilgilerle uğraşırken kullanın.
 
 ## Ne Zaman Aktif Edilir
 
-- Kimlik doÃ„Å¸rulama ekleme (JWT, OAuth2, session-based)
-- Yetkilendirme uygulama (@PreAuthorize, role-based eriÃ…Å¸im)
-- KullanÃ„Â±cÃ„Â± giriÃ…Å¸ini doÃ„Å¸rulama (Bean Validation, custom validator'lar)
-- CORS, CSRF veya gÃƒÂ¼venlik baÃ…Å¸lÃ„Â±klarÃ„Â±nÃ„Â± yapÃ„Â±landÃ„Â±rma
-- Gizli bilgileri yÃƒÂ¶netme (Vault, ortam deÃ„Å¸iÃ…Å¸kenleri)
-- Rate limiting veya brute-force korumasÃ„Â± ekleme
-- BaÃ„Å¸Ã„Â±mlÃ„Â±lÃ„Â±klarÃ„Â± CVE iÃƒÂ§in tarama
+- Kimlik doğrulama ekleme (JWT, OAuth2, session-based)
+- Yetkilendirme uygulama (@PreAuthorize, role-based erişim)
+- Kullanıcı girişini doğrulama (Bean Validation, custom validator'lar)
+- CORS, CSRF veya güvenlik başlıklarını yapılandırma
+- Gizli bilgileri yönetme (Vault, ortam değişkenleri)
+- Rate limiting veya brute-force koruması ekleme
+- Bağımlılıkları CVE için tarama
 
-## Kimlik DoÃ„Å¸rulama
+## Kimlik Doğrulama
 
-- Ã„Â°ptal listesi ile stateless JWT veya opaque token'larÃ„Â± tercih edin
-- Session'lar iÃƒÂ§in `httpOnly`, `Secure`, `SameSite=Strict` cookie'leri kullanÃ„Â±n
-- Token'larÃ„Â± `OncePerRequestFilter` veya resource server ile doÃ„Å¸rulayÃ„Â±n
+- İptal listesi ile stateless JWT veya opaque token'ları tercih edin
+- Session'lar için `httpOnly`, `Secure`, `SameSite=Strict` cookie'leri kullanın
+- Token'ları `OncePerRequestFilter` veya resource server ile doğrulayın
 
 ```java
 @Component
@@ -64,9 +64,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
 ## Yetkilendirme
 
-- Method gÃƒÂ¼venliÃ„Å¸ini etkinleÃ…Å¸tirin: `@EnableMethodSecurity`
-- `@PreAuthorize("hasRole('ADMIN')")` veya `@PreAuthorize("@authz.canEdit(#id)")` kullanÃ„Â±n
-- VarsayÃ„Â±lan olarak reddedin; sadece gerekli scope'larÃ„Â± aÃƒÂ§Ã„Â±Ã„Å¸a ÃƒÂ§Ã„Â±karÃ„Â±n
+- Method güvenliğini etkinleştirin: `@EnableMethodSecurity`
+- `@PreAuthorize("hasRole('ADMIN')")` veya `@PreAuthorize("@authz.canEdit(#id)")` kullanın
+- Varsayılan olarak reddedin; sadece gerekli scope'ları açığa çıkarın
 
 ```java
 @RestController
@@ -88,20 +88,20 @@ public class AdminController {
 }
 ```
 
-## Girdi DoÃ„Å¸rulama
+## Girdi Doğrulama
 
-- Controller'larda `@Valid` ile Bean Validation kullanÃ„Â±n
-- DTO'lara kÃ„Â±sÃ„Â±tlamalar uygulayÃ„Â±n: `@NotBlank`, `@Email`, `@Size`, custom validator'lar
-- Render etmeden ÃƒÂ¶nce herhangi bir HTML'i whitelist ile temizleyin
+- Controller'larda `@Valid` ile Bean Validation kullanın
+- DTO'lara kısıtlamalar uygulayın: `@NotBlank`, `@Email`, `@Size`, custom validator'lar
+- Render etmeden önce herhangi bir HTML'i whitelist ile temizleyin
 
 ```java
-// KÃƒâ€“TÃƒÅ“: Validation yok
+// KÖTÜ: Validation yok
 @PostMapping("/users")
 public User createUser(@RequestBody UserDto dto) {
   return userService.create(dto);
 }
 
-// Ã„Â°YÃ„Â°: DoÃ„Å¸rulanmÃ„Â±Ã…Å¸ DTO
+// İYİ: Doğrulanmış DTO
 public record CreateUserDto(
     @NotBlank @Size(max = 100) String name,
     @NotBlank @Email String email,
@@ -115,45 +115,45 @@ public ResponseEntity<UserDto> createUser(@Valid @RequestBody CreateUserDto dto)
 }
 ```
 
-## SQL Injection Ãƒâ€“nleme
+## SQL Injection Önleme
 
-- Spring Data repository'leri veya parametreli sorgular kullanÃ„Â±n
-- Native sorgular iÃƒÂ§in `:param` binding'leri kullanÃ„Â±n; string'leri asla birleÃ…Å¸tirmeyin
+- Spring Data repository'leri veya parametreli sorgular kullanın
+- Native sorgular için `:param` binding'leri kullanın; string'leri asla birleştirmeyin
 
 ```java
-// KÃƒâ€“TÃƒÅ“: Native sorguda string birleÃ…Å¸tirme
+// KÖTÜ: Native sorguda string birleştirme
 @Query(value = "SELECT * FROM users WHERE name = '" + name + "'", nativeQuery = true)
 
-// Ã„Â°YÃ„Â°: Parametreli native sorgu
+// İYİ: Parametreli native sorgu
 @Query(value = "SELECT * FROM users WHERE name = :name", nativeQuery = true)
 List<User> findByName(@Param("name") String name);
 
-// Ã„Â°YÃ„Â°: Spring Data tÃƒÂ¼retilmiÃ…Å¸ sorgu (otomatik parametreli)
+// İYİ: Spring Data türetilmiş sorgu (otomatik parametreli)
 List<User> findByEmailAndActiveTrue(String email);
 ```
 
 ## Parola Kodlama
 
-- ParolalarÃ„Â± her zaman BCrypt veya Argon2 ile hash'leyin Ã¢â‚¬â€ asla dÃƒÂ¼z metin saklamayÃ„Â±n
-- Manuel hash'leme deÃ„Å¸il `PasswordEncoder` bean'i kullanÃ„Â±n
+- Parolaları her zaman BCrypt veya Argon2 ile hash'leyin — asla düz metin saklamayın
+- Manuel hash'leme değil `PasswordEncoder` bean'i kullanın
 
 ```java
 @Bean
 public PasswordEncoder passwordEncoder() {
-  return new BCryptPasswordEncoder(12); // cost faktÃƒÂ¶rÃƒÂ¼ 12
+  return new BCryptPasswordEncoder(12); // cost faktörü 12
 }
 
-// Servis iÃƒÂ§inde
+// Servis içinde
 public User register(CreateUserDto dto) {
   String hashedPassword = passwordEncoder.encode(dto.password());
   return userRepository.save(new User(dto.email(), hashedPassword));
 }
 ```
 
-## CSRF KorumasÃ„Â±
+## CSRF Koruması
 
-- TarayÃ„Â±cÃ„Â± session uygulamalarÃ„Â± iÃƒÂ§in CSRF'i etkin tutun; formlara/baÃ…Å¸lÃ„Â±klara token ekleyin
-- Bearer token'lÃ„Â± saf API'ler iÃƒÂ§in CSRF'i devre dÃ„Â±Ã…Å¸Ã„Â± bÃ„Â±rakÃ„Â±n ve stateless auth'a gÃƒÂ¼venin
+- Tarayıcı session uygulamaları için CSRF'i etkin tutun; formlara/başlıklara token ekleyin
+- Bearer token'lı saf API'ler için CSRF'i devre dışı bırakın ve stateless auth'a güvenin
 
 ```java
 http
@@ -161,24 +161,24 @@ http
   .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 ```
 
-## Gizli Bilgi YÃƒÂ¶netimi
+## Gizli Bilgi Yönetimi
 
-- Kaynak kodda gizli bilgi yok; env veya vault'tan yÃƒÂ¼kleyin
-- `application.yml`'i kimlik bilgilerinden arÃ„Â±nmÃ„Â±Ã…Å¸ tutun; yer tutucular kullanÃ„Â±n
-- Token'larÃ„Â± ve DB kimlik bilgilerini dÃƒÂ¼zenli olarak dÃƒÂ¶ndÃƒÂ¼rÃƒÂ¼n
+- Kaynak kodda gizli bilgi yok; env veya vault'tan yükleyin
+- `application.yml`'i kimlik bilgilerinden arınmış tutun; yer tutucular kullanın
+- Token'ları ve DB kimlik bilgilerini düzenli olarak döndürün
 
 ```yaml
-# KÃƒâ€“TÃƒÅ“: application.yml'de sabit kodlanmÃ„Â±Ã…Å¸
+# KÖTÜ: application.yml'de sabit kodlanmış
 spring:
   datasource:
     password: mySecretPassword123
 
-# Ã„Â°YÃ„Â°: Ortam deÃ„Å¸iÃ…Å¸keni yer tutucu
+# İYİ: Ortam değişkeni yer tutucu
 spring:
   datasource:
     password: ${DB_PASSWORD}
 
-# Ã„Â°YÃ„Â°: Spring Cloud Vault entegrasyonu
+# İYİ: Spring Cloud Vault entegrasyonu
 spring:
   cloud:
     vault:
@@ -186,7 +186,7 @@ spring:
       token: ${VAULT_TOKEN}
 ```
 
-## GÃƒÂ¼venlik BaÃ…Å¸lÃ„Â±klarÃ„Â±
+## Güvenlik Başlıkları
 
 ```java
 http
@@ -198,10 +198,10 @@ http
     .referrerPolicy(rp -> rp.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.NO_REFERRER)));
 ```
 
-## CORS YapÃ„Â±landÃ„Â±rmasÃ„Â±
+## CORS Yapılandırması
 
-- CORS'u controller baÃ…Å¸Ã„Â±na deÃ„Å¸il, gÃƒÂ¼venlik filtre seviyesinde yapÃ„Â±landÃ„Â±rÃ„Â±n
-- Ã„Â°zin verilen origin'leri kÃ„Â±sÃ„Â±tlayÃ„Â±n Ã¢â‚¬â€ production'da asla `*` kullanmayÃ„Â±n
+- CORS'u controller başına değil, güvenlik filtre seviyesinde yapılandırın
+- İzin verilen origin'leri kısıtlayın — production'da asla `*` kullanmayın
 
 ```java
 @Bean
@@ -218,17 +218,17 @@ public CorsConfigurationSource corsConfigurationSource() {
   return source;
 }
 
-// SecurityFilterChain iÃƒÂ§inde:
+// SecurityFilterChain içinde:
 http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
 ```
 
 ## Rate Limiting
 
-- PahalÃ„Â± endpoint'lerde Bucket4j veya gateway seviyesi limitler uygulayÃ„Â±n
-- Patlamalarda logla ve uyar; yeniden deneme ipuÃƒÂ§larÃ„Â± ile 429 dÃƒÂ¶ndÃƒÂ¼r
+- Pahalı endpoint'lerde Bucket4j veya gateway seviyesi limitler uygulayın
+- Patlamalarda logla ve uyar; yeniden deneme ipuçları ile 429 döndür
 
 ```java
-// Endpoint baÃ…Å¸Ã„Â±na rate limiting iÃƒÂ§in Bucket4j kullanma
+// Endpoint başına rate limiting için Bucket4j kullanma
 @Component
 public class RateLimitFilter extends OncePerRequestFilter {
   private final Map<String, Bucket> buckets = new ConcurrentHashMap<>();
@@ -255,33 +255,33 @@ public class RateLimitFilter extends OncePerRequestFilter {
 }
 ```
 
-## BaÃ„Å¸Ã„Â±mlÃ„Â±lÃ„Â±k GÃƒÂ¼venliÃ„Å¸i
+## Bağımlılık Güvenliği
 
-- CI'da OWASP Dependency Check / Snyk ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±rÃ„Â±n
-- Spring Boot ve Spring Security'yi desteklenen sÃƒÂ¼rÃƒÂ¼mlerde tutun
-- Bilinen CVE'lerde build'leri baÃ…Å¸arÃ„Â±sÃ„Â±z yapÃ„Â±n
+- CI'da OWASP Dependency Check / Snyk çalıştırın
+- Spring Boot ve Spring Security'yi desteklenen sürümlerde tutun
+- Bilinen CVE'lerde build'leri başarısız yapın
 
 ## Loglama ve PII
 
-- Gizli bilgileri, token'larÃ„Â±, parolalarÃ„Â± veya tam PAN verilerini asla loglamayÃ„Â±n
-- Hassas alanlarÃ„Â± redakte edin; yapÃ„Â±landÃ„Â±rÃ„Â±lmÃ„Â±Ã…Å¸ JSON loglama kullanÃ„Â±n
+- Gizli bilgileri, token'ları, parolaları veya tam PAN verilerini asla loglamayın
+- Hassas alanları redakte edin; yapılandırılmış JSON loglama kullanın
 
-## Dosya YÃƒÂ¼klemeleri
+## Dosya Yüklemeleri
 
-- Boyutu, content type'Ã„Â± ve uzantÃ„Â±yÃ„Â± doÃ„Å¸rulayÃ„Â±n
-- Web root dÃ„Â±Ã…Å¸Ã„Â±nda saklayÃ„Â±n; gerekirse tarayÃ„Â±n
+- Boyutu, content type'ı ve uzantıyı doğrulayın
+- Web root dışında saklayın; gerekirse tarayın
 
-## YayÃ„Â±n Ãƒâ€“ncesi Kontrol Listesi
+## Yayın Öncesi Kontrol Listesi
 
-- [ ] Auth token'larÃ„Â± doÃ„Å¸ru Ã…Å¸ekilde doÃ„Å¸rulanmÃ„Â±Ã…Å¸ ve sÃƒÂ¼resi dolmuÃ…Å¸
-- [ ] Her hassas path'te yetkilendirme korumalarÃ„Â±
-- [ ] TÃƒÂ¼m giriÃ…Å¸ler doÃ„Å¸rulanmÃ„Â±Ã…Å¸ ve temizlenmiÃ…Å¸
-- [ ] String-birleÃ…Å¸tirilmiÃ…Å¸ SQL yok
-- [ ] Uygulama tÃƒÂ¼rÃƒÂ¼ iÃƒÂ§in doÃ„Å¸ru CSRF duruÃ…Å¸u
-- [ ] Gizli bilgiler harici; hiÃƒÂ§biri commit edilmemiÃ…Å¸
-- [ ] GÃƒÂ¼venlik baÃ…Å¸lÃ„Â±klarÃ„Â± yapÃ„Â±landÃ„Â±rÃ„Â±lmÃ„Â±Ã…Å¸
+- [ ] Auth token'ları doğru şekilde doğrulanmış ve süresi dolmuş
+- [ ] Her hassas path'te yetkilendirme korumaları
+- [ ] Tüm girişler doğrulanmış ve temizlenmiş
+- [ ] String-birleştirilmiş SQL yok
+- [ ] Uygulama türü için doğru CSRF duruşu
+- [ ] Gizli bilgiler harici; hiçbiri commit edilmemiş
+- [ ] Güvenlik başlıkları yapılandırılmış
 - [ ] API'lerde rate limiting
-- [ ] BaÃ„Å¸Ã„Â±mlÃ„Â±lÃ„Â±klar taranmÃ„Â±Ã…Å¸ ve gÃƒÂ¼ncel
-- [ ] Loglar hassas verilerden arÃ„Â±nmÃ„Â±Ã…Å¸
+- [ ] Bağımlılıklar taranmış ve güncel
+- [ ] Loglar hassas verilerden arınmış
 
-**UnutmayÃ„Â±n**: VarsayÃ„Â±lan olarak reddet, giriÃ…Å¸leri doÃ„Å¸rula, en az ayrÃ„Â±calÃ„Â±k ve ÃƒÂ¶nce yapÃ„Â±landÃ„Â±rma ile gÃƒÂ¼venli.
+**Unutmayın**: Varsayılan olarak reddet, girişleri doğrula, en az ayrıcalık ve önce yapılandırma ile güvenli.

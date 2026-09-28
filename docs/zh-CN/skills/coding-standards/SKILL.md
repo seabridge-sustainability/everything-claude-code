@@ -1,10 +1,10 @@
 ---
 name: coding-standards
-description: Ã©â‚¬â€šÃ§â€Â¨Ã¤ÂºÅ½TypeScriptÃ£â‚¬ÂJavaScriptÃ£â‚¬ÂReactÃ¥â€™Å’Node.jsÃ¥Â¼â‚¬Ã¥Ââ€˜Ã§Å¡â€žÃ©â‚¬Å¡Ã§â€Â¨Ã§Â¼â€“Ã§Â ÂÃ¦Â â€¡Ã¥â€¡â€ Ã£â‚¬ÂÃ¦Å“â‚¬Ã¤Â½Â³Ã¥Â®Å¾Ã¨Â·ÂµÃ¥â€™Å’Ã¦Â¨Â¡Ã¥Â¼ÂÃ£â‚¬â€š
+description: 适用于TypeScript、JavaScript、React和Node.js开发的通用编码标准、最佳实践和模式。
 origin: ECC
 ---
 
-# Ã§Â¼â€“Ã§Â ÂÃ¦Â â€¡Ã¥â€¡â€ Ã¤Â¸Å½Ã¦Å“â‚¬Ã¤Â½Â³Ã¥Â®Å¾Ã¨Â·Âµ
+# 编码标准与最佳实践
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -21,50 +21,50 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-Ã©â‚¬â€šÃ§â€Â¨Ã¤ÂºÅ½Ã¦â€°â‚¬Ã¦Å“â€°Ã©Â¡Â¹Ã§â€ºÂ®Ã§Å¡â€žÃ©â‚¬Å¡Ã§â€Â¨Ã§Â¼â€“Ã§Â ÂÃ¦Â â€¡Ã¥â€¡â€ Ã£â‚¬â€š
+适用于所有项目的通用编码标准。
 
-## Ã¤Â½â€¢Ã¦â€”Â¶Ã¦Â¿â‚¬Ã¦Â´Â»
+## 何时激活
 
-* Ã¥Â¼â‚¬Ã¥Â§â€¹Ã¦â€“Â°Ã©Â¡Â¹Ã§â€ºÂ®Ã¦Ë†â€“Ã¦â€“Â°Ã¦Â¨Â¡Ã¥Ââ€”Ã¦â€”Â¶
-* Ã¥Â®Â¡Ã¦Å¸Â¥Ã¤Â»Â£Ã§Â ÂÃ¨Â´Â¨Ã©â€¡ÂÃ¥â€™Å’Ã¥ÂÂ¯Ã§Â»Â´Ã¦Å Â¤Ã¦â‚¬Â§Ã¦â€”Â¶
-* Ã©â€¡ÂÃ¦Å¾â€žÃ§Å½Â°Ã¦Å“â€°Ã¤Â»Â£Ã§Â ÂÃ¤Â»Â¥Ã©ÂÂµÃ¥Â¾ÂªÃ§ÂºÂ¦Ã¥Â®Å¡Ã¦â€”Â¶
-* Ã¥Â¼ÂºÃ¥Ë†Â¶Ã¦â€°Â§Ã¨Â¡Å’Ã¥â€˜Â½Ã¥ÂÂÃ£â‚¬ÂÃ¦Â Â¼Ã¥Â¼ÂÃ¦Ë†â€“Ã§Â»â€œÃ¦Å¾â€žÃ¤Â¸â‚¬Ã¨â€¡Â´Ã¦â‚¬Â§Ã¦â€”Â¶
-* Ã¨Â®Â¾Ã§Â½Â®Ã¤Â»Â£Ã§Â ÂÃ¦Â£â‚¬Ã¦Å¸Â¥Ã£â‚¬ÂÃ¦Â Â¼Ã¥Â¼ÂÃ¥Å’â€“Ã¦Ë†â€“Ã§Â±Â»Ã¥Å¾â€¹Ã¦Â£â‚¬Ã¦Å¸Â¥Ã¨Â§â€žÃ¥Ë†â„¢Ã¦â€”Â¶
-* Ã¥Â¼â€¢Ã¥Â¯Â¼Ã¦â€“Â°Ã¨Â´Â¡Ã§Å’Â®Ã¨â‚¬â€¦Ã§â€ Å¸Ã¦â€šâ€°Ã§Â¼â€“Ã§Â ÂÃ¨Â§â€žÃ¨Å’Æ’Ã¦â€”Â¶
+* 开始新项目或新模块时
+* 审查代码质量和可维护性时
+* 重构现有代码以遵循约定时
+* 强制执行命名、格式或结构一致性时
+* 设置代码检查、格式化或类型检查规则时
+* 引导新贡献者熟悉编码规范时
 
-## Ã¤Â»Â£Ã§Â ÂÃ¨Â´Â¨Ã©â€¡ÂÃ¥Å½Å¸Ã¥Ë†â„¢
+## 代码质量原则
 
-### 1. Ã¥ÂÂ¯Ã¨Â¯Â»Ã¦â‚¬Â§Ã¤Â¼ËœÃ¥â€¦Ë†
+### 1. 可读性优先
 
-* Ã¤Â»Â£Ã§Â ÂÃ¨Â¢Â«Ã©Ëœâ€¦Ã¨Â¯Â»Ã§Å¡â€žÃ¦Â¬Â¡Ã¦â€¢Â°Ã¨Â¿Å“Ã¥Â¤Å¡Ã¤ÂºÅ½Ã¨Â¢Â«Ã§Â¼â€“Ã¥â€ â„¢Ã§Å¡â€žÃ¦Â¬Â¡Ã¦â€¢Â°
-* Ã¦Â¸â€¦Ã¦â„¢Â°Ã§Å¡â€žÃ¥ÂËœÃ©â€¡ÂÃ¥â€™Å’Ã¥â€¡Â½Ã¦â€¢Â°Ã¥ÂÂ
-* Ã¤Â¼ËœÃ¥â€¦Ë†Ã©â‚¬â€°Ã¦â€¹Â©Ã¨â€¡ÂªÃ¦â€“â€¡Ã¦Â¡Â£Ã¥Å’â€“Ã¤Â»Â£Ã§Â ÂÃ¯Â¼Å’Ã¨â‚¬Å’Ã©ÂÅ¾Ã¦Â³Â¨Ã©â€¡Å 
-* Ã¤Â¸â‚¬Ã¨â€¡Â´Ã§Å¡â€žÃ¦Â Â¼Ã¥Â¼ÂÃ¥Å’â€“
+* 代码被阅读的次数远多于被编写的次数
+* 清晰的变量和函数名
+* 优先选择自文档化代码，而非注释
+* 一致的格式化
 
-### 2. KISS (Ã¤Â¿ÂÃ¦Å’ÂÃ§Â®â‚¬Ã¥Ââ€¢Ã¯Â¼Å’Ã¥â€šÂ»Ã§â€œÅ“)
+### 2. KISS (保持简单，傻瓜)
 
-* Ã©â€¡â€¡Ã§â€Â¨Ã¨Æ’Â½Ã¥Â·Â¥Ã¤Â½Å“Ã§Å¡â€žÃ¦Å“â‚¬Ã§Â®â‚¬Ã¥Ââ€¢Ã¦â€“Â¹Ã¦Â¡Ë†
-* Ã©ÂÂ¿Ã¥â€¦ÂÃ¨Â¿â€¡Ã¥ÂºÂ¦Ã¨Â®Â¾Ã¨Â®Â¡
-* Ã¤Â¸ÂÃ¨Â¦ÂÃ¨Â¿â€¡Ã¦â€”Â©Ã¤Â¼ËœÃ¥Å’â€“
-* Ã¦Ëœâ€œÃ¤ÂºÅ½Ã§Ââ€ Ã¨Â§Â£ > Ã¨ÂÂªÃ¦ËœÅ½Ã§Å¡â€žÃ¤Â»Â£Ã§Â Â
+* 采用能工作的最简单方案
+* 避免过度设计
+* 不要过早优化
+* 易于理解 > 聪明的代码
 
-### 3. DRY (Ã¤Â¸ÂÃ¨Â¦ÂÃ©â€¡ÂÃ¥Â¤ÂÃ¨â€¡ÂªÃ¥Â·Â±)
+### 3. DRY (不要重复自己)
 
-* Ã¥Â°â€ Ã©â‚¬Å¡Ã§â€Â¨Ã©â‚¬Â»Ã¨Â¾â€˜Ã¦ÂÂÃ¥Ââ€“Ã¥Ë†Â°Ã¥â€¡Â½Ã¦â€¢Â°Ã¤Â¸Â­
-* Ã¥Ë†â€ºÃ¥Â»ÂºÃ¥ÂÂ¯Ã¥Â¤ÂÃ§â€Â¨Ã§Å¡â€žÃ§Â»â€žÃ¤Â»Â¶
-* Ã¨Â·Â¨Ã¦Â¨Â¡Ã¥Ââ€”Ã¥â€¦Â±Ã¤ÂºÂ«Ã¥Â·Â¥Ã¥â€¦Â·Ã¥â€¡Â½Ã¦â€¢Â°
-* Ã©ÂÂ¿Ã¥â€¦ÂÃ¥Â¤ÂÃ¥Ë†Â¶Ã§Â²ËœÃ¨Â´Â´Ã¥Â¼ÂÃ§Â¼â€“Ã§Â¨â€¹
+* 将通用逻辑提取到函数中
+* 创建可复用的组件
+* 跨模块共享工具函数
+* 避免复制粘贴式编程
 
-### 4. YAGNI (Ã¤Â½Â Ã¤Â¸ÂÃ¤Â¼Å¡Ã©Å“â‚¬Ã¨Â¦ÂÃ¥Â®Æ’)
+### 4. YAGNI (你不会需要它)
 
-* Ã¤Â¸ÂÃ¨Â¦ÂÃ©Â¢â€žÃ¥â€¦Ë†Ã¦Å¾â€žÃ¥Â»ÂºÃ¤Â¸ÂÃ©Å“â‚¬Ã¨Â¦ÂÃ§Å¡â€žÃ¥Å Å¸Ã¨Æ’Â½
-* Ã©ÂÂ¿Ã¥â€¦ÂÃ¦Å½Â¨Ã¦Âµâ€¹Ã¦â‚¬Â§Ã¦Â³â€ºÃ¥Å’â€“
-* Ã¤Â»â€¦Ã¥Å“Â¨Ã©Å“â‚¬Ã¨Â¦ÂÃ¦â€”Â¶Ã¥Â¢Å¾Ã¥Å Â Ã¥Â¤ÂÃ¦Ââ€šÃ¦â‚¬Â§
-* Ã¤Â»Å½Ã§Â®â‚¬Ã¥Ââ€¢Ã¥Â¼â‚¬Ã¥Â§â€¹Ã¯Â¼Å’Ã©Å“â‚¬Ã¨Â¦ÂÃ¦â€”Â¶Ã¥â€ ÂÃ©â€¡ÂÃ¦Å¾â€ž
+* 不要预先构建不需要的功能
+* 避免推测性泛化
+* 仅在需要时增加复杂性
+* 从简单开始，需要时再重构
 
-## TypeScript/JavaScript Ã¦Â â€¡Ã¥â€¡â€ 
+## TypeScript/JavaScript 标准
 
-### Ã¥ÂËœÃ©â€¡ÂÃ¥â€˜Â½Ã¥ÂÂ
+### 变量命名
 
 ```typescript
 // PASS: GOOD: Descriptive names
@@ -78,7 +78,7 @@ const flag = true
 const x = 1000
 ```
 
-### Ã¥â€¡Â½Ã¦â€¢Â°Ã¥â€˜Â½Ã¥ÂÂ
+### 函数命名
 
 ```typescript
 // PASS: GOOD: Verb-noun pattern
@@ -92,7 +92,7 @@ function similarity(a, b) { }
 function email(e) { }
 ```
 
-### Ã¤Â¸ÂÃ¥ÂÂ¯Ã¥ÂËœÃ¦â‚¬Â§Ã¦Â¨Â¡Ã¥Â¼Â (Ã¥â€¦Â³Ã©â€Â®)
+### 不可变性模式 (关键)
 
 ```typescript
 // PASS: ALWAYS use spread operator
@@ -108,7 +108,7 @@ user.name = 'New Name'  // BAD
 items.push(newItem)     // BAD
 ```
 
-### Ã©â€â„¢Ã¨Â¯Â¯Ã¥Â¤â€žÃ§Ââ€ 
+### 错误处理
 
 ```typescript
 // PASS: GOOD: Comprehensive error handling
@@ -134,7 +134,7 @@ async function fetchData(url) {
 }
 ```
 
-### Async/Await Ã¦Å“â‚¬Ã¤Â½Â³Ã¥Â®Å¾Ã¨Â·Âµ
+### Async/Await 最佳实践
 
 ```typescript
 // PASS: GOOD: Parallel execution when possible
@@ -150,7 +150,7 @@ const markets = await fetchMarkets()
 const stats = await fetchStats()
 ```
 
-### Ã§Â±Â»Ã¥Å¾â€¹Ã¥Â®â€°Ã¥â€¦Â¨
+### 类型安全
 
 ```typescript
 // PASS: GOOD: Proper types
@@ -171,9 +171,9 @@ function getMarket(id: any): Promise<any> {
 }
 ```
 
-## React Ã¦Å“â‚¬Ã¤Â½Â³Ã¥Â®Å¾Ã¨Â·Âµ
+## React 最佳实践
 
-### Ã§Â»â€žÃ¤Â»Â¶Ã§Â»â€œÃ¦Å¾â€ž
+### 组件结构
 
 ```typescript
 // PASS: GOOD: Functional component with types
@@ -207,7 +207,7 @@ export function Button(props) {
 }
 ```
 
-### Ã¨â€¡ÂªÃ¥Â®Å¡Ã¤Â¹â€° Hooks
+### 自定义 Hooks
 
 ```typescript
 // PASS: GOOD: Reusable custom hook
@@ -229,7 +229,7 @@ export function useDebounce<T>(value: T, delay: number): T {
 const debouncedQuery = useDebounce(searchQuery, 500)
 ```
 
-### Ã§Å Â¶Ã¦â‚¬ÂÃ§Â®Â¡Ã§Ââ€ 
+### 状态管理
 
 ```typescript
 // PASS: GOOD: Proper state updates
@@ -242,7 +242,7 @@ setCount(prev => prev + 1)
 setCount(count + 1)  // Can be stale in async scenarios
 ```
 
-### Ã¦ÂÂ¡Ã¤Â»Â¶Ã¦Â¸Â²Ã¦Å¸â€œ
+### 条件渲染
 
 ```typescript
 // PASS: GOOD: Clear conditional rendering
@@ -254,23 +254,23 @@ setCount(count + 1)  // Can be stale in async scenarios
 {isLoading ? <Spinner /> : error ? <ErrorMessage error={error} /> : data ? <DataDisplay data={data} /> : null}
 ```
 
-## API Ã¨Â®Â¾Ã¨Â®Â¡Ã¦Â â€¡Ã¥â€¡â€ 
+## API 设计标准
 
-### REST API Ã§ÂºÂ¦Ã¥Â®Å¡
+### REST API 约定
 
 ```
-GET    /api/markets              # Ã¥Ë†â€”Ã¥â€¡ÂºÃ¦â€°â‚¬Ã¦Å“â€°Ã¥Â¸â€šÃ¥Å“Âº
-GET    /api/markets/:id          # Ã¨Å½Â·Ã¥Ââ€“Ã§â€°Â¹Ã¥Â®Å¡Ã¥Â¸â€šÃ¥Å“Âº
-POST   /api/markets              # Ã¥Ë†â€ºÃ¥Â»ÂºÃ¦â€“Â°Ã¥Â¸â€šÃ¥Å“Âº
-PUT    /api/markets/:id          # Ã¦â€ºÂ´Ã¦â€“Â°Ã¥Â¸â€šÃ¥Å“ÂºÃ¯Â¼Ë†Ã¥Â®Å’Ã¦â€¢Â´Ã¯Â¼â€°
-PATCH  /api/markets/:id          # Ã¦â€ºÂ´Ã¦â€“Â°Ã¥Â¸â€šÃ¥Å“ÂºÃ¯Â¼Ë†Ã©Æ’Â¨Ã¥Ë†â€ Ã¯Â¼â€°
-DELETE /api/markets/:id          # Ã¥Ë†Â Ã©â„¢Â¤Ã¥Â¸â€šÃ¥Å“Âº
+GET    /api/markets              # 列出所有市场
+GET    /api/markets/:id          # 获取特定市场
+POST   /api/markets              # 创建新市场
+PUT    /api/markets/:id          # 更新市场（完整）
+PATCH  /api/markets/:id          # 更新市场（部分）
+DELETE /api/markets/:id          # 删除市场
 
-# Ã§â€Â¨Ã¤ÂºÅ½Ã§Â­â€ºÃ©â‚¬â€°Ã§Å¡â€žÃ¦Å¸Â¥Ã¨Â¯Â¢Ã¥Ââ€šÃ¦â€¢Â°
+# 用于筛选的查询参数
 GET /api/markets?status=active&limit=10&offset=0
 ```
 
-### Ã¥â€œÂÃ¥Âºâ€Ã¦Â Â¼Ã¥Â¼Â
+### 响应格式
 
 ```typescript
 // PASS: GOOD: Consistent response structure
@@ -299,7 +299,7 @@ return NextResponse.json({
 }, { status: 400 })
 ```
 
-### Ã¨Â¾â€œÃ¥â€¦Â¥Ã©ÂªÅ’Ã¨Â¯Â
+### 输入验证
 
 ```typescript
 import { z } from 'zod'
@@ -330,41 +330,41 @@ export async function POST(request: Request) {
 }
 ```
 
-## Ã¦â€“â€¡Ã¤Â»Â¶Ã§Â»â€žÃ§Â»â€¡
+## 文件组织
 
-### Ã©Â¡Â¹Ã§â€ºÂ®Ã§Â»â€œÃ¦Å¾â€ž
+### 项目结构
 
 ```
 src/
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ app/                    # Next.js App Router
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ api/               # API routes
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ markets/           # Market pages
-Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ (auth)/           # Auth pages (route groups)
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ components/            # React components
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ ui/               # Generic UI components
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ forms/            # Form components
-Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ layouts/          # Layout components
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ hooks/                # Custom React hooks
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ lib/                  # Utilities and configs
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ api/             # API clients
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ utils/           # Helper functions
-Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ constants/       # Constants
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ types/                # TypeScript types
-Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ styles/              # Global styles
+├── app/                    # Next.js App Router
+│   ├── api/               # API routes
+│   ├── markets/           # Market pages
+│   └── (auth)/           # Auth pages (route groups)
+├── components/            # React components
+│   ├── ui/               # Generic UI components
+│   ├── forms/            # Form components
+│   └── layouts/          # Layout components
+├── hooks/                # Custom React hooks
+├── lib/                  # Utilities and configs
+│   ├── api/             # API clients
+│   ├── utils/           # Helper functions
+│   └── constants/       # Constants
+├── types/                # TypeScript types
+└── styles/              # Global styles
 ```
 
-### Ã¦â€“â€¡Ã¤Â»Â¶Ã¥â€˜Â½Ã¥ÂÂ
+### 文件命名
 
 ```
-components/Button.tsx          # Ã§Â»â€žÃ¤Â»Â¶Ã¤Â½Â¿Ã§â€Â¨Ã¥Â¸â€¢Ã¦â€“Â¯Ã¥ÂÂ¡Ã¥â€˜Â½Ã¥ÂÂÃ¦Â³â€¢
-hooks/useAuth.ts              # Ã¤Â½Â¿Ã§â€Â¨ 'use' Ã¥â€°ÂÃ§Â¼â‚¬Ã§Å¡â€žÃ©Â©Â¼Ã¥Â³Â°Ã¥â€˜Â½Ã¥ÂÂÃ¦Â³â€¢
-lib/formatDate.ts             # Ã¥Â·Â¥Ã¥â€¦Â·Ã¥â€¡Â½Ã¦â€¢Â°Ã¤Â½Â¿Ã§â€Â¨Ã©Â©Â¼Ã¥Â³Â°Ã¥â€˜Â½Ã¥ÂÂÃ¦Â³â€¢
-types/market.types.ts         # Ã¤Â½Â¿Ã§â€Â¨ .types Ã¥ÂÅ½Ã§Â¼â‚¬Ã§Å¡â€žÃ©Â©Â¼Ã¥Â³Â°Ã¥â€˜Â½Ã¥ÂÂÃ¦Â³â€¢
+components/Button.tsx          # 组件使用帕斯卡命名法
+hooks/useAuth.ts              # 使用 'use' 前缀的驼峰命名法
+lib/formatDate.ts             # 工具函数使用驼峰命名法
+types/market.types.ts         # 使用 .types 后缀的驼峰命名法
 ```
 
-## Ã¦Â³Â¨Ã©â€¡Å Ã¤Â¸Å½Ã¦â€“â€¡Ã¦Â¡Â£
+## 注释与文档
 
-### Ã¤Â½â€¢Ã¦â€”Â¶Ã¦Â·Â»Ã¥Å Â Ã¦Â³Â¨Ã©â€¡Å 
+### 何时添加注释
 
 ```typescript
 // PASS: GOOD: Explain WHY, not WHAT
@@ -382,7 +382,7 @@ count++
 name = user.name
 ```
 
-### Ã¥â€¦Â¬Ã¥â€¦Â± API Ã§Å¡â€ž JSDoc
+### 公共 API 的 JSDoc
 
 ````typescript
 /**
@@ -407,9 +407,9 @@ export async function searchMarkets(
 }
 ````
 
-## Ã¦â‚¬Â§Ã¨Æ’Â½Ã¦Å“â‚¬Ã¤Â½Â³Ã¥Â®Å¾Ã¨Â·Âµ
+## 性能最佳实践
 
-### Ã¨Â®Â°Ã¥Â¿â€ Ã¥Å’â€“
+### 记忆化
 
 ```typescript
 import { useMemo, useCallback } from 'react'
@@ -426,7 +426,7 @@ const handleSearch = useCallback((query: string) => {
 }, [])
 ```
 
-### Ã¦â€¡â€™Ã¥Å Â Ã¨Â½Â½
+### 懒加载
 
 ```typescript
 import { lazy, Suspense } from 'react'
@@ -443,7 +443,7 @@ export function Dashboard() {
 }
 ```
 
-### Ã¦â€¢Â°Ã¦ÂÂ®Ã¥Âºâ€œÃ¦Å¸Â¥Ã¨Â¯Â¢
+### 数据库查询
 
 ```typescript
 // PASS: GOOD: Select only needed columns
@@ -458,9 +458,9 @@ const { data } = await supabase
   .select('*')
 ```
 
-## Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¦Â â€¡Ã¥â€¡â€ 
+## 测试标准
 
-### Ã¦Âµâ€¹Ã¨Â¯â€¢Ã§Â»â€œÃ¦Å¾â€ž (AAA Ã¦Â¨Â¡Ã¥Â¼Â)
+### 测试结构 (AAA 模式)
 
 ```typescript
 test('calculates similarity correctly', () => {
@@ -476,7 +476,7 @@ test('calculates similarity correctly', () => {
 })
 ```
 
-### Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¥â€˜Â½Ã¥ÂÂ
+### 测试命名
 
 ```typescript
 // PASS: GOOD: Descriptive test names
@@ -489,11 +489,11 @@ test('works', () => { })
 test('test search', () => { })
 ```
 
-## Ã¤Â»Â£Ã§Â ÂÃ¥Â¼â€šÃ¥â€˜Â³Ã¦Â£â‚¬Ã¦Âµâ€¹
+## 代码异味检测
 
-Ã¨Â­Â¦Ã¦Æ’â€¢Ã¤Â»Â¥Ã¤Â¸â€¹Ã¥ÂÂÃ¦Â¨Â¡Ã¥Â¼ÂÃ¯Â¼Å¡
+警惕以下反模式：
 
-### 1. Ã©â€¢Â¿Ã¥â€¡Â½Ã¦â€¢Â°
+### 1. 长函数
 
 ```typescript
 // FAIL: BAD: Function > 50 lines
@@ -509,7 +509,7 @@ function processMarketData() {
 }
 ```
 
-### 2. Ã¦Â·Â±Ã¥Â±â€šÃ¥ÂµÅ’Ã¥Â¥â€”
+### 2. 深层嵌套
 
 ```typescript
 // FAIL: BAD: 5+ levels of nesting
@@ -535,7 +535,7 @@ if (!hasPermission) return
 // Do something
 ```
 
-### 3. Ã©Â­â€Ã¦Â³â€¢Ã¦â€¢Â°Ã¥Â­â€”
+### 3. 魔法数字
 
 ```typescript
 // FAIL: BAD: Unexplained numbers
@@ -550,4 +550,4 @@ if (retryCount > MAX_RETRIES) { }
 setTimeout(callback, DEBOUNCE_DELAY_MS)
 ```
 
-**Ã¨Â®Â°Ã¤Â½Â**Ã¯Â¼Å¡Ã¤Â»Â£Ã§Â ÂÃ¨Â´Â¨Ã©â€¡ÂÃ¤Â¸ÂÃ¥Â®Â¹Ã¥Â¦Â¥Ã¥ÂÂÃ£â‚¬â€šÃ¦Â¸â€¦Ã¦â„¢Â°Ã£â‚¬ÂÃ¥ÂÂ¯Ã§Â»Â´Ã¦Å Â¤Ã§Å¡â€žÃ¤Â»Â£Ã§Â ÂÃ¨Æ’Â½Ã¥Â¤Å¸Ã¥Â®Å¾Ã§Å½Â°Ã¥Â¿Â«Ã©â‚¬Å¸Ã¥Â¼â‚¬Ã¥Ââ€˜Ã¥â€™Å’Ã¨â€¡ÂªÃ¤Â¿Â¡Ã§Å¡â€žÃ©â€¡ÂÃ¦Å¾â€žÃ£â‚¬â€š
+**记住**：代码质量不容妥协。清晰、可维护的代码能够实现快速开发和自信的重构。

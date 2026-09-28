@@ -1,10 +1,10 @@
 ---
 name: coding-standards
-description: TypeScript, JavaScript, React ve Node.js geliÃ…Å¸tirme iÃƒÂ§in evrensel kodlama standartlarÃ„Â±, en iyi uygulamalar ve kalÃ„Â±plar.
+description: TypeScript, JavaScript, React ve Node.js geliştirme için evrensel kodlama standartları, en iyi uygulamalar ve kalıplar.
 origin: ECC
 ---
 
-# Kodlama StandartlarÃ„Â± ve En Ã„Â°yi Uygulamalar
+# Kodlama Standartları ve En İyi Uygulamalar
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -21,77 +21,77 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-TÃƒÂ¼m projelerde uygulanabilir evrensel kodlama standartlarÃ„Â±.
+Tüm projelerde uygulanabilir evrensel kodlama standartları.
 
-## Ne Zaman AktifleÃ…Å¸tirmelisiniz
+## Ne Zaman Aktifleştirmelisiniz
 
-- Yeni bir proje veya modÃƒÂ¼l baÃ…Å¸latÃ„Â±rken
-- Kod kalitesi ve sÃƒÂ¼rdÃƒÂ¼rÃƒÂ¼lebilirlik iÃƒÂ§in kod incelerken
-- Mevcut kodu kurallara uygun hale getirmek iÃƒÂ§in refactor ederken
-- Ã„Â°simlendirme, biÃƒÂ§imlendirme veya yapÃ„Â±sal tutarlÃ„Â±lÃ„Â±Ã„Å¸Ã„Â± zorunlu kÃ„Â±larken
-- Linting, biÃƒÂ§imlendirme veya tÃƒÂ¼r kontrolÃƒÂ¼ kurallarÃ„Â± ayarlarken
-- Yeni katkÃ„Â±da bulunanlarÃ„Â± kodlama kurallarÃ„Â±na alÃ„Â±Ã…Å¸tÃ„Â±rÃ„Â±rken
+- Yeni bir proje veya modül başlatırken
+- Kod kalitesi ve sürdürülebilirlik için kod incelerken
+- Mevcut kodu kurallara uygun hale getirmek için refactor ederken
+- İsimlendirme, biçimlendirme veya yapısal tutarlılığı zorunlu kılarken
+- Linting, biçimlendirme veya tür kontrolü kuralları ayarlarken
+- Yeni katkıda bulunanları kodlama kurallarına alıştırırken
 
-## Kod Kalitesi Ã„Â°lkeleri
+## Kod Kalitesi İlkeleri
 
-### 1. Ãƒâ€“nce Okunabilirlik
-- Kod yazÃ„Â±lmaktan ÃƒÂ§ok okunur
-- Net deÃ„Å¸iÃ…Å¸ken ve fonksiyon isimleri
-- Yorumlardan ÃƒÂ§ok kendi kendini belgeleyen kod tercih edilir
-- TutarlÃ„Â± biÃƒÂ§imlendirme
+### 1. Önce Okunabilirlik
+- Kod yazılmaktan çok okunur
+- Net değişken ve fonksiyon isimleri
+- Yorumlardan çok kendi kendini belgeleyen kod tercih edilir
+- Tutarlı biçimlendirme
 
 ### 2. KISS (Keep It Simple, Stupid - Basit Tut)
-- Ãƒâ€¡alÃ„Â±Ã…Å¸an en basit ÃƒÂ§ÃƒÂ¶zÃƒÂ¼m
-- AÃ…Å¸Ã„Â±rÃ„Â± mÃƒÂ¼hendislikten kaÃƒÂ§Ã„Â±nÃ„Â±n
-- Erken optimizasyon yapmayÃ„Â±n
-- AnlaÃ…Å¸Ã„Â±lÃ„Â±r kod > akÃ„Â±llÃ„Â±ca kod
+- Çalışan en basit çözüm
+- Aşırı mühendislikten kaçının
+- Erken optimizasyon yapmayın
+- Anlaşılır kod > akıllıca kod
 
 ### 3. DRY (Don't Repeat Yourself - Kendini Tekrar Etme)
-- Ortak mantÃ„Â±Ã„Å¸Ã„Â± fonksiyonlara ÃƒÂ§Ã„Â±karÃ„Â±n
-- Yeniden kullanÃ„Â±labilir bileÃ…Å¸enler oluÃ…Å¸turun
-- YardÃ„Â±mcÃ„Â± araÃƒÂ§larÃ„Â± modÃƒÂ¼ller arasÃ„Â±nda paylaÃ…Å¸Ã„Â±n
-- Kopyala-yapÃ„Â±Ã…Å¸tÃ„Â±r programlamadan kaÃƒÂ§Ã„Â±nÃ„Â±n
+- Ortak mantığı fonksiyonlara çıkarın
+- Yeniden kullanılabilir bileşenler oluşturun
+- Yardımcı araçları modüller arasında paylaşın
+- Kopyala-yapıştır programlamadan kaçının
 
-### 4. YAGNI (You Aren't Gonna Need It - Ã„Â°htiyacÃ„Â±n Olmayacak)
-- Ã„Â°htiyaÃƒÂ§ duyulmadan ÃƒÂ¶zellikler oluÃ…Å¸turmayÃ„Â±n
-- SpekÃƒÂ¼latif genellemeden kaÃƒÂ§Ã„Â±nÃ„Â±n
-- KarmaÃ…Å¸Ã„Â±klÃ„Â±Ã„Å¸Ã„Â± sadece gerektiÃ„Å¸inde ekleyin
-- Basit baÃ…Å¸layÃ„Â±n, gerektiÃ„Å¸inde refactor edin
+### 4. YAGNI (You Aren't Gonna Need It - İhtiyacın Olmayacak)
+- İhtiyaç duyulmadan özellikler oluşturmayın
+- Spekülatif genellemeden kaçının
+- Karmaşıklığı sadece gerektiğinde ekleyin
+- Basit başlayın, gerektiğinde refactor edin
 
-## TypeScript/JavaScript StandartlarÃ„Â±
+## TypeScript/JavaScript Standartları
 
-### DeÃ„Å¸iÃ…Å¸ken Ã„Â°simlendirme
+### Değişken İsimlendirme
 
 ```typescript
-// PASS: Ã„Â°YÃ„Â°: AÃƒÂ§Ã„Â±klayÃ„Â±cÃ„Â± isimler
+// PASS: İYİ: Açıklayıcı isimler
 const marketSearchQuery = 'election'
 const isUserAuthenticated = true
 const totalRevenue = 1000
 
-// FAIL: KÃƒâ€“TÃƒÅ“: Belirsiz isimler
+// FAIL: KÖTÜ: Belirsiz isimler
 const q = 'election'
 const flag = true
 const x = 1000
 ```
 
-### Fonksiyon Ã„Â°simlendirme
+### Fonksiyon İsimlendirme
 
 ```typescript
-// PASS: Ã„Â°YÃ„Â°: Fiil-isim kalÃ„Â±bÃ„Â±
+// PASS: İYİ: Fiil-isim kalıbı
 async function fetchMarketData(marketId: string) { }
 function calculateSimilarity(a: number[], b: number[]) { }
 function isValidEmail(email: string): boolean { }
 
-// FAIL: KÃƒâ€“TÃƒÅ“: Belirsiz veya sadece isim
+// FAIL: KÖTÜ: Belirsiz veya sadece isim
 async function market(id: string) { }
 function similarity(a, b) { }
 function email(e) { }
 ```
 
-### DeÃ„Å¸iÃ…Å¸mezlik KalÃ„Â±bÃ„Â± (KRÃ„Â°TÃ„Â°K)
+### Değişmezlik Kalıbı (KRİTİK)
 
 ```typescript
-// PASS: HER ZAMAN spread operatÃƒÂ¶rÃƒÂ¼ kullanÃ„Â±n
+// PASS: HER ZAMAN spread operatörü kullanın
 const updatedUser = {
   ...user,
   name: 'New Name'
@@ -99,15 +99,15 @@ const updatedUser = {
 
 const updatedArray = [...items, newItem]
 
-// FAIL: ASLA doÃ„Å¸rudan mutasyon yapmayÃ„Â±n
-user.name = 'New Name'  // KÃƒâ€“TÃƒÅ“
-items.push(newItem)     // KÃƒâ€“TÃƒÅ“
+// FAIL: ASLA doğrudan mutasyon yapmayın
+user.name = 'New Name'  // KÖTÜ
+items.push(newItem)     // KÖTÜ
 ```
 
-### Hata YÃƒÂ¶netimi
+### Hata Yönetimi
 
 ```typescript
-// PASS: Ã„Â°YÃ„Â°: KapsamlÃ„Â± hata yÃƒÂ¶netimi
+// PASS: İYİ: Kapsamlı hata yönetimi
 async function fetchData(url: string) {
   try {
     const response = await fetch(url)
@@ -123,33 +123,33 @@ async function fetchData(url: string) {
   }
 }
 
-// FAIL: KÃƒâ€“TÃƒÅ“: Hata yÃƒÂ¶netimi yok
+// FAIL: KÖTÜ: Hata yönetimi yok
 async function fetchData(url) {
   const response = await fetch(url)
   return response.json()
 }
 ```
 
-### Async/Await En Ã„Â°yi UygulamalarÃ„Â±
+### Async/Await En İyi Uygulamaları
 
 ```typescript
-// PASS: Ã„Â°YÃ„Â°: MÃƒÂ¼mkÃƒÂ¼n olduÃ„Å¸unda paralel yÃƒÂ¼rÃƒÂ¼tme
+// PASS: İYİ: Mümkün olduğunda paralel yürütme
 const [users, markets, stats] = await Promise.all([
   fetchUsers(),
   fetchMarkets(),
   fetchStats()
 ])
 
-// FAIL: KÃƒâ€“TÃƒÅ“: Gereksiz yere sÃ„Â±ralÃ„Â±
+// FAIL: KÖTÜ: Gereksiz yere sıralı
 const users = await fetchUsers()
 const markets = await fetchMarkets()
 const stats = await fetchStats()
 ```
 
-### TÃƒÂ¼r GÃƒÂ¼venliÃ„Å¸i
+### Tür Güvenliği
 
 ```typescript
-// PASS: Ã„Â°YÃ„Â°: DoÃ„Å¸ru tipler
+// PASS: İYİ: Doğru tipler
 interface Market {
   id: string
   name: string
@@ -161,18 +161,18 @@ function getMarket(id: string): Promise<Market> {
   // Implementation
 }
 
-// FAIL: KÃƒâ€“TÃƒÅ“: 'any' kullanÃ„Â±mÃ„Â±
+// FAIL: KÖTÜ: 'any' kullanımı
 function getMarket(id: any): Promise<any> {
   // Implementation
 }
 ```
 
-## React En Ã„Â°yi UygulamalarÃ„Â±
+## React En İyi Uygulamaları
 
-### BileÃ…Å¸en YapÃ„Â±sÃ„Â±
+### Bileşen Yapısı
 
 ```typescript
-// PASS: Ã„Â°YÃ„Â°: Tiplerle fonksiyonel bileÃ…Å¸en
+// PASS: İYİ: Tiplerle fonksiyonel bileşen
 interface ButtonProps {
   children: React.ReactNode
   onClick: () => void
@@ -197,16 +197,16 @@ export function Button({
   )
 }
 
-// FAIL: KÃƒâ€“TÃƒÅ“: Tip yok, belirsiz yapÃ„Â±
+// FAIL: KÖTÜ: Tip yok, belirsiz yapı
 export function Button(props) {
   return <button onClick={props.onClick}>{props.children}</button>
 }
 ```
 
-### Ãƒâ€“zel Hook'lar
+### Özel Hook'lar
 
 ```typescript
-// PASS: Ã„Â°YÃ„Â°: Yeniden kullanÃ„Â±labilir ÃƒÂ¶zel hook
+// PASS: İYİ: Yeniden kullanılabilir özel hook
 export function useDebounce<T>(value: T, delay: number): T {
   const [debouncedValue, setDebouncedValue] = useState<T>(value)
 
@@ -221,55 +221,55 @@ export function useDebounce<T>(value: T, delay: number): T {
   return debouncedValue
 }
 
-// KullanÃ„Â±m
+// Kullanım
 const debouncedQuery = useDebounce(searchQuery, 500)
 ```
 
-### State YÃƒÂ¶netimi
+### State Yönetimi
 
 ```typescript
-// PASS: Ã„Â°YÃ„Â°: DoÃ„Å¸ru state gÃƒÂ¼ncellemeleri
+// PASS: İYİ: Doğru state güncellemeleri
 const [count, setCount] = useState(0)
 
-// Ãƒâ€“nceki state'e dayalÃ„Â± fonksiyonel gÃƒÂ¼ncelleme
+// Önceki state'e dayalı fonksiyonel güncelleme
 setCount(prev => prev + 1)
 
-// FAIL: KÃƒâ€“TÃƒÅ“: DoÃ„Å¸rudan state referansÃ„Â±
+// FAIL: KÖTÜ: Doğrudan state referansı
 setCount(count + 1)  // Async senaryolarda eski olabilir
 ```
 
-### KoÃ…Å¸ullu Render
+### Koşullu Render
 
 ```typescript
-// PASS: Ã„Â°YÃ„Â°: AÃƒÂ§Ã„Â±k koÃ…Å¸ullu render
+// PASS: İYİ: Açık koşullu render
 {isLoading && <Spinner />}
 {error && <ErrorMessage error={error} />}
 {data && <DataDisplay data={data} />}
 
-// FAIL: KÃƒâ€“TÃƒÅ“: Ternary cehennemi
+// FAIL: KÖTÜ: Ternary cehennemi
 {isLoading ? <Spinner /> : error ? <ErrorMessage error={error} /> : data ? <DataDisplay data={data} /> : null}
 ```
 
-## API TasarÃ„Â±m StandartlarÃ„Â±
+## API Tasarım Standartları
 
-### REST API KurallarÃ„Â±
+### REST API Kuralları
 
 ```
-GET    /api/markets              # TÃƒÂ¼m marketleri listele
+GET    /api/markets              # Tüm marketleri listele
 GET    /api/markets/:id          # Belirli marketi getir
-POST   /api/markets              # Yeni market oluÃ…Å¸tur
-PUT    /api/markets/:id          # Marketi gÃƒÂ¼ncelle (tam)
-PATCH  /api/markets/:id          # Marketi gÃƒÂ¼ncelle (kÃ„Â±smi)
+POST   /api/markets              # Yeni market oluştur
+PUT    /api/markets/:id          # Marketi güncelle (tam)
+PATCH  /api/markets/:id          # Marketi güncelle (kısmi)
 DELETE /api/markets/:id          # Marketi sil
 
-# Filtreleme iÃƒÂ§in query parametreleri
+# Filtreleme için query parametreleri
 GET /api/markets?status=active&limit=10&offset=0
 ```
 
-### Response FormatÃ„Â±
+### Response Formatı
 
 ```typescript
-// PASS: Ã„Â°YÃ„Â°: TutarlÃ„Â± response yapÃ„Â±sÃ„Â±
+// PASS: İYİ: Tutarlı response yapısı
 interface ApiResponse<T> {
   success: boolean
   data?: T
@@ -281,7 +281,7 @@ interface ApiResponse<T> {
   }
 }
 
-// BaÃ…Å¸arÃ„Â±lÃ„Â± response
+// Başarılı response
 return NextResponse.json({
   success: true,
   data: markets,
@@ -295,12 +295,12 @@ return NextResponse.json({
 }, { status: 400 })
 ```
 
-### Input DoÃ„Å¸rulama
+### Input Doğrulama
 
 ```typescript
 import { z } from 'zod'
 
-// PASS: Ã„Â°YÃ„Â°: Schema doÃ„Å¸rulama
+// PASS: İYİ: Schema doğrulama
 const CreateMarketSchema = z.object({
   name: z.string().min(1).max(200),
   description: z.string().min(1).max(2000),
@@ -313,7 +313,7 @@ export async function POST(request: Request) {
 
   try {
     const validated = CreateMarketSchema.parse(body)
-    // DoÃ„Å¸rulanmÃ„Â±Ã…Å¸ veriyle devam et
+    // Doğrulanmış veriyle devam et
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({
@@ -328,66 +328,66 @@ export async function POST(request: Request) {
 
 ## Dosya Organizasyonu
 
-### Proje YapÃ„Â±sÃ„Â±
+### Proje Yapısı
 
 ```
 src/
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ app/                    # Next.js App Router
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ api/               # API routes
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ markets/           # Market sayfalarÃ„Â±
-Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ (auth)/           # Auth sayfalarÃ„Â± (route groups)
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ components/            # React bileÃ…Å¸enleri
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ ui/               # Genel UI bileÃ…Å¸enleri
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ forms/            # Form bileÃ…Å¸enleri
-Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ layouts/          # Layout bileÃ…Å¸enleri
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ hooks/                # Ãƒâ€“zel React hooks
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ lib/                  # YardÃ„Â±mcÃ„Â± araÃƒÂ§lar ve konfigÃƒÂ¼rasyonlar
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ api/             # API istemcileri
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ utils/           # YardÃ„Â±mcÃ„Â± fonksiyonlar
-Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ constants/       # Sabitler
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ types/                # TypeScript tipleri
-Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ styles/              # Global stiller
+├── app/                    # Next.js App Router
+│   ├── api/               # API routes
+│   ├── markets/           # Market sayfaları
+│   └── (auth)/           # Auth sayfaları (route groups)
+├── components/            # React bileşenleri
+│   ├── ui/               # Genel UI bileşenleri
+│   ├── forms/            # Form bileşenleri
+│   └── layouts/          # Layout bileşenleri
+├── hooks/                # Özel React hooks
+├── lib/                  # Yardımcı araçlar ve konfigürasyonlar
+│   ├── api/             # API istemcileri
+│   ├── utils/           # Yardımcı fonksiyonlar
+│   └── constants/       # Sabitler
+├── types/                # TypeScript tipleri
+└── styles/              # Global stiller
 ```
 
-### Dosya Ã„Â°simlendirme
+### Dosya İsimlendirme
 
 ```
-components/Button.tsx          # BileÃ…Å¸enler iÃƒÂ§in PascalCase
-hooks/useAuth.ts              # 'use' ÃƒÂ¶neki ile camelCase
-lib/formatDate.ts             # YardÃ„Â±mcÃ„Â± araÃƒÂ§lar iÃƒÂ§in camelCase
+components/Button.tsx          # Bileşenler için PascalCase
+hooks/useAuth.ts              # 'use' öneki ile camelCase
+lib/formatDate.ts             # Yardımcı araçlar için camelCase
 types/market.types.ts         # .types soneki ile camelCase
 ```
 
-## Yorumlar ve DokÃƒÂ¼mantasyon
+## Yorumlar ve Dokümantasyon
 
-### Ne Zaman Yorum YapmalÃ„Â±
+### Ne Zaman Yorum Yapmalı
 
 ```typescript
-// PASS: Ã„Â°YÃ„Â°: NÃ„Â°Ãƒâ€¡Ã„Â°N'i aÃƒÂ§Ã„Â±klayÃ„Â±n, NE'yi deÃ„Å¸il
-// Kesintiler sÃ„Â±rasÃ„Â±nda API'yi aÃ…Å¸Ã„Â±rÃ„Â± yÃƒÂ¼klemekten kaÃƒÂ§Ã„Â±nmak iÃƒÂ§in exponential backoff kullan
+// PASS: İYİ: NİÇİN'i açıklayın, NE'yi değil
+// Kesintiler sırasında API'yi aşırı yüklemekten kaçınmak için exponential backoff kullan
 const delay = Math.min(1000 * Math.pow(2, retryCount), 30000)
 
-// BÃƒÂ¼yÃƒÂ¼k dizilerle performans iÃƒÂ§in burada kasÃ„Â±tlÃ„Â± olarak mutasyon kullanÃ„Â±lÃ„Â±yor
+// Büyük dizilerle performans için burada kasıtlı olarak mutasyon kullanılıyor
 items.push(newItem)
 
-// FAIL: KÃƒâ€“TÃƒÅ“: AÃƒÂ§Ã„Â±k olanÃ„Â± belirtmek
-// SayacÃ„Â± 1 artÃ„Â±r
+// FAIL: KÖTÜ: Açık olanı belirtmek
+// Sayacı 1 artır
 count++
 
-// Ã„Â°smi kullanÃ„Â±cÃ„Â±nÃ„Â±n ismine ayarla
+// İsmi kullanıcının ismine ayarla
 name = user.name
 ```
 
-### Public API'ler iÃƒÂ§in JSDoc
+### Public API'ler için JSDoc
 
 ```typescript
 /**
  * Semantik benzerlik kullanarak market arar.
  *
- * @param query - DoÃ„Å¸al dil arama sorgusu
- * @param limit - Maksimum sonuÃƒÂ§ sayÃ„Â±sÃ„Â± (varsayÃ„Â±lan: 10)
- * @returns Benzerlik skoruna gÃƒÂ¶re sÃ„Â±ralanmÃ„Â±Ã…Å¸ market dizisi
- * @throws {Error} OpenAI API baÃ…Å¸arÃ„Â±sÃ„Â±z olursa veya Redis kullanÃ„Â±lamazsa
+ * @param query - Doğal dil arama sorgusu
+ * @param limit - Maksimum sonuç sayısı (varsayılan: 10)
+ * @returns Benzerlik skoruna göre sıralanmış market dizisi
+ * @throws {Error} OpenAI API başarısız olursa veya Redis kullanılamazsa
  *
  * @example
  * ```typescript
@@ -403,19 +403,19 @@ export async function searchMarkets(
 }
 ```
 
-## Performans En Ã„Â°yi UygulamalarÃ„Â±
+## Performans En İyi Uygulamaları
 
 ### Memoization
 
 ```typescript
 import { useMemo, useCallback } from 'react'
 
-// PASS: Ã„Â°YÃ„Â°: PahalÃ„Â± hesaplamalarÃ„Â± memoize et
+// PASS: İYİ: Pahalı hesaplamaları memoize et
 const sortedMarkets = useMemo(() => {
   return markets.sort((a, b) => b.volume - a.volume)
 }, [markets])
 
-// PASS: Ã„Â°YÃ„Â°: Callback'leri memoize et
+// PASS: İYİ: Callback'leri memoize et
 const handleSearch = useCallback((query: string) => {
   setSearchQuery(query)
 }, [])
@@ -426,7 +426,7 @@ const handleSearch = useCallback((query: string) => {
 ```typescript
 import { lazy, Suspense } from 'react'
 
-// PASS: Ã„Â°YÃ„Â°: AÃ„Å¸Ã„Â±r bileÃ…Å¸enleri lazy yÃƒÂ¼kle
+// PASS: İYİ: Ağır bileşenleri lazy yükle
 const HeavyChart = lazy(() => import('./HeavyChart'))
 
 export function Dashboard() {
@@ -438,64 +438,64 @@ export function Dashboard() {
 }
 ```
 
-### VeritabanÃ„Â± SorgularÃ„Â±
+### Veritabanı Sorguları
 
 ```typescript
-// PASS: Ã„Â°YÃ„Â°: Sadece gerekli sÃƒÂ¼tunlarÃ„Â± seÃƒÂ§
+// PASS: İYİ: Sadece gerekli sütunları seç
 const { data } = await supabase
   .from('markets')
   .select('id, name, status')
   .limit(10)
 
-// FAIL: KÃƒâ€“TÃƒÅ“: Her Ã…Å¸eyi seÃƒÂ§
+// FAIL: KÖTÜ: Her şeyi seç
 const { data } = await supabase
   .from('markets')
   .select('*')
 ```
 
-## Test StandartlarÃ„Â±
+## Test Standartları
 
-### Test YapÃ„Â±sÃ„Â± (AAA KalÃ„Â±bÃ„Â±)
+### Test Yapısı (AAA Kalıbı)
 
 ```typescript
-test('benzerliÃ„Å¸i doÃ„Å¸ru hesaplar', () => {
-  // Arrange (HazÃ„Â±rla)
+test('benzerliği doğru hesaplar', () => {
+  // Arrange (Hazırla)
   const vector1 = [1, 0, 0]
   const vector2 = [0, 1, 0]
 
-  // Act (Ã„Â°Ã…Å¸le)
+  // Act (İşle)
   const similarity = calculateCosineSimilarity(vector1, vector2)
 
-  // Assert (DoÃ„Å¸rula)
+  // Assert (Doğrula)
   expect(similarity).toBe(0)
 })
 ```
 
-### Test Ã„Â°simlendirme
+### Test İsimlendirme
 
 ```typescript
-// PASS: Ã„Â°YÃ„Â°: AÃƒÂ§Ã„Â±klayÃ„Â±cÃ„Â± test isimleri
-test('sorguya uygun market bulunamadÃ„Â±Ã„Å¸Ã„Â±nda boÃ…Å¸ dizi dÃƒÂ¶ndÃƒÂ¼rÃƒÂ¼r', () => { })
-test('OpenAI API anahtarÃ„Â± eksikse hata fÃ„Â±rlatÃ„Â±r', () => { })
-test('Redis kullanÃ„Â±lamazsa substring aramaya geri dÃƒÂ¶ner', () => { })
+// PASS: İYİ: Açıklayıcı test isimleri
+test('sorguya uygun market bulunamadığında boş dizi döndürür', () => { })
+test('OpenAI API anahtarı eksikse hata fırlatır', () => { })
+test('Redis kullanılamazsa substring aramaya geri döner', () => { })
 
-// FAIL: KÃƒâ€“TÃƒÅ“: Belirsiz test isimleri
-test('ÃƒÂ§alÃ„Â±Ã…Å¸Ã„Â±r', () => { })
+// FAIL: KÖTÜ: Belirsiz test isimleri
+test('çalışır', () => { })
 test('arama testi', () => { })
 ```
 
 ## Kod Kokusu Tespiti
 
-Bu anti-kalÃ„Â±plara dikkat edin:
+Bu anti-kalıplara dikkat edin:
 
 ### 1. Uzun Fonksiyonlar
 ```typescript
-// FAIL: KÃƒâ€“TÃƒÅ“: 50 satÃ„Â±rdan uzun fonksiyon
+// FAIL: KÖTÜ: 50 satırdan uzun fonksiyon
 function processMarketData() {
-  // 100 satÃ„Â±r kod
+  // 100 satır kod
 }
 
-// PASS: Ã„Â°YÃ„Â°: KÃƒÂ¼ÃƒÂ§ÃƒÂ¼k fonksiyonlara bÃƒÂ¶l
+// PASS: İYİ: Küçük fonksiyonlara böl
 function processMarketData() {
   const validated = validateData()
   const transformed = transformData(validated)
@@ -503,38 +503,38 @@ function processMarketData() {
 }
 ```
 
-### 2. Derin Ã„Â°ÃƒÂ§ Ã„Â°ÃƒÂ§e GeÃƒÂ§me
+### 2. Derin İç İçe Geçme
 ```typescript
-// FAIL: KÃƒâ€“TÃƒÅ“: 5+ seviye iÃƒÂ§ iÃƒÂ§e geÃƒÂ§me
+// FAIL: KÖTÜ: 5+ seviye iç içe geçme
 if (user) {
   if (user.isAdmin) {
     if (market) {
       if (market.isActive) {
         if (hasPermission) {
-          // Bir Ã…Å¸eyler yap
+          // Bir şeyler yap
         }
       }
     }
   }
 }
 
-// PASS: Ã„Â°YÃ„Â°: Erken dÃƒÂ¶nÃƒÂ¼Ã…Å¸ler
+// PASS: İYİ: Erken dönüşler
 if (!user) return
 if (!user.isAdmin) return
 if (!market) return
 if (!market.isActive) return
 if (!hasPermission) return
 
-// Bir Ã…Å¸eyler yap
+// Bir şeyler yap
 ```
 
-### 3. Sihirli SayÃ„Â±lar
+### 3. Sihirli Sayılar
 ```typescript
-// FAIL: KÃƒâ€“TÃƒÅ“: AÃƒÂ§Ã„Â±klanmamÃ„Â±Ã…Å¸ sayÃ„Â±lar
+// FAIL: KÖTÜ: Açıklanmamış sayılar
 if (retryCount > 3) { }
 setTimeout(callback, 500)
 
-// PASS: Ã„Â°YÃ„Â°: Ã„Â°simlendirilmiÃ…Å¸ sabitler
+// PASS: İYİ: İsimlendirilmiş sabitler
 const MAX_RETRIES = 3
 const DEBOUNCE_DELAY_MS = 500
 
@@ -542,4 +542,4 @@ if (retryCount > MAX_RETRIES) { }
 setTimeout(callback, DEBOUNCE_DELAY_MS)
 ```
 
-**UnutmayÃ„Â±n**: Kod kalitesi pazarlÃ„Â±k konusu deÃ„Å¸ildir. AÃƒÂ§Ã„Â±k, sÃƒÂ¼rdÃƒÂ¼rÃƒÂ¼lebilir kod hÃ„Â±zlÃ„Â± geliÃ…Å¸tirme ve gÃƒÂ¼venli refactoring saÃ„Å¸lar.
+**Unutmayın**: Kod kalitesi pazarlık konusu değildir. Açık, sürdürülebilir kod hızlı geliştirme ve güvenli refactoring sağlar.

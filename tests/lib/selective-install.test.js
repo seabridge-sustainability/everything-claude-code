@@ -507,6 +507,7 @@ function runTests() {
         env: { ...process.env, HOME: homeDir },
         encoding: 'utf8',
         stdio: ['pipe', 'pipe', 'pipe'],
+        maxBuffer: 4 * 1024 * 1024,
       });
 
       assert.ok(result.includes('Mode: manifest'), 'Should be manifest mode');
@@ -538,6 +539,7 @@ function runTests() {
         env: { ...process.env, HOME: homeDir },
         encoding: 'utf8',
         stdio: ['pipe', 'pipe', 'pipe'],
+        maxBuffer: 4 * 1024 * 1024,
       });
       const parsed = JSON.parse(result);
 

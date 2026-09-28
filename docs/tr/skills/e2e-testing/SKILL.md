@@ -1,10 +1,10 @@
 ---
 name: e2e-testing
-description: Playwright E2E test kalÃ„Â±plarÃ„Â±, Page Object Model, yapÃ„Â±landÃ„Â±rma, CI/CD entegrasyonu, artifact yÃƒÂ¶netimi ve kararsÃ„Â±z test stratejileri.
+description: Playwright E2E test kalıpları, Page Object Model, yapılandırma, CI/CD entegrasyonu, artifact yönetimi ve kararsız test stratejileri.
 origin: ECC
 ---
 
-# E2E Test KalÃ„Â±plarÃ„Â±
+# E2E Test Kalıpları
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -21,27 +21,27 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-KararlÃ„Â±, hÃ„Â±zlÃ„Â± ve sÃƒÂ¼rdÃƒÂ¼rÃƒÂ¼lebilir E2E test paketleri oluÃ…Å¸turmak iÃƒÂ§in kapsamlÃ„Â± Playwright kalÃ„Â±plarÃ„Â±.
+Kararlı, hızlı ve sürdürülebilir E2E test paketleri oluşturmak için kapsamlı Playwright kalıpları.
 
-## Test DosyasÃ„Â± Organizasyonu
+## Test Dosyası Organizasyonu
 
 ```
 tests/
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ e2e/
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ auth/
-Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ login.spec.ts
-Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ logout.spec.ts
-Ã¢â€â€š   Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ register.spec.ts
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ features/
-Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ browse.spec.ts
-Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ search.spec.ts
-Ã¢â€â€š   Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ create.spec.ts
-Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ api/
-Ã¢â€â€š       Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ endpoints.spec.ts
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ fixtures/
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ auth.ts
-Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ data.ts
-Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ playwright.config.ts
+├── e2e/
+│   ├── auth/
+│   │   ├── login.spec.ts
+│   │   ├── logout.spec.ts
+│   │   └── register.spec.ts
+│   ├── features/
+│   │   ├── browse.spec.ts
+│   │   ├── search.spec.ts
+│   │   └── create.spec.ts
+│   └── api/
+│       └── endpoints.spec.ts
+├── fixtures/
+│   ├── auth.ts
+│   └── data.ts
+└── playwright.config.ts
 ```
 
 ## Page Object Model (POM)
@@ -79,7 +79,7 @@ export class ItemsPage {
 }
 ```
 
-## Test YapÃ„Â±sÃ„Â±
+## Test Yapısı
 
 ```typescript
 import { test, expect } from '@playwright/test'
@@ -112,7 +112,7 @@ test.describe('Item Search', () => {
 })
 ```
 
-## Playwright YapÃ„Â±landÃ„Â±rmasÃ„Â±
+## Playwright Yapılandırması
 
 ```typescript
 import { defineConfig, devices } from '@playwright/test'
@@ -151,7 +151,7 @@ export default defineConfig({
 })
 ```
 
-## KararsÃ„Â±z Test KalÃ„Â±plarÃ„Â±
+## Kararsız Test Kalıpları
 
 ### Karantina
 
@@ -167,47 +167,47 @@ test('conditional skip', async ({ page }) => {
 })
 ```
 
-### KararsÃ„Â±zlÃ„Â±Ã„Å¸Ã„Â± Belirleme
+### Kararsızlığı Belirleme
 
 ```bash
 npx playwright test tests/search.spec.ts --repeat-each=10
 npx playwright test tests/search.spec.ts --retries=3
 ```
 
-### YaygÃ„Â±n Nedenler ve Ãƒâ€¡ÃƒÂ¶zÃƒÂ¼mler
+### Yaygın Nedenler ve Çözümler
 
-**YarÃ„Â±Ã…Å¸ koÃ…Å¸ullarÃ„Â±:**
+**Yarış koşulları:**
 ```typescript
-// KÃƒÂ¶tÃƒÂ¼: element'in hazÃ„Â±r olduÃ„Å¸unu varsayar
+// Kötü: element'in hazır olduğunu varsayar
 await page.click('[data-testid="button"]')
 
-// Ã„Â°yi: otomatik bekleme locator
+// İyi: otomatik bekleme locator
 await page.locator('[data-testid="button"]').click()
 ```
 
-**AÃ„Å¸ zamanlamasÃ„Â±:**
+**Ağ zamanlaması:**
 ```typescript
-// KÃƒÂ¶tÃƒÂ¼: keyfi timeout
+// Kötü: keyfi timeout
 await page.waitForTimeout(5000)
 
-// Ã„Â°yi: belirli koÃ…Å¸ulu bekle
+// İyi: belirli koşulu bekle
 await page.waitForResponse(resp => resp.url().includes('/api/data'))
 ```
 
-**Animasyon zamanlamasÃ„Â±:**
+**Animasyon zamanlaması:**
 ```typescript
-// KÃƒÂ¶tÃƒÂ¼: animasyon sÃ„Â±rasÃ„Â±nda tÃ„Â±kla
+// Kötü: animasyon sırasında tıkla
 await page.click('[data-testid="menu-item"]')
 
-// Ã„Â°yi: kararlÃ„Â±lÃ„Â±Ã„Å¸Ã„Â± bekle
+// İyi: kararlılığı bekle
 await page.locator('[data-testid="menu-item"]').waitFor({ state: 'visible' })
 await page.waitForLoadState('networkidle')
 await page.locator('[data-testid="menu-item"]').click()
 ```
 
-## Artifact YÃƒÂ¶netimi
+## Artifact Yönetimi
 
-### Ekran GÃƒÂ¶rÃƒÂ¼ntÃƒÂ¼leri
+### Ekran Görüntüleri
 
 ```typescript
 await page.screenshot({ path: 'artifacts/after-login.png' })
@@ -223,7 +223,7 @@ await browser.startTracing(page, {
   screenshots: true,
   snapshots: true,
 })
-// ... test aksiyonlarÃ„Â± ...
+// ... test aksiyonları ...
 await browser.stopTracing()
 ```
 
@@ -265,29 +265,29 @@ jobs:
           retention-days: 30
 ```
 
-## Test Raporu Ã…Å¾ablonu
+## Test Raporu Şablonu
 
 ```markdown
 # E2E Test Raporu
 
 **Tarih:** YYYY-MM-DD HH:MM
-**SÃƒÂ¼re:** Xd Ys
-**Durum:** GEÃƒâ€¡TÃ„Â° / BAÃ…Å¾ARISIZ
+**Süre:** Xd Ys
+**Durum:** GEÇTİ / BAŞARISIZ
 
-## Ãƒâ€“zet
-- Toplam: X | GeÃƒÂ§ti: Y (Z%) | BaÃ…Å¸arÃ„Â±sÃ„Â±z: A | KararsÃ„Â±z: B | AtlandÃ„Â±: C
+## Özet
+- Toplam: X | Geçti: Y (Z%) | Başarısız: A | Kararsız: B | Atlandı: C
 
-## BaÃ…Å¸arÃ„Â±sÃ„Â±z Testler
+## Başarısız Testler
 
-### test-adÃ„Â±
+### test-adı
 **Dosya:** `tests/e2e/feature.spec.ts:45`
-**Hata:** Element'in gÃƒÂ¶rÃƒÂ¼nÃƒÂ¼r olmasÃ„Â± bekleniyordu
-**Ekran GÃƒÂ¶rÃƒÂ¼ntÃƒÂ¼sÃƒÂ¼:** artifacts/failed.png
-**Ãƒâ€“nerilen Ãƒâ€¡ÃƒÂ¶zÃƒÂ¼m:** [aÃƒÂ§Ã„Â±klama]
+**Hata:** Element'in görünür olması bekleniyordu
+**Ekran Görüntüsü:** artifacts/failed.png
+**Önerilen Çözüm:** [açıklama]
 
 ## Artifact'lar
 - HTML Raporu: playwright-report/index.html
-- Ekran GÃƒÂ¶rÃƒÂ¼ntÃƒÂ¼leri: artifacts/*.png
+- Ekran Görüntüleri: artifacts/*.png
 - Videolar: artifacts/videos/*.webm
 - Trace'ler: artifacts/*.zip
 ```
@@ -296,7 +296,7 @@ jobs:
 
 ```typescript
 test('wallet connection', async ({ page, context }) => {
-  // Wallet provider'Ã„Â± mock'la
+  // Wallet provider'ı mock'la
   await context.addInitScript(() => {
     window.ethereum = {
       isMetaMask: true,
@@ -314,18 +314,18 @@ test('wallet connection', async ({ page, context }) => {
 })
 ```
 
-## Finansal / Kritik AkÃ„Â±Ã…Å¸ Testi
+## Finansal / Kritik Akış Testi
 
 ```typescript
 test('trade execution', async ({ page }) => {
-  // ÃƒÅ“retimde atla Ã¢â‚¬â€ gerÃƒÂ§ek para
+  // Üretimde atla — gerçek para
   test.skip(process.env.NODE_ENV === 'production', 'Skip on production')
 
   await page.goto('/markets/test-market')
   await page.locator('[data-testid="position-yes"]').click()
   await page.locator('[data-testid="trade-amount"]').fill('1.0')
 
-  // Ãƒâ€“nizlemeyi doÃ„Å¸rula
+  // Önizlemeyi doğrula
   const preview = page.locator('[data-testid="trade-preview"]')
   await expect(preview).toContainText('1.0')
 

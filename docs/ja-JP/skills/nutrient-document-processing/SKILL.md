@@ -1,6 +1,6 @@
 ---
 name: nutrient-document-processing
-description: Nutrient DWS API Ã£â€šâ€™Ã¤Â½Â¿Ã§â€Â¨Ã£Ââ€”Ã£ÂÂ¦Ã£Æ’â€°Ã£â€šÂ­Ã£Æ’Â¥Ã£Æ’Â¡Ã£Æ’Â³Ã£Æ’Ë†Ã£ÂÂ®Ã¥â€¡Â¦Ã§Ââ€ Ã£â‚¬ÂÃ¥Â¤â€°Ã¦Ââ€ºÃ£â‚¬ÂOCRÃ£â‚¬ÂÃ¦Å Â½Ã¥â€¡ÂºÃ£â‚¬ÂÃ§Â·Â¨Ã©â€ºâ€ Ã£â‚¬ÂÃ§Â½Â²Ã¥ÂÂÃ£â‚¬ÂÃ£Æ’â€¢Ã£â€šÂ©Ã£Æ’Â¼Ã£Æ’Â Ã¥â€¦Â¥Ã¥Å â€ºÃ£â€šâ€™Ã¨Â¡Å’Ã£Ââ€žÃ£ÂÂ¾Ã£Ââ„¢Ã£â‚¬â€šPDFÃ£â‚¬ÂDOCXÃ£â‚¬ÂXLSXÃ£â‚¬ÂPPTXÃ£â‚¬ÂHTMLÃ£â‚¬ÂÃ§â€Â»Ã¥Æ’ÂÃ£ÂÂ«Ã¥Â¯Â¾Ã¥Â¿Å“Ã£Ââ€”Ã£ÂÂ¦Ã£Ââ€žÃ£ÂÂ¾Ã£Ââ„¢Ã£â‚¬â€š
+description: Nutrient DWS API を使用してドキュメントの処理、変換、OCR、抽出、編集、署名、フォーム入力を行います。PDF、DOCX、XLSX、PPTX、HTML、画像に対応しています。
 ---
 
 # Nutrient Document Processing
@@ -20,38 +20,38 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-[Nutrient DWS Processor API](https://www.nutrient.io/api/) Ã£ÂÂ§Ã£Æ’â€°Ã£â€šÂ­Ã£Æ’Â¥Ã£Æ’Â¡Ã£Æ’Â³Ã£Æ’Ë†Ã£â€šâ€™Ã¥â€¡Â¦Ã§Ââ€ Ã£Ââ€”Ã£ÂÂ¾Ã£Ââ„¢Ã£â‚¬â€šÃ£Æ’â€¢Ã£â€šÂ©Ã£Æ’Â¼Ã£Æ’Å¾Ã£Æ’Æ’Ã£Æ’Ë†Ã¥Â¤â€°Ã¦Ââ€ºÃ£â‚¬ÂÃ£Æ’â€ Ã£â€šÂ­Ã£â€šÂ¹Ã£Æ’Ë†Ã£ÂÂ¨Ã£Æ’â€ Ã£Æ’Â¼Ã£Æ’â€“Ã£Æ’Â«Ã£ÂÂ®Ã¦Å Â½Ã¥â€¡ÂºÃ£â‚¬ÂÃ£â€šÂ¹Ã£â€šÂ­Ã£Æ’Â£Ã£Æ’Â³Ã£Ââ€¢Ã£â€šÅ’Ã£ÂÅ¸Ã£Æ’â€°Ã£â€šÂ­Ã£Æ’Â¥Ã£Æ’Â¡Ã£Æ’Â³Ã£Æ’Ë†Ã£ÂÂ® OCRÃ£â‚¬ÂPII Ã£ÂÂ®Ã§Â·Â¨Ã©â€ºâ€ Ã£â‚¬ÂÃ£â€šÂ¦Ã£â€šÂ©Ã£Æ’Â¼Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Å¾Ã£Æ’Â¼Ã£â€šÂ¯Ã£ÂÂ®Ã¨Â¿Â½Ã¥Å Â Ã£â‚¬ÂÃ£Æ’â€¡Ã£â€šÂ¸Ã£â€šÂ¿Ã£Æ’Â«Ã§Â½Â²Ã¥ÂÂÃ£â‚¬ÂPDF Ã£Æ’â€¢Ã£â€šÂ©Ã£Æ’Â¼Ã£Æ’Â Ã£ÂÂ®Ã¥â€¦Â¥Ã¥Å â€ºÃ£ÂÅ’Ã¥ÂÂ¯Ã¨Æ’Â½Ã£ÂÂ§Ã£Ââ„¢Ã£â‚¬â€š
+[Nutrient DWS Processor API](https://www.nutrient.io/api/) でドキュメントを処理します。フォーマット変換、テキストとテーブルの抽出、スキャンされたドキュメントの OCR、PII の編集、ウォーターマークの追加、デジタル署名、PDF フォームの入力が可能です。
 
-## Ã£â€šÂ»Ã£Æ’Æ’Ã£Æ’Ë†Ã£â€šÂ¢Ã£Æ’Æ’Ã£Æ’â€”
+## セットアップ
 
-**[nutrient.io](https://dashboard.nutrient.io/sign_up/?product=processor)** Ã£ÂÂ§Ã§â€žÂ¡Ã¦â€“â„¢Ã£ÂÂ® API Ã£â€šÂ­Ã£Æ’Â¼Ã£â€šâ€™Ã¥Ââ€“Ã¥Â¾â€”Ã£Ââ€”Ã£ÂÂ¦Ã£ÂÂÃ£ÂÂ Ã£Ââ€¢Ã£Ââ€ž
+**[nutrient.io](https://dashboard.nutrient.io/sign_up/?product=processor)** で無料の API キーを取得してください
 
 ```bash
 export NUTRIENT_API_KEY="pdf_live_..."
 ```
 
-Ã£Ââ„¢Ã£ÂÂ¹Ã£ÂÂ¦Ã£ÂÂ®Ã£Æ’ÂªÃ£â€šÂ¯Ã£â€šÂ¨Ã£â€šÂ¹Ã£Æ’Ë†Ã£ÂÂ¯ `https://api.nutrient.io/build` Ã£ÂÂ« `instructions` JSON Ã£Æ’â€¢Ã£â€šÂ£Ã£Æ’Â¼Ã£Æ’Â«Ã£Æ’â€°Ã£â€šâ€™Ã¥ÂÂ«Ã£â€šâ‚¬Ã£Æ’Å¾Ã£Æ’Â«Ã£Æ’ÂÃ£Æ’â€˜Ã£Æ’Â¼Ã£Æ’Ë† POST Ã£ÂÂ¨Ã£Ââ€”Ã£ÂÂ¦Ã©â‚¬ÂÃ¤Â¿Â¡Ã£Ââ€¢Ã£â€šÅ’Ã£ÂÂ¾Ã£Ââ„¢Ã£â‚¬â€š
+すべてのリクエストは `https://api.nutrient.io/build` に `instructions` JSON フィールドを含むマルチパート POST として送信されます。
 
-## Ã¦â€œÂÃ¤Â½Å“
+## 操作
 
-### Ã£Æ’â€°Ã£â€šÂ­Ã£Æ’Â¥Ã£Æ’Â¡Ã£Æ’Â³Ã£Æ’Ë†Ã£ÂÂ®Ã¥Â¤â€°Ã¦Ââ€º
+### ドキュメントの変換
 
 ```bash
-# DOCX Ã£Ââ€¹Ã£â€šâ€° PDF Ã£ÂÂ¸
+# DOCX から PDF へ
 curl -X POST https://api.nutrient.io/build \
   -H "Authorization: Bearer $NUTRIENT_API_KEY" \
   -F "document.docx=@document.docx" \
   -F 'instructions={"parts":[{"file":"document.docx"}]}' \
   -o output.pdf
 
-# PDF Ã£Ââ€¹Ã£â€šâ€° DOCX Ã£ÂÂ¸
+# PDF から DOCX へ
 curl -X POST https://api.nutrient.io/build \
   -H "Authorization: Bearer $NUTRIENT_API_KEY" \
   -F "document.pdf=@document.pdf" \
   -F 'instructions={"parts":[{"file":"document.pdf"}],"output":{"type":"docx"}}' \
   -o output.docx
 
-# HTML Ã£Ââ€¹Ã£â€šâ€° PDF Ã£ÂÂ¸
+# HTML から PDF へ
 curl -X POST https://api.nutrient.io/build \
   -H "Authorization: Bearer $NUTRIENT_API_KEY" \
   -F "index.html=@index.html" \
@@ -59,19 +59,19 @@ curl -X POST https://api.nutrient.io/build \
   -o output.pdf
 ```
 
-Ã£â€šÂµÃ£Æ’ÂÃ£Æ’Â¼Ã£Æ’Ë†Ã£Ââ€¢Ã£â€šÅ’Ã£ÂÂ¦Ã£Ââ€žÃ£â€šâ€¹Ã¥â€¦Â¥Ã¥Å â€ºÃ¥Â½Â¢Ã¥Â¼Â: PDFÃ£â‚¬ÂDOCXÃ£â‚¬ÂXLSXÃ£â‚¬ÂPPTXÃ£â‚¬ÂDOCÃ£â‚¬ÂXLSÃ£â‚¬ÂPPTÃ£â‚¬ÂPPSÃ£â‚¬ÂPPSXÃ£â‚¬ÂODTÃ£â‚¬ÂRTFÃ£â‚¬ÂHTMLÃ£â‚¬ÂJPGÃ£â‚¬ÂPNGÃ£â‚¬ÂTIFFÃ£â‚¬ÂHEICÃ£â‚¬ÂGIFÃ£â‚¬ÂWebPÃ£â‚¬ÂSVGÃ£â‚¬ÂTGAÃ£â‚¬ÂEPSÃ£â‚¬â€š
+サポートされている入力形式: PDF、DOCX、XLSX、PPTX、DOC、XLS、PPT、PPS、PPSX、ODT、RTF、HTML、JPG、PNG、TIFF、HEIC、GIF、WebP、SVG、TGA、EPS。
 
-### Ã£Æ’â€ Ã£â€šÂ­Ã£â€šÂ¹Ã£Æ’Ë†Ã£ÂÂ¨Ã£Æ’â€¡Ã£Æ’Â¼Ã£â€šÂ¿Ã£ÂÂ®Ã¦Å Â½Ã¥â€¡Âº
+### テキストとデータの抽出
 
 ```bash
-# Ã£Æ’â€”Ã£Æ’Â¬Ã£Æ’Â¼Ã£Æ’Â³Ã£Æ’â€ Ã£â€šÂ­Ã£â€šÂ¹Ã£Æ’Ë†Ã£ÂÂ®Ã¦Å Â½Ã¥â€¡Âº
+# プレーンテキストの抽出
 curl -X POST https://api.nutrient.io/build \
   -H "Authorization: Bearer $NUTRIENT_API_KEY" \
   -F "document.pdf=@document.pdf" \
   -F 'instructions={"parts":[{"file":"document.pdf"}],"output":{"type":"text"}}' \
   -o output.txt
 
-# Ã£Æ’â€ Ã£Æ’Â¼Ã£Æ’â€“Ã£Æ’Â«Ã£â€šâ€™ Excel Ã£ÂÂ¨Ã£Ââ€”Ã£ÂÂ¦Ã¦Å Â½Ã¥â€¡Âº
+# テーブルを Excel として抽出
 curl -X POST https://api.nutrient.io/build \
   -H "Authorization: Bearer $NUTRIENT_API_KEY" \
   -F "document.pdf=@document.pdf" \
@@ -79,10 +79,10 @@ curl -X POST https://api.nutrient.io/build \
   -o tables.xlsx
 ```
 
-### Ã£â€šÂ¹Ã£â€šÂ­Ã£Æ’Â£Ã£Æ’Â³Ã£Ââ€¢Ã£â€šÅ’Ã£ÂÅ¸Ã£Æ’â€°Ã£â€šÂ­Ã£Æ’Â¥Ã£Æ’Â¡Ã£Æ’Â³Ã£Æ’Ë†Ã£ÂÂ® OCR
+### スキャンされたドキュメントの OCR
 
 ```bash
-# Ã¦Â¤Å“Ã§Â´Â¢Ã¥ÂÂ¯Ã¨Æ’Â½Ã£ÂÂª PDF Ã£ÂÂ¸Ã£ÂÂ® OCRÃ¯Â¼Ë†100Ã¤Â»Â¥Ã¤Â¸Å Ã£ÂÂ®Ã¨Â¨â‚¬Ã¨ÂªÅ¾Ã£â€šâ€™Ã£â€šÂµÃ£Æ’ÂÃ£Æ’Â¼Ã£Æ’Ë†Ã¯Â¼â€°
+# 検索可能な PDF への OCR（100以上の言語をサポート）
 curl -X POST https://api.nutrient.io/build \
   -H "Authorization: Bearer $NUTRIENT_API_KEY" \
   -F "scanned.pdf=@scanned.pdf" \
@@ -90,19 +90,19 @@ curl -X POST https://api.nutrient.io/build \
   -o searchable.pdf
 ```
 
-Ã¨Â¨â‚¬Ã¨ÂªÅ¾: ISO 639-2 Ã£â€šÂ³Ã£Æ’Â¼Ã£Æ’â€°Ã¯Â¼Ë†Ã¤Â¾â€¹: `eng`Ã£â‚¬Â`deu`Ã£â‚¬Â`fra`Ã£â‚¬Â`spa`Ã£â‚¬Â`jpn`Ã£â‚¬Â`kor`Ã£â‚¬Â`chi_sim`Ã£â‚¬Â`chi_tra`Ã£â‚¬Â`ara`Ã£â‚¬Â`hin`Ã£â‚¬Â`rus`Ã¯Â¼â€°Ã£â€šâ€™Ã¤Â»â€¹Ã£Ââ€”Ã£ÂÂ¦100Ã¤Â»Â¥Ã¤Â¸Å Ã£ÂÂ®Ã¨Â¨â‚¬Ã¨ÂªÅ¾Ã£â€šâ€™Ã£â€šÂµÃ£Æ’ÂÃ£Æ’Â¼Ã£Æ’Ë†Ã£Ââ€”Ã£ÂÂ¦Ã£Ââ€žÃ£ÂÂ¾Ã£Ââ„¢Ã£â‚¬â€š`english` Ã£â€šâ€ž `german` Ã£ÂÂªÃ£ÂÂ©Ã£ÂÂ®Ã¥Â®Å’Ã¥â€¦Â¨Ã£ÂÂªÃ¨Â¨â‚¬Ã¨ÂªÅ¾Ã¥ÂÂÃ£â€šâ€šÃ¦Â©Å¸Ã¨Æ’Â½Ã£Ââ€”Ã£ÂÂ¾Ã£Ââ„¢Ã£â‚¬â€šÃ£â€šÂµÃ£Æ’ÂÃ£Æ’Â¼Ã£Æ’Ë†Ã£Ââ€¢Ã£â€šÅ’Ã£ÂÂ¦Ã£Ââ€žÃ£â€šâ€¹Ã£Ââ„¢Ã£ÂÂ¹Ã£ÂÂ¦Ã£ÂÂ®Ã£â€šÂ³Ã£Æ’Â¼Ã£Æ’â€°Ã£ÂÂ«Ã£ÂÂ¤Ã£Ââ€žÃ£ÂÂ¦Ã£ÂÂ¯Ã£â‚¬Â[Ã¥Â®Å’Ã¥â€¦Â¨Ã£ÂÂª OCR Ã¨Â¨â‚¬Ã¨ÂªÅ¾Ã¨Â¡Â¨](https://www.nutrient.io/guides/document-engine/ocr/language-support/)Ã£â€šâ€™Ã¥Ââ€šÃ§â€¦Â§Ã£Ââ€”Ã£ÂÂ¦Ã£ÂÂÃ£ÂÂ Ã£Ââ€¢Ã£Ââ€žÃ£â‚¬â€š
+言語: ISO 639-2 コード（例: `eng`、`deu`、`fra`、`spa`、`jpn`、`kor`、`chi_sim`、`chi_tra`、`ara`、`hin`、`rus`）を介して100以上の言語をサポートしています。`english` や `german` などの完全な言語名も機能します。サポートされているすべてのコードについては、[完全な OCR 言語表](https://www.nutrient.io/guides/document-engine/ocr/language-support/)を参照してください。
 
-### Ã¦Â©Å¸Ã¥Â¯â€ Ã¦Æ’â€¦Ã¥Â Â±Ã£ÂÂ®Ã§Â·Â¨Ã©â€ºâ€ 
+### 機密情報の編集
 
 ```bash
-# Ã£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³Ã£Æ’â„¢Ã£Æ’Â¼Ã£â€šÂ¹Ã¯Â¼Ë†SSNÃ£â‚¬ÂÃ£Æ’Â¡Ã£Æ’Â¼Ã£Æ’Â«Ã¯Â¼â€°
+# パターンベース（SSN、メール）
 curl -X POST https://api.nutrient.io/build \
   -H "Authorization: Bearer $NUTRIENT_API_KEY" \
   -F "document.pdf=@document.pdf" \
   -F 'instructions={"parts":[{"file":"document.pdf"}],"actions":[{"type":"redaction","strategy":"preset","strategyOptions":{"preset":"social-security-number"}},{"type":"redaction","strategy":"preset","strategyOptions":{"preset":"email-address"}}]}' \
   -o redacted.pdf
 
-# Ã¦Â­Â£Ã¨Â¦ÂÃ¨Â¡Â¨Ã§ÂÂ¾Ã£Æ’â„¢Ã£Æ’Â¼Ã£â€šÂ¹
+# 正規表現ベース
 curl -X POST https://api.nutrient.io/build \
   -H "Authorization: Bearer $NUTRIENT_API_KEY" \
   -F "document.pdf=@document.pdf" \
@@ -110,9 +110,9 @@ curl -X POST https://api.nutrient.io/build \
   -o redacted.pdf
 ```
 
-Ã£Æ’â€”Ã£Æ’ÂªÃ£â€šÂ»Ã£Æ’Æ’Ã£Æ’Ë†: `social-security-number`Ã£â‚¬Â`email-address`Ã£â‚¬Â`credit-card-number`Ã£â‚¬Â`international-phone-number`Ã£â‚¬Â`north-american-phone-number`Ã£â‚¬Â`date`Ã£â‚¬Â`time`Ã£â‚¬Â`url`Ã£â‚¬Â`ipv4`Ã£â‚¬Â`ipv6`Ã£â‚¬Â`mac-address`Ã£â‚¬Â`us-zip-code`Ã£â‚¬Â`vin`Ã£â‚¬â€š
+プリセット: `social-security-number`、`email-address`、`credit-card-number`、`international-phone-number`、`north-american-phone-number`、`date`、`time`、`url`、`ipv4`、`ipv6`、`mac-address`、`us-zip-code`、`vin`。
 
-### Ã£â€šÂ¦Ã£â€šÂ©Ã£Æ’Â¼Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Å¾Ã£Æ’Â¼Ã£â€šÂ¯Ã£ÂÂ®Ã¨Â¿Â½Ã¥Å Â 
+### ウォーターマークの追加
 
 ```bash
 curl -X POST https://api.nutrient.io/build \
@@ -122,10 +122,10 @@ curl -X POST https://api.nutrient.io/build \
   -o watermarked.pdf
 ```
 
-### Ã£Æ’â€¡Ã£â€šÂ¸Ã£â€šÂ¿Ã£Æ’Â«Ã§Â½Â²Ã¥ÂÂ
+### デジタル署名
 
 ```bash
-# Ã¨â€¡ÂªÃ¥Â·Â±Ã§Â½Â²Ã¥ÂÂ CMS Ã§Â½Â²Ã¥ÂÂ
+# 自己署名 CMS 署名
 curl -X POST https://api.nutrient.io/build \
   -H "Authorization: Bearer $NUTRIENT_API_KEY" \
   -F "document.pdf=@document.pdf" \
@@ -133,7 +133,7 @@ curl -X POST https://api.nutrient.io/build \
   -o signed.pdf
 ```
 
-### PDF Ã£Æ’â€¢Ã£â€šÂ©Ã£Æ’Â¼Ã£Æ’Â Ã£ÂÂ®Ã¥â€¦Â¥Ã¥Å â€º
+### PDF フォームの入力
 
 ```bash
 curl -X POST https://api.nutrient.io/build \
@@ -143,9 +143,9 @@ curl -X POST https://api.nutrient.io/build \
   -o filled.pdf
 ```
 
-## MCP Ã£â€šÂµÃ£Æ’Â¼Ã£Æ’ÂÃ£Æ’Â¼Ã¯Â¼Ë†Ã¤Â»Â£Ã¦â€ºÂ¿Ã¯Â¼â€°
+## MCP サーバー（代替）
 
-Ã£Æ’ÂÃ£â€šÂ¤Ã£Æ’â€ Ã£â€šÂ£Ã£Æ’â€“Ã£Æ’â€žÃ£Æ’Â¼Ã£Æ’Â«Ã§ÂµÂ±Ã¥ÂË†Ã£ÂÂ«Ã£ÂÂ¯Ã£â‚¬Âcurl Ã£ÂÂ®Ã¤Â»Â£Ã£â€šÂÃ£â€šÅ Ã£ÂÂ« MCP Ã£â€šÂµÃ£Æ’Â¼Ã£Æ’ÂÃ£Æ’Â¼Ã£â€šâ€™Ã¤Â½Â¿Ã§â€Â¨Ã£Ââ€”Ã£ÂÂ¾Ã£Ââ„¢Ã¯Â¼Å¡
+ネイティブツール統合には、curl の代わりに MCP サーバーを使用します：
 
 ```json
 {
@@ -162,18 +162,18 @@ curl -X POST https://api.nutrient.io/build \
 }
 ```
 
-## Ã¤Â½Â¿Ã§â€Â¨Ã£â€šÂ¿Ã£â€šÂ¤Ã£Æ’Å¸Ã£Æ’Â³Ã£â€šÂ°
+## 使用タイミング
 
-- Ã£Æ’â€¢Ã£â€šÂ©Ã£Æ’Â¼Ã£Æ’Å¾Ã£Æ’Æ’Ã£Æ’Ë†Ã©â€“â€œÃ£ÂÂ§Ã£ÂÂ®Ã£Æ’â€°Ã£â€šÂ­Ã£Æ’Â¥Ã£Æ’Â¡Ã£Æ’Â³Ã£Æ’Ë†Ã¥Â¤â€°Ã¦Ââ€ºÃ¯Â¼Ë†PDFÃ£â‚¬ÂDOCXÃ£â‚¬ÂXLSXÃ£â‚¬ÂPPTXÃ£â‚¬ÂHTMLÃ£â‚¬ÂÃ§â€Â»Ã¥Æ’ÂÃ¯Â¼â€°
-- PDF Ã£Ââ€¹Ã£â€šâ€°Ã£Æ’â€ Ã£â€šÂ­Ã£â€šÂ¹Ã£Æ’Ë†Ã£â‚¬ÂÃ£Æ’â€ Ã£Æ’Â¼Ã£Æ’â€“Ã£Æ’Â«Ã£â‚¬ÂÃ£â€šÂ­Ã£Æ’Â¼Ã¥â‚¬Â¤Ã£Æ’Å¡Ã£â€šÂ¢Ã£ÂÂ®Ã¦Å Â½Ã¥â€¡Âº
-- Ã£â€šÂ¹Ã£â€šÂ­Ã£Æ’Â£Ã£Æ’Â³Ã£Ââ€¢Ã£â€šÅ’Ã£ÂÅ¸Ã£Æ’â€°Ã£â€šÂ­Ã£Æ’Â¥Ã£Æ’Â¡Ã£Æ’Â³Ã£Æ’Ë†Ã£ÂÂ¾Ã£ÂÅ¸Ã£ÂÂ¯Ã§â€Â»Ã¥Æ’ÂÃ£ÂÂ® OCR
-- Ã£Æ’â€°Ã£â€šÂ­Ã£Æ’Â¥Ã£Æ’Â¡Ã£Æ’Â³Ã£Æ’Ë†Ã£â€šâ€™Ã¥â€¦Â±Ã¦Å“â€°Ã£Ââ„¢Ã£â€šâ€¹Ã¥â€°ÂÃ£ÂÂ® PII Ã£ÂÂ®Ã§Â·Â¨Ã©â€ºâ€ 
-- Ã£Æ’â€°Ã£Æ’Â©Ã£Æ’â€¢Ã£Æ’Ë†Ã£ÂÂ¾Ã£ÂÅ¸Ã£ÂÂ¯Ã¦Â©Å¸Ã¥Â¯â€ Ã¦â€“â€¡Ã¦â€ºÂ¸Ã£ÂÂ¸Ã£ÂÂ®Ã£â€šÂ¦Ã£â€šÂ©Ã£Æ’Â¼Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Å¾Ã£Æ’Â¼Ã£â€šÂ¯Ã£ÂÂ®Ã¨Â¿Â½Ã¥Å Â 
-- Ã¥Â¥â€˜Ã§Â´â€žÃ£ÂÂ¾Ã£ÂÅ¸Ã£ÂÂ¯Ã¥ÂË†Ã¦â€žÂÃ¦â€ºÂ¸Ã£ÂÂ¸Ã£ÂÂ®Ã£Æ’â€¡Ã£â€šÂ¸Ã£â€šÂ¿Ã£Æ’Â«Ã§Â½Â²Ã¥ÂÂ
-- Ã£Æ’â€”Ã£Æ’Â­Ã£â€šÂ°Ã£Æ’Â©Ã£Æ’Â Ã£ÂÂ«Ã£â€šË†Ã£â€šâ€¹ PDF Ã£Æ’â€¢Ã£â€šÂ©Ã£Æ’Â¼Ã£Æ’Â Ã£ÂÂ®Ã¥â€¦Â¥Ã¥Å â€º
+- フォーマット間でのドキュメント変換（PDF、DOCX、XLSX、PPTX、HTML、画像）
+- PDF からテキスト、テーブル、キー値ペアの抽出
+- スキャンされたドキュメントまたは画像の OCR
+- ドキュメントを共有する前の PII の編集
+- ドラフトまたは機密文書へのウォーターマークの追加
+- 契約または合意書へのデジタル署名
+- プログラムによる PDF フォームの入力
 
-## Ã£Æ’ÂªÃ£Æ’Â³Ã£â€šÂ¯
+## リンク
 
 - [API Playground](https://dashboard.nutrient.io/processor-api/playground/)
-- [Ã¥Â®Å’Ã¥â€¦Â¨Ã£ÂÂª API Ã£Æ’â€°Ã£â€šÂ­Ã£Æ’Â¥Ã£Æ’Â¡Ã£Æ’Â³Ã£Æ’Ë†](https://www.nutrient.io/guides/dws-processor/)
-- [npm MCP Ã£â€šÂµÃ£Æ’Â¼Ã£Æ’ÂÃ£Æ’Â¼](https://www.npmjs.com/package/@nutrient-sdk/dws-mcp-server)
+- [完全な API ドキュメント](https://www.nutrient.io/guides/dws-processor/)
+- [npm MCP サーバー](https://www.npmjs.com/package/@nutrient-sdk/dws-mcp-server)

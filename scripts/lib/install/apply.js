@@ -295,6 +295,8 @@ function comparablePath(filePath) {
 function findPreviousManagedHooks(previousState, plan, operation) {
   if (
     !previousState
+    || !previousState.target
+    || !plan.adapter
     || previousState.target.id !== plan.adapter.id
     || comparablePath(previousState.target.root) !== comparablePath(plan.targetRoot)
     || comparablePath(previousState.target.installStatePath) !== comparablePath(plan.installStatePath)

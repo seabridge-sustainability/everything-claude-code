@@ -1,10 +1,10 @@
 ---
 name: e2e-testing
-description: Playwright E2E Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¦Â¨Â¡Ã¥Â¼ÂÃ£â‚¬ÂÃ©Â¡ÂµÃ©ÂÂ¢Ã¥Â¯Â¹Ã¨Â±Â¡Ã¦Â¨Â¡Ã¥Å¾â€¹Ã£â‚¬ÂÃ©â€¦ÂÃ§Â½Â®Ã£â‚¬ÂCI/CD Ã©â€ºâ€ Ã¦Ë†ÂÃ£â‚¬ÂÃ¥Â·Â¥Ã¤Â»Â¶Ã§Â®Â¡Ã§Ââ€ Ã¥â€™Å’Ã¤Â¸ÂÃ§Â¨Â³Ã¥Â®Å¡Ã¦Âµâ€¹Ã¨Â¯â€¢Ã§Â­â€“Ã§â€¢Â¥Ã£â‚¬â€š
+description: Playwright E2E 测试模式、页面对象模型、配置、CI/CD 集成、工件管理和不稳定测试策略。
 origin: ECC
 ---
 
-# E2E Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¦Â¨Â¡Ã¥Â¼Â
+# E2E 测试模式
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -21,30 +21,30 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-Ã§â€Â¨Ã¤ÂºÅ½Ã¦Å¾â€žÃ¥Â»ÂºÃ§Â¨Â³Ã¥Â®Å¡Ã£â‚¬ÂÃ¥Â¿Â«Ã©â‚¬Å¸Ã¤Â¸â€Ã¥ÂÂ¯Ã§Â»Â´Ã¦Å Â¤Ã§Å¡â€ž E2E Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¥Â¥â€”Ã¤Â»Â¶Ã§Å¡â€žÃ¥â€¦Â¨Ã©ÂÂ¢ Playwright Ã¦Â¨Â¡Ã¥Â¼ÂÃ£â‚¬â€š
+用于构建稳定、快速且可维护的 E2E 测试套件的全面 Playwright 模式。
 
-## Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¦â€“â€¡Ã¤Â»Â¶Ã§Â»â€žÃ§Â»â€¡
+## 测试文件组织
 
 ```
 tests/
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ e2e/
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ auth/
-Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ login.spec.ts
-Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ logout.spec.ts
-Ã¢â€â€š   Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ register.spec.ts
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ features/
-Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ browse.spec.ts
-Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ search.spec.ts
-Ã¢â€â€š   Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ create.spec.ts
-Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ api/
-Ã¢â€â€š       Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ endpoints.spec.ts
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ fixtures/
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ auth.ts
-Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ data.ts
-Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ playwright.config.ts
+├── e2e/
+│   ├── auth/
+│   │   ├── login.spec.ts
+│   │   ├── logout.spec.ts
+│   │   └── register.spec.ts
+│   ├── features/
+│   │   ├── browse.spec.ts
+│   │   ├── search.spec.ts
+│   │   └── create.spec.ts
+│   └── api/
+│       └── endpoints.spec.ts
+├── fixtures/
+│   ├── auth.ts
+│   └── data.ts
+└── playwright.config.ts
 ```
 
-## Ã©Â¡ÂµÃ©ÂÂ¢Ã¥Â¯Â¹Ã¨Â±Â¡Ã¦Â¨Â¡Ã¥Å¾â€¹ (POM)
+## 页面对象模型 (POM)
 
 ```typescript
 import { Page, Locator } from '@playwright/test'
@@ -79,7 +79,7 @@ export class ItemsPage {
 }
 ```
 
-## Ã¦Âµâ€¹Ã¨Â¯â€¢Ã§Â»â€œÃ¦Å¾â€ž
+## 测试结构
 
 ```typescript
 import { test, expect } from '@playwright/test'
@@ -112,7 +112,7 @@ test.describe('Item Search', () => {
 })
 ```
 
-## Playwright Ã©â€¦ÂÃ§Â½Â®
+## Playwright 配置
 
 ```typescript
 import { defineConfig, devices } from '@playwright/test'
@@ -151,9 +151,9 @@ export default defineConfig({
 })
 ```
 
-## Ã¤Â¸ÂÃ§Â¨Â³Ã¥Â®Å¡Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¦Â¨Â¡Ã¥Â¼Â
+## 不稳定测试模式
 
-### Ã©Å¡â€Ã§Â¦Â»
+### 隔离
 
 ```typescript
 test('flaky: complex search', async ({ page }) => {
@@ -167,16 +167,16 @@ test('conditional skip', async ({ page }) => {
 })
 ```
 
-### Ã¨Â¯â€ Ã¥Ë†Â«Ã¤Â¸ÂÃ§Â¨Â³Ã¥Â®Å¡Ã¦â‚¬Â§
+### 识别不稳定性
 
 ```bash
 npx playwright test tests/search.spec.ts --repeat-each=10
 npx playwright test tests/search.spec.ts --retries=3
 ```
 
-### Ã¥Â¸Â¸Ã¨Â§ÂÃ¥Å½Å¸Ã¥â€ºÂ Ã¤Â¸Å½Ã¤Â¿Â®Ã¥Â¤Â
+### 常见原因与修复
 
-**Ã§Â«Å¾Ã¦â‚¬ÂÃ¦ÂÂ¡Ã¤Â»Â¶Ã¯Â¼Å¡**
+**竞态条件：**
 
 ```typescript
 // Bad: assumes element is ready
@@ -186,7 +186,7 @@ await page.click('[data-testid="button"]')
 await page.locator('[data-testid="button"]').click()
 ```
 
-**Ã§Â½â€˜Ã§Â»Å“Ã¦â€”Â¶Ã¥ÂºÂÃ¯Â¼Å¡**
+**网络时序：**
 
 ```typescript
 // Bad: arbitrary timeout
@@ -196,7 +196,7 @@ await page.waitForTimeout(5000)
 await page.waitForResponse(resp => resp.url().includes('/api/data'))
 ```
 
-**Ã¥Å Â¨Ã§â€Â»Ã¦â€”Â¶Ã¥ÂºÂÃ¯Â¼Å¡**
+**动画时序：**
 
 ```typescript
 // Bad: click during animation
@@ -208,9 +208,9 @@ await page.waitForLoadState('networkidle')
 await page.locator('[data-testid="menu-item"]').click()
 ```
 
-## Ã¤ÂºÂ§Ã§â€°Â©Ã§Â®Â¡Ã§Ââ€ 
+## 产物管理
 
-### Ã¦Ë†ÂªÃ¥â€ºÂ¾
+### 截图
 
 ```typescript
 await page.screenshot({ path: 'artifacts/after-login.png' })
@@ -218,7 +218,7 @@ await page.screenshot({ path: 'artifacts/full-page.png', fullPage: true })
 await page.locator('[data-testid="chart"]').screenshot({ path: 'artifacts/chart.png' })
 ```
 
-### Ã¨Â·Å¸Ã¨Â¸ÂªÃ¨Â®Â°Ã¥Â½â€¢
+### 跟踪记录
 
 ```typescript
 await browser.startTracing(page, {
@@ -230,7 +230,7 @@ await browser.startTracing(page, {
 await browser.stopTracing()
 ```
 
-### Ã¨Â§â€ Ã©Â¢â€˜
+### 视频
 
 ```typescript
 // In playwright.config.ts
@@ -240,7 +240,7 @@ use: {
 }
 ```
 
-## CI/CD Ã©â€ºâ€ Ã¦Ë†Â
+## CI/CD 集成
 
 ```yaml
 # .github/workflows/e2e.yml
@@ -268,34 +268,34 @@ jobs:
           retention-days: 30
 ```
 
-## Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¦Å Â¥Ã¥â€˜Å Ã¦Â¨Â¡Ã¦ÂÂ¿
+## 测试报告模板
 
 ```markdown
-# E2E Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¦Å Â¥Ã¥â€˜Å 
+# E2E 测试报告
 
-**Ã¦â€”Â¥Ã¦Å“Å¸Ã¯Â¼Å¡** YYYY-MM-DD HH:MM
-**Ã¦Å’ÂÃ§Â»Â­Ã¦â€”Â¶Ã©â€”Â´Ã¯Â¼Å¡** Xm Ys
-**Ã§Å Â¶Ã¦â‚¬ÂÃ¯Â¼Å¡** Ã©â‚¬Å¡Ã¨Â¿â€¡ / Ã¥Â¤Â±Ã¨Â´Â¥
+**日期：** YYYY-MM-DD HH:MM
+**持续时间：** Xm Ys
+**状态：** 通过 / 失败
 
-## Ã¦Â¦â€šÃ¨Â¦Â
-- Ã¦â‚¬Â»Ã¨Â®Â¡Ã¯Â¼Å¡X | Ã©â‚¬Å¡Ã¨Â¿â€¡Ã¯Â¼Å¡Y (Z%) | Ã¥Â¤Â±Ã¨Â´Â¥Ã¯Â¼Å¡A | Ã¤Â¸ÂÃ§Â¨Â³Ã¥Â®Å¡Ã¯Â¼Å¡B | Ã¨Â·Â³Ã¨Â¿â€¡Ã¯Â¼Å¡C
+## 概要
+- 总计：X | 通过：Y (Z%) | 失败：A | 不稳定：B | 跳过：C
 
-## Ã¥Â¤Â±Ã¨Â´Â¥Ã§Å¡â€žÃ¦Âµâ€¹Ã¨Â¯â€¢
+## 失败的测试
 
 ### test-name
-**Ã¦â€“â€¡Ã¤Â»Â¶Ã¯Â¼Å¡** `tests/e2e/feature.spec.ts:45`
-**Ã©â€â„¢Ã¨Â¯Â¯Ã¯Â¼Å¡** Ã¦Å“Å¸Ã¦Å“â€ºÃ¥â€¦Æ’Ã§Â´Â Ã¥ÂÂ¯Ã¨Â§Â
-**Ã¦Ë†ÂªÃ¥â€ºÂ¾Ã¯Â¼Å¡** artifacts/failed.png
-**Ã¥Â»ÂºÃ¨Â®Â®Ã¤Â¿Â®Ã¥Â¤ÂÃ¯Â¼Å¡** [description]
+**文件：** `tests/e2e/feature.spec.ts:45`
+**错误：** 期望元素可见
+**截图：** artifacts/failed.png
+**建议修复：** [description]
 
-## Ã¤ÂºÂ§Ã§â€°Â©
-- HTML Ã¦Å Â¥Ã¥â€˜Å Ã¯Â¼Å¡playwright-report/index.html
-- Ã¦Ë†ÂªÃ¥â€ºÂ¾Ã¯Â¼Å¡artifacts/*.png
-- Ã¨Â§â€ Ã©Â¢â€˜Ã¯Â¼Å¡artifacts/videos/*.webm
-- Ã¨Â¿Â½Ã¨Â¸ÂªÃ¦â€“â€¡Ã¤Â»Â¶Ã¯Â¼Å¡artifacts/*.zip
+## 产物
+- HTML 报告：playwright-report/index.html
+- 截图：artifacts/*.png
+- 视频：artifacts/videos/*.webm
+- 追踪文件：artifacts/*.zip
 ```
 
-## Ã©â€™Â±Ã¥Å’â€¦ / Web3 Ã¦Âµâ€¹Ã¨Â¯â€¢
+## 钱包 / Web3 测试
 
 ```typescript
 test('wallet connection', async ({ page, context }) => {
@@ -317,11 +317,11 @@ test('wallet connection', async ({ page, context }) => {
 })
 ```
 
-## Ã©â€¡â€˜Ã¨Å¾Â / Ã¥â€¦Â³Ã©â€Â®Ã¦ÂµÂÃ§Â¨â€¹Ã¦Âµâ€¹Ã¨Â¯â€¢
+## 金融 / 关键流程测试
 
 ```typescript
 test('trade execution', async ({ page }) => {
-  // Skip on production Ã¢â‚¬â€ real money
+  // Skip on production — real money
   test.skip(process.env.NODE_ENV === 'production', 'Skip on production')
 
   await page.goto('/markets/test-market')

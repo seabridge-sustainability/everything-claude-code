@@ -58,7 +58,7 @@ function loadAdapterRegistry(repo = ROOT) {
 }
 
 function readText(file) {
-  return fs.readFileSync(file, 'utf8').replace(/^\uFEFF/, '');
+  return fs.readFileSync(file, 'utf8').replace(/^\uFEFF/, '').replace(/\r\n/g, '\n');
 }
 
 /** Remove fenced blocks and inline code so imports/paths inside them are ignored. */
@@ -341,9 +341,30 @@ const REPOS = [
   { name: 'everything-claude-code', self: true, budget: 24 * 1024 },
 ];
 
+function defaultWorkspace() {
+  if (process.env.SEABRIDGE_WORKSPACE) return process.env.SEABRIDGE_WORKSPACE;
+  const repo = path.resolve(__dirname, '..');
+  const dotGit = path.join(repo, '.git');
+  if (fs.existsSync(dotGit) && fs.statSync(dotGit).isFile()) {
+    const match = fs.readFileSync(dotGit, 'utf8').match(/^gitdir:\s*(.+)$/m);
+    if (match) {
+      let cursor = path.resolve(repo, match[1].trim());
+      while (path.basename(cursor).toLowerCase() !== '.git') {
+        const parent = path.dirname(cursor);
+        if (parent === cursor) break;
+        cursor = parent;
+      }
+      if (path.basename(cursor).toLowerCase() === '.git') {
+        return path.dirname(path.dirname(cursor));
+      }
+    }
+  }
+  return path.dirname(repo);
+}
+
 function main(argv) {
   const wsIdx = argv.indexOf('--workspace');
-  const workspace = wsIdx >= 0 ? argv[wsIdx + 1] : (process.env.SEABRIDGE_WORKSPACE || path.resolve(__dirname, '..', '..'));
+  const workspace = wsIdx >= 0 ? argv[wsIdx + 1] : defaultWorkspace();
   const all = [];
   for (const r of REPOS) {
     const repo = r.self ? path.resolve(__dirname, '..') : path.join(workspace, r.name);
@@ -360,6 +381,6 @@ function main(argv) {
   return all.some((r) => r.failures.length) ? 1 : 0;
 }
 
-module.exports = { loadAdapterRegistry, expandImports, stripCode, alwaysLoadedRules, legacyEffectiveStacks, effectiveStacks, markerBlock, canonicalBlocks, brokenPathRefs, duplicatedLines, checkRepo, REQUIRED, STALE, CODEX_CAP };
+module.exports = { loadAdapterRegistry, expandImports, stripCode, alwaysLoadedRules, legacyEffectiveStacks, effectiveStacks, markerBlock, canonicalBlocks, brokenPathRefs, duplicatedLines, checkRepo, defaultWorkspace, REQUIRED, STALE, CODEX_CAP };
 
 if (require.main === module) process.exit(main(process.argv.slice(2)));

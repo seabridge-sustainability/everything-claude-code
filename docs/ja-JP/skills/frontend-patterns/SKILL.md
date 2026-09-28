@@ -1,9 +1,9 @@
 ---
 name: frontend-patterns
-description: ReactÃ£â‚¬ÂNext.jsÃ£â‚¬ÂÃ§Å Â¶Ã¦â€¦â€¹Ã§Â®Â¡Ã§Ââ€ Ã£â‚¬ÂÃ£Æ’â€˜Ã£Æ’â€¢Ã£â€šÂ©Ã£Æ’Â¼Ã£Æ’Å¾Ã£Æ’Â³Ã£â€šÂ¹Ã¦Å“â‚¬Ã©ÂÂ©Ã¥Å’â€“Ã£â‚¬ÂUIÃ£Æ’â„¢Ã£â€šÂ¹Ã£Æ’Ë†Ã£Æ’â€”Ã£Æ’Â©Ã£â€šÂ¯Ã£Æ’â€ Ã£â€šÂ£Ã£â€šÂ¹Ã£ÂÂ®Ã£ÂÅ¸Ã£â€šÂÃ£ÂÂ®Ã£Æ’â€¢Ã£Æ’Â­Ã£Æ’Â³Ã£Æ’Ë†Ã£â€šÂ¨Ã£Æ’Â³Ã£Æ’â€°Ã©â€“â€¹Ã§â„¢ÂºÃ£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³Ã£â‚¬â€š
+description: React、Next.js、状態管理、パフォーマンス最適化、UIベストプラクティスのためのフロントエンド開発パターン。
 ---
 
-# Ã£Æ’â€¢Ã£Æ’Â­Ã£Æ’Â³Ã£Æ’Ë†Ã£â€šÂ¨Ã£Æ’Â³Ã£Æ’â€°Ã©â€“â€¹Ã§â„¢ÂºÃ£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³
+# フロントエンド開発パターン
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -20,11 +20,11 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-ReactÃ£â‚¬ÂNext.jsÃ£â‚¬ÂÃ©Â«ËœÃ¦â‚¬Â§Ã¨Æ’Â½Ã£Æ’Â¦Ã£Æ’Â¼Ã£â€šÂ¶Ã£Æ’Â¼Ã£â€šÂ¤Ã£Æ’Â³Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’â€¢Ã£â€šÂ§Ã£Æ’Â¼Ã£â€šÂ¹Ã£ÂÂ®Ã£ÂÅ¸Ã£â€šÂÃ£ÂÂ®Ã£Æ’Â¢Ã£Æ’â‚¬Ã£Æ’Â³Ã£ÂÂªÃ£Æ’â€¢Ã£Æ’Â­Ã£Æ’Â³Ã£Æ’Ë†Ã£â€šÂ¨Ã£Æ’Â³Ã£Æ’â€°Ã£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³Ã£â‚¬â€š
+React、Next.js、高性能ユーザーインターフェースのためのモダンなフロントエンドパターン。
 
-## Ã£â€šÂ³Ã£Æ’Â³Ã£Æ’ÂÃ£Æ’Â¼Ã£Æ’ÂÃ£Æ’Â³Ã£Æ’Ë†Ã£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³
+## コンポーネントパターン
 
-### Ã§Â¶â„¢Ã¦â€°Â¿Ã£â€šË†Ã£â€šÅ Ã£â€šÂ³Ã£Æ’Â³Ã£Æ’ÂÃ£â€šÂ¸Ã£â€šÂ·Ã£Æ’Â§Ã£Æ’Â³
+### 継承よりコンポジション
 
 ```typescript
 // PASS: GOOD: Component composition
@@ -52,7 +52,7 @@ export function CardBody({ children }: { children: React.ReactNode }) {
 </Card>
 ```
 
-### Ã¨Â¤â€¡Ã¥ÂË†Ã£â€šÂ³Ã£Æ’Â³Ã£Æ’ÂÃ£Æ’Â¼Ã£Æ’ÂÃ£Æ’Â³Ã£Æ’Ë†
+### 複合コンポーネント
 
 ```typescript
 interface TabsContextValue {
@@ -102,7 +102,7 @@ export function Tab({ id, children }: { id: string, children: React.ReactNode })
 </Tabs>
 ```
 
-### Ã£Æ’Â¬Ã£Æ’Â³Ã£Æ’â‚¬Ã£Æ’Â¼Ã£Æ’â€”Ã£Æ’Â­Ã£Æ’Æ’Ã£Æ’â€”Ã£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³
+### レンダープロップパターン
 
 ```typescript
 interface DataLoaderProps<T> {
@@ -136,9 +136,9 @@ export function DataLoader<T>({ url, children }: DataLoaderProps<T>) {
 </DataLoader>
 ```
 
-## Ã£â€šÂ«Ã£â€šÂ¹Ã£â€šÂ¿Ã£Æ’Â Ã£Æ’â€¢Ã£Æ’Æ’Ã£â€šÂ¯Ã£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³
+## カスタムフックパターン
 
-### Ã§Å Â¶Ã¦â€¦â€¹Ã§Â®Â¡Ã§Ââ€ Ã£Æ’â€¢Ã£Æ’Æ’Ã£â€šÂ¯
+### 状態管理フック
 
 ```typescript
 export function useToggle(initialValue = false): [boolean, () => void] {
@@ -155,7 +155,7 @@ export function useToggle(initialValue = false): [boolean, () => void] {
 const [isOpen, toggleOpen] = useToggle()
 ```
 
-### Ã©ÂÅ¾Ã¥ÂÅ’Ã¦Å“Å¸Ã£Æ’â€¡Ã£Æ’Â¼Ã£â€šÂ¿Ã¥Ââ€“Ã¥Â¾â€”Ã£Æ’â€¢Ã£Æ’Æ’Ã£â€šÂ¯
+### 非同期データ取得フック
 
 ```typescript
 interface UseQueryOptions<T> {
@@ -223,7 +223,7 @@ const { data: markets, loading, error, refetch } = useQuery(
 )
 ```
 
-### Ã£Æ’â€¡Ã£Æ’ÂÃ£â€šÂ¦Ã£Æ’Â³Ã£â€šÂ¹Ã£Æ’â€¢Ã£Æ’Æ’Ã£â€šÂ¯
+### デバウンスフック
 
 ```typescript
 export function useDebounce<T>(value: T, delay: number): T {
@@ -251,9 +251,9 @@ useEffect(() => {
 }, [debouncedQuery])
 ```
 
-## Ã§Å Â¶Ã¦â€¦â€¹Ã§Â®Â¡Ã§Ââ€ Ã£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³
+## 状態管理パターン
 
-### Context + ReducerÃ£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³
+### Context + Reducerパターン
 
 ```typescript
 interface State {
@@ -306,9 +306,9 @@ export function useMarkets() {
 }
 ```
 
-## Ã£Æ’â€˜Ã£Æ’â€¢Ã£â€šÂ©Ã£Æ’Â¼Ã£Æ’Å¾Ã£Æ’Â³Ã£â€šÂ¹Ã¦Å“â‚¬Ã©ÂÂ©Ã¥Å’â€“
+## パフォーマンス最適化
 
-### Ã£Æ’Â¡Ã£Æ’Â¢Ã¥Å’â€“
+### メモ化
 
 ```typescript
 // PASS: useMemo for expensive computations
@@ -333,7 +333,7 @@ export const MarketCard = React.memo<MarketCardProps>(({ market }) => {
 })
 ```
 
-### Ã£â€šÂ³Ã£Æ’Â¼Ã£Æ’â€°Ã¥Ë†â€ Ã¥â€°Â²Ã£ÂÂ¨Ã©Ââ€¦Ã¥Â»Â¶Ã¨ÂªÂ­Ã£ÂÂ¿Ã¨Â¾Â¼Ã£ÂÂ¿
+### コード分割と遅延読み込み
 
 ```typescript
 import { lazy, Suspense } from 'react'
@@ -357,7 +357,7 @@ export function Dashboard() {
 }
 ```
 
-### Ã©â€¢Â·Ã£Ââ€žÃ£Æ’ÂªÃ£â€šÂ¹Ã£Æ’Ë†Ã£ÂÂ®Ã¤Â»Â®Ã¦Æ’Â³Ã¥Å’â€“
+### 長いリストの仮想化
 
 ```typescript
 import { useVirtualizer } from '@tanstack/react-virtual'
@@ -401,9 +401,9 @@ export function VirtualMarketList({ markets }: { markets: Market[] }) {
 }
 ```
 
-## Ã£Æ’â€¢Ã£â€šÂ©Ã£Æ’Â¼Ã£Æ’Â Ã¥â€¡Â¦Ã§Ââ€ Ã£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³
+## フォーム処理パターン
 
-### Ã£Æ’ÂÃ£Æ’ÂªÃ£Æ’â€¡Ã£Æ’Â¼Ã£â€šÂ·Ã£Æ’Â§Ã£Æ’Â³Ã¤Â»ËœÃ£ÂÂÃ¥Ë†Â¶Ã¥Â¾Â¡Ã£Æ’â€¢Ã£â€šÂ©Ã£Æ’Â¼Ã£Æ’Â 
+### バリデーション付き制御フォーム
 
 ```typescript
 interface FormData {
@@ -478,7 +478,7 @@ export function CreateMarketForm() {
 }
 ```
 
-## Ã£â€šÂ¨Ã£Æ’Â©Ã£Æ’Â¼Ã£Æ’ÂÃ£â€šÂ¦Ã£Æ’Â³Ã£Æ’â‚¬Ã£Æ’ÂªÃ£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³
+## エラーバウンダリパターン
 
 ```typescript
 interface ErrorBoundaryState {
@@ -526,9 +526,9 @@ export class ErrorBoundary extends React.Component<
 </ErrorBoundary>
 ```
 
-## Ã£â€šÂ¢Ã£Æ’â€¹Ã£Æ’Â¡Ã£Æ’Â¼Ã£â€šÂ·Ã£Æ’Â§Ã£Æ’Â³Ã£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³
+## アニメーションパターン
 
-### Framer MotionÃ£â€šÂ¢Ã£Æ’â€¹Ã£Æ’Â¡Ã£Æ’Â¼Ã£â€šÂ·Ã£Æ’Â§Ã£Æ’Â³
+### Framer Motionアニメーション
 
 ```typescript
 import { motion, AnimatePresence } from 'framer-motion'
@@ -580,9 +580,9 @@ export function Modal({ isOpen, onClose, children }: ModalProps) {
 }
 ```
 
-## Ã£â€šÂ¢Ã£â€šÂ¯Ã£â€šÂ»Ã£â€šÂ·Ã£Æ’â€œÃ£Æ’ÂªÃ£Æ’â€ Ã£â€šÂ£Ã£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³
+## アクセシビリティパターン
 
-### Ã£â€šÂ­Ã£Æ’Â¼Ã£Æ’Å“Ã£Æ’Â¼Ã£Æ’â€°Ã£Æ’Å Ã£Æ’â€œÃ£â€šÂ²Ã£Æ’Â¼Ã£â€šÂ·Ã£Æ’Â§Ã£Æ’Â³
+### キーボードナビゲーション
 
 ```typescript
 export function Dropdown({ options, onSelect }: DropdownProps) {
@@ -623,7 +623,7 @@ export function Dropdown({ options, onSelect }: DropdownProps) {
 }
 ```
 
-### Ã£Æ’â€¢Ã£â€šÂ©Ã£Æ’Â¼Ã£â€šÂ«Ã£â€šÂ¹Ã§Â®Â¡Ã§Ââ€ 
+### フォーカス管理
 
 ```typescript
 export function Modal({ isOpen, onClose, children }: ModalProps) {
@@ -657,4 +657,4 @@ export function Modal({ isOpen, onClose, children }: ModalProps) {
 }
 ```
 
-**Ã¨Â¦Å¡Ã£ÂË†Ã£ÂÂ¦Ã£ÂÅ Ã£Ââ€žÃ£ÂÂ¦Ã£ÂÂÃ£ÂÂ Ã£Ââ€¢Ã£Ââ€ž**: Ã£Æ’Â¢Ã£Æ’â‚¬Ã£Æ’Â³Ã£ÂÂªÃ£Æ’â€¢Ã£Æ’Â­Ã£Æ’Â³Ã£Æ’Ë†Ã£â€šÂ¨Ã£Æ’Â³Ã£Æ’â€°Ã£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³Ã£ÂÂ«Ã£â€šË†Ã£â€šÅ Ã£â‚¬ÂÃ¤Â¿ÂÃ¥Â®Ë†Ã¥ÂÂ¯Ã¨Æ’Â½Ã£ÂÂ§Ã©Â«ËœÃ¦â‚¬Â§Ã¨Æ’Â½Ã£ÂÂªÃ£Æ’Â¦Ã£Æ’Â¼Ã£â€šÂ¶Ã£Æ’Â¼Ã£â€šÂ¤Ã£Æ’Â³Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’â€¢Ã£â€šÂ§Ã£Æ’Â¼Ã£â€šÂ¹Ã£â€šâ€™Ã¥Â®Å¸Ã¨Â£â€¦Ã£ÂÂ§Ã£ÂÂÃ£ÂÂ¾Ã£Ââ„¢Ã£â‚¬â€šÃ£Æ’â€”Ã£Æ’Â­Ã£â€šÂ¸Ã£â€šÂ§Ã£â€šÂ¯Ã£Æ’Ë†Ã£ÂÂ®Ã¨Â¤â€¡Ã©â€ºâ€˜Ã£Ââ€¢Ã£ÂÂ«Ã©ÂÂ©Ã£Ââ€”Ã£ÂÅ¸Ã£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³Ã£â€šâ€™Ã©ÂÂ¸Ã¦Å Å¾Ã£Ââ€”Ã£ÂÂ¦Ã£ÂÂÃ£ÂÂ Ã£Ââ€¢Ã£Ââ€žÃ£â‚¬â€š
+**覚えておいてください**: モダンなフロントエンドパターンにより、保守可能で高性能なユーザーインターフェースを実装できます。プロジェクトの複雑さに適したパターンを選択してください。

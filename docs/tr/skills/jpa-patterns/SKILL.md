@@ -1,10 +1,10 @@
 ---
 name: jpa-patterns
-description: Spring Boot'ta entity tasarÃ„Â±mÃ„Â±, iliÃ…Å¸kiler, sorgu optimizasyonu, transaction'lar, auditing, indeksleme, sayfalama ve pooling iÃƒÂ§in JPA/Hibernate kalÃ„Â±plarÃ„Â±.
+description: Spring Boot'ta entity tasarımı, ilişkiler, sorgu optimizasyonu, transaction'lar, auditing, indeksleme, sayfalama ve pooling için JPA/Hibernate kalıpları.
 origin: ECC
 ---
 
-# JPA/Hibernate KalÃ„Â±plarÃ„Â±
+# JPA/Hibernate Kalıpları
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -21,18 +21,18 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-Spring Boot'ta veri modelleme, repository'ler ve performans ayarlamasÃ„Â± iÃƒÂ§in kullanÃ„Â±n.
+Spring Boot'ta veri modelleme, repository'ler ve performans ayarlaması için kullanın.
 
-## Ne Zaman AktifleÃ…Å¸tirmeli
+## Ne Zaman Aktifleştirmeli
 
-- JPA entity'leri ve tablo eÃ…Å¸lemelerini tasarlarken
-- Ã„Â°liÃ…Å¸kileri tanÃ„Â±mlarken (@OneToMany, @ManyToOne, @ManyToMany)
-- SorgularÃ„Â± optimize ederken (N+1 ÃƒÂ¶nleme, fetch stratejileri, projections)
-- Transaction'larÃ„Â±, auditing'i veya soft delete'leri yapÃ„Â±landÃ„Â±rÃ„Â±rken
-- Sayfalama, sÃ„Â±ralama veya ÃƒÂ¶zel repository metodlarÃ„Â± kurarken
+- JPA entity'leri ve tablo eşlemelerini tasarlarken
+- İlişkileri tanımlarken (@OneToMany, @ManyToOne, @ManyToMany)
+- Sorguları optimize ederken (N+1 önleme, fetch stratejileri, projections)
+- Transaction'ları, auditing'i veya soft delete'leri yapılandırırken
+- Sayfalama, sıralama veya özel repository metodları kurarken
 - Connection pooling (HikariCP) veya second-level caching ayarlarken
 
-## Entity TasarÃ„Â±mÃ„Â±
+## Entity Tasarımı
 
 ```java
 @Entity
@@ -58,29 +58,29 @@ public class MarketEntity {
 }
 ```
 
-Auditing'i etkinleÃ…Å¸tir:
+Auditing'i etkinleştir:
 ```java
 @Configuration
 @EnableJpaAuditing
 class JpaConfig {}
 ```
 
-## Ã„Â°liÃ…Å¸kiler ve N+1 Ãƒâ€“nleme
+## İlişkiler ve N+1 Önleme
 
 ```java
 @OneToMany(mappedBy = "market", cascade = CascadeType.ALL, orphanRemoval = true)
 private List<PositionEntity> positions = new ArrayList<>();
 ```
 
-- VarsayÃ„Â±lan olarak lazy loading; gerektiÃ„Å¸inde sorgularda `JOIN FETCH` kullan
-- Koleksiyonlarda `EAGER` kullanmaktan kaÃƒÂ§Ã„Â±n; okuma yollarÃ„Â± iÃƒÂ§in DTO projections kullan
+- Varsayılan olarak lazy loading; gerektiğinde sorgularda `JOIN FETCH` kullan
+- Koleksiyonlarda `EAGER` kullanmaktan kaçın; okuma yolları için DTO projections kullan
 
 ```java
 @Query("select m from MarketEntity m left join fetch m.positions where m.id = :id")
 Optional<MarketEntity> findWithPositions(@Param("id") Long id);
 ```
 
-## Repository KalÃ„Â±plarÃ„Â±
+## Repository Kalıpları
 
 ```java
 public interface MarketRepository extends JpaRepository<MarketEntity, Long> {
@@ -91,7 +91,7 @@ public interface MarketRepository extends JpaRepository<MarketEntity, Long> {
 }
 ```
 
-- Hafif sorgular iÃƒÂ§in projections kullan:
+- Hafif sorgular için projections kullan:
 ```java
 public interface MarketSummary {
   Long getId();
@@ -103,9 +103,9 @@ Page<MarketSummary> findAllBy(Pageable pageable);
 
 ## Transaction'lar
 
-- Servis metodlarÃ„Â±nÃ„Â± `@Transactional` ile iÃ…Å¸aretle
-- Okuma yollarÃ„Â±nÃ„Â± optimize etmek iÃƒÂ§in `@Transactional(readOnly = true)` kullan
-- Propagation'Ã„Â± dikkatle seÃƒÂ§; uzun sÃƒÂ¼reli transaction'lardan kaÃƒÂ§Ã„Â±n
+- Servis metodlarını `@Transactional` ile işaretle
+- Okuma yollarını optimize etmek için `@Transactional(readOnly = true)` kullan
+- Propagation'ı dikkatle seç; uzun süreli transaction'lardan kaçın
 
 ```java
 @Transactional
@@ -124,18 +124,18 @@ PageRequest page = PageRequest.of(pageNumber, pageSize, Sort.by("createdAt").des
 Page<MarketEntity> markets = repo.findByStatus(MarketStatus.ACTIVE, page);
 ```
 
-Cursor benzeri sayfalama iÃƒÂ§in, sÃ„Â±ralama ile birlikte JPQL'de `id > :lastId` ekle.
+Cursor benzeri sayfalama için, sıralama ile birlikte JPQL'de `id > :lastId` ekle.
 
-## Ã„Â°ndeksleme ve Performans
+## İndeksleme ve Performans
 
-- YaygÃ„Â±n filtreler iÃƒÂ§in indeksler ekle (`status`, `slug`, foreign key'ler)
-- Sorgu kalÃ„Â±plarÃ„Â±na uyan composite indeksler kullan (`status, created_at`)
-- `select *` kullanmaktan kaÃƒÂ§Ã„Â±n; sadece gerekli sÃƒÂ¼tunlarÃ„Â± project et
-- `saveAll` ve `hibernate.jdbc.batch_size` ile yazmalarÃ„Â± batch'le
+- Yaygın filtreler için indeksler ekle (`status`, `slug`, foreign key'ler)
+- Sorgu kalıplarına uyan composite indeksler kullan (`status, created_at`)
+- `select *` kullanmaktan kaçın; sadece gerekli sütunları project et
+- `saveAll` ve `hibernate.jdbc.batch_size` ile yazmaları batch'le
 
 ## Connection Pooling (HikariCP)
 
-Ãƒâ€“nerilen ÃƒÂ¶zellikler:
+Önerilen özellikler:
 ```
 spring.datasource.hikari.maximum-pool-size=20
 spring.datasource.hikari.minimum-idle=5
@@ -143,24 +143,24 @@ spring.datasource.hikari.connection-timeout=30000
 spring.datasource.hikari.validation-timeout=5000
 ```
 
-PostgreSQL LOB iÃ…Å¸leme iÃƒÂ§in ekle:
+PostgreSQL LOB işleme için ekle:
 ```
 spring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation=true
 ```
 
 ## Caching
 
-- 1st-level cache EntityManager baÃ…Å¸Ã„Â±na; transaction'lar arasÃ„Â± entity'leri tutmaktan kaÃƒÂ§Ã„Â±n
-- Okuma aÃ„Å¸Ã„Â±rlÃ„Â±klÃ„Â± entity'ler iÃƒÂ§in second-level cache'i dikkatle dÃƒÂ¼Ã…Å¸ÃƒÂ¼n; eviction stratejisini doÃ„Å¸rula
+- 1st-level cache EntityManager başına; transaction'lar arası entity'leri tutmaktan kaçın
+- Okuma ağırlıklı entity'ler için second-level cache'i dikkatle düşün; eviction stratejisini doğrula
 
 ## Migration'lar
 
-- Flyway veya Liquibase kullan; ÃƒÂ¼retimde Hibernate auto DDL'ye asla gÃƒÂ¼venme
-- Migration'larÃ„Â± idempotent ve ekleyici tut; plan olmadan sÃƒÂ¼tun kaldÃ„Â±rmaktan kaÃƒÂ§Ã„Â±n
+- Flyway veya Liquibase kullan; üretimde Hibernate auto DDL'ye asla güvenme
+- Migration'ları idempotent ve ekleyici tut; plan olmadan sütun kaldırmaktan kaçın
 
-## Veri EriÃ…Å¸imi Testi
+## Veri Erişimi Testi
 
-- ÃƒÅ“retimi yansÃ„Â±tmak iÃƒÂ§in Testcontainers ile `@DataJpaTest` tercih et
-- LoglarÃ„Â± kullanarak SQL verimliliÃ„Å¸ini assert et: parametre deÃ„Å¸erleri iÃƒÂ§in `logging.level.org.hibernate.SQL=DEBUG` ve `logging.level.org.hibernate.orm.jdbc.bind=TRACE` ayarla
+- Üretimi yansıtmak için Testcontainers ile `@DataJpaTest` tercih et
+- Logları kullanarak SQL verimliliğini assert et: parametre değerleri için `logging.level.org.hibernate.SQL=DEBUG` ve `logging.level.org.hibernate.orm.jdbc.bind=TRACE` ayarla
 
-**HatÃ„Â±rla**: Entity'leri yalÃ„Â±n, sorgularÃ„Â± kasÃ„Â±tlÃ„Â± ve transaction'larÃ„Â± kÃ„Â±sa tut. Fetch stratejileri ve projections ile N+1'i ÃƒÂ¶nle, ve okuma/yazma yollarÃ„Â±n iÃƒÂ§in indeksle.
+**Hatırla**: Entity'leri yalın, sorguları kasıtlı ve transaction'ları kısa tut. Fetch stratejileri ve projections ile N+1'i önle, ve okuma/yazma yolların için indeksle.

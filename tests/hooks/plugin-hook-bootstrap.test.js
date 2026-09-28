@@ -438,7 +438,7 @@ process.exit(7);
         console.log('  SKIP 2 Windows .sh fallback tests: bash.exe is unavailable');
       }
 
-      if (test('shell mode emits skip warning for .sh script when no bash found on Windows', () => {
+      if (test('shell mode handles .sh scripts when PATH excludes bash', () => {
       const root = createTempDir();
       try {
         writeFile(root, path.join('scripts', 'hook.sh'), 'printf unreachable\n');
@@ -454,12 +454,20 @@ process.exit(7);
         });
 
         assert.strictEqual(result.status, 0);
-        assert.strictEqual(result.stdout, '');
-        assert.ok(
-          result.stderr.includes('no bash binary found') ||
-          result.stderr.includes('shell runtime unavailable'),
-          `unexpected stderr: ${result.stderr}`
-        );
+        const fixedGitBash = [
+          'C:\\Program Files\\Git\\bin\\bash.exe',
+          'C:\\Program Files\\Git\\usr\\bin\\bash.exe'
+        ].some(candidate => fs.existsSync(candidate));
+        if (fixedGitBash) {
+          assert.strictEqual(result.stdout, 'unreachable');
+        } else {
+          assert.strictEqual(result.stdout, '');
+          assert.ok(
+            result.stderr.includes('no bash binary found') ||
+            result.stderr.includes('shell runtime unavailable'),
+            `unexpected stderr: ${result.stderr}`
+          );
+        }
       } finally {
         cleanup(root);
       }

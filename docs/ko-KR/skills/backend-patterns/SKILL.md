@@ -1,10 +1,10 @@
 ---
 name: backend-patterns
-description: Node.js, Express, Next.js API Ã«ÂÂ¼Ã¬Å¡Â°Ã­Å Â¸Ã«Â¥Â¼ Ã¬Å“â€žÃ­â€¢Å“ Ã«Â°Â±Ã¬â€”â€Ã«â€œÅ“ Ã¬â€¢â€žÃ­â€šÂ¤Ã­â€¦ÂÃ¬Â²Ëœ Ã­Å’Â¨Ã­â€žÂ´, API Ã¬â€žÂ¤ÃªÂ³â€ž, Ã«ÂÂ°Ã¬ÂÂ´Ã­â€žÂ°Ã«Â²Â Ã¬ÂÂ´Ã¬Å Â¤ Ã¬ÂµÅ“Ã¬Â ÂÃ­â„¢â€ Ã«Â°Â Ã¬â€žÅ“Ã«Â²â€ž Ã¬â€šÂ¬Ã¬ÂÂ´Ã«â€œÅ“ Ã«ÂªÂ¨Ã«Â²â€ Ã¬â€šÂ¬Ã«Â¡â‚¬.
+description: Node.js, Express, Next.js API 라우트를 위한 백엔드 아키텍처 패턴, API 설계, 데이터베이스 최적화 및 서버 사이드 모범 사례.
 origin: ECC
 ---
 
-# Ã«Â°Â±Ã¬â€”â€Ã«â€œÅ“ ÃªÂ°Å“Ã«Â°Å“ Ã­Å’Â¨Ã­â€žÂ´
+# 백엔드 개발 패턴
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -21,21 +21,21 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-Ã­â„¢â€¢Ã¬Å¾Â¥ ÃªÂ°â‚¬Ã«Å Â¥Ã­â€¢Å“ Ã¬â€žÅ“Ã«Â²â€ž Ã¬â€šÂ¬Ã¬ÂÂ´Ã«â€œÅ“ Ã¬â€¢Â Ã­â€Å’Ã«Â¦Â¬Ã¬Â¼â‚¬Ã¬ÂÂ´Ã¬â€¦ËœÃ¬Ââ€ž Ã¬Å“â€žÃ­â€¢Å“ Ã«Â°Â±Ã¬â€”â€Ã«â€œÅ“ Ã¬â€¢â€žÃ­â€šÂ¤Ã­â€¦ÂÃ¬Â²Ëœ Ã­Å’Â¨Ã­â€žÂ´ÃªÂ³Â¼ Ã«ÂªÂ¨Ã«Â²â€ Ã¬â€šÂ¬Ã«Â¡â‚¬.
+확장 가능한 서버 사이드 애플리케이션을 위한 백엔드 아키텍처 패턴과 모범 사례.
 
-## Ã­â„¢Å“Ã¬â€žÂ±Ã­â„¢â€ Ã¬â€¹Å“Ã¬Â Â
+## 활성화 시점
 
-- REST Ã«ËœÂÃ«Å â€ GraphQL API Ã¬â€”â€Ã«â€œÅ“Ã­ÂÂ¬Ã¬ÂÂ¸Ã­Å Â¸Ã«Â¥Â¼ Ã¬â€žÂ¤ÃªÂ³â€žÃ­â€¢Â  Ã«â€¢Å’
-- Repository, Service Ã«ËœÂÃ«Å â€ Controller Ã«Â Ë†Ã¬ÂÂ´Ã¬â€“Â´Ã«Â¥Â¼ ÃªÂµÂ¬Ã­Ëœâ€žÃ­â€¢Â  Ã«â€¢Å’
-- Ã«ÂÂ°Ã¬ÂÂ´Ã­â€žÂ°Ã«Â²Â Ã¬ÂÂ´Ã¬Å Â¤ Ã¬Â¿Â¼Ã«Â¦Â¬Ã«Â¥Â¼ Ã¬ÂµÅ“Ã¬Â ÂÃ­â„¢â€Ã­â€¢Â  Ã«â€¢Å’ (N+1, Ã¬ÂÂ¸Ã«ÂÂ±Ã¬â€¹Â±, Ã¬Â»Â¤Ã«â€žÂ¥Ã¬â€¦Ëœ Ã­â€™â‚¬Ã«Â§Â)
-- Ã¬ÂºÂÃ¬â€¹Â±Ã¬Ââ€ž Ã¬Â¶â€ÃªÂ°â‚¬Ã­â€¢Â  Ã«â€¢Å’ (Redis, Ã¬ÂÂ¸Ã«Â©â€Ã«ÂªÂ¨Ã«Â¦Â¬, HTTP Ã¬ÂºÂÃ¬â€¹Å“ Ã­â€”Â¤Ã«Ââ€)
-- Ã«Â°Â±ÃªÂ·Â¸Ã«ÂÂ¼Ã¬Å¡Â´Ã«â€œÅ“ Ã¬Å¾â€˜Ã¬â€”â€¦Ã¬ÂÂ´Ã«â€šËœ Ã«Â¹â€žÃ«Ââ„¢ÃªÂ¸Â° Ã¬Â²ËœÃ«Â¦Â¬Ã«Â¥Â¼ Ã¬â€žÂ¤Ã¬Â â€¢Ã­â€¢Â  Ã«â€¢Å’
-- APIÃ«Â¥Â¼ Ã¬Å“â€žÃ­â€¢Å“ Ã¬â€”ÂÃ«Å¸Â¬ Ã¬Â²ËœÃ«Â¦Â¬ Ã«Â°Â Ã¬Å“Â Ã­Å¡Â¨Ã¬â€žÂ± ÃªÂ²â‚¬Ã¬â€šÂ¬Ã«Â¥Â¼ ÃªÂµÂ¬Ã¬Â¡Â°Ã­â„¢â€Ã­â€¢Â  Ã«â€¢Å’
-- Ã«Â¯Â¸Ã«â€œÂ¤Ã¬â€ºÂ¨Ã¬â€“Â´Ã«Â¥Â¼ ÃªÂµÂ¬Ã¬Â¶â€¢Ã­â€¢Â  Ã«â€¢Å’ (Ã¬ÂÂ¸Ã¬Â¦Â, Ã«Â¡Å“ÃªÂ¹â€¦, Ã¬Å¡â€Ã¬Â²Â­ Ã¬Â Å“Ã­â€¢Å“)
+- REST 또는 GraphQL API 엔드포인트를 설계할 때
+- Repository, Service 또는 Controller 레이어를 구현할 때
+- 데이터베이스 쿼리를 최적화할 때 (N+1, 인덱싱, 커넥션 풀링)
+- 캐싱을 추가할 때 (Redis, 인메모리, HTTP 캐시 헤더)
+- 백그라운드 작업이나 비동기 처리를 설정할 때
+- API를 위한 에러 처리 및 유효성 검사를 구조화할 때
+- 미들웨어를 구축할 때 (인증, 로깅, 요청 제한)
 
-## API Ã¬â€žÂ¤ÃªÂ³â€ž Ã­Å’Â¨Ã­â€žÂ´
+## API 설계 패턴
 
-### RESTful API ÃªÂµÂ¬Ã¬Â¡Â°
+### RESTful API 구조
 
 ```typescript
 // PASS: Resource-based URLs
@@ -50,7 +50,7 @@ DELETE /api/markets/:id             # Delete resource
 GET /api/markets?status=active&sort=volume&limit=20&offset=0
 ```
 
-### Repository Ã­Å’Â¨Ã­â€žÂ´
+### Repository 패턴
 
 ```typescript
 // Abstract data access logic
@@ -85,7 +85,7 @@ class SupabaseMarketRepository implements MarketRepository {
 }
 ```
 
-### Service Ã«Â Ë†Ã¬ÂÂ´Ã¬â€“Â´ Ã­Å’Â¨Ã­â€žÂ´
+### Service 레이어 패턴
 
 ```typescript
 // Business logic separated from data access
@@ -114,7 +114,7 @@ class MarketService {
 }
 ```
 
-### Ã«Â¯Â¸Ã«â€œÂ¤Ã¬â€ºÂ¨Ã¬â€“Â´ Ã­Å’Â¨Ã­â€žÂ´
+### 미들웨어 패턴
 
 ```typescript
 // Request/response processing pipeline
@@ -142,9 +142,9 @@ export default withAuth(async (req, res) => {
 })
 ```
 
-## Ã«ÂÂ°Ã¬ÂÂ´Ã­â€žÂ°Ã«Â²Â Ã¬ÂÂ´Ã¬Å Â¤ Ã­Å’Â¨Ã­â€žÂ´
+## 데이터베이스 패턴
 
-### Ã¬Â¿Â¼Ã«Â¦Â¬ Ã¬ÂµÅ“Ã¬Â ÂÃ­â„¢â€
+### 쿼리 최적화
 
 ```typescript
 // PASS: GOOD: Select only needed columns
@@ -161,7 +161,7 @@ const { data } = await supabase
   .select('*')
 ```
 
-### N+1 Ã¬Â¿Â¼Ã«Â¦Â¬ Ã«Â°Â©Ã¬Â§â‚¬
+### N+1 쿼리 방지
 
 ```typescript
 // FAIL: BAD: N+1 query problem
@@ -181,7 +181,7 @@ markets.forEach(market => {
 })
 ```
 
-### Ã­Å Â¸Ã«Å¾Å“Ã¬Å¾Â­Ã¬â€¦Ëœ Ã­Å’Â¨Ã­â€žÂ´
+### 트랜잭션 패턴
 
 ```typescript
 async function createMarketWithPosition(
@@ -219,9 +219,9 @@ END;
 $$;
 ```
 
-## Ã¬ÂºÂÃ¬â€¹Â± Ã¬Â â€žÃ«Å¾Âµ
+## 캐싱 전략
 
-### Redis Ã¬ÂºÂÃ¬â€¹Â± Ã«Â Ë†Ã¬ÂÂ´Ã¬â€“Â´
+### Redis 캐싱 레이어
 
 ```typescript
 class CachedMarketRepository implements MarketRepository {
@@ -255,7 +255,7 @@ class CachedMarketRepository implements MarketRepository {
 }
 ```
 
-### Cache-Aside Ã­Å’Â¨Ã­â€žÂ´
+### Cache-Aside 패턴
 
 ```typescript
 async function getMarketWithCache(id: string): Promise<Market> {
@@ -277,9 +277,9 @@ async function getMarketWithCache(id: string): Promise<Market> {
 }
 ```
 
-## Ã¬â€”ÂÃ«Å¸Â¬ Ã¬Â²ËœÃ«Â¦Â¬ Ã­Å’Â¨Ã­â€žÂ´
+## 에러 처리 패턴
 
-### Ã¬Â¤â€˜Ã¬â€¢â„¢Ã­â„¢â€Ã«ÂÅ“ Ã¬â€”ÂÃ«Å¸Â¬ Ã­â€¢Â¸Ã«â€œÂ¤Ã«Å¸Â¬
+### 중앙화된 에러 핸들러
 
 ```typescript
 class ApiError extends Error {
@@ -329,7 +329,7 @@ export async function GET(request: Request) {
 }
 ```
 
-### Ã¬Â§â‚¬Ã¬Ë†Ëœ Ã«Â°Â±Ã¬ËœÂ¤Ã­â€â€žÃ«Â¥Â¼ Ã¬ÂÂ´Ã¬Å¡Â©Ã­â€¢Å“ Ã¬Å¾Â¬Ã¬â€¹Å“Ã«Ââ€ž
+### 지수 백오프를 이용한 재시도
 
 ```typescript
 async function fetchWithRetry<T>(
@@ -359,9 +359,9 @@ async function fetchWithRetry<T>(
 const data = await fetchWithRetry(() => fetchFromAPI())
 ```
 
-## Ã¬ÂÂ¸Ã¬Â¦Â Ã«Â°Â Ã¬ÂÂ¸ÃªÂ°â‚¬
+## 인증 및 인가
 
-### JWT Ã­â€ Â Ã­ÂÂ° ÃªÂ²â‚¬Ã¬Â¦Â
+### JWT 토큰 검증
 
 ```typescript
 import jwt from 'jsonwebtoken'
@@ -401,7 +401,7 @@ export async function GET(request: Request) {
 }
 ```
 
-### Ã¬â€”Â­Ã­â€¢Â  ÃªÂ¸Â°Ã«Â°Ëœ Ã¬Â â€˜ÃªÂ·Â¼ Ã¬Â Å“Ã¬â€“Â´
+### 역할 기반 접근 제어
 
 ```typescript
 type Permission = 'read' | 'write' | 'delete' | 'admin'
@@ -444,9 +444,9 @@ export const DELETE = requirePermission('delete')(
 )
 ```
 
-## Ã¬Å¡â€Ã¬Â²Â­ Ã¬Â Å“Ã­â€¢Å“
+## 요청 제한
 
-### ÃªÂ°â€žÃ«â€¹Â¨Ã­â€¢Å“ Ã¬ÂÂ¸Ã«Â©â€Ã«ÂªÂ¨Ã«Â¦Â¬ Ã¬Å¡â€Ã¬Â²Â­ Ã¬Â Å“Ã­â€¢Å“ÃªÂ¸Â°
+### 간단한 인메모리 요청 제한기
 
 ```typescript
 class RateLimiter {
@@ -492,9 +492,9 @@ export async function GET(request: Request) {
 }
 ```
 
-## Ã«Â°Â±ÃªÂ·Â¸Ã«ÂÂ¼Ã¬Å¡Â´Ã«â€œÅ“ Ã¬Å¾â€˜Ã¬â€”â€¦ Ã«Â°Â Ã­ÂÂ
+## 백그라운드 작업 및 큐
 
-### ÃªÂ°â€žÃ«â€¹Â¨Ã­â€¢Å“ Ã­ÂÂ Ã­Å’Â¨Ã­â€žÂ´
+### 간단한 큐 패턴
 
 ```typescript
 class JobQueue<T> {
@@ -547,9 +547,9 @@ export async function POST(request: Request) {
 }
 ```
 
-## Ã«Â¡Å“ÃªÂ¹â€¦ Ã«Â°Â Ã«ÂªÂ¨Ã«â€¹Ë†Ã­â€žÂ°Ã«Â§Â
+## 로깅 및 모니터링
 
-### ÃªÂµÂ¬Ã¬Â¡Â°Ã­â„¢â€Ã«ÂÅ“ Ã«Â¡Å“ÃªÂ¹â€¦
+### 구조화된 로깅
 
 ```typescript
 interface LogContext {
@@ -611,4 +611,4 @@ export async function GET(request: Request) {
 }
 ```
 
-**ÃªÂ¸Â°Ã¬â€“ÂµÃ­â€¢ËœÃ¬â€žÂ¸Ã¬Å¡â€**: Ã«Â°Â±Ã¬â€”â€Ã«â€œÅ“ Ã­Å’Â¨Ã­â€žÂ´Ã¬Ââ‚¬ Ã­â„¢â€¢Ã¬Å¾Â¥ ÃªÂ°â‚¬Ã«Å Â¥Ã­â€¢ËœÃªÂ³Â  Ã¬Å“Â Ã¬Â§â‚¬Ã«Â³Â´Ã¬Ë†Ëœ ÃªÂ°â‚¬Ã«Å Â¥Ã­â€¢Å“ Ã¬â€žÅ“Ã«Â²â€ž Ã¬â€šÂ¬Ã¬ÂÂ´Ã«â€œÅ“ Ã¬â€¢Â Ã­â€Å’Ã«Â¦Â¬Ã¬Â¼â‚¬Ã¬ÂÂ´Ã¬â€¦ËœÃ¬Ââ€ž ÃªÂ°â‚¬Ã«Å Â¥Ã­â€¢ËœÃªÂ²Å’ Ã­â€¢Â©Ã«â€¹Ë†Ã«â€¹Â¤. Ã«Â³ÂµÃ¬Å¾Â¡Ã«Ââ€ž Ã¬Ë†ËœÃ¬Â¤â‚¬Ã¬â€”Â Ã«Â§Å¾Ã«Å â€ Ã­Å’Â¨Ã­â€žÂ´Ã¬Ââ€ž Ã¬â€žÂ Ã­Æ’ÂÃ­â€¢ËœÃ¬â€žÂ¸Ã¬Å¡â€.
+**기억하세요**: 백엔드 패턴은 확장 가능하고 유지보수 가능한 서버 사이드 애플리케이션을 가능하게 합니다. 복잡도 수준에 맞는 패턴을 선택하세요.

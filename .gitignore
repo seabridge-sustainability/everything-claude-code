@@ -92,6 +92,9 @@ temp/
 # Observer temp files (continuous-learning-v2)
 .observer-tmp/
 
+# Local agent-evaluation reports (may contain model output and usage data)
+artifacts/agent-runs/behavior-evals/
+
 # Rust build artifacts
 ecc2/target/
 

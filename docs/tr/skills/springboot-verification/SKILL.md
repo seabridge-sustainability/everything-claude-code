@@ -4,7 +4,7 @@ description: "Verification loop for Spring Boot projects: build, static analysis
 origin: ECC
 ---
 
-# Spring Boot DoÃ„Å¸rulama DÃƒÂ¶ngÃƒÂ¼sÃƒÂ¼
+# Spring Boot Doğrulama Döngüsü
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -21,15 +21,15 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-PR'lardan ÃƒÂ¶nce, bÃƒÂ¼yÃƒÂ¼k deÃ„Å¸iÃ…Å¸ikliklerden sonra ve deployment ÃƒÂ¶ncesi ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±rÃ„Â±n.
+PR'lardan önce, büyük değişikliklerden sonra ve deployment öncesi çalıştırın.
 
 ## Ne Zaman Aktif Edilir
 
-- Spring Boot servisi iÃƒÂ§in pull request aÃƒÂ§madan ÃƒÂ¶nce
-- BÃƒÂ¼yÃƒÂ¼k refactoring veya baÃ„Å¸Ã„Â±mlÃ„Â±lÃ„Â±k yÃƒÂ¼kseltmelerinden sonra
-- Staging veya production iÃƒÂ§in deployment ÃƒÂ¶ncesi doÃ„Å¸rulama
-- Tam build Ã¢â€ â€™ lint Ã¢â€ â€™ test Ã¢â€ â€™ gÃƒÂ¼venlik taramasÃ„Â± pipeline'Ã„Â± ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±rma
-- Test kapsamÃ„Â±nÃ„Â±n eÃ…Å¸ikleri karÃ…Å¸Ã„Â±ladÃ„Â±Ã„Å¸Ã„Â±nÃ„Â± doÃ„Å¸rulama
+- Spring Boot servisi için pull request açmadan önce
+- Büyük refactoring veya bağımlılık yükseltmelerinden sonra
+- Staging veya production için deployment öncesi doğrulama
+- Tam build → lint → test → güvenlik taraması pipeline'ı çalıştırma
+- Test kapsamının eşikleri karşıladığını doğrulama
 
 ## Faz 1: Build
 
@@ -39,16 +39,16 @@ mvn -T 4 clean verify -DskipTests
 ./gradlew clean assemble -x test
 ```
 
-Build baÃ…Å¸arÃ„Â±sÃ„Â±z olursa, durdurun ve dÃƒÂ¼zeltin.
+Build başarısız olursa, durdurun ve düzeltin.
 
 ## Faz 2: Static Analiz
 
-Maven (yaygÃ„Â±n plugin'ler):
+Maven (yaygın plugin'ler):
 ```bash
 mvn -T 4 spotbugs:check pmd:check checkstyle:check
 ```
 
-Gradle (yapÃ„Â±landÃ„Â±rÃ„Â±lmÃ„Â±Ã…Å¸sa):
+Gradle (yapılandırılmışsa):
 ```bash
 ./gradlew checkstyleMain pmdMain spotbugsMain
 ```
@@ -57,18 +57,18 @@ Gradle (yapÃ„Â±landÃ„Â±rÃ„Â±lmÃ„Â±Ã…Å¸sa):
 
 ```bash
 mvn -T 4 test
-mvn jacoco:report   # 80%+ kapsam doÃ„Å¸rula
+mvn jacoco:report   # 80%+ kapsam doğrula
 # veya
 ./gradlew test jacocoTestReport
 ```
 
 Rapor:
-- Toplam testler, geÃƒÂ§en/baÃ…Å¸arÃ„Â±sÃ„Â±z
-- Kapsam % (satÃ„Â±rlar/dallar)
+- Toplam testler, geçen/başarısız
+- Kapsam % (satırlar/dallar)
 
 ### Unit Testler
 
-Mock baÃ„Å¸Ã„Â±mlÃ„Â±lÃ„Â±klarla izole olarak servis mantÃ„Â±Ã„Å¸Ã„Â±nÃ„Â± test edin:
+Mock bağımlılıklarla izole olarak servis mantığını test edin:
 
 ```java
 @ExtendWith(MockitoExtension.class)
@@ -102,7 +102,7 @@ class UserServiceTest {
 
 ### Testcontainers ile Entegrasyon Testleri
 
-H2 yerine gerÃƒÂ§ek bir veritabanÃ„Â±na karÃ…Å¸Ã„Â± test edin:
+H2 yerine gerçek bir veritabanına karşı test edin:
 
 ```java
 @SpringBootTest
@@ -136,7 +136,7 @@ class UserRepositoryIntegrationTest {
 
 ### MockMvc ile API Testleri
 
-Tam Spring context ile controller katmanÃ„Â±nÃ„Â± test edin:
+Tam Spring context ile controller katmanını test edin:
 
 ```java
 @WebMvcTest(UserController.class)
@@ -171,10 +171,10 @@ class UserControllerTest {
 }
 ```
 
-## Faz 4: GÃƒÂ¼venlik TaramasÃ„Â±
+## Faz 4: Güvenlik Taraması
 
 ```bash
-# BaÃ„Å¸Ã„Â±mlÃ„Â±lÃ„Â±k CVE'leri
+# Bağımlılık CVE'leri
 mvn org.owasp:dependency-check-maven:check
 # veya
 ./gradlew dependencyCheckAnalyze
@@ -183,31 +183,31 @@ mvn org.owasp:dependency-check-maven:check
 grep -rn "password\s*=\s*\"" src/ --include="*.java" --include="*.yml" --include="*.properties"
 grep -rn "sk-\|api_key\|secret" src/ --include="*.java" --include="*.yml"
 
-# Gizli bilgiler (git geÃƒÂ§miÃ…Å¸i)
-git secrets --scan  # yapÃ„Â±landÃ„Â±rÃ„Â±lmÃ„Â±Ã…Å¸sa
+# Gizli bilgiler (git geçmişi)
+git secrets --scan  # yapılandırılmışsa
 ```
 
-### YaygÃ„Â±n GÃƒÂ¼venlik BulgularÃ„Â±
+### Yaygın Güvenlik Bulguları
 
 ```
-# System.out.println kontrolÃƒÂ¼ (yerine logger kullan)
+# System.out.println kontrolü (yerine logger kullan)
 grep -rn "System\.out\.print" src/main/ --include="*.java"
 
-# YanÃ„Â±tlarda ham exception mesajlarÃ„Â± kontrolÃƒÂ¼
+# Yanıtlarda ham exception mesajları kontrolü
 grep -rn "e\.getMessage()" src/main/ --include="*.java"
 
-# Wildcard CORS kontrolÃƒÂ¼
+# Wildcard CORS kontrolü
 grep -rn "allowedOrigins.*\*" src/main/ --include="*.java"
 ```
 
-## Faz 5: Lint/Format (opsiyonel kapÃ„Â±)
+## Faz 5: Lint/Format (opsiyonel kapı)
 
 ```bash
-mvn spotless:apply   # Spotless plugin kullanÃ„Â±yorsanÃ„Â±z
+mvn spotless:apply   # Spotless plugin kullanıyorsanız
 ./gradlew spotlessApply
 ```
 
-## Faz 6: Diff Ã„Â°ncelemesi
+## Faz 6: Diff İncelemesi
 
 ```bash
 git diff --stat
@@ -215,32 +215,32 @@ git diff
 ```
 
 Kontrol listesi:
-- Debug loglarÃ„Â± kalmamÃ„Â±Ã…Å¸ (`System.out`, koruma olmadan `log.debug`)
-- AnlamlÃ„Â± hatalar ve HTTP durumlarÃ„Â±
+- Debug logları kalmamış (`System.out`, koruma olmadan `log.debug`)
+- Anlamlı hatalar ve HTTP durumları
 - Gerekli yerlerde transaction'lar ve validation mevcut
-- Config deÃ„Å¸iÃ…Å¸iklikleri belgelenmiÃ…Å¸
+- Config değişiklikleri belgelenmiş
 
-## Ãƒâ€¡Ã„Â±ktÃ„Â± Ã…Å¾ablonu
+## Çıktı Şablonu
 
 ```
-DOÃ„Å¾RULAMA RAPORU
+DOĞRULAMA RAPORU
 ===================
-Build:     [GEÃƒâ€¡TÃ„Â°/BAÃ…Å¾ARISIZ]
-Static:    [GEÃƒâ€¡TÃ„Â°/BAÃ…Å¾ARISIZ] (spotbugs/pmd/checkstyle)
-Testler:   [GEÃƒâ€¡TÃ„Â°/BAÃ…Å¾ARISIZ] (X/Y geÃƒÂ§ti, Z% kapsam)
-GÃƒÂ¼venlik:  [GEÃƒâ€¡TÃ„Â°/BAÃ…Å¾ARISIZ] (CVE bulgularÃ„Â±: N)
-Diff:      [X dosya deÃ„Å¸iÃ…Å¸ti]
+Build:     [GEÇTİ/BAŞARISIZ]
+Static:    [GEÇTİ/BAŞARISIZ] (spotbugs/pmd/checkstyle)
+Testler:   [GEÇTİ/BAŞARISIZ] (X/Y geçti, Z% kapsam)
+Güvenlik:  [GEÇTİ/BAŞARISIZ] (CVE bulguları: N)
+Diff:      [X dosya değişti]
 
-Genel:     [HAZIR / HAZIR DEÃ„Å¾Ã„Â°L]
+Genel:     [HAZIR / HAZIR DEĞİL]
 
-DÃƒÂ¼zeltilecek Sorunlar:
+Düzeltilecek Sorunlar:
 1. ...
 2. ...
 ```
 
-## SÃƒÂ¼rekli Mod
+## Sürekli Mod
 
-- Ãƒâ€“nemli deÃ„Å¸iÃ…Å¸ikliklerde veya uzun oturumlarda her 30-60 dakikada bir fazlarÃ„Â± yeniden ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±rÃ„Â±n
-- KÃ„Â±sa dÃƒÂ¶ngÃƒÂ¼ tutun: hÃ„Â±zlÃ„Â± geri bildirim iÃƒÂ§in `mvn -T 4 test` + spotbugs
+- Önemli değişikliklerde veya uzun oturumlarda her 30-60 dakikada bir fazları yeniden çalıştırın
+- Kısa döngü tutun: hızlı geri bildirim için `mvn -T 4 test` + spotbugs
 
-**UnutmayÃ„Â±n**: HÃ„Â±zlÃ„Â± geri bildirim geÃƒÂ§ sÃƒÂ¼rprizleri yener. KapÃ„Â±yÃ„Â± sÃ„Â±kÃ„Â± tutunÃ¢â‚¬â€production sistemlerinde uyarÃ„Â±larÃ„Â± kusur olarak deÃ„Å¸erlendirin.
+**Unutmayın**: Hızlı geri bildirim geç sürprizleri yener. Kapıyı sıkı tutun—production sistemlerinde uyarıları kusur olarak değerlendirin.

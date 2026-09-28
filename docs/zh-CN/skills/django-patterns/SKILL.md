@@ -1,10 +1,10 @@
 ---
 name: django-patterns
-description: DjangoÃ¦Å¾Â¶Ã¦Å¾â€žÃ¦Â¨Â¡Ã¥Â¼ÂÃ¯Â¼Å’Ã¤Â½Â¿Ã§â€Â¨DRFÃ¨Â®Â¾Ã¨Â®Â¡REST APIÃ¯Â¼Å’ORMÃ¦Å“â‚¬Ã¤Â½Â³Ã¥Â®Å¾Ã¨Â·ÂµÃ¯Â¼Å’Ã§Â¼â€œÃ¥Â­ËœÃ¯Â¼Å’Ã¤Â¿Â¡Ã¥ÂÂ·Ã¯Â¼Å’Ã¤Â¸Â­Ã©â€”Â´Ã¤Â»Â¶Ã¯Â¼Å’Ã¤Â»Â¥Ã¥ÂÅ Ã§â€Å¸Ã¤ÂºÂ§Ã§ÂºÂ§DjangoÃ¥Âºâ€Ã§â€Â¨Ã§Â¨â€¹Ã¥ÂºÂÃ£â‚¬â€š
+description: Django架构模式，使用DRF设计REST API，ORM最佳实践，缓存，信号，中间件，以及生产级Django应用程序。
 origin: ECC
 ---
 
-# Django Ã¥Â¼â‚¬Ã¥Ââ€˜Ã¦Â¨Â¡Ã¥Â¼Â
+# Django 开发模式
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -21,51 +21,51 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-Ã©â‚¬â€šÃ§â€Â¨Ã¤ÂºÅ½Ã¥ÂÂ¯Ã¦â€°Â©Ã¥Â±â€¢Ã£â‚¬ÂÃ¥ÂÂ¯Ã§Â»Â´Ã¦Å Â¤Ã¥Âºâ€Ã§â€Â¨Ã§Â¨â€¹Ã¥ÂºÂÃ§Å¡â€žÃ§â€Å¸Ã¤ÂºÂ§Ã§ÂºÂ§ Django Ã¦Å¾Â¶Ã¦Å¾â€žÃ¦Â¨Â¡Ã¥Â¼ÂÃ£â‚¬â€š
+适用于可扩展、可维护应用程序的生产级 Django 架构模式。
 
-## Ã¤Â½â€¢Ã¦â€”Â¶Ã¦Â¿â‚¬Ã¦Â´Â»
+## 何时激活
 
-* Ã¦Å¾â€žÃ¥Â»Âº Django Web Ã¥Âºâ€Ã§â€Â¨Ã§Â¨â€¹Ã¥ÂºÂÃ¦â€”Â¶
-* Ã¨Â®Â¾Ã¨Â®Â¡ Django REST Framework API Ã¦â€”Â¶
-* Ã¤Â½Â¿Ã§â€Â¨ Django ORM Ã¥â€™Å’Ã¦Â¨Â¡Ã¥Å¾â€¹Ã¦â€”Â¶
-* Ã¨Â®Â¾Ã§Â½Â® Django Ã©Â¡Â¹Ã§â€ºÂ®Ã§Â»â€œÃ¦Å¾â€žÃ¦â€”Â¶
-* Ã¥Â®Å¾Ã§Å½Â°Ã§Â¼â€œÃ¥Â­ËœÃ£â‚¬ÂÃ¤Â¿Â¡Ã¥ÂÂ·Ã£â‚¬ÂÃ¤Â¸Â­Ã©â€”Â´Ã¤Â»Â¶Ã¦â€”Â¶
+* 构建 Django Web 应用程序时
+* 设计 Django REST Framework API 时
+* 使用 Django ORM 和模型时
+* 设置 Django 项目结构时
+* 实现缓存、信号、中间件时
 
-## Ã©Â¡Â¹Ã§â€ºÂ®Ã§Â»â€œÃ¦Å¾â€ž
+## 项目结构
 
-### Ã¦Å½Â¨Ã¨ÂÂÃ¥Â¸Æ’Ã¥Â±â‚¬
+### 推荐布局
 
 ```
 myproject/
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ config/
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ __init__.py
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ settings/
-Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ __init__.py
-Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ base.py          # Ã¥Å¸ÂºÃ§Â¡â‚¬Ã¨Â®Â¾Ã§Â½Â®
-Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ development.py   # Ã¥Â¼â‚¬Ã¥Ââ€˜Ã§Å½Â¯Ã¥Â¢Æ’Ã¨Â®Â¾Ã§Â½Â®
-Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ production.py    # Ã§â€Å¸Ã¤ÂºÂ§Ã§Å½Â¯Ã¥Â¢Æ’Ã¨Â®Â¾Ã§Â½Â®
-Ã¢â€â€š   Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ test.py          # Ã¦Âµâ€¹Ã¨Â¯â€¢Ã§Å½Â¯Ã¥Â¢Æ’Ã¨Â®Â¾Ã§Â½Â®
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ urls.py
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ wsgi.py
-Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ asgi.py
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ manage.py
-Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ apps/
-    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ __init__.py
-    Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ users/
-    Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ __init__.py
-    Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ models.py
-    Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ views.py
-    Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ serializers.py
-    Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ urls.py
-    Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ permissions.py
-    Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ filters.py
-    Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ services.py
-    Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ tests/
-    Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ products/
-        Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ ...
+├── config/
+│   ├── __init__.py
+│   ├── settings/
+│   │   ├── __init__.py
+│   │   ├── base.py          # 基础设置
+│   │   ├── development.py   # 开发环境设置
+│   │   ├── production.py    # 生产环境设置
+│   │   └── test.py          # 测试环境设置
+│   ├── urls.py
+│   ├── wsgi.py
+│   └── asgi.py
+├── manage.py
+└── apps/
+    ├── __init__.py
+    ├── users/
+    │   ├── __init__.py
+    │   ├── models.py
+    │   ├── views.py
+    │   ├── serializers.py
+    │   ├── urls.py
+    │   ├── permissions.py
+    │   ├── filters.py
+    │   ├── services.py
+    │   └── tests/
+    └── products/
+        └── ...
 ```
 
-### Ã¦â€¹â€ Ã¥Ë†â€ Ã¨Â®Â¾Ã§Â½Â®Ã¦Â¨Â¡Ã¥Â¼Â
+### 拆分设置模式
 
 ```python
 # config/settings/base.py
@@ -165,9 +165,9 @@ LOGGING = {
 }
 ```
 
-## Ã¦Â¨Â¡Ã¥Å¾â€¹Ã¨Â®Â¾Ã¨Â®Â¡Ã¦Â¨Â¡Ã¥Â¼Â
+## 模型设计模式
 
-### Ã¦Â¨Â¡Ã¥Å¾â€¹Ã¦Å“â‚¬Ã¤Â½Â³Ã¥Â®Å¾Ã¨Â·Âµ
+### 模型最佳实践
 
 ```python
 from django.db import models
@@ -240,7 +240,7 @@ class Product(models.Model):
         super().save(*args, **kwargs)
 ```
 
-### QuerySet Ã¦Å“â‚¬Ã¤Â½Â³Ã¥Â®Å¾Ã¨Â·Âµ
+### QuerySet 最佳实践
 
 ```python
 from django.db import models
@@ -280,7 +280,7 @@ class Product(models.Model):
 Product.objects.active().with_category().in_stock()
 ```
 
-### Ã§Â®Â¡Ã§Ââ€ Ã¥â„¢Â¨Ã¦â€“Â¹Ã¦Â³â€¢
+### 管理器方法
 
 ```python
 class ProductManager(models.Manager):
@@ -310,9 +310,9 @@ class Product(models.Model):
     custom = ProductManager()
 ```
 
-## Django REST Framework Ã¦Â¨Â¡Ã¥Â¼Â
+## Django REST Framework 模式
 
-### Ã¥ÂºÂÃ¥Ë†â€”Ã¥Å’â€“Ã¥â„¢Â¨Ã¦Â¨Â¡Ã¥Â¼Â
+### 序列化器模式
 
 ```python
 from rest_framework import serializers
@@ -395,7 +395,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         return user
 ```
 
-### ViewSet Ã¦Â¨Â¡Ã¥Â¼Â
+### ViewSet 模式
 
 ```python
 from rest_framework import viewsets, status, filters
@@ -454,7 +454,7 @@ class ProductViewSet(viewsets.ModelViewSet):
         return self.get_paginated_response(serializer.data)
 ```
 
-### Ã¨â€¡ÂªÃ¥Â®Å¡Ã¤Â¹â€°Ã¦â€œÂÃ¤Â½Å“
+### 自定义操作
 
 ```python
 from rest_framework.decorators import api_view, permission_classes
@@ -486,7 +486,7 @@ def add_to_cart(request):
     return Response({'message': 'Added to cart'}, status=status.HTTP_201_CREATED)
 ```
 
-## Ã¦Å“ÂÃ¥Å Â¡Ã¥Â±â€šÃ¦Â¨Â¡Ã¥Â¼Â
+## 服务层模式
 
 ```python
 # apps/orders/services.py
@@ -544,9 +544,9 @@ class OrderService:
         pass
 ```
 
-## Ã§Â¼â€œÃ¥Â­ËœÃ§Â­â€“Ã§â€¢Â¥
+## 缓存策略
 
-### Ã¨Â§â€ Ã¥â€ºÂ¾Ã§ÂºÂ§Ã§Â¼â€œÃ¥Â­Ëœ
+### 视图级缓存
 
 ```python
 from django.views.decorators.cache import cache_page
@@ -559,7 +559,7 @@ class ProductListView(generic.ListView):
     context_object_name = 'products'
 ```
 
-### Ã¦Â¨Â¡Ã¦ÂÂ¿Ã§â€°â€¡Ã¦Â®ÂµÃ§Â¼â€œÃ¥Â­Ëœ
+### 模板片段缓存
 
 ```django
 {% load cache %}
@@ -568,7 +568,7 @@ class ProductListView(generic.ListView):
 {% endcache %}
 ```
 
-### Ã¤Â½Å½Ã§ÂºÂ§Ã§Â¼â€œÃ¥Â­Ëœ
+### 低级缓存
 
 ```python
 from django.core.cache import cache
@@ -585,7 +585,7 @@ def get_featured_products():
     return products
 ```
 
-### QuerySet Ã§Â¼â€œÃ¥Â­Ëœ
+### QuerySet 缓存
 
 ```python
 from django.core.cache import cache
@@ -603,9 +603,9 @@ def get_popular_categories():
     return categories
 ```
 
-## Ã¤Â¿Â¡Ã¥ÂÂ·
+## 信号
 
-### Ã¤Â¿Â¡Ã¥ÂÂ·Ã¦Â¨Â¡Ã¥Â¼Â
+### 信号模式
 
 ```python
 # apps/users/signals.py
@@ -639,9 +639,9 @@ class UsersConfig(AppConfig):
         import apps.users.signals
 ```
 
-## Ã¤Â¸Â­Ã©â€”Â´Ã¤Â»Â¶
+## 中间件
 
-### Ã¨â€¡ÂªÃ¥Â®Å¡Ã¤Â¹â€°Ã¤Â¸Â­Ã©â€”Â´Ã¤Â»Â¶
+### 自定义中间件
 
 ```python
 # middleware/active_user_middleware.py
@@ -673,9 +673,9 @@ class RequestLoggingMiddleware(MiddlewareMixin):
         return response
 ```
 
-## Ã¦â‚¬Â§Ã¨Æ’Â½Ã¤Â¼ËœÃ¥Å’â€“
+## 性能优化
 
-### N+1 Ã¦Å¸Â¥Ã¨Â¯Â¢Ã©Â¢â€žÃ©ËœÂ²
+### N+1 查询预防
 
 ```python
 # Bad - N+1 queries
@@ -695,7 +695,7 @@ for product in products:
         print(tag.name)
 ```
 
-### Ã¦â€¢Â°Ã¦ÂÂ®Ã¥Âºâ€œÃ§Â´Â¢Ã¥Â¼â€¢
+### 数据库索引
 
 ```python
 class Product(models.Model):
@@ -712,7 +712,7 @@ class Product(models.Model):
         ]
 ```
 
-### Ã¦â€°Â¹Ã©â€¡ÂÃ¦â€œÂÃ¤Â½Å“
+### 批量操作
 
 ```python
 # Bulk create
@@ -731,19 +731,19 @@ Product.objects.bulk_update(products, ['is_active'])
 Product.objects.filter(stock=0).delete()
 ```
 
-## Ã¥Â¿Â«Ã©â‚¬Å¸Ã¥Ââ€šÃ¨â‚¬Æ’
+## 快速参考
 
-| Ã¦Â¨Â¡Ã¥Â¼Â | Ã¦ÂÂÃ¨Â¿Â° |
+| 模式 | 描述 |
 |---------|-------------|
-| Ã¦â€¹â€ Ã¥Ë†â€ Ã¨Â®Â¾Ã§Â½Â® | Ã¥Ë†â€ Ã§Â¦Â»Ã¥Â¼â‚¬Ã¥Ââ€˜/Ã§â€Å¸Ã¤ÂºÂ§/Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¨Â®Â¾Ã§Â½Â® |
-| Ã¨â€¡ÂªÃ¥Â®Å¡Ã¤Â¹â€° QuerySet | Ã¥ÂÂ¯Ã©â€¡ÂÃ§â€Â¨Ã§Å¡â€žÃ¦Å¸Â¥Ã¨Â¯Â¢Ã¦â€“Â¹Ã¦Â³â€¢ |
-| Ã¦Å“ÂÃ¥Å Â¡Ã¥Â±â€š | Ã¤Â¸Å¡Ã¥Å Â¡Ã©â‚¬Â»Ã¨Â¾â€˜Ã¥Ë†â€ Ã§Â¦Â» |
-| ViewSet | REST API Ã§Â«Â¯Ã§â€šÂ¹ |
-| Ã¥ÂºÂÃ¥Ë†â€”Ã¥Å’â€“Ã¥â„¢Â¨Ã©ÂªÅ’Ã¨Â¯Â | Ã¨Â¯Â·Ã¦Â±â€š/Ã¥â€œÂÃ¥Âºâ€Ã¨Â½Â¬Ã¦ÂÂ¢ |
-| select\_related | Ã¥Â¤â€“Ã©â€Â®Ã¤Â¼ËœÃ¥Å’â€“ |
-| prefetch\_related | Ã¥Â¤Å¡Ã¥Â¯Â¹Ã¥Â¤Å¡Ã¤Â¼ËœÃ¥Å’â€“ |
-| Ã§Â¼â€œÃ¥Â­ËœÃ¤Â¼ËœÃ¥â€¦Ë† | Ã§Â¼â€œÃ¥Â­ËœÃ¦Ëœâ€šÃ¨Â´ÂµÃ¦â€œÂÃ¤Â½Å“ |
-| Ã¤Â¿Â¡Ã¥ÂÂ· | Ã¤Âºâ€¹Ã¤Â»Â¶Ã©Â©Â±Ã¥Å Â¨Ã¦â€œÂÃ¤Â½Å“ |
-| Ã¤Â¸Â­Ã©â€”Â´Ã¤Â»Â¶ | Ã¨Â¯Â·Ã¦Â±â€š/Ã¥â€œÂÃ¥Âºâ€Ã¥Â¤â€žÃ§Ââ€  |
+| 拆分设置 | 分离开发/生产/测试设置 |
+| 自定义 QuerySet | 可重用的查询方法 |
+| 服务层 | 业务逻辑分离 |
+| ViewSet | REST API 端点 |
+| 序列化器验证 | 请求/响应转换 |
+| select\_related | 外键优化 |
+| prefetch\_related | 多对多优化 |
+| 缓存优先 | 缓存昂贵操作 |
+| 信号 | 事件驱动操作 |
+| 中间件 | 请求/响应处理 |
 
-Ã¨Â¯Â·Ã¨Â®Â°Ã¤Â½ÂÃ¯Â¼Å¡Django Ã¦ÂÂÃ¤Â¾â€ºÃ¤Âºâ€ Ã¨Â®Â¸Ã¥Â¤Å¡Ã¥Â¿Â«Ã¦ÂÂ·Ã¦â€“Â¹Ã¥Â¼ÂÃ¯Â¼Å’Ã¤Â½â€ Ã¥Â¯Â¹Ã¤ÂºÅ½Ã§â€Å¸Ã¤ÂºÂ§Ã¥Âºâ€Ã§â€Â¨Ã§Â¨â€¹Ã¥ÂºÂÃ¦ÂÂ¥Ã¨Â¯Â´Ã¯Â¼Å’Ã§Â»â€œÃ¦Å¾â€žÃ¥â€™Å’Ã§Â»â€žÃ§Â»â€¡Ã¦Â¯â€Ã§Â®â‚¬Ã¦Â´ÂÃ§Å¡â€žÃ¤Â»Â£Ã§Â ÂÃ¦â€ºÂ´Ã©â€¡ÂÃ¨Â¦ÂÃ£â‚¬â€šÃ¤Â¸ÂºÃ¥ÂÂ¯Ã§Â»Â´Ã¦Å Â¤Ã¦â‚¬Â§Ã¨â‚¬Å’Ã¦Å¾â€žÃ¥Â»ÂºÃ£â‚¬â€š
+请记住：Django 提供了许多快捷方式，但对于生产应用程序来说，结构和组织比简洁的代码更重要。为可维护性而构建。

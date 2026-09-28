@@ -4,7 +4,7 @@ description: Laravel architecture patterns, routing/controllers, Eloquent ORM, s
 origin: ECC
 ---
 
-# Laravel GeliÃ…Å¸tirme Desenleri
+# Laravel Geliştirme Desenleri
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -21,66 +21,66 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-Ãƒâ€“lÃƒÂ§eklenebilir, bakÃ„Â±m yapÃ„Â±labilir uygulamalar iÃƒÂ§in ÃƒÂ¼retim seviyesi Laravel mimari desenleri.
+Ölçeklenebilir, bakım yapılabilir uygulamalar için üretim seviyesi Laravel mimari desenleri.
 
-## Ne Zaman KullanÃ„Â±lÃ„Â±r
+## Ne Zaman Kullanılır
 
-- Laravel web uygulamalarÃ„Â± veya API'ler oluÃ…Å¸turma
-- Controller'lar, servisler ve domain mantÃ„Â±Ã„Å¸Ã„Â±nÃ„Â± yapÃ„Â±landÃ„Â±rma
-- Eloquent model'ler ve iliÃ…Å¸kiler ile ÃƒÂ§alÃ„Â±Ã…Å¸ma
+- Laravel web uygulamaları veya API'ler oluşturma
+- Controller'lar, servisler ve domain mantığını yapılandırma
+- Eloquent model'ler ve ilişkiler ile çalışma
 - Resource'lar ve sayfalama ile API tasarlama
-- Kuyruklar, event'ler, caching ve arka plan iÃ…Å¸leri ekleme
+- Kuyruklar, event'ler, caching ve arka plan işleri ekleme
 
-## NasÃ„Â±l Ãƒâ€¡alÃ„Â±Ã…Å¸Ã„Â±r
+## Nasıl Çalışır
 
-- UygulamayÃ„Â± net sÃ„Â±nÃ„Â±rlar etrafÃ„Â±nda yapÃ„Â±landÃ„Â±rÃ„Â±n (controller'lar -> servisler/action'lar -> model'ler).
-- Routing'i ÃƒÂ¶ngÃƒÂ¶rÃƒÂ¼lebilir tutmak iÃƒÂ§in aÃƒÂ§Ã„Â±k binding'ler ve scoped binding'ler kullanÃ„Â±n; eriÃ…Å¸im kontrolÃƒÂ¼ iÃƒÂ§in yetkilendirmeyi yine de uygulayÃ„Â±n.
-- Domain mantÃ„Â±Ã„Å¸Ã„Â±nÃ„Â± tutarlÃ„Â± tutmak iÃƒÂ§in typed model'leri, cast'leri ve scope'larÃ„Â± tercih edin.
-- IO-aÃ„Å¸Ã„Â±r iÃ…Å¸leri kuyruklarda tutun ve pahalÃ„Â± okumalarÃ„Â± ÃƒÂ¶nbelleÃ„Å¸e alÃ„Â±n.
-- Config'i `config/*` iÃƒÂ§inde merkezileÃ…Å¸tirin ve ortamlarÃ„Â± aÃƒÂ§Ã„Â±k tutun.
+- Uygulamayı net sınırlar etrafında yapılandırın (controller'lar -> servisler/action'lar -> model'ler).
+- Routing'i öngörülebilir tutmak için açık binding'ler ve scoped binding'ler kullanın; erişim kontrolü için yetkilendirmeyi yine de uygulayın.
+- Domain mantığını tutarlı tutmak için typed model'leri, cast'leri ve scope'ları tercih edin.
+- IO-ağır işleri kuyruklarda tutun ve pahalı okumaları önbelleğe alın.
+- Config'i `config/*` içinde merkezileştirin ve ortamları açık tutun.
 
-## Ãƒâ€“rnekler
+## Örnekler
 
-### Proje YapÃ„Â±sÃ„Â±
+### Proje Yapısı
 
-Net katman sÃ„Â±nÃ„Â±rlarÃ„Â± (HTTP, servisler/action'lar, model'ler) ile geleneksel bir Laravel dÃƒÂ¼zeni kullanÃ„Â±n.
+Net katman sınırları (HTTP, servisler/action'lar, model'ler) ile geleneksel bir Laravel düzeni kullanın.
 
-### Ãƒâ€“nerilen DÃƒÂ¼zen
+### Önerilen Düzen
 
 ```
 app/
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Actions/            # Tek amaÃƒÂ§lÃ„Â± kullanÃ„Â±m durumlarÃ„Â±
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Console/
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Events/
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Exceptions/
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Http/
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Controllers/
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Middleware/
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Requests/       # Form request validation
-Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Resources/      # API resources
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Jobs/
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Models/
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Policies/
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Providers/
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Services/           # Domain servislerini koordine etme
-Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Support/
+├── Actions/            # Tek amaçlı kullanım durumları
+├── Console/
+├── Events/
+├── Exceptions/
+├── Http/
+│   ├── Controllers/
+│   ├── Middleware/
+│   ├── Requests/       # Form request validation
+│   └── Resources/      # API resources
+├── Jobs/
+├── Models/
+├── Policies/
+├── Providers/
+├── Services/           # Domain servislerini koordine etme
+└── Support/
 config/
 database/
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ factories/
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ migrations/
-Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ seeders/
+├── factories/
+├── migrations/
+└── seeders/
 resources/
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ views/
-Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ lang/
+├── views/
+└── lang/
 routes/
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ api.php
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ web.php
-Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ console.php
+├── api.php
+├── web.php
+└── console.php
 ```
 
 ### Controllers -> Services -> Actions
 
-Controller'larÃ„Â± ince tutun. Orkestrasyon'u servislere ve tek amaÃƒÂ§lÃ„Â± mantÃ„Â±Ã„Å¸Ã„Â± action'lara koyun.
+Controller'ları ince tutun. Orkestrasyon'u servislere ve tek amaçlı mantığı action'lara koyun.
 
 ```php
 final class CreateOrderAction
@@ -113,7 +113,7 @@ final class OrdersController extends Controller
 
 ### Routing ve Controllers
 
-Netlik iÃƒÂ§in route-model binding ve resource controller'larÃ„Â± tercih edin.
+Netlik için route-model binding ve resource controller'ları tercih edin.
 
 ```php
 use Illuminate\Support\Facades\Route;
@@ -125,7 +125,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 ### Route Model Binding (Scoped)
 
-Ãƒâ€¡apraz kiracÃ„Â± eriÃ…Å¸imini ÃƒÂ¶nlemek iÃƒÂ§in scoped binding'leri kullanÃ„Â±n.
+Çapraz kiracı erişimini önlemek için scoped binding'leri kullanın.
 
 ```php
 Route::scopeBindings()->group(function () {
@@ -133,11 +133,11 @@ Route::scopeBindings()->group(function () {
 });
 ```
 
-### Ã„Â°ÃƒÂ§ Ã„Â°ÃƒÂ§e Route'lar ve Binding Ã„Â°simleri
+### İç İçe Route'lar ve Binding İsimleri
 
-- Ãƒâ€¡ift iÃƒÂ§ iÃƒÂ§e geÃƒÂ§meyi ÃƒÂ¶nlemek iÃƒÂ§in prefix'leri ve path'leri tutarlÃ„Â± tutun (ÃƒÂ¶rn. `conversation` vs `conversations`).
-- Bound model'e uyan tek bir parametre ismi kullanÃ„Â±n (ÃƒÂ¶rn. `Conversation` iÃƒÂ§in `{conversation}`).
-- Ã„Â°ÃƒÂ§ iÃƒÂ§e geÃƒÂ§irirken ÃƒÂ¼st-alt iliÃ…Å¸kilerini zorlamak iÃƒÂ§in scoped binding'leri tercih edin.
+- Çift iç içe geçmeyi önlemek için prefix'leri ve path'leri tutarlı tutun (örn. `conversation` vs `conversations`).
+- Bound model'e uyan tek bir parametre ismi kullanın (örn. `Conversation` için `{conversation}`).
+- İç içe geçirirken üst-alt ilişkilerini zorlamak için scoped binding'leri tercih edin.
 
 ```php
 use App\Http\Controllers\Api\ConversationController;
@@ -160,7 +160,7 @@ Route::middleware('auth:sanctum')->prefix('conversations')->group(function () {
 });
 ```
 
-Bir parametrenin farklÃ„Â± bir model sÃ„Â±nÃ„Â±fÃ„Â±na ÃƒÂ§ÃƒÂ¶zÃƒÂ¼mlenmesini istiyorsanÃ„Â±z, aÃƒÂ§Ã„Â±k binding tanÃ„Â±mlayÃ„Â±n. Ãƒâ€“zel binding mantÃ„Â±Ã„Å¸Ã„Â± iÃƒÂ§in `Route::bind()` kullanÃ„Â±n veya model'de `resolveRouteBinding()` uygulayÃ„Â±n.
+Bir parametrenin farklı bir model sınıfına çözümlenmesini istiyorsanız, açık binding tanımlayın. Özel binding mantığı için `Route::bind()` kullanın veya model'de `resolveRouteBinding()` uygulayın.
 
 ```php
 use App\Models\AiConversation;
@@ -171,7 +171,7 @@ Route::model('conversation', AiConversation::class);
 
 ### Service Container Binding'leri
 
-Net baÃ„Å¸Ã„Â±mlÃ„Â±lÃ„Â±k baÃ„Å¸lantÃ„Â±sÃ„Â± iÃƒÂ§in bir service provider'da interface'leri implementasyonlara baÃ„Å¸layÃ„Â±n.
+Net bağımlılık bağlantısı için bir service provider'da interface'leri implementasyonlara bağlayın.
 
 ```php
 use App\Repositories\EloquentOrderRepository;
@@ -189,7 +189,7 @@ final class AppServiceProvider extends ServiceProvider
 
 ### Eloquent Model Desenleri
 
-### Model YapÃ„Â±landÃ„Â±rmasÃ„Â±
+### Model Yapılandırması
 
 ```php
 final class Project extends Model
@@ -215,9 +215,9 @@ final class Project extends Model
 }
 ```
 
-### Ãƒâ€“zel Cast'ler ve Value Object'ler
+### Özel Cast'ler ve Value Object'ler
 
-SÃ„Â±kÃ„Â± tiplemeler iÃƒÂ§in enum'lar veya value object'leri kullanÃ„Â±n.
+Sıkı tiplemeler için enum'lar veya value object'leri kullanın.
 
 ```php
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -237,7 +237,7 @@ protected function budgetCents(): Attribute
 }
 ```
 
-### N+1'i Ãƒâ€“nlemek iÃƒÂ§in Eager Loading
+### N+1'i Önlemek için Eager Loading
 
 ```php
 $orders = Order::query()
@@ -246,7 +246,7 @@ $orders = Order::query()
     ->paginate(25);
 ```
 
-### KarmaÃ…Å¸Ã„Â±k Filtreler iÃƒÂ§in Query Object'leri
+### Karmaşık Filtreler için Query Object'leri
 
 ```php
 final class ProjectQuery
@@ -276,8 +276,8 @@ final class ProjectQuery
 
 ### Global Scope'lar ve Soft Delete'ler
 
-VarsayÃ„Â±lan filtreleme iÃƒÂ§in global scope'larÃ„Â± ve geri kurtarÃ„Â±labilir kayÃ„Â±tlar iÃƒÂ§in `SoftDeletes` kullanÃ„Â±n.
-KatmanlÃ„Â± davranÃ„Â±Ã…Å¸ istemediÃ„Å¸iniz sÃƒÂ¼rece, aynÃ„Â± filtre iÃƒÂ§in global scope veya named scope kullanÃ„Â±n, ikisini birden deÃ„Å¸il.
+Varsayılan filtreleme için global scope'ları ve geri kurtarılabilir kayıtlar için `SoftDeletes` kullanın.
+Katmanlı davranış istemediğiniz sürece, aynı filtre için global scope veya named scope kullanın, ikisini birden değil.
 
 ```php
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -296,7 +296,7 @@ final class Project extends Model
 }
 ```
 
-### Yeniden KullanÃ„Â±labilir Filtreler iÃƒÂ§in Query Scope'larÃ„Â±
+### Yeniden Kullanılabilir Filtreler için Query Scope'ları
 
 ```php
 use Illuminate\Database\Eloquent\Builder;
@@ -309,11 +309,11 @@ final class Project extends Model
     }
 }
 
-// Servis, repository vb. iÃƒÂ§inde
+// Servis, repository vb. içinde
 $projects = Project::ownedBy($user->id)->get();
 ```
 
-### Ãƒâ€¡ok AdÃ„Â±mlÃ„Â± GÃƒÂ¼ncellemeler iÃƒÂ§in Transaction'lar
+### Çok Adımlı Güncellemeler için Transaction'lar
 
 ```php
 use Illuminate\Support\Facades\DB;
@@ -326,13 +326,13 @@ DB::transaction(function (): void {
 
 ### Migration'lar
 
-### Ã„Â°simlendirme KuralÃ„Â±
+### İsimlendirme Kuralı
 
-- Dosya isimleri zaman damgasÃ„Â± kullanÃ„Â±r: `YYYY_MM_DD_HHMMSS_create_users_table.php`
-- Migration'lar anonim sÃ„Â±nÃ„Â±flar kullanÃ„Â±r (isimlendirilmiÃ…Å¸ sÃ„Â±nÃ„Â±f yok); dosya ismi amacÃ„Â± iletir
-- Tablo isimleri varsayÃ„Â±lan olarak `snake_case` ve ÃƒÂ§oÃ„Å¸uldur
+- Dosya isimleri zaman damgası kullanır: `YYYY_MM_DD_HHMMSS_create_users_table.php`
+- Migration'lar anonim sınıflar kullanır (isimlendirilmiş sınıf yok); dosya ismi amacı iletir
+- Tablo isimleri varsayılan olarak `snake_case` ve çoğuldur
 
-### Ãƒâ€“rnek Migration
+### Örnek Migration
 
 ```php
 use Illuminate\Database\Migrations\Migration;
@@ -361,7 +361,7 @@ return new class extends Migration
 
 ### Form Request'ler ve Validation
 
-Validation'Ã„Â± form request'lerde tutun ve input'larÃ„Â± DTO'lara dÃƒÂ¶nÃƒÂ¼Ã…Å¸tÃƒÂ¼rÃƒÂ¼n.
+Validation'ı form request'lerde tutun ve input'ları DTO'lara dönüştürün.
 
 ```php
 use App\Models\Order;
@@ -393,9 +393,9 @@ final class StoreOrderRequest extends FormRequest
 }
 ```
 
-### API Resource'larÃ„Â±
+### API Resource'ları
 
-Resource'lar ve sayfalama ile API yanÃ„Â±tlarÃ„Â±nÃ„Â± tutarlÃ„Â± tutun.
+Resource'lar ve sayfalama ile API yanıtlarını tutarlı tutun.
 
 ```php
 $projects = Project::query()->active()->paginate(25);
@@ -414,17 +414,17 @@ return response()->json([
 
 ### Event'ler, Job'lar ve Kuyruklar
 
-- Yan etkiler iÃƒÂ§in domain event'leri yayÃ„Â±nlayÃ„Â±n (email'ler, analytics)
-- YavaÃ…Å¸ iÃ…Å¸ler iÃƒÂ§in kuyruÃ„Å¸a alÃ„Â±nmÃ„Â±Ã…Å¸ job'larÃ„Â± kullanÃ„Â±n (raporlar, export'lar, webhook'lar)
-- Yeniden deneme ve backoff ile idempotent handler'larÃ„Â± tercih edin
+- Yan etkiler için domain event'leri yayınlayın (email'ler, analytics)
+- Yavaş işler için kuyruğa alınmış job'ları kullanın (raporlar, export'lar, webhook'lar)
+- Yeniden deneme ve backoff ile idempotent handler'ları tercih edin
 
 ### Caching
 
-- Okuma-aÃ„Å¸Ã„Â±rlÃ„Â±klÃ„Â± endpoint'leri ve pahalÃ„Â± sorgularÃ„Â± ÃƒÂ¶nbelleÃ„Å¸e alÃ„Â±n
-- Model event'lerinde (created/updated/deleted) ÃƒÂ¶nbellekleri geÃƒÂ§ersiz kÃ„Â±lÃ„Â±n
-- Kolay geÃƒÂ§ersiz kÃ„Â±lma iÃƒÂ§in ilgili verileri ÃƒÂ¶nbelleÃ„Å¸e alÃ„Â±rken tag'leri kullanÃ„Â±n
+- Okuma-ağırlıklı endpoint'leri ve pahalı sorguları önbelleğe alın
+- Model event'lerinde (created/updated/deleted) önbellekleri geçersiz kılın
+- Kolay geçersiz kılma için ilgili verileri önbelleğe alırken tag'leri kullanın
 
-### YapÃ„Â±landÃ„Â±rma ve Ortamlar
+### Yapılandırma ve Ortamlar
 
-- Gizli bilgileri `.env`'de ve yapÃ„Â±landÃ„Â±rmayÃ„Â± `config/*.php`'de tutun
-- Ortama ÃƒÂ¶zel yapÃ„Â±landÃ„Â±rma geÃƒÂ§ersiz kÃ„Â±lmalarÃ„Â± kullanÃ„Â±n ve production'da `config:cache` kullanÃ„Â±n
+- Gizli bilgileri `.env`'de ve yapılandırmayı `config/*.php`'de tutun
+- Ortama özel yapılandırma geçersiz kılmaları kullanın ve production'da `config:cache` kullanın

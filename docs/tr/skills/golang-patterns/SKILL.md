@@ -1,10 +1,10 @@
 ---
 name: golang-patterns
-description: Ã„Â°diomatic Go desenler, en iyi uygulamalar ve saÃ„Å¸lam, verimli ve bakÃ„Â±mÃ„Â± kolay Go uygulamalarÃ„Â± oluÃ…Å¸turmak iÃƒÂ§in konvansiyonlar.
+description: İdiomatic Go desenler, en iyi uygulamalar ve sağlam, verimli ve bakımı kolay Go uygulamaları oluşturmak için konvansiyonlar.
 origin: ECC
 ---
 
-# Go GeliÃ…Å¸tirme Desenleri
+# Go Geliştirme Desenleri
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -21,23 +21,23 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-SaÃ„Å¸lam, verimli ve bakÃ„Â±mÃ„Â± kolay uygulamalar oluÃ…Å¸turmak iÃƒÂ§in idiomatic Go desenleri ve en iyi uygulamalar.
+Sağlam, verimli ve bakımı kolay uygulamalar oluşturmak için idiomatic Go desenleri ve en iyi uygulamalar.
 
-## Ne Zaman EtkinleÃ…Å¸tirmeli
+## Ne Zaman Etkinleştirmeli
 
 - Yeni Go kodu yazarken
-- Go kodunu gÃƒÂ¶zden geÃƒÂ§irirken
+- Go kodunu gözden geçirirken
 - Mevcut Go kodunu refactor ederken
-- Go paketleri/modÃƒÂ¼lleri tasarlarken
+- Go paketleri/modülleri tasarlarken
 
 ## Temel Prensipler
 
-### 1. Basitlik ve AÃƒÂ§Ã„Â±klÃ„Â±k
+### 1. Basitlik ve Açıklık
 
-Go, zekiceden ziyade basitliÃ„Å¸i tercih eder. Kod aÃƒÂ§Ã„Â±k ve okunmasÃ„Â± kolay olmalÃ„Â±dÃ„Â±r.
+Go, zekiceden ziyade basitliği tercih eder. Kod açık ve okunması kolay olmalıdır.
 
 ```go
-// Ã„Â°yi: AÃƒÂ§Ã„Â±k ve doÃ„Å¸rudan
+// İyi: Açık ve doğrudan
 func GetUser(id string) (*User, error) {
     user, err := db.FindUser(id)
     if err != nil {
@@ -46,7 +46,7 @@ func GetUser(id string) (*User, error) {
     return user, nil
 }
 
-// KÃƒÂ¶tÃƒÂ¼: AÃ…Å¸Ã„Â±rÃ„Â± zeki
+// Kötü: Aşırı zeki
 func GetUser(id string) (*User, error) {
     return func() (*User, error) {
         if u, e := db.FindUser(id); e == nil {
@@ -58,15 +58,15 @@ func GetUser(id string) (*User, error) {
 }
 ```
 
-### 2. SÃ„Â±fÃ„Â±r DeÃ„Å¸eri KullanÃ„Â±Ã…Å¸lÃ„Â± YapÃ„Â±n
+### 2. Sıfır Değeri Kullanışlı Yapın
 
-TÃƒÂ¼rleri, sÃ„Â±fÃ„Â±r deÃ„Å¸erinin baÃ…Å¸latma olmadan hemen kullanÃ„Â±labilir olacaÃ„Å¸Ã„Â± Ã…Å¸ekilde tasarlayÃ„Â±n.
+Türleri, sıfır değerinin başlatma olmadan hemen kullanılabilir olacağı şekilde tasarlayın.
 
 ```go
-// Ã„Â°yi: SÃ„Â±fÃ„Â±r deÃ„Å¸er kullanÃ„Â±Ã…Å¸lÃ„Â±dÃ„Â±r
+// İyi: Sıfır değer kullanışlıdır
 type Counter struct {
     mu    sync.Mutex
-    count int // sÃ„Â±fÃ„Â±r deÃ„Å¸er 0'dÃ„Â±r, kullanÃ„Â±ma hazÃ„Â±rdÃ„Â±r
+    count int // sıfır değer 0'dır, kullanıma hazırdır
 }
 
 func (c *Counter) Inc() {
@@ -75,22 +75,22 @@ func (c *Counter) Inc() {
     c.mu.Unlock()
 }
 
-// Ã„Â°yi: bytes.Buffer sÃ„Â±fÃ„Â±r deÃ„Å¸erle ÃƒÂ§alÃ„Â±Ã…Å¸Ã„Â±r
+// İyi: bytes.Buffer sıfır değerle çalışır
 var buf bytes.Buffer
 buf.WriteString("hello")
 
-// KÃƒÂ¶tÃƒÂ¼: BaÃ…Å¸latma gerektirir
+// Kötü: Başlatma gerektirir
 type BadCounter struct {
     counts map[string]int // nil map panic verir
 }
 ```
 
-### 3. Interface Kabul Et, Struct DÃƒÂ¶ndÃƒÂ¼r
+### 3. Interface Kabul Et, Struct Döndür
 
-Fonksiyonlar interface parametreleri kabul etmeli ve somut tipler dÃƒÂ¶ndÃƒÂ¼rmelidir.
+Fonksiyonlar interface parametreleri kabul etmeli ve somut tipler döndürmelidir.
 
 ```go
-// Ã„Â°yi: Interface kabul eder, somut tip dÃƒÂ¶ndÃƒÂ¼rÃƒÂ¼r
+// İyi: Interface kabul eder, somut tip döndürür
 func ProcessData(r io.Reader) (*Result, error) {
     data, err := io.ReadAll(r)
     if err != nil {
@@ -99,18 +99,18 @@ func ProcessData(r io.Reader) (*Result, error) {
     return &Result{Data: data}, nil
 }
 
-// KÃƒÂ¶tÃƒÂ¼: Interface dÃƒÂ¶ndÃƒÂ¼rÃƒÂ¼r (implementasyon detaylarÃ„Â±nÃ„Â± gereksiz yere gizler)
+// Kötü: Interface döndürür (implementasyon detaylarını gereksiz yere gizler)
 func ProcessData(r io.Reader) (io.Reader, error) {
     // ...
 }
 ```
 
-## Hata Ã„Â°Ã…Å¸leme Desenleri
+## Hata İşleme Desenleri
 
-### BaÃ„Å¸lam ile Hata Sarmalama
+### Bağlam ile Hata Sarmalama
 
 ```go
-// Ã„Â°yi: HatalarÃ„Â± baÃ„Å¸lamla sarmalayÃ„Â±n
+// İyi: Hataları bağlamla sarmalayın
 func LoadConfig(path string) (*Config, error) {
     data, err := os.ReadFile(path)
     if err != nil {
@@ -126,10 +126,10 @@ func LoadConfig(path string) (*Config, error) {
 }
 ```
 
-### Ãƒâ€“zel Hata Tipleri
+### Özel Hata Tipleri
 
 ```go
-// Domain'e ÃƒÂ¶zgÃƒÂ¼ hatalarÃ„Â± tanÃ„Â±mlayÃ„Â±n
+// Domain'e özgü hataları tanımlayın
 type ValidationError struct {
     Field   string
     Message string
@@ -139,7 +139,7 @@ func (e *ValidationError) Error() string {
     return fmt.Sprintf("validation failed on %s: %s", e.Field, e.Message)
 }
 
-// YaygÃ„Â±n durumlar iÃƒÂ§in sentinel hatalar
+// Yaygın durumlar için sentinel hatalar
 var (
     ErrNotFound     = errors.New("resource not found")
     ErrUnauthorized = errors.New("unauthorized")
@@ -147,11 +147,11 @@ var (
 )
 ```
 
-### errors.Is ve errors.As ile Hata KontrolÃƒÂ¼
+### errors.Is ve errors.As ile Hata Kontrolü
 
 ```go
 func HandleError(err error) {
-    // Belirli bir hatayÃ„Â± kontrol et
+    // Belirli bir hatayı kontrol et
     if errors.Is(err, sql.ErrNoRows) {
         log.Println("No records found")
         return
@@ -170,23 +170,23 @@ func HandleError(err error) {
 }
 ```
 
-### HatalarÃ„Â± Asla GÃƒÂ¶z ArdÃ„Â± Etmeyin
+### Hataları Asla Göz Ardı Etmeyin
 
 ```go
-// KÃƒÂ¶tÃƒÂ¼: BoÃ…Å¸ tanÃ„Â±mlayÃ„Â±cÃ„Â± ile hatayÃ„Â± gÃƒÂ¶z ardÃ„Â± etmek
+// Kötü: Boş tanımlayıcı ile hatayı göz ardı etmek
 result, _ := doSomething()
 
-// Ã„Â°yi: HatayÃ„Â± iÃ…Å¸leyin veya neden gÃƒÂ¶z ardÃ„Â± edildiÃ„Å¸ini aÃƒÂ§Ã„Â±kÃƒÂ§a belgelendirin
+// İyi: Hatayı işleyin veya neden göz ardı edildiğini açıkça belgelendirin
 result, err := doSomething()
 if err != nil {
     return err
 }
 
-// Kabul edilebilir: Hata gerÃƒÂ§ekten ÃƒÂ¶nemli olmadÃ„Â±Ã„Å¸Ã„Â±nda (nadir)
-_ = writer.Close() // En iyi ÃƒÂ§aba temizliÃ„Å¸i, hata baÃ…Å¸ka yerde loglanÃ„Â±r
+// Kabul edilebilir: Hata gerçekten önemli olmadığında (nadir)
+_ = writer.Close() // En iyi çaba temizliği, hata başka yerde loglanır
 ```
 
-## EÃ…Å¸zamanlÃ„Â±lÃ„Â±k Desenleri
+## Eşzamanlılık Desenleri
 
 ### Worker Pool
 
@@ -209,7 +209,7 @@ func WorkerPool(jobs <-chan Job, results chan<- Result, numWorkers int) {
 }
 ```
 
-### Ã„Â°ptal ve Zaman AÃ…Å¸Ã„Â±mlarÃ„Â± iÃƒÂ§in Context
+### İptal ve Zaman Aşımları için Context
 
 ```go
 func FetchWithTimeout(ctx context.Context, url string) ([]byte, error) {
@@ -252,7 +252,7 @@ func GracefulShutdown(server *http.Server) {
 }
 ```
 
-### Koordineli Goroutine'ler iÃƒÂ§in errgroup
+### Koordineli Goroutine'ler için errgroup
 
 ```go
 import "golang.org/x/sync/errgroup"
@@ -262,7 +262,7 @@ func FetchAll(ctx context.Context, urls []string) ([][]byte, error) {
     results := make([][]byte, len(urls))
 
     for i, url := range urls {
-        i, url := i, url // Loop deÃ„Å¸iÃ…Å¸kenlerini yakala
+        i, url := i, url // Loop değişkenlerini yakala
         g.Go(func() error {
             data, err := FetchWithTimeout(ctx, url)
             if err != nil {
@@ -280,20 +280,20 @@ func FetchAll(ctx context.Context, urls []string) ([][]byte, error) {
 }
 ```
 
-### Goroutine SÃ„Â±zÃ„Â±ntÃ„Â±larÃ„Â±ndan KaÃƒÂ§Ã„Â±nma
+### Goroutine Sızıntılarından Kaçınma
 
 ```go
-// KÃƒÂ¶tÃƒÂ¼: Context iptal edilirse goroutine sÃ„Â±zÃ„Â±ntÃ„Â±sÃ„Â±
+// Kötü: Context iptal edilirse goroutine sızıntısı
 func leakyFetch(ctx context.Context, url string) <-chan []byte {
     ch := make(chan []byte)
     go func() {
         data, _ := fetch(url)
-        ch <- data // AlÃ„Â±cÃ„Â± yoksa sonsuza kadar bloklar
+        ch <- data // Alıcı yoksa sonsuza kadar bloklar
     }()
     return ch
 }
 
-// Ã„Â°yi: Ã„Â°ptali dÃƒÂ¼zgÃƒÂ¼n bir Ã…Å¸ekilde iÃ…Å¸ler
+// İyi: İptali düzgün bir şekilde işler
 func safeFetch(ctx context.Context, url string) <-chan []byte {
     ch := make(chan []byte, 1) // Tamponlu kanal
     go func() {
@@ -310,12 +310,12 @@ func safeFetch(ctx context.Context, url string) <-chan []byte {
 }
 ```
 
-## Interface TasarÃ„Â±mÃ„Â±
+## Interface Tasarımı
 
-### KÃƒÂ¼ÃƒÂ§ÃƒÂ¼k, OdaklanmÃ„Â±Ã…Å¸ Interface'ler
+### Küçük, Odaklanmış Interface'ler
 
 ```go
-// Ã„Â°yi: Tek metodlu interface'ler
+// İyi: Tek metodlu interface'ler
 type Reader interface {
     Read(p []byte) (n int, err error)
 }
@@ -328,7 +328,7 @@ type Closer interface {
     Close() error
 }
 
-// Interface'leri gerektiÃ„Å¸i gibi birleÃ…Å¸tirin
+// Interface'leri gerektiği gibi birleştirin
 type ReadWriteCloser interface {
     Reader
     Writer
@@ -336,13 +336,13 @@ type ReadWriteCloser interface {
 }
 ```
 
-### Interface'leri KullanÃ„Â±ldÃ„Â±klarÃ„Â± Yerde TanÃ„Â±mlayÃ„Â±n
+### Interface'leri Kullanıldıkları Yerde Tanımlayın
 
 ```go
-// SaÃ„Å¸layÃ„Â±cÃ„Â± pakette deÃ„Å¸il, tÃƒÂ¼ketici pakette
+// Sağlayıcı pakette değil, tüketici pakette
 package service
 
-// UserStore bu servisin neye ihtiyacÃ„Â± olduÃ„Å¸unu tanÃ„Â±mlar
+// UserStore bu servisin neye ihtiyacı olduğunu tanımlar
 type UserStore interface {
     GetUser(id string) (*User, error)
     SaveUser(user *User) error
@@ -352,11 +352,11 @@ type Service struct {
     store UserStore
 }
 
-// Somut implementasyon baÃ…Å¸ka bir pakette olabilir
+// Somut implementasyon başka bir pakette olabilir
 // Bu interface'i bilmesine gerek yoktur
 ```
 
-### Type Assertion ile Opsiyonel DavranÃ„Â±Ã…Å¸
+### Type Assertion ile Opsiyonel Davranış
 
 ```go
 type Flusher interface {
@@ -378,53 +378,53 @@ func WriteAndFlush(w io.Writer, data []byte) error {
 
 ## Paket Organizasyonu
 
-### Standart Proje DÃƒÂ¼zeni
+### Standart Proje Düzeni
 
 ```text
 myproject/
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ cmd/
-Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ myapp/
-Ã¢â€â€š       Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ main.go           # GiriÃ…Å¸ noktasÃ„Â±
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ internal/
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ handler/              # HTTP handler'lar
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ service/              # Ã„Â°Ã…Å¸ mantÃ„Â±Ã„Å¸Ã„Â±
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ repository/           # Veri eriÃ…Å¸imi
-Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ config/               # YapÃ„Â±landÃ„Â±rma
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ pkg/
-Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ client/               # Public API client
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ api/
-Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ v1/                   # API tanÃ„Â±mlarÃ„Â± (proto, OpenAPI)
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ testdata/                 # Test fixture'larÃ„Â±
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ go.mod
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ go.sum
-Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ Makefile
+├── cmd/
+│   └── myapp/
+│       └── main.go           # Giriş noktası
+├── internal/
+│   ├── handler/              # HTTP handler'lar
+│   ├── service/              # İş mantığı
+│   ├── repository/           # Veri erişimi
+│   └── config/               # Yapılandırma
+├── pkg/
+│   └── client/               # Public API client
+├── api/
+│   └── v1/                   # API tanımları (proto, OpenAPI)
+├── testdata/                 # Test fixture'ları
+├── go.mod
+├── go.sum
+└── Makefile
 ```
 
-### Paket Ã„Â°simlendirme
+### Paket İsimlendirme
 
 ```go
-// Ã„Â°yi: KÃ„Â±sa, kÃƒÂ¼ÃƒÂ§ÃƒÂ¼k harf, alt ÃƒÂ§izgi yok
+// İyi: Kısa, küçük harf, alt çizgi yok
 package http
 package json
 package user
 
-// KÃƒÂ¶tÃƒÂ¼: Verbose, karÃ„Â±Ã…Å¸Ã„Â±k bÃƒÂ¼yÃƒÂ¼k/kÃƒÂ¼ÃƒÂ§ÃƒÂ¼k harf veya gereksiz
+// Kötü: Verbose, karışık büyük/küçük harf veya gereksiz
 package httpHandler
 package json_parser
 package userService // Gereksiz 'Service' eki
 ```
 
-### Paket Seviyesi State'ten KaÃƒÂ§Ã„Â±nÃ„Â±n
+### Paket Seviyesi State'ten Kaçının
 
 ```go
-// KÃƒÂ¶tÃƒÂ¼: Global deÃ„Å¸iÃ…Å¸ken state
+// Kötü: Global değişken state
 var db *sql.DB
 
 func init() {
     db, _ = sql.Open("postgres", os.Getenv("DATABASE_URL"))
 }
 
-// Ã„Â°yi: Dependency injection
+// İyi: Dependency injection
 type Server struct {
     db *sql.DB
 }
@@ -434,7 +434,7 @@ func NewServer(db *sql.DB) *Server {
 }
 ```
 
-## Struct TasarÃ„Â±mÃ„Â±
+## Struct Tasarımı
 
 ### Functional Options Deseni
 
@@ -462,8 +462,8 @@ func WithLogger(l *log.Logger) Option {
 func NewServer(addr string, opts ...Option) *Server {
     s := &Server{
         addr:    addr,
-        timeout: 30 * time.Second, // varsayÃ„Â±lan
-        logger:  log.Default(),    // varsayÃ„Â±lan
+        timeout: 30 * time.Second, // varsayılan
+        logger:  log.Default(),    // varsayılan
     }
     for _, opt := range opts {
         opt(s)
@@ -471,14 +471,14 @@ func NewServer(addr string, opts ...Option) *Server {
     return s
 }
 
-// KullanÃ„Â±m
+// Kullanım
 server := NewServer(":8080",
     WithTimeout(60*time.Second),
     WithLogger(customLogger),
 )
 ```
 
-### Kompozisyon iÃƒÂ§in Embedding
+### Kompozisyon için Embedding
 
 ```go
 type Logger struct {
@@ -490,7 +490,7 @@ func (l *Logger) Log(msg string) {
 }
 
 type Server struct {
-    *Logger // Embedding - Server Log metodunu alÃ„Â±r
+    *Logger // Embedding - Server Log metodunu alır
     addr    string
 }
 
@@ -501,17 +501,17 @@ func NewServer(addr string) *Server {
     }
 }
 
-// KullanÃ„Â±m
+// Kullanım
 s := NewServer(":8080")
-s.Log("Starting...") // GÃƒÂ¶mÃƒÂ¼lÃƒÂ¼ Logger.Log'u ÃƒÂ§aÃ„Å¸Ã„Â±rÃ„Â±r
+s.Log("Starting...") // Gömülü Logger.Log'u çağırır
 ```
 
 ## Bellek ve Performans
 
-### Boyut BilindiÃ„Å¸inde Slice'larÃ„Â± Ãƒâ€“nceden Tahsis Edin
+### Boyut Bilindiğinde Slice'ları Önceden Tahsis Edin
 
 ```go
-// KÃƒÂ¶tÃƒÂ¼: Slice'Ã„Â± birden ÃƒÂ§ok kez bÃƒÂ¼yÃƒÂ¼tÃƒÂ¼r
+// Kötü: Slice'ı birden çok kez büyütür
 func processItems(items []Item) []Result {
     var results []Result
     for _, item := range items {
@@ -520,7 +520,7 @@ func processItems(items []Item) []Result {
     return results
 }
 
-// Ã„Â°yi: Tek tahsis
+// İyi: Tek tahsis
 func processItems(items []Item) []Result {
     results := make([]Result, 0, len(items))
     for _, item := range items {
@@ -530,7 +530,7 @@ func processItems(items []Item) []Result {
 }
 ```
 
-### SÃ„Â±k Tahsisler iÃƒÂ§in sync.Pool KullanÃ„Â±n
+### Sık Tahsisler için sync.Pool Kullanın
 
 ```go
 var bufferPool = sync.Pool{
@@ -547,15 +547,15 @@ func ProcessRequest(data []byte) []byte {
     }()
 
     buf.Write(data)
-    // Ã„Â°Ã…Å¸le...
+    // İşle...
     return buf.Bytes()
 }
 ```
 
-### DÃƒÂ¶ngÃƒÂ¼lerde String BirleÃ…Å¸tirmekten KaÃƒÂ§Ã„Â±nÃ„Â±n
+### Döngülerde String Birleştirmekten Kaçının
 
 ```go
-// KÃƒÂ¶tÃƒÂ¼: BirÃƒÂ§ok string tahsisi oluÃ…Å¸turur
+// Kötü: Birçok string tahsisi oluşturur
 func join(parts []string) string {
     var result string
     for _, p := range parts {
@@ -564,7 +564,7 @@ func join(parts []string) string {
     return result
 }
 
-// Ã„Â°yi: strings.Builder ile tek tahsis
+// İyi: strings.Builder ile tek tahsis
 func join(parts []string) string {
     var sb strings.Builder
     for i, p := range parts {
@@ -576,7 +576,7 @@ func join(parts []string) string {
     return sb.String()
 }
 
-// En iyi: Standart kÃƒÂ¼tÃƒÂ¼phaneyi kullanÃ„Â±n
+// En iyi: Standart kütüphaneyi kullanın
 func join(parts []string) string {
     return strings.Join(parts, ",")
 }
@@ -587,7 +587,7 @@ func join(parts []string) string {
 ### Temel Komutlar
 
 ```bash
-# Build ve ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
+# Build ve çalıştır
 go build ./...
 go run ./cmd/myapp
 
@@ -601,7 +601,7 @@ go vet ./...
 staticcheck ./...
 golangci-lint run
 
-# ModÃƒÂ¼l yÃƒÂ¶netimi
+# Modül yönetimi
 go mod tidy
 go mod verify
 
@@ -610,7 +610,7 @@ gofmt -w .
 goimports -w .
 ```
 
-### Ãƒâ€“nerilen Linter YapÃ„Â±landÃ„Â±rmasÃ„Â± (.golangci.yml)
+### Önerilen Linter Yapılandırması (.golangci.yml)
 
 ```yaml
 linters:
@@ -638,53 +638,53 @@ issues:
   exclude-use-default: false
 ```
 
-## HÃ„Â±zlÃ„Â± Referans: Go Ã„Â°fadeleri
+## Hızlı Referans: Go İfadeleri
 
-| Ã„Â°fade | AÃƒÂ§Ã„Â±klama |
+| İfade | Açıklama |
 |-------|----------|
-| Interface kabul et, struct dÃƒÂ¶ndÃƒÂ¼r | Fonksiyonlar interface parametreleri kabul eder, somut tipler dÃƒÂ¶ndÃƒÂ¼rÃƒÂ¼r |
-| Hatalar deÃ„Å¸erdir | HatalarÃ„Â± exception deÃ„Å¸il birinci sÃ„Â±nÃ„Â±f deÃ„Å¸erler olarak ele alÃ„Â±n |
-| BelleÃ„Å¸i paylaÃ…Å¸arak iletiÃ…Å¸im kurmayÃ„Â±n | Goroutine'ler arasÃ„Â± koordinasyon iÃƒÂ§in kanallarÃ„Â± kullanÃ„Â±n |
-| SÃ„Â±fÃ„Â±r deÃ„Å¸eri kullanÃ„Â±Ã…Å¸lÃ„Â± yapÃ„Â±n | Tipler aÃƒÂ§Ã„Â±k baÃ…Å¸latma olmadan ÃƒÂ§alÃ„Â±Ã…Å¸malÃ„Â±dÃ„Â±r |
-| Biraz kopyalama biraz baÃ„Å¸Ã„Â±mlÃ„Â±lÃ„Â±ktan iyidir | Gereksiz dÃ„Â±Ã…Å¸ baÃ„Å¸Ã„Â±mlÃ„Â±lÃ„Â±klardan kaÃƒÂ§Ã„Â±nÃ„Â±n |
-| AÃƒÂ§Ã„Â±k zekiden iyidir | OkunabilirliÃ„Å¸i zekiceden ÃƒÂ¶ncelikli kÃ„Â±lÃ„Â±n |
-| gofmt kimsenin favorisi deÃ„Å¸il ama herkesin arkadaÃ…Å¸Ã„Â± | Her zaman gofmt/goimports ile formatlayÃ„Â±n |
-| Erken dÃƒÂ¶nÃƒÂ¼n | HatalarÃ„Â± ÃƒÂ¶nce iÃ…Å¸leyin, mutlu yolu girintilendirilmemiÃ…Å¸ tutun |
+| Interface kabul et, struct döndür | Fonksiyonlar interface parametreleri kabul eder, somut tipler döndürür |
+| Hatalar değerdir | Hataları exception değil birinci sınıf değerler olarak ele alın |
+| Belleği paylaşarak iletişim kurmayın | Goroutine'ler arası koordinasyon için kanalları kullanın |
+| Sıfır değeri kullanışlı yapın | Tipler açık başlatma olmadan çalışmalıdır |
+| Biraz kopyalama biraz bağımlılıktan iyidir | Gereksiz dış bağımlılıklardan kaçının |
+| Açık zekiden iyidir | Okunabilirliği zekiceden öncelikli kılın |
+| gofmt kimsenin favorisi değil ama herkesin arkadaşı | Her zaman gofmt/goimports ile formatlayın |
+| Erken dönün | Hataları önce işleyin, mutlu yolu girintilendirilmemiş tutun |
 
-## KaÃƒÂ§Ã„Â±nÃ„Â±lmasÃ„Â± Gereken Anti-Desenler
+## Kaçınılması Gereken Anti-Desenler
 
 ```go
-// KÃƒÂ¶tÃƒÂ¼: Uzun fonksiyonlarda naked return'ler
+// Kötü: Uzun fonksiyonlarda naked return'ler
 func process() (result int, err error) {
-    // ... 50 satÃ„Â±r ...
-    return // Ne dÃƒÂ¶ndÃƒÂ¼rÃƒÂ¼lÃƒÂ¼yor?
+    // ... 50 satır ...
+    return // Ne döndürülüyor?
 }
 
-// KÃƒÂ¶tÃƒÂ¼: Kontrol akÃ„Â±Ã…Å¸Ã„Â± iÃƒÂ§in panic kullanmak
+// Kötü: Kontrol akışı için panic kullanmak
 func GetUser(id string) *User {
     user, err := db.Find(id)
     if err != nil {
-        panic(err) // Bunu yapmayÃ„Â±n
+        panic(err) // Bunu yapmayın
     }
     return user
 }
 
-// KÃƒÂ¶tÃƒÂ¼: Struct iÃƒÂ§inde context geÃƒÂ§mek
+// Kötü: Struct içinde context geçmek
 type Request struct {
-    ctx context.Context // Context ilk parametre olmalÃ„Â±
+    ctx context.Context // Context ilk parametre olmalı
     ID  string
 }
 
-// Ã„Â°yi: Context ilk parametre olarak
+// İyi: Context ilk parametre olarak
 func ProcessRequest(ctx context.Context, id string) error {
     // ...
 }
 
-// KÃƒÂ¶tÃƒÂ¼: Value ve pointer receiver'larÃ„Â± karÃ„Â±Ã…Å¸tÃ„Â±rmak
+// Kötü: Value ve pointer receiver'ları karıştırmak
 type Counter struct{ n int }
 func (c Counter) Value() int { return c.n }    // Value receiver
 func (c *Counter) Increment() { c.n++ }        // Pointer receiver
-// Bir stil seÃƒÂ§in ve tutarlÃ„Â± olun
+// Bir stil seçin ve tutarlı olun
 ```
 
-**UnutmayÃ„Â±n**: Go kodu en iyi anlamda sÃ„Â±kÃ„Â±cÃ„Â± olmalÃ„Â±dÃ„Â±r - ÃƒÂ¶ngÃƒÂ¶rÃƒÂ¼lebilir, tutarlÃ„Â± ve anlaÃ…Å¸Ã„Â±lmasÃ„Â± kolay. Ã…Å¾ÃƒÂ¼phe duyduÃ„Å¸unuzda, basit tutun.
+**Unutmayın**: Go kodu en iyi anlamda sıkıcı olmalıdır - öngörülebilir, tutarlı ve anlaşılması kolay. Şüphe duyduğunuzda, basit tutun.

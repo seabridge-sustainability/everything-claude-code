@@ -24,6 +24,8 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { spawnSync } = require('child_process');
+const { toShellPath } = require('../../scripts/lib/shell-path');
+const { findShellBinary } = require('../../scripts/hooks/observe-runner');
 
 const repoRoot = path.resolve(__dirname, '..', '..');
 const observeShPath = path.join(
@@ -77,7 +79,9 @@ function runObserve(entrypoint) {
       cwd: home
     });
 
-    return spawnSync('bash', ['-x', observeShPath, 'post'], {
+    const shell = findShellBinary();
+    assert.ok(shell, 'a bash-compatible shell is required for this test');
+    return spawnSync(shell, ['-x', toShellPath(observeShPath, shell), 'post'], {
       input: hookInput,
       env: {
         ...process.env,

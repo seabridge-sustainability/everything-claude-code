@@ -1,65 +1,83 @@
-# Coding-agent system efficiency review — 2026-09-27
+# Coding-agent system efficiency review - 2026-09-27
 
 ## Outcome
 
-This iteration reduced default context, made instruction and skill adapters testable,
-and bounded GitHub Actions fan-out without weakening the canonical safety contract.
+This iteration reduced default context, made every advertised instruction adapter
+testable, bounded GitHub Actions fan-out, and repaired the remaining skill-catalog
+integrity issues without weakening the canonical safety contract.
 
-## Changes
+## Instruction and context changes
 
-- Default ECC MCPs: 10 to 2 (`chrome-devtools` and the explicitly retained
-  GitHub integration), both version-pinned. The project change does not modify
-  the requested Slack or Calendar user-level connectors; other project MCPs stay
-  on demand instead of entering every session.
-- Cursor startup rules: nine stale always-loaded copies (about 38.5K characters)
-  to one generated 5.3K-character baseline. The remaining common rules are
-  generated, opt-in adapters.
-- Gemini: the ECC adapter now imports `AGENTS.md` instead of eagerly loading an
-  approximately 84K-character duplicate stack and an optional missing vendor file.
-  The same thin-adapter pattern was applied to autoresearch, OpenSeaBri,
-  CLIMADA-stack, and `_upstream`.
-- Codex skills: generated wrappers use checkout-relative canonical pointers and
-  trigger-bearing descriptions. Stale universal-TDD, fixed-coverage, and timed
-  verification copies were removed.
-- Skill routing: load the minimum applicable set; explicit and mandatory risk
-  triggers win. Small low-risk changes do not require a skill ceremony.
-- Verification: review, security, performance, and test guidance is scoped to the
-  touched risk boundary. Manual UI and runtime checks are required when behavior
-  cannot be proven by static tests alone.
-- Evals: instruction scenarios fail closed on failed or missing requirements;
-  advisory mode is explicit. Canonical skill validation is strict while the
-  localized documentation backlog remains warning-only.
-- GitHub Actions: one full Node test lane replaces 33 full-suite matrix runs.
-  Five runtime/package-manager lanes run one focused smoke test; Windows and
-  macOS run compact platform-specific hook, installer, migration, and MCP checks.
-  Tag-triggered duplicate CI and duplicate scheduled audits were removed; coverage
-  runs only for pull requests; supply-chain watch runs daily with cancellation.
-- Workflow security: third-party Actions are commit-SHA pinned. Harness workflows
-  have path filters, least privilege, timeouts, and concurrency cancellation.
-- Local secret scanning reports detector, file, and line only; it does not echo
-  the secret-bearing source line.
+- `AGENTS.md` remains the canonical policy. Claude, Codex, Gemini, Copilot,
+  Cursor, OpenCode, Kiro, Qwen, and the other advertised runtimes use thin,
+  validated adapters instead of carrying divergent copies.
+- The Karpathy skill and Cursor rule are explicitly opt-in. Their useful
+  simplicity and verification principles remain available, but they no longer
+  load for every non-trivial task or override security and error handling.
+- Prompt-defense language is part of the generated goal protocol and adapters.
+- Default ECC MCPs remain limited to the explicitly retained browser and GitHub
+  integrations. Optional connectors stay out of the startup context.
+- The duplicated Anthropic `frontend-design` skill copies were retired; the
+  provider-native skill remains the authoritative source.
 
-## Verification
+## Verification and evaluation changes
 
-- Agent-system efficiency contract: 6/6.
-- Instruction stack: 13/13.
-- Plugin manifest: 68/68.
-- Validators: 188/188.
-- Codex skill surface: 4/4.
-- Workflow security: 26/26 plus live validator pass.
-- Packed release artifact: 24/24.
-- Supply-chain IOC checks: 22/22; advisory-source checks: 10/10.
-- Generated Cursor and Codex wrapper parity checks pass.
-- Strict canonical skill validation passes. It still reports 120 pre-existing
-  localized-document encoding warnings, deliberately outside this change.
+- Added a three-scenario behavioral-eval matrix for Codex, Claude, and Gemini.
+  Planning is offline and free. Live replay requires both an explicit approval
+  environment variable and a positive USD budget, is capped at nine sequential
+  runs, and records success, latency, tool calls, retries, tokens, and cost.
+- Added negative controls for the live-call approval gate and adapter drift.
+- Added Windows-safe shell path normalization for hook runners and fixed Plan
+  Canvas process spawning.
+- Fixed instruction-stack discovery from linked worktrees so validation targets
+  the real workspace rather than similarly named stale directories.
+- Fixed Claude scope migration, legacy/minimal installer ownership guards, large
+  selective-install test buffers, and stale harness assertions.
+- Updated the Pi adapter test from the retired fixed-coverage marker to the
+  canonical risk-scaled testing marker.
 
-The full Windows suite was also sampled once. Failures unrelated to this change
-remain in platform-specific shell fixtures and stale translated catalog counts;
-focused tests covering every modified contract passed.
+## Skill-catalog hygiene
 
-## Operating policy
+- Reduced `agent-eval`, `security-review`, and `btw` to small routing skills that
+  progressively disclose detailed workflow only when relevant.
+- Added automated routing-hygiene tests for opt-in behavior, duplicate canonical
+  skills, and compact skill metadata.
+- Added a conservative localized-skill encoding repair/check tool. It repaired
+  181 previously garbled localized skill files, including malformed frontmatter.
+- All 901 skill directories now validate with zero warnings. All 518 localized
+  skill documents pass the encoding test.
+- Catalog documentation and plugin metadata are synchronized at 75 agents,
+  383 skills, and 96 commands.
 
-Use local focused verification before any push, batch related changes into one
-verified commit, and mark documentation/agent-system-only commits `[skip actions]`.
-Do not use speculative pushes to discover failures. A second push is justified
-only for a reproduced CI-only issue after reassessing the complete failure set.
+## GitHub Actions cost policy
+
+- One full Node test lane replaces the former broad full-suite matrix.
+- Compatibility lanes run bounded smoke or platform-specific checks rather than
+  repeating the complete suite.
+- Workflows use path filters, concurrency cancellation, timeouts, least
+  privilege, and pinned third-party actions.
+- Agents must verify locally, batch related changes into one push, and use
+  `[skip actions]` for documentation or agent-system-only commits when repository
+  policy permits it. Pushes are not used as speculative test runs.
+
+## Verification evidence
+
+- Instruction registry: 18/18 checks, including negative controls.
+- Agent-system efficiency: 8/8.
+- Behavioral-eval contract: 18/18; dry plan produced nine bounded runs and the
+  unapproved live path failed before any provider call.
+- Skill routing: 19/19.
+- Localized encoding: 518/518; strict validator: 901 skill directories, zero
+  warnings.
+- Installer apply: 45/45; Claude scope migration: 16/16; OpenCode migration:
+  9/9; selective install: 46/46.
+- Windows hook/bootstrap/path checks, Plan Canvas end to end, OpenCode build and
+  package, Copilot support, and catalog/manifest validators all pass.
+- Full repository suite: 4,743/4,743 tests passed on Windows.
+
+## Remaining evidence boundary
+
+Static and local behavioral tests prove instruction delivery and enforcement,
+not perfect compliance by every future vendor model. The nine-run live replay is
+therefore the final empirical layer. It should run periodically, with an approved
+budget, rather than on every commit. No paid model call was made in this change.

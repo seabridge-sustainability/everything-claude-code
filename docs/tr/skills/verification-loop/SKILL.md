@@ -1,6 +1,6 @@
 ---
 name: verification-loop
-description: "Claude Code oturumlarÃ„Â± iÃƒÂ§in kapsamlÃ„Â± doÃ„Å¸rulama sistemi."
+description: "Claude Code oturumları için kapsamlı doğrulama sistemi."
 origin: ECC
 ---
 
@@ -21,29 +21,29 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-Claude Code oturumlarÃ„Â± iÃƒÂ§in kapsamlÃ„Â± doÃ„Å¸rulama sistemi.
+Claude Code oturumları için kapsamlı doğrulama sistemi.
 
-## Ne Zaman KullanÃ„Â±lÃ„Â±r
+## Ne Zaman Kullanılır
 
-Bu skill'i Ã…Å¸u durumlarda ÃƒÂ§aÃ„Å¸Ã„Â±r:
-- Bir ÃƒÂ¶zellik veya ÃƒÂ¶nemli kod deÃ„Å¸iÃ…Å¸ikliÃ„Å¸i tamamladÃ„Â±ktan sonra
-- PR oluÃ…Å¸turmadan ÃƒÂ¶nce
-- Kalite kapÃ„Â±larÃ„Â±nÃ„Â±n geÃƒÂ§tiÃ„Å¸inden emin olmak istediÃ„Å¸inde
-- Refactoring sonrasÃ„Â±nda
+Bu skill'i şu durumlarda çağır:
+- Bir özellik veya önemli kod değişikliği tamamladıktan sonra
+- PR oluşturmadan önce
+- Kalite kapılarının geçtiğinden emin olmak istediğinde
+- Refactoring sonrasında
 
-## DoÃ„Å¸rulama FazlarÃ„Â±
+## Doğrulama Fazları
 
-### Faz 1: Build DoÃ„Å¸rulamasÃ„Â±
+### Faz 1: Build Doğrulaması
 ```bash
-# Projenin build olup olmadÃ„Â±Ã„Å¸Ã„Â±nÃ„Â± kontrol et
+# Projenin build olup olmadığını kontrol et
 npm run build 2>&1 | tail -20
 # VEYA
 pnpm build 2>&1 | tail -20
 ```
 
-Build baÃ…Å¸arÃ„Â±sÃ„Â±z olursa, devam etmeden ÃƒÂ¶nce DUR ve dÃƒÂ¼zelt.
+Build başarısız olursa, devam etmeden önce DUR ve düzelt.
 
-### Faz 2: Tip KontrolÃƒÂ¼
+### Faz 2: Tip Kontrolü
 ```bash
 # TypeScript projeleri
 npx tsc --noEmit 2>&1 | head -30
@@ -52,9 +52,9 @@ npx tsc --noEmit 2>&1 | head -30
 pyright . 2>&1 | head -30
 ```
 
-TÃƒÂ¼m tip hatalarÃ„Â±nÃ„Â± raporla. Devam etmeden ÃƒÂ¶nce kritik olanlarÃ„Â± dÃƒÂ¼zelt.
+Tüm tip hatalarını raporla. Devam etmeden önce kritik olanları düzelt.
 
-### Faz 3: Lint KontrolÃƒÂ¼
+### Faz 3: Lint Kontrolü
 ```bash
 # JavaScript/TypeScript
 npm run lint 2>&1 | head -30
@@ -65,22 +65,22 @@ ruff check . 2>&1 | head -30
 
 ### Faz 4: Test Paketi
 ```bash
-# Testleri coverage ile ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
+# Testleri coverage ile çalıştır
 npm run test -- --coverage 2>&1 | tail -50
 
-# Coverage eÃ…Å¸iÃ„Å¸ini kontrol et
+# Coverage eşiğini kontrol et
 # Hedef: minimum %80
 ```
 
 Rapor:
 - Toplam testler: X
-- GeÃƒÂ§ti: X
-- BaÃ…Å¸arÃ„Â±sÃ„Â±z: X
+- Geçti: X
+- Başarısız: X
 - Coverage: %X
 
-### Faz 5: GÃƒÂ¼venlik TaramasÃ„Â±
+### Faz 5: Güvenlik Taraması
 ```bash
-# Secret'larÃ„Â± kontrol et
+# Secret'ları kontrol et
 grep -rn "sk-" --include="*.ts" --include="*.js" . 2>/dev/null | head -10
 grep -rn "api_key" --include="*.ts" --include="*.js" . 2>/dev/null | head -10
 
@@ -88,54 +88,54 @@ grep -rn "api_key" --include="*.ts" --include="*.js" . 2>/dev/null | head -10
 grep -rn "console.log" --include="*.ts" --include="*.tsx" src/ 2>/dev/null | head -10
 ```
 
-### Faz 6: Diff Ã„Â°ncelemesi
+### Faz 6: Diff İncelemesi
 ```bash
-# Neyin deÃ„Å¸iÃ…Å¸tiÃ„Å¸ini gÃƒÂ¶ster
+# Neyin değiştiğini göster
 git diff --stat
 git diff HEAD~1 --name-only
 ```
 
-Her deÃ„Å¸iÃ…Å¸en dosyayÃ„Â± Ã…Å¸unlar iÃƒÂ§in incele:
-- Ã„Â°stenmeyen deÃ„Å¸iÃ…Å¸iklikler
-- Eksik hata iÃ…Å¸leme
+Her değişen dosyayı şunlar için incele:
+- İstenmeyen değişiklikler
+- Eksik hata işleme
 - Potansiyel edge case'ler
 
-## Ãƒâ€¡Ã„Â±ktÃ„Â± FormatÃ„Â±
+## Çıktı Formatı
 
-TÃƒÂ¼m fazlarÃ„Â± ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±rdÃ„Â±ktan sonra, bir doÃ„Å¸rulama raporu ÃƒÂ¼ret:
+Tüm fazları çalıştırdıktan sonra, bir doğrulama raporu üret:
 
 ```
-DOÃ„Å¾RULAMA RAPORU
+DOĞRULAMA RAPORU
 ==================
 
 Build:     [PASS/FAIL]
 Tipler:    [PASS/FAIL] (X hata)
-Lint:      [PASS/FAIL] (X uyarÃ„Â±)
-Testler:   [PASS/FAIL] (X/Y geÃƒÂ§ti, %Z coverage)
-GÃƒÂ¼venlik:  [PASS/FAIL] (X sorun)
-Diff:      [X dosya deÃ„Å¸iÃ…Å¸ti]
+Lint:      [PASS/FAIL] (X uyarı)
+Testler:   [PASS/FAIL] (X/Y geçti, %Z coverage)
+Güvenlik:  [PASS/FAIL] (X sorun)
+Diff:      [X dosya değişti]
 
-Genel:     PR iÃƒÂ§in [HAZIR/HAZIR DEÃ„Å¾Ã„Â°L]
+Genel:     PR için [HAZIR/HAZIR DEĞİL]
 
-DÃƒÂ¼zeltilmesi Gereken Sorunlar:
+Düzeltilmesi Gereken Sorunlar:
 1. ...
 2. ...
 ```
 
-## SÃƒÂ¼rekli Mod
+## Sürekli Mod
 
-Uzun oturumlar iÃƒÂ§in, her 15 dakikada bir veya major deÃ„Å¸iÃ…Å¸ikliklerden sonra doÃ„Å¸rulama ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r:
+Uzun oturumlar için, her 15 dakikada bir veya major değişikliklerden sonra doğrulama çalıştır:
 
 ```markdown
-Mental kontrol noktasÃ„Â± belirle:
-- Her fonksiyonu tamamladÃ„Â±ktan sonra
+Mental kontrol noktası belirle:
+- Her fonksiyonu tamamladıktan sonra
 - Bir component'i bitirdikten sonra
-- Sonraki gÃƒÂ¶reve geÃƒÂ§meden ÃƒÂ¶nce
+- Sonraki göreve geçmeden önce
 
-Ãƒâ€¡alÃ„Â±Ã…Å¸tÃ„Â±r: /verify
+Çalıştır: /verify
 ```
 
 ## Hook'larla Entegrasyon
 
-Bu skill PostToolUse hook'larÃ„Â±nÃ„Â± tamamlar ancak daha derin doÃ„Å¸rulama saÃ„Å¸lar.
-Hook'lar sorunlarÃ„Â± anÃ„Â±nda yakalar; bu skill kapsamlÃ„Â± inceleme saÃ„Å¸lar.
+Bu skill PostToolUse hook'larını tamamlar ancak daha derin doğrulama sağlar.
+Hook'lar sorunları anında yakalar; bu skill kapsamlı inceleme sağlar.

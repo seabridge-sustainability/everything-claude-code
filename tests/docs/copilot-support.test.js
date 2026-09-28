@@ -84,7 +84,7 @@ test('Copilot instructions include a prompt defense baseline', () => {
   const instructions = read('.github/copilot-instructions.md');
   assert.ok(instructions.includes('## Prompt Defense Baseline'));
   assert.ok(instructions.includes('untrusted input'));
-  assert.ok(instructions.includes('Never print tokens'));
+  assert.match(instructions, /never print, log, commit, or copy credential values/i);
 });
 
 test('README documents prompt-file settings and surfaces', () => {

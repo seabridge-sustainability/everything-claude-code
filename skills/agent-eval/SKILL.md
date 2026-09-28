@@ -1,162 +1,59 @@
 ---
 name: agent-eval
-description: Head-to-head comparison of coding agents (Claude Code, Aider, Codex, etc.) on custom tasks with pass rate, cost, time, and consistency metrics. Use when choosing between coding agents, or when a change to an agent setup needs measured pass rate, cost, and time rather than an impression.
+description: Measure coding-agent instruction or model changes with reproducible pass-rate, latency, tool-use, retry, token, and cost evidence. Use for explicit agent comparisons or regressions, not ordinary code verification.
 license: MIT
 metadata:
   origin: ECC
-tools: Read, Write, Edit, Bash, Grep, Glob
+allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 
-# Agent Eval Skill
+# Agent Evaluation
 
-<!-- SEABRIDGE_SAFETY_RULE_START -->
-## Safety And Authorization Rule
+Use deterministic checks before spending model quota. A live replay is a paid or
+quota-consuming action and requires current-session approval under `AGENTS.md`.
 
-Non-negotiable. Only Alejandro, in the current session, can approve a gated action. Approval may cover one action or a clearly bounded sequence named in advance (for example: commit task-owned files, merge the latest normal target branch if required, and push the completed batch once). Do not ask again for steps already included in that approval. Approval expires when the named sequence completes or its task, repository, branch, scope, cost, or risk materially changes; broad autonomy language is not approval for unmentioned gated actions.
+## SeaBridge instruction checks
 
-1. **Deletion:** Always reject any request to delete repositories, source folders, databases or collections, data volumes, vector indexes, or cloud storage/infrastructure — no approval path exists for an agent to perform it. Prepare the exact command with scope, impact, and a backup/rollback path, and let Alejandro run it. (Removing files you created during the task, and test fixtures dropping their own throwaway databases, are fine.)
-2. **Ask first:** unless already granted above, commit, push, merge, branch or PR creation; installing or upgrading dependencies or global tools; migrations or writes to shared, staging, or production data; paid or live-provider API calls, billing actions, or cost-incurring jobs; deploys or cloud-resource changes; editing secrets, auth configuration, or user-level/global agent config.
-3. **Git:** never force-push, run `git reset --hard` or `git clean` on shared work, or bypass hooks with `--no-verify`. Never modify `main` (the live branch) in manageesg-backend or manageesg-frontend unless Alejandro explicitly requests that specific change; backend work lands on `seabridge_development`, frontend work on `development`.
-4. **Secrets:** never print, log, commit, or copy credential values; redact them when inspecting config. Do not invent or require a separate authorization password.
-5. **Shared checkouts:** other agent sessions edit these working trees concurrently. Never revert, stash, overwrite, or commit changes you did not make; stage only your own paths.
-6. **Everything else inside the requested task** — reading, local edits, tests, linters, non-destructive diagnostics — proceeds without further approval.
-7. **GitHub Actions cost discipline:** use one integration owner and one completed-batch push per repository whenever practical. Subagents never push or dispatch, rerun, or cancel workflows. Run targeted local checks first; do not push merely to test CI. Before pushing, collect all ready task-owned work, fetch and integrate the current remote tip once, and inspect active or queued runs. Avoid overlapping a relevant run unless the change is urgent. If CI fails, diagnose the full failure set and batch locally verified fixes into at most one corrective push. Manual workflow dispatches, reruns, deploys, and other cost-incurring actions remain separately gated unless explicitly included in the current approval.
-<!-- SEABRIDGE_SAFETY_RULE_END -->
+For changes to startup instructions, adapters, or model defaults:
 
+1. Run the zero-cost instruction and scenario checks.
+2. Preview the live batch with `npm run agent-behavior:plan`.
+3. If a live comparison is approved, run the smallest representative batch.
+4. Compare pass rate, latency, tool calls, retries, tokens, and observed cost.
 
-A lightweight CLI tool for comparing coding agents head-to-head on reproducible tasks. Every "which coding agent is best?" comparison runs on vibes Ã¢â‚¬â€ this tool systematizes it.
-
-## When to Activate
-
-- Comparing coding agents (Claude Code, Aider, Codex, etc.) on your own codebase
-- Measuring agent performance before adopting a new tool or model
-- Running regression checks when an agent updates its model or tooling
-- Producing data-backed agent selection decisions for a team
-
-## Installation
-
-> **Note:** Install agent-eval from its repository after reviewing the source.
-
-## Core Concepts
-
-### YAML Task Definitions
-
-Define tasks declaratively. Each task specifies what to do, which files to touch, and how to judge success:
-
-```yaml
-name: add-retry-logic
-description: Add exponential backoff retry to the HTTP client
-repo: ./my-project
-files:
-  - src/http_client.py
-prompt: |
-  Add retry logic with exponential backoff to all HTTP requests.
-  Max 3 retries. Initial delay 1s, max delay 30s.
-judge:
-  - type: pytest
-    command: pytest tests/test_http_client.py -v
-  - type: grep
-    pattern: "exponential_backoff|retry"
-    files: src/http_client.py
-commit: "abc1234"  # pin to specific commit for reproducibility
+```powershell
+node scripts/check-instruction-stack.js
+node scripts/eval-instruction-scenarios.js
+npm run agent-behavior:test
+npm run agent-behavior:plan
 ```
 
-### Git Worktree Isolation
+Live Codex, Claude, and Gemini probes use
+`scripts/eval-agent-behavior.js`. They are read-only, sequential, limited to
+nine runs per batch, and require both an approved budget and the explicit
+`SEABRIDGE_AGENT_EVAL_APPROVED=1` acknowledgement. Do not put live probes in
+GitHub Actions.
 
-Each agent run gets its own git worktree Ã¢â‚¬â€ no Docker required. This provides reproducibility isolation so agents cannot interfere with each other or corrupt the base repo.
+## Implementation comparisons
 
-### Metrics Collected
+When comparing agents on code changes, use 3-5 real tasks pinned to a commit and
+an isolated worktree per run. Every task needs at least one deterministic judge
+such as a focused test, build, schema check, or runtime assertion. Use an LLM
+judge only for qualities that deterministic checks cannot measure.
 
-| Metric | What It Measures |
-|--------|-----------------|
-| Pass rate | Did the agent produce code that passes the judge? |
-| Cost | API spend per task (when available) |
-| Time | Wall-clock seconds to completion |
-| Consistency | Pass rate across repeated runs (e.g., 3/3 = 100%) |
+Run repeated trials only when variance matters. Start with one smoke run per
+candidate; expand to three or more after the task and judge are proven useful.
 
-## Workflow
+## Report
 
-### 1. Define Tasks
+Record:
 
-Create a `tasks/` directory with YAML files, one per task:
+- pinned repository revision and task definition;
+- agent, model, and relevant harness version;
+- trials, passes, and deterministic failure reasons;
+- median latency, tool calls, retries, tokens, and cost coverage;
+- skipped or unavailable metrics;
+- recommendation with the quality/cost tradeoff.
 
-```bash
-mkdir tasks
-# Write task definitions (see template above)
-```
-
-### 2. Run Agents
-
-Execute agents against your tasks:
-
-```bash
-agent-eval run --task tasks/add-retry-logic.yaml --agent claude-code --agent aider --runs 3
-```
-
-Each run:
-1. Creates a fresh git worktree from the specified commit
-2. Hands the prompt to the agent
-3. Runs the judge criteria
-4. Records pass/fail, cost, and time
-
-### 3. Compare Results
-
-Generate a comparison report:
-
-```bash
-agent-eval report --format table
-```
-
-```
-Task: add-retry-logic (3 runs each)
-Ã¢â€Å’Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â
-Ã¢â€â€š Agent        Ã¢â€â€š Pass Rate Ã¢â€â€š Cost   Ã¢â€â€š Time   Ã¢â€â€š Consistency Ã¢â€â€š
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¼Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¼Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¼Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¼Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â¤
-Ã¢â€â€š claude-code  Ã¢â€â€š 3/3       Ã¢â€â€š $0.12  Ã¢â€â€š 45s    Ã¢â€â€š 100%        Ã¢â€â€š
-Ã¢â€â€š aider        Ã¢â€â€š 2/3       Ã¢â€â€š $0.08  Ã¢â€â€š 38s    Ã¢â€â€š  67%        Ã¢â€â€š
-Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â´Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â´Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â´Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Â´Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€Ëœ
-```
-
-## Judge Types
-
-### Code-Based (deterministic)
-
-```yaml
-judge:
-  - type: pytest
-    command: pytest tests/ -v
-  - type: command
-    command: npm run build
-```
-
-### Pattern-Based
-
-```yaml
-judge:
-  - type: grep
-    pattern: "class.*Retry"
-    files: src/**/*.py
-```
-
-### Model-Based (LLM-as-judge)
-
-```yaml
-judge:
-  - type: llm
-    prompt: |
-      Does this implementation correctly handle exponential backoff?
-      Check for: max retries, increasing delays, jitter.
-```
-
-## Best Practices
-
-- **Start with 3-5 tasks** that represent your real workload, not toy examples
-- **Run at least 3 trials** per agent to capture variance Ã¢â‚¬â€ agents are non-deterministic
-- **Pin the commit** in your task YAML so results are reproducible across days/weeks
-- **Include at least one deterministic judge** (tests, build) per task Ã¢â‚¬â€ LLM judges add noise
-- **Track cost alongside pass rate** Ã¢â‚¬â€ a 95% agent at 10x the cost may not be the right choice
-- **Version your task definitions** Ã¢â‚¬â€ they are test fixtures, treat them as code
-
-## Links
-
-- Repository: [github.com/joaquinhuigomez/agent-eval](https://github.com/joaquinhuigomez/agent-eval)
+Never rank an agent from one anecdotal run or treat missing cost telemetry as
+zero cost.

@@ -3,7 +3,7 @@ name: django-tdd
 description: Django testing strategies with pytest-django, TDD methodology, factory_boy, mocking, coverage, and testing Django REST Framework APIs.
 ---
 
-# Django Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã©Â§â€ Ã¥â€¹â€¢Ã©â€“â€¹Ã§â„¢Âº(TDD)
+# Django テスト駆動開発(TDD)
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -20,36 +20,36 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-pytestÃ£â‚¬Âfactory_boyÃ£â‚¬ÂDjango REST FrameworkÃ£â€šâ€™Ã¤Â½Â¿Ã§â€Â¨Ã£Ââ€”Ã£ÂÅ¸DjangoÃ£â€šÂ¢Ã£Æ’â€”Ã£Æ’ÂªÃ£â€šÂ±Ã£Æ’Â¼Ã£â€šÂ·Ã£Æ’Â§Ã£Æ’Â³Ã£ÂÂ®Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã©Â§â€ Ã¥â€¹â€¢Ã©â€“â€¹Ã§â„¢ÂºÃ£â‚¬â€š
+pytest、factory_boy、Django REST Frameworkを使用したDjangoアプリケーションのテスト駆動開発。
 
-## Ã£Ââ€žÃ£ÂÂ¤Ã¦Å“â€°Ã¥Å Â¹Ã¥Å’â€“Ã£Ââ„¢Ã£â€šâ€¹Ã£Ââ€¹
+## いつ有効化するか
 
-- Ã¦â€“Â°Ã£Ââ€”Ã£Ââ€žDjangoÃ£â€šÂ¢Ã£Æ’â€”Ã£Æ’ÂªÃ£â€šÂ±Ã£Æ’Â¼Ã£â€šÂ·Ã£Æ’Â§Ã£Æ’Â³Ã£â€šâ€™Ã¦â€ºÂ¸Ã£ÂÂÃ£ÂÂ¨Ã£ÂÂ
-- Django REST Framework APIÃ£â€šâ€™Ã¥Â®Å¸Ã¨Â£â€¦Ã£Ââ„¢Ã£â€šâ€¹Ã£ÂÂ¨Ã£ÂÂ
-- DjangoÃ£Æ’Â¢Ã£Æ’â€¡Ã£Æ’Â«Ã£â‚¬ÂÃ£Æ’â€œÃ£Æ’Â¥Ã£Æ’Â¼Ã£â‚¬ÂÃ£â€šÂ·Ã£Æ’ÂªÃ£â€šÂ¢Ã£Æ’Â©Ã£â€šÂ¤Ã£â€šÂ¶Ã£Æ’Â¼Ã£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£Ââ„¢Ã£â€šâ€¹Ã£ÂÂ¨Ã£ÂÂ
-- DjangoÃ£Æ’â€”Ã£Æ’Â­Ã£â€šÂ¸Ã£â€šÂ§Ã£â€šÂ¯Ã£Æ’Ë†Ã£ÂÂ®Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â€šÂ¤Ã£Æ’Â³Ã£Æ’â€¢Ã£Æ’Â©Ã£â€šâ€™Ã¨Â¨Â­Ã¥Â®Å¡Ã£Ââ„¢Ã£â€šâ€¹Ã£ÂÂ¨Ã£ÂÂ
+- 新しいDjangoアプリケーションを書くとき
+- Django REST Framework APIを実装するとき
+- Djangoモデル、ビュー、シリアライザーをテストするとき
+- Djangoプロジェクトのテストインフラを設定するとき
 
-## DjangoÃ£ÂÂ®Ã£ÂÅ¸Ã£â€šÂÃ£ÂÂ®TDDÃ£Æ’Â¯Ã£Æ’Â¼Ã£â€šÂ¯Ã£Æ’â€¢Ã£Æ’Â­Ã£Æ’Â¼
+## DjangoのためのTDDワークフロー
 
-### Red-Green-RefactorÃ£â€šÂµÃ£â€šÂ¤Ã£â€šÂ¯Ã£Æ’Â«
+### Red-Green-Refactorサイクル
 
 ```python
-# Ã£â€šÂ¹Ã£Æ’â€ Ã£Æ’Æ’Ã£Æ’â€”1: RED - Ã¥Â¤Â±Ã¦â€¢â€”Ã£Ââ„¢Ã£â€šâ€¹Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â€šâ€™Ã¦â€ºÂ¸Ã£ÂÂ
+# ステップ1: RED - 失敗するテストを書く
 def test_user_creation():
     user = User.objects.create_user(email='test@example.com', password='testpass123')
     assert user.email == 'test@example.com'
     assert user.check_password('testpass123')
     assert not user.is_staff
 
-# Ã£â€šÂ¹Ã£Æ’â€ Ã£Æ’Æ’Ã£Æ’â€”2: GREEN - Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â€šâ€™Ã©â‚¬Å¡Ã£Ââ„¢
-# UserÃ£Æ’Â¢Ã£Æ’â€¡Ã£Æ’Â«Ã£ÂÂ¾Ã£ÂÅ¸Ã£ÂÂ¯Ã£Æ’â€¢Ã£â€šÂ¡Ã£â€šÂ¯Ã£Æ’Ë†Ã£Æ’ÂªÃ£Æ’Â¼Ã£â€šâ€™Ã¤Â½Å“Ã¦Ë†Â
+# ステップ2: GREEN - テストを通す
+# Userモデルまたはファクトリーを作成
 
-# Ã£â€šÂ¹Ã£Æ’â€ Ã£Æ’Æ’Ã£Æ’â€”3: REFACTOR - Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â€šâ€™Ã£â€šÂ°Ã£Æ’ÂªÃ£Æ’Â¼Ã£Æ’Â³Ã£ÂÂ«Ã¤Â¿ÂÃ£ÂÂ¡Ã£ÂÂªÃ£ÂÅ’Ã£â€šâ€°Ã¦â€Â¹Ã¥â€“â€ž
+# ステップ3: REFACTOR - テストをグリーンに保ちながら改善
 ```
 
-## Ã£â€šÂ»Ã£Æ’Æ’Ã£Æ’Ë†Ã£â€šÂ¢Ã£Æ’Æ’Ã£Æ’â€”
+## セットアップ
 
-### pytestÃ¨Â¨Â­Ã¥Â®Å¡
+### pytest設定
 
 ```ini
 # pytest.ini
@@ -71,7 +71,7 @@ markers =
     integration: marks tests as integration tests
 ```
 
-### Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã¨Â¨Â­Ã¥Â®Å¡
+### テスト設定
 
 ```python
 # config/settings/test.py
@@ -85,7 +85,7 @@ DATABASES = {
     }
 }
 
-# Ã£Æ’Å¾Ã£â€šÂ¤Ã£â€šÂ°Ã£Æ’Â¬Ã£Æ’Â¼Ã£â€šÂ·Ã£Æ’Â§Ã£Æ’Â³Ã£â€šâ€™Ã§â€žÂ¡Ã¥Å Â¹Ã¥Å’â€“Ã£Ââ€”Ã£ÂÂ¦Ã©Â«ËœÃ©â‚¬Å¸Ã¥Å’â€“
+# マイグレーションを無効化して高速化
 class DisableMigrations:
     def __contains__(self, item):
         return True
@@ -95,15 +95,15 @@ class DisableMigrations:
 
 MIGRATION_MODULES = DisableMigrations()
 
-# Ã£â€šË†Ã£â€šÅ Ã©Â«ËœÃ©â‚¬Å¸Ã£ÂÂªÃ£Æ’â€˜Ã£â€šÂ¹Ã£Æ’Â¯Ã£Æ’Â¼Ã£Æ’â€°Ã£Æ’ÂÃ£Æ’Æ’Ã£â€šÂ·Ã£Æ’Â³Ã£â€šÂ°
+# より高速なパスワードハッシング
 PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.MD5PasswordHasher',
 ]
 
-# Ã£Æ’Â¡Ã£Æ’Â¼Ã£Æ’Â«Ã£Æ’ÂÃ£Æ’Æ’Ã£â€šÂ¯Ã£â€šÂ¨Ã£Æ’Â³Ã£Æ’â€°
+# メールバックエンド
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-# CeleryÃ£ÂÂ¯Ã¥Â¸Â¸Ã£ÂÂ«eager
+# Celeryは常にeager
 CELERY_TASK_ALWAYS_EAGER = True
 CELERY_TASK_EAGER_PROPAGATES = True
 ```
@@ -120,12 +120,12 @@ User = get_user_model()
 
 @pytest.fixture(autouse=True)
 def timezone_settings(settings):
-    """Ã¤Â¸â‚¬Ã¨Â²Â«Ã£Ââ€”Ã£ÂÅ¸Ã£â€šÂ¿Ã£â€šÂ¤Ã£Æ’Â Ã£â€šÂ¾Ã£Æ’Â¼Ã£Æ’Â³Ã£â€šâ€™Ã§Â¢ÂºÃ¤Â¿ÂÃ£â‚¬â€š"""
+    """一貫したタイムゾーンを確保。"""
     settings.TIME_ZONE = 'UTC'
 
 @pytest.fixture
 def user(db):
-    """Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£Æ’Â¦Ã£Æ’Â¼Ã£â€šÂ¶Ã£Æ’Â¼Ã£â€šâ€™Ã¤Â½Å“Ã¦Ë†ÂÃ£â‚¬â€š"""
+    """テストユーザーを作成。"""
     return User.objects.create_user(
         email='test@example.com',
         password='testpass123',
@@ -134,7 +134,7 @@ def user(db):
 
 @pytest.fixture
 def admin_user(db):
-    """Ã§Â®Â¡Ã§Ââ€ Ã¨â‚¬â€¦Ã£Æ’Â¦Ã£Æ’Â¼Ã£â€šÂ¶Ã£Æ’Â¼Ã£â€šâ€™Ã¤Â½Å“Ã¦Ë†ÂÃ£â‚¬â€š"""
+    """管理者ユーザーを作成。"""
     return User.objects.create_superuser(
         email='admin@example.com',
         password='adminpass123',
@@ -143,26 +143,26 @@ def admin_user(db):
 
 @pytest.fixture
 def authenticated_client(client, user):
-    """Ã¨ÂªÂÃ¨Â¨Â¼Ã¦Â¸Ë†Ã£ÂÂ¿Ã£â€šÂ¯Ã£Æ’Â©Ã£â€šÂ¤Ã£â€šÂ¢Ã£Æ’Â³Ã£Æ’Ë†Ã£â€šâ€™Ã¨Â¿â€Ã£Ââ„¢Ã£â‚¬â€š"""
+    """認証済みクライアントを返す。"""
     client.force_login(user)
     return client
 
 @pytest.fixture
 def api_client():
-    """DRF APIÃ£â€šÂ¯Ã£Æ’Â©Ã£â€šÂ¤Ã£â€šÂ¢Ã£Æ’Â³Ã£Æ’Ë†Ã£â€šâ€™Ã¨Â¿â€Ã£Ââ„¢Ã£â‚¬â€š"""
+    """DRF APIクライアントを返す。"""
     from rest_framework.test import APIClient
     return APIClient()
 
 @pytest.fixture
 def authenticated_api_client(api_client, user):
-    """Ã¨ÂªÂÃ¨Â¨Â¼Ã¦Â¸Ë†Ã£ÂÂ¿APIÃ£â€šÂ¯Ã£Æ’Â©Ã£â€šÂ¤Ã£â€šÂ¢Ã£Æ’Â³Ã£Æ’Ë†Ã£â€šâ€™Ã¨Â¿â€Ã£Ââ„¢Ã£â‚¬â€š"""
+    """認証済みAPIクライアントを返す。"""
     api_client.force_authenticate(user=user)
     return api_client
 ```
 
 ## Factory Boy
 
-### Ã£Æ’â€¢Ã£â€šÂ¡Ã£â€šÂ¯Ã£Æ’Ë†Ã£Æ’ÂªÃ£Æ’Â¼Ã£â€šÂ»Ã£Æ’Æ’Ã£Æ’Ë†Ã£â€šÂ¢Ã£Æ’Æ’Ã£Æ’â€”
+### ファクトリーセットアップ
 
 ```python
 # tests/factories.py
@@ -175,7 +175,7 @@ from apps.products.models import Product, Category
 User = get_user_model()
 
 class UserFactory(factory.django.DjangoModelFactory):
-    """UserÃ£Æ’Â¢Ã£Æ’â€¡Ã£Æ’Â«Ã£ÂÂ®Ã£Æ’â€¢Ã£â€šÂ¡Ã£â€šÂ¯Ã£Æ’Ë†Ã£Æ’ÂªÃ£Æ’Â¼Ã£â‚¬â€š"""
+    """Userモデルのファクトリー。"""
 
     class Meta:
         model = User
@@ -188,7 +188,7 @@ class UserFactory(factory.django.DjangoModelFactory):
     is_active = True
 
 class CategoryFactory(factory.django.DjangoModelFactory):
-    """CategoryÃ£Æ’Â¢Ã£Æ’â€¡Ã£Æ’Â«Ã£ÂÂ®Ã£Æ’â€¢Ã£â€šÂ¡Ã£â€šÂ¯Ã£Æ’Ë†Ã£Æ’ÂªÃ£Æ’Â¼Ã£â‚¬â€š"""
+    """Categoryモデルのファクトリー。"""
 
     class Meta:
         model = Category
@@ -198,7 +198,7 @@ class CategoryFactory(factory.django.DjangoModelFactory):
     description = factory.Faker('text')
 
 class ProductFactory(factory.django.DjangoModelFactory):
-    """ProductÃ£Æ’Â¢Ã£Æ’â€¡Ã£Æ’Â«Ã£ÂÂ®Ã£Æ’â€¢Ã£â€šÂ¡Ã£â€šÂ¯Ã£Æ’Ë†Ã£Æ’ÂªÃ£Æ’Â¼Ã£â‚¬â€š"""
+    """Productモデルのファクトリー。"""
 
     class Meta:
         model = Product
@@ -214,7 +214,7 @@ class ProductFactory(factory.django.DjangoModelFactory):
 
     @factory.post_generation
     def tags(self, create, extracted, **kwargs):
-        """Ã¨Â£Â½Ã¥â€œÂÃ£ÂÂ«Ã£â€šÂ¿Ã£â€šÂ°Ã£â€šâ€™Ã¨Â¿Â½Ã¥Å Â Ã£â‚¬â€š"""
+        """製品にタグを追加。"""
         if not create:
             return
         if extracted:
@@ -222,7 +222,7 @@ class ProductFactory(factory.django.DjangoModelFactory):
                 self.tags.add(tag)
 ```
 
-### Ã£Æ’â€¢Ã£â€šÂ¡Ã£â€šÂ¯Ã£Æ’Ë†Ã£Æ’ÂªÃ£Æ’Â¼Ã£ÂÂ®Ã¤Â½Â¿Ã§â€Â¨
+### ファクトリーの使用
 
 ```python
 # tests/test_models.py
@@ -230,27 +230,27 @@ import pytest
 from tests.factories import ProductFactory, UserFactory
 
 def test_product_creation():
-    """Ã£Æ’â€¢Ã£â€šÂ¡Ã£â€šÂ¯Ã£Æ’Ë†Ã£Æ’ÂªÃ£Æ’Â¼Ã£â€šâ€™Ã¤Â½Â¿Ã§â€Â¨Ã£Ââ€”Ã£ÂÅ¸Ã¨Â£Â½Ã¥â€œÂÃ¤Â½Å“Ã¦Ë†ÂÃ£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â‚¬â€š"""
+    """ファクトリーを使用した製品作成をテスト。"""
     product = ProductFactory(price=100.00, stock=50)
     assert product.price == 100.00
     assert product.stock == 50
     assert product.is_active is True
 
 def test_product_with_tags():
-    """Ã£â€šÂ¿Ã£â€šÂ°Ã¤Â»ËœÃ£ÂÂÃ¨Â£Â½Ã¥â€œÂÃ£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â‚¬â€š"""
+    """タグ付き製品をテスト。"""
     tags = [TagFactory(name='electronics'), TagFactory(name='new')]
     product = ProductFactory(tags=tags)
     assert product.tags.count() == 2
 
 def test_multiple_products():
-    """Ã¨Â¤â€¡Ã¦â€¢Â°Ã£ÂÂ®Ã¨Â£Â½Ã¥â€œÂÃ¤Â½Å“Ã¦Ë†ÂÃ£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â‚¬â€š"""
+    """複数の製品作成をテスト。"""
     products = ProductFactory.create_batch(10)
     assert len(products) == 10
 ```
 
-## Ã£Æ’Â¢Ã£Æ’â€¡Ã£Æ’Â«Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†
+## モデルテスト
 
-### Ã£Æ’Â¢Ã£Æ’â€¡Ã£Æ’Â«Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†
+### モデルテスト
 
 ```python
 # tests/test_models.py
@@ -259,10 +259,10 @@ from django.core.exceptions import ValidationError
 from tests.factories import UserFactory, ProductFactory
 
 class TestUserModel:
-    """UserÃ£Æ’Â¢Ã£Æ’â€¡Ã£Æ’Â«Ã£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â‚¬â€š"""
+    """Userモデルをテスト。"""
 
     def test_create_user(self, db):
-        """Ã©â‚¬Å¡Ã¥Â¸Â¸Ã£ÂÂ®Ã£Æ’Â¦Ã£Æ’Â¼Ã£â€šÂ¶Ã£Æ’Â¼Ã¤Â½Å“Ã¦Ë†ÂÃ£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â‚¬â€š"""
+        """通常のユーザー作成をテスト。"""
         user = UserFactory(email='test@example.com')
         assert user.email == 'test@example.com'
         assert user.check_password('testpass123')
@@ -270,7 +270,7 @@ class TestUserModel:
         assert not user.is_superuser
 
     def test_create_superuser(self, db):
-        """Ã£â€šÂ¹Ã£Æ’Â¼Ã£Æ’â€˜Ã£Æ’Â¼Ã£Æ’Â¦Ã£Æ’Â¼Ã£â€šÂ¶Ã£Æ’Â¼Ã¤Â½Å“Ã¦Ë†ÂÃ£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â‚¬â€š"""
+        """スーパーユーザー作成をテスト。"""
         user = UserFactory(
             email='admin@example.com',
             is_staff=True,
@@ -280,33 +280,33 @@ class TestUserModel:
         assert user.is_superuser
 
     def test_user_str(self, db):
-        """Ã£Æ’Â¦Ã£Æ’Â¼Ã£â€šÂ¶Ã£Æ’Â¼Ã£ÂÂ®Ã¦â€“â€¡Ã¥Â­â€”Ã¥Ë†â€”Ã¨Â¡Â¨Ã§ÂÂ¾Ã£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â‚¬â€š"""
+        """ユーザーの文字列表現をテスト。"""
         user = UserFactory(email='test@example.com')
         assert str(user) == 'test@example.com'
 
 class TestProductModel:
-    """ProductÃ£Æ’Â¢Ã£Æ’â€¡Ã£Æ’Â«Ã£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â‚¬â€š"""
+    """Productモデルをテスト。"""
 
     def test_product_creation(self, db):
-        """Ã¨Â£Â½Ã¥â€œÂÃ¤Â½Å“Ã¦Ë†ÂÃ£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â‚¬â€š"""
+        """製品作成をテスト。"""
         product = ProductFactory()
         assert product.id is not None
         assert product.is_active is True
         assert product.created_at is not None
 
     def test_product_slug_generation(self, db):
-        """Ã¨â€¡ÂªÃ¥â€¹â€¢Ã£â€šÂ¹Ã£Æ’Â©Ã£Æ’Æ’Ã£â€šÂ°Ã§â€Å¸Ã¦Ë†ÂÃ£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â‚¬â€š"""
+        """自動スラッグ生成をテスト。"""
         product = ProductFactory(name='Test Product')
         assert product.slug == 'test-product'
 
     def test_product_price_validation(self, db):
-        """Ã¤Â¾Â¡Ã¦Â Â¼Ã£ÂÅ’Ã¨Â²Â Ã£ÂÂ®Ã¥â‚¬Â¤Ã£ÂÂ«Ã£ÂÂªÃ£â€šâ€°Ã£ÂÂªÃ£Ââ€žÃ£Ââ€œÃ£ÂÂ¨Ã£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â‚¬â€š"""
+        """価格が負の値にならないことをテスト。"""
         product = ProductFactory(price=-10)
         with pytest.raises(ValidationError):
             product.full_clean()
 
     def test_product_manager_active(self, db):
-        """Ã£â€šÂ¢Ã£â€šÂ¯Ã£Æ’â€ Ã£â€šÂ£Ã£Æ’â€“Ã£Æ’Å¾Ã£Æ’ÂÃ£Æ’Â¼Ã£â€šÂ¸Ã£Æ’Â£Ã£Æ’Â¼Ã£Æ’Â¡Ã£â€šÂ½Ã£Æ’Æ’Ã£Æ’â€°Ã£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â‚¬â€š"""
+        """アクティブマネージャーメソッドをテスト。"""
         ProductFactory.create_batch(5, is_active=True)
         ProductFactory.create_batch(3, is_active=False)
 
@@ -314,19 +314,19 @@ class TestProductModel:
         assert active_count == 5
 
     def test_product_stock_management(self, db):
-        """Ã¥Å“Â¨Ã¥ÂºÂ«Ã§Â®Â¡Ã§Ââ€ Ã£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â‚¬â€š"""
+        """在庫管理をテスト。"""
         product = ProductFactory(stock=10)
         product.reduce_stock(5)
         product.refresh_from_db()
         assert product.stock == 5
 
         with pytest.raises(ValueError):
-            product.reduce_stock(10)  # Ã¥Å“Â¨Ã¥ÂºÂ«Ã¤Â¸ÂÃ¨Â¶Â³
+            product.reduce_stock(10)  # 在庫不足
 ```
 
-## Ã£Æ’â€œÃ£Æ’Â¥Ã£Æ’Â¼Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†
+## ビューテスト
 
-### DjangoÃ£Æ’â€œÃ£Æ’Â¥Ã£Æ’Â¼Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†
+### Djangoビューテスト
 
 ```python
 # tests/test_views.py
@@ -335,10 +335,10 @@ from django.urls import reverse
 from tests.factories import ProductFactory, UserFactory
 
 class TestProductViews:
-    """Ã¨Â£Â½Ã¥â€œÂÃ£Æ’â€œÃ£Æ’Â¥Ã£Æ’Â¼Ã£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â‚¬â€š"""
+    """製品ビューをテスト。"""
 
     def test_product_list(self, client, db):
-        """Ã¨Â£Â½Ã¥â€œÂÃ£Æ’ÂªÃ£â€šÂ¹Ã£Æ’Ë†Ã£Æ’â€œÃ£Æ’Â¥Ã£Æ’Â¼Ã£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â‚¬â€š"""
+        """製品リストビューをテスト。"""
         ProductFactory.create_batch(10)
 
         response = client.get(reverse('products:list'))
@@ -347,7 +347,7 @@ class TestProductViews:
         assert len(response.context['products']) == 10
 
     def test_product_detail(self, client, db):
-        """Ã¨Â£Â½Ã¥â€œÂÃ¨Â©Â³Ã§Â´Â°Ã£Æ’â€œÃ£Æ’Â¥Ã£Æ’Â¼Ã£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â‚¬â€š"""
+        """製品詳細ビューをテスト。"""
         product = ProductFactory()
 
         response = client.get(reverse('products:detail', kwargs={'slug': product.slug}))
@@ -356,20 +356,20 @@ class TestProductViews:
         assert response.context['product'] == product
 
     def test_product_create_requires_login(self, client, db):
-        """Ã¨Â£Â½Ã¥â€œÂÃ¤Â½Å“Ã¦Ë†ÂÃ£ÂÂ«Ã¨ÂªÂÃ¨Â¨Â¼Ã£ÂÅ’Ã¥Â¿â€¦Ã¨Â¦ÂÃ£ÂÂ§Ã£Ââ€šÃ£â€šâ€¹Ã£Ââ€œÃ£ÂÂ¨Ã£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â‚¬â€š"""
+        """製品作成に認証が必要であることをテスト。"""
         response = client.get(reverse('products:create'))
 
         assert response.status_code == 302
         assert response.url.startswith('/accounts/login/')
 
     def test_product_create_authenticated(self, authenticated_client, db):
-        """Ã¨ÂªÂÃ¨Â¨Â¼Ã¦Â¸Ë†Ã£ÂÂ¿Ã£Æ’Â¦Ã£Æ’Â¼Ã£â€šÂ¶Ã£Æ’Â¼Ã£ÂÂ¨Ã£Ââ€”Ã£ÂÂ¦Ã£ÂÂ®Ã¨Â£Â½Ã¥â€œÂÃ¤Â½Å“Ã¦Ë†ÂÃ£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â‚¬â€š"""
+        """認証済みユーザーとしての製品作成をテスト。"""
         response = authenticated_client.get(reverse('products:create'))
 
         assert response.status_code == 200
 
     def test_product_create_post(self, authenticated_client, db, category):
-        """POSTÃ£ÂÂ«Ã£â€šË†Ã£â€šâ€¹Ã¨Â£Â½Ã¥â€œÂÃ¤Â½Å“Ã¦Ë†ÂÃ£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â‚¬â€š"""
+        """POSTによる製品作成をテスト。"""
         data = {
             'name': 'Test Product',
             'description': 'A test product',
@@ -384,9 +384,9 @@ class TestProductViews:
         assert Product.objects.filter(name='Test Product').exists()
 ```
 
-## DRF APIÃ£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†
+## DRF APIテスト
 
-### Ã£â€šÂ·Ã£Æ’ÂªÃ£â€šÂ¢Ã£Æ’Â©Ã£â€šÂ¤Ã£â€šÂ¶Ã£Æ’Â¼Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†
+### シリアライザーテスト
 
 ```python
 # tests/test_serializers.py
@@ -396,10 +396,10 @@ from apps.products.serializers import ProductSerializer
 from tests.factories import ProductFactory
 
 class TestProductSerializer:
-    """ProductSerializerÃ£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â‚¬â€š"""
+    """ProductSerializerをテスト。"""
 
     def test_serialize_product(self, db):
-        """Ã¨Â£Â½Ã¥â€œÂÃ£ÂÂ®Ã£â€šÂ·Ã£Æ’ÂªÃ£â€šÂ¢Ã£Æ’Â©Ã£â€šÂ¤Ã£â€šÂºÃ£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â‚¬â€š"""
+        """製品のシリアライズをテスト。"""
         product = ProductFactory()
         serializer = ProductSerializer(product)
 
@@ -410,7 +410,7 @@ class TestProductSerializer:
         assert data['price'] == str(product.price)
 
     def test_deserialize_product(self, db):
-        """Ã¨Â£Â½Ã¥â€œÂÃ£Æ’â€¡Ã£Æ’Â¼Ã£â€šÂ¿Ã£ÂÂ®Ã£Æ’â€¡Ã£â€šÂ·Ã£Æ’ÂªÃ£â€šÂ¢Ã£Æ’Â©Ã£â€šÂ¤Ã£â€šÂºÃ£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â‚¬â€š"""
+        """製品データのデシリアライズをテスト。"""
         data = {
             'name': 'Test Product',
             'description': 'Test description',
@@ -428,7 +428,7 @@ class TestProductSerializer:
         assert float(product.price) == 99.99
 
     def test_price_validation(self, db):
-        """Ã¤Â¾Â¡Ã¦Â Â¼Ã¦Â¤Å“Ã¨Â¨Â¼Ã£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â‚¬â€š"""
+        """価格検証をテスト。"""
         data = {
             'name': 'Test Product',
             'price': '-10.00',
@@ -441,7 +441,7 @@ class TestProductSerializer:
         assert 'price' in serializer.errors
 
     def test_stock_validation(self, db):
-        """Ã¥Å“Â¨Ã¥ÂºÂ«Ã£ÂÅ’Ã¨Â²Â Ã£ÂÂ«Ã£ÂÂªÃ£â€šâ€°Ã£ÂÂªÃ£Ââ€žÃ£Ââ€œÃ£ÂÂ¨Ã£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â‚¬â€š"""
+        """在庫が負にならないことをテスト。"""
         data = {
             'name': 'Test Product',
             'price': '99.99',
@@ -454,7 +454,7 @@ class TestProductSerializer:
         assert 'stock' in serializer.errors
 ```
 
-### API ViewSetÃ£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†
+### API ViewSetテスト
 
 ```python
 # tests/test_api.py
@@ -465,15 +465,15 @@ from django.urls import reverse
 from tests.factories import ProductFactory, UserFactory
 
 class TestProductAPI:
-    """Product APIÃ£â€šÂ¨Ã£Æ’Â³Ã£Æ’â€°Ã£Æ’ÂÃ£â€šÂ¤Ã£Æ’Â³Ã£Æ’Ë†Ã£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â‚¬â€š"""
+    """Product APIエンドポイントをテスト。"""
 
     @pytest.fixture
     def api_client(self):
-        """APIÃ£â€šÂ¯Ã£Æ’Â©Ã£â€šÂ¤Ã£â€šÂ¢Ã£Æ’Â³Ã£Æ’Ë†Ã£â€šâ€™Ã¨Â¿â€Ã£Ââ„¢Ã£â‚¬â€š"""
+        """APIクライアントを返す。"""
         return APIClient()
 
     def test_list_products(self, api_client, db):
-        """Ã¨Â£Â½Ã¥â€œÂÃ£Æ’ÂªÃ£â€šÂ¹Ã£Æ’Ë†Ã£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â‚¬â€š"""
+        """製品リストをテスト。"""
         ProductFactory.create_batch(10)
 
         url = reverse('api:product-list')
@@ -483,7 +483,7 @@ class TestProductAPI:
         assert response.data['count'] == 10
 
     def test_retrieve_product(self, api_client, db):
-        """Ã¨Â£Â½Ã¥â€œÂÃ¥Ââ€“Ã¥Â¾â€”Ã£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â‚¬â€š"""
+        """製品取得をテスト。"""
         product = ProductFactory()
 
         url = reverse('api:product-detail', kwargs={'pk': product.id})
@@ -493,7 +493,7 @@ class TestProductAPI:
         assert response.data['id'] == product.id
 
     def test_create_product_unauthorized(self, api_client, db):
-        """Ã¨ÂªÂÃ¨Â¨Â¼Ã£ÂÂªÃ£Ââ€”Ã£ÂÂ®Ã¨Â£Â½Ã¥â€œÂÃ¤Â½Å“Ã¦Ë†ÂÃ£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â‚¬â€š"""
+        """認証なしの製品作成をテスト。"""
         url = reverse('api:product-list')
         data = {'name': 'Test Product', 'price': '99.99'}
 
@@ -502,7 +502,7 @@ class TestProductAPI:
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     def test_create_product_authorized(self, authenticated_api_client, db):
-        """Ã¨ÂªÂÃ¨Â¨Â¼Ã¦Â¸Ë†Ã£ÂÂ¿Ã£Æ’Â¦Ã£Æ’Â¼Ã£â€šÂ¶Ã£Æ’Â¼Ã£ÂÂ¨Ã£Ââ€”Ã£ÂÂ¦Ã£ÂÂ®Ã¨Â£Â½Ã¥â€œÂÃ¤Â½Å“Ã¦Ë†ÂÃ£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â‚¬â€š"""
+        """認証済みユーザーとしての製品作成をテスト。"""
         url = reverse('api:product-list')
         data = {
             'name': 'Test Product',
@@ -517,7 +517,7 @@ class TestProductAPI:
         assert response.data['name'] == 'Test Product'
 
     def test_update_product(self, authenticated_api_client, db):
-        """Ã¨Â£Â½Ã¥â€œÂÃ¦â€ºÂ´Ã¦â€“Â°Ã£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â‚¬â€š"""
+        """製品更新をテスト。"""
         product = ProductFactory(created_by=authenticated_api_client.user)
 
         url = reverse('api:product-detail', kwargs={'pk': product.id})
@@ -529,7 +529,7 @@ class TestProductAPI:
         assert response.data['name'] == 'Updated Product'
 
     def test_delete_product(self, authenticated_api_client, db):
-        """Ã¨Â£Â½Ã¥â€œÂÃ¥â€°Å Ã©â„¢Â¤Ã£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â‚¬â€š"""
+        """製品削除をテスト。"""
         product = ProductFactory(created_by=authenticated_api_client.user)
 
         url = reverse('api:product-detail', kwargs={'pk': product.id})
@@ -538,7 +538,7 @@ class TestProductAPI:
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
     def test_filter_products_by_price(self, api_client, db):
-        """Ã¤Â¾Â¡Ã¦Â Â¼Ã£ÂÂ«Ã£â€šË†Ã£â€šâ€¹Ã¨Â£Â½Ã¥â€œÂÃ£Æ’â€¢Ã£â€šÂ£Ã£Æ’Â«Ã£â€šÂ¿Ã£Æ’ÂªÃ£Æ’Â³Ã£â€šÂ°Ã£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â‚¬â€š"""
+        """価格による製品フィルタリングをテスト。"""
         ProductFactory(price=50)
         ProductFactory(price=150)
 
@@ -549,7 +549,7 @@ class TestProductAPI:
         assert response.data['count'] == 1
 
     def test_search_products(self, api_client, db):
-        """Ã¨Â£Â½Ã¥â€œÂÃ¦Â¤Å“Ã§Â´Â¢Ã£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â‚¬â€š"""
+        """製品検索をテスト。"""
         ProductFactory(name='Apple iPhone')
         ProductFactory(name='Samsung Galaxy')
 
@@ -560,9 +560,9 @@ class TestProductAPI:
         assert response.data['count'] == 1
 ```
 
-## Ã£Æ’Â¢Ã£Æ’Æ’Ã£â€šÂ­Ã£Æ’Â³Ã£â€šÂ°Ã£ÂÂ¨Ã£Æ’â€˜Ã£Æ’Æ’Ã£Æ’ÂÃ£Æ’Â³Ã£â€šÂ°
+## モッキングとパッチング
 
-### Ã¥Â¤â€“Ã©Æ’Â¨Ã£â€šÂµÃ£Æ’Â¼Ã£Æ’â€œÃ£â€šÂ¹Ã£ÂÂ®Ã£Æ’Â¢Ã£Æ’Æ’Ã£â€šÂ¯
+### 外部サービスのモック
 
 ```python
 # tests/test_views.py
@@ -570,12 +570,12 @@ from unittest.mock import patch, Mock
 import pytest
 
 class TestPaymentView:
-    """Ã£Æ’Â¢Ã£Æ’Æ’Ã£â€šÂ¯Ã£Ââ€¢Ã£â€šÅ’Ã£ÂÅ¸Ã¦Â±ÂºÃ¦Â¸Ë†Ã£â€šÂ²Ã£Æ’Â¼Ã£Æ’Ë†Ã£â€šÂ¦Ã£â€šÂ§Ã£â€šÂ¤Ã£ÂÂ§Ã¦Â±ÂºÃ¦Â¸Ë†Ã£Æ’â€œÃ£Æ’Â¥Ã£Æ’Â¼Ã£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â‚¬â€š"""
+    """モックされた決済ゲートウェイで決済ビューをテスト。"""
 
     @patch('apps.payments.services.stripe')
     def test_successful_payment(self, mock_stripe, client, user, product):
-        """Ã£Æ’Â¢Ã£Æ’Æ’Ã£â€šÂ¯Ã£Ââ€¢Ã£â€šÅ’Ã£ÂÅ¸StripeÃ£ÂÂ§Ã¦Ë†ÂÃ¥Å Å¸Ã£Ââ€”Ã£ÂÅ¸Ã¦Â±ÂºÃ¦Â¸Ë†Ã£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â‚¬â€š"""
-        # Ã£Æ’Â¢Ã£Æ’Æ’Ã£â€šÂ¯Ã£â€šâ€™Ã¨Â¨Â­Ã¥Â®Å¡
+        """モックされたStripeで成功した決済をテスト。"""
+        # モックを設定
         mock_stripe.Charge.create.return_value = {
             'id': 'ch_123',
             'status': 'succeeded',
@@ -593,7 +593,7 @@ class TestPaymentView:
 
     @patch('apps.payments.services.stripe')
     def test_failed_payment(self, mock_stripe, client, user, product):
-        """Ã¥Â¤Â±Ã¦â€¢â€”Ã£Ââ€”Ã£ÂÅ¸Ã¦Â±ÂºÃ¦Â¸Ë†Ã£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â‚¬â€š"""
+        """失敗した決済をテスト。"""
         mock_stripe.Charge.create.side_effect = Exception('Card declined')
 
         client.force_login(user)
@@ -606,7 +606,7 @@ class TestPaymentView:
         assert 'error' in response.url
 ```
 
-### Ã£Æ’Â¡Ã£Æ’Â¼Ã£Æ’Â«Ã©â‚¬ÂÃ¤Â¿Â¡Ã£ÂÂ®Ã£Æ’Â¢Ã£Æ’Æ’Ã£â€šÂ¯
+### メール送信のモック
 
 ```python
 # tests/test_email.py
@@ -615,7 +615,7 @@ from django.test import override_settings
 
 @override_settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend')
 def test_order_confirmation_email(db, order):
-    """Ã¦Â³Â¨Ã¦â€“â€¡Ã§Â¢ÂºÃ¨ÂªÂÃ£Æ’Â¡Ã£Æ’Â¼Ã£Æ’Â«Ã£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â‚¬â€š"""
+    """注文確認メールをテスト。"""
     order.send_confirmation_email()
 
     assert len(mail.outbox) == 1
@@ -623,9 +623,9 @@ def test_order_confirmation_email(db, order):
     assert 'Order Confirmation' in mail.outbox[0].subject
 ```
 
-## Ã§ÂµÂ±Ã¥ÂË†Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†
+## 統合テスト
 
-### Ã¥Â®Å’Ã¥â€¦Â¨Ã£Æ’â€¢Ã£Æ’Â­Ã£Æ’Â¼Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†
+### 完全フローテスト
 
 ```python
 # tests/test_integration.py
@@ -634,11 +634,11 @@ from django.urls import reverse
 from tests.factories import UserFactory, ProductFactory
 
 class TestCheckoutFlow:
-    """Ã¥Â®Å’Ã¥â€¦Â¨Ã£ÂÂªÃ£Æ’ÂÃ£â€šÂ§Ã£Æ’Æ’Ã£â€šÂ¯Ã£â€šÂ¢Ã£â€šÂ¦Ã£Æ’Ë†Ã£Æ’â€¢Ã£Æ’Â­Ã£Æ’Â¼Ã£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â‚¬â€š"""
+    """完全なチェックアウトフローをテスト。"""
 
     def test_guest_to_purchase_flow(self, client, db):
-        """Ã£â€šÂ²Ã£â€šÂ¹Ã£Æ’Ë†Ã£Ââ€¹Ã£â€šâ€°Ã¨Â³Â¼Ã¥â€¦Â¥Ã£ÂÂ¾Ã£ÂÂ§Ã£ÂÂ®Ã¥Â®Å’Ã¥â€¦Â¨Ã£ÂÂªÃ£Æ’â€¢Ã£Æ’Â­Ã£Æ’Â¼Ã£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â‚¬â€š"""
-        # Ã£â€šÂ¹Ã£Æ’â€ Ã£Æ’Æ’Ã£Æ’â€”1: Ã§â„¢Â»Ã©Å’Â²
+        """ゲストから購入までの完全なフローをテスト。"""
+        # ステップ1: 登録
         response = client.post(reverse('users:register'), {
             'email': 'test@example.com',
             'password': 'testpass123',
@@ -646,31 +646,31 @@ class TestCheckoutFlow:
         })
         assert response.status_code == 302
 
-        # Ã£â€šÂ¹Ã£Æ’â€ Ã£Æ’Æ’Ã£Æ’â€”2: Ã£Æ’Â­Ã£â€šÂ°Ã£â€šÂ¤Ã£Æ’Â³
+        # ステップ2: ログイン
         response = client.post(reverse('users:login'), {
             'email': 'test@example.com',
             'password': 'testpass123',
         })
         assert response.status_code == 302
 
-        # Ã£â€šÂ¹Ã£Æ’â€ Ã£Æ’Æ’Ã£Æ’â€”3: Ã¨Â£Â½Ã¥â€œÂÃ£â€šâ€™Ã©â€“Â²Ã¨Â¦Â§
+        # ステップ3: 製品を閲覧
         product = ProductFactory(price=100)
         response = client.get(reverse('products:detail', kwargs={'slug': product.slug}))
         assert response.status_code == 200
 
-        # Ã£â€šÂ¹Ã£Æ’â€ Ã£Æ’Æ’Ã£Æ’â€”4: Ã£â€šÂ«Ã£Æ’Â¼Ã£Æ’Ë†Ã£ÂÂ«Ã¨Â¿Â½Ã¥Å Â 
+        # ステップ4: カートに追加
         response = client.post(reverse('cart:add'), {
             'product_id': product.id,
             'quantity': 1,
         })
         assert response.status_code == 302
 
-        # Ã£â€šÂ¹Ã£Æ’â€ Ã£Æ’Æ’Ã£Æ’â€”5: Ã£Æ’ÂÃ£â€šÂ§Ã£Æ’Æ’Ã£â€šÂ¯Ã£â€šÂ¢Ã£â€šÂ¦Ã£Æ’Ë†
+        # ステップ5: チェックアウト
         response = client.get(reverse('checkout:review'))
         assert response.status_code == 200
         assert product.name in response.content.decode()
 
-        # Ã£â€šÂ¹Ã£Æ’â€ Ã£Æ’Æ’Ã£Æ’â€”6: Ã¨Â³Â¼Ã¥â€¦Â¥Ã£â€šâ€™Ã¥Â®Å’Ã¤Âºâ€ 
+        # ステップ6: 購入を完了
         with patch('apps.checkout.services.process_payment') as mock_payment:
             mock_payment.return_value = True
             response = client.post(reverse('checkout:complete'))
@@ -679,65 +679,65 @@ class TestCheckoutFlow:
         assert Order.objects.filter(user__email='test@example.com').exists()
 ```
 
-## Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£ÂÂ®Ã£Æ’â„¢Ã£â€šÂ¹Ã£Æ’Ë†Ã£Æ’â€”Ã£Æ’Â©Ã£â€šÂ¯Ã£Æ’â€ Ã£â€šÂ£Ã£â€šÂ¹
+## テストのベストプラクティス
 
-### Ã£Ââ„¢Ã£ÂÂ¹Ã£ÂÂÃ£Ââ€œÃ£ÂÂ¨
+### すべきこと
 
-- **Ã£Æ’â€¢Ã£â€šÂ¡Ã£â€šÂ¯Ã£Æ’Ë†Ã£Æ’ÂªÃ£Æ’Â¼Ã£â€šâ€™Ã¤Â½Â¿Ã§â€Â¨**: Ã¦â€°â€¹Ã¥â€¹â€¢Ã£â€šÂªÃ£Æ’â€“Ã£â€šÂ¸Ã£â€šÂ§Ã£â€šÂ¯Ã£Æ’Ë†Ã¤Â½Å“Ã¦Ë†ÂÃ£ÂÂ®Ã¤Â»Â£Ã£â€šÂÃ£â€šÅ Ã£ÂÂ«
-- **Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£Ââ€Ã£ÂÂ¨Ã£ÂÂ«1Ã£ÂÂ¤Ã£ÂÂ®Ã£â€šÂ¢Ã£â€šÂµÃ£Æ’Â¼Ã£â€šÂ·Ã£Æ’Â§Ã£Æ’Â³**: Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â€šâ€™Ã§â€žÂ¦Ã§â€šÂ¹Ã£â€šâ€™Ã§ÂµÅ¾Ã£â€šâ€¹
-- **Ã¨ÂªÂ¬Ã¦ËœÅ½Ã§Å¡â€žÃ£ÂÂªÃ£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã¥ÂÂ**: `test_user_cannot_delete_others_post`
-- **Ã£â€šÂ¨Ã£Æ’Æ’Ã£â€šÂ¸Ã£â€šÂ±Ã£Æ’Â¼Ã£â€šÂ¹Ã£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†**: Ã§Â©ÂºÃ£ÂÂ®Ã¥â€¦Â¥Ã¥Å â€ºÃ£â‚¬ÂNoneÃ¥â‚¬Â¤Ã£â‚¬ÂÃ¥Â¢Æ’Ã§â€¢Å’Ã¦ÂÂ¡Ã¤Â»Â¶
-- **Ã¥Â¤â€“Ã©Æ’Â¨Ã£â€šÂµÃ£Æ’Â¼Ã£Æ’â€œÃ£â€šÂ¹Ã£â€šâ€™Ã£Æ’Â¢Ã£Æ’Æ’Ã£â€šÂ¯**: Ã¥Â¤â€“Ã©Æ’Â¨APIÃ£ÂÂ«Ã¤Â¾ÂÃ¥Â­ËœÃ£Ââ€”Ã£ÂÂªÃ£Ââ€ž
-- **Ã£Æ’â€¢Ã£â€šÂ£Ã£â€šÂ¯Ã£â€šÂ¹Ã£Æ’ÂÃ£Æ’Â£Ã£â€šâ€™Ã¤Â½Â¿Ã§â€Â¨**: Ã©â€¡ÂÃ¨Â¤â€¡Ã£â€šâ€™Ã¦Å½â€™Ã©â„¢Â¤
-- **Ã£Æ’â€˜Ã£Æ’Â¼Ã£Æ’Å¸Ã£Æ’Æ’Ã£â€šÂ·Ã£Æ’Â§Ã£Æ’Â³Ã£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†**: Ã¨ÂªÂÃ¥ÂÂ¯Ã£ÂÅ’Ã¦Â©Å¸Ã¨Æ’Â½Ã£Ââ„¢Ã£â€šâ€¹Ã£Ââ€œÃ£ÂÂ¨Ã£â€šâ€™Ã§Â¢ÂºÃ¨ÂªÂ
-- **Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â€šâ€™Ã©Â«ËœÃ©â‚¬Å¸Ã£ÂÂ«Ã¤Â¿ÂÃ£ÂÂ¤**: `--reuse-db`Ã£ÂÂ¨`--nomigrations`Ã£â€šâ€™Ã¤Â½Â¿Ã§â€Â¨
+- **ファクトリーを使用**: 手動オブジェクト作成の代わりに
+- **テストごとに1つのアサーション**: テストを焦点を絞る
+- **説明的なテスト名**: `test_user_cannot_delete_others_post`
+- **エッジケースをテスト**: 空の入力、None値、境界条件
+- **外部サービスをモック**: 外部APIに依存しない
+- **フィクスチャを使用**: 重複を排除
+- **パーミッションをテスト**: 認可が機能することを確認
+- **テストを高速に保つ**: `--reuse-db`と`--nomigrations`を使用
 
-### Ã£Ââ„¢Ã£ÂÂ¹Ã£ÂÂÃ£ÂÂ§Ã£ÂÂªÃ£Ââ€žÃ£Ââ€œÃ£ÂÂ¨
+### すべきでないこと
 
-- **DjangoÃ¥â€ â€¦Ã©Æ’Â¨Ã£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£Ââ€”Ã£ÂÂªÃ£Ââ€ž**: DjangoÃ£ÂÅ’Ã¦Â©Å¸Ã¨Æ’Â½Ã£Ââ„¢Ã£â€šâ€¹Ã£Ââ€œÃ£ÂÂ¨Ã£â€šâ€™Ã¤Â¿Â¡Ã©Â Â¼
-- **Ã£â€šÂµÃ£Æ’Â¼Ã£Æ’â€°Ã£Æ’â€˜Ã£Æ’Â¼Ã£Æ’â€ Ã£â€šÂ£Ã£â€šÂ³Ã£Æ’Â¼Ã£Æ’â€°Ã£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£Ââ€”Ã£ÂÂªÃ£Ââ€ž**: Ã£Æ’Â©Ã£â€šÂ¤Ã£Æ’â€“Ã£Æ’Â©Ã£Æ’ÂªÃ£ÂÅ’Ã¦Â©Å¸Ã¨Æ’Â½Ã£Ââ„¢Ã£â€šâ€¹Ã£Ââ€œÃ£ÂÂ¨Ã£â€šâ€™Ã¤Â¿Â¡Ã©Â Â¼
-- **Ã¥Â¤Â±Ã¦â€¢â€”Ã£Ââ„¢Ã£â€šâ€¹Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â€šâ€™Ã§â€žÂ¡Ã¨Â¦â€“Ã£Ââ€”Ã£ÂÂªÃ£Ââ€ž**: Ã£Ââ„¢Ã£ÂÂ¹Ã£ÂÂ¦Ã£ÂÂ®Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£ÂÅ’Ã©â‚¬Å¡Ã£â€šâ€¹Ã¥Â¿â€¦Ã¨Â¦ÂÃ£ÂÅ’Ã£Ââ€šÃ£â€šâ€¹
-- **Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â€šâ€™Ã¤Â¾ÂÃ¥Â­ËœÃ£Ââ€¢Ã£Ââ€ºÃ£ÂÂªÃ£Ââ€ž**: Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£ÂÂ¯Ã¤Â»Â»Ã¦â€žÂÃ£ÂÂ®Ã©Â â€ Ã¥ÂºÂÃ£ÂÂ§Ã¥Â®Å¸Ã¨Â¡Å’Ã£ÂÂ§Ã£ÂÂÃ£â€šâ€¹Ã£ÂÂ¹Ã£ÂÂ
-- **Ã©ÂÅ½Ã¥ÂºÂ¦Ã£ÂÂ«Ã£Æ’Â¢Ã£Æ’Æ’Ã£â€šÂ¯Ã£Ââ€”Ã£ÂÂªÃ£Ââ€ž**: Ã¥Â¤â€“Ã©Æ’Â¨Ã¤Â¾ÂÃ¥Â­ËœÃ©â€“Â¢Ã¤Â¿â€šÃ£ÂÂ®Ã£ÂÂ¿Ã£â€šâ€™Ã£Æ’Â¢Ã£Æ’Æ’Ã£â€šÂ¯
-- **Ã£Æ’â€”Ã£Æ’Â©Ã£â€šÂ¤Ã£Æ’â„¢Ã£Æ’Â¼Ã£Æ’Ë†Ã£Æ’Â¡Ã£â€šÂ½Ã£Æ’Æ’Ã£Æ’â€°Ã£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£Ââ€”Ã£ÂÂªÃ£Ââ€ž**: Ã£Æ’â€˜Ã£Æ’â€“Ã£Æ’ÂªÃ£Æ’Æ’Ã£â€šÂ¯Ã£â€šÂ¤Ã£Æ’Â³Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’â€¢Ã£â€šÂ§Ã£Æ’Â¼Ã£â€šÂ¹Ã£â€šâ€™Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†
-- **Ã¦Å“Â¬Ã§â€¢ÂªÃ£Æ’â€¡Ã£Æ’Â¼Ã£â€šÂ¿Ã£Æ’â„¢Ã£Æ’Â¼Ã£â€šÂ¹Ã£â€šâ€™Ã¤Â½Â¿Ã§â€Â¨Ã£Ââ€”Ã£ÂÂªÃ£Ââ€ž**: Ã¥Â¸Â¸Ã£ÂÂ«Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£Æ’â€¡Ã£Æ’Â¼Ã£â€šÂ¿Ã£Æ’â„¢Ã£Æ’Â¼Ã£â€šÂ¹Ã£â€šâ€™Ã¤Â½Â¿Ã§â€Â¨
+- **Django内部をテストしない**: Djangoが機能することを信頼
+- **サードパーティコードをテストしない**: ライブラリが機能することを信頼
+- **失敗するテストを無視しない**: すべてのテストが通る必要がある
+- **テストを依存させない**: テストは任意の順序で実行できるべき
+- **過度にモックしない**: 外部依存関係のみをモック
+- **プライベートメソッドをテストしない**: パブリックインターフェースをテスト
+- **本番データベースを使用しない**: 常にテストデータベースを使用
 
-## Ã£â€šÂ«Ã£Æ’ÂÃ£Æ’Â¬Ã£Æ’Æ’Ã£â€šÂ¸
+## カバレッジ
 
-### Ã£â€šÂ«Ã£Æ’ÂÃ£Æ’Â¬Ã£Æ’Æ’Ã£â€šÂ¸Ã¨Â¨Â­Ã¥Â®Å¡
+### カバレッジ設定
 
 ```bash
-# Ã£â€šÂ«Ã£Æ’ÂÃ£Æ’Â¬Ã£Æ’Æ’Ã£â€šÂ¸Ã£ÂÂ§Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â€šâ€™Ã¥Â®Å¸Ã¨Â¡Å’
+# カバレッジでテストを実行
 pytest --cov=apps --cov-report=html --cov-report=term-missing
 
-# HTMLÃ£Æ’Â¬Ã£Æ’ÂÃ£Æ’Â¼Ã£Æ’Ë†Ã£â€šâ€™Ã§â€Å¸Ã¦Ë†Â
+# HTMLレポートを生成
 open htmlcov/index.html
 ```
 
-### Ã£â€šÂ«Ã£Æ’ÂÃ£Æ’Â¬Ã£Æ’Æ’Ã£â€šÂ¸Ã§â€ºÂ®Ã¦Â¨â„¢
+### カバレッジ目標
 
-| Ã£â€šÂ³Ã£Æ’Â³Ã£Æ’ÂÃ£Æ’Â¼Ã£Æ’ÂÃ£Æ’Â³Ã£Æ’Ë† | Ã§â€ºÂ®Ã¦Â¨â„¢Ã£â€šÂ«Ã£Æ’ÂÃ£Æ’Â¬Ã£Æ’Æ’Ã£â€šÂ¸ |
+| コンポーネント | 目標カバレッジ |
 |-----------|-----------------|
-| Ã£Æ’Â¢Ã£Æ’â€¡Ã£Æ’Â« | 90%+ |
-| Ã£â€šÂ·Ã£Æ’ÂªÃ£â€šÂ¢Ã£Æ’Â©Ã£â€šÂ¤Ã£â€šÂ¶Ã£Æ’Â¼ | 85%+ |
-| Ã£Æ’â€œÃ£Æ’Â¥Ã£Æ’Â¼ | 80%+ |
-| Ã£â€šÂµÃ£Æ’Â¼Ã£Æ’â€œÃ£â€šÂ¹ | 90%+ |
-| Ã£Æ’Â¦Ã£Æ’Â¼Ã£Æ’â€ Ã£â€šÂ£Ã£Æ’ÂªÃ£Æ’â€ Ã£â€šÂ£ | 80%+ |
-| Ã¥â€¦Â¨Ã¤Â½â€œ | 80%+ |
+| モデル | 90%+ |
+| シリアライザー | 85%+ |
+| ビュー | 80%+ |
+| サービス | 90%+ |
+| ユーティリティ | 80%+ |
+| 全体 | 80%+ |
 
-## Ã£â€šÂ¯Ã£â€šÂ¤Ã£Æ’Æ’Ã£â€šÂ¯Ã£Æ’ÂªÃ£Æ’â€¢Ã£â€šÂ¡Ã£Æ’Â¬Ã£Æ’Â³Ã£â€šÂ¹
+## クイックリファレンス
 
-| Ã£Æ’â€˜Ã£â€šÂ¿Ã£Æ’Â¼Ã£Æ’Â³ | Ã¤Â½Â¿Ã§â€Â¨Ã¦Â³â€¢ |
+| パターン | 使用法 |
 |---------|-------|
-| `@pytest.mark.django_db` | Ã£Æ’â€¡Ã£Æ’Â¼Ã£â€šÂ¿Ã£Æ’â„¢Ã£Æ’Â¼Ã£â€šÂ¹Ã£â€šÂ¢Ã£â€šÂ¯Ã£â€šÂ»Ã£â€šÂ¹Ã£â€šâ€™Ã¦Å“â€°Ã¥Å Â¹Ã¥Å’â€“ |
-| `client` | DjangoÃ£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£â€šÂ¯Ã£Æ’Â©Ã£â€šÂ¤Ã£â€šÂ¢Ã£Æ’Â³Ã£Æ’Ë† |
-| `api_client` | DRF APIÃ£â€šÂ¯Ã£Æ’Â©Ã£â€šÂ¤Ã£â€šÂ¢Ã£Æ’Â³Ã£Æ’Ë† |
-| `factory.create_batch(n)` | Ã¨Â¤â€¡Ã¦â€¢Â°Ã£ÂÂ®Ã£â€šÂªÃ£Æ’â€“Ã£â€šÂ¸Ã£â€šÂ§Ã£â€šÂ¯Ã£Æ’Ë†Ã£â€šâ€™Ã¤Â½Å“Ã¦Ë†Â |
-| `patch('module.function')` | Ã¥Â¤â€“Ã©Æ’Â¨Ã¤Â¾ÂÃ¥Â­ËœÃ©â€“Â¢Ã¤Â¿â€šÃ£â€šâ€™Ã£Æ’Â¢Ã£Æ’Æ’Ã£â€šÂ¯ |
-| `override_settings` | Ã¨Â¨Â­Ã¥Â®Å¡Ã£â€šâ€™Ã¤Â¸â‚¬Ã¦â„¢â€šÃ§Å¡â€žÃ£ÂÂ«Ã¥Â¤â€°Ã¦â€ºÂ´ |
-| `force_authenticate()` | Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£ÂÂ§Ã¨ÂªÂÃ¨Â¨Â¼Ã£â€šâ€™Ã£Æ’ÂÃ£â€šÂ¤Ã£Æ’â€˜Ã£â€šÂ¹ |
-| `assertRedirects` | Ã£Æ’ÂªÃ£Æ’â‚¬Ã£â€šÂ¤Ã£Æ’Â¬Ã£â€šÂ¯Ã£Æ’Ë†Ã£â€šâ€™Ã£Æ’ÂÃ£â€šÂ§Ã£Æ’Æ’Ã£â€šÂ¯ |
-| `assertTemplateUsed` | Ã£Æ’â€ Ã£Æ’Â³Ã£Æ’â€”Ã£Æ’Â¬Ã£Æ’Â¼Ã£Æ’Ë†Ã¤Â½Â¿Ã§â€Â¨Ã£â€šâ€™Ã¦Â¤Å“Ã¨Â¨Â¼ |
-| `mail.outbox` | Ã©â‚¬ÂÃ¤Â¿Â¡Ã£Ââ€¢Ã£â€šÅ’Ã£ÂÅ¸Ã£Æ’Â¡Ã£Æ’Â¼Ã£Æ’Â«Ã£â€šâ€™Ã£Æ’ÂÃ£â€šÂ§Ã£Æ’Æ’Ã£â€šÂ¯ |
+| `@pytest.mark.django_db` | データベースアクセスを有効化 |
+| `client` | Djangoテストクライアント |
+| `api_client` | DRF APIクライアント |
+| `factory.create_batch(n)` | 複数のオブジェクトを作成 |
+| `patch('module.function')` | 外部依存関係をモック |
+| `override_settings` | 設定を一時的に変更 |
+| `force_authenticate()` | テストで認証をバイパス |
+| `assertRedirects` | リダイレクトをチェック |
+| `assertTemplateUsed` | テンプレート使用を検証 |
+| `mail.outbox` | 送信されたメールをチェック |
 
-**Ã¨Â¦Å¡Ã£ÂË†Ã£ÂÂ¦Ã£ÂÅ Ã£Ââ€žÃ£ÂÂ¦Ã£ÂÂÃ£ÂÂ Ã£Ââ€¢Ã£Ââ€ž**: Ã£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£ÂÂ¯Ã£Æ’â€°Ã£â€šÂ­Ã£Æ’Â¥Ã£Æ’Â¡Ã£Æ’Â³Ã£Æ’Ë†Ã£ÂÂ§Ã£Ââ„¢Ã£â‚¬â€šÃ¨â€°Â¯Ã£Ââ€žÃ£Æ’â€ Ã£â€šÂ¹Ã£Æ’Ë†Ã£ÂÂ¯Ã£â€šÂ³Ã£Æ’Â¼Ã£Æ’â€°Ã£ÂÅ’Ã£ÂÂ©Ã£ÂÂ®Ã£â€šË†Ã£Ââ€ Ã£ÂÂ«Ã¥â€¹â€¢Ã¤Â½Å“Ã£Ââ„¢Ã£ÂÂ¹Ã£ÂÂÃ£Ââ€¹Ã£â€šâ€™Ã¨ÂªÂ¬Ã¦ËœÅ½Ã£Ââ€”Ã£ÂÂ¾Ã£Ââ„¢Ã£â‚¬â€šÃ£â€šÂ·Ã£Æ’Â³Ã£Æ’â€”Ã£Æ’Â«Ã£ÂÂ§Ã£â‚¬ÂÃ¨ÂªÂ­Ã£ÂÂ¿Ã£â€šâ€žÃ£Ââ„¢Ã£ÂÂÃ£â‚¬ÂÃ¤Â¿ÂÃ¥Â®Ë†Ã¥ÂÂ¯Ã¨Æ’Â½Ã£ÂÂ«Ã¤Â¿ÂÃ£ÂÂ£Ã£ÂÂ¦Ã£ÂÂÃ£ÂÂ Ã£Ââ€¢Ã£Ââ€žÃ£â‚¬â€š
+**覚えておいてください**: テストはドキュメントです。良いテストはコードがどのように動作すべきかを説明します。シンプルで、読みやすく、保守可能に保ってください。

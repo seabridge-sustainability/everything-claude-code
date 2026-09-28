@@ -1,10 +1,10 @@
 ---
 name: docker-patterns
-description: Ã§â€Â¨Ã¤ÂºÅ½Ã¦Å“Â¬Ã¥Å“Â°Ã¥Â¼â‚¬Ã¥Ââ€˜Ã§Å¡â€žDockerÃ¥â€™Å’Docker ComposeÃ¦Â¨Â¡Ã¥Â¼ÂÃ¯Â¼Å’Ã¥Å’â€¦Ã¦â€¹Â¬Ã¥Â®Â¹Ã¥â„¢Â¨Ã¥Â®â€°Ã¥â€¦Â¨Ã£â‚¬ÂÃ§Â½â€˜Ã§Â»Å“Ã£â‚¬ÂÃ¥ÂÂ·Ã§Â­â€“Ã§â€¢Â¥Ã¥â€™Å’Ã¥Â¤Å¡Ã¦Å“ÂÃ¥Å Â¡Ã§Â¼â€“Ã¦Å½â€™Ã£â‚¬â€š
+description: 用于本地开发的Docker和Docker Compose模式，包括容器安全、网络、卷策略和多服务编排。
 origin: ECC
 ---
 
-# Docker Ã¦Â¨Â¡Ã¥Â¼Â
+# Docker 模式
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -21,19 +21,19 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-Ã©â‚¬â€šÃ§â€Â¨Ã¤ÂºÅ½Ã¥Â®Â¹Ã¥â„¢Â¨Ã¥Å’â€“Ã¥Â¼â‚¬Ã¥Ââ€˜Ã§Å¡â€ž Docker Ã¥â€™Å’ Docker Compose Ã¦Å“â‚¬Ã¤Â½Â³Ã¥Â®Å¾Ã¨Â·ÂµÃ£â‚¬â€š
+适用于容器化开发的 Docker 和 Docker Compose 最佳实践。
 
-## Ã¤Â½â€¢Ã¦â€”Â¶Ã¥ÂÂ¯Ã§â€Â¨
+## 何时启用
 
-* Ã¤Â¸ÂºÃ¦Å“Â¬Ã¥Å“Â°Ã¥Â¼â‚¬Ã¥Ââ€˜Ã¨Â®Â¾Ã§Â½Â® Docker Compose
-* Ã¨Â®Â¾Ã¨Â®Â¡Ã¥Â¤Å¡Ã¥Â®Â¹Ã¥â„¢Â¨Ã¦Å¾Â¶Ã¦Å¾â€ž
-* Ã¦Å½â€™Ã¦Å¸Â¥Ã¥Â®Â¹Ã¥â„¢Â¨Ã§Â½â€˜Ã§Â»Å“Ã¦Ë†â€“Ã¥ÂÂ·Ã©â€”Â®Ã©Â¢Ëœ
-* Ã¥Â®Â¡Ã¦Å¸Â¥ Dockerfile Ã§Å¡â€žÃ¥Â®â€°Ã¥â€¦Â¨Ã¦â‚¬Â§Ã¥â€™Å’Ã¥Â¤Â§Ã¥Â°Â
-* Ã¤Â»Å½Ã¦Å“Â¬Ã¥Å“Â°Ã¥Â¼â‚¬Ã¥Ââ€˜Ã¨Â¿ÂÃ§Â§Â»Ã¥Ë†Â°Ã¥Â®Â¹Ã¥â„¢Â¨Ã¥Å’â€“Ã¥Â·Â¥Ã¤Â½Å“Ã¦ÂµÂ
+* 为本地开发设置 Docker Compose
+* 设计多容器架构
+* 排查容器网络或卷问题
+* 审查 Dockerfile 的安全性和大小
+* 从本地开发迁移到容器化工作流
 
-## Ã§â€Â¨Ã¤ÂºÅ½Ã¦Å“Â¬Ã¥Å“Â°Ã¥Â¼â‚¬Ã¥Ââ€˜Ã§Å¡â€ž Docker Compose
+## 用于本地开发的 Docker Compose
 
-### Ã¦Â â€¡Ã¥â€¡â€  Web Ã¥Âºâ€Ã§â€Â¨Ã¦Â Ë†
+### 标准 Web 应用栈
 
 ```yaml
 # docker-compose.yml
@@ -93,7 +93,7 @@ volumes:
   redisdata:
 ```
 
-### Ã¥Â¼â‚¬Ã¥Ââ€˜Ã¤Â¸Å½Ã§â€Å¸Ã¤ÂºÂ§ Dockerfile
+### 开发与生产 Dockerfile
 
 ```dockerfile
 # Stage: dependencies
@@ -131,7 +131,7 @@ HEALTHCHECK --interval=30s --timeout=3s CMD wget -qO- http://localhost:3000/heal
 CMD ["node", "dist/server.js"]
 ```
 
-### Ã¨Â¦â€ Ã§â€ºâ€“Ã¦â€“â€¡Ã¤Â»Â¶
+### 覆盖文件
 
 ```yaml
 # docker-compose.override.yml (auto-loaded, dev-only settings)
@@ -164,19 +164,19 @@ docker compose up
 docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 ```
 
-## Ã§Â½â€˜Ã§Â»Å“
+## 网络
 
-### Ã¦Å“ÂÃ¥Å Â¡Ã¥Ââ€˜Ã§Å½Â°
+### 服务发现
 
-Ã¥ÂÅ’Ã¤Â¸â‚¬ Compose Ã§Â½â€˜Ã§Â»Å“Ã¤Â¸Â­Ã§Å¡â€žÃ¦Å“ÂÃ¥Å Â¡Ã¥ÂÂ¯Ã©â‚¬Å¡Ã¨Â¿â€¡Ã¦Å“ÂÃ¥Å Â¡Ã¥ÂÂÃ¨Â§Â£Ã¦Å¾ÂÃ¯Â¼Å¡
+同一 Compose 网络中的服务可通过服务名解析：
 
 ```
-# Ã¤Â»Å½ "app" Ã¥Â®Â¹Ã¥â„¢Â¨Ã¯Â¼Å¡
-postgres://postgres:postgres@db:5432/app_dev    # "db" Ã¨Â§Â£Ã¦Å¾ÂÃ¥Ë†Â° db Ã¥Â®Â¹Ã¥â„¢Â¨
-redis://redis:6379/0                             # "redis" Ã¨Â§Â£Ã¦Å¾ÂÃ¥Ë†Â° redis Ã¥Â®Â¹Ã¥â„¢Â¨
+# 从 "app" 容器：
+postgres://postgres:postgres@db:5432/app_dev    # "db" 解析到 db 容器
+redis://redis:6379/0                             # "redis" 解析到 redis 容器
 ```
 
-### Ã¨â€¡ÂªÃ¥Â®Å¡Ã¤Â¹â€°Ã§Â½â€˜Ã§Â»Å“
+### 自定义网络
 
 ```yaml
 services:
@@ -198,7 +198,7 @@ networks:
   backend-net:
 ```
 
-### Ã¤Â»â€¦Ã¦Å¡Â´Ã©Å“Â²Ã¦â€°â‚¬Ã©Å“â‚¬Ã¥â€ â€¦Ã¥Â®Â¹
+### 仅暴露所需内容
 
 ```yaml
 services:
@@ -208,7 +208,7 @@ services:
     # Omit ports entirely in production -- accessible only within Docker network
 ```
 
-## Ã¥ÂÂ·Ã§Â­â€“Ã§â€¢Â¥
+## 卷策略
 
 ```yaml
 volumes:
@@ -222,7 +222,7 @@ volumes:
   # - /app/node_modules
 ```
 
-### Ã¥Â¸Â¸Ã¨Â§ÂÃ¦Â¨Â¡Ã¥Â¼Â
+### 常见模式
 
 ```yaml
 services:
@@ -238,9 +238,9 @@ services:
       - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql  # Init scripts
 ```
 
-## Ã¥Â®Â¹Ã¥â„¢Â¨Ã¥Â®â€°Ã¥â€¦Â¨
+## 容器安全
 
-### Dockerfile Ã¥Å Â Ã¥â€ºÂº
+### Dockerfile 加固
 
 ```dockerfile
 # 1. Use specific tags (never :latest)
@@ -255,7 +255,7 @@ USER app
 # 5. No secrets in image layers
 ```
 
-### Compose Ã¥Â®â€°Ã¥â€¦Â¨
+### Compose 安全
 
 ```yaml
 services:
@@ -272,7 +272,7 @@ services:
       - NET_BIND_SERVICE          # Only if binding to ports < 1024
 ```
 
-### Ã¥Â¯â€ Ã©â€™Â¥Ã§Â®Â¡Ã§Ââ€ 
+### 密钥管理
 
 ```yaml
 # GOOD: Use environment variables (injected at runtime)
@@ -315,9 +315,9 @@ README.md
 tests/
 ```
 
-## Ã¨Â°Æ’Ã¨Â¯â€¢
+## 调试
 
-### Ã¥Â¸Â¸Ã§â€Â¨Ã¥â€˜Â½Ã¤Â»Â¤
+### 常用命令
 
 ```bash
 # View logs
@@ -343,7 +343,7 @@ docker compose down -v                # Also remove volumes (DESTRUCTIVE)
 docker system prune                   # Remove unused images/containers
 ```
 
-### Ã¨Â°Æ’Ã¨Â¯â€¢Ã§Â½â€˜Ã§Â»Å“Ã©â€”Â®Ã©Â¢Ëœ
+### 调试网络问题
 
 ```bash
 # Check DNS resolution inside container
@@ -357,24 +357,24 @@ docker network ls
 docker network inspect <project>_default
 ```
 
-## Ã¥ÂÂÃ¦Â¨Â¡Ã¥Â¼Â
+## 反模式
 
 ```
-# Ã©â€â„¢Ã¨Â¯Â¯Ã¥ÂÅ¡Ã¦Â³â€¢Ã¯Â¼Å¡Ã¥Å“Â¨Ã§â€Å¸Ã¤ÂºÂ§Ã§Å½Â¯Ã¥Â¢Æ’Ã¤Â¸Â­Ã¤Â½Â¿Ã§â€Â¨ docker compose Ã¨â‚¬Å’Ã¤Â¸ÂÃ¨Â¿â€ºÃ¨Â¡Å’Ã§Â¼â€“Ã¦Å½â€™
-# Ã§â€Å¸Ã¤ÂºÂ§Ã§Å½Â¯Ã¥Â¢Æ’Ã¥Â¤Å¡Ã¥Â®Â¹Ã¥â„¢Â¨Ã¥Â·Â¥Ã¤Â½Å“Ã¨Â´Å¸Ã¨Â½Â½Ã¥Âºâ€Ã¤Â½Â¿Ã§â€Â¨ KubernetesÃ£â‚¬ÂECS Ã¦Ë†â€“ Docker Swarm
+# 错误做法：在生产环境中使用 docker compose 而不进行编排
+# 生产环境多容器工作负载应使用 Kubernetes、ECS 或 Docker Swarm
 
-# Ã©â€â„¢Ã¨Â¯Â¯Ã¥ÂÅ¡Ã¦Â³â€¢Ã¯Â¼Å¡Ã¥Å“Â¨Ã¥Â®Â¹Ã¥â„¢Â¨Ã¥â€ â€¦Ã¥Â­ËœÃ¥â€šÂ¨Ã¦â€¢Â°Ã¦ÂÂ®Ã¨â‚¬Å’Ã¤Â¸ÂÃ¤Â½Â¿Ã§â€Â¨Ã¥ÂÂ·
-# Ã¥Â®Â¹Ã¥â„¢Â¨Ã¦ËœÂ¯Ã¤Â¸Â´Ã¦â€”Â¶Ã¦â‚¬Â§Ã§Å¡â€žÃ¢â‚¬â€Ã¢â‚¬â€Ã¤Â¸ÂÃ¤Â½Â¿Ã§â€Â¨Ã¥ÂÂ·Ã¦â€”Â¶Ã¯Â¼Å’Ã©â€¡ÂÃ¥ÂÂ¯Ã¤Â¼Å¡Ã¥Â¯Â¼Ã¨â€¡Â´Ã¦â€°â‚¬Ã¦Å“â€°Ã¦â€¢Â°Ã¦ÂÂ®Ã¤Â¸Â¢Ã¥Â¤Â±
+# 错误做法：在容器内存储数据而不使用卷
+# 容器是临时性的——不使用卷时，重启会导致所有数据丢失
 
-# Ã©â€â„¢Ã¨Â¯Â¯Ã¥ÂÅ¡Ã¦Â³â€¢Ã¯Â¼Å¡Ã¤Â»Â¥ root Ã§â€Â¨Ã¦Ë†Â·Ã¨ÂºÂ«Ã¤Â»Â½Ã¨Â¿ÂÃ¨Â¡Å’
-# Ã¥Â§â€¹Ã§Â»Ë†Ã¥Ë†â€ºÃ¥Â»ÂºÃ¥Â¹Â¶Ã¤Â½Â¿Ã§â€Â¨Ã©ÂÅ¾ root Ã§â€Â¨Ã¦Ë†Â·
+# 错误做法：以 root 用户身份运行
+# 始终创建并使用非 root 用户
 
-# Ã©â€â„¢Ã¨Â¯Â¯Ã¥ÂÅ¡Ã¦Â³â€¢Ã¯Â¼Å¡Ã¤Â½Â¿Ã§â€Â¨ :latest Ã¦Â â€¡Ã§Â­Â¾
-# Ã¥â€ºÂºÃ¥Â®Å¡Ã¥Ë†Â°Ã§â€°Â¹Ã¥Â®Å¡Ã§â€°Ë†Ã¦Å“Â¬Ã¤Â»Â¥Ã¥Â®Å¾Ã§Å½Â°Ã¥ÂÂ¯Ã¥Â¤ÂÃ§Å½Â°Ã§Å¡â€žÃ¦Å¾â€žÃ¥Â»Âº
+# 错误做法：使用 :latest 标签
+# 固定到特定版本以实现可复现的构建
 
-# Ã©â€â„¢Ã¨Â¯Â¯Ã¥ÂÅ¡Ã¦Â³â€¢Ã¯Â¼Å¡Ã¥Â°â€ Ã¦â€°â‚¬Ã¦Å“â€°Ã¦Å“ÂÃ¥Å Â¡Ã¦â€Â¾Ã¥â€¦Â¥Ã¤Â¸â‚¬Ã¤Â¸ÂªÃ¥Â·Â¨Ã¥Å¾â€¹Ã¥Â®Â¹Ã¥â„¢Â¨
-# Ã¥â€¦Â³Ã¦Â³Â¨Ã§â€šÂ¹Ã¥Ë†â€ Ã§Â¦Â»Ã¯Â¼Å¡Ã¦Â¯ÂÃ¤Â¸ÂªÃ¥Â®Â¹Ã¥â„¢Â¨Ã¨Â¿ÂÃ¨Â¡Å’Ã¤Â¸â‚¬Ã¤Â¸ÂªÃ¨Â¿â€ºÃ§Â¨â€¹
+# 错误做法：将所有服务放入一个巨型容器
+# 关注点分离：每个容器运行一个进程
 
-# Ã©â€â„¢Ã¨Â¯Â¯Ã¥ÂÅ¡Ã¦Â³â€¢Ã¯Â¼Å¡Ã¥Â°â€ Ã¥Â¯â€ Ã©â€™Â¥Ã¦â€Â¾Ã¥â€¦Â¥ docker-compose.yml
-# Ã¤Â½Â¿Ã§â€Â¨ .env Ã¦â€“â€¡Ã¤Â»Â¶Ã¯Â¼Ë†Ã¥Å“Â¨ git Ã¤Â¸Â­Ã¥Â¿Â½Ã§â€¢Â¥Ã¯Â¼â€°Ã¦Ë†â€“ Docker secrets
+# 错误做法：将密钥放入 docker-compose.yml
+# 使用 .env 文件（在 git 中忽略）或 Docker secrets
 ```

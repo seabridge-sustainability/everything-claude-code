@@ -1,10 +1,10 @@
 ---
 name: database-migrations
-description: Ã…Å¾ema deÃ„Å¸iÃ…Å¸iklikleri, veri migration'larÃ„Â±, rollback'ler ve PostgreSQL, MySQL ve yaygÃ„Â±n ORM'ler (Prisma, Drizzle, Django, TypeORM, golang-migrate) arasÃ„Â±nda sÃ„Â±fÃ„Â±r kesinti deployment'larÃ„Â± iÃƒÂ§in veritabanÃ„Â± migration en iyi uygulamalarÃ„Â±.
+description: Şema değişiklikleri, veri migration'ları, rollback'ler ve PostgreSQL, MySQL ve yaygın ORM'ler (Prisma, Drizzle, Django, TypeORM, golang-migrate) arasında sıfır kesinti deployment'ları için veritabanı migration en iyi uygulamaları.
 origin: ECC
 ---
 
-# VeritabanÃ„Â± Migration KalÃ„Â±plarÃ„Â±
+# Veritabanı Migration Kalıpları
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -21,102 +21,102 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-ÃƒÅ“retim sistemleri iÃƒÂ§in gÃƒÂ¼venli, geri alÃ„Â±nabilir veritabanÃ„Â± Ã…Å¸ema deÃ„Å¸iÃ…Å¸iklikleri.
+Üretim sistemleri için güvenli, geri alınabilir veritabanı şema değişiklikleri.
 
-## Ne Zaman AktifleÃ…Å¸tirmeli
+## Ne Zaman Aktifleştirmeli
 
-- VeritabanÃ„Â± tablolarÃ„Â± oluÃ…Å¸tururken veya deÃ„Å¸iÃ…Å¸tirirken
-- SÃƒÂ¼tun veya indeks eklerken/kaldÃ„Â±rÃ„Â±rken
-- Veri migration'larÃ„Â± ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±rÃ„Â±rken (backfill, dÃƒÂ¶nÃƒÂ¼Ã…Å¸tÃƒÂ¼rme)
-- SÃ„Â±fÃ„Â±r kesinti Ã…Å¸ema deÃ„Å¸iÃ…Å¸iklikleri planlarken
-- Yeni bir proje iÃƒÂ§in migration araÃƒÂ§larÃ„Â± kurarken
+- Veritabanı tabloları oluştururken veya değiştirirken
+- Sütun veya indeks eklerken/kaldırırken
+- Veri migration'ları çalıştırırken (backfill, dönüştürme)
+- Sıfır kesinti şema değişiklikleri planlarken
+- Yeni bir proje için migration araçları kurarken
 
-## Temel Ã„Â°lkeler
+## Temel İlkeler
 
-1. **Her deÃ„Å¸iÃ…Å¸iklik bir migration'dÃ„Â±r** Ã¢â‚¬â€ ÃƒÂ¼retim veritabanlarÃ„Â±nÃ„Â± asla manuel olarak deÃ„Å¸iÃ…Å¸tirmeyin
-2. **Migration'lar ÃƒÂ¼retimde sadece ileri** Ã¢â‚¬â€ rollback'ler yeni forward migration'lar kullanÃ„Â±r
-3. **Ã…Å¾ema ve veri migration'larÃ„Â± ayrÃ„Â±dÃ„Â±r** Ã¢â‚¬â€ tek migration'da DDL ve DML'yi asla karÃ„Â±Ã…Å¸tÃ„Â±rmayÃ„Â±n
-4. **Migration'larÃ„Â± ÃƒÂ¼retim boyutundaki veriye karÃ…Å¸Ã„Â± test edin** Ã¢â‚¬â€ 100 satÃ„Â±rda ÃƒÂ§alÃ„Â±Ã…Å¸an migration 10M'de kilitlenebilir
-5. **Migration'lar ÃƒÂ¼retimde ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±ktan sonra deÃ„Å¸iÃ…Å¸mezdir** Ã¢â‚¬â€ ÃƒÂ¼retimde ÃƒÂ§alÃ„Â±Ã…Å¸an migration'Ã„Â± asla dÃƒÂ¼zenlemeyin
+1. **Her değişiklik bir migration'dır** — üretim veritabanlarını asla manuel olarak değiştirmeyin
+2. **Migration'lar üretimde sadece ileri** — rollback'ler yeni forward migration'lar kullanır
+3. **Şema ve veri migration'ları ayrıdır** — tek migration'da DDL ve DML'yi asla karıştırmayın
+4. **Migration'ları üretim boyutundaki veriye karşı test edin** — 100 satırda çalışan migration 10M'de kilitlenebilir
+5. **Migration'lar üretimde çalıştıktan sonra değişmezdir** — üretimde çalışan migration'ı asla düzenlemeyin
 
-## Migration GÃƒÂ¼venlik Kontrol Listesi
+## Migration Güvenlik Kontrol Listesi
 
-Herhangi bir migration uygulamadan ÃƒÂ¶nce:
+Herhangi bir migration uygulamadan önce:
 
-- [ ] Migration UP ve DOWN'a sahip (veya aÃƒÂ§Ã„Â±kÃƒÂ§a geri alÃ„Â±namaz olarak iÃ…Å¸aretlenmiÃ…Å¸)
-- [ ] BÃƒÂ¼yÃƒÂ¼k tablolarda tam tablo kilitleri yok (concurrent operasyonlar kullan)
-- [ ] Yeni sÃƒÂ¼tunlar varsayÃ„Â±lanlara sahip veya nullable (varsayÃ„Â±lan olmadan NOT NULL asla ekleme)
-- [ ] Ã„Â°ndeksler concurrent oluÃ…Å¸turuluyor (mevcut tablolar iÃƒÂ§in CREATE TABLE ile inline deÃ„Å¸il)
-- [ ] Veri backfill Ã…Å¸ema deÃ„Å¸iÃ…Å¸ikliÃ„Å¸inden ayrÃ„Â± bir migration
-- [ ] ÃƒÅ“retim verisinin kopyasÃ„Â±na karÃ…Å¸Ã„Â± test edilmiÃ…Å¸
-- [ ] Rollback planÃ„Â± dokÃƒÂ¼mante edilmiÃ…Å¸
+- [ ] Migration UP ve DOWN'a sahip (veya açıkça geri alınamaz olarak işaretlenmiş)
+- [ ] Büyük tablolarda tam tablo kilitleri yok (concurrent operasyonlar kullan)
+- [ ] Yeni sütunlar varsayılanlara sahip veya nullable (varsayılan olmadan NOT NULL asla ekleme)
+- [ ] İndeksler concurrent oluşturuluyor (mevcut tablolar için CREATE TABLE ile inline değil)
+- [ ] Veri backfill şema değişikliğinden ayrı bir migration
+- [ ] Üretim verisinin kopyasına karşı test edilmiş
+- [ ] Rollback planı dokümante edilmiş
 
-## PostgreSQL KalÃ„Â±plarÃ„Â±
+## PostgreSQL Kalıpları
 
-### GÃƒÂ¼venli SÃƒÂ¼tun Ekleme
+### Güvenli Sütun Ekleme
 
 ```sql
--- Ã„Â°YÃ„Â°: Nullable sÃƒÂ¼tun, kilit yok
+-- İYİ: Nullable sütun, kilit yok
 ALTER TABLE users ADD COLUMN avatar_url TEXT;
 
--- Ã„Â°YÃ„Â°: VarsayÃ„Â±lanlÃ„Â± sÃƒÂ¼tun (Postgres 11+ anlÃ„Â±k, yeniden yazma yok)
+-- İYİ: Varsayılanlı sütun (Postgres 11+ anlık, yeniden yazma yok)
 ALTER TABLE users ADD COLUMN is_active BOOLEAN NOT NULL DEFAULT true;
 
--- KÃƒâ€“TÃƒÅ“: Mevcut tabloda varsayÃ„Â±lansÃ„Â±z NOT NULL (tam yeniden yazma gerektirir)
+-- KÖTÜ: Mevcut tabloda varsayılansız NOT NULL (tam yeniden yazma gerektirir)
 ALTER TABLE users ADD COLUMN role TEXT NOT NULL;
--- Bu tabloyu kilitler ve her satÃ„Â±rÃ„Â± yeniden yazar
+-- Bu tabloyu kilitler ve her satırı yeniden yazar
 ```
 
-### Kesinti Olmadan Ã„Â°ndeks Ekleme
+### Kesinti Olmadan İndeks Ekleme
 
 ```sql
--- KÃƒâ€“TÃƒÅ“: BÃƒÂ¼yÃƒÂ¼k tablolarda yazmalarÃ„Â± engeller
+-- KÖTÜ: Büyük tablolarda yazmaları engeller
 CREATE INDEX idx_users_email ON users (email);
 
--- Ã„Â°YÃ„Â°: Engellemez, concurrent yazmalara izin verir
+-- İYİ: Engellemez, concurrent yazmalara izin verir
 CREATE INDEX CONCURRENTLY idx_users_email ON users (email);
 
--- Not: CONCURRENTLY transaction bloÃ„Å¸u iÃƒÂ§inde ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±rÃ„Â±lamaz
--- Ãƒâ€¡oÃ„Å¸u migration aracÃ„Â± bunun iÃƒÂ§in ÃƒÂ¶zel iÃ…Å¸leme ihtiyaÃƒÂ§ duyar
+-- Not: CONCURRENTLY transaction bloğu içinde çalıştırılamaz
+-- Çoğu migration aracı bunun için özel işleme ihtiyaç duyar
 ```
 
-### SÃƒÂ¼tun Yeniden AdlandÃ„Â±rma (SÃ„Â±fÃ„Â±r Kesinti)
+### Sütun Yeniden Adlandırma (Sıfır Kesinti)
 
-ÃƒÅ“retimde asla doÃ„Å¸rudan yeniden adlandÃ„Â±rmayÃ„Â±n. Expand-contract kalÃ„Â±bÃ„Â±nÃ„Â± kullanÃ„Â±n:
+Üretimde asla doğrudan yeniden adlandırmayın. Expand-contract kalıbını kullanın:
 
 ```sql
--- AdÃ„Â±m 1: Yeni sÃƒÂ¼tun ekle (migration 001)
+-- Adım 1: Yeni sütun ekle (migration 001)
 ALTER TABLE users ADD COLUMN display_name TEXT;
 
--- AdÃ„Â±m 2: Veriyi backfill et (migration 002, veri migration'Ã„Â±)
+-- Adım 2: Veriyi backfill et (migration 002, veri migration'ı)
 UPDATE users SET display_name = username WHERE display_name IS NULL;
 
--- AdÃ„Â±m 3: Uygulama kodunu her iki sÃƒÂ¼tunu okuma/yazma iÃƒÂ§in gÃƒÂ¼ncelle
--- Uygulama deÃ„Å¸iÃ…Å¸ikliklerini deploy et
+-- Adım 3: Uygulama kodunu her iki sütunu okuma/yazma için güncelle
+-- Uygulama değişikliklerini deploy et
 
--- AdÃ„Â±m 4: Eski sÃƒÂ¼tuna yazmayÃ„Â± durdur, kaldÃ„Â±r (migration 003)
+-- Adım 4: Eski sütuna yazmayı durdur, kaldır (migration 003)
 ALTER TABLE users DROP COLUMN username;
 ```
 
-### GÃƒÂ¼venli SÃƒÂ¼tun KaldÃ„Â±rma
+### Güvenli Sütun Kaldırma
 
 ```sql
--- AdÃ„Â±m 1: SÃƒÂ¼tuna tÃƒÂ¼m uygulama referanslarÃ„Â±nÃ„Â± kaldÃ„Â±r
--- AdÃ„Â±m 2: SÃƒÂ¼tun referansÃ„Â± olmadan uygulamayÃ„Â± deploy et
--- AdÃ„Â±m 3: Sonraki migration'da sÃƒÂ¼tunu kaldÃ„Â±r
+-- Adım 1: Sütuna tüm uygulama referanslarını kaldır
+-- Adım 2: Sütun referansı olmadan uygulamayı deploy et
+-- Adım 3: Sonraki migration'da sütunu kaldır
 ALTER TABLE orders DROP COLUMN legacy_status;
 
--- Django iÃƒÂ§in: SeparateDatabaseAndState kullanarak modelden kaldÃ„Â±r
--- DROP COLUMN oluÃ…Å¸turmadan (sonra sonraki migration'da kaldÃ„Â±r)
+-- Django için: SeparateDatabaseAndState kullanarak modelden kaldır
+-- DROP COLUMN oluşturmadan (sonra sonraki migration'da kaldır)
 ```
 
-### BÃƒÂ¼yÃƒÂ¼k Veri Migration'larÃ„Â±
+### Büyük Veri Migration'ları
 
 ```sql
--- KÃƒâ€“TÃƒÅ“: TÃƒÂ¼m satÃ„Â±rlarÃ„Â± tek transaction'da gÃƒÂ¼nceller (tabloyu kilitler)
+-- KÖTÜ: Tüm satırları tek transaction'da günceller (tabloyu kilitler)
 UPDATE users SET normalized_email = LOWER(email);
 
--- Ã„Â°YÃ„Â°: Ã„Â°lerleme ile batch gÃƒÂ¼ncelleme
+-- İYİ: İlerleme ile batch güncelleme
 DO $$
 DECLARE
   batch_size INT := 10000;
@@ -141,23 +141,23 @@ END $$;
 
 ## Prisma (TypeScript/Node.js)
 
-### Ã„Â°Ã…Å¸ AkÃ„Â±Ã…Å¸Ã„Â±
+### İş Akışı
 
 ```bash
-# Ã…Å¾ema deÃ„Å¸iÃ…Å¸ikliklerinden migration oluÃ…Å¸tur
+# Şema değişikliklerinden migration oluştur
 npx prisma migrate dev --name add_user_avatar
 
-# ÃƒÅ“retimde bekleyen migration'larÃ„Â± uygula
+# Üretimde bekleyen migration'ları uygula
 npx prisma migrate deploy
 
-# VeritabanÃ„Â±nÃ„Â± sÃ„Â±fÃ„Â±rla (sadece dev)
+# Veritabanını sıfırla (sadece dev)
 npx prisma migrate reset
 
-# Ã…Å¾ema deÃ„Å¸iÃ…Å¸ikliklerinden sonra client oluÃ…Å¸tur
+# Şema değişikliklerinden sonra client oluştur
 npx prisma generate
 ```
 
-### Ã…Å¾ema Ãƒâ€“rneÃ„Å¸i
+### Şema Örneği
 
 ```prisma
 model User {
@@ -174,37 +174,37 @@ model User {
 }
 ```
 
-### Ãƒâ€“zel SQL Migration
+### Özel SQL Migration
 
-Prisma'nÃ„Â±n ifade edemediÃ„Å¸i operasyonlar iÃƒÂ§in (concurrent indeksler, veri backfill'leri):
+Prisma'nın ifade edemediği operasyonlar için (concurrent indeksler, veri backfill'leri):
 
 ```bash
-# BoÃ…Å¸ migration oluÃ…Å¸tur, sonra SQL'i manuel dÃƒÂ¼zenle
+# Boş migration oluştur, sonra SQL'i manuel düzenle
 npx prisma migrate dev --create-only --name add_email_index
 ```
 
 ```sql
 -- migrations/20240115_add_email_index/migration.sql
--- Prisma CONCURRENTLY oluÃ…Å¸turamaz, bu yÃƒÂ¼zden manuel yazÃ„Â±yoruz
+-- Prisma CONCURRENTLY oluşturamaz, bu yüzden manuel yazıyoruz
 CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_users_email ON users (email);
 ```
 
 ## Drizzle (TypeScript/Node.js)
 
-### Ã„Â°Ã…Å¸ AkÃ„Â±Ã…Å¸Ã„Â±
+### İş Akışı
 
 ```bash
-# Ã…Å¾ema deÃ„Å¸iÃ…Å¸ikliklerinden migration oluÃ…Å¸tur
+# Şema değişikliklerinden migration oluştur
 npx drizzle-kit generate
 
-# Migration'larÃ„Â± uygula
+# Migration'ları uygula
 npx drizzle-kit migrate
 
-# Ã…Å¾emayÃ„Â± doÃ„Å¸rudan push et (sadece dev, migration dosyasÃ„Â± yok)
+# Şemayı doğrudan push et (sadece dev, migration dosyası yok)
 npx drizzle-kit push
 ```
 
-### Ã…Å¾ema Ãƒâ€“rneÃ„Å¸i
+### Şema Örneği
 
 ```typescript
 import { pgTable, text, timestamp, uuid, boolean } from "drizzle-orm/pg-core";
@@ -221,19 +221,19 @@ export const users = pgTable("users", {
 
 ## Django (Python)
 
-### Ã„Â°Ã…Å¸ AkÃ„Â±Ã…Å¸Ã„Â±
+### İş Akışı
 
 ```bash
-# Model deÃ„Å¸iÃ…Å¸ikliklerinden migration oluÃ…Å¸tur
+# Model değişikliklerinden migration oluştur
 python manage.py makemigrations
 
-# Migration'larÃ„Â± uygula
+# Migration'ları uygula
 python manage.py migrate
 
-# Migration durumunu gÃƒÂ¶ster
+# Migration durumunu göster
 python manage.py showmigrations
 
-# Ãƒâ€“zel SQL iÃƒÂ§in boÃ…Å¸ migration oluÃ…Å¸tur
+# Özel SQL için boş migration oluştur
 python manage.py makemigrations --empty app_name -n description
 ```
 
@@ -253,7 +253,7 @@ def backfill_display_names(apps, schema_editor):
         User.objects.bulk_update(batch, ["display_name"], batch_size=batch_size)
 
 def reverse_backfill(apps, schema_editor):
-    pass  # Veri migration'Ã„Â±, geri alma gerekmez
+    pass  # Veri migration'ı, geri alma gerekmez
 
 class Migration(migrations.Migration):
     dependencies = [("accounts", "0015_add_display_name")]
@@ -265,23 +265,23 @@ class Migration(migrations.Migration):
 
 ## golang-migrate (Go)
 
-### Ã„Â°Ã…Å¸ AkÃ„Â±Ã…Å¸Ã„Â±
+### İş Akışı
 
 ```bash
-# Migration ÃƒÂ§ifti oluÃ…Å¸tur
+# Migration çifti oluştur
 migrate create -ext sql -dir migrations -seq add_user_avatar
 
-# TÃƒÂ¼m bekleyen migration'larÃ„Â± uygula
+# Tüm bekleyen migration'ları uygula
 migrate -path migrations -database "$DATABASE_URL" up
 
-# Son migration'Ã„Â± rollback et
+# Son migration'ı rollback et
 migrate -path migrations -database "$DATABASE_URL" down 1
 
-# Versiyonu zorla (dirty durumu dÃƒÂ¼zelt)
+# Versiyonu zorla (dirty durumu düzelt)
 migrate -path migrations -database "$DATABASE_URL" force VERSION
 ```
 
-### Migration DosyalarÃ„Â±
+### Migration Dosyaları
 
 ```sql
 -- migrations/000003_add_user_avatar.up.sql
@@ -293,42 +293,42 @@ DROP INDEX IF EXISTS idx_users_avatar;
 ALTER TABLE users DROP COLUMN IF EXISTS avatar_url;
 ```
 
-## SÃ„Â±fÃ„Â±r Kesinti Migration Stratejisi
+## Sıfır Kesinti Migration Stratejisi
 
-Kritik ÃƒÂ¼retim deÃ„Å¸iÃ…Å¸iklikleri iÃƒÂ§in expand-contract kalÃ„Â±bÃ„Â±nÃ„Â± takip edin:
+Kritik üretim değişiklikleri için expand-contract kalıbını takip edin:
 
 ```
 Faz 1: EXPAND
-  - Yeni sÃƒÂ¼tun/tablo ekle (nullable veya varsayÃ„Â±lanlÃ„Â±)
-  - Deploy: uygulama hem ESKÃ„Â° hem YENÃ„Â°'ye yazar
+  - Yeni sütun/tablo ekle (nullable veya varsayılanlı)
+  - Deploy: uygulama hem ESKİ hem YENİ'ye yazar
   - Mevcut veriyi backfill et
 
 Faz 2: MIGRATE
-  - Deploy: uygulama YENÃ„Â°'den okur, her Ã„Â°KÃ„Â°SÃ„Â°NE yazar
-  - Veri tutarlÃ„Â±lÃ„Â±Ã„Å¸Ã„Â±nÃ„Â± doÃ„Å¸rula
+  - Deploy: uygulama YENİ'den okur, her İKİSİNE yazar
+  - Veri tutarlılığını doğrula
 
 Faz 3: CONTRACT
-  - Deploy: uygulama sadece YENÃ„Â°'yi kullanÃ„Â±r
-  - Eski sÃƒÂ¼tun/tabloyu ayrÃ„Â± migration'da kaldÃ„Â±r
+  - Deploy: uygulama sadece YENİ'yi kullanır
+  - Eski sütun/tabloyu ayrı migration'da kaldır
 ```
 
-### Zaman Ãƒâ€¡izelgesi Ãƒâ€“rneÃ„Å¸i
+### Zaman Çizelgesi Örneği
 
 ```
-GÃƒÂ¼n 1: Migration new_status sÃƒÂ¼tunu ekler (nullable)
-GÃƒÂ¼n 1: App v2 deploy et Ã¢â‚¬â€ hem status hem new_status'a yaz
-GÃƒÂ¼n 2: Mevcut satÃ„Â±rlar iÃƒÂ§in backfill migration'Ã„Â± ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±r
-GÃƒÂ¼n 3: App v3 deploy et Ã¢â‚¬â€ sadece new_status'tan okur
-GÃƒÂ¼n 7: Migration eski status sÃƒÂ¼tununu kaldÃ„Â±rÃ„Â±r
+Gün 1: Migration new_status sütunu ekler (nullable)
+Gün 1: App v2 deploy et — hem status hem new_status'a yaz
+Gün 2: Mevcut satırlar için backfill migration'ı çalıştır
+Gün 3: App v3 deploy et — sadece new_status'tan okur
+Gün 7: Migration eski status sütununu kaldırır
 ```
 
-## Anti-KalÃ„Â±plar
+## Anti-Kalıplar
 
-| Anti-KalÃ„Â±p | Neden BaÃ…Å¸arÃ„Â±sÃ„Â±z Olur | Daha Ã„Â°yi YaklaÃ…Å¸Ã„Â±m |
+| Anti-Kalıp | Neden Başarısız Olur | Daha İyi Yaklaşım |
 |-------------|-------------|-----------------|
-| ÃƒÅ“retimde manuel SQL | Denetim izi yok, tekrarlanamaz | Her zaman migration dosyalarÃ„Â± kullan |
-| Deploy edilmiÃ…Å¸ migration'larÃ„Â± dÃƒÂ¼zenleme | Ortamlar arasÃ„Â± sapma yaratÃ„Â±r | Bunun yerine yeni migration oluÃ…Å¸tur |
-| VarsayÃ„Â±lansÃ„Â±z NOT NULL | Tabloyu kilitler, tÃƒÂ¼m satÃ„Â±rlarÃ„Â± yeniden yazar | Nullable ekle, backfill et, sonra kÃ„Â±sÃ„Â±t ekle |
-| BÃƒÂ¼yÃƒÂ¼k tabloda inline indeks | Build sÃ„Â±rasÃ„Â±nda yazmalarÃ„Â± engeller | CREATE INDEX CONCURRENTLY |
-| Tek migration'da Ã…Å¸ema + veri | Rollback zor, uzun transaction'lar | AyrÃ„Â± migration'lar |
-| Kodu kaldÃ„Â±rmadan ÃƒÂ¶nce sÃƒÂ¼tun kaldÃ„Â±rma | Eksik sÃƒÂ¼tunda uygulama hatalarÃ„Â± | Ãƒâ€“nce kodu kaldÃ„Â±r, sonra sÃƒÂ¼tunu sonraki deploy'da kaldÃ„Â±r |
+| Üretimde manuel SQL | Denetim izi yok, tekrarlanamaz | Her zaman migration dosyaları kullan |
+| Deploy edilmiş migration'ları düzenleme | Ortamlar arası sapma yaratır | Bunun yerine yeni migration oluştur |
+| Varsayılansız NOT NULL | Tabloyu kilitler, tüm satırları yeniden yazar | Nullable ekle, backfill et, sonra kısıt ekle |
+| Büyük tabloda inline indeks | Build sırasında yazmaları engeller | CREATE INDEX CONCURRENTLY |
+| Tek migration'da şema + veri | Rollback zor, uzun transaction'lar | Ayrı migration'lar |
+| Kodu kaldırmadan önce sütun kaldırma | Eksik sütunda uygulama hataları | Önce kodu kaldır, sonra sütunu sonraki deploy'da kaldır |

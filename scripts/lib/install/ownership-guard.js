@@ -42,7 +42,9 @@ function prepareUserOwnedFileGuard(plan, migration) {
     ? readInstallState(plan.installStatePath)
     : null;
   if (previousState && (
-    previousState.target.id !== plan.adapter.id
+    !previousState.target
+    || !plan.adapter
+    || previousState.target.id !== plan.adapter.id
     || comparablePath(previousState.target.root) !== comparablePath(plan.targetRoot)
     || comparablePath(previousState.target.installStatePath) !== comparablePath(plan.installStatePath)
   )) {

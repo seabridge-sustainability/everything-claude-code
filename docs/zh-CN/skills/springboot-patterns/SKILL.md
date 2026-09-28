@@ -1,10 +1,10 @@
 ---
 name: springboot-patterns
-description: Spring BootÃ¦Å¾Â¶Ã¦Å¾â€žÃ¦Â¨Â¡Ã¥Â¼ÂÃ£â‚¬ÂREST APIÃ¨Â®Â¾Ã¨Â®Â¡Ã£â‚¬ÂÃ¥Ë†â€ Ã¥Â±â€šÃ¦Å“ÂÃ¥Å Â¡Ã£â‚¬ÂÃ¦â€¢Â°Ã¦ÂÂ®Ã¨Â®Â¿Ã©â€”Â®Ã£â‚¬ÂÃ§Â¼â€œÃ¥Â­ËœÃ£â‚¬ÂÃ¥Â¼â€šÃ¦Â­Â¥Ã¥Â¤â€žÃ§Ââ€ Ã¥â€™Å’Ã¦â€”Â¥Ã¥Â¿â€”Ã¨Â®Â°Ã¥Â½â€¢Ã£â‚¬â€šÃ§â€Â¨Ã¤ÂºÅ½Java Spring BootÃ¥ÂÅ½Ã§Â«Â¯Ã¥Â·Â¥Ã¤Â½Å“Ã£â‚¬â€š
+description: Spring Boot架构模式、REST API设计、分层服务、数据访问、缓存、异步处理和日志记录。用于Java Spring Boot后端工作。
 origin: ECC
 ---
 
-# Spring Boot Ã¥Â¼â‚¬Ã¥Ââ€˜Ã¦Â¨Â¡Ã¥Â¼Â
+# Spring Boot 开发模式
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -21,18 +21,18 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-Ã§â€Â¨Ã¤ÂºÅ½Ã¥ÂÂ¯Ã¦â€°Â©Ã¥Â±â€¢Ã£â‚¬ÂÃ§â€Å¸Ã¤ÂºÂ§Ã§ÂºÂ§Ã¦Å“ÂÃ¥Å Â¡Ã§Å¡â€ž Spring Boot Ã¦Å¾Â¶Ã¦Å¾â€žÃ¥â€™Å’ API Ã¦Â¨Â¡Ã¥Â¼ÂÃ£â‚¬â€š
+用于可扩展、生产级服务的 Spring Boot 架构和 API 模式。
 
-## Ã¤Â½â€¢Ã¦â€”Â¶Ã¦Â¿â‚¬Ã¦Â´Â»
+## 何时激活
 
-* Ã¤Â½Â¿Ã§â€Â¨ Spring MVC Ã¦Ë†â€“ WebFlux Ã¦Å¾â€žÃ¥Â»Âº REST API
-* Ã¦Å¾â€žÃ¥Â»ÂºÃ¦Å½Â§Ã¥Ë†Â¶Ã¥â„¢Â¨ Ã¢â€ â€™ Ã¦Å“ÂÃ¥Å Â¡ Ã¢â€ â€™ Ã¤Â»â€œÃ¥Âºâ€œÃ¥Â±â€šÃ§Â»â€œÃ¦Å¾â€ž
-* Ã©â€¦ÂÃ§Â½Â® Spring Data JPAÃ£â‚¬ÂÃ§Â¼â€œÃ¥Â­ËœÃ¦Ë†â€“Ã¥Â¼â€šÃ¦Â­Â¥Ã¥Â¤â€žÃ§Ââ€ 
-* Ã¦Â·Â»Ã¥Å Â Ã©ÂªÅ’Ã¨Â¯ÂÃ£â‚¬ÂÃ¥Â¼â€šÃ¥Â¸Â¸Ã¥Â¤â€žÃ§Ââ€ Ã¦Ë†â€“Ã¥Ë†â€ Ã©Â¡Âµ
-* Ã¤Â¸ÂºÃ¥Â¼â‚¬Ã¥Ââ€˜/Ã©Â¢â€žÃ¥Ââ€˜Ã¥Â¸Æ’/Ã§â€Å¸Ã¤ÂºÂ§Ã§Å½Â¯Ã¥Â¢Æ’Ã¨Â®Â¾Ã§Â½Â®Ã©â€¦ÂÃ§Â½Â®Ã¦â€“â€¡Ã¤Â»Â¶
-* Ã¤Â½Â¿Ã§â€Â¨ Spring Events Ã¦Ë†â€“ Kafka Ã¥Â®Å¾Ã§Å½Â°Ã¤Âºâ€¹Ã¤Â»Â¶Ã©Â©Â±Ã¥Å Â¨Ã¦Â¨Â¡Ã¥Â¼Â
+* 使用 Spring MVC 或 WebFlux 构建 REST API
+* 构建控制器 → 服务 → 仓库层结构
+* 配置 Spring Data JPA、缓存或异步处理
+* 添加验证、异常处理或分页
+* 为开发/预发布/生产环境设置配置文件
+* 使用 Spring Events 或 Kafka 实现事件驱动模式
 
-## REST API Ã§Â»â€œÃ¦Å¾â€ž
+## REST API 结构
 
 ```java
 @RestController
@@ -61,7 +61,7 @@ class MarketController {
 }
 ```
 
-## Ã¤Â»â€œÃ¥Âºâ€œÃ¦Â¨Â¡Ã¥Â¼Â (Spring Data JPA)
+## 仓库模式 (Spring Data JPA)
 
 ```java
 public interface MarketRepository extends JpaRepository<MarketEntity, Long> {
@@ -70,7 +70,7 @@ public interface MarketRepository extends JpaRepository<MarketEntity, Long> {
 }
 ```
 
-## Ã¥Â¸Â¦Ã¤Âºâ€¹Ã¥Å Â¡Ã§Å¡â€žÃ¦Å“ÂÃ¥Å Â¡Ã¥Â±â€š
+## 带事务的服务层
 
 ```java
 @Service
@@ -90,7 +90,7 @@ public class MarketService {
 }
 ```
 
-## DTO Ã¥â€™Å’Ã©ÂªÅ’Ã¨Â¯Â
+## DTO 和验证
 
 ```java
 public record CreateMarketRequest(
@@ -106,7 +106,7 @@ public record MarketResponse(Long id, String name, MarketStatus status) {
 }
 ```
 
-## Ã¥Â¼â€šÃ¥Â¸Â¸Ã¥Â¤â€žÃ§Ââ€ 
+## 异常处理
 
 ```java
 @ControllerAdvice
@@ -133,9 +133,9 @@ class GlobalExceptionHandler {
 }
 ```
 
-## Ã§Â¼â€œÃ¥Â­Ëœ
+## 缓存
 
-Ã©Å“â‚¬Ã¨Â¦ÂÃ¥Å“Â¨Ã©â€¦ÂÃ§Â½Â®Ã§Â±Â»Ã¤Â¸Å Ã¤Â½Â¿Ã§â€Â¨ `@EnableCaching`Ã£â‚¬â€š
+需要在配置类上使用 `@EnableCaching`。
 
 ```java
 @Service
@@ -158,9 +158,9 @@ public class MarketCacheService {
 }
 ```
 
-## Ã¥Â¼â€šÃ¦Â­Â¥Ã¥Â¤â€žÃ§Ââ€ 
+## 异步处理
 
-Ã©Å“â‚¬Ã¨Â¦ÂÃ¥Å“Â¨Ã©â€¦ÂÃ§Â½Â®Ã§Â±Â»Ã¤Â¸Å Ã¤Â½Â¿Ã§â€Â¨ `@EnableAsync`Ã£â‚¬â€š
+需要在配置类上使用 `@EnableAsync`。
 
 ```java
 @Service
@@ -173,7 +173,7 @@ public class NotificationService {
 }
 ```
 
-## Ã¦â€”Â¥Ã¥Â¿â€”Ã¨Â®Â°Ã¥Â½â€¢ (SLF4J)
+## 日志记录 (SLF4J)
 
 ```java
 @Service
@@ -193,7 +193,7 @@ public class ReportService {
 }
 ```
 
-## Ã¤Â¸Â­Ã©â€”Â´Ã¤Â»Â¶ / Ã¨Â¿â€¡Ã¦Â»Â¤Ã¥â„¢Â¨
+## 中间件 / 过滤器
 
 ```java
 @Component
@@ -215,14 +215,14 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
 }
 ```
 
-## Ã¥Ë†â€ Ã©Â¡ÂµÃ¥â€™Å’Ã¦Å½â€™Ã¥ÂºÂ
+## 分页和排序
 
 ```java
 PageRequest page = PageRequest.of(pageNumber, pageSize, Sort.by("createdAt").descending());
 Page<Market> results = marketService.list(page);
 ```
 
-## Ã¥Â®Â¹Ã©â€â„¢Ã§Å¡â€žÃ¥Â¤â€“Ã©Æ’Â¨Ã¨Â°Æ’Ã§â€Â¨
+## 容错的外部调用
 
 ```java
 public <T> T withRetry(Supplier<T> supplier, int maxRetries) {
@@ -246,18 +246,18 @@ public <T> T withRetry(Supplier<T> supplier, int maxRetries) {
 }
 ```
 
-## Ã©â‚¬Å¸Ã§Å½â€¡Ã©â„¢ÂÃ¥Ë†Â¶ (Ã¨Â¿â€¡Ã¦Â»Â¤Ã¥â„¢Â¨ + Bucket4j)
+## 速率限制 (过滤器 + Bucket4j)
 
-**Ã¥Â®â€°Ã¥â€¦Â¨Ã©Â¡Â»Ã§Å¸Â¥**Ã¯Â¼Å¡Ã©Â»ËœÃ¨Â®Â¤Ã¦Æ’â€¦Ã¥â€ ÂµÃ¤Â¸â€¹ `X-Forwarded-For` Ã¥Â¤Â´Ã¦ËœÂ¯Ã¤Â¸ÂÃ¥ÂÂ¯Ã¤Â¿Â¡Ã§Å¡â€žÃ¯Â¼Å’Ã¥â€ºÂ Ã¤Â¸ÂºÃ¥Â®Â¢Ã¦Ë†Â·Ã§Â«Â¯Ã¥ÂÂ¯Ã¤Â»Â¥Ã¤Â¼ÂªÃ©â‚¬Â Ã¥Â®Æ’Ã£â‚¬â€š
-Ã¤Â»â€¦Ã¥Å“Â¨Ã¤Â»Â¥Ã¤Â¸â€¹Ã¦Æ’â€¦Ã¥â€ ÂµÃ¤Â¸â€¹Ã¤Â½Â¿Ã§â€Â¨Ã¨Â½Â¬Ã¥Ââ€˜Ã¥Â¤Â´Ã¯Â¼Å¡
+**安全须知**：默认情况下 `X-Forwarded-For` 头是不可信的，因为客户端可以伪造它。
+仅在以下情况下使用转发头：
 
-1. Ã¦â€šÂ¨Ã§Å¡â€žÃ¥Âºâ€Ã§â€Â¨Ã§Â¨â€¹Ã¥ÂºÂÃ¤Â½ÂÃ¤ÂºÅ½Ã¥ÂÂ¯Ã¤Â¿Â¡Ã§Å¡â€žÃ¥ÂÂÃ¥Ââ€˜Ã¤Â»Â£Ã§Ââ€ Ã¯Â¼Ë†nginxÃ£â‚¬ÂAWS ALB Ã§Â­â€°Ã¯Â¼â€°Ã¤Â¹â€¹Ã¥ÂÅ½
-2. Ã¦â€šÂ¨Ã¥Â·Â²Ã¥Â°â€  `ForwardedHeaderFilter` Ã¦Â³Â¨Ã¥â€ Å’Ã¤Â¸Âº bean
-3. Ã¦â€šÂ¨Ã¥Â·Â²Ã¥Å“Â¨Ã¥Âºâ€Ã§â€Â¨Ã¥Â±Å¾Ã¦â‚¬Â§Ã¤Â¸Â­Ã©â€¦ÂÃ§Â½Â®Ã¤Âºâ€  `server.forward-headers-strategy=NATIVE` Ã¦Ë†â€“ `FRAMEWORK`
-4. Ã¦â€šÂ¨Ã§Å¡â€žÃ¤Â»Â£Ã§Ââ€ Ã©â€¦ÂÃ§Â½Â®Ã¤Â¸ÂºÃ¨Â¦â€ Ã§â€ºâ€“Ã¯Â¼Ë†Ã¨â‚¬Å’Ã©ÂÅ¾Ã¨Â¿Â½Ã¥Å Â Ã¯Â¼â€°`X-Forwarded-For` Ã¥Â¤Â´
+1. 您的应用程序位于可信的反向代理（nginx、AWS ALB 等）之后
+2. 您已将 `ForwardedHeaderFilter` 注册为 bean
+3. 您已在应用属性中配置了 `server.forward-headers-strategy=NATIVE` 或 `FRAMEWORK`
+4. 您的代理配置为覆盖（而非追加）`X-Forwarded-For` 头
 
-Ã¥Â½â€œ `ForwardedHeaderFilter` Ã¨Â¢Â«Ã¦Â­Â£Ã§Â¡Â®Ã©â€¦ÂÃ§Â½Â®Ã¦â€”Â¶Ã¯Â¼Å’`request.getRemoteAddr()` Ã¥Â°â€ Ã¨â€¡ÂªÃ¥Å Â¨Ã¤Â»Å½Ã¨Â½Â¬Ã¥Ââ€˜Ã§Å¡â€žÃ¥Â¤Â´Ã¤Â¸Â­Ã¨Â¿â€Ã¥â€ºÅ¾Ã¦Â­Â£Ã§Â¡Â®Ã§Å¡â€žÃ¥Â®Â¢Ã¦Ë†Â·Ã§Â«Â¯ IPÃ£â‚¬â€š
-Ã¦Â²Â¡Ã¦Å“â€°Ã¦Â­Â¤Ã©â€¦ÂÃ§Â½Â®Ã¦â€”Â¶Ã¯Â¼Å’Ã¨Â¯Â·Ã§â€ºÂ´Ã¦Å½Â¥Ã¤Â½Â¿Ã§â€Â¨ `request.getRemoteAddr()`Ã¢â‚¬â€Ã¢â‚¬â€Ã¥Â®Æ’Ã¨Â¿â€Ã¥â€ºÅ¾Ã§Å¡â€žÃ¦ËœÂ¯Ã§â€ºÂ´Ã¦Å½Â¥Ã¨Â¿Å¾Ã¦Å½Â¥Ã§Å¡â€ž IPÃ¯Â¼Å’Ã¨Â¿â„¢Ã¦ËœÂ¯Ã¥â€Â¯Ã¤Â¸â‚¬Ã¥ÂÂ¯Ã¤Â¿Â¡Ã§Å¡â€žÃ¥â‚¬Â¼Ã£â‚¬â€š
+当 `ForwardedHeaderFilter` 被正确配置时，`request.getRemoteAddr()` 将自动从转发的头中返回正确的客户端 IP。
+没有此配置时，请直接使用 `request.getRemoteAddr()`——它返回的是直接连接的 IP，这是唯一可信的值。
 
 ```java
 @Component
@@ -283,7 +283,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
    * 4. Configure server.tomcat.remoteip.trusted-proxies or equivalent for your container
    *
    * Without this configuration, request.getRemoteAddr() returns the proxy IP, not the client IP.
-   * Do NOT read X-Forwarded-For directlyÃ¢â‚¬â€it is trivially spoofable without trusted proxy handling.
+   * Do NOT read X-Forwarded-For directly—it is trivially spoofable without trusted proxy handling.
    */
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -307,22 +307,22 @@ public class RateLimitFilter extends OncePerRequestFilter {
 }
 ```
 
-## Ã¥ÂÅ½Ã¥ÂÂ°Ã¤Â½Å“Ã¤Â¸Å¡
+## 后台作业
 
-Ã¤Â½Â¿Ã§â€Â¨ Spring Ã§Å¡â€ž `@Scheduled` Ã¦Ë†â€“Ã¤Â¸Å½Ã©ËœÅ¸Ã¥Ë†â€”Ã¯Â¼Ë†Ã¥Â¦â€š KafkaÃ£â‚¬ÂSQSÃ£â‚¬ÂRabbitMQÃ¯Â¼â€°Ã©â€ºâ€ Ã¦Ë†ÂÃ£â‚¬â€šÃ¤Â¿ÂÃ¦Å’ÂÃ¥Â¤â€žÃ§Ââ€ Ã§Â¨â€¹Ã¥ÂºÂÃ¦ËœÂ¯Ã¥Â¹â€šÃ§Â­â€°Ã§Å¡â€žÃ¥â€™Å’Ã¥ÂÂ¯Ã¨Â§â€šÃ¥Â¯Å¸Ã§Å¡â€žÃ£â‚¬â€š
+使用 Spring 的 `@Scheduled` 或与队列（如 Kafka、SQS、RabbitMQ）集成。保持处理程序是幂等的和可观察的。
 
-## Ã¥ÂÂ¯Ã¨Â§â€šÃ¦Âµâ€¹Ã¦â‚¬Â§
+## 可观测性
 
-* Ã©â‚¬Å¡Ã¨Â¿â€¡ Logback Ã§Â¼â€“Ã§Â ÂÃ¥â„¢Â¨Ã¨Â¿â€ºÃ¨Â¡Å’Ã§Â»â€œÃ¦Å¾â€žÃ¥Å’â€“Ã¦â€”Â¥Ã¥Â¿â€”Ã¨Â®Â°Ã¥Â½â€¢ (JSON)
-* Ã¦Å’â€¡Ã¦Â â€¡Ã¯Â¼Å¡Micrometer + Prometheus/OTel
-* Ã¨Â¿Â½Ã¨Â¸ÂªÃ¯Â¼Å¡Ã¥Â¸Â¦Ã¦Å“â€° OpenTelemetry Ã¦Ë†â€“ Brave Ã¥ÂÅ½Ã§Â«Â¯Ã§Å¡â€ž Micrometer Tracing
+* 通过 Logback 编码器进行结构化日志记录 (JSON)
+* 指标：Micrometer + Prometheus/OTel
+* 追踪：带有 OpenTelemetry 或 Brave 后端的 Micrometer Tracing
 
-## Ã§â€Å¸Ã¤ÂºÂ§Ã§Å½Â¯Ã¥Â¢Æ’Ã©Â»ËœÃ¨Â®Â¤Ã¨Â®Â¾Ã§Â½Â®
+## 生产环境默认设置
 
-* Ã¤Â¼ËœÃ¥â€¦Ë†Ã¤Â½Â¿Ã§â€Â¨Ã¦Å¾â€žÃ©â‚¬Â Ã¥â€¡Â½Ã¦â€¢Â°Ã¦Â³Â¨Ã¥â€¦Â¥Ã¯Â¼Å’Ã©ÂÂ¿Ã¥â€¦ÂÃ¥Â­â€”Ã¦Â®ÂµÃ¦Â³Â¨Ã¥â€¦Â¥
-* Ã¥ÂÂ¯Ã§â€Â¨ `spring.mvc.problemdetails.enabled=true` Ã¤Â»Â¥Ã¨Å½Â·Ã¥Â¾â€” RFC 7807 Ã©â€â„¢Ã¨Â¯Â¯ (Spring Boot 3+)
-* Ã¦Â Â¹Ã¦ÂÂ®Ã¥Â·Â¥Ã¤Â½Å“Ã¨Â´Å¸Ã¨Â½Â½Ã©â€¦ÂÃ§Â½Â® HikariCP Ã¨Â¿Å¾Ã¦Å½Â¥Ã¦Â±Â Ã¥Â¤Â§Ã¥Â°ÂÃ¯Â¼Å’Ã¨Â®Â¾Ã§Â½Â®Ã¨Â¶â€¦Ã¦â€”Â¶
-* Ã¥Â¯Â¹Ã¦Å¸Â¥Ã¨Â¯Â¢Ã¤Â½Â¿Ã§â€Â¨ `@Transactional(readOnly = true)`
-* Ã¥Å“Â¨Ã©â‚¬â€šÃ¥Â½â€œÃ§Å¡â€žÃ¥Å“Â°Ã¦â€“Â¹Ã©â‚¬Å¡Ã¨Â¿â€¡ `@NonNull` Ã¥â€™Å’ `Optional` Ã¥Â¼ÂºÃ¥Ë†Â¶Ã¦â€°Â§Ã¨Â¡Å’Ã§Â©ÂºÃ¥â‚¬Â¼Ã¥Â®â€°Ã¥â€¦Â¨
+* 优先使用构造函数注入，避免字段注入
+* 启用 `spring.mvc.problemdetails.enabled=true` 以获得 RFC 7807 错误 (Spring Boot 3+)
+* 根据工作负载配置 HikariCP 连接池大小，设置超时
+* 对查询使用 `@Transactional(readOnly = true)`
+* 在适当的地方通过 `@NonNull` 和 `Optional` 强制执行空值安全
 
-**Ã¨Â®Â°Ã¤Â½Â**Ã¯Â¼Å¡Ã¤Â¿ÂÃ¦Å’ÂÃ¦Å½Â§Ã¥Ë†Â¶Ã¥â„¢Â¨Ã§Â²Â¾Ã§Â®â‚¬Ã£â‚¬ÂÃ¦Å“ÂÃ¥Å Â¡Ã¤Â¸â€œÃ¦Â³Â¨Ã£â‚¬ÂÃ¤Â»â€œÃ¥Âºâ€œÃ§Â®â‚¬Ã¥Ââ€¢Ã¯Â¼Å’Ã¥Â¹Â¶Ã©â€ºâ€ Ã¤Â¸Â­Ã¥Â¤â€žÃ§Ââ€ Ã©â€â„¢Ã¨Â¯Â¯Ã£â‚¬â€šÃ¤Â¸ÂºÃ¥ÂÂ¯Ã§Â»Â´Ã¦Å Â¤Ã¦â‚¬Â§Ã¥â€™Å’Ã¥ÂÂ¯Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¦â‚¬Â§Ã¨Â¿â€ºÃ¨Â¡Å’Ã¤Â¼ËœÃ¥Å’â€“Ã£â‚¬â€š
+**记住**：保持控制器精简、服务专注、仓库简单，并集中处理错误。为可维护性和可测试性进行优化。

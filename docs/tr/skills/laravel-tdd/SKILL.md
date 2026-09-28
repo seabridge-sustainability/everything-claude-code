@@ -4,7 +4,7 @@ description: Test-driven development for Laravel with PHPUnit and Pest, factorie
 origin: ECC
 ---
 
-# Laravel TDD Ã„Â°Ã…Å¸ AkÃ„Â±Ã…Å¸Ã„Â±
+# Laravel TDD İş Akışı
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -21,51 +21,51 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-80%+ kapsam (unit + feature) ile Laravel uygulamalarÃ„Â± iÃƒÂ§in test-driven development.
+80%+ kapsam (unit + feature) ile Laravel uygulamaları için test-driven development.
 
-## Ne Zaman KullanÃ„Â±lÃ„Â±r
+## Ne Zaman Kullanılır
 
-- Laravel'de yeni ÃƒÂ¶zellikler veya endpoint'ler
-- Bug dÃƒÂ¼zeltmeleri veya refactoring'ler
-- Eloquent model'leri, policy'leri, job'larÃ„Â± ve notification'larÃ„Â± test etme
-- Proje zaten PHPUnit'te standartlaÃ…Å¸mamÃ„Â±Ã…Å¸sa yeni testler iÃƒÂ§in Pest'i tercih edin
+- Laravel'de yeni özellikler veya endpoint'ler
+- Bug düzeltmeleri veya refactoring'ler
+- Eloquent model'leri, policy'leri, job'ları ve notification'ları test etme
+- Proje zaten PHPUnit'te standartlaşmamışsa yeni testler için Pest'i tercih edin
 
-## NasÃ„Â±l Ãƒâ€¡alÃ„Â±Ã…Å¸Ã„Â±r
+## Nasıl Çalışır
 
-### Red-Green-Refactor DÃƒÂ¶ngÃƒÂ¼sÃƒÂ¼
+### Red-Green-Refactor Döngüsü
 
-1) BaÃ…Å¸arÃ„Â±sÃ„Â±z bir test yazÃ„Â±n
-2) GeÃƒÂ§mek iÃƒÂ§in minimal deÃ„Å¸iÃ…Å¸iklik uygulayÃ„Â±n
-3) Testleri yeÃ…Å¸il tutarken refactor edin
+1) Başarısız bir test yazın
+2) Geçmek için minimal değişiklik uygulayın
+3) Testleri yeşil tutarken refactor edin
 
-### Test KatmanlarÃ„Â±
+### Test Katmanları
 
-- **Unit**: saf PHP sÃ„Â±nÃ„Â±flarÃ„Â±, value object'leri, servisler
+- **Unit**: saf PHP sınıfları, value object'leri, servisler
 - **Feature**: HTTP endpoint'leri, auth, validation, policy'ler
-- **Integration**: database + kuyruk + harici sÃ„Â±nÃ„Â±rlar
+- **Integration**: database + kuyruk + harici sınırlar
 
-Kapsama gÃƒÂ¶re katmanlarÃ„Â± seÃƒÂ§in:
+Kapsama göre katmanları seçin:
 
-- Saf iÃ…Å¸ mantÃ„Â±Ã„Å¸Ã„Â± ve servisler iÃƒÂ§in **Unit** testleri kullanÃ„Â±n.
-- HTTP, auth, validation ve yanÃ„Â±t Ã…Å¸ekli iÃƒÂ§in **Feature** testleri kullanÃ„Â±n.
-- DB/kuyruklar/harici servisleri birlikte doÃ„Å¸rularken **Integration** testleri kullanÃ„Â±n.
+- Saf iş mantığı ve servisler için **Unit** testleri kullanın.
+- HTTP, auth, validation ve yanıt şekli için **Feature** testleri kullanın.
+- DB/kuyruklar/harici servisleri birlikte doğrularken **Integration** testleri kullanın.
 
 ### Database Stratejisi
 
-- Ãƒâ€¡oÃ„Å¸u feature/integration testi iÃƒÂ§in `RefreshDatabase` (test run'Ã„Â± baÃ…Å¸Ã„Â±na bir kez migration'larÃ„Â± ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±rÃ„Â±r, ardÃ„Â±ndan desteklendiÃ„Å¸inde her testi bir transaction'a sarar; in-memory veritabanlarÃ„Â± test baÃ…Å¸Ã„Â±na yeniden migrate edebilir)
-- Ã…Å¾ema zaten migrate edilmiÃ…Å¸se ve sadece test baÃ…Å¸Ã„Â±na rollback'e ihtiyacÃ„Â±nÃ„Â±z varsa `DatabaseTransactions`
-- Her test iÃƒÂ§in tam bir migrate/fresh'e ihtiyacÃ„Â±nÃ„Â±z varsa ve maliyetini karÃ…Å¸Ã„Â±layabiliyorsanÃ„Â±z `DatabaseMigrations`
+- Çoğu feature/integration testi için `RefreshDatabase` (test run'ı başına bir kez migration'ları çalıştırır, ardından desteklendiğinde her testi bir transaction'a sarar; in-memory veritabanları test başına yeniden migrate edebilir)
+- Şema zaten migrate edilmişse ve sadece test başına rollback'e ihtiyacınız varsa `DatabaseTransactions`
+- Her test için tam bir migrate/fresh'e ihtiyacınız varsa ve maliyetini karşılayabiliyorsanız `DatabaseMigrations`
 
-VeritabanÃ„Â±na dokunan testler iÃƒÂ§in varsayÃ„Â±lan olarak `RefreshDatabase` kullanÃ„Â±n: transaction desteÃ„Å¸i olan veritabanlarÃ„Â± iÃƒÂ§in, test run'Ã„Â± baÃ…Å¸Ã„Â±na bir kez (static bir bayrak aracÃ„Â±lÃ„Â±Ã„Å¸Ã„Â±yla) migration'larÃ„Â± ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±rÃ„Â±r ve her testi bir transaction'a sarar; `:memory:` SQLite veya transaction'sÃ„Â±z baÃ„Å¸lantÃ„Â±lar iÃƒÂ§in her testten ÃƒÂ¶nce migrate eder. Ã…Å¾ema zaten migrate edilmiÃ…Å¸se ve sadece test baÃ…Å¸Ã„Â±na rollback'lere ihtiyacÃ„Â±nÃ„Â±z varsa `DatabaseTransactions` kullanÃ„Â±n.
+Veritabanına dokunan testler için varsayılan olarak `RefreshDatabase` kullanın: transaction desteği olan veritabanları için, test run'ı başına bir kez (static bir bayrak aracılığıyla) migration'ları çalıştırır ve her testi bir transaction'a sarar; `:memory:` SQLite veya transaction'sız bağlantılar için her testten önce migrate eder. Şema zaten migrate edilmişse ve sadece test başına rollback'lere ihtiyacınız varsa `DatabaseTransactions` kullanın.
 
-### Test Framework SeÃƒÂ§imi
+### Test Framework Seçimi
 
-- Mevcut olduÃ„Å¸unda yeni testler iÃƒÂ§in varsayÃ„Â±lan olarak **Pest** kullanÃ„Â±n.
-- Proje zaten PHPUnit'te standartlaÃ…Å¸mÃ„Â±Ã…Å¸sa veya PHPUnit'e ÃƒÂ¶zgÃƒÂ¼ araÃƒÂ§lar gerektiriyorsa sadece **PHPUnit** kullanÃ„Â±n.
+- Mevcut olduğunda yeni testler için varsayılan olarak **Pest** kullanın.
+- Proje zaten PHPUnit'te standartlaşmışsa veya PHPUnit'e özgü araçlar gerektiriyorsa sadece **PHPUnit** kullanın.
 
-## Ãƒâ€“rnekler
+## Örnekler
 
-### PHPUnit Ãƒâ€“rneÃ„Å¸i
+### PHPUnit Örneği
 
 ```php
 use App\Models\User;
@@ -90,7 +90,7 @@ final class ProjectControllerTest extends TestCase
 }
 ```
 
-### Feature Test Ãƒâ€“rneÃ„Å¸i (HTTP KatmanÃ„Â±)
+### Feature Test Örneği (HTTP Katmanı)
 
 ```php
 use App\Models\Project;
@@ -115,7 +115,7 @@ final class ProjectIndexTest extends TestCase
 }
 ```
 
-### Pest Ãƒâ€“rneÃ„Å¸i
+### Pest Örneği
 
 ```php
 use App\Models\User;
@@ -138,7 +138,7 @@ test('owner can create project', function () {
 });
 ```
 
-### Feature Test Pest Ãƒâ€“rneÃ„Å¸i (HTTP KatmanÃ„Â±)
+### Feature Test Pest Örneği (HTTP Katmanı)
 
 ```php
 use App\Models\Project;
@@ -162,8 +162,8 @@ test('projects index returns paginated results', function () {
 
 ### Factory'ler ve State'ler
 
-- Test verileri iÃƒÂ§in factory'leri kullanÃ„Â±n
-- UÃƒÂ§ durumlar iÃƒÂ§in state'leri tanÃ„Â±mlayÃ„Â±n (archived, admin, trial)
+- Test verileri için factory'leri kullanın
+- Uç durumlar için state'leri tanımlayın (archived, admin, trial)
 
 ```php
 $user = User::factory()->state(['role' => 'admin'])->create();
@@ -171,11 +171,11 @@ $user = User::factory()->state(['role' => 'admin'])->create();
 
 ### Database Testi
 
-- Temiz durum iÃƒÂ§in `RefreshDatabase` kullanÃ„Â±n
+- Temiz durum için `RefreshDatabase` kullanın
 - Testleri izole ve deterministik tutun
 - Manuel sorgular yerine `assertDatabaseHas` tercih edin
 
-### Persistence Test Ãƒâ€“rneÃ„Å¸i
+### Persistence Test Örneği
 
 ```php
 use App\Models\Project;
@@ -197,12 +197,12 @@ final class ProjectRepositoryTest extends TestCase
 }
 ```
 
-### Yan Etkiler iÃƒÂ§in Fake'ler
+### Yan Etkiler için Fake'ler
 
-- Job'lar iÃƒÂ§in `Bus::fake()`
-- KuyruÃ„Å¸a alÃ„Â±nmÃ„Â±Ã…Å¸ iÃ…Å¸ler iÃƒÂ§in `Queue::fake()`
-- Bildirimler iÃƒÂ§in `Mail::fake()` ve `Notification::fake()`
-- Domain event'leri iÃƒÂ§in `Event::fake()`
+- Job'lar için `Bus::fake()`
+- Kuyruğa alınmış işler için `Queue::fake()`
+- Bildirimler için `Mail::fake()` ve `Notification::fake()`
+- Domain event'leri için `Event::fake()`
 
 ```php
 use Illuminate\Support\Facades\Queue;
@@ -237,24 +237,24 @@ $response->assertOk();
 
 ### HTTP ve Harici Servisler
 
-- Harici API'leri izole etmek iÃƒÂ§in `Http::fake()` kullanÃ„Â±n
-- Giden payload'larÃ„Â± `Http::assertSent()` ile doÃ„Å¸rulayÃ„Â±n
+- Harici API'leri izole etmek için `Http::fake()` kullanın
+- Giden payload'ları `Http::assertSent()` ile doğrulayın
 
 ### Kapsam Hedefleri
 
-- Unit + feature testleri iÃƒÂ§in 80%+ kapsam zorlayÃ„Â±n
-- CI'da `pcov` veya `XDEBUG_MODE=coverage` kullanÃ„Â±n
+- Unit + feature testleri için 80%+ kapsam zorlayın
+- CI'da `pcov` veya `XDEBUG_MODE=coverage` kullanın
 
-### Test KomutlarÃ„Â±
+### Test Komutları
 
 - `php artisan test`
 - `vendor/bin/phpunit`
 - `vendor/bin/pest`
 
-### Test YapÃ„Â±landÃ„Â±rmasÃ„Â±
+### Test Yapılandırması
 
-- HÃ„Â±zlÃ„Â± testler iÃƒÂ§in `phpunit.xml`'de `DB_CONNECTION=sqlite` ve `DB_DATABASE=:memory:` ayarlayÃ„Â±n
-- Dev/prod verilerine dokunmaktan kaÃƒÂ§Ã„Â±nmak iÃƒÂ§in testler iÃƒÂ§in ayrÃ„Â± env tutun
+- Hızlı testler için `phpunit.xml`'de `DB_CONNECTION=sqlite` ve `DB_DATABASE=:memory:` ayarlayın
+- Dev/prod verilerine dokunmaktan kaçınmak için testler için ayrı env tutun
 
 ### Yetkilendirme Testleri
 
@@ -267,7 +267,7 @@ $this->assertFalse(Gate::forUser($otherUser)->allows('update', $project));
 
 ### Inertia Feature Testleri
 
-Inertia.js kullanÃ„Â±rken, Inertia test yardÃ„Â±mcÃ„Â±larÃ„Â± ile component ismi ve prop'larÃ„Â± doÃ„Å¸rulayÃ„Â±n.
+Inertia.js kullanırken, Inertia test yardımcıları ile component ismi ve prop'ları doğrulayın.
 
 ```php
 use App\Models\User;
@@ -295,4 +295,4 @@ final class DashboardInertiaTest extends TestCase
 }
 ```
 
-Testleri Inertia yanÃ„Â±tlarÃ„Â±yla uyumlu tutmak iÃƒÂ§in ham JSON assertion'larÃ„Â± yerine `assertInertia` tercih edin.
+Testleri Inertia yanıtlarıyla uyumlu tutmak için ham JSON assertion'ları yerine `assertInertia` tercih edin.

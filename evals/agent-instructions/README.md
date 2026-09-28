@@ -42,10 +42,30 @@ defect, not a model defect, until shown otherwise.
 
 ## 3. Behavioural replay (optional, needs approval for spend)
 
-Replay 2–3 historical tasks from `docs/handoffs/` with the old and new stacks and
-compare tool calls, turns, and outcome using the session-log miner
-(`scripts/measure-instruction-stack.py` for static cost; Claude Code JSONL logs in
-`~/.claude/projects/<repo>/` for behaviour). Not run by default: it costs model time.
+Plan the bounded cross-harness probe without making model calls:
+
+```powershell
+npm run agent-behavior:plan
+node scripts/eval-agent-behavior.js --plan --harness codex,claude,gemini --runs 1 --budget-usd 3
+```
+
+The default probe asks three read-only instruction questions and records pass
+rate, latency, tool calls, retries, tokens, and reported cost. Live execution is
+local-only, sequential, capped at nine runs, and disabled unless the current
+session has approved the spend, `SEABRIDGE_AGENT_EVAL_APPROVED=1` is set, and an
+explicit `--budget-usd` is supplied. Claude receives a hard per-run CLI budget;
+Codex and Gemini do not expose equivalent hard CLI caps, so their guard is the
+approved total plus the run-count ceiling.
+
+```powershell
+$env:SEABRIDGE_AGENT_EVAL_APPROVED='1' # set only after current-session approval
+node scripts/eval-agent-behavior.js --run --runs 1 --budget-usd 3
+```
+
+Reports go to ignored `artifacts/agent-runs/behavior-evals/`. Run the probe after
+an instruction-system or model change, and otherwise no more than every 30 days.
+Do not schedule it in GitHub Actions: unattended model calls would spend quota
+and defeat the Actions cost policy.
 
 ## Future model upgrade checklist
 

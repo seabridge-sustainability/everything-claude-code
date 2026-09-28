@@ -1,10 +1,10 @@
 ---
 name: backend-patterns
-description: Node.js, Express ve Next.js API routes iÃƒÂ§in backend mimari kalÃ„Â±plarÃ„Â±, API tasarÃ„Â±mÃ„Â±, veritabanÃ„Â± optimizasyonu ve sunucu tarafÃ„Â± en iyi uygulamalar.
+description: Node.js, Express ve Next.js API routes için backend mimari kalıpları, API tasarımı, veritabanı optimizasyonu ve sunucu tarafı en iyi uygulamalar.
 origin: ECC
 ---
 
-# Backend GeliÃ…Å¸tirme KalÃ„Â±plarÃ„Â±
+# Backend Geliştirme Kalıpları
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -21,39 +21,39 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-Ãƒâ€“lÃƒÂ§eklenebilir sunucu tarafÃ„Â± uygulamalar iÃƒÂ§in backend mimari kalÃ„Â±plarÃ„Â± ve en iyi uygulamalar.
+Ölçeklenebilir sunucu tarafı uygulamalar için backend mimari kalıpları ve en iyi uygulamalar.
 
-## Ne Zaman AktifleÃ…Å¸tirmelisiniz
+## Ne Zaman Aktifleştirmelisiniz
 
 - REST veya GraphQL API endpoint'leri tasarlarken
-- Repository, service veya controller katmanlarÃ„Â± uygularken
-- VeritabanÃ„Â± sorgularÃ„Â±nÃ„Â± optimize ederken (N+1, indeksleme, baÃ„Å¸lantÃ„Â± havuzu)
-- Ãƒâ€“nbellekleme eklerken (Redis, in-memory, HTTP cache baÃ…Å¸lÃ„Â±klarÃ„Â±)
-- Arka plan iÃ…Å¸leri veya async iÃ…Å¸leme ayarlarken
-- API'ler iÃƒÂ§in hata yÃƒÂ¶netimi ve doÃ„Å¸rulama yapÃ„Â±landÃ„Â±rÃ„Â±rken
-- Middleware oluÃ…Å¸tururken (auth, logging, rate limiting)
+- Repository, service veya controller katmanları uygularken
+- Veritabanı sorgularını optimize ederken (N+1, indeksleme, bağlantı havuzu)
+- Önbellekleme eklerken (Redis, in-memory, HTTP cache başlıkları)
+- Arka plan işleri veya async işleme ayarlarken
+- API'ler için hata yönetimi ve doğrulama yapılandırırken
+- Middleware oluştururken (auth, logging, rate limiting)
 
-## API TasarÃ„Â±m KalÃ„Â±plarÃ„Â±
+## API Tasarım Kalıpları
 
-### RESTful API YapÃ„Â±sÃ„Â±
+### RESTful API Yapısı
 
 ```typescript
-// PASS: Kaynak tabanlÃ„Â± URL'ler
-GET    /api/markets                 # KaynaklarÃ„Â± listele
+// PASS: Kaynak tabanlı URL'ler
+GET    /api/markets                 # Kaynakları listele
 GET    /api/markets/:id             # Tek kaynak getir
-POST   /api/markets                 # Kaynak oluÃ…Å¸tur
-PUT    /api/markets/:id             # KaynaÃ„Å¸Ã„Â± deÃ„Å¸iÃ…Å¸tir (tam)
-PATCH  /api/markets/:id             # KaynaÃ„Å¸Ã„Â± gÃƒÂ¼ncelle (kÃ„Â±smi)
-DELETE /api/markets/:id             # KaynaÃ„Å¸Ã„Â± sil
+POST   /api/markets                 # Kaynak oluştur
+PUT    /api/markets/:id             # Kaynağı değiştir (tam)
+PATCH  /api/markets/:id             # Kaynağı güncelle (kısmi)
+DELETE /api/markets/:id             # Kaynağı sil
 
-// PASS: Filtreleme, sÃ„Â±ralama, sayfalama iÃƒÂ§in query parametreleri
+// PASS: Filtreleme, sıralama, sayfalama için query parametreleri
 GET /api/markets?status=active&sort=volume&limit=20&offset=0
 ```
 
-### Repository KalÃ„Â±bÃ„Â±
+### Repository Kalıbı
 
 ```typescript
-// Veri eriÃ…Å¸im mantÃ„Â±Ã„Å¸Ã„Â±nÃ„Â± soyutla
+// Veri erişim mantığını soyutla
 interface MarketRepository {
   findAll(filters?: MarketFilters): Promise<Market[]>
   findById(id: string): Promise<Market | null>
@@ -80,26 +80,26 @@ class SupabaseMarketRepository implements MarketRepository {
     return data
   }
 
-  // DiÃ„Å¸er metodlar...
+  // Diğer metodlar...
 }
 ```
 
-### Service KatmanÃ„Â± KalÃ„Â±bÃ„Â±
+### Service Katmanı Kalıbı
 
 ```typescript
-// Ã„Â°Ã…Å¸ mantÃ„Â±Ã„Å¸Ã„Â± veri eriÃ…Å¸iminden ayrÃ„Â±lmÃ„Â±Ã…Å¸
+// İş mantığı veri erişiminden ayrılmış
 class MarketService {
   constructor(private marketRepo: MarketRepository) {}
 
   async searchMarkets(query: string, limit: number = 10): Promise<Market[]> {
-    // Ã„Â°Ã…Å¸ mantÃ„Â±Ã„Å¸Ã„Â±
+    // İş mantığı
     const embedding = await generateEmbedding(query)
     const results = await this.vectorSearch(embedding, limit)
 
     // Tam veriyi getir
     const markets = await this.marketRepo.findByIds(results.map(r => r.id))
 
-    // BenzerliÃ„Å¸e gÃƒÂ¶re sÃ„Â±rala
+    // Benzerliğe göre sırala
     return markets.sort((a, b) => {
       const scoreA = results.find(r => r.id === a.id)?.score || 0
       const scoreB = results.find(r => r.id === b.id)?.score || 0
@@ -113,10 +113,10 @@ class MarketService {
 }
 ```
 
-### Middleware KalÃ„Â±bÃ„Â±
+### Middleware Kalıbı
 
 ```typescript
-// Request/response iÃ…Å¸leme hattÃ„Â±
+// Request/response işleme hattı
 export function withAuth(handler: NextApiHandler): NextApiHandler {
   return async (req, res) => {
     const token = req.headers.authorization?.replace('Bearer ', '')
@@ -135,18 +135,18 @@ export function withAuth(handler: NextApiHandler): NextApiHandler {
   }
 }
 
-// KullanÃ„Â±m
+// Kullanım
 export default withAuth(async (req, res) => {
-  // Handler req.user'a eriÃ…Å¸ebilir
+  // Handler req.user'a erişebilir
 })
 ```
 
-## VeritabanÃ„Â± KalÃ„Â±plarÃ„Â±
+## Veritabanı Kalıpları
 
 ### Sorgu Optimizasyonu
 
 ```typescript
-// PASS: Ã„Â°YÃ„Â°: Sadece gerekli sÃƒÂ¼tunlarÃ„Â± seÃƒÂ§
+// PASS: İYİ: Sadece gerekli sütunları seç
 const { data } = await supabase
   .from('markets')
   .select('id, name, status, volume')
@@ -154,22 +154,22 @@ const { data } = await supabase
   .order('volume', { ascending: false })
   .limit(10)
 
-// FAIL: KÃƒâ€“TÃƒÅ“: Her Ã…Å¸eyi seÃƒÂ§
+// FAIL: KÖTÜ: Her şeyi seç
 const { data } = await supabase
   .from('markets')
   .select('*')
 ```
 
-### N+1 Sorgu Ãƒâ€“nleme
+### N+1 Sorgu Önleme
 
 ```typescript
-// FAIL: KÃƒâ€“TÃƒÅ“: N+1 sorgu problemi
+// FAIL: KÖTÜ: N+1 sorgu problemi
 const markets = await getMarkets()
 for (const market of markets) {
   market.creator = await getUser(market.creator_id)  // N sorgu
 }
 
-// PASS: Ã„Â°YÃ„Â°: Toplu getirme
+// PASS: İYİ: Toplu getirme
 const markets = await getMarkets()
 const creatorIds = markets.map(m => m.creator_id)
 const creators = await getUsers(creatorIds)  // 1 sorgu
@@ -180,7 +180,7 @@ markets.forEach(market => {
 })
 ```
 
-### Transaction KalÃ„Â±bÃ„Â±
+### Transaction Kalıbı
 
 ```typescript
 async function createMarketWithPosition(
@@ -206,7 +206,7 @@ RETURNS jsonb
 LANGUAGE plpgsql
 AS $$
 BEGIN
-  -- Transaction otomatik baÃ…Å¸lar
+  -- Transaction otomatik başlar
   INSERT INTO markets VALUES (market_data);
   INSERT INTO positions VALUES (position_data);
   RETURN jsonb_build_object('success', true);
@@ -218,9 +218,9 @@ END;
 $$;
 ```
 
-## Ãƒâ€“nbellekleme Stratejileri
+## Önbellekleme Stratejileri
 
-### Redis Ãƒâ€“nbellekleme KatmanÃ„Â±
+### Redis Önbellekleme Katmanı
 
 ```typescript
 class CachedMarketRepository implements MarketRepository {
@@ -230,18 +230,18 @@ class CachedMarketRepository implements MarketRepository {
   ) {}
 
   async findById(id: string): Promise<Market | null> {
-    // Ãƒâ€“nce ÃƒÂ¶nbelleÃ„Å¸i kontrol et
+    // Önce önbelleği kontrol et
     const cached = await this.redis.get(`market:${id}`)
 
     if (cached) {
       return JSON.parse(cached)
     }
 
-    // Cache miss - veritabanÃ„Â±ndan getir
+    // Cache miss - veritabanından getir
     const market = await this.baseRepo.findById(id)
 
     if (market) {
-      // 5 dakika ÃƒÂ¶nbellekle
+      // 5 dakika önbellekle
       await this.redis.setex(`market:${id}`, 300, JSON.stringify(market))
     }
 
@@ -254,13 +254,13 @@ class CachedMarketRepository implements MarketRepository {
 }
 ```
 
-### Cache-Aside KalÃ„Â±bÃ„Â±
+### Cache-Aside Kalıbı
 
 ```typescript
 async function getMarketWithCache(id: string): Promise<Market> {
   const cacheKey = `market:${id}`
 
-  // Ãƒâ€“nbelleÃ„Å¸i dene
+  // Önbelleği dene
   const cached = await redis.get(cacheKey)
   if (cached) return JSON.parse(cached)
 
@@ -269,16 +269,16 @@ async function getMarketWithCache(id: string): Promise<Market> {
 
   if (!market) throw new Error('Market not found')
 
-  // Ãƒâ€“nbelleÃ„Å¸i gÃƒÂ¼ncelle
+  // Önbelleği güncelle
   await redis.setex(cacheKey, 300, JSON.stringify(market))
 
   return market
 }
 ```
 
-## Hata YÃƒÂ¶netimi KalÃ„Â±plarÃ„Â±
+## Hata Yönetimi Kalıpları
 
-### Merkezi Hata YÃƒÂ¶neticisi
+### Merkezi Hata Yöneticisi
 
 ```typescript
 class ApiError extends Error {
@@ -308,7 +308,7 @@ export function errorHandler(error: unknown, req: Request): Response {
     }, { status: 400 })
   }
 
-  // Beklenmeyen hatalarÃ„Â± logla
+  // Beklenmeyen hataları logla
   console.error('Unexpected error:', error)
 
   return NextResponse.json({
@@ -317,7 +317,7 @@ export function errorHandler(error: unknown, req: Request): Response {
   }, { status: 500 })
 }
 
-// KullanÃ„Â±m
+// Kullanım
 export async function GET(request: Request) {
   try {
     const data = await fetchData()
@@ -354,13 +354,13 @@ async function fetchWithRetry<T>(
   throw lastError!
 }
 
-// KullanÃ„Â±m
+// Kullanım
 const data = await fetchWithRetry(() => fetchFromAPI())
 ```
 
-## Kimlik DoÃ„Å¸rulama ve Yetkilendirme
+## Kimlik Doğrulama ve Yetkilendirme
 
-### JWT Token DoÃ„Å¸rulama
+### JWT Token Doğrulama
 
 ```typescript
 import jwt from 'jsonwebtoken'
@@ -390,7 +390,7 @@ export async function requireAuth(request: Request) {
   return verifyToken(token)
 }
 
-// API route'unda kullanÃ„Â±m
+// API route'unda kullanım
 export async function GET(request: Request) {
   const user = await requireAuth(request)
 
@@ -400,7 +400,7 @@ export async function GET(request: Request) {
 }
 ```
 
-### Rol TabanlÃ„Â± EriÃ…Å¸im KontrolÃƒÂ¼
+### Rol Tabanlı Erişim Kontrolü
 
 ```typescript
 type Permission = 'read' | 'write' | 'delete' | 'admin'
@@ -434,10 +434,10 @@ export function requirePermission(permission: Permission) {
   }
 }
 
-// KullanÃ„Â±m - HOF handler'Ã„Â± sarar
+// Kullanım - HOF handler'ı sarar
 export const DELETE = requirePermission('delete')(
   async (request: Request, user: User) => {
-    // Handler doÃ„Å¸rulanmÃ„Â±Ã…Å¸ yetki ile kullanÃ„Â±cÃ„Â± alÃ„Â±r
+    // Handler doğrulanmış yetki ile kullanıcı alır
     return new Response('Deleted', { status: 200 })
   }
 )
@@ -459,14 +459,14 @@ class RateLimiter {
     const now = Date.now()
     const requests = this.requests.get(identifier) || []
 
-    // Pencere dÃ„Â±Ã…Å¸Ã„Â±ndaki eski istekleri kaldÃ„Â±r
+    // Pencere dışındaki eski istekleri kaldır
     const recentRequests = requests.filter(time => now - time < windowMs)
 
     if (recentRequests.length >= maxRequests) {
-      return false  // Rate limit aÃ…Å¸Ã„Â±ldÃ„Â±
+      return false  // Rate limit aşıldı
     }
 
-    // Mevcut isteÃ„Å¸i ekle
+    // Mevcut isteği ekle
     recentRequests.push(now)
     this.requests.set(identifier, recentRequests)
 
@@ -487,13 +487,13 @@ export async function GET(request: Request) {
     }, { status: 429 })
   }
 
-  // Ã„Â°stekle devam et
+  // İstekle devam et
 }
 ```
 
-## Arka Plan Ã„Â°Ã…Å¸leri ve Kuyruklar
+## Arka Plan İşleri ve Kuyruklar
 
-### Basit Kuyruk KalÃ„Â±bÃ„Â±
+### Basit Kuyruk Kalıbı
 
 ```typescript
 class JobQueue<T> {
@@ -525,11 +525,11 @@ class JobQueue<T> {
   }
 
   private async execute(job: T): Promise<void> {
-    // Ã„Â°Ã…Å¸ yÃƒÂ¼rÃƒÂ¼tme mantÃ„Â±Ã„Å¸Ã„Â±
+    // İş yürütme mantığı
   }
 }
 
-// Market indeksleme iÃƒÂ§in kullanÃ„Â±m
+// Market indeksleme için kullanım
 interface IndexJob {
   marketId: string
 }
@@ -539,16 +539,16 @@ const indexQueue = new JobQueue<IndexJob>()
 export async function POST(request: Request) {
   const { marketId } = await request.json()
 
-  // Bloke etmek yerine kuyruÃ„Å¸a ekle
+  // Bloke etmek yerine kuyruğa ekle
   await indexQueue.add({ marketId })
 
   return NextResponse.json({ success: true, message: 'Job queued' })
 }
 ```
 
-## Loglama ve Ã„Â°zleme
+## Loglama ve İzleme
 
-### YapÃ„Â±landÃ„Â±rÃ„Â±lmÃ„Â±Ã…Å¸ Loglama
+### Yapılandırılmış Loglama
 
 ```typescript
 interface LogContext {
@@ -590,7 +590,7 @@ class Logger {
 
 const logger = new Logger()
 
-// KullanÃ„Â±m
+// Kullanım
 export async function GET(request: Request) {
   const requestId = crypto.randomUUID()
 
@@ -610,4 +610,4 @@ export async function GET(request: Request) {
 }
 ```
 
-**UnutmayÃ„Â±n**: Backend kalÃ„Â±plarÃ„Â± ÃƒÂ¶lÃƒÂ§eklenebilir, sÃƒÂ¼rdÃƒÂ¼rÃƒÂ¼lebilir sunucu tarafÃ„Â± uygulamalar saÃ„Å¸lar. KarmaÃ…Å¸Ã„Â±klÃ„Â±k seviyenize uyan kalÃ„Â±plarÃ„Â± seÃƒÂ§in.
+**Unutmayın**: Backend kalıpları ölçeklenebilir, sürdürülebilir sunucu tarafı uygulamalar sağlar. Karmaşıklık seviyenize uyan kalıpları seçin.

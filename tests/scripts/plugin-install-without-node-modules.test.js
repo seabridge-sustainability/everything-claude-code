@@ -57,8 +57,13 @@ function assertNoNodeModulesInAncestry(dir) {
 
 function run(scriptRelativePath, args, cwd) {
   try {
+    const env = { ...process.env };
+    // This fixture proves behavior without installed packages. Do not let a
+    // developer's or CI runner's global module search path defeat isolation.
+    delete env.NODE_PATH;
     const stdout = execFileSync('node', [path.join(cwd, scriptRelativePath), ...args], {
       encoding: 'utf8',
+      env,
       stdio: ['pipe', 'pipe', 'pipe'],
       timeout: 10000,
     });

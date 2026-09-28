@@ -1,10 +1,10 @@
 ---
 name: frontend-patterns
-description: ReactÃ£â‚¬ÂNext.jsÃ£â‚¬ÂÃ§Å Â¶Ã¦â‚¬ÂÃ§Â®Â¡Ã§Ââ€ Ã£â‚¬ÂÃ¦â‚¬Â§Ã¨Æ’Â½Ã¤Â¼ËœÃ¥Å’â€“Ã¥â€™Å’UIÃ¦Å“â‚¬Ã¤Â½Â³Ã¥Â®Å¾Ã¨Â·ÂµÃ§Å¡â€žÃ¥â€°ÂÃ§Â«Â¯Ã¥Â¼â‚¬Ã¥Ââ€˜Ã¦Â¨Â¡Ã¥Â¼ÂÃ£â‚¬â€š
+description: React、Next.js、状态管理、性能优化和UI最佳实践的前端开发模式。
 origin: ECC
 ---
 
-# Ã¥â€°ÂÃ§Â«Â¯Ã¥Â¼â‚¬Ã¥Ââ€˜Ã¦Â¨Â¡Ã¥Â¼Â
+# 前端开发模式
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -21,21 +21,21 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-Ã©â‚¬â€šÃ§â€Â¨Ã¤ÂºÅ½ ReactÃ£â‚¬ÂNext.js Ã¥â€™Å’Ã©Â«ËœÃ¦â‚¬Â§Ã¨Æ’Â½Ã§â€Â¨Ã¦Ë†Â·Ã§â€¢Å’Ã©ÂÂ¢Ã§Å¡â€žÃ§Å½Â°Ã¤Â»Â£Ã¥â€°ÂÃ§Â«Â¯Ã¦Â¨Â¡Ã¥Â¼ÂÃ£â‚¬â€š
+适用于 React、Next.js 和高性能用户界面的现代前端模式。
 
-## Ã¤Â½â€¢Ã¦â€”Â¶Ã¦Â¿â‚¬Ã¦Â´Â»
+## 何时激活
 
-* Ã¦Å¾â€žÃ¥Â»Âº React Ã§Â»â€žÃ¤Â»Â¶Ã¯Â¼Ë†Ã§Â»â€žÃ¥ÂË†Ã£â‚¬ÂÃ¥Â±Å¾Ã¦â‚¬Â§Ã£â‚¬ÂÃ¦Â¸Â²Ã¦Å¸â€œÃ¯Â¼â€°
-* Ã§Â®Â¡Ã§Ââ€ Ã§Å Â¶Ã¦â‚¬ÂÃ¯Â¼Ë†useStateÃ£â‚¬ÂuseReducerÃ£â‚¬ÂZustandÃ£â‚¬ÂContextÃ¯Â¼â€°
-* Ã¥Â®Å¾Ã§Å½Â°Ã¦â€¢Â°Ã¦ÂÂ®Ã¨Å½Â·Ã¥Ââ€“Ã¯Â¼Ë†SWRÃ£â‚¬ÂReact QueryÃ£â‚¬ÂÃ¦Å“ÂÃ¥Å Â¡Ã¥â„¢Â¨Ã§Â»â€žÃ¤Â»Â¶Ã¯Â¼â€°
-* Ã¤Â¼ËœÃ¥Å’â€“Ã¦â‚¬Â§Ã¨Æ’Â½Ã¯Â¼Ë†Ã¨Â®Â°Ã¥Â¿â€ Ã¥Å’â€“Ã£â‚¬ÂÃ¨â„¢Å¡Ã¦â€¹Å¸Ã¥Å’â€“Ã£â‚¬ÂÃ¤Â»Â£Ã§Â ÂÃ¥Ë†â€ Ã¥â€°Â²Ã¯Â¼â€°
-* Ã¥Â¤â€žÃ§Ââ€ Ã¨Â¡Â¨Ã¥Ââ€¢Ã¯Â¼Ë†Ã©ÂªÅ’Ã¨Â¯ÂÃ£â‚¬ÂÃ¥Ââ€”Ã¦Å½Â§Ã¨Â¾â€œÃ¥â€¦Â¥Ã£â‚¬ÂZod Ã¦Â¨Â¡Ã¥Â¼ÂÃ¯Â¼â€°
-* Ã¥Â¤â€žÃ§Ââ€ Ã¥Â®Â¢Ã¦Ë†Â·Ã§Â«Â¯Ã¨Â·Â¯Ã§â€Â±Ã¥â€™Å’Ã¥Â¯Â¼Ã¨Ë†Âª
-* Ã¦Å¾â€žÃ¥Â»ÂºÃ¥ÂÂ¯Ã¨Â®Â¿Ã©â€”Â®Ã£â‚¬ÂÃ¥â€œÂÃ¥Âºâ€Ã¥Â¼ÂÃ§Å¡â€ž UI Ã¦Â¨Â¡Ã¥Â¼Â
+* 构建 React 组件（组合、属性、渲染）
+* 管理状态（useState、useReducer、Zustand、Context）
+* 实现数据获取（SWR、React Query、服务器组件）
+* 优化性能（记忆化、虚拟化、代码分割）
+* 处理表单（验证、受控输入、Zod 模式）
+* 处理客户端路由和导航
+* 构建可访问、响应式的 UI 模式
 
-## Ã§Â»â€žÃ¤Â»Â¶Ã¦Â¨Â¡Ã¥Â¼Â
+## 组件模式
 
-### Ã§Â»â€žÃ¥ÂË†Ã¤Â¼ËœÃ¤ÂºÅ½Ã§Â»Â§Ã¦â€°Â¿
+### 组合优于继承
 
 ```typescript
 // PASS: GOOD: Component composition
@@ -63,7 +63,7 @@ export function CardBody({ children }: { children: React.ReactNode }) {
 </Card>
 ```
 
-### Ã¥Â¤ÂÃ¥ÂË†Ã§Â»â€žÃ¤Â»Â¶
+### 复合组件
 
 ```typescript
 interface TabsContextValue {
@@ -113,7 +113,7 @@ export function Tab({ id, children }: { id: string, children: React.ReactNode })
 </Tabs>
 ```
 
-### Ã¦Â¸Â²Ã¦Å¸â€œÃ¥Â±Å¾Ã¦â‚¬Â§Ã¦Â¨Â¡Ã¥Â¼Â
+### 渲染属性模式
 
 ```typescript
 interface DataLoaderProps<T> {
@@ -147,9 +147,9 @@ export function DataLoader<T>({ url, children }: DataLoaderProps<T>) {
 </DataLoader>
 ```
 
-## Ã¨â€¡ÂªÃ¥Â®Å¡Ã¤Â¹â€° Hooks Ã¦Â¨Â¡Ã¥Â¼Â
+## 自定义 Hooks 模式
 
-### Ã§Å Â¶Ã¦â‚¬ÂÃ§Â®Â¡Ã§Ââ€  Hook
+### 状态管理 Hook
 
 ```typescript
 export function useToggle(initialValue = false): [boolean, () => void] {
@@ -166,7 +166,7 @@ export function useToggle(initialValue = false): [boolean, () => void] {
 const [isOpen, toggleOpen] = useToggle()
 ```
 
-### Ã¥Â¼â€šÃ¦Â­Â¥Ã¦â€¢Â°Ã¦ÂÂ®Ã¨Å½Â·Ã¥Ââ€“ Hook
+### 异步数据获取 Hook
 
 ```typescript
 interface UseQueryOptions<T> {
@@ -234,7 +234,7 @@ const { data: markets, loading, error, refetch } = useQuery(
 )
 ```
 
-### Ã©ËœÂ²Ã¦Å â€“ Hook
+### 防抖 Hook
 
 ```typescript
 export function useDebounce<T>(value: T, delay: number): T {
@@ -262,9 +262,9 @@ useEffect(() => {
 }, [debouncedQuery])
 ```
 
-## Ã§Å Â¶Ã¦â‚¬ÂÃ§Â®Â¡Ã§Ââ€ Ã¦Â¨Â¡Ã¥Â¼Â
+## 状态管理模式
 
-### Context + Reducer Ã¦Â¨Â¡Ã¥Â¼Â
+### Context + Reducer 模式
 
 ```typescript
 interface State {
@@ -317,9 +317,9 @@ export function useMarkets() {
 }
 ```
 
-## Ã¦â‚¬Â§Ã¨Æ’Â½Ã¤Â¼ËœÃ¥Å’â€“
+## 性能优化
 
-### Ã¨Â®Â°Ã¥Â¿â€ Ã¥Å’â€“
+### 记忆化
 
 ```typescript
 // PASS: useMemo for expensive computations
@@ -344,7 +344,7 @@ export const MarketCard = React.memo<MarketCardProps>(({ market }) => {
 })
 ```
 
-### Ã¤Â»Â£Ã§Â ÂÃ¥Ë†â€ Ã¥â€°Â²Ã¤Â¸Å½Ã¦â€¡â€™Ã¥Å Â Ã¨Â½Â½
+### 代码分割与懒加载
 
 ```typescript
 import { lazy, Suspense } from 'react'
@@ -368,7 +368,7 @@ export function Dashboard() {
 }
 ```
 
-### Ã©â€¢Â¿Ã¥Ë†â€”Ã¨Â¡Â¨Ã¨â„¢Å¡Ã¦â€¹Å¸Ã¥Å’â€“
+### 长列表虚拟化
 
 ```typescript
 import { useVirtualizer } from '@tanstack/react-virtual'
@@ -412,9 +412,9 @@ export function VirtualMarketList({ markets }: { markets: Market[] }) {
 }
 ```
 
-## Ã¨Â¡Â¨Ã¥Ââ€¢Ã¥Â¤â€žÃ§Ââ€ Ã¦Â¨Â¡Ã¥Â¼Â
+## 表单处理模式
 
-### Ã¥Â¸Â¦Ã©ÂªÅ’Ã¨Â¯ÂÃ§Å¡â€žÃ¥Ââ€”Ã¦Å½Â§Ã¨Â¡Â¨Ã¥Ââ€¢
+### 带验证的受控表单
 
 ```typescript
 interface FormData {
@@ -489,7 +489,7 @@ export function CreateMarketForm() {
 }
 ```
 
-## Ã©â€â„¢Ã¨Â¯Â¯Ã¨Â¾Â¹Ã§â€¢Å’Ã¦Â¨Â¡Ã¥Â¼Â
+## 错误边界模式
 
 ```typescript
 interface ErrorBoundaryState {
@@ -537,9 +537,9 @@ export class ErrorBoundary extends React.Component<
 </ErrorBoundary>
 ```
 
-## Ã¥Å Â¨Ã§â€Â»Ã¦Â¨Â¡Ã¥Â¼Â
+## 动画模式
 
-### Framer Motion Ã¥Å Â¨Ã§â€Â»
+### Framer Motion 动画
 
 ```typescript
 import { motion, AnimatePresence } from 'framer-motion'
@@ -591,9 +591,9 @@ export function Modal({ isOpen, onClose, children }: ModalProps) {
 }
 ```
 
-## Ã¦â€”Â Ã©Å¡Å“Ã§Â¢ÂÃ¦Â¨Â¡Ã¥Â¼Â
+## 无障碍模式
 
-### Ã©â€Â®Ã§â€ºËœÃ¥Â¯Â¼Ã¨Ë†Âª
+### 键盘导航
 
 ```typescript
 export function Dropdown({ options, onSelect }: DropdownProps) {
@@ -634,7 +634,7 @@ export function Dropdown({ options, onSelect }: DropdownProps) {
 }
 ```
 
-### Ã§â€žÂ¦Ã§â€šÂ¹Ã§Â®Â¡Ã§Ââ€ 
+### 焦点管理
 
 ```typescript
 export function Modal({ isOpen, onClose, children }: ModalProps) {
@@ -668,4 +668,4 @@ export function Modal({ isOpen, onClose, children }: ModalProps) {
 }
 ```
 
-**Ã¨Â®Â°Ã¤Â½Â**Ã¯Â¼Å¡Ã§Å½Â°Ã¤Â»Â£Ã¥â€°ÂÃ§Â«Â¯Ã¦Â¨Â¡Ã¥Â¼ÂÃ¨Æ’Â½Ã¥Â®Å¾Ã§Å½Â°Ã¥ÂÂ¯Ã§Â»Â´Ã¦Å Â¤Ã£â‚¬ÂÃ©Â«ËœÃ¦â‚¬Â§Ã¨Æ’Â½Ã§Å¡â€žÃ§â€Â¨Ã¦Ë†Â·Ã§â€¢Å’Ã©ÂÂ¢Ã£â‚¬â€šÃ©â‚¬â€°Ã¦â€¹Â©Ã©â‚¬â€šÃ¥ÂË†Ã¤Â½Â Ã©Â¡Â¹Ã§â€ºÂ®Ã¥Â¤ÂÃ¦Ââ€šÃ¥ÂºÂ¦Ã§Å¡â€žÃ¦Â¨Â¡Ã¥Â¼ÂÃ£â‚¬â€š
+**记住**：现代前端模式能实现可维护、高性能的用户界面。选择适合你项目复杂度的模式。

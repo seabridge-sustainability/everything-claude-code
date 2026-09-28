@@ -1,10 +1,10 @@
 ---
 name: pytorch-patterns
-description: PyTorchÃ¦Â·Â±Ã¥ÂºÂ¦Ã¥Â­Â¦Ã¤Â¹Â Ã¦Â¨Â¡Ã¥Â¼ÂÃ¤Â¸Å½Ã¦Å“â‚¬Ã¤Â½Â³Ã¥Â®Å¾Ã¨Â·ÂµÃ¯Â¼Å’Ã§â€Â¨Ã¤ÂºÅ½Ã¦Å¾â€žÃ¥Â»ÂºÃ§Â¨Â³Ã¥ÂÂ¥Ã£â‚¬ÂÃ©Â«ËœÃ¦â€¢Ë†Ã¤Â¸â€Ã¥ÂÂ¯Ã¥Â¤ÂÃ§Å½Â°Ã§Å¡â€žÃ¨Â®Â­Ã§Â»Æ’Ã¦ÂµÂÃ§Â¨â€¹Ã£â‚¬ÂÃ¦Â¨Â¡Ã¥Å¾â€¹Ã¦Å¾Â¶Ã¦Å¾â€žÃ¥â€™Å’Ã¦â€¢Â°Ã¦ÂÂ®Ã¥Å Â Ã¨Â½Â½Ã£â‚¬â€š
+description: PyTorch深度学习模式与最佳实践，用于构建稳健、高效且可复现的训练流程、模型架构和数据加载。
 origin: ECC
 ---
 
-# PyTorch Ã¥Â¼â‚¬Ã¥Ââ€˜Ã¦Â¨Â¡Ã¥Â¼Â
+# PyTorch 开发模式
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -21,21 +21,21 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-Ã¦Å¾â€žÃ¥Â»ÂºÃ§Â¨Â³Ã¥ÂÂ¥Ã£â‚¬ÂÃ©Â«ËœÃ¦â€¢Ë†Ã¥â€™Å’Ã¥ÂÂ¯Ã¥Â¤ÂÃ§Å½Â°Ã¦Â·Â±Ã¥ÂºÂ¦Ã¥Â­Â¦Ã¤Â¹Â Ã¥Âºâ€Ã§â€Â¨Ã§Å¡â€ž PyTorch Ã¦Æ’Â¯Ã§â€Â¨Ã¦Â¨Â¡Ã¥Â¼ÂÃ¤Â¸Å½Ã¦Å“â‚¬Ã¤Â½Â³Ã¥Â®Å¾Ã¨Â·ÂµÃ£â‚¬â€š
+构建稳健、高效和可复现深度学习应用的 PyTorch 惯用模式与最佳实践。
 
-## Ã¤Â½â€¢Ã¦â€”Â¶Ã¤Â½Â¿Ã§â€Â¨
+## 何时使用
 
-* Ã§Â¼â€“Ã¥â€ â„¢Ã¦â€“Â°Ã§Å¡â€ž PyTorch Ã¦Â¨Â¡Ã¥Å¾â€¹Ã¦Ë†â€“Ã¨Â®Â­Ã§Â»Æ’Ã¨â€žÅ¡Ã¦Å“Â¬Ã¦â€”Â¶
-* Ã¨Â¯â€žÃ¥Â®Â¡Ã¦Â·Â±Ã¥ÂºÂ¦Ã¥Â­Â¦Ã¤Â¹Â Ã¤Â»Â£Ã§Â ÂÃ¦â€”Â¶
-* Ã¨Â°Æ’Ã¨Â¯â€¢Ã¨Â®Â­Ã§Â»Æ’Ã¥Â¾ÂªÃ§Å½Â¯Ã¦Ë†â€“Ã¦â€¢Â°Ã¦ÂÂ®Ã§Â®Â¡Ã©Ââ€œÃ¦â€”Â¶
-* Ã¤Â¼ËœÃ¥Å’â€“ GPU Ã¥â€ â€¦Ã¥Â­ËœÃ¤Â½Â¿Ã§â€Â¨Ã¦Ë†â€“Ã¨Â®Â­Ã§Â»Æ’Ã©â‚¬Å¸Ã¥ÂºÂ¦Ã¦â€”Â¶
-* Ã¨Â®Â¾Ã§Â½Â®Ã¥ÂÂ¯Ã¥Â¤ÂÃ§Å½Â°Ã¥Â®Å¾Ã©ÂªÅ’Ã¦â€”Â¶
+* 编写新的 PyTorch 模型或训练脚本时
+* 评审深度学习代码时
+* 调试训练循环或数据管道时
+* 优化 GPU 内存使用或训练速度时
+* 设置可复现实验时
 
-## Ã¦Â Â¸Ã¥Â¿Æ’Ã¥Å½Å¸Ã¥Ë†â„¢
+## 核心原则
 
-### 1. Ã¨Â®Â¾Ã¥Â¤â€¡Ã¦â€”Â Ã¥â€¦Â³Ã¤Â»Â£Ã§Â Â
+### 1. 设备无关代码
 
-Ã¥Â§â€¹Ã§Â»Ë†Ã§Â¼â€“Ã¥â€ â„¢Ã¨Æ’Â½Ã¥Å“Â¨ CPU Ã¥â€™Å’ GPU Ã¤Â¸Å Ã¨Â¿ÂÃ¨Â¡Å’Ã¤Â¸â€Ã¤Â¸ÂÃ§Â¡Â¬Ã§Â¼â€“Ã§Â ÂÃ¨Â®Â¾Ã¥Â¤â€¡Ã§Å¡â€žÃ¤Â»Â£Ã§Â ÂÃ£â‚¬â€š
+始终编写能在 CPU 和 GPU 上运行且不硬编码设备的代码。
 
 ```python
 # Good: Device-agnostic
@@ -48,9 +48,9 @@ model = MyModel().cuda()  # Crashes if no GPU
 data = data.cuda()
 ```
 
-### 2. Ã¥ÂÂ¯Ã¥Â¤ÂÃ§Å½Â°Ã¦â‚¬Â§Ã¤Â¼ËœÃ¥â€¦Ë†
+### 2. 可复现性优先
 
-Ã¨Â®Â¾Ã§Â½Â®Ã¦â€°â‚¬Ã¦Å“â€°Ã©Å¡ÂÃ¦Å“ÂºÃ§Â§ÂÃ¥Â­ÂÃ¤Â»Â¥Ã¨Å½Â·Ã¥Â¾â€”Ã¥ÂÂ¯Ã¥Â¤ÂÃ§Å½Â°Ã§Å¡â€žÃ§Â»â€œÃ¦Å¾Å“Ã£â‚¬â€š
+设置所有随机种子以获得可复现的结果。
 
 ```python
 # Good: Full reproducibility setup
@@ -66,9 +66,9 @@ def set_seed(seed: int = 42) -> None:
 model = MyModel()  # Different weights every run
 ```
 
-### 3. Ã¦ËœÂ¾Ã¥Â¼ÂÃ¥Â½Â¢Ã§Å Â¶Ã§Â®Â¡Ã§Ââ€ 
+### 3. 显式形状管理
 
-Ã¥Â§â€¹Ã§Â»Ë†Ã¨Â®Â°Ã¥Â½â€¢Ã¥Â¹Â¶Ã©ÂªÅ’Ã¨Â¯ÂÃ¥Â¼Â Ã©â€¡ÂÃ¥Â½Â¢Ã§Å Â¶Ã£â‚¬â€š
+始终记录并验证张量形状。
 
 ```python
 # Good: Shape-annotated forward pass
@@ -87,9 +87,9 @@ def forward(self, x):
     return self.fc(x)           # Will this even work?
 ```
 
-## Ã¦Â¨Â¡Ã¥Å¾â€¹Ã¦Å¾Â¶Ã¦Å¾â€žÃ¦Â¨Â¡Ã¥Â¼Â
+## 模型架构模式
 
-### Ã¦Â¸â€¦Ã¦â„¢Â°Ã§Å¡â€ž nn.Module Ã§Â»â€œÃ¦Å¾â€ž
+### 清晰的 nn.Module 结构
 
 ```python
 # Good: Well-organized module
@@ -122,7 +122,7 @@ class ImageClassifier(nn.Module):
         return x
 ```
 
-### Ã¦Â­Â£Ã§Â¡Â®Ã§Å¡â€žÃ¦ÂÆ’Ã©â€¡ÂÃ¥Ë†ÂÃ¥Â§â€¹Ã¥Å’â€“
+### 正确的权重初始化
 
 ```python
 # Good: Explicit initialization
@@ -141,9 +141,9 @@ model = MyModel()
 model.apply(model._init_weights)
 ```
 
-## Ã¨Â®Â­Ã§Â»Æ’Ã¥Â¾ÂªÃ§Å½Â¯Ã¦Â¨Â¡Ã¥Â¼Â
+## 训练循环模式
 
-### Ã¦Â â€¡Ã¥â€¡â€ Ã¨Â®Â­Ã§Â»Æ’Ã¥Â¾ÂªÃ§Å½Â¯
+### 标准训练循环
 
 ```python
 # Good: Complete training loop with best practices
@@ -184,7 +184,7 @@ def train_one_epoch(
     return total_loss / len(dataloader)
 ```
 
-### Ã©ÂªÅ’Ã¨Â¯ÂÃ¥Â¾ÂªÃ§Å½Â¯
+### 验证循环
 
 ```python
 # Good: Proper evaluation
@@ -195,7 +195,7 @@ def evaluate(
     criterion: nn.Module,
     device: torch.device,
 ) -> tuple[float, float]:
-    model.eval()  # Always set eval mode Ã¢â‚¬â€ disables dropout, uses running BN stats
+    model.eval()  # Always set eval mode — disables dropout, uses running BN stats
     total_loss = 0.0
     correct = 0
     total = 0
@@ -210,9 +210,9 @@ def evaluate(
     return total_loss / len(dataloader), correct / total
 ```
 
-## Ã¦â€¢Â°Ã¦ÂÂ®Ã§Â®Â¡Ã©Ââ€œÃ¦Â¨Â¡Ã¥Â¼Â
+## 数据管道模式
 
-### Ã¨â€¡ÂªÃ¥Â®Å¡Ã¤Â¹â€°Ã¦â€¢Â°Ã¦ÂÂ®Ã©â€ºâ€ 
+### 自定义数据集
 
 ```python
 # Good: Clean Dataset with type hints
@@ -240,7 +240,7 @@ class ImageDataset(Dataset):
         return img, label
 ```
 
-### Ã©Â«ËœÃ¦â€¢Ë†Ã§Å¡â€žÃ¦â€¢Â°Ã¦ÂÂ®Ã¥Å Â Ã¨Â½Â½Ã¥â„¢Â¨Ã©â€¦ÂÃ§Â½Â®
+### 高效的数据加载器配置
 
 ```python
 # Good: Optimized DataLoader
@@ -258,7 +258,7 @@ dataloader = DataLoader(
 dataloader = DataLoader(dataset, batch_size=32)  # num_workers=0, no pin_memory
 ```
 
-### Ã©â€™Ë†Ã¥Â¯Â¹Ã¥ÂËœÃ©â€¢Â¿Ã¦â€¢Â°Ã¦ÂÂ®Ã§Å¡â€žÃ¨â€¡ÂªÃ¥Â®Å¡Ã¤Â¹â€°Ã¦â€¢Â´Ã§Ââ€ Ã¥â€¡Â½Ã¦â€¢Â°
+### 针对变长数据的自定义整理函数
 
 ```python
 # Good: Pad sequences in collate_fn
@@ -271,9 +271,9 @@ def collate_fn(batch: list[tuple[torch.Tensor, int]]) -> tuple[torch.Tensor, tor
 dataloader = DataLoader(dataset, batch_size=32, collate_fn=collate_fn)
 ```
 
-## Ã¦Â£â‚¬Ã¦Å¸Â¥Ã§â€šÂ¹Ã¦Â¨Â¡Ã¥Â¼Â
+## 检查点模式
 
-### Ã¤Â¿ÂÃ¥Â­ËœÃ¥â€™Å’Ã¥Å Â Ã¨Â½Â½Ã¦Â£â‚¬Ã¦Å¸Â¥Ã§â€šÂ¹
+### 保存和加载检查点
 
 ```python
 # Good: Complete checkpoint with all training state
@@ -306,9 +306,9 @@ def load_checkpoint(
 torch.save(model.state_dict(), "model.pt")
 ```
 
-## Ã¦â‚¬Â§Ã¨Æ’Â½Ã¤Â¼ËœÃ¥Å’â€“
+## 性能优化
 
-### Ã¦Â·Â·Ã¥ÂË†Ã§Â²Â¾Ã¥ÂºÂ¦Ã¨Â®Â­Ã§Â»Æ’
+### 混合精度训练
 
 ```python
 # Good: AMP with GradScaler
@@ -323,7 +323,7 @@ for data, target in dataloader:
     optimizer.zero_grad(set_to_none=True)
 ```
 
-### Ã¥Â¤Â§Ã¦Â¨Â¡Ã¥Å¾â€¹Ã§Å¡â€žÃ¦Â¢Â¯Ã¥ÂºÂ¦Ã¦Â£â‚¬Ã¦Å¸Â¥Ã§â€šÂ¹
+### 大模型的梯度检查点
 
 ```python
 # Good: Trade compute for memory
@@ -337,7 +337,7 @@ class LargeModel(nn.Module):
         return self.head(x)
 ```
 
-### Ã¤Â½Â¿Ã§â€Â¨ torch.compile Ã¥Å Â Ã©â‚¬Å¸
+### 使用 torch.compile 加速
 
 ```python
 # Good: Compile the model for faster execution (PyTorch 2.0+)
@@ -347,22 +347,22 @@ model = torch.compile(model, mode="reduce-overhead")
 # Modes: "default" (safe), "reduce-overhead" (faster), "max-autotune" (fastest)
 ```
 
-## Ã¥Â¿Â«Ã©â‚¬Å¸Ã¥Ââ€šÃ¨â‚¬Æ’Ã¯Â¼Å¡PyTorch Ã¦Æ’Â¯Ã§â€Â¨Ã¦Â³â€¢
+## 快速参考：PyTorch 惯用法
 
-| Ã¦Æ’Â¯Ã§â€Â¨Ã¦Â³â€¢ | Ã¦ÂÂÃ¨Â¿Â° |
+| 惯用法 | 描述 |
 |-------|-------------|
-| `model.train()` / `model.eval()` | Ã¨Â®Â­Ã§Â»Æ’/Ã¨Â¯â€žÃ¤Â¼Â°Ã¥â€°ÂÃ¥Â§â€¹Ã§Â»Ë†Ã¨Â®Â¾Ã§Â½Â®Ã¦Â¨Â¡Ã¥Â¼Â |
-| `torch.no_grad()` | Ã¦Å½Â¨Ã§Ââ€ Ã¦â€”Â¶Ã§Â¦ÂÃ§â€Â¨Ã¦Â¢Â¯Ã¥ÂºÂ¦ |
-| `optimizer.zero_grad(set_to_none=True)` | Ã¦â€ºÂ´Ã©Â«ËœÃ¦â€¢Ë†Ã§Å¡â€žÃ¦Â¢Â¯Ã¥ÂºÂ¦Ã¦Â¸â€¦Ã©â€ºÂ¶ |
-| `.to(device)` | Ã¨Â®Â¾Ã¥Â¤â€¡Ã¦â€”Â Ã¥â€¦Â³Ã§Å¡â€žÃ¥Â¼Â Ã©â€¡Â/Ã¦Â¨Â¡Ã¥Å¾â€¹Ã¦â€Â¾Ã§Â½Â® |
-| `torch.amp.autocast` | Ã¦Â·Â·Ã¥ÂË†Ã§Â²Â¾Ã¥ÂºÂ¦Ã¤Â»Â¥Ã¨Å½Â·Ã¥Â¾â€” 2 Ã¥â‚¬ÂÃ©â‚¬Å¸Ã¥ÂºÂ¦ |
-| `pin_memory=True` | Ã¦â€ºÂ´Ã¥Â¿Â«Ã§Å¡â€ž CPUÃ¢â€ â€™GPU Ã¦â€¢Â°Ã¦ÂÂ®Ã¤Â¼Â Ã¨Â¾â€œ |
-| `torch.compile` | JIT Ã§Â¼â€“Ã¨Â¯â€˜Ã¥Å Â Ã©â‚¬Å¸ (2.0+) |
-| `weights_only=True` | Ã¥Â®â€°Ã¥â€¦Â¨Ã§Å¡â€žÃ¦Â¨Â¡Ã¥Å¾â€¹Ã¥Å Â Ã¨Â½Â½ |
-| `torch.manual_seed` | Ã¥ÂÂ¯Ã¥Â¤ÂÃ§Å½Â°Ã§Å¡â€žÃ¥Â®Å¾Ã©ÂªÅ’ |
-| `gradient_checkpointing` | Ã¤Â»Â¥Ã¨Â®Â¡Ã§Â®â€”Ã¦ÂÂ¢Ã¥Ââ€“Ã¥â€ â€¦Ã¥Â­Ëœ |
+| `model.train()` / `model.eval()` | 训练/评估前始终设置模式 |
+| `torch.no_grad()` | 推理时禁用梯度 |
+| `optimizer.zero_grad(set_to_none=True)` | 更高效的梯度清零 |
+| `.to(device)` | 设备无关的张量/模型放置 |
+| `torch.amp.autocast` | 混合精度以获得 2 倍速度 |
+| `pin_memory=True` | 更快的 CPU→GPU 数据传输 |
+| `torch.compile` | JIT 编译加速 (2.0+) |
+| `weights_only=True` | 安全的模型加载 |
+| `torch.manual_seed` | 可复现的实验 |
+| `gradient_checkpointing` | 以计算换取内存 |
 
-## Ã¥Âºâ€Ã©ÂÂ¿Ã¥â€¦ÂÃ§Å¡â€žÃ¥ÂÂÃ¦Â¨Â¡Ã¥Â¼Â
+## 应避免的反模式
 
 ```python
 # Bad: Forgetting model.eval() during validation
@@ -408,4 +408,4 @@ torch.save(model, "model.pt")  # Saves entire model (fragile, not portable)
 torch.save(model.state_dict(), "model.pt")
 ```
 
-**Ã¨Â¯Â·Ã¨Â®Â°Ã¤Â½Â**Ã¯Â¼Å¡PyTorch Ã¤Â»Â£Ã§Â ÂÃ¥Âºâ€Ã¥ÂÅ¡Ã¥Ë†Â°Ã¨Â®Â¾Ã¥Â¤â€¡Ã¦â€”Â Ã¥â€¦Â³Ã£â‚¬ÂÃ¥ÂÂ¯Ã¥Â¤ÂÃ§Å½Â°Ã¤Â¸â€Ã¥â€ â€¦Ã¥Â­ËœÃ¦â€žÂÃ¨Â¯â€ Ã¥Â¼ÂºÃ£â‚¬â€šÃ¥Â¦â€šÃ¦Å“â€°Ã§â€“â€˜Ã©â€”Â®Ã¯Â¼Å’Ã¨Â¯Â·Ã¤Â½Â¿Ã§â€Â¨ `torch.profiler` Ã¨Â¿â€ºÃ¨Â¡Å’Ã¥Ë†â€ Ã¦Å¾ÂÃ¯Â¼Å’Ã¥Â¹Â¶Ã¤Â½Â¿Ã§â€Â¨ `torch.cuda.memory_summary()` Ã¦Â£â‚¬Ã¦Å¸Â¥ GPU Ã¥â€ â€¦Ã¥Â­ËœÃ£â‚¬â€š
+**请记住**：PyTorch 代码应做到设备无关、可复现且内存意识强。如有疑问，请使用 `torch.profiler` 进行分析，并使用 `torch.cuda.memory_summary()` 检查 GPU 内存。

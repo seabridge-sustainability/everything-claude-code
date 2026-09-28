@@ -3,7 +3,7 @@ name: golang-testing
 description: Go testing patterns including table-driven tests, subtests, benchmarks, fuzzing, and test coverage. Follows TDD methodology with idiomatic Go practices.
 ---
 
-# Go Ã¦Â¸Â¬Ã¨Â©Â¦Ã¦Â¨Â¡Ã¥Â¼Â
+# Go 測試模式
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -20,39 +20,39 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-Ã§â€Â¨Ã¦â€“Â¼Ã¦â€™Â°Ã¥Â¯Â«Ã¥ÂÂ¯Ã©ÂÂ Ã£â‚¬ÂÃ¥ÂÂ¯Ã§Â¶Â­Ã¨Â­Â·Ã¦Â¸Â¬Ã¨Â©Â¦Ã§Å¡â€žÃ¥Â®Å’Ã¦â€¢Â´ Go Ã¦Â¸Â¬Ã¨Â©Â¦Ã¦Â¨Â¡Ã¥Â¼ÂÃ¯Â¼Å’Ã©ÂÂµÃ¥Â¾Âª TDD Ã¦â€“Â¹Ã¦Â³â€¢Ã¨Â«â€“Ã£â‚¬â€š
+用於撰寫可靠、可維護測試的完整 Go 測試模式，遵循 TDD 方法論。
 
-## Ã¤Â½â€¢Ã¦â„¢â€šÃ¥â€¢Å¸Ã§â€Â¨
+## 何時啟用
 
-- Ã¦â€™Â°Ã¥Â¯Â«Ã¦â€“Â°Ã§Å¡â€ž Go Ã¥â€¡Â½Ã¥Â¼ÂÃ¦Ë†â€“Ã¦â€“Â¹Ã¦Â³â€¢
-- Ã§â€šÂºÃ§ÂÂ¾Ã¦Å“â€°Ã§Â¨â€¹Ã¥Â¼ÂÃ§Â¢Â¼Ã¥Â¢Å¾Ã¥Å Â Ã¦Â¸Â¬Ã¨Â©Â¦Ã¨Â¦â€ Ã¨â€œâ€¹Ã§Å½â€¡
-- Ã§â€šÂºÃ¦â€¢Ë†Ã¨Æ’Â½Ã©â€”Å“Ã©ÂÂµÃ§Â¨â€¹Ã¥Â¼ÂÃ§Â¢Â¼Ã¥Â»ÂºÃ§Â«â€¹Ã¥Å¸ÂºÃ¦Âºâ€“Ã¦Â¸Â¬Ã¨Â©Â¦
-- Ã¥Â¯Â¦Ã¤Â½Å“Ã¨Â¼Â¸Ã¥â€¦Â¥Ã©Â©â€”Ã¨Â­â€°Ã§Å¡â€žÃ¦Â¨Â¡Ã§Â³Å Ã¦Â¸Â¬Ã¨Â©Â¦
-- Ã¥Å“Â¨ Go Ã¥Â°Ë†Ã¦Â¡Ë†Ã¤Â¸Â­Ã©ÂÂµÃ¥Â¾Âª TDD Ã¥Â·Â¥Ã¤Â½Å“Ã¦ÂµÂÃ§Â¨â€¹
+- 撰寫新的 Go 函式或方法
+- 為現有程式碼增加測試覆蓋率
+- 為效能關鍵程式碼建立基準測試
+- 實作輸入驗證的模糊測試
+- 在 Go 專案中遵循 TDD 工作流程
 
-## Go Ã§Å¡â€ž TDD Ã¥Â·Â¥Ã¤Â½Å“Ã¦ÂµÂÃ§Â¨â€¹
+## Go 的 TDD 工作流程
 
-### RED-GREEN-REFACTOR Ã¥Â¾ÂªÃ§â€™Â°
+### RED-GREEN-REFACTOR 循環
 
 ```
-RED     Ã¢â€ â€™ Ã¥â€¦Ë†Ã¥Â¯Â«Ã¥Â¤Â±Ã¦â€¢â€”Ã§Å¡â€žÃ¦Â¸Â¬Ã¨Â©Â¦
-GREEN   Ã¢â€ â€™ Ã¦â€™Â°Ã¥Â¯Â«Ã¦Å“â‚¬Ã¥Â°â€˜Ã§Â¨â€¹Ã¥Â¼ÂÃ§Â¢Â¼Ã¤Â½Â¿Ã¦Â¸Â¬Ã¨Â©Â¦Ã©â‚¬Å¡Ã©ÂÅ½
-REFACTOR Ã¢â€ â€™ Ã¥Å“Â¨Ã¤Â¿ÂÃ¦Å’ÂÃ¦Â¸Â¬Ã¨Â©Â¦Ã§Â¶Â Ã¨â€°Â²Ã§Å¡â€žÃ¥ÂÅ’Ã¦â„¢â€šÃ¦â€Â¹Ã¥â€“â€žÃ§Â¨â€¹Ã¥Â¼ÂÃ§Â¢Â¼
-REPEAT  Ã¢â€ â€™ Ã§Â¹Â¼Ã§ÂºÅ’Ã¤Â¸â€¹Ã¤Â¸â‚¬Ã¥â‚¬â€¹Ã©Å“â‚¬Ã¦Â±â€š
+RED     → 先寫失敗的測試
+GREEN   → 撰寫最少程式碼使測試通過
+REFACTOR → 在保持測試綠色的同時改善程式碼
+REPEAT  → 繼續下一個需求
 ```
 
-### Go Ã¤Â¸Â­Ã§Å¡â€žÃ©â‚¬ÂÃ¦Â­Â¥ TDD
+### Go 中的逐步 TDD
 
 ```go
-// Ã¦Â­Â¥Ã©Â©Å¸ 1Ã¯Â¼Å¡Ã¥Â®Å¡Ã§Â¾Â©Ã¤Â»â€¹Ã©ÂÂ¢/Ã§Â°Â½Ã§Â«Â 
+// 步驟 1：定義介面/簽章
 // calculator.go
 package calculator
 
 func Add(a, b int) int {
-    panic("not implemented") // Ã¤Â½â€Ã¤Â½ÂÃ§Â¬Â¦
+    panic("not implemented") // 佔位符
 }
 
-// Ã¦Â­Â¥Ã©Â©Å¸ 2Ã¯Â¼Å¡Ã¦â€™Â°Ã¥Â¯Â«Ã¥Â¤Â±Ã¦â€¢â€”Ã¦Â¸Â¬Ã¨Â©Â¦Ã¯Â¼Ë†REDÃ¯Â¼â€°
+// 步驟 2：撰寫失敗測試（RED）
 // calculator_test.go
 package calculator
 
@@ -66,26 +66,26 @@ func TestAdd(t *testing.T) {
     }
 }
 
-// Ã¦Â­Â¥Ã©Â©Å¸ 3Ã¯Â¼Å¡Ã¥Å¸Â·Ã¨Â¡Å’Ã¦Â¸Â¬Ã¨Â©Â¦ - Ã©Â©â€”Ã¨Â­â€°Ã¥Â¤Â±Ã¦â€¢â€”
+// 步驟 3：執行測試 - 驗證失敗
 // $ go test
 // --- FAIL: TestAdd (0.00s)
 // panic: not implemented
 
-// Ã¦Â­Â¥Ã©Â©Å¸ 4Ã¯Â¼Å¡Ã¥Â¯Â¦Ã¤Â½Å“Ã¦Å“â‚¬Ã¥Â°â€˜Ã§Â¨â€¹Ã¥Â¼ÂÃ§Â¢Â¼Ã¯Â¼Ë†GREENÃ¯Â¼â€°
+// 步驟 4：實作最少程式碼（GREEN）
 func Add(a, b int) int {
     return a + b
 }
 
-// Ã¦Â­Â¥Ã©Â©Å¸ 5Ã¯Â¼Å¡Ã¥Å¸Â·Ã¨Â¡Å’Ã¦Â¸Â¬Ã¨Â©Â¦ - Ã©Â©â€”Ã¨Â­â€°Ã©â‚¬Å¡Ã©ÂÅ½
+// 步驟 5：執行測試 - 驗證通過
 // $ go test
 // PASS
 
-// Ã¦Â­Â¥Ã©Â©Å¸ 6Ã¯Â¼Å¡Ã¥Â¦â€šÃ©Å“â‚¬Ã¨Â¦ÂÃ¥â€°â€¡Ã©â€¡ÂÃ¦Â§â€¹Ã¯Â¼Å’Ã©Â©â€”Ã¨Â­â€°Ã¦Â¸Â¬Ã¨Â©Â¦Ã¤Â»ÂÃ§â€žÂ¶Ã©â‚¬Å¡Ã©ÂÅ½
+// 步驟 6：如需要則重構，驗證測試仍然通過
 ```
 
-## Ã¨Â¡Â¨Ã¦Â Â¼Ã©Â©â€¦Ã¥â€¹â€¢Ã¦Â¸Â¬Ã¨Â©Â¦
+## 表格驅動測試
 
-Go Ã¦Â¸Â¬Ã¨Â©Â¦Ã§Å¡â€žÃ¦Â¨â„¢Ã¦Âºâ€“Ã¦Â¨Â¡Ã¥Â¼ÂÃ£â‚¬â€šÃ¤Â»Â¥Ã¦Å“â‚¬Ã¥Â°â€˜Ã§Â¨â€¹Ã¥Â¼ÂÃ§Â¢Â¼Ã©Ââ€Ã¥Ë†Â°Ã¥Â®Å’Ã¦â€¢Â´Ã¨Â¦â€ Ã¨â€œâ€¹Ã£â‚¬â€š
+Go 測試的標準模式。以最少程式碼達到完整覆蓋。
 
 ```go
 func TestAdd(t *testing.T) {
@@ -113,7 +113,7 @@ func TestAdd(t *testing.T) {
 }
 ```
 
-### Ã¥Â¸Â¶Ã©Å’Â¯Ã¨ÂªÂ¤Ã¦Â¡Ë†Ã¤Â¾â€¹Ã§Å¡â€žÃ¨Â¡Â¨Ã¦Â Â¼Ã©Â©â€¦Ã¥â€¹â€¢Ã¦Â¸Â¬Ã¨Â©Â¦
+### 帶錯誤案例的表格驅動測試
 
 ```go
 func TestParseConfig(t *testing.T) {
@@ -141,7 +141,7 @@ func TestParseConfig(t *testing.T) {
         {
             name:  "minimal config",
             input: `{}`,
-            want:  &Config{}, // Ã©â€ºÂ¶Ã¥â‚¬Â¼ config
+            want:  &Config{}, // 零值 config
         },
     }
 
@@ -168,13 +168,13 @@ func TestParseConfig(t *testing.T) {
 }
 ```
 
-## Ã¥Â­ÂÃ¦Â¸Â¬Ã¨Â©Â¦
+## 子測試
 
-### Ã§Âµâ€žÃ§Â¹â€Ã§â€ºÂ¸Ã©â€”Å“Ã¦Â¸Â¬Ã¨Â©Â¦
+### 組織相關測試
 
 ```go
 func TestUser(t *testing.T) {
-    // Ã¦â€°â‚¬Ã¦Å“â€°Ã¥Â­ÂÃ¦Â¸Â¬Ã¨Â©Â¦Ã¥â€¦Â±Ã¤ÂºÂ«Ã§Å¡â€žÃ¨Â¨Â­Ã§Â½Â®
+    // 所有子測試共享的設置
     db := setupTestDB(t)
 
     t.Run("Create", func(t *testing.T) {
@@ -208,7 +208,7 @@ func TestUser(t *testing.T) {
 }
 ```
 
-### Ã¤Â¸Â¦Ã¨Â¡Å’Ã¥Â­ÂÃ¦Â¸Â¬Ã¨Â©Â¦
+### 並行子測試
 
 ```go
 func TestParallel(t *testing.T) {
@@ -222,36 +222,36 @@ func TestParallel(t *testing.T) {
     }
 
     for _, tt := range tests {
-        tt := tt // Ã¦Ââ€¢Ã§ÂÂ²Ã§Â¯â€žÃ¥Å“ÂÃ¨Â®Å Ã¦â€¢Â¸
+        tt := tt // 捕獲範圍變數
         t.Run(tt.name, func(t *testing.T) {
-            t.Parallel() // Ã¤Â¸Â¦Ã¨Â¡Å’Ã¥Å¸Â·Ã¨Â¡Å’Ã¥Â­ÂÃ¦Â¸Â¬Ã¨Â©Â¦
+            t.Parallel() // 並行執行子測試
             result := Process(tt.input)
-            // Ã¦â€“Â·Ã¨Â¨â‚¬...
+            // 斷言...
             _ = result
         })
     }
 }
 ```
 
-## Ã¦Â¸Â¬Ã¨Â©Â¦Ã¨Â¼â€Ã¥Å Â©Ã¥â€¡Â½Ã¥Â¼Â
+## 測試輔助函式
 
-### Ã¨Â¼â€Ã¥Å Â©Ã¥â€¡Â½Ã¥Â¼Â
+### 輔助函式
 
 ```go
 func setupTestDB(t *testing.T) *sql.DB {
-    t.Helper() // Ã¦Â¨â„¢Ã¨Â¨ËœÃ§â€šÂºÃ¨Â¼â€Ã¥Å Â©Ã¥â€¡Â½Ã¥Â¼Â
+    t.Helper() // 標記為輔助函式
 
     db, err := sql.Open("sqlite3", ":memory:")
     if err != nil {
         t.Fatalf("failed to open database: %v", err)
     }
 
-    // Ã¦Â¸Â¬Ã¨Â©Â¦Ã§ÂµÂÃ¦ÂÅ¸Ã¦â„¢â€šÃ¦Â¸â€¦Ã§Ââ€ 
+    // 測試結束時清理
     t.Cleanup(func() {
         db.Close()
     })
 
-    // Ã¥Å¸Â·Ã¨Â¡Å’ migrations
+    // 執行 migrations
     if _, err := db.Exec(schema); err != nil {
         t.Fatalf("failed to create schema: %v", err)
     }
@@ -274,34 +274,34 @@ func assertEqual[T comparable](t *testing.T, got, want T) {
 }
 ```
 
-### Ã¨â€¡Â¨Ã¦â„¢â€šÃ¦Âªâ€Ã¦Â¡Ë†Ã¥â€™Å’Ã§â€ºÂ®Ã©Å’â€ž
+### 臨時檔案和目錄
 
 ```go
 func TestFileProcessing(t *testing.T) {
-    // Ã¥Â»ÂºÃ§Â«â€¹Ã¨â€¡Â¨Ã¦â„¢â€šÃ§â€ºÂ®Ã©Å’â€ž - Ã¨â€¡ÂªÃ¥â€¹â€¢Ã¦Â¸â€¦Ã§Ââ€ 
+    // 建立臨時目錄 - 自動清理
     tmpDir := t.TempDir()
 
-    // Ã¥Â»ÂºÃ§Â«â€¹Ã¦Â¸Â¬Ã¨Â©Â¦Ã¦Âªâ€Ã¦Â¡Ë†
+    // 建立測試檔案
     testFile := filepath.Join(tmpDir, "test.txt")
     err := os.WriteFile(testFile, []byte("test content"), 0644)
     if err != nil {
         t.Fatalf("failed to create test file: %v", err)
     }
 
-    // Ã¥Å¸Â·Ã¨Â¡Å’Ã¦Â¸Â¬Ã¨Â©Â¦
+    // 執行測試
     result, err := ProcessFile(testFile)
     if err != nil {
         t.Fatalf("ProcessFile failed: %v", err)
     }
 
-    // Ã¦â€“Â·Ã¨Â¨â‚¬...
+    // 斷言...
     _ = result
 }
 ```
 
-## Golden Ã¦Âªâ€Ã¦Â¡Ë†
+## Golden 檔案
 
-Ã¤Â½Â¿Ã§â€Â¨Ã¥â€žÂ²Ã¥Â­ËœÃ¥Å“Â¨ `testdata/` Ã¤Â¸Â­Ã§Å¡â€žÃ©Â ÂÃ¦Å“Å¸Ã¨Â¼Â¸Ã¥â€¡ÂºÃ¦Âªâ€Ã¦Â¡Ë†Ã©â‚¬Â²Ã¨Â¡Å’Ã¦Â¸Â¬Ã¨Â©Â¦Ã£â‚¬â€š
+使用儲存在 `testdata/` 中的預期輸出檔案進行測試。
 
 ```go
 var update = flag.Bool("update", false, "update golden files")
@@ -322,7 +322,7 @@ func TestRender(t *testing.T) {
             golden := filepath.Join("testdata", tt.name+".golden")
 
             if *update {
-                // Ã¦â€ºÂ´Ã¦â€“Â° golden Ã¦Âªâ€Ã¦Â¡Ë†Ã¯Â¼Å¡go test -update
+                // 更新 golden 檔案：go test -update
                 err := os.WriteFile(golden, got, 0644)
                 if err != nil {
                     t.Fatalf("failed to update golden file: %v", err)
@@ -342,27 +342,27 @@ func TestRender(t *testing.T) {
 }
 ```
 
-## Ã¤Â½Â¿Ã§â€Â¨Ã¤Â»â€¹Ã©ÂÂ¢ Mock
+## 使用介面 Mock
 
-### Ã¥Å¸ÂºÃ¦â€“Â¼Ã¤Â»â€¹Ã©ÂÂ¢Ã§Å¡â€ž Mock
+### 基於介面的 Mock
 
 ```go
-// Ã¥Â®Å¡Ã§Â¾Â©Ã¤Â¾ÂÃ¨Â³Â´Ã§Å¡â€žÃ¤Â»â€¹Ã©ÂÂ¢
+// 定義依賴的介面
 type UserRepository interface {
     GetUser(id string) (*User, error)
     SaveUser(user *User) error
 }
 
-// Ã§â€Å¸Ã§â€Â¢Ã¥Â¯Â¦Ã¤Â½Å“
+// 生產實作
 type PostgresUserRepository struct {
     db *sql.DB
 }
 
 func (r *PostgresUserRepository) GetUser(id string) (*User, error) {
-    // Ã¥Â¯Â¦Ã©Å¡â€ºÃ¨Â³â€¡Ã¦â€“â„¢Ã¥ÂºÂ«Ã¦Å¸Â¥Ã¨Â©Â¢
+    // 實際資料庫查詢
 }
 
-// Ã¦Â¸Â¬Ã¨Â©Â¦Ã§â€Â¨ Mock Ã¥Â¯Â¦Ã¤Â½Å“
+// 測試用 Mock 實作
 type MockUserRepository struct {
     GetUserFunc  func(id string) (*User, error)
     SaveUserFunc func(user *User) error
@@ -376,7 +376,7 @@ func (m *MockUserRepository) SaveUser(user *User) error {
     return m.SaveUserFunc(user)
 }
 
-// Ã¤Â½Â¿Ã§â€Â¨ mock Ã§Å¡â€žÃ¦Â¸Â¬Ã¨Â©Â¦
+// 使用 mock 的測試
 func TestUserService(t *testing.T) {
     mock := &MockUserRepository{
         GetUserFunc: func(id string) (*User, error) {
@@ -399,25 +399,25 @@ func TestUserService(t *testing.T) {
 }
 ```
 
-## Ã¥Å¸ÂºÃ¦Âºâ€“Ã¦Â¸Â¬Ã¨Â©Â¦
+## 基準測試
 
-### Ã¥Å¸ÂºÃ¦Å“Â¬Ã¥Å¸ÂºÃ¦Âºâ€“Ã¦Â¸Â¬Ã¨Â©Â¦
+### 基本基準測試
 
 ```go
 func BenchmarkProcess(b *testing.B) {
     data := generateTestData(1000)
-    b.ResetTimer() // Ã¤Â¸ÂÃ¨Â¨Ë†Ã§Â®â€”Ã¨Â¨Â­Ã§Â½Â®Ã¦â„¢â€šÃ©â€“â€œ
+    b.ResetTimer() // 不計算設置時間
 
     for i := 0; i < b.N; i++ {
         Process(data)
     }
 }
 
-// Ã¥Å¸Â·Ã¨Â¡Å’Ã¯Â¼Å¡go test -bench=BenchmarkProcess -benchmem
-// Ã¨Â¼Â¸Ã¥â€¡ÂºÃ¯Â¼Å¡BenchmarkProcess-8   10000   105234 ns/op   4096 B/op   10 allocs/op
+// 執行：go test -bench=BenchmarkProcess -benchmem
+// 輸出：BenchmarkProcess-8   10000   105234 ns/op   4096 B/op   10 allocs/op
 ```
 
-### Ã¤Â¸ÂÃ¥ÂÅ’Ã¥Â¤Â§Ã¥Â°ÂÃ§Å¡â€žÃ¥Å¸ÂºÃ¦Âºâ€“Ã¦Â¸Â¬Ã¨Â©Â¦
+### 不同大小的基準測試
 
 ```go
 func BenchmarkSort(b *testing.B) {
@@ -429,7 +429,7 @@ func BenchmarkSort(b *testing.B) {
             b.ResetTimer()
 
             for i := 0; i < b.N; i++ {
-                // Ã¨Â¤â€¡Ã¨Â£Â½Ã¤Â»Â¥Ã©ÂÂ¿Ã¥â€¦ÂÃ¦Å½â€™Ã¥ÂºÂÃ¥Â·Â²Ã¦Å½â€™Ã¥ÂºÂÃ§Å¡â€žÃ¨Â³â€¡Ã¦â€“â„¢
+                // 複製以避免排序已排序的資料
                 tmp := make([]int, len(data))
                 copy(tmp, data)
                 sort.Ints(tmp)
@@ -439,7 +439,7 @@ func BenchmarkSort(b *testing.B) {
 }
 ```
 
-### Ã¨Â¨ËœÃ¦â€ Â¶Ã©Â«â€Ã¥Ë†â€ Ã©â€¦ÂÃ¥Å¸ÂºÃ¦Âºâ€“Ã¦Â¸Â¬Ã¨Â©Â¦
+### 記憶體分配基準測試
 
 ```go
 func BenchmarkStringConcat(b *testing.B) {
@@ -473,13 +473,13 @@ func BenchmarkStringConcat(b *testing.B) {
 }
 ```
 
-## Ã¦Â¨Â¡Ã§Â³Å Ã¦Â¸Â¬Ã¨Â©Â¦Ã¯Â¼Ë†Go 1.18+Ã¯Â¼â€°
+## 模糊測試（Go 1.18+）
 
-### Ã¥Å¸ÂºÃ¦Å“Â¬Ã¦Â¨Â¡Ã§Â³Å Ã¦Â¸Â¬Ã¨Â©Â¦
+### 基本模糊測試
 
 ```go
 func FuzzParseJSON(f *testing.F) {
-    // Ã¦â€“Â°Ã¥Â¢Å¾Ã§Â¨Â®Ã¥Â­ÂÃ¨ÂªÅ¾Ã¦â€“â„¢Ã¥ÂºÂ«
+    // 新增種子語料庫
     f.Add(`{"name": "test"}`)
     f.Add(`{"count": 123}`)
     f.Add(`[]`)
@@ -490,11 +490,11 @@ func FuzzParseJSON(f *testing.F) {
         err := json.Unmarshal([]byte(input), &result)
 
         if err != nil {
-            // Ã©Å¡Â¨Ã¦Â©Å¸Ã¨Â¼Â¸Ã¥â€¦Â¥Ã©Â ÂÃ¦Å“Å¸Ã¦Å“Æ’Ã¦Å“â€°Ã§â€žÂ¡Ã¦â€¢Ë† JSON
+            // 隨機輸入預期會有無效 JSON
             return
         }
 
-        // Ã¥Â¦â€šÃ¦Å¾Å“Ã¨Â§Â£Ã¦Å¾ÂÃ¦Ë†ÂÃ¥Å Å¸Ã¯Â¼Å’Ã©â€¡ÂÃ¦â€“Â°Ã§Â·Â¨Ã§Â¢Â¼Ã¦â€¡â€°Ã¨Â©Â²Ã¥ÂÂ¯Ã¨Â¡Å’
+        // 如果解析成功，重新編碼應該可行
         _, err = json.Marshal(result)
         if err != nil {
             t.Errorf("Marshal failed after successful Unmarshal: %v", err)
@@ -502,10 +502,10 @@ func FuzzParseJSON(f *testing.F) {
     })
 }
 
-// Ã¥Å¸Â·Ã¨Â¡Å’Ã¯Â¼Å¡go test -fuzz=FuzzParseJSON -fuzztime=30s
+// 執行：go test -fuzz=FuzzParseJSON -fuzztime=30s
 ```
 
-### Ã¥Â¤Å¡Ã¨Â¼Â¸Ã¥â€¦Â¥Ã¦Â¨Â¡Ã§Â³Å Ã¦Â¸Â¬Ã¨Â©Â¦
+### 多輸入模糊測試
 
 ```go
 func FuzzCompare(f *testing.F) {
@@ -516,12 +516,12 @@ func FuzzCompare(f *testing.F) {
     f.Fuzz(func(t *testing.T, a, b string) {
         result := Compare(a, b)
 
-        // Ã¥Â±Â¬Ã¦â‚¬Â§Ã¯Â¼Å¡Compare(a, a) Ã¦â€¡â€°Ã¨Â©Â²Ã§Â¸Â½Ã¦ËœÂ¯Ã§Â­â€°Ã¦â€“Â¼ 0
+        // 屬性：Compare(a, a) 應該總是等於 0
         if a == b && result != 0 {
             t.Errorf("Compare(%q, %q) = %d; want 0", a, b, result)
         }
 
-        // Ã¥Â±Â¬Ã¦â‚¬Â§Ã¯Â¼Å¡Compare(a, b) Ã¥â€™Å’ Compare(b, a) Ã¦â€¡â€°Ã¨Â©Â²Ã¦Å“â€°Ã§â€ºÂ¸Ã¥ÂÂÃ§Â¬Â¦Ã¨â„¢Å¸
+        // 屬性：Compare(a, b) 和 Compare(b, a) 應該有相反符號
         reverse := Compare(b, a)
         if (result > 0 && reverse >= 0) || (result < 0 && reverse <= 0) {
             if result != 0 || reverse != 0 {
@@ -533,48 +533,48 @@ func FuzzCompare(f *testing.F) {
 }
 ```
 
-## Ã¦Â¸Â¬Ã¨Â©Â¦Ã¨Â¦â€ Ã¨â€œâ€¹Ã§Å½â€¡
+## 測試覆蓋率
 
-### Ã¥Å¸Â·Ã¨Â¡Å’Ã¨Â¦â€ Ã¨â€œâ€¹Ã§Å½â€¡
+### 執行覆蓋率
 
 ```bash
-# Ã¥Å¸ÂºÃ¦Å“Â¬Ã¨Â¦â€ Ã¨â€œâ€¹Ã§Å½â€¡
+# 基本覆蓋率
 go test -cover ./...
 
-# Ã§â€Â¢Ã§â€Å¸Ã¨Â¦â€ Ã¨â€œâ€¹Ã§Å½â€¡ profile
+# 產生覆蓋率 profile
 go test -coverprofile=coverage.out ./...
 
-# Ã¥Å“Â¨Ã§â‚¬ÂÃ¨Â¦Â½Ã¥â„¢Â¨Ã¦Å¸Â¥Ã§Å“â€¹Ã¨Â¦â€ Ã¨â€œâ€¹Ã§Å½â€¡
+# 在瀏覽器查看覆蓋率
 go tool cover -html=coverage.out
 
-# Ã¦Å’â€°Ã¥â€¡Â½Ã¥Â¼ÂÃ¦Å¸Â¥Ã§Å“â€¹Ã¨Â¦â€ Ã¨â€œâ€¹Ã§Å½â€¡
+# 按函式查看覆蓋率
 go tool cover -func=coverage.out
 
-# Ã¥ÂÂ«Ã§Â«Â¶Ã¦â€¦â€¹Ã¥ÂÂµÃ¦Â¸Â¬Ã§Å¡â€žÃ¨Â¦â€ Ã¨â€œâ€¹Ã§Å½â€¡
+# 含競態偵測的覆蓋率
 go test -race -coverprofile=coverage.out ./...
 ```
 
-### Ã¨Â¦â€ Ã¨â€œâ€¹Ã§Å½â€¡Ã§â€ºÂ®Ã¦Â¨â„¢
+### 覆蓋率目標
 
-| Ã§Â¨â€¹Ã¥Â¼ÂÃ§Â¢Â¼Ã©Â¡Å¾Ã¥Å¾â€¹ | Ã§â€ºÂ®Ã¦Â¨â„¢ |
+| 程式碼類型 | 目標 |
 |-----------|------|
-| Ã©â€”Å“Ã©ÂÂµÃ¦Â¥Â­Ã¥â€¹â„¢Ã©â€šÂÃ¨Â¼Â¯ | 100% |
-| Ã¥â€¦Â¬Ã©â€“â€¹ API | 90%+ |
-| Ã¤Â¸â‚¬Ã¨Ë†Â¬Ã§Â¨â€¹Ã¥Â¼ÂÃ§Â¢Â¼ | 80%+ |
-| Ã§â€Â¢Ã§â€Å¸Ã§Å¡â€žÃ§Â¨â€¹Ã¥Â¼ÂÃ§Â¢Â¼ | Ã¦Å½â€™Ã©â„¢Â¤ |
+| 關鍵業務邏輯 | 100% |
+| 公開 API | 90%+ |
+| 一般程式碼 | 80%+ |
+| 產生的程式碼 | 排除 |
 
-## HTTP Handler Ã¦Â¸Â¬Ã¨Â©Â¦
+## HTTP Handler 測試
 
 ```go
 func TestHealthHandler(t *testing.T) {
-    // Ã¥Â»ÂºÃ§Â«â€¹Ã¨Â«â€¹Ã¦Â±â€š
+    // 建立請求
     req := httptest.NewRequest(http.MethodGet, "/health", nil)
     w := httptest.NewRecorder()
 
-    // Ã¥â€˜Â¼Ã¥ÂÂ« handler
+    // 呼叫 handler
     HealthHandler(w, req)
 
-    // Ã¦ÂªÂ¢Ã¦Å¸Â¥Ã¥â€ºÅ¾Ã¦â€¡â€°
+    // 檢查回應
     resp := w.Result()
     defer resp.Body.Close()
 
@@ -646,65 +646,65 @@ func TestAPIHandler(t *testing.T) {
 }
 ```
 
-## Ã¦Â¸Â¬Ã¨Â©Â¦Ã¦Å’â€¡Ã¤Â»Â¤
+## 測試指令
 
 ```bash
-# Ã¥Å¸Â·Ã¨Â¡Å’Ã¦â€°â‚¬Ã¦Å“â€°Ã¦Â¸Â¬Ã¨Â©Â¦
+# 執行所有測試
 go test ./...
 
-# Ã¥Å¸Â·Ã¨Â¡Å’Ã¨Â©Â³Ã§Â´Â°Ã¨Â¼Â¸Ã¥â€¡ÂºÃ§Å¡â€žÃ¦Â¸Â¬Ã¨Â©Â¦
+# 執行詳細輸出的測試
 go test -v ./...
 
-# Ã¥Å¸Â·Ã¨Â¡Å’Ã§â€°Â¹Ã¥Â®Å¡Ã¦Â¸Â¬Ã¨Â©Â¦
+# 執行特定測試
 go test -run TestAdd ./...
 
-# Ã¥Å¸Â·Ã¨Â¡Å’Ã¥Å’Â¹Ã©â€¦ÂÃ¦Â¨Â¡Ã¥Â¼ÂÃ§Å¡â€žÃ¦Â¸Â¬Ã¨Â©Â¦
+# 執行匹配模式的測試
 go test -run "TestUser/Create" ./...
 
-# Ã¥Å¸Â·Ã¨Â¡Å’Ã¥Â¸Â¶Ã§Â«Â¶Ã¦â€¦â€¹Ã¥ÂÂµÃ¦Â¸Â¬Ã¥â„¢Â¨Ã§Å¡â€žÃ¦Â¸Â¬Ã¨Â©Â¦
+# 執行帶競態偵測器的測試
 go test -race ./...
 
-# Ã¥Å¸Â·Ã¨Â¡Å’Ã¥Â¸Â¶Ã¨Â¦â€ Ã¨â€œâ€¹Ã§Å½â€¡Ã§Å¡â€žÃ¦Â¸Â¬Ã¨Â©Â¦
+# 執行帶覆蓋率的測試
 go test -cover -coverprofile=coverage.out ./...
 
-# Ã¥ÂÂªÃ¥Å¸Â·Ã¨Â¡Å’Ã§Å¸Â­Ã¦Â¸Â¬Ã¨Â©Â¦
+# 只執行短測試
 go test -short ./...
 
-# Ã¥Å¸Â·Ã¨Â¡Å’Ã¥Â¸Â¶Ã©â‚¬Â¾Ã¦â„¢â€šÃ§Å¡â€žÃ¦Â¸Â¬Ã¨Â©Â¦
+# 執行帶逾時的測試
 go test -timeout 30s ./...
 
-# Ã¥Å¸Â·Ã¨Â¡Å’Ã¥Å¸ÂºÃ¦Âºâ€“Ã¦Â¸Â¬Ã¨Â©Â¦
+# 執行基準測試
 go test -bench=. -benchmem ./...
 
-# Ã¥Å¸Â·Ã¨Â¡Å’Ã¦Â¨Â¡Ã§Â³Å Ã¦Â¸Â¬Ã¨Â©Â¦
+# 執行模糊測試
 go test -fuzz=FuzzParse -fuzztime=30s ./...
 
-# Ã¨Â¨Ë†Ã§Â®â€”Ã¦Â¸Â¬Ã¨Â©Â¦Ã¥Å¸Â·Ã¨Â¡Å’Ã¦Â¬Â¡Ã¦â€¢Â¸Ã¯Â¼Ë†Ã§â€Â¨Ã¦â€“Â¼Ã¥ÂÂµÃ¦Â¸Â¬Ã¤Â¸ÂÃ§Â©Â©Ã¥Â®Å¡Ã¦Â¸Â¬Ã¨Â©Â¦Ã¯Â¼â€°
+# 計算測試執行次數（用於偵測不穩定測試）
 go test -count=10 ./...
 ```
 
-## Ã¦Å“â‚¬Ã¤Â½Â³Ã¥Â¯Â¦Ã¥â€¹â„¢
+## 最佳實務
 
-**Ã¦â€¡â€°Ã¨Â©Â²Ã¥ÂÅ¡Ã§Å¡â€žÃ¯Â¼Å¡**
-- Ã¥â€¦Ë†Ã¥Â¯Â«Ã¦Â¸Â¬Ã¨Â©Â¦Ã¯Â¼Ë†TDDÃ¯Â¼â€°
-- Ã¤Â½Â¿Ã§â€Â¨Ã¨Â¡Â¨Ã¦Â Â¼Ã©Â©â€¦Ã¥â€¹â€¢Ã¦Â¸Â¬Ã¨Â©Â¦Ã¤Â»Â¥Ã§ÂÂ²Ã¥Â¾â€”Ã¥Â®Å’Ã¦â€¢Â´Ã¨Â¦â€ Ã¨â€œâ€¹
-- Ã¦Â¸Â¬Ã¨Â©Â¦Ã¨Â¡Å’Ã§â€šÂºÃ¯Â¼Å’Ã¨â‚¬Å’Ã©ÂÅ¾Ã¥Â¯Â¦Ã¤Â½Å“
-- Ã¥Å“Â¨Ã¨Â¼â€Ã¥Å Â©Ã¥â€¡Â½Ã¥Â¼ÂÃ¤Â¸Â­Ã¤Â½Â¿Ã§â€Â¨ `t.Helper()`
-- Ã¥Â°ÂÃ§ÂÂ¨Ã§Â«â€¹Ã¦Â¸Â¬Ã¨Â©Â¦Ã¤Â½Â¿Ã§â€Â¨ `t.Parallel()`
-- Ã§â€Â¨ `t.Cleanup()` Ã¦Â¸â€¦Ã§Ââ€ Ã¨Â³â€¡Ã¦ÂºÂ
-- Ã¤Â½Â¿Ã§â€Â¨Ã¦ÂÂÃ¨Â¿Â°Ã¦Æ’â€¦Ã¥Â¢Æ’Ã§Å¡â€žÃ¦Å“â€°Ã¦â€žÂÃ§Â¾Â©Ã¦Â¸Â¬Ã¨Â©Â¦Ã¥ÂÂÃ§Â¨Â±
+**應該做的：**
+- 先寫測試（TDD）
+- 使用表格驅動測試以獲得完整覆蓋
+- 測試行為，而非實作
+- 在輔助函式中使用 `t.Helper()`
+- 對獨立測試使用 `t.Parallel()`
+- 用 `t.Cleanup()` 清理資源
+- 使用描述情境的有意義測試名稱
 
-**Ã¤Â¸ÂÃ¦â€¡â€°Ã¨Â©Â²Ã¥ÂÅ¡Ã§Å¡â€žÃ¯Â¼Å¡**
-- Ã¤Â¸ÂÃ¨Â¦ÂÃ§â€ºÂ´Ã¦Å½Â¥Ã¦Â¸Â¬Ã¨Â©Â¦Ã§Â§ÂÃ¦Å“â€°Ã¥â€¡Â½Ã¥Â¼ÂÃ¯Â¼Ë†Ã©â‚¬ÂÃ©ÂÅ½Ã¥â€¦Â¬Ã©â€“â€¹ API Ã¦Â¸Â¬Ã¨Â©Â¦Ã¯Â¼â€°
-- Ã¤Â¸ÂÃ¨Â¦ÂÃ¥Å“Â¨Ã¦Â¸Â¬Ã¨Â©Â¦Ã¤Â¸Â­Ã¤Â½Â¿Ã§â€Â¨ `time.Sleep()`Ã¯Â¼Ë†Ã¤Â½Â¿Ã§â€Â¨ channels Ã¦Ë†â€“Ã¦Â¢ÂÃ¤Â»Â¶Ã¯Â¼â€°
-- Ã¤Â¸ÂÃ¨Â¦ÂÃ¥Â¿Â½Ã§â€¢Â¥Ã¤Â¸ÂÃ§Â©Â©Ã¥Â®Å¡Ã¦Â¸Â¬Ã¨Â©Â¦Ã¯Â¼Ë†Ã¤Â¿Â®Ã¥Â¾Â©Ã¦Ë†â€“Ã§Â§Â»Ã©â„¢Â¤Ã¥Â®Æ’Ã¥â‚¬â€˜Ã¯Â¼â€°
-- Ã¤Â¸ÂÃ¨Â¦Â mock Ã¦â€°â‚¬Ã¦Å“â€°Ã¦ÂÂ±Ã¨Â¥Â¿Ã¯Â¼Ë†Ã¥ÂÂ¯Ã¨Æ’Â½Ã¦â„¢â€šÃ¥ÂÂÃ¥Â¥Â½Ã¦â€¢Â´Ã¥ÂË†Ã¦Â¸Â¬Ã¨Â©Â¦Ã¯Â¼â€°
-- Ã¤Â¸ÂÃ¨Â¦ÂÃ¨Â·Â³Ã©ÂÅ½Ã©Å’Â¯Ã¨ÂªÂ¤Ã¨Â·Â¯Ã¥Â¾â€˜Ã¦Â¸Â¬Ã¨Â©Â¦
+**不應該做的：**
+- 不要直接測試私有函式（透過公開 API 測試）
+- 不要在測試中使用 `time.Sleep()`（使用 channels 或條件）
+- 不要忽略不穩定測試（修復或移除它們）
+- 不要 mock 所有東西（可能時偏好整合測試）
+- 不要跳過錯誤路徑測試
 
-## CI/CD Ã¦â€¢Â´Ã¥ÂË†
+## CI/CD 整合
 
 ```yaml
-# GitHub Actions Ã§Â¯â€žÃ¤Â¾â€¹
+# GitHub Actions 範例
 test:
   runs-on: ubuntu-latest
   steps:
@@ -722,4 +722,4 @@ test:
         awk -F'%' '{if ($1 < 80) exit 1}'
 ```
 
-**Ã¨Â¨ËœÃ¤Â½Â**Ã¯Â¼Å¡Ã¦Â¸Â¬Ã¨Â©Â¦Ã¦ËœÂ¯Ã¦â€“â€¡Ã¤Â»Â¶Ã£â‚¬â€šÃ¥Â®Æ’Ã¥â‚¬â€˜Ã¥Â±â€¢Ã§Â¤ÂºÃ¤Â½Â Ã§Å¡â€žÃ§Â¨â€¹Ã¥Â¼ÂÃ§Â¢Â¼Ã¦â€¡â€°Ã¨Â©Â²Ã¥Â¦â€šÃ¤Â½â€¢Ã¤Â½Â¿Ã§â€Â¨Ã£â‚¬â€šÃ¦Â¸â€¦Ã¦Â¥Å¡Ã¥Å“Â°Ã¦â€™Â°Ã¥Â¯Â«Ã¤Â¸Â¦Ã¤Â¿ÂÃ¦Å’ÂÃ¦â€ºÂ´Ã¦â€“Â°Ã£â‚¬â€š
+**記住**：測試是文件。它們展示你的程式碼應該如何使用。清楚地撰寫並保持更新。

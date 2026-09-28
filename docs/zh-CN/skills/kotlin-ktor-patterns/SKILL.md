@@ -1,10 +1,10 @@
 ---
 name: kotlin-ktor-patterns
-description: Ktor Ã¦Å“ÂÃ¥Å Â¡Ã¥â„¢Â¨Ã¦Â¨Â¡Ã¥Â¼ÂÃ¯Â¼Å’Ã¥Å’â€¦Ã¦â€¹Â¬Ã¨Â·Â¯Ã§â€Â± DSLÃ£â‚¬ÂÃ¦Ââ€™Ã¤Â»Â¶Ã£â‚¬ÂÃ¨ÂºÂ«Ã¤Â»Â½Ã©ÂªÅ’Ã¨Â¯ÂÃ£â‚¬ÂKoin DIÃ£â‚¬Âkotlinx.serializationÃ£â‚¬ÂWebSockets Ã¥â€™Å’ testApplication Ã¦Âµâ€¹Ã¨Â¯â€¢Ã£â‚¬â€š
+description: Ktor 服务器模式，包括路由 DSL、插件、身份验证、Koin DI、kotlinx.serialization、WebSockets 和 testApplication 测试。
 origin: ECC
 ---
 
-# Ktor Ã¦Å“ÂÃ¥Å Â¡Ã¥â„¢Â¨Ã¦Â¨Â¡Ã¥Â¼Â
+# Ktor 服务器模式
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -21,55 +21,55 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-Ã¤Â½Â¿Ã§â€Â¨ Kotlin Ã¥ÂÂÃ§Â¨â€¹Ã¦Å¾â€žÃ¥Â»ÂºÃ¥ÂÂ¥Ã¥Â£Â®Ã£â‚¬ÂÃ¥ÂÂ¯Ã§Â»Â´Ã¦Å Â¤Ã§Å¡â€ž HTTP Ã¦Å“ÂÃ¥Å Â¡Ã¥â„¢Â¨Ã§Å¡â€žÃ§Â»Â¼Ã¥ÂË† Ktor Ã¦Â¨Â¡Ã¥Â¼ÂÃ£â‚¬â€š
+使用 Kotlin 协程构建健壮、可维护的 HTTP 服务器的综合 Ktor 模式。
 
-## Ã¤Â½â€¢Ã¦â€”Â¶Ã¥ÂÂ¯Ã§â€Â¨
+## 何时启用
 
-* Ã¦Å¾â€žÃ¥Â»Âº Ktor HTTP Ã¦Å“ÂÃ¥Å Â¡Ã¥â„¢Â¨
-* Ã©â€¦ÂÃ§Â½Â® Ktor Ã¦Ââ€™Ã¤Â»Â¶Ã¯Â¼Ë†AuthÃ£â‚¬ÂCORSÃ£â‚¬ÂContentNegotiationÃ£â‚¬ÂStatusPagesÃ¯Â¼â€°
-* Ã¤Â½Â¿Ã§â€Â¨ Ktor Ã¥Â®Å¾Ã§Å½Â° REST API
-* Ã¤Â½Â¿Ã§â€Â¨ Koin Ã¨Â®Â¾Ã§Â½Â®Ã¤Â¾ÂÃ¨Âµâ€“Ã¦Â³Â¨Ã¥â€¦Â¥
-* Ã¤Â½Â¿Ã§â€Â¨ testApplication Ã§Â¼â€“Ã¥â€ â„¢ Ktor Ã©â€ºâ€ Ã¦Ë†ÂÃ¦Âµâ€¹Ã¨Â¯â€¢
-* Ã¥Å“Â¨ Ktor Ã¤Â¸Â­Ã¤Â½Â¿Ã§â€Â¨ WebSocket
+* 构建 Ktor HTTP 服务器
+* 配置 Ktor 插件（Auth、CORS、ContentNegotiation、StatusPages）
+* 使用 Ktor 实现 REST API
+* 使用 Koin 设置依赖注入
+* 使用 testApplication 编写 Ktor 集成测试
+* 在 Ktor 中使用 WebSocket
 
-## Ã¥Âºâ€Ã§â€Â¨Ã§Â¨â€¹Ã¥ÂºÂÃ§Â»â€œÃ¦Å¾â€ž
+## 应用程序结构
 
-### Ã¦Â â€¡Ã¥â€¡â€  Ktor Ã©Â¡Â¹Ã§â€ºÂ®Ã¥Â¸Æ’Ã¥Â±â‚¬
+### 标准 Ktor 项目布局
 
 ```text
 src/main/kotlin/
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ com/example/
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Application.kt           # Ã¥â€¦Â¥Ã¥ÂÂ£Ã§â€šÂ¹Ã¯Â¼Å’Ã¦Â¨Â¡Ã¥Ââ€”Ã©â€¦ÂÃ§Â½Â®
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ plugins/
-Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Routing.kt           # Ã¨Â·Â¯Ã§â€Â±Ã¥Â®Å¡Ã¤Â¹â€°
-Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Serialization.kt     # Ã¥â€ â€¦Ã¥Â®Â¹Ã¥ÂÂÃ¥â€¢â€ Ã¨Â®Â¾Ã§Â½Â®
-Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ Authentication.kt    # Ã¨Â®Â¤Ã¨Â¯ÂÃ©â€¦ÂÃ§Â½Â®
-Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ StatusPages.kt       # Ã©â€â„¢Ã¨Â¯Â¯Ã¥Â¤â€žÃ§Ââ€ 
-Ã¢â€â€š   Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ CORS.kt              # CORS Ã©â€¦ÂÃ§Â½Â®
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ routes/
-Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ UserRoutes.kt        # /users Ã§Â«Â¯Ã§â€šÂ¹
-Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ AuthRoutes.kt        # /auth Ã§Â«Â¯Ã§â€šÂ¹
-Ã¢â€â€š   Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ HealthRoutes.kt      # /health Ã§Â«Â¯Ã§â€šÂ¹
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ models/
-Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ User.kt              # Ã©Â¢â€ Ã¥Å¸Å¸Ã¦Â¨Â¡Ã¥Å¾â€¹
-Ã¢â€â€š   Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ ApiResponse.kt       # Ã¥â€œÂÃ¥Âºâ€Ã¥Â°ÂÃ¨Â£â€¦
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ services/
-Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ UserService.kt       # Ã¤Â¸Å¡Ã¥Å Â¡Ã©â‚¬Â»Ã¨Â¾â€˜
-Ã¢â€â€š   Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ AuthService.kt       # Ã¨Â®Â¤Ã¨Â¯ÂÃ©â‚¬Â»Ã¨Â¾â€˜
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ repositories/
-Ã¢â€â€š   Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ UserRepository.kt    # Ã¦â€¢Â°Ã¦ÂÂ®Ã¨Â®Â¿Ã©â€”Â®Ã¦Å½Â¥Ã¥ÂÂ£
-Ã¢â€â€š   Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ ExposedUserRepository.kt
-Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ di/
-Ã¢â€â€š       Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ AppModule.kt         # Koin Ã¦Â¨Â¡Ã¥Ââ€”
+├── com/example/
+│   ├── Application.kt           # 入口点，模块配置
+│   ├── plugins/
+│   │   ├── Routing.kt           # 路由定义
+│   │   ├── Serialization.kt     # 内容协商设置
+│   │   ├── Authentication.kt    # 认证配置
+│   │   ├── StatusPages.kt       # 错误处理
+│   │   └── CORS.kt              # CORS 配置
+│   ├── routes/
+│   │   ├── UserRoutes.kt        # /users 端点
+│   │   ├── AuthRoutes.kt        # /auth 端点
+│   │   └── HealthRoutes.kt      # /health 端点
+│   ├── models/
+│   │   ├── User.kt              # 领域模型
+│   │   └── ApiResponse.kt       # 响应封装
+│   ├── services/
+│   │   ├── UserService.kt       # 业务逻辑
+│   │   └── AuthService.kt       # 认证逻辑
+│   ├── repositories/
+│   │   ├── UserRepository.kt    # 数据访问接口
+│   │   └── ExposedUserRepository.kt
+│   └── di/
+│       └── AppModule.kt         # Koin 模块
 src/test/kotlin/
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ com/example/
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ routes/
-Ã¢â€â€š   Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ UserRoutesTest.kt
-Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ services/
-Ã¢â€â€š       Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ UserServiceTest.kt
+├── com/example/
+│   ├── routes/
+│   │   └── UserRoutesTest.kt
+│   └── services/
+│       └── UserServiceTest.kt
 ```
 
-### Ã¥Âºâ€Ã§â€Â¨Ã§Â¨â€¹Ã¥ÂºÂÃ¥â€¦Â¥Ã¥ÂÂ£Ã§â€šÂ¹
+### 应用程序入口点
 
 ```kotlin
 // Application.kt
@@ -87,9 +87,9 @@ fun Application.module() {
 }
 ```
 
-## Ã¨Â·Â¯Ã§â€Â± DSL
+## 路由 DSL
 
-### Ã¥Å¸ÂºÃ¦Å“Â¬Ã¨Â·Â¯Ã§â€Â±
+### 基本路由
 
 ```kotlin
 // plugins/Routing.kt
@@ -145,7 +145,7 @@ fun Route.userRoutes() {
 }
 ```
 
-### Ã¤Â½Â¿Ã§â€Â¨Ã¨Â®Â¤Ã¨Â¯ÂÃ¨Â·Â¯Ã§â€Â±Ã§Â»â€žÃ§Â»â€¡Ã¨Â·Â¯Ã§â€Â±
+### 使用认证路由组织路由
 
 ```kotlin
 fun Route.userRoutes() {
@@ -164,9 +164,9 @@ fun Route.userRoutes() {
 }
 ```
 
-## Ã¥â€ â€¦Ã¥Â®Â¹Ã¥ÂÂÃ¥â€¢â€ Ã¤Â¸Å½Ã¥ÂºÂÃ¥Ë†â€”Ã¥Å’â€“
+## 内容协商与序列化
 
-### kotlinx.serialization Ã¨Â®Â¾Ã§Â½Â®
+### kotlinx.serialization 设置
 
 ```kotlin
 // plugins/Serialization.kt
@@ -183,7 +183,7 @@ fun Application.configureSerialization() {
 }
 ```
 
-### Ã¥ÂÂ¯Ã¥ÂºÂÃ¥Ë†â€”Ã¥Å’â€“Ã¦Â¨Â¡Ã¥Å¾â€¹
+### 可序列化模型
 
 ```kotlin
 @Serializable
@@ -224,7 +224,7 @@ data class PaginatedResponse<T>(
 )
 ```
 
-### Ã¨â€¡ÂªÃ¥Â®Å¡Ã¤Â¹â€°Ã¥ÂºÂÃ¥Ë†â€”Ã¥Å’â€“Ã¥â„¢Â¨
+### 自定义序列化器
 
 ```kotlin
 object InstantSerializer : KSerializer<Instant> {
@@ -236,9 +236,9 @@ object InstantSerializer : KSerializer<Instant> {
 }
 ```
 
-## Ã¨ÂºÂ«Ã¤Â»Â½Ã©ÂªÅ’Ã¨Â¯Â
+## 身份验证
 
-### JWT Ã¨ÂºÂ«Ã¤Â»Â½Ã©ÂªÅ’Ã¨Â¯Â
+### JWT 身份验证
 
 ```kotlin
 // plugins/Authentication.kt
@@ -280,7 +280,7 @@ fun ApplicationCall.userId(): String =
         ?: throw AuthenticationException("No userId in token")
 ```
 
-### Ã¨Â®Â¤Ã¨Â¯ÂÃ¨Â·Â¯Ã§â€Â±
+### 认证路由
 
 ```kotlin
 fun Route.authRoutes() {
@@ -314,7 +314,7 @@ fun Route.authRoutes() {
 }
 ```
 
-## Ã§Å Â¶Ã¦â‚¬ÂÃ©Â¡ÂµÃ¯Â¼Ë†Ã©â€â„¢Ã¨Â¯Â¯Ã¥Â¤â€žÃ§Ââ€ Ã¯Â¼â€°
+## 状态页（错误处理）
 
 ```kotlin
 // plugins/StatusPages.kt
@@ -370,7 +370,7 @@ fun Application.configureStatusPages() {
 }
 ```
 
-## CORS Ã©â€¦ÂÃ§Â½Â®
+## CORS 配置
 
 ```kotlin
 // plugins/CORS.kt
@@ -389,9 +389,9 @@ fun Application.configureCORS() {
 }
 ```
 
-## Koin Ã¤Â¾ÂÃ¨Âµâ€“Ã¦Â³Â¨Ã¥â€¦Â¥
+## Koin 依赖注入
 
-### Ã¦Â¨Â¡Ã¥Ââ€”Ã¥Â®Å¡Ã¤Â¹â€°
+### 模块定义
 
 ```kotlin
 // di/AppModule.kt
@@ -417,7 +417,7 @@ fun Application.configureDI() {
 }
 ```
 
-### Ã¥Å“Â¨Ã¨Â·Â¯Ã§â€Â±Ã¤Â¸Â­Ã¤Â½Â¿Ã§â€Â¨ Koin
+### 在路由中使用 Koin
 
 ```kotlin
 fun Route.userRoutes() {
@@ -432,7 +432,7 @@ fun Route.userRoutes() {
 }
 ```
 
-### Ã§â€Â¨Ã¤ÂºÅ½Ã¦Âµâ€¹Ã¨Â¯â€¢Ã§Å¡â€ž Koin
+### 用于测试的 Koin
 
 ```kotlin
 class UserServiceTest : FunSpec(), KoinTest {
@@ -455,7 +455,7 @@ class UserServiceTest : FunSpec(), KoinTest {
 }
 ```
 
-## Ã¨Â¯Â·Ã¦Â±â€šÃ©ÂªÅ’Ã¨Â¯Â
+## 请求验证
 
 ```kotlin
 // Validate request data in routes
@@ -490,7 +490,7 @@ fun Application.configureWebSockets() {
     install(WebSockets) {
         pingPeriod = 15.seconds
         timeout = 15.seconds
-        maxFrameSize = 64 * 1024 // 64 KiB Ã¢â‚¬â€ increase only if your protocol requires larger frames
+        maxFrameSize = 64 * 1024 // 64 KiB — increase only if your protocol requires larger frames
         masking = false // Server-to-client frames are unmasked per RFC 6455; client-to-server are always masked by Ktor
     }
 }
@@ -533,9 +533,9 @@ data class Connection(val session: DefaultWebSocketSession) {
 }
 ```
 
-## testApplication Ã¦Âµâ€¹Ã¨Â¯â€¢
+## testApplication 测试
 
-### Ã¥Å¸ÂºÃ¦Å“Â¬Ã¨Â·Â¯Ã§â€Â±Ã¦Âµâ€¹Ã¨Â¯â€¢
+### 基本路由测试
 
 ```kotlin
 class UserRoutesTest : FunSpec({
@@ -597,7 +597,7 @@ class UserRoutesTest : FunSpec({
 })
 ```
 
-### Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¨Â®Â¤Ã¨Â¯ÂÃ¨Â·Â¯Ã§â€Â±
+### 测试认证路由
 
 ```kotlin
 class AuthenticatedRoutesTest : FunSpec({
@@ -646,7 +646,7 @@ class AuthenticatedRoutesTest : FunSpec({
 })
 ```
 
-## Ã©â€¦ÂÃ§Â½Â®
+## 配置
 
 ### application.yaml
 
@@ -670,7 +670,7 @@ database:
   maxPoolSize: 10
 ```
 
-### Ã¨Â¯Â»Ã¥Ââ€“Ã©â€¦ÂÃ§Â½Â®
+### 读取配置
 
 ```kotlin
 fun Application.configureDI() {
@@ -687,18 +687,18 @@ fun Application.configureDI() {
 }
 ```
 
-## Ã¥Â¿Â«Ã©â‚¬Å¸Ã¥Ââ€šÃ¨â‚¬Æ’Ã¯Â¼Å¡Ktor Ã¦Â¨Â¡Ã¥Â¼Â
+## 快速参考：Ktor 模式
 
-| Ã¦Â¨Â¡Ã¥Â¼Â | Ã¦ÂÂÃ¨Â¿Â° |
+| 模式 | 描述 |
 |---------|-------------|
-| `route("/path") { get { } }` | Ã¤Â½Â¿Ã§â€Â¨ DSL Ã¨Â¿â€ºÃ¨Â¡Å’Ã¨Â·Â¯Ã§â€Â±Ã¥Ë†â€ Ã§Â»â€ž |
-| `call.receive<T>()` | Ã¥ÂÂÃ¥ÂºÂÃ¥Ë†â€”Ã¥Å’â€“Ã¨Â¯Â·Ã¦Â±â€šÃ¤Â½â€œ |
-| `call.respond(status, body)` | Ã¥Ââ€˜Ã©â‚¬ÂÃ¥Â¸Â¦Ã§Å Â¶Ã¦â‚¬ÂÃ§Å¡â€žÃ¥â€œÂÃ¥Âºâ€ |
-| `call.parameters["id"]` | Ã¨Â¯Â»Ã¥Ââ€“Ã¨Â·Â¯Ã¥Â¾â€žÃ¥Ââ€šÃ¦â€¢Â° |
-| `call.request.queryParameters["q"]` | Ã¨Â¯Â»Ã¥Ââ€“Ã¦Å¸Â¥Ã¨Â¯Â¢Ã¥Ââ€šÃ¦â€¢Â° |
-| `install(Plugin) { }` | Ã¥Â®â€°Ã¨Â£â€¦Ã¥Â¹Â¶Ã©â€¦ÂÃ§Â½Â®Ã¦Ââ€™Ã¤Â»Â¶ |
-| `authenticate("name") { }` | Ã¤Â½Â¿Ã§â€Â¨Ã¨ÂºÂ«Ã¤Â»Â½Ã©ÂªÅ’Ã¨Â¯ÂÃ¤Â¿ÂÃ¦Å Â¤Ã¨Â·Â¯Ã§â€Â± |
-| `by inject<T>()` | Koin Ã¤Â¾ÂÃ¨Âµâ€“Ã¦Â³Â¨Ã¥â€¦Â¥ |
-| `testApplication { }` | Ã©â€ºâ€ Ã¦Ë†ÂÃ¦Âµâ€¹Ã¨Â¯â€¢ |
+| `route("/path") { get { } }` | 使用 DSL 进行路由分组 |
+| `call.receive<T>()` | 反序列化请求体 |
+| `call.respond(status, body)` | 发送带状态的响应 |
+| `call.parameters["id"]` | 读取路径参数 |
+| `call.request.queryParameters["q"]` | 读取查询参数 |
+| `install(Plugin) { }` | 安装并配置插件 |
+| `authenticate("name") { }` | 使用身份验证保护路由 |
+| `by inject<T>()` | Koin 依赖注入 |
+| `testApplication { }` | 集成测试 |
 
-**Ã¨Â®Â°Ã¤Â½Â**Ã¯Â¼Å¡Ktor Ã¦ËœÂ¯Ã¥â€ºÂ´Ã§Â»â€¢ Kotlin Ã¥ÂÂÃ§Â¨â€¹Ã¥â€™Å’ DSL Ã¨Â®Â¾Ã¨Â®Â¡Ã§Å¡â€žÃ£â‚¬â€šÃ¤Â¿ÂÃ¦Å’ÂÃ¨Â·Â¯Ã§â€Â±Ã§Â²Â¾Ã§Â®â‚¬Ã¯Â¼Å’Ã¥Â°â€ Ã©â‚¬Â»Ã¨Â¾â€˜Ã¦Å½Â¨Ã©â‚¬ÂÃ¥Ë†Â°Ã¦Å“ÂÃ¥Å Â¡Ã¥Â±â€šÃ¯Â¼Å’Ã¥Â¹Â¶Ã¤Â½Â¿Ã§â€Â¨ Koin Ã¨Â¿â€ºÃ¨Â¡Å’Ã¤Â¾ÂÃ¨Âµâ€“Ã¦Â³Â¨Ã¥â€¦Â¥Ã£â‚¬â€šÃ¤Â½Â¿Ã§â€Â¨ `testApplication` Ã¨Â¿â€ºÃ¨Â¡Å’Ã¦Âµâ€¹Ã¨Â¯â€¢Ã¤Â»Â¥Ã¨Å½Â·Ã¥Â¾â€”Ã¥Â®Å’Ã¦â€¢Â´Ã§Å¡â€žÃ©â€ºâ€ Ã¦Ë†ÂÃ¨Â¦â€ Ã§â€ºâ€“Ã£â‚¬â€š
+**记住**：Ktor 是围绕 Kotlin 协程和 DSL 设计的。保持路由精简，将逻辑推送到服务层，并使用 Koin 进行依赖注入。使用 `testApplication` 进行测试以获得完整的集成覆盖。

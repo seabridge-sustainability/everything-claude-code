@@ -3,7 +3,7 @@ name: django-security
 description: Django security best practices, authentication, authorization, CSRF protection, SQL injection prevention, XSS prevention, and secure deployment configurations.
 ---
 
-# Django Ã£â€šÂ»Ã£â€šÂ­Ã£Æ’Â¥Ã£Æ’ÂªÃ£Æ’â€ Ã£â€šÂ£Ã£Æ’â„¢Ã£â€šÂ¹Ã£Æ’Ë†Ã£Æ’â€”Ã£Æ’Â©Ã£â€šÂ¯Ã£Æ’â€ Ã£â€šÂ£Ã£â€šÂ¹
+# Django セキュリティベストプラクティス
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -20,51 +20,51 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-Ã¤Â¸â‚¬Ã¨Ë†Â¬Ã§Å¡â€žÃ£ÂÂªÃ¨â€žâ€ Ã¥Â¼Â±Ã¦â‚¬Â§Ã£Ââ€¹Ã£â€šâ€°Ã¤Â¿ÂÃ¨Â­Â·Ã£Ââ„¢Ã£â€šâ€¹Ã£ÂÅ¸Ã£â€šÂÃ£ÂÂ®DjangoÃ£â€šÂ¢Ã£Æ’â€”Ã£Æ’ÂªÃ£â€šÂ±Ã£Æ’Â¼Ã£â€šÂ·Ã£Æ’Â§Ã£Æ’Â³Ã£ÂÂ®Ã¥Å’â€¦Ã¦â€¹Â¬Ã§Å¡â€žÃ£ÂÂªÃ£â€šÂ»Ã£â€šÂ­Ã£Æ’Â¥Ã£Æ’ÂªÃ£Æ’â€ Ã£â€šÂ£Ã£â€šÂ¬Ã£â€šÂ¤Ã£Æ’â€°Ã£Æ’Â©Ã£â€šÂ¤Ã£Æ’Â³Ã£â‚¬â€š
+一般的な脆弱性から保護するためのDjangoアプリケーションの包括的なセキュリティガイドライン。
 
-## Ã£Ââ€žÃ£ÂÂ¤Ã¦Å“â€°Ã¥Å Â¹Ã¥Å’â€“Ã£Ââ„¢Ã£â€šâ€¹Ã£Ââ€¹
+## いつ有効化するか
 
-- DjangoÃ¨ÂªÂÃ¨Â¨Â¼Ã£ÂÂ¨Ã¨ÂªÂÃ¥ÂÂ¯Ã£â€šâ€™Ã¨Â¨Â­Ã¥Â®Å¡Ã£Ââ„¢Ã£â€šâ€¹Ã£ÂÂ¨Ã£ÂÂ
-- Ã£Æ’Â¦Ã£Æ’Â¼Ã£â€šÂ¶Ã£Æ’Â¼Ã¦Â¨Â©Ã©â„¢ÂÃ£ÂÂ¨Ã£Æ’Â­Ã£Æ’Â¼Ã£Æ’Â«Ã£â€šâ€™Ã¥Â®Å¸Ã¨Â£â€¦Ã£Ââ„¢Ã£â€šâ€¹Ã£ÂÂ¨Ã£ÂÂ
-- Ã¦Å“Â¬Ã§â€¢ÂªÃ£â€šÂ»Ã£â€šÂ­Ã£Æ’Â¥Ã£Æ’ÂªÃ£Æ’â€ Ã£â€šÂ£Ã¨Â¨Â­Ã¥Â®Å¡Ã£â€šâ€™Ã¦Â§â€¹Ã¦Ë†ÂÃ£Ââ„¢Ã£â€šâ€¹Ã£ÂÂ¨Ã£ÂÂ
-- DjangoÃ£â€šÂ¢Ã£Æ’â€”Ã£Æ’ÂªÃ£â€šÂ±Ã£Æ’Â¼Ã£â€šÂ·Ã£Æ’Â§Ã£Æ’Â³Ã£ÂÂ®Ã£â€šÂ»Ã£â€šÂ­Ã£Æ’Â¥Ã£Æ’ÂªÃ£Æ’â€ Ã£â€šÂ£Ã¥â€¢ÂÃ©Â¡Å’Ã£â€šâ€™Ã£Æ’Â¬Ã£Æ’â€œÃ£Æ’Â¥Ã£Æ’Â¼Ã£Ââ„¢Ã£â€šâ€¹Ã£ÂÂ¨Ã£ÂÂ
-- DjangoÃ£â€šÂ¢Ã£Æ’â€”Ã£Æ’ÂªÃ£â€šÂ±Ã£Æ’Â¼Ã£â€šÂ·Ã£Æ’Â§Ã£Æ’Â³Ã£â€šâ€™Ã¦Å“Â¬Ã§â€¢ÂªÃ§â€™Â°Ã¥Â¢Æ’Ã£ÂÂ«Ã£Æ’â€¡Ã£Æ’â€”Ã£Æ’Â­Ã£â€šÂ¤Ã£Ââ„¢Ã£â€šâ€¹Ã£ÂÂ¨Ã£ÂÂ
+- Django認証と認可を設定するとき
+- ユーザー権限とロールを実装するとき
+- 本番セキュリティ設定を構成するとき
+- Djangoアプリケーションのセキュリティ問題をレビューするとき
+- Djangoアプリケーションを本番環境にデプロイするとき
 
-## Ã¦Â Â¸Ã£ÂÂ¨Ã£ÂÂªÃ£â€šâ€¹Ã£â€šÂ»Ã£â€šÂ­Ã£Æ’Â¥Ã£Æ’ÂªÃ£Æ’â€ Ã£â€šÂ£Ã¨Â¨Â­Ã¥Â®Å¡
+## 核となるセキュリティ設定
 
-### Ã¦Å“Â¬Ã§â€¢ÂªÃ¨Â¨Â­Ã¥Â®Å¡Ã£ÂÂ®Ã¦Â§â€¹Ã¦Ë†Â
+### 本番設定の構成
 
 ```python
 # settings/production.py
 import os
 
-DEBUG = False  # Ã©â€¡ÂÃ¨Â¦Â: Ã¦Å“Â¬Ã§â€¢ÂªÃ§â€™Â°Ã¥Â¢Æ’Ã£ÂÂ§Ã£ÂÂ¯Ã§ÂµÂ¶Ã¥Â¯Â¾Ã£ÂÂ«TrueÃ£ÂÂ«Ã£Ââ€”Ã£ÂÂªÃ£Ââ€ž
+DEBUG = False  # 重要: 本番環境では絶対にTrueにしない
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '').split(',')
 
-# Ã£â€šÂ»Ã£â€šÂ­Ã£Æ’Â¥Ã£Æ’ÂªÃ£Æ’â€ Ã£â€šÂ£Ã£Æ’ËœÃ£Æ’Æ’Ã£Æ’â‚¬Ã£Æ’Â¼
+# セキュリティヘッダー
 SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
-SECURE_HSTS_SECONDS = 31536000  # 1Ã¥Â¹Â´
+SECURE_HSTS_SECONDS = 31536000  # 1年
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = 'DENY'
 
-# HTTPSÃ£ÂÂ¨Ã£â€šÂ¯Ã£Æ’Æ’Ã£â€šÂ­Ã£Æ’Â¼
+# HTTPSとクッキー
 SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = 'Lax'
 CSRF_COOKIE_SAMESITE = 'Lax'
 
-# Ã£â€šÂ·Ã£Æ’Â¼Ã£â€šÂ¯Ã£Æ’Â¬Ã£Æ’Æ’Ã£Æ’Ë†Ã£â€šÂ­Ã£Æ’Â¼Ã¯Â¼Ë†Ã§â€™Â°Ã¥Â¢Æ’Ã¥Â¤â€°Ã¦â€¢Â°Ã§ÂµÅ’Ã§â€Â±Ã£ÂÂ§Ã¨Â¨Â­Ã¥Â®Å¡Ã£Ââ„¢Ã£â€šâ€¹Ã¥Â¿â€¦Ã¨Â¦ÂÃ£ÂÅ’Ã£Ââ€šÃ£â€šÅ Ã£ÂÂ¾Ã£Ââ„¢Ã¯Â¼â€°
+# シークレットキー（環境変数経由で設定する必要があります）
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 if not SECRET_KEY:
     raise ImproperlyConfigured('DJANGO_SECRET_KEY environment variable is required')
 
-# Ã£Æ’â€˜Ã£â€šÂ¹Ã£Æ’Â¯Ã£Æ’Â¼Ã£Æ’â€°Ã¦Â¤Å“Ã¨Â¨Â¼
+# パスワード検証
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -84,9 +84,9 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 ```
 
-## Ã¨ÂªÂÃ¨Â¨Â¼
+## 認証
 
-### Ã£â€šÂ«Ã£â€šÂ¹Ã£â€šÂ¿Ã£Æ’Â Ã£Æ’Â¦Ã£Æ’Â¼Ã£â€šÂ¶Ã£Æ’Â¼Ã£Æ’Â¢Ã£Æ’â€¡Ã£Æ’Â«
+### カスタムユーザーモデル
 
 ```python
 # apps/users/models.py
@@ -94,12 +94,12 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 class User(AbstractUser):
-    """Ã£â€šË†Ã£â€šÅ Ã¨â€°Â¯Ã£Ââ€žÃ£â€šÂ»Ã£â€šÂ­Ã£Æ’Â¥Ã£Æ’ÂªÃ£Æ’â€ Ã£â€šÂ£Ã£ÂÂ®Ã£ÂÅ¸Ã£â€šÂÃ£ÂÂ®Ã£â€šÂ«Ã£â€šÂ¹Ã£â€šÂ¿Ã£Æ’Â Ã£Æ’Â¦Ã£Æ’Â¼Ã£â€šÂ¶Ã£Æ’Â¼Ã£Æ’Â¢Ã£Æ’â€¡Ã£Æ’Â«Ã£â‚¬â€š"""
+    """より良いセキュリティのためのカスタムユーザーモデル。"""
 
     email = models.EmailField(unique=True)
     phone = models.CharField(max_length=20, blank=True)
 
-    USERNAME_FIELD = 'email'  # Ã£Æ’Â¡Ã£Æ’Â¼Ã£Æ’Â«Ã£â€šâ€™Ã£Æ’Â¦Ã£Æ’Â¼Ã£â€šÂ¶Ã£Æ’Â¼Ã¥ÂÂÃ£ÂÂ¨Ã£Ââ€”Ã£ÂÂ¦Ã¤Â½Â¿Ã§â€Â¨
+    USERNAME_FIELD = 'email'  # メールをユーザー名として使用
     REQUIRED_FIELDS = ['username']
 
     class Meta:
@@ -114,10 +114,10 @@ class User(AbstractUser):
 AUTH_USER_MODEL = 'users.User'
 ```
 
-### Ã£Æ’â€˜Ã£â€šÂ¹Ã£Æ’Â¯Ã£Æ’Â¼Ã£Æ’â€°Ã£Æ’ÂÃ£Æ’Æ’Ã£â€šÂ·Ã£Æ’Â³Ã£â€šÂ°
+### パスワードハッシング
 
 ```python
-# Ã£Æ’â€¡Ã£Æ’â€¢Ã£â€šÂ©Ã£Æ’Â«Ã£Æ’Ë†Ã£ÂÂ§Ã£ÂÂ¯DjangoÃ£ÂÂ¯PBKDF2Ã£â€šâ€™Ã¤Â½Â¿Ã§â€Â¨Ã£â‚¬â€šÃ£â€šË†Ã£â€šÅ Ã¥Â¼Â·Ã¥Å â€ºÃ£ÂÂªÃ£â€šÂ»Ã£â€šÂ­Ã£Æ’Â¥Ã£Æ’ÂªÃ£Æ’â€ Ã£â€šÂ£Ã£ÂÂ®Ã£ÂÅ¸Ã£â€šÂÃ£ÂÂ«:
+# デフォルトではDjangoはPBKDF2を使用。より強力なセキュリティのために:
 PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.Argon2PasswordHasher',
     'django.contrib.auth.hashers.PBKDF2PasswordHasher',
@@ -126,20 +126,20 @@ PASSWORD_HASHERS = [
 ]
 ```
 
-### Ã£â€šÂ»Ã£Æ’Æ’Ã£â€šÂ·Ã£Æ’Â§Ã£Æ’Â³Ã§Â®Â¡Ã§Ââ€ 
+### セッション管理
 
 ```python
-# Ã£â€šÂ»Ã£Æ’Æ’Ã£â€šÂ·Ã£Æ’Â§Ã£Æ’Â³Ã¨Â¨Â­Ã¥Â®Å¡
-SESSION_ENGINE = 'django.contrib.sessions.backends.cache'  # Ã£ÂÂ¾Ã£ÂÅ¸Ã£ÂÂ¯ 'db'
+# セッション設定
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'  # または 'db'
 SESSION_CACHE_ALIAS = 'default'
-SESSION_COOKIE_AGE = 3600 * 24 * 7  # 1Ã©â‚¬Â±Ã©â€“â€œ
+SESSION_COOKIE_AGE = 3600 * 24 * 7  # 1週間
 SESSION_SAVE_EVERY_REQUEST = False
-SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Ã£â€šË†Ã£â€šÅ Ã¨â€°Â¯Ã£Ââ€žUXÃ£ÂÂ§Ã£Ââ„¢Ã£ÂÅ’Ã£â‚¬ÂÃ£â€šÂ»Ã£â€šÂ­Ã£Æ’Â¥Ã£Æ’ÂªÃ£Æ’â€ Ã£â€šÂ£Ã£ÂÂ¯Ã¤Â½Å½Ã£Ââ€ž
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # より良いUXですが、セキュリティは低い
 ```
 
-## Ã¨ÂªÂÃ¥ÂÂ¯
+## 認可
 
-### Ã£Æ’â€˜Ã£Æ’Â¼Ã£Æ’Å¸Ã£Æ’Æ’Ã£â€šÂ·Ã£Æ’Â§Ã£Æ’Â³
+### パーミッション
 
 ```python
 # models.py
@@ -158,7 +158,7 @@ class Post(models.Model):
         ]
 
     def user_can_edit(self, user):
-        """Ã£Æ’Â¦Ã£Æ’Â¼Ã£â€šÂ¶Ã£Æ’Â¼Ã£ÂÅ’Ã£Ââ€œÃ£ÂÂ®Ã¦Å â€¢Ã§Â¨Â¿Ã£â€šâ€™Ã§Â·Â¨Ã©â€ºâ€ Ã£ÂÂ§Ã£ÂÂÃ£â€šâ€¹Ã£Ââ€¹Ã£Æ’ÂÃ£â€šÂ§Ã£Æ’Æ’Ã£â€šÂ¯Ã£â‚¬â€š"""
+        """ユーザーがこの投稿を編集できるかチェック。"""
         return self.author == user or user.has_perm('app.can_edit_others')
 
 # views.py
@@ -168,32 +168,32 @@ from django.views.generic import UpdateView
 class PostUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = Post
     permission_required = 'app.can_edit_others'
-    raise_exception = True  # Ã£Æ’ÂªÃ£Æ’â‚¬Ã£â€šÂ¤Ã£Æ’Â¬Ã£â€šÂ¯Ã£Æ’Ë†Ã£ÂÂ®Ã¤Â»Â£Ã£â€šÂÃ£â€šÅ Ã£ÂÂ«403Ã£â€šâ€™Ã¨Â¿â€Ã£Ââ„¢
+    raise_exception = True  # リダイレクトの代わりに403を返す
 
     def get_queryset(self):
-        """Ã£Æ’Â¦Ã£Æ’Â¼Ã£â€šÂ¶Ã£Æ’Â¼Ã£ÂÅ’Ã¨â€¡ÂªÃ¥Ë†â€ Ã£ÂÂ®Ã¦Å â€¢Ã§Â¨Â¿Ã£ÂÂ®Ã£ÂÂ¿Ã£â€šâ€™Ã§Â·Â¨Ã©â€ºâ€ Ã£ÂÂ§Ã£ÂÂÃ£â€šâ€¹Ã£â€šË†Ã£Ââ€ Ã£ÂÂ«Ã£Ââ„¢Ã£â€šâ€¹Ã£â‚¬â€š"""
+        """ユーザーが自分の投稿のみを編集できるようにする。"""
         return Post.objects.filter(author=self.request.user)
 ```
 
-### Ã£â€šÂ«Ã£â€šÂ¹Ã£â€šÂ¿Ã£Æ’Â Ã£Æ’â€˜Ã£Æ’Â¼Ã£Æ’Å¸Ã£Æ’Æ’Ã£â€šÂ·Ã£Æ’Â§Ã£Æ’Â³
+### カスタムパーミッション
 
 ```python
 # permissions.py
 from rest_framework import permissions
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
-    """Ã¦â€°â‚¬Ã¦Å“â€°Ã¨â‚¬â€¦Ã£ÂÂ®Ã£ÂÂ¿Ã£ÂÅ’Ã£â€šÂªÃ£Æ’â€“Ã£â€šÂ¸Ã£â€šÂ§Ã£â€šÂ¯Ã£Æ’Ë†Ã£â€šâ€™Ã§Â·Â¨Ã©â€ºâ€ Ã£ÂÂ§Ã£ÂÂÃ£â€šâ€¹Ã£â€šË†Ã£Ââ€ Ã£ÂÂ«Ã£Ââ„¢Ã£â€šâ€¹Ã£â‚¬â€š"""
+    """所有者のみがオブジェクトを編集できるようにする。"""
 
     def has_object_permission(self, request, view, obj):
-        # Ã¨ÂªÂ­Ã£ÂÂ¿Ã¥Ââ€“Ã£â€šÅ Ã¦Â¨Â©Ã©â„¢ÂÃ£ÂÂ¯Ã¤Â»Â»Ã¦â€žÂÃ£ÂÂ®Ã£Æ’ÂªÃ£â€šÂ¯Ã£â€šÂ¨Ã£â€šÂ¹Ã£Æ’Ë†Ã£ÂÂ«Ã¨Â¨Â±Ã¥ÂÂ¯
+        # 読み取り権限は任意のリクエストに許可
         if request.method in permissions.SAFE_METHODS:
             return True
 
-        # Ã¦â€ºÂ¸Ã£ÂÂÃ¨Â¾Â¼Ã£ÂÂ¿Ã¦Â¨Â©Ã©â„¢ÂÃ£ÂÂ¯Ã¦â€°â‚¬Ã¦Å“â€°Ã¨â‚¬â€¦Ã£ÂÂ®Ã£ÂÂ¿
+        # 書き込み権限は所有者のみ
         return obj.author == request.user
 
 class IsAdminOrReadOnly(permissions.BasePermission):
-    """Ã§Â®Â¡Ã§Ââ€ Ã¨â‚¬â€¦Ã£ÂÂ¯Ã¤Â½â€¢Ã£ÂÂ§Ã£â€šâ€šÃ£ÂÂ§Ã£ÂÂÃ£â‚¬ÂÃ¤Â»â€“Ã£ÂÂ¯Ã¨ÂªÂ­Ã£ÂÂ¿Ã¥Ââ€“Ã£â€šÅ Ã£ÂÂ®Ã£ÂÂ¿Ã£â‚¬â€š"""
+    """管理者は何でもでき、他は読み取りのみ。"""
 
     def has_permission(self, request, view):
         if request.method in permissions.SAFE_METHODS:
@@ -201,13 +201,13 @@ class IsAdminOrReadOnly(permissions.BasePermission):
         return request.user and request.user.is_staff
 
 class IsVerifiedUser(permissions.BasePermission):
-    """Ã¦Â¤Å“Ã¨Â¨Â¼Ã¦Â¸Ë†Ã£ÂÂ¿Ã£Æ’Â¦Ã£Æ’Â¼Ã£â€šÂ¶Ã£Æ’Â¼Ã£ÂÂ®Ã£ÂÂ¿Ã£â€šâ€™Ã¨Â¨Â±Ã¥ÂÂ¯Ã£â‚¬â€š"""
+    """検証済みユーザーのみを許可。"""
 
     def has_permission(self, request, view):
         return request.user and request.user.is_authenticated and request.user.is_verified
 ```
 
-### Ã£Æ’Â­Ã£Æ’Â¼Ã£Æ’Â«Ã£Æ’â„¢Ã£Æ’Â¼Ã£â€šÂ¹Ã£â€šÂ¢Ã£â€šÂ¯Ã£â€šÂ»Ã£â€šÂ¹Ã¥Ë†Â¶Ã¥Â¾Â¡(RBAC)
+### ロールベースアクセス制御(RBAC)
 
 ```python
 # models.py
@@ -229,7 +229,7 @@ class User(AbstractUser):
 
 # Mixin
 class AdminRequiredMixin:
-    """Ã§Â®Â¡Ã§Ââ€ Ã¨â‚¬â€¦Ã£Æ’Â­Ã£Æ’Â¼Ã£Æ’Â«Ã£â€šâ€™Ã¨Â¦ÂÃ¦Â±â€šÃ£Ââ„¢Ã£â€šâ€¹MixinÃ£â‚¬â€š"""
+    """管理者ロールを要求するMixin。"""
 
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated or not request.user.is_admin():
@@ -238,97 +238,97 @@ class AdminRequiredMixin:
         return super().dispatch(request, *args, **kwargs)
 ```
 
-## SQLÃ£â€šÂ¤Ã£Æ’Â³Ã£â€šÂ¸Ã£â€šÂ§Ã£â€šÂ¯Ã£â€šÂ·Ã£Æ’Â§Ã£Æ’Â³Ã©ËœÂ²Ã¦Â­Â¢
+## SQLインジェクション防止
 
-### Django ORMÃ¤Â¿ÂÃ¨Â­Â·
+### Django ORM保護
 
 ```python
-# GOOD: Django ORMÃ£ÂÂ¯Ã¨â€¡ÂªÃ¥â€¹â€¢Ã§Å¡â€žÃ£ÂÂ«Ã£Æ’â€˜Ã£Æ’Â©Ã£Æ’Â¡Ã£Æ’Â¼Ã£â€šÂ¿Ã£â€šâ€™Ã£â€šÂ¨Ã£â€šÂ¹Ã£â€šÂ±Ã£Æ’Â¼Ã£Æ’â€”
+# GOOD: Django ORMは自動的にパラメータをエスケープ
 def get_user(username):
-    return User.objects.get(username=username)  # Ã¥Â®â€°Ã¥â€¦Â¨
+    return User.objects.get(username=username)  # 安全
 
-# GOOD: raw()Ã£ÂÂ§Ã£Æ’â€˜Ã£Æ’Â©Ã£Æ’Â¡Ã£Æ’Â¼Ã£â€šÂ¿Ã£â€šâ€™Ã¤Â½Â¿Ã§â€Â¨
+# GOOD: raw()でパラメータを使用
 def search_users(query):
     return User.objects.raw('SELECT * FROM users WHERE username = %s', [query])
 
-# BAD: Ã£Æ’Â¦Ã£Æ’Â¼Ã£â€šÂ¶Ã£Æ’Â¼Ã¥â€¦Â¥Ã¥Å â€ºÃ£â€šâ€™Ã§â€ºÂ´Ã¦Å½Â¥Ã¨Â£Å“Ã©â€“â€œÃ£Ââ€”Ã£ÂÂªÃ£Ââ€ž
+# BAD: ユーザー入力を直接補間しない
 def get_user_bad(username):
-    return User.objects.raw(f'SELECT * FROM users WHERE username = {username}')  # Ã¨â€žâ€ Ã¥Â¼Â±Ã¯Â¼Â
+    return User.objects.raw(f'SELECT * FROM users WHERE username = {username}')  # 脆弱！
 
-# GOOD: Ã©ÂÂ©Ã¥Ë†â€¡Ã£ÂÂªÃ£â€šÂ¨Ã£â€šÂ¹Ã£â€šÂ±Ã£Æ’Â¼Ã£Æ’â€”Ã£ÂÂ§filterÃ£â€šâ€™Ã¤Â½Â¿Ã§â€Â¨
+# GOOD: 適切なエスケープでfilterを使用
 def get_users_by_email(email):
-    return User.objects.filter(email__iexact=email)  # Ã¥Â®â€°Ã¥â€¦Â¨
+    return User.objects.filter(email__iexact=email)  # 安全
 
-# GOOD: Ã¨Â¤â€¡Ã©â€ºâ€˜Ã£ÂÂªÃ£â€šÂ¯Ã£â€šÂ¨Ã£Æ’ÂªÃ£ÂÂ«QÃ£â€šÂªÃ£Æ’â€“Ã£â€šÂ¸Ã£â€šÂ§Ã£â€šÂ¯Ã£Æ’Ë†Ã£â€šâ€™Ã¤Â½Â¿Ã§â€Â¨
+# GOOD: 複雑なクエリにQオブジェクトを使用
 from django.db.models import Q
 def search_users_complex(query):
     return User.objects.filter(
         Q(username__icontains=query) |
         Q(email__icontains=query)
-    )  # Ã¥Â®â€°Ã¥â€¦Â¨
+    )  # 安全
 ```
 
-### raw()Ã£ÂÂ§Ã£ÂÂ®Ã¨Â¿Â½Ã¥Å Â Ã£â€šÂ»Ã£â€šÂ­Ã£Æ’Â¥Ã£Æ’ÂªÃ£Æ’â€ Ã£â€šÂ£
+### raw()での追加セキュリティ
 
 ```python
-# Ã§â€Å¸Ã£ÂÂ®SQLÃ£â€šâ€™Ã¤Â½Â¿Ã§â€Â¨Ã£Ââ„¢Ã£â€šâ€¹Ã¥Â¿â€¦Ã¨Â¦ÂÃ£ÂÅ’Ã£Ââ€šÃ£â€šâ€¹Ã¥Â Â´Ã¥ÂË†Ã£ÂÂ¯Ã£â‚¬ÂÃ¥Â¸Â¸Ã£ÂÂ«Ã£Æ’â€˜Ã£Æ’Â©Ã£Æ’Â¡Ã£Æ’Â¼Ã£â€šÂ¿Ã£â€šâ€™Ã¤Â½Â¿Ã§â€Â¨
+# 生のSQLを使用する必要がある場合は、常にパラメータを使用
 User.objects.raw(
     'SELECT * FROM users WHERE email = %s AND status = %s',
     [user_input_email, status]
 )
 ```
 
-## XSSÃ©ËœÂ²Ã¦Â­Â¢
+## XSS防止
 
-### Ã£Æ’â€ Ã£Æ’Â³Ã£Æ’â€”Ã£Æ’Â¬Ã£Æ’Â¼Ã£Æ’Ë†Ã£â€šÂ¨Ã£â€šÂ¹Ã£â€šÂ±Ã£Æ’Â¼Ã£Æ’â€”
+### テンプレートエスケープ
 
 ```django
-{# DjangoÃ£ÂÂ¯Ã£Æ’â€¡Ã£Æ’â€¢Ã£â€šÂ©Ã£Æ’Â«Ã£Æ’Ë†Ã£ÂÂ§Ã¥Â¤â€°Ã¦â€¢Â°Ã£â€šâ€™Ã¨â€¡ÂªÃ¥â€¹â€¢Ã£â€šÂ¨Ã£â€šÂ¹Ã£â€šÂ±Ã£Æ’Â¼Ã£Æ’â€” - Ã¥Â®â€°Ã¥â€¦Â¨ #}
-{{ user_input }}  {# Ã£â€šÂ¨Ã£â€šÂ¹Ã£â€šÂ±Ã£Æ’Â¼Ã£Æ’â€”Ã£Ââ€¢Ã£â€šÅ’Ã£ÂÅ¸HTML #}
+{# Djangoはデフォルトで変数を自動エスケープ - 安全 #}
+{{ user_input }}  {# エスケープされたHTML #}
 
-{# Ã¤Â¿Â¡Ã©Â Â¼Ã£ÂÂ§Ã£ÂÂÃ£â€šâ€¹Ã£â€šÂ³Ã£Æ’Â³Ã£Æ’â€ Ã£Æ’Â³Ã£Æ’â€žÃ£ÂÂ®Ã£ÂÂ¿Ã£â€šâ€™Ã¦ËœÅ½Ã§Â¤ÂºÃ§Å¡â€žÃ£ÂÂ«Ã¥Â®â€°Ã¥â€¦Â¨Ã£ÂÂ¨Ã£Æ’Å¾Ã£Æ’Â¼Ã£â€šÂ¯ #}
-{{ trusted_html|safe }}  {# Ã£â€šÂ¨Ã£â€šÂ¹Ã£â€šÂ±Ã£Æ’Â¼Ã£Æ’â€”Ã£Ââ€¢Ã£â€šÅ’Ã£ÂÂªÃ£Ââ€ž #}
+{# 信頼できるコンテンツのみを明示的に安全とマーク #}
+{{ trusted_html|safe }}  {# エスケープされない #}
 
-{# Ã¥Â®â€°Ã¥â€¦Â¨Ã£ÂÂªHTMLÃ£ÂÂ®Ã£ÂÅ¸Ã£â€šÂÃ£ÂÂ«Ã£Æ’â€ Ã£Æ’Â³Ã£Æ’â€”Ã£Æ’Â¬Ã£Æ’Â¼Ã£Æ’Ë†Ã£Æ’â€¢Ã£â€šÂ£Ã£Æ’Â«Ã£â€šÂ¿Ã£â€šâ€™Ã¤Â½Â¿Ã§â€Â¨ #}
-{{ user_input|escape }}  {# Ã£Æ’â€¡Ã£Æ’â€¢Ã£â€šÂ©Ã£Æ’Â«Ã£Æ’Ë†Ã£ÂÂ¨Ã¥ÂÅ’Ã£ÂËœ #}
-{{ user_input|striptags }}  {# Ã£Ââ„¢Ã£ÂÂ¹Ã£ÂÂ¦Ã£ÂÂ®HTMLÃ£â€šÂ¿Ã£â€šÂ°Ã£â€šâ€™Ã¥â€°Å Ã©â„¢Â¤ #}
+{# 安全なHTMLのためにテンプレートフィルタを使用 #}
+{{ user_input|escape }}  {# デフォルトと同じ #}
+{{ user_input|striptags }}  {# すべてのHTMLタグを削除 #}
 
-{# JavaScriptÃ£â€šÂ¨Ã£â€šÂ¹Ã£â€šÂ±Ã£Æ’Â¼Ã£Æ’â€” #}
+{# JavaScriptエスケープ #}
 <script>
     var username = {{ username|escapejs }};
 </script>
 ```
 
-### Ã¥Â®â€°Ã¥â€¦Â¨Ã£ÂÂªÃ¦â€“â€¡Ã¥Â­â€”Ã¥Ë†â€”Ã¥â€¡Â¦Ã§Ââ€ 
+### 安全な文字列処理
 
 ```python
 from django.utils.safestring import mark_safe
 from django.utils.html import escape
 
-# BAD: Ã£â€šÂ¨Ã£â€šÂ¹Ã£â€šÂ±Ã£Æ’Â¼Ã£Æ’â€”Ã£Ââ€ºÃ£ÂÅ¡Ã£ÂÂ«Ã£Æ’Â¦Ã£Æ’Â¼Ã£â€šÂ¶Ã£Æ’Â¼Ã¥â€¦Â¥Ã¥Å â€ºÃ£â€šâ€™Ã¥Â®â€°Ã¥â€¦Â¨Ã£ÂÂ¨Ã£Æ’Å¾Ã£Æ’Â¼Ã£â€šÂ¯Ã£Ââ€”Ã£ÂÂªÃ£Ââ€ž
+# BAD: エスケープせずにユーザー入力を安全とマークしない
 def render_bad(user_input):
-    return mark_safe(user_input)  # Ã¨â€žâ€ Ã¥Â¼Â±Ã¯Â¼Â
+    return mark_safe(user_input)  # 脆弱！
 
-# GOOD: Ã¦Å“â‚¬Ã¥Ë†ÂÃ£ÂÂ«Ã£â€šÂ¨Ã£â€šÂ¹Ã£â€šÂ±Ã£Æ’Â¼Ã£Æ’â€”Ã£â‚¬ÂÃ¦Â¬Â¡Ã£ÂÂ«Ã¥Â®â€°Ã¥â€¦Â¨Ã£ÂÂ¨Ã£Æ’Å¾Ã£Æ’Â¼Ã£â€šÂ¯
+# GOOD: 最初にエスケープ、次に安全とマーク
 def render_good(user_input):
     return mark_safe(escape(user_input))
 
-# GOOD: Ã¥Â¤â€°Ã¦â€¢Â°Ã£â€šâ€™Ã¦Å’ÂÃ£ÂÂ¤HTMLÃ£ÂÂ«format_htmlÃ£â€šâ€™Ã¤Â½Â¿Ã§â€Â¨
+# GOOD: 変数を持つHTMLにformat_htmlを使用
 from django.utils.html import format_html
 
 def greet_user(username):
     return format_html('<span class="user">{}</span>', escape(username))
 ```
 
-### HTTPÃ£Æ’ËœÃ£Æ’Æ’Ã£Æ’â‚¬Ã£Æ’Â¼
+### HTTPヘッダー
 
 ```python
 # settings.py
-SECURE_CONTENT_TYPE_NOSNIFF = True  # MIMEÃ£â€šÂ¹Ã£Æ’â€¹Ã£Æ’Æ’Ã£Æ’â€¢Ã£â€šÂ£Ã£Æ’Â³Ã£â€šÂ°Ã£â€šâ€™Ã©ËœÂ²Ã¦Â­Â¢
-SECURE_BROWSER_XSS_FILTER = True  # XSSÃ£Æ’â€¢Ã£â€šÂ£Ã£Æ’Â«Ã£â€šÂ¿Ã£â€šâ€™Ã¦Å“â€°Ã¥Å Â¹Ã¥Å’â€“
-X_FRAME_OPTIONS = 'DENY'  # Ã£â€šÂ¯Ã£Æ’ÂªÃ£Æ’Æ’Ã£â€šÂ¯Ã£â€šÂ¸Ã£Æ’Â£Ã£Æ’Æ’Ã£â€šÂ­Ã£Æ’Â³Ã£â€šÂ°Ã£â€šâ€™Ã©ËœÂ²Ã¦Â­Â¢
+SECURE_CONTENT_TYPE_NOSNIFF = True  # MIMEスニッフィングを防止
+SECURE_BROWSER_XSS_FILTER = True  # XSSフィルタを有効化
+X_FRAME_OPTIONS = 'DENY'  # クリックジャッキングを防止
 
-# Ã£â€šÂ«Ã£â€šÂ¹Ã£â€šÂ¿Ã£Æ’Â Ã£Æ’Å¸Ã£Æ’â€°Ã£Æ’Â«Ã£â€šÂ¦Ã£â€šÂ§Ã£â€šÂ¢
+# カスタムミドルウェア
 from django.conf import settings
 
 class SecurityHeaderMiddleware:
@@ -344,25 +344,25 @@ class SecurityHeaderMiddleware:
         return response
 ```
 
-## CSRFÃ¤Â¿ÂÃ¨Â­Â·
+## CSRF保護
 
-### Ã£Æ’â€¡Ã£Æ’â€¢Ã£â€šÂ©Ã£Æ’Â«Ã£Æ’Ë†CSRFÃ¤Â¿ÂÃ¨Â­Â·
+### デフォルトCSRF保護
 
 ```python
-# settings.py - CSRFÃ£ÂÂ¯Ã£Æ’â€¡Ã£Æ’â€¢Ã£â€šÂ©Ã£Æ’Â«Ã£Æ’Ë†Ã£ÂÂ§Ã¦Å“â€°Ã¥Å Â¹
-CSRF_COOKIE_SECURE = True  # HTTPSÃ£ÂÂ§Ã£ÂÂ®Ã£ÂÂ¿Ã©â‚¬ÂÃ¤Â¿Â¡
-CSRF_COOKIE_HTTPONLY = True  # JavaScriptÃ£â€šÂ¢Ã£â€šÂ¯Ã£â€šÂ»Ã£â€šÂ¹Ã£â€šâ€™Ã©ËœÂ²Ã¦Â­Â¢
-CSRF_COOKIE_SAMESITE = 'Lax'  # Ã¤Â¸â‚¬Ã©Æ’Â¨Ã£ÂÂ®Ã£â€šÂ±Ã£Æ’Â¼Ã£â€šÂ¹Ã£ÂÂ§CSRFÃ£â€šâ€™Ã©ËœÂ²Ã¦Â­Â¢
-CSRF_TRUSTED_ORIGINS = ['https://example.com']  # Ã¤Â¿Â¡Ã©Â Â¼Ã£Ââ€¢Ã£â€šÅ’Ã£ÂÅ¸Ã£Æ’â€°Ã£Æ’Â¡Ã£â€šÂ¤Ã£Æ’Â³
+# settings.py - CSRFはデフォルトで有効
+CSRF_COOKIE_SECURE = True  # HTTPSでのみ送信
+CSRF_COOKIE_HTTPONLY = True  # JavaScriptアクセスを防止
+CSRF_COOKIE_SAMESITE = 'Lax'  # 一部のケースでCSRFを防止
+CSRF_TRUSTED_ORIGINS = ['https://example.com']  # 信頼されたドメイン
 
-# Ã£Æ’â€ Ã£Æ’Â³Ã£Æ’â€”Ã£Æ’Â¬Ã£Æ’Â¼Ã£Æ’Ë†Ã¤Â½Â¿Ã§â€Â¨
+# テンプレート使用
 <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">Submit</button>
 </form>
 
-# AJAXÃ£Æ’ÂªÃ£â€šÂ¯Ã£â€šÂ¨Ã£â€šÂ¹Ã£Æ’Ë†
+# AJAXリクエスト
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -388,34 +388,34 @@ fetch('/api/endpoint/', {
 });
 ```
 
-### Ã£Æ’â€œÃ£Æ’Â¥Ã£Æ’Â¼Ã£ÂÂ®Ã©â„¢Â¤Ã¥Â¤â€“Ã¯Â¼Ë†Ã¦â€¦Å½Ã©â€¡ÂÃ£ÂÂ«Ã¤Â½Â¿Ã§â€Â¨Ã¯Â¼â€°
+### ビューの除外（慎重に使用）
 
 ```python
 from django.views.decorators.csrf import csrf_exempt
 
-@csrf_exempt  # Ã§ÂµÂ¶Ã¥Â¯Â¾Ã£ÂÂ«Ã¥Â¿â€¦Ã¨Â¦ÂÃ£ÂÂªÃ¥Â Â´Ã¥ÂË†Ã£ÂÂ®Ã£ÂÂ¿Ã¤Â½Â¿Ã§â€Â¨Ã¯Â¼Â
+@csrf_exempt  # 絶対に必要な場合のみ使用！
 def webhook_view(request):
-    # Ã¥Â¤â€“Ã©Æ’Â¨Ã£â€šÂµÃ£Æ’Â¼Ã£Æ’â€œÃ£â€šÂ¹Ã£Ââ€¹Ã£â€šâ€°Ã£ÂÂ®Webhook
+    # 外部サービスからのWebhook
     pass
 ```
 
-## Ã£Æ’â€¢Ã£â€šÂ¡Ã£â€šÂ¤Ã£Æ’Â«Ã£â€šÂ¢Ã£Æ’Æ’Ã£Æ’â€”Ã£Æ’Â­Ã£Æ’Â¼Ã£Æ’â€°Ã£â€šÂ»Ã£â€šÂ­Ã£Æ’Â¥Ã£Æ’ÂªÃ£Æ’â€ Ã£â€šÂ£
+## ファイルアップロードセキュリティ
 
-### Ã£Æ’â€¢Ã£â€šÂ¡Ã£â€šÂ¤Ã£Æ’Â«Ã¦Â¤Å“Ã¨Â¨Â¼
+### ファイル検証
 
 ```python
 import os
 from django.core.exceptions import ValidationError
 
 def validate_file_extension(value):
-    """Ã£Æ’â€¢Ã£â€šÂ¡Ã£â€šÂ¤Ã£Æ’Â«Ã¦â€¹Â¡Ã¥Â¼ÂµÃ¥Â­ÂÃ£â€šâ€™Ã¦Â¤Å“Ã¨Â¨Â¼Ã£â‚¬â€š"""
+    """ファイル拡張子を検証。"""
     ext = os.path.splitext(value.name)[1]
     valid_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.pdf']
     if not ext.lower() in valid_extensions:
         raise ValidationError('Unsupported file extension.')
 
 def validate_file_size(value):
-    """Ã£Æ’â€¢Ã£â€šÂ¡Ã£â€šÂ¤Ã£Æ’Â«Ã£â€šÂµÃ£â€šÂ¤Ã£â€šÂºÃ£â€šâ€™Ã¦Â¤Å“Ã¨Â¨Â¼Ã¯Â¼Ë†Ã¦Å“â‚¬Ã¥Â¤Â§5MBÃ¯Â¼â€°Ã£â‚¬â€š"""
+    """ファイルサイズを検証（最大5MB）。"""
     filesize = value.size
     if filesize > 5 * 1024 * 1024:
         raise ValidationError('File too large. Max size is 5MB.')
@@ -428,24 +428,24 @@ class Document(models.Model):
     )
 ```
 
-### Ã¥Â®â€°Ã¥â€¦Â¨Ã£ÂÂªÃ£Æ’â€¢Ã£â€šÂ¡Ã£â€šÂ¤Ã£Æ’Â«Ã£â€šÂ¹Ã£Æ’Ë†Ã£Æ’Â¬Ã£Æ’Â¼Ã£â€šÂ¸
+### 安全なファイルストレージ
 
 ```python
 # settings.py
 MEDIA_ROOT = '/var/www/media/'
 MEDIA_URL = '/media/'
 
-# Ã¦Å“Â¬Ã§â€¢ÂªÃ§â€™Â°Ã¥Â¢Æ’Ã£ÂÂ§Ã£Æ’Â¡Ã£Æ’â€¡Ã£â€šÂ£Ã£â€šÂ¢Ã£ÂÂ«Ã¥Ë†Â¥Ã£ÂÂ®Ã£Æ’â€°Ã£Æ’Â¡Ã£â€šÂ¤Ã£Æ’Â³Ã£â€šâ€™Ã¤Â½Â¿Ã§â€Â¨
+# 本番環境でメディアに別のドメインを使用
 MEDIA_DOMAIN = 'https://media.example.com'
 
-# Ã£Æ’Â¦Ã£Æ’Â¼Ã£â€šÂ¶Ã£Æ’Â¼Ã£â€šÂ¢Ã£Æ’Æ’Ã£Æ’â€”Ã£Æ’Â­Ã£Æ’Â¼Ã£Æ’â€°Ã£â€šâ€™Ã§â€ºÂ´Ã¦Å½Â¥Ã¦ÂÂÃ¤Â¾â€ºÃ£Ââ€”Ã£ÂÂªÃ£Ââ€ž
-# Ã©Ââ„¢Ã§Å¡â€žÃ£Æ’â€¢Ã£â€šÂ¡Ã£â€šÂ¤Ã£Æ’Â«Ã£ÂÂ«Ã£ÂÂ¯whitenoiseÃ£ÂÂ¾Ã£ÂÅ¸Ã£ÂÂ¯CDNÃ£â€šâ€™Ã¤Â½Â¿Ã§â€Â¨
-# Ã£Æ’Â¡Ã£Æ’â€¡Ã£â€šÂ£Ã£â€šÂ¢Ã£Æ’â€¢Ã£â€šÂ¡Ã£â€šÂ¤Ã£Æ’Â«Ã£ÂÂ«Ã£ÂÂ¯Ã¥Ë†Â¥Ã£ÂÂ®Ã£â€šÂµÃ£Æ’Â¼Ã£Æ’ÂÃ£Æ’Â¼Ã£ÂÂ¾Ã£ÂÅ¸Ã£ÂÂ¯S3Ã£â€šâ€™Ã¤Â½Â¿Ã§â€Â¨
+# ユーザーアップロードを直接提供しない
+# 静的ファイルにはwhitenoiseまたはCDNを使用
+# メディアファイルには別のサーバーまたはS3を使用
 ```
 
-## APIÃ£â€šÂ»Ã£â€šÂ­Ã£Æ’Â¥Ã£Æ’ÂªÃ£Æ’â€ Ã£â€šÂ£
+## APIセキュリティ
 
-### Ã£Æ’Â¬Ã£Æ’Â¼Ã£Æ’Ë†Ã¥Ë†Â¶Ã©â„¢Â
+### レート制限
 
 ```python
 # settings.py
@@ -461,7 +461,7 @@ REST_FRAMEWORK = {
     }
 }
 
-# Ã£â€šÂ«Ã£â€šÂ¹Ã£â€šÂ¿Ã£Æ’Â Ã£â€šÂ¹Ã£Æ’Â­Ã£Æ’Æ’Ã£Æ’Ë†Ã£Æ’Â«
+# カスタムスロットル
 from rest_framework.throttling import UserRateThrottle
 
 class BurstRateThrottle(UserRateThrottle):
@@ -473,7 +473,7 @@ class SustainedRateThrottle(UserRateThrottle):
     rate = '1000/day'
 ```
 
-### APIÃ§â€Â¨Ã¨ÂªÂÃ¨Â¨Â¼
+### API用認証
 
 ```python
 # settings.py
@@ -498,7 +498,7 @@ def protected_view(request):
     return Response({'message': 'You are authenticated'})
 ```
 
-## Ã£â€šÂ»Ã£â€šÂ­Ã£Æ’Â¥Ã£Æ’ÂªÃ£Æ’â€ Ã£â€šÂ£Ã£Æ’ËœÃ£Æ’Æ’Ã£Æ’â‚¬Ã£Æ’Â¼
+## セキュリティヘッダー
 
 ### Content Security Policy
 
@@ -527,34 +527,34 @@ class CSPMiddleware:
         return response
 ```
 
-## Ã§â€™Â°Ã¥Â¢Æ’Ã¥Â¤â€°Ã¦â€¢Â°
+## 環境変数
 
-### Ã£â€šÂ·Ã£Æ’Â¼Ã£â€šÂ¯Ã£Æ’Â¬Ã£Æ’Æ’Ã£Æ’Ë†Ã£ÂÂ®Ã§Â®Â¡Ã§Ââ€ 
+### シークレットの管理
 
 ```python
-# python-decoupleÃ£ÂÂ¾Ã£ÂÅ¸Ã£ÂÂ¯django-environÃ£â€šâ€™Ã¤Â½Â¿Ã§â€Â¨
+# python-decoupleまたはdjango-environを使用
 import environ
 
 env = environ.Env(
-    # Ã£â€šÂ­Ã£Æ’Â£Ã£â€šÂ¹Ã£Æ’â€ Ã£â€šÂ£Ã£Æ’Â³Ã£â€šÂ°Ã£â‚¬ÂÃ£Æ’â€¡Ã£Æ’â€¢Ã£â€šÂ©Ã£Æ’Â«Ã£Æ’Ë†Ã¥â‚¬Â¤Ã£â€šâ€™Ã¨Â¨Â­Ã¥Â®Å¡
+    # キャスティング、デフォルト値を設定
     DEBUG=(bool, False)
 )
 
-# .envÃ£Æ’â€¢Ã£â€šÂ¡Ã£â€šÂ¤Ã£Æ’Â«Ã£â€šâ€™Ã¨ÂªÂ­Ã£ÂÂ¿Ã¨Â¾Â¼Ã£â€šâ‚¬
+# .envファイルを読み込む
 environ.Env.read_env()
 
 SECRET_KEY = env('DJANGO_SECRET_KEY')
 DATABASE_URL = env('DATABASE_URL')
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
 
-# .envÃ£Æ’â€¢Ã£â€šÂ¡Ã£â€šÂ¤Ã£Æ’Â«Ã¯Â¼Ë†Ã£Ââ€œÃ£â€šÅ’Ã£â€šâ€™Ã£â€šÂ³Ã£Æ’Å¸Ã£Æ’Æ’Ã£Æ’Ë†Ã£Ââ€”Ã£ÂÂªÃ£Ââ€žÃ¯Â¼â€°
+# .envファイル（これをコミットしない）
 DEBUG=False
 SECRET_KEY=your-secret-key-here
 DATABASE_URL=postgresql://user:password@localhost:5432/dbname
 ALLOWED_HOSTS=example.com,www.example.com
 ```
 
-## Ã£â€šÂ»Ã£â€šÂ­Ã£Æ’Â¥Ã£Æ’ÂªÃ£Æ’â€ Ã£â€šÂ£Ã£â€šÂ¤Ã£Æ’â„¢Ã£Æ’Â³Ã£Æ’Ë†Ã£ÂÂ®Ã£Æ’Â­Ã£â€šÂ°Ã¨Â¨ËœÃ©Å’Â²
+## セキュリティイベントのログ記録
 
 ```python
 # settings.py
@@ -587,21 +587,21 @@ LOGGING = {
 }
 ```
 
-## Ã£â€šÂ¯Ã£â€šÂ¤Ã£Æ’Æ’Ã£â€šÂ¯Ã£â€šÂ»Ã£â€šÂ­Ã£Æ’Â¥Ã£Æ’ÂªÃ£Æ’â€ Ã£â€šÂ£Ã£Æ’ÂÃ£â€šÂ§Ã£Æ’Æ’Ã£â€šÂ¯Ã£Æ’ÂªÃ£â€šÂ¹Ã£Æ’Ë†
+## クイックセキュリティチェックリスト
 
-| Ã£Æ’ÂÃ£â€šÂ§Ã£Æ’Æ’Ã£â€šÂ¯ | Ã¨ÂªÂ¬Ã¦ËœÅ½ |
+| チェック | 説明 |
 |-------|-------------|
-| `DEBUG = False` | Ã¦Å“Â¬Ã§â€¢ÂªÃ§â€™Â°Ã¥Â¢Æ’Ã£ÂÂ§DEBUGÃ£â€šâ€™Ã¦Â±ÂºÃ£Ââ€”Ã£ÂÂ¦Ã¥Â®Å¸Ã¨Â¡Å’Ã£Ââ€”Ã£ÂÂªÃ£Ââ€ž |
-| HTTPSÃ£ÂÂ®Ã£ÂÂ¿ | SSLÃ£â€šâ€™Ã¥Â¼Â·Ã¥Ë†Â¶Ã£â‚¬ÂÃ£â€šÂ»Ã£â€šÂ­Ã£Æ’Â¥Ã£â€šÂ¢Ã£â€šÂ¯Ã£Æ’Æ’Ã£â€šÂ­Ã£Æ’Â¼ |
-| Ã¥Â¼Â·Ã¥Å â€ºÃ£ÂÂªÃ£â€šÂ·Ã£Æ’Â¼Ã£â€šÂ¯Ã£Æ’Â¬Ã£Æ’Æ’Ã£Æ’Ë† | SECRET_KEYÃ£ÂÂ«Ã§â€™Â°Ã¥Â¢Æ’Ã¥Â¤â€°Ã¦â€¢Â°Ã£â€šâ€™Ã¤Â½Â¿Ã§â€Â¨ |
-| Ã£Æ’â€˜Ã£â€šÂ¹Ã£Æ’Â¯Ã£Æ’Â¼Ã£Æ’â€°Ã¦Â¤Å“Ã¨Â¨Â¼ | Ã£Ââ„¢Ã£ÂÂ¹Ã£ÂÂ¦Ã£ÂÂ®Ã£Æ’â€˜Ã£â€šÂ¹Ã£Æ’Â¯Ã£Æ’Â¼Ã£Æ’â€°Ã£Æ’ÂÃ£Æ’ÂªÃ£Æ’â€¡Ã£Æ’Â¼Ã£â€šÂ¿Ã£â€šâ€™Ã¦Å“â€°Ã¥Å Â¹Ã¥Å’â€“ |
-| CSRFÃ¤Â¿ÂÃ¨Â­Â· | Ã£Æ’â€¡Ã£Æ’â€¢Ã£â€šÂ©Ã£Æ’Â«Ã£Æ’Ë†Ã£ÂÂ§Ã¦Å“â€°Ã¥Å Â¹Ã£â‚¬ÂÃ§â€žÂ¡Ã¥Å Â¹Ã£ÂÂ«Ã£Ââ€”Ã£ÂÂªÃ£Ââ€ž |
-| XSSÃ©ËœÂ²Ã¦Â­Â¢ | DjangoÃ£ÂÂ¯Ã¨â€¡ÂªÃ¥â€¹â€¢Ã£â€šÂ¨Ã£â€šÂ¹Ã£â€šÂ±Ã£Æ’Â¼Ã£Æ’â€”Ã£â‚¬ÂÃ£Æ’Â¦Ã£Æ’Â¼Ã£â€šÂ¶Ã£Æ’Â¼Ã¥â€¦Â¥Ã¥Å â€ºÃ£ÂÂ§<code>\|safe</code>Ã£â€šâ€™Ã¤Â½Â¿Ã§â€Â¨Ã£Ââ€”Ã£ÂÂªÃ£Ââ€ž |
-| SQLÃ£â€šÂ¤Ã£Æ’Â³Ã£â€šÂ¸Ã£â€šÂ§Ã£â€šÂ¯Ã£â€šÂ·Ã£Æ’Â§Ã£Æ’Â³ | ORMÃ£â€šâ€™Ã¤Â½Â¿Ã§â€Â¨Ã£â‚¬ÂÃ£â€šÂ¯Ã£â€šÂ¨Ã£Æ’ÂªÃ£ÂÂ§Ã¦â€“â€¡Ã¥Â­â€”Ã¥Ë†â€”Ã£â€šâ€™Ã©â‚¬Â£Ã§ÂµÂÃ£Ââ€”Ã£ÂÂªÃ£Ââ€ž |
-| Ã£Æ’â€¢Ã£â€šÂ¡Ã£â€šÂ¤Ã£Æ’Â«Ã£â€šÂ¢Ã£Æ’Æ’Ã£Æ’â€”Ã£Æ’Â­Ã£Æ’Â¼Ã£Æ’â€° | Ã£Æ’â€¢Ã£â€šÂ¡Ã£â€šÂ¤Ã£Æ’Â«Ã£â€šÂ¿Ã£â€šÂ¤Ã£Æ’â€”Ã£ÂÂ¨Ã£â€šÂµÃ£â€šÂ¤Ã£â€šÂºÃ£â€šâ€™Ã¦Â¤Å“Ã¨Â¨Â¼ |
-| Ã£Æ’Â¬Ã£Æ’Â¼Ã£Æ’Ë†Ã¥Ë†Â¶Ã©â„¢Â | APIÃ£â€šÂ¨Ã£Æ’Â³Ã£Æ’â€°Ã£Æ’ÂÃ£â€šÂ¤Ã£Æ’Â³Ã£Æ’Ë†Ã£â€šâ€™Ã£â€šÂ¹Ã£Æ’Â­Ã£Æ’Æ’Ã£Æ’Ë†Ã£Æ’Â« |
-| Ã£â€šÂ»Ã£â€šÂ­Ã£Æ’Â¥Ã£Æ’ÂªÃ£Æ’â€ Ã£â€šÂ£Ã£Æ’ËœÃ£Æ’Æ’Ã£Æ’â‚¬Ã£Æ’Â¼ | CSPÃ£â‚¬ÂX-Frame-OptionsÃ£â‚¬ÂHSTS |
-| Ã£Æ’Â­Ã£â€šÂ°Ã¨Â¨ËœÃ©Å’Â² | Ã£â€šÂ»Ã£â€šÂ­Ã£Æ’Â¥Ã£Æ’ÂªÃ£Æ’â€ Ã£â€šÂ£Ã£â€šÂ¤Ã£Æ’â„¢Ã£Æ’Â³Ã£Æ’Ë†Ã£â€šâ€™Ã£Æ’Â­Ã£â€šÂ° |
-| Ã¦â€ºÂ´Ã¦â€“Â° | DjangoÃ£ÂÂ¨DependenciesÃ£â€šâ€™Ã¦Å“â‚¬Ã¦â€“Â°Ã£ÂÂ«Ã¤Â¿ÂÃ£ÂÂ¤ |
+| `DEBUG = False` | 本番環境でDEBUGを決して実行しない |
+| HTTPSのみ | SSLを強制、セキュアクッキー |
+| 強力なシークレット | SECRET_KEYに環境変数を使用 |
+| パスワード検証 | すべてのパスワードバリデータを有効化 |
+| CSRF保護 | デフォルトで有効、無効にしない |
+| XSS防止 | Djangoは自動エスケープ、ユーザー入力で<code>\|safe</code>を使用しない |
+| SQLインジェクション | ORMを使用、クエリで文字列を連結しない |
+| ファイルアップロード | ファイルタイプとサイズを検証 |
+| レート制限 | APIエンドポイントをスロットル |
+| セキュリティヘッダー | CSP、X-Frame-Options、HSTS |
+| ログ記録 | セキュリティイベントをログ |
+| 更新 | DjangoとDependenciesを最新に保つ |
 
-**Ã¨Â¦Å¡Ã£ÂË†Ã£ÂÂ¦Ã£ÂÅ Ã£Ââ€žÃ£ÂÂ¦Ã£ÂÂÃ£ÂÂ Ã£Ââ€¢Ã£Ââ€ž**: Ã£â€šÂ»Ã£â€šÂ­Ã£Æ’Â¥Ã£Æ’ÂªÃ£Æ’â€ Ã£â€šÂ£Ã£ÂÂ¯Ã¨Â£Â½Ã¥â€œÂÃ£ÂÂ§Ã£ÂÂ¯Ã£ÂÂªÃ£ÂÂÃ£â‚¬ÂÃ£Æ’â€”Ã£Æ’Â­Ã£â€šÂ»Ã£â€šÂ¹Ã£ÂÂ§Ã£Ââ„¢Ã£â‚¬â€šÃ¥Â®Å¡Ã¦Å“Å¸Ã§Å¡â€žÃ£ÂÂ«Ã£â€šÂ»Ã£â€šÂ­Ã£Æ’Â¥Ã£Æ’ÂªÃ£Æ’â€ Ã£â€šÂ£Ã£Æ’â€”Ã£Æ’Â©Ã£â€šÂ¯Ã£Æ’â€ Ã£â€šÂ£Ã£â€šÂ¹Ã£â€šâ€™Ã£Æ’Â¬Ã£Æ’â€œÃ£Æ’Â¥Ã£Æ’Â¼Ã£Ââ€”Ã£â‚¬ÂÃ¦â€ºÂ´Ã¦â€“Â°Ã£Ââ€”Ã£ÂÂ¦Ã£ÂÂÃ£ÂÂ Ã£Ââ€¢Ã£Ââ€žÃ£â‚¬â€š
+**覚えておいてください**: セキュリティは製品ではなく、プロセスです。定期的にセキュリティプラクティスをレビューし、更新してください。

@@ -3,7 +3,7 @@ name: backend-patterns
 description: Backend architecture patterns, API design, database optimization, and server-side best practices for Node.js, Express, and Next.js API routes.
 ---
 
-# Ã¥Â¾Å’Ã§Â«Â¯Ã©â€“â€¹Ã§â„¢Â¼Ã¦Â¨Â¡Ã¥Â¼Â
+# 後端開發模式
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -20,29 +20,29 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-Ã§â€Â¨Ã¦â€“Â¼Ã¥ÂÂ¯Ã¦â€œÂ´Ã¥Â±â€¢Ã¤Â¼ÂºÃ¦Å“ÂÃ¥â„¢Â¨Ã§Â«Â¯Ã¦â€¡â€°Ã§â€Â¨Ã§Â¨â€¹Ã¥Â¼ÂÃ§Å¡â€žÃ¥Â¾Å’Ã§Â«Â¯Ã¦Å¾Â¶Ã¦Â§â€¹Ã¦Â¨Â¡Ã¥Â¼ÂÃ¥â€™Å’Ã¦Å“â‚¬Ã¤Â½Â³Ã¥Â¯Â¦Ã¥â€¹â„¢Ã£â‚¬â€š
+用於可擴展伺服器端應用程式的後端架構模式和最佳實務。
 
-## API Ã¨Â¨Â­Ã¨Â¨Ë†Ã¦Â¨Â¡Ã¥Â¼Â
+## API 設計模式
 
-### RESTful API Ã§ÂµÂÃ¦Â§â€¹
+### RESTful API 結構
 
 ```typescript
-// PASS: Ã¥Å¸ÂºÃ¦â€“Â¼Ã¨Â³â€¡Ã¦ÂºÂÃ§Å¡â€ž URL
-GET    /api/markets                 # Ã¥Ë†â€”Ã¥â€¡ÂºÃ¨Â³â€¡Ã¦ÂºÂ
-GET    /api/markets/:id             # Ã¥Ââ€“Ã¥Â¾â€”Ã¥â€“Â®Ã¤Â¸â‚¬Ã¨Â³â€¡Ã¦ÂºÂ
-POST   /api/markets                 # Ã¥Â»ÂºÃ§Â«â€¹Ã¨Â³â€¡Ã¦ÂºÂ
-PUT    /api/markets/:id             # Ã¦â€ºÂ¿Ã¦Ââ€ºÃ¨Â³â€¡Ã¦ÂºÂ
-PATCH  /api/markets/:id             # Ã¦â€ºÂ´Ã¦â€“Â°Ã¨Â³â€¡Ã¦ÂºÂ
-DELETE /api/markets/:id             # Ã¥Ë†ÂªÃ©â„¢Â¤Ã¨Â³â€¡Ã¦ÂºÂ
+// PASS: 基於資源的 URL
+GET    /api/markets                 # 列出資源
+GET    /api/markets/:id             # 取得單一資源
+POST   /api/markets                 # 建立資源
+PUT    /api/markets/:id             # 替換資源
+PATCH  /api/markets/:id             # 更新資源
+DELETE /api/markets/:id             # 刪除資源
 
-// PASS: Ã§â€Â¨Ã¦â€“Â¼Ã©ÂÅ½Ã¦Â¿Â¾Ã£â‚¬ÂÃ¦Å½â€™Ã¥ÂºÂÃ£â‚¬ÂÃ¥Ë†â€ Ã©Â ÂÃ§Å¡â€žÃ¦Å¸Â¥Ã¨Â©Â¢Ã¥ÂÆ’Ã¦â€¢Â¸
+// PASS: 用於過濾、排序、分頁的查詢參數
 GET /api/markets?status=active&sort=volume&limit=20&offset=0
 ```
 
-### Repository Ã¦Â¨Â¡Ã¥Â¼Â
+### Repository 模式
 
 ```typescript
-// Ã¦Å Â½Ã¨Â±Â¡Ã¨Â³â€¡Ã¦â€“â„¢Ã¥Â­ËœÃ¥Ââ€“Ã©â€šÂÃ¨Â¼Â¯
+// 抽象資料存取邏輯
 interface MarketRepository {
   findAll(filters?: MarketFilters): Promise<Market[]>
   findById(id: string): Promise<Market | null>
@@ -69,26 +69,26 @@ class SupabaseMarketRepository implements MarketRepository {
     return data
   }
 
-  // Ã¥â€¦Â¶Ã¤Â»â€“Ã¦â€“Â¹Ã¦Â³â€¢...
+  // 其他方法...
 }
 ```
 
-### Service Ã¥Â±Â¤Ã¦Â¨Â¡Ã¥Â¼Â
+### Service 層模式
 
 ```typescript
-// Ã¦Â¥Â­Ã¥â€¹â„¢Ã©â€šÂÃ¨Â¼Â¯Ã¨Ë†â€¡Ã¨Â³â€¡Ã¦â€“â„¢Ã¥Â­ËœÃ¥Ââ€“Ã¥Ë†â€ Ã©â€ºÂ¢
+// 業務邏輯與資料存取分離
 class MarketService {
   constructor(private marketRepo: MarketRepository) {}
 
   async searchMarkets(query: string, limit: number = 10): Promise<Market[]> {
-    // Ã¦Â¥Â­Ã¥â€¹â„¢Ã©â€šÂÃ¨Â¼Â¯
+    // 業務邏輯
     const embedding = await generateEmbedding(query)
     const results = await this.vectorSearch(embedding, limit)
 
-    // Ã¥Ââ€“Ã¥Â¾â€”Ã¥Â®Å’Ã¦â€¢Â´Ã¨Â³â€¡Ã¦â€“â„¢
+    // 取得完整資料
     const markets = await this.marketRepo.findByIds(results.map(r => r.id))
 
-    // Ã¤Â¾ÂÃ§â€ºÂ¸Ã¤Â¼Â¼Ã¥ÂºÂ¦Ã¦Å½â€™Ã¥ÂºÂ
+    // 依相似度排序
     return markets.sort((a, b) => {
       const scoreA = results.find(r => r.id === a.id)?.score || 0
       const scoreB = results.find(r => r.id === b.id)?.score || 0
@@ -97,15 +97,15 @@ class MarketService {
   }
 
   private async vectorSearch(embedding: number[], limit: number) {
-    // Ã¥Ââ€˜Ã©â€¡ÂÃ¦ÂÅ“Ã¥Â°â€¹Ã¥Â¯Â¦Ã¤Â½Å“
+    // 向量搜尋實作
   }
 }
 ```
 
-### Middleware Ã¦Â¨Â¡Ã¥Â¼Â
+### Middleware 模式
 
 ```typescript
-// Ã¨Â«â€¹Ã¦Â±â€š/Ã¥â€ºÅ¾Ã¦â€¡â€°Ã¨â„¢â€¢Ã§Ââ€ Ã¦ÂµÂÃ¦Â°Â´Ã§Â·Å¡
+// 請求/回應處理流水線
 export function withAuth(handler: NextApiHandler): NextApiHandler {
   return async (req, res) => {
     const token = req.headers.authorization?.replace('Bearer ', '')
@@ -124,18 +124,18 @@ export function withAuth(handler: NextApiHandler): NextApiHandler {
   }
 }
 
-// Ã¤Â½Â¿Ã§â€Â¨Ã¦â€“Â¹Ã¥Â¼Â
+// 使用方式
 export default withAuth(async (req, res) => {
-  // Handler Ã¥ÂÂ¯Ã¥Â­ËœÃ¥Ââ€“ req.user
+  // Handler 可存取 req.user
 })
 ```
 
-## Ã¨Â³â€¡Ã¦â€“â„¢Ã¥ÂºÂ«Ã¦Â¨Â¡Ã¥Â¼Â
+## 資料庫模式
 
-### Ã¦Å¸Â¥Ã¨Â©Â¢Ã¥â€žÂªÃ¥Å’â€“
+### 查詢優化
 
 ```typescript
-// PASS: Ã¨â€°Â¯Ã¥Â¥Â½Ã¯Â¼Å¡Ã¥ÂÂªÃ©ÂÂ¸Ã¦â€œâ€¡Ã©Å“â‚¬Ã¨Â¦ÂÃ§Å¡â€žÃ¦Â¬â€žÃ¤Â½Â
+// PASS: 良好：只選擇需要的欄位
 const { data } = await supabase
   .from('markets')
   .select('id, name, status, volume')
@@ -143,25 +143,25 @@ const { data } = await supabase
   .order('volume', { ascending: false })
   .limit(10)
 
-// FAIL: Ã¤Â¸ÂÃ¨â€°Â¯Ã¯Â¼Å¡Ã©ÂÂ¸Ã¦â€œâ€¡Ã¦â€°â‚¬Ã¦Å“â€°Ã¦Â¬â€žÃ¤Â½Â
+// FAIL: 不良：選擇所有欄位
 const { data } = await supabase
   .from('markets')
   .select('*')
 ```
 
-### N+1 Ã¦Å¸Â¥Ã¨Â©Â¢Ã¥â€¢ÂÃ©Â¡Å’Ã©Â ÂÃ©ËœÂ²
+### N+1 查詢問題預防
 
 ```typescript
-// FAIL: Ã¤Â¸ÂÃ¨â€°Â¯Ã¯Â¼Å¡N+1 Ã¦Å¸Â¥Ã¨Â©Â¢Ã¥â€¢ÂÃ©Â¡Å’
+// FAIL: 不良：N+1 查詢問題
 const markets = await getMarkets()
 for (const market of markets) {
-  market.creator = await getUser(market.creator_id)  // N Ã¦Â¬Â¡Ã¦Å¸Â¥Ã¨Â©Â¢
+  market.creator = await getUser(market.creator_id)  // N 次查詢
 }
 
-// PASS: Ã¨â€°Â¯Ã¥Â¥Â½Ã¯Â¼Å¡Ã¦â€°Â¹Ã¦Â¬Â¡Ã¥Ââ€“Ã¥Â¾â€”
+// PASS: 良好：批次取得
 const markets = await getMarkets()
 const creatorIds = markets.map(m => m.creator_id)
-const creators = await getUsers(creatorIds)  // 1 Ã¦Â¬Â¡Ã¦Å¸Â¥Ã¨Â©Â¢
+const creators = await getUsers(creatorIds)  // 1 次查詢
 const creatorMap = new Map(creators.map(c => [c.id, c]))
 
 markets.forEach(market => {
@@ -169,14 +169,14 @@ markets.forEach(market => {
 })
 ```
 
-### Transaction Ã¦Â¨Â¡Ã¥Â¼Â
+### Transaction 模式
 
 ```typescript
 async function createMarketWithPosition(
   marketData: CreateMarketDto,
   positionData: CreatePositionDto
 ) {
-  // Ã¤Â½Â¿Ã§â€Â¨ Supabase transaction
+  // 使用 Supabase transaction
   const { data, error } = await supabase.rpc('create_market_with_position', {
     market_data: marketData,
     position_data: positionData
@@ -186,7 +186,7 @@ async function createMarketWithPosition(
   return data
 }
 
-// Supabase Ã¤Â¸Â­Ã§Å¡â€ž SQL Ã¥â€¡Â½Ã¥Â¼Â
+// Supabase 中的 SQL 函式
 CREATE OR REPLACE FUNCTION create_market_with_position(
   market_data jsonb,
   position_data jsonb
@@ -195,21 +195,21 @@ RETURNS jsonb
 LANGUAGE plpgsql
 AS $$
 BEGIN
-  -- Ã¨â€¡ÂªÃ¥â€¹â€¢Ã©â€“â€¹Ã¥Â§â€¹ transaction
+  -- 自動開始 transaction
   INSERT INTO markets VALUES (market_data);
   INSERT INTO positions VALUES (position_data);
   RETURN jsonb_build_object('success', true);
 EXCEPTION
   WHEN OTHERS THEN
-    -- Ã¨â€¡ÂªÃ¥â€¹â€¢ rollback
+    -- 自動 rollback
     RETURN jsonb_build_object('success', false, 'error', SQLERRM);
 END;
 $$;
 ```
 
-## Ã¥Â¿Â«Ã¥Ââ€“Ã§Â­â€“Ã§â€¢Â¥
+## 快取策略
 
-### Redis Ã¥Â¿Â«Ã¥Ââ€“Ã¥Â±Â¤
+### Redis 快取層
 
 ```typescript
 class CachedMarketRepository implements MarketRepository {
@@ -219,18 +219,18 @@ class CachedMarketRepository implements MarketRepository {
   ) {}
 
   async findById(id: string): Promise<Market | null> {
-    // Ã¥â€¦Ë†Ã¦ÂªÂ¢Ã¦Å¸Â¥Ã¥Â¿Â«Ã¥Ââ€“
+    // 先檢查快取
     const cached = await this.redis.get(`market:${id}`)
 
     if (cached) {
       return JSON.parse(cached)
     }
 
-    // Ã¥Â¿Â«Ã¥Ââ€“Ã¦Å“ÂªÃ¥â€˜Â½Ã¤Â¸Â­ - Ã¥Â¾Å¾Ã¨Â³â€¡Ã¦â€“â„¢Ã¥ÂºÂ«Ã¥Ââ€“Ã¥Â¾â€”
+    // 快取未命中 - 從資料庫取得
     const market = await this.baseRepo.findById(id)
 
     if (market) {
-      // Ã¥Â¿Â«Ã¥Ââ€“ 5 Ã¥Ë†â€ Ã©ÂËœ
+      // 快取 5 分鐘
       await this.redis.setex(`market:${id}`, 300, JSON.stringify(market))
     }
 
@@ -243,31 +243,31 @@ class CachedMarketRepository implements MarketRepository {
 }
 ```
 
-### Cache-Aside Ã¦Â¨Â¡Ã¥Â¼Â
+### Cache-Aside 模式
 
 ```typescript
 async function getMarketWithCache(id: string): Promise<Market> {
   const cacheKey = `market:${id}`
 
-  // Ã¥Ëœâ€”Ã¨Â©Â¦Ã¥Â¿Â«Ã¥Ââ€“
+  // 嘗試快取
   const cached = await redis.get(cacheKey)
   if (cached) return JSON.parse(cached)
 
-  // Ã¥Â¿Â«Ã¥Ââ€“Ã¦Å“ÂªÃ¥â€˜Â½Ã¤Â¸Â­ - Ã¥Â¾Å¾Ã¨Â³â€¡Ã¦â€“â„¢Ã¥ÂºÂ«Ã¥Ââ€“Ã¥Â¾â€”
+  // 快取未命中 - 從資料庫取得
   const market = await db.markets.findUnique({ where: { id } })
 
   if (!market) throw new Error('Market not found')
 
-  // Ã¦â€ºÂ´Ã¦â€“Â°Ã¥Â¿Â«Ã¥Ââ€“
+  // 更新快取
   await redis.setex(cacheKey, 300, JSON.stringify(market))
 
   return market
 }
 ```
 
-## Ã©Å’Â¯Ã¨ÂªÂ¤Ã¨â„¢â€¢Ã§Ââ€ Ã¦Â¨Â¡Ã¥Â¼Â
+## 錯誤處理模式
 
-### Ã©â€ºâ€ Ã¤Â¸Â­Ã¥Â¼ÂÃ©Å’Â¯Ã¨ÂªÂ¤Ã¨â„¢â€¢Ã§Ââ€ Ã¥â„¢Â¨
+### 集中式錯誤處理器
 
 ```typescript
 class ApiError extends Error {
@@ -297,7 +297,7 @@ export function errorHandler(error: unknown, req: Request): Response {
     }, { status: 400 })
   }
 
-  // Ã¨Â¨ËœÃ©Å’â€žÃ©ÂÅ¾Ã©Â ÂÃ¦Å“Å¸Ã©Å’Â¯Ã¨ÂªÂ¤
+  // 記錄非預期錯誤
   console.error('Unexpected error:', error)
 
   return NextResponse.json({
@@ -306,7 +306,7 @@ export function errorHandler(error: unknown, req: Request): Response {
   }, { status: 500 })
 }
 
-// Ã¤Â½Â¿Ã§â€Â¨Ã¦â€“Â¹Ã¥Â¼Â
+// 使用方式
 export async function GET(request: Request) {
   try {
     const data = await fetchData()
@@ -317,7 +317,7 @@ export async function GET(request: Request) {
 }
 ```
 
-### Ã¦Å’â€¡Ã¦â€¢Â¸Ã©â‚¬â‚¬Ã©ÂÂ¿Ã©â€¡ÂÃ¨Â©Â¦
+### 指數退避重試
 
 ```typescript
 async function fetchWithRetry<T>(
@@ -333,7 +333,7 @@ async function fetchWithRetry<T>(
       lastError = error as Error
 
       if (i < maxRetries - 1) {
-        // Ã¦Å’â€¡Ã¦â€¢Â¸Ã©â‚¬â‚¬Ã©ÂÂ¿Ã¯Â¼Å¡1s, 2s, 4s
+        // 指數退避：1s, 2s, 4s
         const delay = Math.pow(2, i) * 1000
         await new Promise(resolve => setTimeout(resolve, delay))
       }
@@ -343,13 +343,13 @@ async function fetchWithRetry<T>(
   throw lastError!
 }
 
-// Ã¤Â½Â¿Ã§â€Â¨Ã¦â€“Â¹Ã¥Â¼Â
+// 使用方式
 const data = await fetchWithRetry(() => fetchFromAPI())
 ```
 
-## Ã¨ÂªÂÃ¨Â­â€°Ã¨Ë†â€¡Ã¦Å½Ë†Ã¦Â¬Å 
+## 認證與授權
 
-### JWT Token Ã©Â©â€”Ã¨Â­â€°
+### JWT Token 驗證
 
 ```typescript
 import jwt from 'jsonwebtoken'
@@ -379,7 +379,7 @@ export async function requireAuth(request: Request) {
   return verifyToken(token)
 }
 
-// Ã¥Å“Â¨ API Ã¨Â·Â¯Ã§â€Â±Ã¤Â¸Â­Ã¤Â½Â¿Ã§â€Â¨
+// 在 API 路由中使用
 export async function GET(request: Request) {
   const user = await requireAuth(request)
 
@@ -389,7 +389,7 @@ export async function GET(request: Request) {
 }
 ```
 
-### Ã¥Å¸ÂºÃ¦â€“Â¼Ã¨Â§â€™Ã¨â€°Â²Ã§Å¡â€žÃ¥Â­ËœÃ¥Ââ€“Ã¦Å½Â§Ã¥Ë†Â¶
+### 基於角色的存取控制
 
 ```typescript
 type Permission = 'read' | 'write' | 'delete' | 'admin'
@@ -423,18 +423,18 @@ export function requirePermission(permission: Permission) {
   }
 }
 
-// Ã¤Â½Â¿Ã§â€Â¨Ã¦â€“Â¹Ã¥Â¼Â - HOF Ã¥Å’â€¦Ã¨Â£Â handler
+// 使用方式 - HOF 包裝 handler
 export const DELETE = requirePermission('delete')(
   async (request: Request, user: User) => {
-    // Handler Ã¦Å½Â¥Ã¦â€Â¶Ã¥Â·Â²Ã©Â©â€”Ã¨Â­â€°Ã¤Â¸â€Ã¥â€¦Â·Ã¦Å“â€°Ã¥Â·Â²Ã©Â©â€”Ã¨Â­â€°Ã¦Â¬Å Ã©â„¢ÂÃ§Å¡â€žÃ¤Â½Â¿Ã§â€Â¨Ã¨â‚¬â€¦
+    // Handler 接收已驗證且具有已驗證權限的使用者
     return new Response('Deleted', { status: 200 })
   }
 )
 ```
 
-## Ã©â‚¬Å¸Ã§Å½â€¡Ã©â„¢ÂÃ¥Ë†Â¶
+## 速率限制
 
-### Ã§Â°Â¡Ã¥â€“Â®Ã§Å¡â€žÃ¨Â¨ËœÃ¦â€ Â¶Ã©Â«â€Ã©â‚¬Å¸Ã§Å½â€¡Ã©â„¢ÂÃ¥Ë†Â¶Ã¥â„¢Â¨
+### 簡單的記憶體速率限制器
 
 ```typescript
 class RateLimiter {
@@ -448,14 +448,14 @@ class RateLimiter {
     const now = Date.now()
     const requests = this.requests.get(identifier) || []
 
-    // Ã§Â§Â»Ã©â„¢Â¤Ã¨Â¦â€“Ã§Âªâ€”Ã¥Â¤â€“Ã§Å¡â€žÃ¨Ë†Å Ã¨Â«â€¹Ã¦Â±â€š
+    // 移除視窗外的舊請求
     const recentRequests = requests.filter(time => now - time < windowMs)
 
     if (recentRequests.length >= maxRequests) {
-      return false  // Ã¨Â¶â€¦Ã©ÂÅ½Ã©â‚¬Å¸Ã§Å½â€¡Ã©â„¢ÂÃ¥Ë†Â¶
+      return false  // 超過速率限制
     }
 
-    // Ã¦â€“Â°Ã¥Â¢Å¾Ã§â€¢Â¶Ã¥â€°ÂÃ¨Â«â€¹Ã¦Â±â€š
+    // 新增當前請求
     recentRequests.push(now)
     this.requests.set(identifier, recentRequests)
 
@@ -468,7 +468,7 @@ const limiter = new RateLimiter()
 export async function GET(request: Request) {
   const ip = request.headers.get('x-forwarded-for') || 'unknown'
 
-  const allowed = await limiter.checkLimit(ip, 100, 60000)  // 100 Ã¨Â«â€¹Ã¦Â±â€š/Ã¥Ë†â€ Ã©ÂËœ
+  const allowed = await limiter.checkLimit(ip, 100, 60000)  // 100 請求/分鐘
 
   if (!allowed) {
     return NextResponse.json({
@@ -476,13 +476,13 @@ export async function GET(request: Request) {
     }, { status: 429 })
   }
 
-  // Ã§Â¹Â¼Ã§ÂºÅ’Ã¨â„¢â€¢Ã§Ââ€ Ã¨Â«â€¹Ã¦Â±â€š
+  // 繼續處理請求
 }
 ```
 
-## Ã¨Æ’Å’Ã¦â„¢Â¯Ã¤Â»Â»Ã¥â€¹â„¢Ã¨Ë†â€¡Ã¤Â½â€¡Ã¥Ë†â€”
+## 背景任務與佇列
 
-### Ã§Â°Â¡Ã¥â€“Â®Ã¤Â½â€¡Ã¥Ë†â€”Ã¦Â¨Â¡Ã¥Â¼Â
+### 簡單佇列模式
 
 ```typescript
 class JobQueue<T> {
@@ -514,11 +514,11 @@ class JobQueue<T> {
   }
 
   private async execute(job: T): Promise<void> {
-    // Ã¤Â»Â»Ã¥â€¹â„¢Ã¥Å¸Â·Ã¨Â¡Å’Ã©â€šÂÃ¨Â¼Â¯
+    // 任務執行邏輯
   }
 }
 
-// Ã§â€Â¨Ã¦â€“Â¼Ã§Â´Â¢Ã¥Â¼â€¢Ã¥Â¸â€šÃ¥Â Â´Ã§Å¡â€žÃ¤Â½Â¿Ã§â€Â¨Ã§Â¯â€žÃ¤Â¾â€¹
+// 用於索引市場的使用範例
 interface IndexJob {
   marketId: string
 }
@@ -528,16 +528,16 @@ const indexQueue = new JobQueue<IndexJob>()
 export async function POST(request: Request) {
   const { marketId } = await request.json()
 
-  // Ã¥Å Â Ã¥â€¦Â¥Ã¤Â½â€¡Ã¥Ë†â€”Ã¨â‚¬Å’Ã©ÂÅ¾Ã©ËœÂ»Ã¥Â¡Å¾
+  // 加入佇列而非阻塞
   await indexQueue.add({ marketId })
 
   return NextResponse.json({ success: true, message: 'Job queued' })
 }
 ```
 
-## Ã¦â€”Â¥Ã¨ÂªÅ’Ã¨Ë†â€¡Ã§â€ºÂ£Ã¦Å½Â§
+## 日誌與監控
 
-### Ã§ÂµÂÃ¦Â§â€¹Ã¥Å’â€“Ã¦â€”Â¥Ã¨ÂªÅ’
+### 結構化日誌
 
 ```typescript
 interface LogContext {
@@ -579,7 +579,7 @@ class Logger {
 
 const logger = new Logger()
 
-// Ã¤Â½Â¿Ã§â€Â¨Ã¦â€“Â¹Ã¥Â¼Â
+// 使用方式
 export async function GET(request: Request) {
   const requestId = crypto.randomUUID()
 
@@ -599,4 +599,4 @@ export async function GET(request: Request) {
 }
 ```
 
-**Ã¨Â¨ËœÃ¤Â½Â**Ã¯Â¼Å¡Ã¥Â¾Å’Ã§Â«Â¯Ã¦Â¨Â¡Ã¥Â¼ÂÃ¨Æ’Â½Ã¥Â¯Â¦Ã§ÂÂ¾Ã¥ÂÂ¯Ã¦â€œÂ´Ã¥Â±â€¢Ã£â‚¬ÂÃ¥ÂÂ¯Ã§Â¶Â­Ã¨Â­Â·Ã§Å¡â€žÃ¤Â¼ÂºÃ¦Å“ÂÃ¥â„¢Â¨Ã§Â«Â¯Ã¦â€¡â€°Ã§â€Â¨Ã§Â¨â€¹Ã¥Â¼ÂÃ£â‚¬â€šÃ©ÂÂ¸Ã¦â€œâ€¡Ã§Â¬Â¦Ã¥ÂË†Ã¤Â½Â Ã¨Â¤â€¡Ã©â€ºÅ“Ã¥ÂºÂ¦Ã§Â­â€°Ã§Â´Å¡Ã§Å¡â€žÃ¦Â¨Â¡Ã¥Â¼ÂÃ£â‚¬â€š
+**記住**：後端模式能實現可擴展、可維護的伺服器端應用程式。選擇符合你複雜度等級的模式。

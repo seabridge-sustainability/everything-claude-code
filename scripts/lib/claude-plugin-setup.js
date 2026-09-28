@@ -162,6 +162,16 @@ function resolveWindowsCmdShim(command, env) {
     return fs.existsSync(candidate) ? candidate : null;
   }
 
+  // Prefer an explicitly earlier PATH entry. Node's Windows CreateProcess
+  // lookup can skip .cmd shims and fall through to a later .exe, which is both
+  // surprising and expensive when tests or managed installations provide the
+  // intended shim first.
+  for (const directory of String(env?.PATH || env?.Path || '').split(path.delimiter)) {
+    if (!directory) continue;
+    const candidate = path.join(directory, `${command}.cmd`);
+    if (fs.existsSync(candidate)) return candidate;
+  }
+
   const lookup = spawnSync('where.exe', [`${command}.cmd`], {
     env,
     encoding: 'utf8',
@@ -222,26 +232,27 @@ function runClaude(args, options = {}, dependencies = {}) {
     timeout: timeoutMs,
     windowsHide: true,
   };
-  let result = spawn(command, args, spawnOptions);
-
-  if (process.platform === 'win32' && result.error) {
-    const shim = resolveWindowsCmdShim(command, spawnOptions.env);
-    if (shim) {
-      let commandLine;
-      try {
-        commandLine = buildWindowsCommandLine(shim, args);
-      } catch (error) {
-        fail(
-          'CLAUDE_COMMAND_FAILED',
-          `Could not run Claude Code: ${error.message}`,
-          { phase: options.phase || 'provider' }
-        );
-      }
-      result = spawn(commandLine, {
-        ...spawnOptions,
-        shell: true,
-      });
+  const shim = process.platform === 'win32'
+    ? resolveWindowsCmdShim(command, spawnOptions.env)
+    : null;
+  let result;
+  if (shim) {
+    let commandLine;
+    try {
+      commandLine = buildWindowsCommandLine(shim, args);
+    } catch (error) {
+      fail(
+        'CLAUDE_COMMAND_FAILED',
+        `Could not run Claude Code: ${error.message}`,
+        { phase: options.phase || 'provider' }
+      );
     }
+    result = spawn(commandLine, {
+      ...spawnOptions,
+      shell: true,
+    });
+  } else {
+    result = spawn(command, args, spawnOptions);
   }
 
   const timedOut = (
@@ -577,11 +588,18 @@ function ensurePluginAtScope(options) {
     );
     return 'updated';
   }
+  const installArgs = [
+    'plugin', 'install', CURRENT_PLUGIN_ID,
+    '--scope', options.scope,
+  ];
+  if (options.hookConfiguration) {
+    installArgs.push(
+      '--config', `hooks_enabled=${options.hookConfiguration.hooks_enabled}`,
+      '--config', `hook_profile=${options.hookConfiguration.hook_profile}`
+    );
+  }
   run(
-    [
-      'plugin', 'install', CURRENT_PLUGIN_ID,
-      '--scope', options.scope,
-    ],
+    installArgs,
     { cwd: options.projectRoot, phase: 'plugin-install' }
   );
   return 'installed';

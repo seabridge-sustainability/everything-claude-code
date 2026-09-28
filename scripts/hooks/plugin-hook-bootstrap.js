@@ -5,6 +5,7 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 const { ensureAgentDataHomeEnv } = require('../lib/agent-data-home');
 const { normalizePluginRootForPlatform } = require('../lib/resolve-ecc-root');
+const { toShellPath } = require('../lib/shell-path');
 const { readStdinRaw: readBoundedStdin, resolveMaxStdin } = require('./hook-input');
 
 const SHELL_PROBE_TIMEOUT_MS = 2000;
@@ -142,6 +143,12 @@ function findBashBinary() {
   if (process.env.BASH && process.env.BASH.trim() && !isPowerShellBin(process.env.BASH.trim())) {
     candidates.push(process.env.BASH.trim());
   }
+  if (process.platform === 'win32') {
+    candidates.push(
+      'C:\\Program Files\\Git\\bin\\bash.exe',
+      'C:\\Program Files\\Git\\usr\\bin\\bash.exe'
+    );
+  }
   candidates.push('bash.exe', 'bash');
 
   for (const candidate of candidates) {
@@ -217,7 +224,7 @@ function spawnShell(rootDir, relPath, raw, args, options = {}) {
         stderr: '[Hook] .sh script requested but no bash binary found on Windows; skipping\n',
       };
     }
-    const bashResult = spawnSync(bash, [scriptPath, ...args], {
+    const bashResult = spawnSync(bash, [toShellPath(scriptPath, bash), ...args], {
       input: raw,
       env: hookEnv,
       cwd: process.cwd(),
@@ -231,7 +238,7 @@ function spawnShell(rootDir, relPath, raw, args, options = {}) {
     // -ExecutionPolicy Bypass: default Windows policy (Restricted) blocks -File
     // execution of .ps1 scripts; Bypass scopes only to this child process.
     ? ['-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-File', scriptPath, ...args]
-    : [scriptPath, ...args];
+    : [toShellPath(scriptPath, shell), ...args];
 
   const result = spawnSync(shell, shellArgs, {
     input: raw,

@@ -1411,7 +1411,7 @@ async function main() {
           "large rule-file edit could flood Pi's system prompt"
       )
 
-      for (const marker of ["Immutability", "Minimum Test Coverage", "Secret Management"]) {
+      for (const marker of ["Immutability", "Risk-Scaled Testing", "Secret Management"]) {
         assert.ok(
           result.includes(marker),
           `expected the concatenated rules text to contain "${marker}" (a marker from one ` +

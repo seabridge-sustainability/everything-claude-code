@@ -4,6 +4,7 @@
 const fs = require('fs');
 const path = require('path');
 const { spawnSync } = require('child_process');
+const { toShellPath: convertToShellPath } = require('../lib/shell-path');
 
 const OBSERVE_RELATIVE_PATH = path.join('skills', 'continuous-learning-v2', 'hooks', 'observe.sh');
 const DEFAULT_TIMEOUT_MS = 9000;
@@ -33,15 +34,8 @@ function resolveTarget(rootDir, relPath) {
   return resolvedTarget;
 }
 
-function toShellPath(filePath) {
-  const normalized = String(filePath || '');
-  if (process.platform !== 'win32') {
-    return normalized;
-  }
-
-  return normalized
-    .replace(/^([A-Za-z]):[\\/]/, (_, driveLetter) => `/${driveLetter.toLowerCase()}/`)
-    .replace(/\\/g, '/');
+function toShellPath(filePath, shell) {
+  return convertToShellPath(filePath, shell);
 }
 
 function findShellBinary() {
@@ -51,7 +45,13 @@ function findShellBinary() {
   }
 
   if (process.platform === 'win32') {
-    candidates.push('bash.exe', 'bash', 'sh');
+    candidates.push(
+      'C:\\Program Files\\Git\\bin\\bash.exe',
+      'C:\\Program Files\\Git\\usr\\bin\\bash.exe',
+      'bash.exe',
+      'bash',
+      'sh'
+    );
   } else {
     candidates.push('bash', 'sh');
   }
@@ -117,7 +117,7 @@ function run(raw, options = {}) {
     };
   }
 
-  const shell = findShellBinary();
+  const shell = options.shell === false ? null : (options.shell || findShellBinary());
   if (!shell) {
     return {
       stderr: '[Hook] shell runtime unavailable; skipping continuous-learning observation',
@@ -125,7 +125,7 @@ function run(raw, options = {}) {
     };
   }
 
-  const result = spawnSync(shell, [toShellPath(observePath), phase], {
+  const result = spawnSync(shell, [toShellPath(observePath, shell), phase], {
     input,
     encoding: 'utf8',
     env: {

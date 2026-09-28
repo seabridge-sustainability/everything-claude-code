@@ -1,10 +1,10 @@
 ---
 name: backend-patterns
-description: Ã¥ÂÅ½Ã§Â«Â¯Ã¦Å¾Â¶Ã¦Å¾â€žÃ¦Â¨Â¡Ã¥Â¼ÂÃ£â‚¬ÂAPIÃ¨Â®Â¾Ã¨Â®Â¡Ã£â‚¬ÂÃ¦â€¢Â°Ã¦ÂÂ®Ã¥Âºâ€œÃ¤Â¼ËœÃ¥Å’â€“Ã¤Â»Â¥Ã¥ÂÅ Ã©â‚¬â€šÃ§â€Â¨Ã¤ÂºÅ½Node.jsÃ£â‚¬ÂExpressÃ¥â€™Å’Next.js APIÃ¨Â·Â¯Ã§â€Â±Ã§Å¡â€žÃ¦Å“ÂÃ¥Å Â¡Ã¥â„¢Â¨Ã§Â«Â¯Ã¦Å“â‚¬Ã¤Â½Â³Ã¥Â®Å¾Ã¨Â·ÂµÃ£â‚¬â€š
+description: 后端架构模式、API设计、数据库优化以及适用于Node.js、Express和Next.js API路由的服务器端最佳实践。
 origin: ECC
 ---
 
-# Ã¥ÂÅ½Ã§Â«Â¯Ã¥Â¼â‚¬Ã¥Ââ€˜Ã¦Â¨Â¡Ã¥Â¼Â
+# 后端开发模式
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -21,21 +21,21 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-Ã§â€Â¨Ã¤ÂºÅ½Ã¥ÂÂ¯Ã¦â€°Â©Ã¥Â±â€¢Ã¦Å“ÂÃ¥Å Â¡Ã¥â„¢Â¨Ã§Â«Â¯Ã¥Âºâ€Ã§â€Â¨Ã§Â¨â€¹Ã¥ÂºÂÃ§Å¡â€žÃ¥ÂÅ½Ã§Â«Â¯Ã¦Å¾Â¶Ã¦Å¾â€žÃ¦Â¨Â¡Ã¥Â¼ÂÃ¥â€™Å’Ã¦Å“â‚¬Ã¤Â½Â³Ã¥Â®Å¾Ã¨Â·ÂµÃ£â‚¬â€š
+用于可扩展服务器端应用程序的后端架构模式和最佳实践。
 
-## Ã¤Â½â€¢Ã¦â€”Â¶Ã¦Â¿â‚¬Ã¦Â´Â»
+## 何时激活
 
-* Ã¨Â®Â¾Ã¨Â®Â¡ REST Ã¦Ë†â€“ GraphQL API Ã§Â«Â¯Ã§â€šÂ¹Ã¦â€”Â¶
-* Ã¥Â®Å¾Ã§Å½Â°Ã¤Â»â€œÃ¥â€šÂ¨Ã¥Â±â€šÃ£â‚¬ÂÃ¦Å“ÂÃ¥Å Â¡Ã¥Â±â€šÃ¦Ë†â€“Ã¦Å½Â§Ã¥Ë†Â¶Ã¥â„¢Â¨Ã¥Â±â€šÃ¦â€”Â¶
-* Ã¤Â¼ËœÃ¥Å’â€“Ã¦â€¢Â°Ã¦ÂÂ®Ã¥Âºâ€œÃ¦Å¸Â¥Ã¨Â¯Â¢Ã¯Â¼Ë†N+1Ã©â€”Â®Ã©Â¢ËœÃ£â‚¬ÂÃ§Â´Â¢Ã¥Â¼â€¢Ã£â‚¬ÂÃ¨Â¿Å¾Ã¦Å½Â¥Ã¦Â±Â Ã¯Â¼â€°Ã¦â€”Â¶
-* Ã¦Â·Â»Ã¥Å Â Ã§Â¼â€œÃ¥Â­ËœÃ¯Â¼Ë†RedisÃ£â‚¬ÂÃ¥â€ â€¦Ã¥Â­ËœÃ§Â¼â€œÃ¥Â­ËœÃ£â‚¬ÂHTTP Ã§Â¼â€œÃ¥Â­ËœÃ¥Â¤Â´Ã¯Â¼â€°Ã¦â€”Â¶
-* Ã¨Â®Â¾Ã§Â½Â®Ã¥ÂÅ½Ã¥ÂÂ°Ã¤Â½Å“Ã¤Â¸Å¡Ã¦Ë†â€“Ã¥Â¼â€šÃ¦Â­Â¥Ã¥Â¤â€žÃ§Ââ€ Ã¦â€”Â¶
-* Ã¤Â¸Âº API Ã¦Å¾â€žÃ¥Â»ÂºÃ©â€â„¢Ã¨Â¯Â¯Ã¥Â¤â€žÃ§Ââ€ Ã¥â€™Å’Ã©ÂªÅ’Ã¨Â¯ÂÃ§Â»â€œÃ¦Å¾â€žÃ¦â€”Â¶
-* Ã¦Å¾â€žÃ¥Â»ÂºÃ¤Â¸Â­Ã©â€”Â´Ã¤Â»Â¶Ã¯Â¼Ë†Ã¨Â®Â¤Ã¨Â¯ÂÃ£â‚¬ÂÃ¦â€”Â¥Ã¥Â¿â€”Ã¨Â®Â°Ã¥Â½â€¢Ã£â‚¬ÂÃ©â‚¬Å¸Ã§Å½â€¡Ã©â„¢ÂÃ¥Ë†Â¶Ã¯Â¼â€°Ã¦â€”Â¶
+* 设计 REST 或 GraphQL API 端点时
+* 实现仓储层、服务层或控制器层时
+* 优化数据库查询（N+1问题、索引、连接池）时
+* 添加缓存（Redis、内存缓存、HTTP 缓存头）时
+* 设置后台作业或异步处理时
+* 为 API 构建错误处理和验证结构时
+* 构建中间件（认证、日志记录、速率限制）时
 
-## API Ã¨Â®Â¾Ã¨Â®Â¡Ã¦Â¨Â¡Ã¥Â¼Â
+## API 设计模式
 
-### RESTful API Ã§Â»â€œÃ¦Å¾â€ž
+### RESTful API 结构
 
 ```typescript
 // PASS: Resource-based URLs
@@ -50,7 +50,7 @@ DELETE /api/markets/:id             # Delete resource
 GET /api/markets?status=active&sort=volume&limit=20&offset=0
 ```
 
-### Ã¤Â»â€œÃ¥â€šÂ¨Ã¦Â¨Â¡Ã¥Â¼Â
+### 仓储模式
 
 ```typescript
 // Abstract data access logic
@@ -84,7 +84,7 @@ class SupabaseMarketRepository implements MarketRepository {
 }
 ```
 
-### Ã¦Å“ÂÃ¥Å Â¡Ã¥Â±â€šÃ¦Â¨Â¡Ã¥Â¼Â
+### 服务层模式
 
 ```typescript
 // Business logic separated from data access
@@ -113,7 +113,7 @@ class MarketService {
 }
 ```
 
-### Ã¤Â¸Â­Ã©â€”Â´Ã¤Â»Â¶Ã¦Â¨Â¡Ã¥Â¼Â
+### 中间件模式
 
 ```typescript
 // Request/response processing pipeline
@@ -141,9 +141,9 @@ export default withAuth(async (req, res) => {
 })
 ```
 
-## Ã¦â€¢Â°Ã¦ÂÂ®Ã¥Âºâ€œÃ¦Â¨Â¡Ã¥Â¼Â
+## 数据库模式
 
-### Ã¦Å¸Â¥Ã¨Â¯Â¢Ã¤Â¼ËœÃ¥Å’â€“
+### 查询优化
 
 ```typescript
 // PASS: GOOD: Select only needed columns
@@ -160,7 +160,7 @@ const { data } = await supabase
   .select('*')
 ```
 
-### N+1 Ã¦Å¸Â¥Ã¨Â¯Â¢Ã©Â¢â€žÃ©ËœÂ²
+### N+1 查询预防
 
 ```typescript
 // FAIL: BAD: N+1 query problem
@@ -180,7 +180,7 @@ markets.forEach(market => {
 })
 ```
 
-### Ã¤Âºâ€¹Ã¥Å Â¡Ã¦Â¨Â¡Ã¥Â¼Â
+### 事务模式
 
 ```typescript
 async function createMarketWithPosition(
@@ -218,9 +218,9 @@ END;
 $;
 ```
 
-## Ã§Â¼â€œÃ¥Â­ËœÃ§Â­â€“Ã§â€¢Â¥
+## 缓存策略
 
-### Redis Ã§Â¼â€œÃ¥Â­ËœÃ¥Â±â€š
+### Redis 缓存层
 
 ```typescript
 class CachedMarketRepository implements MarketRepository {
@@ -254,7 +254,7 @@ class CachedMarketRepository implements MarketRepository {
 }
 ```
 
-### Ã¦â€”ÂÃ¨Â·Â¯Ã§Â¼â€œÃ¥Â­ËœÃ¦Â¨Â¡Ã¥Â¼Â
+### 旁路缓存模式
 
 ```typescript
 async function getMarketWithCache(id: string): Promise<Market> {
@@ -276,9 +276,9 @@ async function getMarketWithCache(id: string): Promise<Market> {
 }
 ```
 
-## Ã©â€â„¢Ã¨Â¯Â¯Ã¥Â¤â€žÃ§Ââ€ Ã¦Â¨Â¡Ã¥Â¼Â
+## 错误处理模式
 
-### Ã©â€ºâ€ Ã¤Â¸Â­Ã¥Â¼ÂÃ©â€â„¢Ã¨Â¯Â¯Ã¥Â¤â€žÃ§Ââ€ Ã§Â¨â€¹Ã¥ÂºÂ
+### 集中式错误处理程序
 
 ```typescript
 class ApiError extends Error {
@@ -328,7 +328,7 @@ export async function GET(request: Request) {
 }
 ```
 
-### Ã¦Å’â€¡Ã¦â€¢Â°Ã©â‚¬â‚¬Ã©ÂÂ¿Ã©â€¡ÂÃ¨Â¯â€¢
+### 指数退避重试
 
 ```typescript
 async function fetchWithRetry<T>(
@@ -358,9 +358,9 @@ async function fetchWithRetry<T>(
 const data = await fetchWithRetry(() => fetchFromAPI())
 ```
 
-## Ã¨Â®Â¤Ã¨Â¯ÂÃ¤Â¸Å½Ã¦Å½Ë†Ã¦ÂÆ’
+## 认证与授权
 
-### JWT Ã¤Â»Â¤Ã§â€°Å’Ã©ÂªÅ’Ã¨Â¯Â
+### JWT 令牌验证
 
 ```typescript
 import jwt from 'jsonwebtoken'
@@ -400,7 +400,7 @@ export async function GET(request: Request) {
 }
 ```
 
-### Ã¥Å¸ÂºÃ¤ÂºÅ½Ã¨Â§â€™Ã¨â€°Â²Ã§Å¡â€žÃ¨Â®Â¿Ã©â€”Â®Ã¦Å½Â§Ã¥Ë†Â¶
+### 基于角色的访问控制
 
 ```typescript
 type Permission = 'read' | 'write' | 'delete' | 'admin'
@@ -443,9 +443,9 @@ export const DELETE = requirePermission('delete')(
 )
 ```
 
-## Ã©â‚¬Å¸Ã§Å½â€¡Ã©â„¢ÂÃ¥Ë†Â¶
+## 速率限制
 
-### Ã§Â®â‚¬Ã¥Ââ€¢Ã§Å¡â€žÃ¥â€ â€¦Ã¥Â­ËœÃ©â‚¬Å¸Ã§Å½â€¡Ã©â„¢ÂÃ¥Ë†Â¶Ã¥â„¢Â¨
+### 简单的内存速率限制器
 
 ```typescript
 class RateLimiter {
@@ -491,9 +491,9 @@ export async function GET(request: Request) {
 }
 ```
 
-## Ã¥ÂÅ½Ã¥ÂÂ°Ã¤Â½Å“Ã¤Â¸Å¡Ã¤Â¸Å½Ã©ËœÅ¸Ã¥Ë†â€”
+## 后台作业与队列
 
-### Ã§Â®â‚¬Ã¥Ââ€¢Ã©ËœÅ¸Ã¥Ë†â€”Ã¦Â¨Â¡Ã¥Â¼Â
+### 简单队列模式
 
 ```typescript
 class JobQueue<T> {
@@ -546,9 +546,9 @@ export async function POST(request: Request) {
 }
 ```
 
-## Ã¦â€”Â¥Ã¥Â¿â€”Ã¨Â®Â°Ã¥Â½â€¢Ã¤Â¸Å½Ã§â€ºâ€˜Ã¦Å½Â§
+## 日志记录与监控
 
-### Ã§Â»â€œÃ¦Å¾â€žÃ¥Å’â€“Ã¦â€”Â¥Ã¥Â¿â€”Ã¨Â®Â°Ã¥Â½â€¢
+### 结构化日志记录
 
 ```typescript
 interface LogContext {
@@ -610,4 +610,4 @@ export async function GET(request: Request) {
 }
 ```
 
-**Ã¨Â®Â°Ã¤Â½Â**Ã¯Â¼Å¡Ã¥ÂÅ½Ã§Â«Â¯Ã¦Â¨Â¡Ã¥Â¼ÂÃ¦â€Â¯Ã¦Å’ÂÃ¥ÂÂ¯Ã¦â€°Â©Ã¥Â±â€¢Ã£â‚¬ÂÃ¥ÂÂ¯Ã§Â»Â´Ã¦Å Â¤Ã§Å¡â€žÃ¦Å“ÂÃ¥Å Â¡Ã¥â„¢Â¨Ã§Â«Â¯Ã¥Âºâ€Ã§â€Â¨Ã§Â¨â€¹Ã¥ÂºÂÃ£â‚¬â€šÃ©â‚¬â€°Ã¦â€¹Â©Ã©â‚¬â€šÃ¥ÂË†Ã¤Â½Â Ã¥Â¤ÂÃ¦Ââ€šÃ§Â¨â€¹Ã¥ÂºÂ¦Ã§Å¡â€žÃ¦Â¨Â¡Ã¥Â¼ÂÃ£â‚¬â€š
+**记住**：后端模式支持可扩展、可维护的服务器端应用程序。选择适合你复杂程度的模式。

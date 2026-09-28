@@ -4,7 +4,7 @@ description: "Verification loop for Laravel projects: env checks, linting, stati
 origin: ECC
 ---
 
-# Laravel DoÃ„Å¸rulama DÃƒÂ¶ngÃƒÂ¼sÃƒÂ¼
+# Laravel Doğrulama Döngüsü
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -21,22 +21,22 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-PR'lardan ÃƒÂ¶nce, bÃƒÂ¼yÃƒÂ¼k deÃ„Å¸iÃ…Å¸ikliklerden sonra ve deployment ÃƒÂ¶ncesi ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±rÃ„Â±n.
+PR'lardan önce, büyük değişikliklerden sonra ve deployment öncesi çalıştırın.
 
-## Ne Zaman KullanÃ„Â±lÃ„Â±r
+## Ne Zaman Kullanılır
 
-- Laravel projesi iÃƒÂ§in pull request aÃƒÂ§madan ÃƒÂ¶nce
-- BÃƒÂ¼yÃƒÂ¼k refactoring'ler veya baÃ„Å¸Ã„Â±mlÃ„Â±lÃ„Â±k yÃƒÂ¼kseltmelerinden sonra
-- Staging veya production iÃƒÂ§in deployment ÃƒÂ¶ncesi doÃ„Å¸rulama
-- Tam lint -> test -> gÃƒÂ¼venlik -> deployment hazÃ„Â±rlÃ„Â±k pipeline'Ã„Â± ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±rma
+- Laravel projesi için pull request açmadan önce
+- Büyük refactoring'ler veya bağımlılık yükseltmelerinden sonra
+- Staging veya production için deployment öncesi doğrulama
+- Tam lint -> test -> güvenlik -> deployment hazırlık pipeline'ı çalıştırma
 
-## NasÃ„Â±l Ãƒâ€¡alÃ„Â±Ã…Å¸Ã„Â±r
+## Nasıl Çalışır
 
-- Her katmanÃ„Â±n bir ÃƒÂ¶ncekinin ÃƒÂ¼zerine inÃ…Å¸a edilmesi iÃƒÂ§in fazlarÃ„Â± sÃ„Â±rayla ortam kontrollerinden deployment hazÃ„Â±rlÃ„Â±Ã„Å¸Ã„Â±na kadar ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±rÃ„Â±n.
-- Ortam ve Composer kontrolleri her Ã…Å¸eyi kapsar; baÃ…Å¸arÃ„Â±sÃ„Â±z olurlarsa hemen durun.
-- Tam testleri ve kapsamÃ„Â± ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±rmadan ÃƒÂ¶nce linting/static analiz temiz olmalÃ„Â±dÃ„Â±r.
-- GÃƒÂ¼venlik ve migration incelemeleri testlerden sonra olur, bÃƒÂ¶ylece veri veya yayÃ„Â±n adÃ„Â±mlarÃ„Â±ndan ÃƒÂ¶nce davranÃ„Â±Ã…Å¸Ã„Â± doÃ„Å¸rularsÃ„Â±nÃ„Â±z.
-- Build/deployment hazÃ„Â±rlÃ„Â±Ã„Å¸Ã„Â± ve kuyruk/zamanlayÃ„Â±cÃ„Â± kontrolleri son kapÃ„Â±lardÃ„Â±r; herhangi bir baÃ…Å¸arÃ„Â±sÃ„Â±zlÃ„Â±k yayÃ„Â±nÃ„Â± engeller.
+- Her katmanın bir öncekinin üzerine inşa edilmesi için fazları sırayla ortam kontrollerinden deployment hazırlığına kadar çalıştırın.
+- Ortam ve Composer kontrolleri her şeyi kapsar; başarısız olurlarsa hemen durun.
+- Tam testleri ve kapsamı çalıştırmadan önce linting/static analiz temiz olmalıdır.
+- Güvenlik ve migration incelemeleri testlerden sonra olur, böylece veri veya yayın adımlarından önce davranışı doğrularsınız.
+- Build/deployment hazırlığı ve kuyruk/zamanlayıcı kontrolleri son kapılardır; herhangi bir başarısızlık yayını engeller.
 
 ## Faz 1: Ortam Kontrolleri
 
@@ -46,11 +46,11 @@ composer --version
 php artisan --version
 ```
 
-- `.env`'nin mevcut olduÃ„Å¸unu ve gerekli anahtarlarÃ„Â±n var olduÃ„Å¸unu doÃ„Å¸rulayÃ„Â±n
-- Production ortamlarÃ„Â± iÃƒÂ§in `APP_DEBUG=false` onaylayÃ„Â±n
-- `APP_ENV`'in hedef deployment'la eÃ…Å¸leÃ…Å¸tiÃ„Å¸ini onaylayÃ„Â±n (`production`, `staging`)
+- `.env`'nin mevcut olduğunu ve gerekli anahtarların var olduğunu doğrulayın
+- Production ortamları için `APP_DEBUG=false` onaylayın
+- `APP_ENV`'in hedef deployment'la eşleştiğini onaylayın (`production`, `staging`)
 
-Yerel olarak Laravel Sail kullanÃ„Â±yorsanÃ„Â±z:
+Yerel olarak Laravel Sail kullanıyorsanız:
 
 ```bash
 ./vendor/bin/sail php -v
@@ -71,7 +71,7 @@ vendor/bin/pint --test
 vendor/bin/phpstan analyse
 ```
 
-Projeniz PHPStan yerine Psalm kullanÃ„Â±yorsa:
+Projeniz PHPStan yerine Psalm kullanıyorsa:
 
 ```bash
 vendor/bin/psalm
@@ -89,7 +89,7 @@ Kapsam (CI):
 XDEBUG_MODE=coverage php artisan test --coverage
 ```
 
-CI ÃƒÂ¶rneÃ„Å¸i (format -> static analiz -> testler):
+CI örneği (format -> static analiz -> testler):
 
 ```bash
 vendor/bin/pint --test
@@ -97,7 +97,7 @@ vendor/bin/phpstan analyse
 XDEBUG_MODE=coverage php artisan test --coverage
 ```
 
-## Faz 4: GÃƒÂ¼venlik ve BaÃ„Å¸Ã„Â±mlÃ„Â±lÃ„Â±k Kontrolleri
+## Faz 4: Güvenlik ve Bağımlılık Kontrolleri
 
 ```bash
 composer audit
@@ -110,12 +110,12 @@ php artisan migrate --pretend
 php artisan migrate:status
 ```
 
-- YÃ„Â±kÃ„Â±cÃ„Â± migration'larÃ„Â± dikkatle inceleyin
-- Migration dosya isimlerinin `Y_m_d_His_*` formatÃ„Â±nÃ„Â± takip ettiÃ„Å¸inden emin olun (ÃƒÂ¶rn. `2025_03_14_154210_create_orders_table.php`) ve deÃ„Å¸iÃ…Å¸ikliÃ„Å¸i net bir Ã…Å¸ekilde aÃƒÂ§Ã„Â±klasÃ„Â±n
-- Rollback'lerin mÃƒÂ¼mkÃƒÂ¼n olduÃ„Å¸undan emin olun
-- `down()` metotlarÃ„Â±nÃ„Â± doÃ„Å¸rulayÃ„Â±n ve aÃƒÂ§Ã„Â±k yedeklemeler olmadan geri alÃ„Â±namaz veri kaybÃ„Â±ndan kaÃƒÂ§Ã„Â±nÃ„Â±n
+- Yıkıcı migration'ları dikkatle inceleyin
+- Migration dosya isimlerinin `Y_m_d_His_*` formatını takip ettiğinden emin olun (örn. `2025_03_14_154210_create_orders_table.php`) ve değişikliği net bir şekilde açıklasın
+- Rollback'lerin mümkün olduğundan emin olun
+- `down()` metotlarını doğrulayın ve açık yedeklemeler olmadan geri alınamaz veri kaybından kaçının
 
-## Faz 6: Build ve Deployment HazÃ„Â±rlÃ„Â±Ã„Å¸Ã„Â±
+## Faz 6: Build ve Deployment Hazırlığı
 
 ```bash
 php artisan optimize:clear
@@ -124,43 +124,43 @@ php artisan route:cache
 php artisan view:cache
 ```
 
-- Cache warmup'larÃ„Â±nÃ„Â±n production yapÃ„Â±landÃ„Â±rmasÃ„Â±nda baÃ…Å¸arÃ„Â±lÃ„Â± olduÃ„Å¸undan emin olun
-- Kuyruk worker'larÃ„Â±nÃ„Â±n ve zamanlayÃ„Â±cÃ„Â±nÃ„Â±n yapÃ„Â±landÃ„Â±rÃ„Â±ldÃ„Â±Ã„Å¸Ã„Â±nÃ„Â± doÃ„Å¸rulayÃ„Â±n
-- Hedef ortamda `storage/` ve `bootstrap/cache/`'in yazÃ„Â±labilir olduÃ„Å¸unu onaylayÃ„Â±n
+- Cache warmup'larının production yapılandırmasında başarılı olduğundan emin olun
+- Kuyruk worker'larının ve zamanlayıcının yapılandırıldığını doğrulayın
+- Hedef ortamda `storage/` ve `bootstrap/cache/`'in yazılabilir olduğunu onaylayın
 
-## Faz 7: Kuyruk ve ZamanlayÃ„Â±cÃ„Â± Kontrolleri
+## Faz 7: Kuyruk ve Zamanlayıcı Kontrolleri
 
 ```bash
 php artisan schedule:list
 php artisan queue:failed
 ```
 
-Horizon kullanÃ„Â±lÃ„Â±yorsa:
+Horizon kullanılıyorsa:
 
 ```bash
 php artisan horizon:status
 ```
 
-`queue:monitor` mevcutsa, job'larÃ„Â± iÃ…Å¸lemeden biriktirmeyi kontrol etmek iÃƒÂ§in kullanÃ„Â±n:
+`queue:monitor` mevcutsa, job'ları işlemeden biriktirmeyi kontrol etmek için kullanın:
 
 ```bash
 php artisan queue:monitor default --max=100
 ```
 
-Aktif doÃ„Å¸rulama (sadece staging): ÃƒÂ¶zel bir kuyruÃ„Å¸a no-op job dispatch edin ve iÃ…Å¸lemek iÃƒÂ§in tek bir worker ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±rÃ„Â±n (non-`sync` kuyruk baÃ„Å¸lantÃ„Â±sÃ„Â±nÃ„Â±n yapÃ„Â±landÃ„Â±rÃ„Â±ldÃ„Â±Ã„Å¸Ã„Â±ndan emin olun).
+Aktif doğrulama (sadece staging): özel bir kuyruğa no-op job dispatch edin ve işlemek için tek bir worker çalıştırın (non-`sync` kuyruk bağlantısının yapılandırıldığından emin olun).
 
 ```bash
 php artisan tinker --execute="dispatch((new App\\Jobs\\QueueHealthcheck())->onQueue('healthcheck'))"
 php artisan queue:work --once --queue=healthcheck
 ```
 
-Job'un beklenen yan etkiyi ÃƒÂ¼rettiÃ„Å¸ini doÃ„Å¸rulayÃ„Â±n (log giriÃ…Å¸i, healthcheck tablo satÃ„Â±rÃ„Â± veya metrik).
+Job'un beklenen yan etkiyi ürettiğini doğrulayın (log girişi, healthcheck tablo satırı veya metrik).
 
-Bunu sadece test job'u iÃ…Å¸lemenin gÃƒÂ¼venli olduÃ„Å¸u non-production ortamlarÃ„Â±nda ÃƒÂ§alÃ„Â±Ã…Å¸tÃ„Â±rÃ„Â±n.
+Bunu sadece test job'u işlemenin güvenli olduğu non-production ortamlarında çalıştırın.
 
-## Ãƒâ€“rnekler
+## Örnekler
 
-Minimal akÃ„Â±Ã…Å¸:
+Minimal akış:
 
 ```bash
 php -v
@@ -176,7 +176,7 @@ php artisan config:cache
 php artisan queue:failed
 ```
 
-CI tarzÃ„Â± pipeline:
+CI tarzı pipeline:
 
 ```bash
 composer validate

@@ -1,10 +1,10 @@
 ---
 name: coding-standards
-description: TypeScript, JavaScript, React, Node.js ÃªÂ°Å“Ã«Â°Å“Ã¬Ââ€ž Ã¬Å“â€žÃ­â€¢Å“ Ã«Â²â€Ã¬Å¡Â© Ã¬Â½â€Ã«â€Â© Ã­â€˜Å“Ã¬Â¤â‚¬, Ã«ÂªÂ¨Ã«Â²â€ Ã¬â€šÂ¬Ã«Â¡â‚¬ Ã«Â°Â Ã­Å’Â¨Ã­â€žÂ´.
+description: TypeScript, JavaScript, React, Node.js 개발을 위한 범용 코딩 표준, 모범 사례 및 패턴.
 origin: ECC
 ---
 
-# Ã¬Â½â€Ã«â€Â© Ã­â€˜Å“Ã¬Â¤â‚¬ Ã«Â°Â Ã«ÂªÂ¨Ã«Â²â€ Ã¬â€šÂ¬Ã«Â¡â‚¬
+# 코딩 표준 및 모범 사례
 
 <!-- SEABRIDGE_SAFETY_RULE_START -->
 ## Safety And Authorization Rule
@@ -21,46 +21,46 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
 
-Ã«ÂªÂ¨Ã«â€œÂ  Ã­â€â€žÃ«Â¡Å“Ã¬Â ÂÃ­Å Â¸Ã¬â€”Â Ã¬Â ÂÃ¬Å¡Â© ÃªÂ°â‚¬Ã«Å Â¥Ã­â€¢Å“ Ã«Â²â€Ã¬Å¡Â© Ã¬Â½â€Ã«â€Â© Ã­â€˜Å“Ã¬Â¤â‚¬.
+모든 프로젝트에 적용 가능한 범용 코딩 표준.
 
-## Ã­â„¢Å“Ã¬â€žÂ±Ã­â„¢â€ Ã¬â€¹Å“Ã¬Â Â
+## 활성화 시점
 
-- Ã¬Æ’Ë† Ã­â€â€žÃ«Â¡Å“Ã¬Â ÂÃ­Å Â¸ Ã«ËœÂÃ«Å â€ Ã«ÂªÂ¨Ã«â€œË†Ã¬Ââ€ž Ã¬â€¹Å“Ã¬Å¾â€˜Ã­â€¢Â  Ã«â€¢Å’
-- Ã¬Â½â€Ã«â€œÅ“ Ã­â€™Ë†Ã¬Â§Ë† Ã«Â°Â Ã¬Å“Â Ã¬Â§â‚¬Ã«Â³Â´Ã¬Ë†ËœÃ¬â€žÂ±Ã¬Ââ€ž ÃªÂ²â‚¬Ã­â€ Â Ã­â€¢Â  Ã«â€¢Å’
-- ÃªÂ¸Â°Ã¬Â¡Â´ Ã¬Â½â€Ã«â€œÅ“Ã«Â¥Â¼ Ã¬Â»Â¨Ã«Â²Â¤Ã¬â€¦ËœÃ¬â€”Â Ã«Â§Å¾ÃªÂ²Å’ Ã«Â¦Â¬Ã­Å’Â©Ã­â€žÂ°Ã«Â§ÂÃ­â€¢Â  Ã«â€¢Å’
-- Ã«â€žÂ¤Ã¬ÂÂ´Ã«Â°Â, Ã­ÂÂ¬Ã«Â§Â·Ã­Å’â€¦ Ã«ËœÂÃ«Å â€ ÃªÂµÂ¬Ã¬Â¡Â°Ã¬Â Â Ã¬ÂÂ¼ÃªÂ´â‚¬Ã¬â€žÂ±Ã¬Ââ€ž Ã¬Â ÂÃ¬Å¡Â©Ã­â€¢Â  Ã«â€¢Å’
-- Ã«Â¦Â°Ã­Å’â€¦, Ã­ÂÂ¬Ã«Â§Â·Ã­Å’â€¦ Ã«ËœÂÃ«Å â€ Ã­Æ’â‚¬Ã¬Å¾â€¦ ÃªÂ²â‚¬Ã¬â€šÂ¬ ÃªÂ·Å“Ã¬Â¹â„¢Ã¬Ââ€ž Ã¬â€žÂ¤Ã¬Â â€¢Ã­â€¢Â  Ã«â€¢Å’
-- Ã¬Æ’Ë† ÃªÂ¸Â°Ã¬â€”Â¬Ã¬Å¾ÂÃ¬â€”ÂÃªÂ²Å’ Ã¬Â½â€Ã«â€Â© Ã¬Â»Â¨Ã«Â²Â¤Ã¬â€¦ËœÃ¬Ââ€ž Ã¬â€¢Ë†Ã«â€šÂ´Ã­â€¢Â  Ã«â€¢Å’
+- 새 프로젝트 또는 모듈을 시작할 때
+- 코드 품질 및 유지보수성을 검토할 때
+- 기존 코드를 컨벤션에 맞게 리팩터링할 때
+- 네이밍, 포맷팅 또는 구조적 일관성을 적용할 때
+- 린팅, 포맷팅 또는 타입 검사 규칙을 설정할 때
+- 새 기여자에게 코딩 컨벤션을 안내할 때
 
-## Ã¬Â½â€Ã«â€œÅ“ Ã­â€™Ë†Ã¬Â§Ë† Ã¬â€ºÂÃ¬Â¹â„¢
+## 코드 품질 원칙
 
-### 1. ÃªÂ°â‚¬Ã«Ââ€¦Ã¬â€žÂ± Ã¬Å¡Â°Ã¬â€žÂ 
-- Ã¬Â½â€Ã«â€œÅ“Ã«Å â€ Ã¬Å¾â€˜Ã¬â€žÂ±Ã«Â³Â´Ã«â€¹Â¤ Ã¬ÂÂ½Ã­Å¾Ë†Ã«Å â€ Ã­Å¡Å¸Ã¬Ë†ËœÃªÂ°â‚¬ Ã«Ââ€ Ã«Â§Å½Ã«â€¹Â¤
-- Ã«Âªâ€¦Ã­â„¢â€¢Ã­â€¢Å“ Ã«Â³â‚¬Ã¬Ë†Ëœ Ã«Â°Â Ã­â€¢Â¨Ã¬Ë†Ëœ Ã¬ÂÂ´Ã«Â¦â€ž Ã¬â€šÂ¬Ã¬Å¡Â©
-- Ã¬Â£Â¼Ã¬â€žÂÃ«Â³Â´Ã«â€¹Â¤ Ã¬Å¾ÂÃªÂ¸Â° Ã«Â¬Â¸Ã¬â€žÅ“Ã­â„¢â€ Ã¬Â½â€Ã«â€œÅ“Ã«Â¥Â¼ Ã¬â€žÂ Ã­ËœÂ¸
-- Ã¬ÂÂ¼ÃªÂ´â‚¬Ã«ÂÅ“ Ã­ÂÂ¬Ã«Â§Â·Ã­Å’â€¦ Ã¬Å“Â Ã¬Â§â‚¬
+### 1. 가독성 우선
+- 코드는 작성보다 읽히는 횟수가 더 많다
+- 명확한 변수 및 함수 이름 사용
+- 주석보다 자기 문서화 코드를 선호
+- 일관된 포맷팅 유지
 
 ### 2. KISS (Keep It Simple, Stupid)
-- Ã«Ââ„¢Ã¬Å¾â€˜Ã­â€¢ËœÃ«Å â€ ÃªÂ°â‚¬Ã¬Å¾Â¥ Ã«â€¹Â¨Ã¬Ë†Å“Ã­â€¢Å“ Ã­â€¢Â´ÃªÂ²Â°Ã¬Â±â€¦
-- ÃªÂ³Â¼Ã«Ââ€žÃ­â€¢Å“ Ã¬â€”â€Ã¬Â§â‚¬Ã«â€¹Ë†Ã¬â€“Â´Ã«Â§Â Ã¬Â§â‚¬Ã¬â€“â€˜
-- Ã¬Â¡Â°ÃªÂ¸Â° Ã¬ÂµÅ“Ã¬Â ÂÃ­â„¢â€ ÃªÂ¸Ë†Ã¬Â§â‚¬
-- Ã¬ÂÂ´Ã­â€¢Â´Ã­â€¢ËœÃªÂ¸Â° Ã¬â€°Â¬Ã¬Å¡Â´ Ã¬Â½â€Ã«â€œÅ“ > Ã¬ËœÂÃ«Â¦Â¬Ã­â€¢Å“ Ã¬Â½â€Ã«â€œÅ“
+- 동작하는 가장 단순한 해결책
+- 과도한 엔지니어링 지양
+- 조기 최적화 금지
+- 이해하기 쉬운 코드 > 영리한 코드
 
 ### 3. DRY (Don't Repeat Yourself)
-- ÃªÂ³ÂµÃ­â€ Âµ Ã«Â¡Å“Ã¬Â§ÂÃ¬Ââ€ž Ã­â€¢Â¨Ã¬Ë†ËœÃ«Â¡Å“ Ã¬Â¶â€Ã¬Â¶Å“
-- Ã¬Å¾Â¬Ã¬â€šÂ¬Ã¬Å¡Â© ÃªÂ°â‚¬Ã«Å Â¥Ã­â€¢Å“ Ã¬Â»Â´Ã­ÂÂ¬Ã«â€žÅ’Ã­Å Â¸ Ã¬Æ’ÂÃ¬â€žÂ±
-- Ã«ÂªÂ¨Ã«â€œË† ÃªÂ°â€ž Ã¬Å“Â Ã­â€¹Â¸Ã«Â¦Â¬Ã­â€¹Â° ÃªÂ³ÂµÃ¬Å“Â 
-- Ã«Â³ÂµÃ¬â€šÂ¬-Ã«Â¶â„¢Ã¬â€”Â¬Ã«â€žÂ£ÃªÂ¸Â° Ã­â€â€žÃ«Â¡Å“ÃªÂ·Â¸Ã«Å¾ËœÃ«Â°Â Ã¬Â§â‚¬Ã¬â€“â€˜
+- 공통 로직을 함수로 추출
+- 재사용 가능한 컴포넌트 생성
+- 모듈 간 유틸리티 공유
+- 복사-붙여넣기 프로그래밍 지양
 
 ### 4. YAGNI (You Aren't Gonna Need It)
-- Ã­â€¢â€žÃ¬Å¡â€Ã­â€¢ËœÃªÂ¸Â° Ã¬Â â€žÃ¬â€”Â ÃªÂ¸Â°Ã«Å Â¥Ã¬Ââ€ž Ã«Â§Å’Ã«â€œÂ¤Ã¬Â§â‚¬ Ã¬â€¢Å ÃªÂ¸Â°
-- Ã¬Â¶â€Ã¬Â¸Â¡Ã¬â€”Â Ã¬ÂËœÃ­â€¢Å“ Ã¬ÂÂ¼Ã«Â°ËœÃ­â„¢â€ Ã¬Â§â‚¬Ã¬â€“â€˜
-- Ã­â€¢â€žÃ¬Å¡â€Ã­â€¢Â  Ã«â€¢Å’Ã«Â§Å’ Ã«Â³ÂµÃ¬Å¾Â¡Ã¬â€žÂ± Ã¬Â¶â€ÃªÂ°â‚¬
-- Ã«â€¹Â¨Ã¬Ë†Å“Ã­â€¢ËœÃªÂ²Å’ Ã¬â€¹Å“Ã¬Å¾â€˜Ã­â€¢ËœÃªÂ³Â  Ã­â€¢â€žÃ¬Å¡â€Ã­â€¢Â  Ã«â€¢Å’ Ã«Â¦Â¬Ã­Å’Â©Ã­â€žÂ°Ã«Â§Â
+- 필요하기 전에 기능을 만들지 않기
+- 추측에 의한 일반화 지양
+- 필요할 때만 복잡성 추가
+- 단순하게 시작하고 필요할 때 리팩터링
 
-## TypeScript/JavaScript Ã­â€˜Å“Ã¬Â¤â‚¬
+## TypeScript/JavaScript 표준
 
-### Ã«Â³â‚¬Ã¬Ë†Ëœ Ã«â€žÂ¤Ã¬ÂÂ´Ã«Â°Â
+### 변수 네이밍
 
 ```typescript
 // PASS: GOOD: Descriptive names
@@ -74,7 +74,7 @@ const flag = true
 const x = 1000
 ```
 
-### Ã­â€¢Â¨Ã¬Ë†Ëœ Ã«â€žÂ¤Ã¬ÂÂ´Ã«Â°Â
+### 함수 네이밍
 
 ```typescript
 // PASS: GOOD: Verb-noun pattern
@@ -88,7 +88,7 @@ function similarity(a, b) { }
 function email(e) { }
 ```
 
-### Ã«Â¶Ë†Ã«Â³â‚¬Ã¬â€žÂ± Ã­Å’Â¨Ã­â€žÂ´ (Ã­â€¢â€žÃ¬Ë†Ëœ)
+### 불변성 패턴 (필수)
 
 ```typescript
 // PASS: ALWAYS use spread operator
@@ -104,7 +104,7 @@ user.name = 'New Name'  // BAD
 items.push(newItem)     // BAD
 ```
 
-### Ã¬â€”ÂÃ«Å¸Â¬ Ã¬Â²ËœÃ«Â¦Â¬
+### 에러 처리
 
 ```typescript
 // PASS: GOOD: Comprehensive error handling
@@ -130,7 +130,7 @@ async function fetchData(url) {
 }
 ```
 
-### Async/Await Ã«ÂªÂ¨Ã«Â²â€ Ã¬â€šÂ¬Ã«Â¡â‚¬
+### Async/Await 모범 사례
 
 ```typescript
 // PASS: GOOD: Parallel execution when possible
@@ -146,7 +146,7 @@ const markets = await fetchMarkets()
 const stats = await fetchStats()
 ```
 
-### Ã­Æ’â‚¬Ã¬Å¾â€¦ Ã¬â€¢Ë†Ã¬Â â€žÃ¬â€žÂ±
+### 타입 안전성
 
 ```typescript
 // PASS: GOOD: Proper types
@@ -167,9 +167,9 @@ function getMarket(id: any): Promise<any> {
 }
 ```
 
-## React Ã«ÂªÂ¨Ã«Â²â€ Ã¬â€šÂ¬Ã«Â¡â‚¬
+## React 모범 사례
 
-### Ã¬Â»Â´Ã­ÂÂ¬Ã«â€žÅ’Ã­Å Â¸ ÃªÂµÂ¬Ã¬Â¡Â°
+### 컴포넌트 구조
 
 ```typescript
 // PASS: GOOD: Functional component with types
@@ -203,7 +203,7 @@ export function Button(props) {
 }
 ```
 
-### Ã¬Â»Â¤Ã¬Å Â¤Ã­â€¦â‚¬ Hook
+### 커스텀 Hook
 
 ```typescript
 // PASS: GOOD: Reusable custom hook
@@ -225,7 +225,7 @@ export function useDebounce<T>(value: T, delay: number): T {
 const debouncedQuery = useDebounce(searchQuery, 500)
 ```
 
-### Ã¬Æ’ÂÃ­Æ’Å“ ÃªÂ´â‚¬Ã«Â¦Â¬
+### 상태 관리
 
 ```typescript
 // PASS: GOOD: Proper state updates
@@ -238,7 +238,7 @@ setCount(prev => prev + 1)
 setCount(count + 1)  // Can be stale in async scenarios
 ```
 
-### Ã¬Â¡Â°ÃªÂ±Â´Ã«Â¶â‚¬ Ã«Â Å’Ã«Ââ€Ã«Â§Â
+### 조건부 렌더링
 
 ```typescript
 // PASS: GOOD: Clear conditional rendering
@@ -250,9 +250,9 @@ setCount(count + 1)  // Can be stale in async scenarios
 {isLoading ? <Spinner /> : error ? <ErrorMessage error={error} /> : data ? <DataDisplay data={data} /> : null}
 ```
 
-## API Ã¬â€žÂ¤ÃªÂ³â€ž Ã­â€˜Å“Ã¬Â¤â‚¬
+## API 설계 표준
 
-### REST API Ã¬Â»Â¨Ã«Â²Â¤Ã¬â€¦Ëœ
+### REST API 컨벤션
 
 ```
 GET    /api/markets              # List all markets
@@ -266,7 +266,7 @@ DELETE /api/markets/:id          # Delete market
 GET /api/markets?status=active&limit=10&offset=0
 ```
 
-### Ã¬Ââ€˜Ã«â€¹Âµ Ã­Ëœâ€¢Ã¬â€¹Â
+### 응답 형식
 
 ```typescript
 // PASS: GOOD: Consistent response structure
@@ -295,7 +295,7 @@ return NextResponse.json({
 }, { status: 400 })
 ```
 
-### Ã¬Å¾â€¦Ã«Â Â¥ Ã¬Å“Â Ã­Å¡Â¨Ã¬â€žÂ± ÃªÂ²â‚¬Ã¬â€šÂ¬
+### 입력 유효성 검사
 
 ```typescript
 import { z } from 'zod'
@@ -326,30 +326,30 @@ export async function POST(request: Request) {
 }
 ```
 
-## Ã­Å’Å’Ã¬ÂÂ¼ ÃªÂµÂ¬Ã¬â€žÂ±
+## 파일 구성
 
-### Ã­â€â€žÃ«Â¡Å“Ã¬Â ÂÃ­Å Â¸ ÃªÂµÂ¬Ã¬Â¡Â°
+### 프로젝트 구조
 
 ```
 src/
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ app/                    # Next.js App Router
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ api/               # API routes
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ markets/           # Market pages
-Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ (auth)/           # Auth pages (route groups)
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ components/            # React components
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ ui/               # Generic UI components
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ forms/            # Form components
-Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ layouts/          # Layout components
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ hooks/                # Custom React hooks
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ lib/                  # Utilities and configs
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ api/             # API clients
-Ã¢â€â€š   Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ utils/           # Helper functions
-Ã¢â€â€š   Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ constants/       # Constants
-Ã¢â€Å“Ã¢â€â‚¬Ã¢â€â‚¬ types/                # TypeScript types
-Ã¢â€â€Ã¢â€â‚¬Ã¢â€â‚¬ styles/              # Global styles
+├── app/                    # Next.js App Router
+│   ├── api/               # API routes
+│   ├── markets/           # Market pages
+│   └── (auth)/           # Auth pages (route groups)
+├── components/            # React components
+│   ├── ui/               # Generic UI components
+│   ├── forms/            # Form components
+│   └── layouts/          # Layout components
+├── hooks/                # Custom React hooks
+├── lib/                  # Utilities and configs
+│   ├── api/             # API clients
+│   ├── utils/           # Helper functions
+│   └── constants/       # Constants
+├── types/                # TypeScript types
+└── styles/              # Global styles
 ```
 
-### Ã­Å’Å’Ã¬ÂÂ¼ Ã«â€žÂ¤Ã¬ÂÂ´Ã«Â°Â
+### 파일 네이밍
 
 ```
 components/Button.tsx          # PascalCase for components
@@ -358,9 +358,9 @@ lib/formatDate.ts             # camelCase for utilities
 types/market.types.ts         # camelCase with .types suffix
 ```
 
-## Ã¬Â£Â¼Ã¬â€žÂ Ã«Â°Â Ã«Â¬Â¸Ã¬â€žÅ“Ã­â„¢â€
+## 주석 및 문서화
 
-### Ã¬Â£Â¼Ã¬â€žÂÃ¬Ââ€ž Ã¬Å¾â€˜Ã¬â€žÂ±Ã­â€¢Â´Ã¬â€¢Â¼ Ã­â€¢ËœÃ«Å â€ ÃªÂ²Â½Ã¬Å¡Â°
+### 주석을 작성해야 하는 경우
 
 ```typescript
 // PASS: GOOD: Explain WHY, not WHAT
@@ -378,7 +378,7 @@ count++
 name = user.name
 ```
 
-### ÃªÂ³ÂµÃªÂ°Å“ APIÃ«Â¥Â¼ Ã¬Å“â€žÃ­â€¢Å“ JSDoc
+### 공개 API를 위한 JSDoc
 
 ```typescript
 /**
@@ -403,9 +403,9 @@ export async function searchMarkets(
 }
 ```
 
-## Ã¬â€žÂ±Ã«Å Â¥ Ã«ÂªÂ¨Ã«Â²â€ Ã¬â€šÂ¬Ã«Â¡â‚¬
+## 성능 모범 사례
 
-### Ã«Â©â€Ã«ÂªÂ¨Ã¬ÂÂ´Ã¬Â Å“Ã¬ÂÂ´Ã¬â€¦Ëœ
+### 메모이제이션
 
 ```typescript
 import { useMemo, useCallback } from 'react'
@@ -421,7 +421,7 @@ const handleSearch = useCallback((query: string) => {
 }, [])
 ```
 
-### Ã¬Â§â‚¬Ã¬â€”Â° Ã«Â¡Å“Ã«â€Â©
+### 지연 로딩
 
 ```typescript
 import { lazy, Suspense } from 'react'
@@ -438,7 +438,7 @@ export function Dashboard() {
 }
 ```
 
-### Ã«ÂÂ°Ã¬ÂÂ´Ã­â€žÂ°Ã«Â²Â Ã¬ÂÂ´Ã¬Å Â¤ Ã¬Â¿Â¼Ã«Â¦Â¬
+### 데이터베이스 쿼리
 
 ```typescript
 // PASS: GOOD: Select only needed columns
@@ -453,9 +453,9 @@ const { data } = await supabase
   .select('*')
 ```
 
-## Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸ Ã­â€˜Å“Ã¬Â¤â‚¬
+## 테스트 표준
 
-### Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸ ÃªÂµÂ¬Ã¬Â¡Â° (AAA Ã­Å’Â¨Ã­â€žÂ´)
+### 테스트 구조 (AAA 패턴)
 
 ```typescript
 test('calculates similarity correctly', () => {
@@ -471,7 +471,7 @@ test('calculates similarity correctly', () => {
 })
 ```
 
-### Ã­â€¦Å’Ã¬Å Â¤Ã­Å Â¸ Ã«â€žÂ¤Ã¬ÂÂ´Ã«Â°Â
+### 테스트 네이밍
 
 ```typescript
 // PASS: GOOD: Descriptive test names
@@ -484,11 +484,11 @@ test('works', () => { })
 test('test search', () => { })
 ```
 
-## Ã¬Â½â€Ã«â€œÅ“ Ã¬Å Â¤Ã«Â©Å“ ÃªÂ°ÂÃ¬Â§â‚¬
+## 코드 스멜 감지
 
-Ã«â€¹Â¤Ã¬ÂÅ’ Ã¬â€¢Ë†Ã­â€¹Â°Ã­Å’Â¨Ã­â€žÂ´Ã¬Ââ€ž Ã¬Â£Â¼Ã¬ÂËœÃ­â€¢ËœÃ¬â€žÂ¸Ã¬Å¡â€:
+다음 안티패턴을 주의하세요:
 
-### 1. ÃªÂ¸Â´ Ã­â€¢Â¨Ã¬Ë†Ëœ
+### 1. 긴 함수
 ```typescript
 // FAIL: BAD: Function > 50 lines
 function processMarketData() {
@@ -503,7 +503,7 @@ function processMarketData() {
 }
 ```
 
-### 2. ÃªÂ¹Å Ã¬Ââ‚¬ Ã¬Â¤â€˜Ã¬Â²Â©
+### 2. 깊은 중첩
 ```typescript
 // FAIL: BAD: 5+ levels of nesting
 if (user) {
@@ -528,7 +528,7 @@ if (!hasPermission) return
 // Do something
 ```
 
-### 3. Ã«Â§Â¤Ã¬Â§Â Ã«â€žËœÃ«Â²â€ž
+### 3. 매직 넘버
 ```typescript
 // FAIL: BAD: Unexplained numbers
 if (retryCount > 3) { }
@@ -542,4 +542,4 @@ if (retryCount > MAX_RETRIES) { }
 setTimeout(callback, DEBOUNCE_DELAY_MS)
 ```
 
-**ÃªÂ¸Â°Ã¬â€“ÂµÃ­â€¢ËœÃ¬â€žÂ¸Ã¬Å¡â€**: Ã¬Â½â€Ã«â€œÅ“ Ã­â€™Ë†Ã¬Â§Ë†Ã¬Ââ‚¬ Ã­Æ’â‚¬Ã­Ëœâ€˜Ã­â€¢Â  Ã¬Ë†Ëœ Ã¬â€”â€ Ã¬Å ÂµÃ«â€¹Ë†Ã«â€¹Â¤. Ã«Âªâ€¦Ã­â„¢â€¢Ã­â€¢ËœÃªÂ³Â  Ã¬Å“Â Ã¬Â§â‚¬Ã«Â³Â´Ã¬Ë†Ëœ ÃªÂ°â‚¬Ã«Å Â¥Ã­â€¢Å“ Ã¬Â½â€Ã«â€œÅ“ÃªÂ°â‚¬ Ã«Â¹Â Ã«Â¥Â¸ ÃªÂ°Å“Ã«Â°Å“ÃªÂ³Â¼ Ã¬Å¾ÂÃ¬â€¹Â ÃªÂ°Â Ã¬Å¾Ë†Ã«Å â€ Ã«Â¦Â¬Ã­Å’Â©Ã­â€žÂ°Ã«Â§ÂÃ¬Ââ€ž ÃªÂ°â‚¬Ã«Å Â¥Ã­â€¢ËœÃªÂ²Å’ Ã­â€¢Â©Ã«â€¹Ë†Ã«â€¹Â¤.
+**기억하세요**: 코드 품질은 타협할 수 없습니다. 명확하고 유지보수 가능한 코드가 빠른 개발과 자신감 있는 리팩터링을 가능하게 합니다.
