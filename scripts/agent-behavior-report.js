@@ -50,24 +50,26 @@ function median(values) {
 }
 
 function aggregateGroup(results) {
-  const successful = results.filter(result => result.pass === true);
+  const valid = results.filter(result => result.validRun !== false && !result.infraError);
+  const successful = valid.filter(result => result.pass === true);
   const knownCosts = results.filter(result => Number.isFinite(result.costUsd));
-  const successfulKnownCosts = successful.filter(result => Number.isFinite(result.costUsd));
   const totalElapsedMs = results.reduce((sum, result) => sum + (Number(result.elapsedMs) || 0), 0);
   const observedCostUsd = knownCosts.reduce((sum, result) => sum + Number(result.costUsd), 0);
   return {
     runs: results.length,
+    validRuns: valid.length,
+    infraFailures: results.length - valid.length,
     successes: successful.length,
-    passRate: results.length ? successful.length / results.length : 0,
-    medianElapsedMs: median(results.map(result => Number(result.elapsedMs) || 0)),
+    passRate: valid.length ? successful.length / valid.length : 0,
+    medianElapsedMs: median(valid.map(result => Number(result.elapsedMs) || 0)),
     elapsedPerSuccessMs: successful.length ? totalElapsedMs / successful.length : null,
     toolCalls: results.reduce((sum, result) => sum + (Number(result.toolCalls) || 0), 0),
     retries: results.reduce((sum, result) => sum + (Number(result.retries) || 0), 0),
     tokens: results.reduce((sum, result) => sum + (Number(result.inputTokens) || 0) + (Number(result.outputTokens) || 0), 0),
     observedCostUsd,
     costCoverage: results.length ? knownCosts.length / results.length : 0,
-    costPerSuccessUsd: successful.length > 0 && successfulKnownCosts.length === successful.length
-      ? successfulKnownCosts.reduce((sum, result) => sum + Number(result.costUsd), 0) / successful.length
+    costPerSuccessUsd: successful.length > 0 && knownCosts.length === results.length
+      ? observedCostUsd / successful.length
       : null
   };
 }
@@ -94,13 +96,13 @@ function renderMarkdown(report) {
   const lines = [
     '# Agent behavior ROI',
     '',
-    '| Harness | Success | Median time | Time / success | Cost / success | Cost coverage | Tokens | Tools | Retries |',
-    '|---|---:|---:|---:|---:|---:|---:|---:|---:|'
+    '| Harness | Success / valid | Infra | Median time | Time / success | Cost / success | Cost coverage | Tokens | Tools | Retries |',
+    '|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|'
   ];
   for (const [harness, row] of Object.entries(report.byHarness)) {
-    lines.push(`| ${harness} | ${row.successes}/${row.runs} (${(row.passRate * 100).toFixed(1)}%) | ${(row.medianElapsedMs / 1000).toFixed(2)}s | ${row.elapsedPerSuccessMs === null ? 'n/a' : `${(row.elapsedPerSuccessMs / 1000).toFixed(2)}s`} | ${formatMoney(row.costPerSuccessUsd)} | ${(row.costCoverage * 100).toFixed(0)}% | ${row.tokens} | ${row.toolCalls} | ${row.retries} |`);
+    lines.push(`| ${harness} | ${row.successes}/${row.validRuns} (${(row.passRate * 100).toFixed(1)}%) | ${row.infraFailures} | ${(row.medianElapsedMs / 1000).toFixed(2)}s | ${row.elapsedPerSuccessMs === null ? 'n/a' : `${(row.elapsedPerSuccessMs / 1000).toFixed(2)}s`} | ${formatMoney(row.costPerSuccessUsd)} | ${(row.costCoverage * 100).toFixed(0)}% | ${row.tokens} | ${row.toolCalls} | ${row.retries} |`);
   }
-  lines.push('', `Runs: ${report.overall.runs}. Cost per success is reported only when every successful run supplied provider cost telemetry.`);
+  lines.push('', `Runs: ${report.overall.runs}. Cost per success includes failed-attempt spend and is reported only when every run supplied provider cost telemetry.`);
   return `${lines.join('\n')}\n`;
 }
 

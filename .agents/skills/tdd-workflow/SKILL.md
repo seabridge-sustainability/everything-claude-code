@@ -1,6 +1,6 @@
 ---
 name: tdd-workflow
-description: "Use for explicit TDD work or stable behavior changes that benefit from a focused RED/GREEN proof. Select test levels by risk and apply repository-owned coverage requirements."
+description: "Generic TDD workflow for explicit test-first requests outside SeaBridge-specific routing. In SeaBridge repositories use sea-test-driven-development; do not load this skill for every code change."
 ---
 
 # tdd-workflow

@@ -21,13 +21,28 @@ const rows = [
 const codex = aggregateGroup(rows.slice(0, 2));
 assert.strictEqual(codex.passRate, 0.5);
 assert.strictEqual(codex.elapsedPerSuccessMs, 4000);
-assert.strictEqual(codex.costPerSuccessUsd, 0.02);
+assert.strictEqual(codex.costPerSuccessUsd, 0.05);
+
+const incompleteAttemptCost = aggregateGroup([
+  rows[0],
+  { ...rows[1], costUsd: null }
+]);
+assert.strictEqual(incompleteAttemptCost.costPerSuccessUsd, null);
+
+const infraSeparated = aggregateGroup([
+  rows[0],
+  { ...rows[1], validRun: false, infraError: 'exit-1' }
+]);
+assert.strictEqual(infraSeparated.passRate, 1);
+assert.strictEqual(infraSeparated.validRuns, 1);
+assert.strictEqual(infraSeparated.infraFailures, 1);
 
 const report = buildReport(rows);
 assert.deepStrictEqual(Object.keys(report.byHarness), ['codex', 'gemini']);
 assert.strictEqual(report.byHarness.gemini.costPerSuccessUsd, null);
 assert.match(renderMarkdown(report), /Cost \/ success/);
 assert.match(renderMarkdown(report), /unknown/);
+assert.match(renderMarkdown(report), /Infra/);
 
 const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-agent-roi-'));
 try {
@@ -40,4 +55,4 @@ try {
 
 assert.throws(() => confinedWritePath(path.resolve('outside-roi.md')), /must stay under/);
 
-console.log('agent behavior ROI report: 9 checks passed');
+console.log('agent behavior ROI report: 14 checks passed');

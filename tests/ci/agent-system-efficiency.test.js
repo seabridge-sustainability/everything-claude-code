@@ -97,7 +97,8 @@ test('CI has one full suite lane and bounded compatibility coverage', () => {
   assert.match(ci, /suite == 'macos'[\s\S]*gan-harness\.test\.js[\s\S]*install-guided\.test\.js/);
   assert.match(ci, /name: Run Windows platform checks[\s\S]*?shell: bash/);
   assert.doesNotMatch(ci, /tags:\s*\['v\*'\]/);
-  assert.match(ci, /coverage:[\s\S]*if: github\.event_name == 'pull_request'/);
+  assert.match(ci, /name: Run full test suite with coverage[\s\S]*if: github\.event_name == 'pull_request'[\s\S]*npm run coverage/);
+  assert.doesNotMatch(ci, /^  coverage:\s*$/m);
   const watch = read('.github/workflows/supply-chain-watch.yml');
   assert.match(watch, /cron: '17 5 \* \* \*'/);
   assert.match(watch, /cancel-in-progress: true/);

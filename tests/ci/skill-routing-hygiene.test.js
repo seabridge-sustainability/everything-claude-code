@@ -44,6 +44,12 @@ assert.ok(lineCount('skills/python-testing/SKILL.md') < 60);
 assert.match(pythonTesting, /Load details only when needed/);
 assert.ok(fs.existsSync(path.join(root, 'skills', 'python-testing', 'references', 'pytest-patterns.md')));
 
+const tddWorkflow = read('skills/tdd-workflow/SKILL.md');
+assert.ok(lineCount('skills/tdd-workflow/SKILL.md') < 60);
+assert.match(tddWorkflow, /SeaBridge repositories use sea-test-driven-development/);
+assert.match(tddWorkflow, /Load details only when needed/);
+assert.ok(fs.existsSync(path.join(root, 'skills', 'tdd-workflow', 'references', 'detailed-guide.md')));
+
 const btw = read('.agents/skills/btw/SKILL.md');
 assert.ok(lineCount('.agents/skills/btw/SKILL.md') < 30);
 assert.doesNotMatch(btw, /SEABRIDGE_SAFETY_RULE_START/);
@@ -52,4 +58,4 @@ assert.doesNotMatch(btw, /[\u0080-\u024f]/u);
 assert.ok(!fs.existsSync(path.join(root, 'skills', 'frontend-design', 'SKILL.md')));
 assert.ok(!fs.existsSync(path.join(root, '.agents', 'skills', 'frontend-design', 'SKILL.md')));
 
-console.log('skill routing hygiene: 22 checks passed');
+console.log('skill routing hygiene: 26 checks passed');

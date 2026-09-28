@@ -203,6 +203,27 @@ test('embedded adapter drift is rejected (negative control)', () => {
   assert.ok(copilot.failures.some(failure => failure.includes('ask-first-list')));
 });
 
+test('product repositories must carry the exact ECC safety and goal blocks', () => {
+  const fixture = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-product-policy-'));
+  try {
+    const canonicalAgents = fs.readFileSync(path.resolve(__dirname, '..', '..', 'AGENTS.md'), 'utf8');
+    fs.writeFileSync(path.join(fixture, 'AGENTS.md'), canonicalAgents);
+    let policy = lib.checkRepo(fixture, fixture, 64 * 1024, { enforceCanonicalPolicy: true })
+      .find(result => result.harness === 'codex');
+    assert.deepStrictEqual(policy.failures, []);
+
+    fs.writeFileSync(
+      path.join(fixture, 'AGENTS.md'),
+      canonicalAgents.replace('one completed-batch push', 'one push for every edit')
+    );
+    policy = lib.checkRepo(fixture, fixture, 64 * 1024, { enforceCanonicalPolicy: true })
+      .find(result => result.harness === 'codex');
+    assert.ok(policy.failures.some(failure => failure.includes('canonical block 1 drifted')));
+  } finally {
+    fs.rmSync(fixture, { recursive: true, force: true });
+  }
+});
+
 test('missing advertised installer target is rejected (negative control)', () => {
   const repo = fixture({
     'AGENTS.md': GOOD_AGENTS,

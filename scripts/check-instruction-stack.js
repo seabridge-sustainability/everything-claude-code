@@ -262,13 +262,26 @@ function duplicatedLines(repo) {
   return readText(claude).split(/\r?\n/).map((l) => l.trim()).filter((l) => l.length >= 60 && a.has(l));
 }
 
-function checkRepo(repo, workspace, budget) {
+function checkRepo(repo, workspace, budget, options = {}) {
   const results = [];
   const isEcc = fs.existsSync(path.join(repo, 'manifests', 'instruction-adapters.json'));
   const expectedBlocks = isEcc ? canonicalBlocks(repo) : [];
+  const productPolicyFailures = [];
+  if (!isEcc && options.enforceCanonicalPolicy) {
+    const productAgents = path.join(repo, 'AGENTS.md');
+    if (!fs.existsSync(productAgents)) {
+      productPolicyFailures.push('missing product AGENTS.md');
+    } else {
+      const actual = canonicalBlocks(repo);
+      const canonical = canonicalBlocks(ROOT);
+      actual.forEach((block, index) => {
+        if (block !== canonical[index]) productPolicyFailures.push(`product canonical block ${index + 1} drifted from ECC`);
+      });
+    }
+  }
   for (const s of effectiveStacks(repo)) {
     const bytes = Buffer.byteLength(s.text, 'utf8');
-    const failures = [];
+    const failures = [...productPolicyFailures];
     if (s.harness === 'codex' && bytes > CODEX_CAP) failures.push(`exceeds Codex 32 KiB cap (${bytes} B): the tail is silently truncated`);
     if (bytes > budget) failures.push(`exceeds budget ${budget} B (${bytes} B)`);
     for (const r of REQUIRED) if (!r.re.test(s.text)) failures.push(`missing invariant: ${r.id}`);
@@ -368,7 +381,7 @@ function main(argv) {
   const all = [];
   for (const r of REPOS) {
     const repo = r.self ? path.resolve(__dirname, '..') : path.join(workspace, r.name);
-    if (fs.existsSync(repo)) all.push(...checkRepo(repo, workspace, r.budget));
+    if (fs.existsSync(repo)) all.push(...checkRepo(repo, workspace, r.budget, { enforceCanonicalPolicy: !r.self }));
   }
   if (argv.includes('--json')) {
     process.stdout.write(JSON.stringify(all, null, 1) + '\n');

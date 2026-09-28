@@ -1,18 +1,24 @@
 param(
-  [string[]]$Roots = @(
-    "C:\Users\adelm\SeaBridgeAI\everything-claude-code",
-    "C:\Users\adelm\SeaBridgeAI\manageesg-backend",
-    "C:\Users\adelm\SeaBridgeAI\manageesg-frontend",
-    "C:\Users\adelm\SeaBridgeAI\openseabri",
-    "C:\Users\adelm\SeaBridgeAI\autoresearch",
-    "C:\Users\adelm\SeaBridgeAI\climada-stack",
-    "C:\Users\adelm\SeaBridgeAI\_upstream"
-  ),
-  [string]$CanonicalFile = "C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\SAFETY_AUTHORIZATION_RULE.md",
+  [string[]]$Roots = @(),
+  [string]$CanonicalFile = "",
   [switch]$Check
 )
 
 $ErrorActionPreference = "Stop"
+
+$eccRoot = Split-Path -Parent $PSScriptRoot
+$workspaceRoot = Split-Path -Parent $eccRoot
+if ($Roots.Count -eq 0) {
+  $Roots = @(
+    $eccRoot,
+    (Join-Path $workspaceRoot "manageesg-backend"),
+    (Join-Path $workspaceRoot "manageesg-frontend"),
+    (Join-Path $workspaceRoot "openseabri"),
+    (Join-Path $workspaceRoot "autoresearch"),
+    (Join-Path $workspaceRoot "climada-stack"),
+    (Join-Path $workspaceRoot "_upstream")
+  )
+}
 
 # Propagates the canonical Safety And Authorization Rule block to every
 # markdown file that carries it. Two match modes:
@@ -24,6 +30,13 @@ $ErrorActionPreference = "Stop"
 
 $startMarker = "<!-- SEABRIDGE_SAFETY_RULE_START -->"
 $endMarker = "<!-- SEABRIDGE_SAFETY_RULE_END -->"
+
+if ([string]::IsNullOrWhiteSpace($CanonicalFile)) {
+  $CanonicalFile = Join-Path $eccRoot "protocols\SAFETY_AUTHORIZATION_RULE.md"
+}
+if (-not (Test-Path -LiteralPath $CanonicalFile -PathType Leaf)) {
+  throw "Canonical safety rule does not exist: $CanonicalFile"
+}
 
 $canonRaw = [System.IO.File]::ReadAllText($CanonicalFile, [System.Text.Encoding]::UTF8)
 $canonMatch = [regex]::Match($canonRaw, "(?s)" + [regex]::Escape($startMarker) + "(.*?)" + [regex]::Escape($endMarker))
@@ -41,6 +54,32 @@ $exclude = '\\node_modules\\|\\external\\|\\vendor\\|\\_upstream\\|\\\.git\\|\\g
 $drift = @()
 $updated = 0
 $adopted = 0
+
+$preflightErrors = @()
+foreach ($root in $Roots) {
+  if (-not (Test-Path -LiteralPath $root -PathType Container)) {
+    $preflightErrors += "missing root : $root"
+    continue
+  }
+  $rootAgents = Join-Path $root "AGENTS.md"
+  if (-not (Test-Path -LiteralPath $rootAgents -PathType Leaf)) {
+    $preflightErrors += "missing AGENTS.md : $rootAgents"
+    continue
+  }
+  $rootText = [System.IO.File]::ReadAllText($rootAgents, [System.Text.Encoding]::UTF8)
+  if (-not $markerRegex.IsMatch($rootText)) {
+    $preflightErrors += "missing safety markers : $rootAgents"
+  }
+}
+
+if ($preflightErrors.Count -gt 0) {
+  $message = "[safety-rule] PREFLIGHT FAIL:`n" + ($preflightErrors -join "`n")
+  if ($Check) {
+    Write-Host $message
+    exit 1
+  }
+  throw $message
+}
 
 # Walk with pruning: excluded trees (worktrees, run checkouts, node_modules,
 # venvs, mirrors) are never entered, so a check takes seconds instead of

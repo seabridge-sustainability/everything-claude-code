@@ -9,6 +9,7 @@ const ROOT = path.resolve(__dirname, '..');
 const DEFAULT_CONFIG = path.join(ROOT, 'evals', 'agent-behavior', 'scenarios.json');
 const DEFAULT_OUTPUT_DIR = path.join(ROOT, 'artifacts', 'agent-runs', 'behavior-evals');
 const APPROVAL_ENV = 'SEABRIDGE_AGENT_EVAL_APPROVED';
+const HARD_MAX_RUNS_PER_BATCH = 9;
 
 function optionValue(args, name) {
   const index = args.indexOf(name);
@@ -49,13 +50,26 @@ function select(config, requestedHarness, requestedScenario) {
   return { harnesses, scenarios };
 }
 
-function validateExecutionGate({ approved, budgetUsd, totalRuns, maxRuns }) {
+function validateExecutionGate({
+  approved,
+  budgetUsd,
+  totalRuns,
+  maxRuns,
+  softBudgetHarnesses = [],
+  softBudgetAcknowledged = false
+}) {
   if (!approved) {
     throw new Error(`live agent evals require current-session approval and ${APPROVAL_ENV}=1`);
   }
   positiveNumber(budgetUsd, '--budget-usd');
   if (totalRuns > maxRuns) {
     throw new Error(`requested ${totalRuns} runs exceeds configured batch limit ${maxRuns}`);
+  }
+  if (totalRuns > HARD_MAX_RUNS_PER_BATCH) {
+    throw new Error(`requested ${totalRuns} runs exceeds hard batch limit ${HARD_MAX_RUNS_PER_BATCH}`);
+  }
+  if (softBudgetHarnesses.length && !softBudgetAcknowledged) {
+    throw new Error(`soft budget acknowledgement required for uncapped harnesses: ${softBudgetHarnesses.join(', ')}; add --allow-soft-budget only after approving that limitation`);
   }
 }
 
@@ -74,7 +88,12 @@ function buildCommand(harness, prompt, perRunBudgetUsd) {
       args: [
         '--print',
         '--output-format', 'stream-json',
+        '--verbose',
         '--permission-mode', 'plan',
+        '--permission-prompts', 'none',
+        '--no-session-persistence',
+        '--strict-mcp-config',
+        '--tools', 'Read',
         '--max-budget-usd', perRunBudgetUsd.toFixed(4),
         prompt
       ],
@@ -138,7 +157,7 @@ function parseStream(stdout) {
   const outputTokens = outputValues.length ? Math.max(...outputValues) : 0;
   const costs = numericValues(events, new Set(['total_cost_usd', 'cost_usd', 'totalCostUsd']));
   const toolCalls = events.filter(event => {
-    const type = String(event.type || event.item?.type || '').toLowerCase();
+    const type = `${event.type || ''} ${event.item?.type || ''}`.toLowerCase();
     return /tool_use|tool_call|command_execution|mcp_tool/.test(type);
   }).length;
   const retries = events.filter(event => /retry/i.test(String(event.type || event.subtype || ''))).length;
@@ -153,9 +172,55 @@ function parseStream(stdout) {
   };
 }
 
+function isNegatedMatch(text, index) {
+  const clause = text.slice(Math.max(0, index - 120), index).split(/[.!?;\n]/).pop();
+  return /\b(?:do not|don't|never|must not|should not|cannot|can't|avoid|instead of|rather than)\b[^.!?;\n]{0,80}$/i.test(clause || '');
+}
+
+function parseStructuredAnswer(text) {
+  const fenced = String(text || '').match(/```(?:json)?\s*([\s\S]*?)```/i);
+  const candidate = fenced ? fenced[1] : String(text || '').slice(
+    String(text || '').indexOf('{'),
+    String(text || '').lastIndexOf('}') + 1
+  );
+  if (!candidate || !candidate.trim().startsWith('{')) return null;
+  try {
+    const parsed = JSON.parse(candidate.trim());
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+function valueAtPath(object, dottedPath) {
+  return String(dottedPath || '').split('.').reduce(
+    (value, key) => (value && typeof value === 'object' ? value[key] : undefined),
+    object
+  );
+}
+
 function scoreText(text, scenario) {
   const missing = (scenario.must || []).filter(pattern => !new RegExp(pattern, 'i').test(text));
-  const harmful = (scenario.mustNot || []).filter(pattern => new RegExp(pattern, 'i').test(text));
+  const harmful = (scenario.mustNot || []).filter(pattern => {
+    const regex = new RegExp(pattern, 'ig');
+    return [...text.matchAll(regex)].some(match => !isNegatedMatch(text, match.index || 0));
+  });
+  const structured = parseStructuredAnswer(text);
+  for (const assertion of scenario.assertions || []) {
+    if (!structured) {
+      missing.push(`structured:${assertion.path}`);
+      continue;
+    }
+    const value = valueAtPath(structured, assertion.path);
+    if (Object.prototype.hasOwnProperty.call(assertion, 'equals')) {
+      if (value !== assertion.equals) missing.push(`equals:${assertion.path}`);
+      continue;
+    }
+    const rendered = typeof value === 'string' ? value : JSON.stringify(value);
+    if (value === undefined || !new RegExp(assertion.matches, 'i').test(rendered || '')) {
+      missing.push(`matches:${assertion.path}`);
+    }
+  }
   return { pass: missing.length === 0 && harmful.length === 0, missing, harmful };
 }
 
@@ -167,12 +232,15 @@ function median(values) {
 }
 
 function summarize(results) {
-  const passed = results.filter(result => result.pass).length;
+  const valid = results.filter(result => result.validRun !== false && !result.infraError);
+  const passed = valid.filter(result => result.pass).length;
   return {
     runs: results.length,
+    validRuns: valid.length,
+    infraFailures: results.length - valid.length,
     passed,
-    passRate: results.length ? passed / results.length : 0,
-    medianElapsedMs: median(results.map(result => result.elapsedMs)),
+    passRate: valid.length ? passed / valid.length : 0,
+    medianElapsedMs: median(valid.map(result => result.elapsedMs)),
     toolCalls: results.reduce((total, result) => total + result.toolCalls, 0),
     retries: results.reduce((total, result) => total + result.retries, 0),
     inputTokens: results.reduce((total, result) => total + result.inputTokens, 0),
@@ -201,10 +269,41 @@ function renderPlan(config, selected, runs, budgetUsd) {
     scenarios: selected.scenarios.map(scenario => scenario.id),
     runsPerCombination: runs,
     totalRuns,
+    hardMaxRunsPerBatch: HARD_MAX_RUNS_PER_BATCH,
     budgetUsd: budgetUsd || null,
     perRunBudgetUsd: perRun,
-    note: 'No model was called. Codex and Gemini do not expose a hard CLI cost cap; the batch limit and approved total budget are operational guards.'
+    softBudgetHarnesses: selected.harnesses.filter(harness => !buildCommand(harness, '', perRun || 0).hardCostCap),
+    note: 'No model was called. Codex and Gemini do not expose a hard CLI cost cap; live use requires --allow-soft-budget in addition to approval. The code-level batch limit cannot be raised by config.'
   };
+}
+
+function buildReport({ configPath, budgetUsd, results, completed, abortReason = null }) {
+  return {
+    schemaVersion: 1,
+    createdAt: new Date().toISOString(),
+    config: path.relative(ROOT, configPath).replace(/\\/g, '/'),
+    approvedBudgetUsd: budgetUsd,
+    completed,
+    abortReason,
+    summary: summarize(results),
+    results
+  };
+}
+
+function writeReport(report, outputPath) {
+  fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+  fs.writeFileSync(outputPath, `${JSON.stringify(report, null, 2)}\n`, { encoding: 'utf8', mode: 0o600 });
+  return report;
+}
+
+function infrastructureError(child, parsed) {
+  if (child.error?.code === 'ENOENT') return 'cli-unavailable';
+  if (child.error?.code === 'ETIMEDOUT') return 'timeout';
+  if (child.error) return `spawn-${child.error.code || child.error.name || 'error'}`;
+  if (child.signal) return `signal-${child.signal}`;
+  if (child.status !== 0) return `exit-${child.status === null ? 'unknown' : child.status}`;
+  if (!parsed.text.trim()) return 'empty-response';
+  return null;
 }
 
 function runBatch({ config, configPath, selected, runs, budgetUsd, outputPath }) {
@@ -228,6 +327,7 @@ function runBatch({ config, configPath, selected, runs, budgetUsd, outputPath })
         });
         const parsed = parseStream(child.stdout);
         const score = scoreText(parsed.text, scenario);
+        const infraError = infrastructureError(child, parsed);
         results.push({
           harness,
           scenario: scenario.id,
@@ -237,27 +337,40 @@ function runBatch({ config, configPath, selected, runs, budgetUsd, outputPath })
           elapsedMs: Date.now() - started,
           ...parsed,
           ...score,
-          pass: child.status === 0 && score.pass,
-          error: child.error ? child.error.message : null,
+          validRun: infraError === null,
+          infraError,
+          pass: infraError === null && score.pass,
+          errorCode: child.error?.code || null,
           hardCostCap: spec.hardCostCap
         });
+        writeReport(buildReport({
+          configPath,
+          budgetUsd,
+          results,
+          completed: false
+        }), outputPath);
         const observed = summarize(results).observedCostUsd;
-        if (observed > budgetUsd) throw new Error(`observed cost $${observed.toFixed(4)} exceeded approved budget`);
+        if (observed > budgetUsd) {
+          const reason = `observed cost $${observed.toFixed(4)} exceeded approved budget`;
+          writeReport(buildReport({
+            configPath,
+            budgetUsd,
+            results,
+            completed: false,
+            abortReason: reason
+          }), outputPath);
+          throw new Error(`${reason}; partial report saved to ${path.relative(ROOT, outputPath)}`);
+        }
       }
     }
   }
 
-  const report = {
-    schemaVersion: 1,
-    createdAt: new Date().toISOString(),
-    config: path.relative(ROOT, configPath).replace(/\\/g, '/'),
-    approvedBudgetUsd: budgetUsd,
-    summary: summarize(results),
-    results
-  };
-  fs.mkdirSync(path.dirname(outputPath), { recursive: true });
-  fs.writeFileSync(outputPath, `${JSON.stringify(report, null, 2)}\n`, { encoding: 'utf8', mode: 0o600 });
-  return report;
+  return writeReport(buildReport({
+    configPath,
+    budgetUsd,
+    results,
+    completed: true
+  }), outputPath);
 }
 
 function main(args = process.argv.slice(2)) {
@@ -278,7 +391,9 @@ function main(args = process.argv.slice(2)) {
     approved: process.env[APPROVAL_ENV] === '1',
     budgetUsd,
     totalRuns: plan.totalRuns,
-    maxRuns: config.maxRunsPerBatch
+    maxRuns: config.maxRunsPerBatch,
+    softBudgetHarnesses: plan.softBudgetHarnesses,
+    softBudgetAcknowledged: args.includes('--allow-soft-budget')
   });
   const outputPath = confinedOutputPath(optionValue(args, '--output'));
   const report = runBatch({ config, configPath, selected, runs, budgetUsd, outputPath });
@@ -297,6 +412,7 @@ if (require.main === module) {
 
 module.exports = {
   buildCommand,
+  buildReport,
   confinedOutputPath,
   extractAssistantText,
   loadConfig,

@@ -50,12 +50,21 @@ node scripts/eval-agent-behavior.js --plan --harness codex,claude,gemini --runs 
 ```
 
 The default probe asks three read-only instruction questions and records pass
-rate, latency, tool calls, retries, tokens, and reported cost. Live execution is
-local-only, sequential, capped at nine runs, and disabled unless the current
-session has approved the spend, `SEABRIDGE_AGENT_EVAL_APPROVED=1` is set, and an
-explicit `--budget-usd` is supplied. Claude receives a hard per-run CLI budget;
-Codex and Gemini do not expose equivalent hard CLI caps, so their guard is the
-approved total plus the run-count ceiling.
+rate, latency, tool calls, retries, tokens, and reported cost. Scenarios request
+JSON answers and use field-level semantic assertions; prohibited-text checks are
+negation-aware, so correct guidance such as "do not push after each change" is
+not scored as harmful merely because it contains the prohibited phrase.
+
+Live execution is local-only and sequential. A code-level ceiling allows at most
+nine runs per batch, even if a scenario config requests more. Execution is
+disabled unless the current session approved the spend,
+`SEABRIDGE_AGENT_EVAL_APPROVED=1` is set, and an explicit `--budget-usd` is
+supplied. Claude is the hard-capped lane: each run receives a CLI budget and is
+isolated with plan mode, no permission prompts, no session persistence, strict
+MCP configuration, and only the `Read` tool. Codex and Gemini do not expose
+equivalent hard CLI cost caps. Any live batch containing either therefore also
+requires `--allow-soft-budget`, which explicitly acknowledges that reported
+spend and the hard nine-run ceiling are operational controls, not a dollar cap.
 
 The SeaBridgeAI pack uses three read-only repository fixtures for backend tenant
 isolation, frontend browser QA, and a backend/frontend response-contract mismatch.
@@ -69,13 +78,21 @@ node scripts/eval-agent-behavior.js --plan --config evals/agent-behavior/seabrid
 
 ```powershell
 $env:SEABRIDGE_AGENT_EVAL_APPROVED='1' # set only after current-session approval
-node scripts/eval-agent-behavior.js --run --runs 1 --budget-usd 3
+# Cross-harness run: explicitly acknowledge Codex/Gemini's soft dollar budget.
+node scripts/eval-agent-behavior.js --run --runs 1 --budget-usd 3 --allow-soft-budget
+
+# Claude-only run: hard per-run CLI budgets, so no soft-budget acknowledgement.
+node scripts/eval-agent-behavior.js --run --harness claude --runs 1 --budget-usd 1
 ```
 
-Reports go to ignored `artifacts/agent-runs/behavior-evals/`. Run the probe after
-an instruction-system or model change, and otherwise no more than every 30 days.
-Do not schedule it in GitHub Actions: unattended model calls would spend quota
-and defeat the Actions cost policy.
+Reports go to ignored `artifacts/agent-runs/behavior-evals/`. The harness writes
+a partial checkpoint after every attempt and records an abort reason before
+stopping on a reported budget breach. CLI, authentication, timeout, signal,
+non-zero-exit, and empty-response failures remain visible as infrastructure
+failures but are excluded from the behavioral pass-rate denominator. Run the
+probe after an instruction-system or model change, and otherwise no more than
+every 30 days. Do not schedule it in GitHub Actions: unattended model calls would
+spend quota and defeat the Actions cost policy.
 
 After one or more approved batches, render the ROI comparison locally:
 
@@ -84,10 +101,13 @@ npm run agent-behavior:report
 node scripts/agent-behavior-report.js --json
 ```
 
-The report compares pass rate, time per successful task, tool calls, retries,
-tokens, and cost per success. Cost per success stays `unknown` unless every
-successful run for that harness supplied provider cost telemetry; missing cost is
-never treated as zero.
+The report compares valid-run pass rate, infrastructure failures, time per
+successful task, tool calls, retries, tokens, and cost per success. Cost per
+success divides total batch spend, including failed-attempt spend, by successful
+valid runs. It stays `unknown` unless every run for that harness supplied
+provider cost telemetry; missing cost is never treated as zero.
+
+The 2026-09-27 hardening and its zero-cost tests made no paid provider calls.
 
 ## Future model upgrade checklist
 

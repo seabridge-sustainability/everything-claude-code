@@ -31,14 +31,25 @@ npm run agent-behavior:report
 ```
 
 Live Codex, Claude, and Gemini probes use
-`scripts/eval-agent-behavior.js`. They are read-only, sequential, limited to
-nine runs per batch, and require both an approved budget and the explicit
-`SEABRIDGE_AGENT_EVAL_APPROVED=1` acknowledgement. Do not put live probes in
-GitHub Actions.
+`scripts/eval-agent-behavior.js`. They are read-only and sequential. A hard,
+code-level ceiling limits every batch to nine runs and cannot be raised by a
+scenario config. Live use requires both an approved budget and the explicit
+`SEABRIDGE_AGENT_EVAL_APPROVED=1` acknowledgement. Claude runs with a hard
+per-run CLI budget, plan mode, no permission prompts or session persistence,
+strict MCP isolation, and only the `Read` tool. Codex and Gemini have no hard CLI
+dollar cap, so selecting either also requires `--allow-soft-budget`. Do not put
+live probes in GitHub Actions.
+
+Scenarios use structured JSON answers and field-level semantic assertions, with
+negation-aware prohibited-text checks. The harness checkpoints a partial report
+after every attempt. Infrastructure failures are reported separately and
+excluded from the behavioral pass-rate denominator.
 
 Use the separate SeaBridgeAI scenario pack for tenant isolation, browser QA, and
 cross-repo contract reasoning. Aggregate completed local runs with the ROI report;
-it leaves cost-per-success unknown when provider cost telemetry is incomplete.
+cost per success uses total batch spend, including failed attempts, divided by
+successful valid runs. It remains unknown when any run lacks provider cost
+telemetry.
 
 ## Implementation comparisons
 

@@ -54,9 +54,21 @@ jobs:
       - name: Install dependencies
         run: npm ci --ignore-scripts
       - name: Run full test suite
+        if: github.event_name != 'pull_request'
         run: node tests/run-all.js
         env:
           CLAUDE_CODE_PACKAGE_MANAGER: npm
+      - name: Run full test suite with coverage
+        if: github.event_name == 'pull_request'
+        run: npm run coverage
+        env:
+          CLAUDE_CODE_PACKAGE_MANAGER: npm
+      - name: Upload coverage report
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: coverage-ubuntu-node20-npm
+          path: coverage/
 
   compatibility:
     name: Compatibility (Node ${{ matrix.node }}, ${{ matrix.pm }})
@@ -358,36 +370,6 @@ jobs:
 
       - name: Run supply-chain IOC scan
         run: npm run security:ioc-scan
-
-  coverage:
-    name: Coverage
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-
-      - name: Setup Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version: '20.x'
-
-      - name: Install dependencies
-        run: npm ci --ignore-scripts
-
-      - name: Run coverage
-        run: npm run coverage
-
-      - name: Upload coverage report
-        if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: coverage-ubuntu-node20-npm
-          path: coverage/
 
   lint:
     name: Lint

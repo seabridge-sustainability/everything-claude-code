@@ -7,15 +7,18 @@ const { spawnSync } = require('child_process');
 
 const SHA = /^[0-9a-f]{7,40}$/i;
 const ZERO_SHA = /^0+$/;
+const PACKAGE_FILES = /^(?:package(?:-lock)?\.json|npm-shrinkwrap\.json|\.npmrc|yarn\.lock|\.yarnrc\.ya?ml|pnpm-lock\.yaml|pnpm-workspace\.yaml|bun\.lockb?|bunfig\.toml|\.opencode\/package(?:-lock)?\.json)$/;
+const INSTALLER_SCRIPTS = /^scripts\/(?:ecc\.js|setup\.js|install-|build-opencode|lib\/(?:install(?:\/|-)|(?:claude|codex)-plugin-setup))/;
+const INSTALLER_TESTS = /^tests\/(?:lib\/(?:install|claude|codex|opencode)|scripts\/(?:install|setup|build-opencode|ecc-universal))/;
 
 const patterns = {
   compatibility: [
     /^\.github\/workflows\/ci\.yml$/,
     /^scripts\/ci\/detect-ci-scope\.js$/,
-    /^(package(?:-lock)?\.json|\.opencode\/package(?:-lock)?\.json)$/,
+    PACKAGE_FILES,
     /^(install\.(?:ps1|sh)|manifests\/|schemas\/)/,
-    /^scripts\/(?:ecc\.js|install-|build-opencode|lib\/install\/|lib\/(?:claude|codex)-plugin-setup)/,
-    /^tests\/(?:lib\/(?:install|claude|codex|opencode)|scripts\/(?:install|build-opencode|ecc-universal))/
+    INSTALLER_SCRIPTS,
+    INSTALLER_TESTS
   ],
   platform: [
     /^\.github\/workflows\/ci\.yml$/,
@@ -27,8 +30,9 @@ const patterns = {
   packed: [
     /^\.github\/workflows\/ci\.yml$/,
     /^scripts\/ci\/detect-ci-scope\.js$/,
-    /^(package(?:-lock)?\.json|\.opencode\/|\.pi\/|install\.(?:ps1|sh)|manifests\/|schemas\/)/,
-    /^scripts\/(?:ecc\.js|install-|build-opencode|lib\/install\/)/,
+    PACKAGE_FILES,
+    /^(?:\.opencode\/|\.pi\/|install\.(?:ps1|sh)|manifests\/|schemas\/)/,
+    INSTALLER_SCRIPTS,
     /^(?:docker\/plugin-setup\/|tests\/ci\/packed-artifact|tests\/scripts\/(?:install|build-opencode|ecc-universal))/
   ]
 };
