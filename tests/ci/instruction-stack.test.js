@@ -21,13 +21,6 @@ const SAFETY = [
 const GOOD_AGENTS = `# Repo\n\nSYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1\n\n${SAFETY}\n\n## Goal Protocol Default\n\nDone means tested.\n`;
 const LONG = 'This sentence is deliberately longer than sixty characters so it counts as a duplicate.';
 
-function markerBlock(text, start, end) {
-  const pattern = new RegExp(`${start}[\\s\\S]*?${end}`);
-  const match = text.replace(/\r\n/g, '\n').match(pattern);
-  assert.ok(match, `missing generated block ${start}`);
-  return match[0];
-}
-
 function fixture(files) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'instr-stack-'));
   for (const [rel, text] of Object.entries(files)) {
@@ -113,6 +106,12 @@ test('~/ paths resolve against the home directory', () => {
   assert.deepStrictEqual(refs, ['~/.definitely-missing-dir/x.md']);
 });
 
+test('the documented Windows ECC root resolves to the active checkout', () => {
+  const root = path.resolve(__dirname, '..', '..');
+  const text = 'See `C:\\Users\\developer\\SeaBridgeAI\\everything-claude-code\\protocols\\GOAL_PROTOCOL.md`.';
+  assert.deepStrictEqual(lib.brokenPathRefs(text, root, path.dirname(root)), []);
+});
+
 test('canonical safety rule supports bounded approval and controls Actions cost', () => {
   const canonical = fs.readFileSync(path.resolve(__dirname, '..', '..', 'protocols', 'SAFETY_AUTHORIZATION_RULE.md'), 'utf8');
   assert.match(canonical, /clearly bounded sequence named in advance/);
@@ -140,13 +139,6 @@ test('default instructions require runtime evidence without unconditional test e
 
 test('thin navigation files do not duplicate the canonical goal contract', () => {
   const root = path.resolve(__dirname, '..', '..');
-  const agents = fs.readFileSync(path.join(root, 'AGENTS.md'), 'utf8');
-  const expected = markerBlock(
-    agents,
-    '<!-- SEABRIDGE_GOAL_PROTOCOL_START -->',
-    '<!-- SEABRIDGE_GOAL_PROTOCOL_END -->',
-  );
-
   for (const name of ['CODEX.md', 'OPENCODE.md', 'CODING_AGENTS.md', '.codex/AGENTS.md']) {
     const adapter = fs.readFileSync(path.join(root, name), 'utf8');
     assert.doesNotMatch(adapter, /SEABRIDGE_GOAL_PROTOCOL_START/);

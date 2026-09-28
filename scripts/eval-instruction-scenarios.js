@@ -73,7 +73,7 @@ function expand(read, rel, depth = 0, seen = new Set()) {
   if (seen.has(rel) || depth > 4) return '';
   seen.add(rel);
   const text = read(rel);
-  if (text == null) return '';
+  if (text === null || text === undefined) return '';
   let out = text;
   const scan = text.replace(/```[\s\S]*?```/g, '').replace(/`[^`\n]*`/g, '');
   for (const m of scan.matchAll(/(^|\s)@([^\s`]+\.md)\b/g)) {
@@ -88,8 +88,11 @@ function stacks(repoName, ref) {
   const read = reader(repo, ref);
   const out = {};
   const agents = read('AGENTS.md');
-  if (agents != null) out.codex = agents;
-  const entry = read('CLAUDE.md') != null ? 'CLAUDE.md' : (agents != null ? 'AGENTS.md' : null);
+  const claude = read('CLAUDE.md');
+  if (agents !== null && agents !== undefined) out.codex = agents;
+  const entry = claude !== null && claude !== undefined
+    ? 'CLAUDE.md'
+    : (agents !== null && agents !== undefined ? 'AGENTS.md' : null);
   if (entry) {
     let t = expand(read, entry);
     for (const r of listRules(repo, ref)) {

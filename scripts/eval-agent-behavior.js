@@ -306,7 +306,7 @@ function infrastructureError(child, parsed) {
   return null;
 }
 
-function runBatch({ config, configPath, selected, runs, budgetUsd, outputPath }) {
+function runBatch({ configPath, selected, runs, budgetUsd, outputPath }) {
   const totalRuns = selected.harnesses.length * selected.scenarios.length * runs;
   const perRunBudgetUsd = budgetUsd / totalRuns;
   const results = [];

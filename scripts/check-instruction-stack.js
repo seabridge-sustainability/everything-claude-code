@@ -246,8 +246,15 @@ function brokenPathRefs(text, repo, workspace) {
     // Output directories may be created on demand and need not exist in a
     // detached validation checkout. Validate concrete file references only.
     if (!abs && !/\.(md|json|jsonc|toml|ps1|js|mjs|py|ts|tsx|yaml|yml|txt)$/.test(ref)) continue;
+    const portableWindowsRef = abs
+      ? ref.match(/\\everything-claude-code(?:\\(.*))?$/i)
+      : null;
     const candidates = home ? [path.join(process.env.USERPROFILE || process.env.HOME || '~', ref.slice(2))]
-      : abs ? [ref] : [path.join(repo, ref), path.join(workspace, ref), path.join(workspace, 'everything-claude-code', ref), path.join(ROOT, ref)];
+      : portableWindowsRef
+        ? [portableWindowsRef[1]
+          ? path.join(repo, ...portableWindowsRef[1].split('\\'))
+          : repo]
+        : abs ? [ref] : [path.join(repo, ref), path.join(workspace, ref), path.join(workspace, 'everything-claude-code', ref), path.join(ROOT, ref)];
     if (!candidates.some((c) => fs.existsSync(c))) broken.push(ref);
   }
   return [...new Set(broken)];

@@ -4,11 +4,6 @@ set -euo pipefail
 # ECC Codex global regression sanity check.
 # Validates that global ~/.codex state matches expected ECC integration.
 
-if ! command -v rg >/dev/null 2>&1; then
-  echo "ERROR: 'rg' (ripgrep) is required but not installed. Install it via: brew install ripgrep / apt install ripgrep" >&2
-  exit 1
-fi
-
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
@@ -110,7 +105,7 @@ if [[ -f "$CONFIG_FILE" ]]; then
     warn "persistent_instructions is not set (recommended but optional)"
   fi
   check_config_pattern '^\[profiles\.strict\]' "profiles.strict exists"
-  check_config_pattern '^\[profiles\.yolo\]' "profiles.yolo exists"
+  check_config_pattern '^\[profiles\.full-auto-approved\]' "profiles.full-auto-approved exists"
 
   # Current default connector set (docs/MCP-CONNECTOR-POLICY.md): exactly
   # one connector. Former defaults (github, memory, sequential-thinking,

@@ -27,7 +27,7 @@ const ROOT_KEYS = ['approval_policy', 'sandbox_mode', 'web_search', 'notify', 'p
 const TABLE_PATHS = [
   'features',
   'profiles.strict',
-  'profiles.yolo',
+  'profiles.full-auto-approved',
   'agents',
   'agents.explorer',
   'agents.reviewer',

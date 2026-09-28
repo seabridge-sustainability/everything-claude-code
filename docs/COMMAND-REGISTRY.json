@@ -23,7 +23,7 @@
     {
       "command": "build-fix",
       "description": "Detect the project build system and incrementally fix build/type errors with minimal safe changes.",
-      "type": "planning",
+      "type": "testing",
       "primaryAgents": [],
       "allAgents": [],
       "skills": [],
@@ -304,7 +304,7 @@
     },
     {
       "command": "go-test",
-      "description": "Enforce TDD workflow for Go. Write table-driven tests first, then implement. Verify 80%+ coverage with go test -cover.",
+      "description": "Run a focused Go TDD workflow. Write table-driven tests first, then implement, and apply repository-owned coverage requirements.",
       "type": "testing",
       "primaryAgents": [],
       "allAgents": [],
@@ -326,7 +326,7 @@
     {
       "command": "gradle-build",
       "description": "Fix Gradle build errors for Android and KMP projects",
-      "type": "planning",
+      "type": "testing",
       "primaryAgents": [],
       "allAgents": [],
       "skills": [],
@@ -335,7 +335,7 @@
     {
       "command": "grill-me-codex",
       "description": "Interview-driven plan, Claude/Codex adversarial consensus, Codex execution, Claude review — for architecturally significant work.",
-      "type": "review",
+      "type": "testing",
       "primaryAgents": [],
       "allAgents": [],
       "skills": [
@@ -411,7 +411,7 @@
     {
       "command": "instinct-status",
       "description": "Show learned instincts (project + global) with confidence",
-      "type": "review",
+      "type": "testing",
       "primaryAgents": [],
       "allAgents": [],
       "skills": [
@@ -463,7 +463,7 @@
     },
     {
       "command": "kotlin-test",
-      "description": "Enforce TDD workflow for Kotlin. Write Kotest tests first, then implement. Verify 80%+ coverage with Kover.",
+      "description": "Run a focused Kotlin TDD workflow. Write Kotest tests first, then implement, and apply repository-owned coverage requirements.",
       "type": "testing",
       "primaryAgents": [],
       "allAgents": [],
@@ -485,7 +485,7 @@
     {
       "command": "learn",
       "description": "Extract reusable patterns from the current session and save them as candidate skills or guidance.",
-      "type": "review",
+      "type": "testing",
       "primaryAgents": [],
       "allAgents": [],
       "skills": [],
@@ -686,7 +686,7 @@
     {
       "command": "pm2",
       "description": "Analyze a project and generate PM2 service commands for detected frontend, backend, or database services.",
-      "type": "planning",
+      "type": "testing",
       "primaryAgents": [],
       "allAgents": [],
       "skills": [],
@@ -715,7 +715,7 @@
     {
       "command": "projects",
       "description": "List known projects and their instinct statistics",
-      "type": "planning",
+      "type": "testing",
       "primaryAgents": [],
       "allAgents": [],
       "skills": [
@@ -726,7 +726,7 @@
     {
       "command": "promote",
       "description": "Promote project-scoped instincts to global scope",
-      "type": "review",
+      "type": "testing",
       "primaryAgents": [],
       "allAgents": [],
       "skills": [
@@ -782,7 +782,7 @@
     {
       "command": "prune",
       "description": "Delete pending instincts older than 30 days that were never promoted",
-      "type": "review",
+      "type": "testing",
       "primaryAgents": [],
       "allAgents": [],
       "skills": [
@@ -924,7 +924,7 @@
     },
     {
       "command": "rust-test",
-      "description": "Enforce TDD workflow for Rust. Write tests first, then implement. Verify 80%+ coverage with cargo-llvm-cov.",
+      "description": "Run an explicit Rust TDD workflow and apply repository-owned coverage requirements.",
       "type": "testing",
       "primaryAgents": [],
       "allAgents": [],
@@ -970,7 +970,7 @@
     {
       "command": "sessions",
       "description": "Manage Claude Code session history, aliases, and session metadata.",
-      "type": "planning",
+      "type": "testing",
       "primaryAgents": [],
       "allAgents": [],
       "skills": [],
@@ -979,7 +979,7 @@
     {
       "command": "setup-pm",
       "description": "Configure your preferred package manager (npm/pnpm/yarn/bun)",
-      "type": "planning",
+      "type": "testing",
       "primaryAgents": [],
       "allAgents": [],
       "skills": [],
@@ -997,7 +997,7 @@
     {
       "command": "skill-health",
       "description": "Show skill portfolio health dashboard with charts and analytics",
-      "type": "review",
+      "type": "testing",
       "primaryAgents": [],
       "allAgents": [],
       "skills": [],
@@ -1015,7 +1015,7 @@
     {
       "command": "update-codemaps",
       "description": "Scan project structure and generate token-lean architecture codemaps.",
-      "type": "planning",
+      "type": "testing",
       "primaryAgents": [],
       "allAgents": [],
       "skills": [],
@@ -1052,9 +1052,9 @@
     "byType": {
       "general": 6,
       "orchestration": 11,
-      "planning": 8,
-      "review": 15,
-      "testing": 56
+      "planning": 1,
+      "review": 9,
+      "testing": 69
     },
     "topAgents": [
       {

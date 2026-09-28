@@ -90,7 +90,7 @@ integrity issues without weakening the canonical safety contract.
 
 ## Verification evidence
 
-- Instruction registry: 19/19 checks, including adapter and product-drift
+- Instruction registry: 20/20 checks, including adapter and product-drift
   negative controls.
 - Agent-system efficiency: 9/9.
 - Behavioral-eval contract: 39/39; dry planning is free, the hard nine-run
@@ -140,7 +140,7 @@ enforces a hard per-run dollar cap; Codex and Gemini require the separate
 CLI ceilings. It is not scheduled in GitHub Actions.
 
 Final focused verification for this follow-up: behavior 39/39, ROI 14/14, CI
-scope 40/40, instruction stack 19/19, skill routing 26/26, package-lock parity
+scope 40/40, instruction stack 20/20, skill routing 26/26, package-lock parity
 3/3 sections, and safety-sync coverage 9/9. The strict validator accepted all
 901 skill directories, 70 generated wrappers were current, and all 37 install
 modules, 84 install components, and seven profiles validated. No paid provider

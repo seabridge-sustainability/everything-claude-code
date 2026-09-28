@@ -409,6 +409,7 @@ function runHermeticPythonPrePush({
       ? process.env.PATH
       : `${toBashPath(pathBin)}${path.delimiter}${process.env.PATH}`,
     HOME: process.env.HOME ?? '',
+    ECC_PREPUSH_RUN_CHECKS: '1',
     ECC_SKIP_GIT_HOOKS: '0',
     ECC_SKIP_PREPUSH: '0',
     MSYS_NO_PATHCONV: '1',
@@ -457,7 +458,8 @@ else failed++;
 // A case-folded spelling, because macOS resolves `$venv/bin/python` to a committed
 // `Python` while git matches index pathspecs case-sensitively. Skipped where the
 // filesystem is case-sensitive and the two names cannot collide.
-if (fs.existsSync(__filename.toUpperCase()) || fs.existsSync(__filename.toLowerCase())) {
+const caseVariant = __filename.toUpperCase();
+if (caseVariant !== __filename && fs.existsSync(caseVariant)) {
   if (
     test('pre-push refuses a tracked interpreter committed under a folded case', () => {
       const { result, calls } = runHermeticPythonPrePush({
@@ -801,7 +803,7 @@ if (
       assert.strictEqual(parsed.web_search, 'live');
       assert.strictEqual(parsed.features.multi_agent, true);
       assert.strictEqual(parsed.profiles.strict.approval_policy, 'on-request');
-      assert.strictEqual(parsed.profiles.yolo.approval_policy, 'never');
+      assert.strictEqual(parsed.profiles['full-auto-approved'].approval_policy, 'never');
       assert.strictEqual(parsed.agents.max_threads, 6);
       assert.strictEqual(parsed.agents.explorer.config_file, 'agents/explorer.toml');
     } finally {
@@ -1133,7 +1135,7 @@ if (
       assert.strictEqual(parsedConfig.features.multi_agent, true);
       assert.ok(parsedConfig.profiles);
       assert.strictEqual(parsedConfig.profiles.strict.approval_policy, 'on-request');
-      assert.strictEqual(parsedConfig.profiles.yolo.approval_policy, 'never');
+      assert.strictEqual(parsedConfig.profiles['full-auto-approved'].approval_policy, 'never');
       assert.ok(parsedConfig.agents);
       assert.strictEqual(parsedConfig.agents.max_threads, 6);
       assert.strictEqual(parsedConfig.agents.max_depth, 1);
