@@ -2,13 +2,17 @@
 title: Knowledge Vault Index
 type: index
 created: 2026-07-06
-updated: 2026-07-06
+updated: 2026-09-28
+status: superseded
+superseded_by: docs/SKILL-PLACEMENT-POLICY.md
 tags:
   - knowledge-vault
 ---
 
-Use this file first when querying the ECC knowledge vault. Read only the
-relevant wiki pages and source records after selecting a topic.
+Retired on 2026-09-28. This folder holds one trial ingest and gets no new pages.
+Its only topic is canonical in `docs/SKILL-PLACEMENT-POLICY.md`. Knowledge
+placement is governed by `config/knowledge-sources.json`; see
+`docs/design/seabridge-knowledge-architecture.md`.
 
 ## ECC Skills
 

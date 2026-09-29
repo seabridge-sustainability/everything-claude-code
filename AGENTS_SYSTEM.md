@@ -60,7 +60,7 @@ Load order for a task (read only what the task actually needs):
 2. Local repo AGENTS.md or CLAUDE.md (usually auto-loaded by the runtime).
 3. ECC SEABRIDGE_CODING_AGENT_SYSTEM.md, for non-trivial work.
 4. ECC repo-integrations/<repo>.md.
-5. The smallest relevant skills/sea-* canonical skill or .agents/skills/sea-* wrapper.
+5. The smallest relevant `skills/sea-*` canonical skill or `.agents/skills/sea-*` wrapper.
 6. `AGENT_SKILLS.md` and the smallest relevant engineering-skill wrapper when invoked or clearly applicable.
 7. Matching workflows/ and checklists/.
 
@@ -261,46 +261,31 @@ handling, accessibility, data-loss protections, source integrity, or explicitly
 requested behavior. For non-trivial changes, leave the smallest meaningful
 verification that would catch a regression, and document any skipped checks.
 
-## LLM Wiki / Knowledge Vault Protocol
+## Knowledge Placement
 
-SeaBridgeAI supports a lightweight LLM Wiki pattern for non-sensitive,
-durable knowledge that should compound over time. This is not a competing
-memory layer. It is a Markdown knowledge-vault workflow that routes through
-existing ECC systems: `agent-memory` for session/project/runtime memory
-questions, `knowledge-ops` for ingestion, storage, and deduplication decisions,
-`sea-knowledge-vault` before editing or validating wiki notes, and
-`openkb-knowledge-base` only when a compiled OpenKB/PageIndex workflow is
-explicitly requested or already configured.
+Where a piece of information lives is decided by
+`config/knowledge-sources.json`, explained in
+`docs/design/seabridge-knowledge-architecture.md`, and routed by the
+`knowledge-ops` skill. Each information type has one owner:
 
-Default vault structure:
+- coding-agent handoffs, discoveries, pending decisions, and resumable context
+  go to the ECC Memory Vault (`scripts/memory.js`, user scope on this machine);
+- engineering rules, decisions, API contracts, and runbooks go to governed repo
+  docs;
+- the operator's business knowledge goes to GBrain, proposed by agents and
+  written by the operator;
+- customer and tenant data never leaves the platform's tenant-scoped stores.
 
-- `knowledge-vault/raw/` stores immutable source inputs or source-reference
-  records for repo-owned files.
-- `knowledge-vault/wiki/` stores agent-maintained Markdown synthesis pages.
-- `knowledge-vault/index.md` is the content-oriented navigation entrypoint.
-- `knowledge-vault/log.md` is the append-only chronological operations log.
-- `knowledge-vault/assets/` is optional and only for approved local images.
+Obsidian is an interface over Markdown and owns nothing. The ECC
+`knowledge-vault/` LLM Wiki trial is retired (2026-09-28): read it only as
+history and do not add pages. Use `sea-knowledge-vault` when editing or
+validating Obsidian-style Markdown notes, and `openkb-knowledge-base` only when
+a compiled OpenKB/PageIndex workflow is explicitly requested or already
+configured.
 
-Raw sources are the source of truth. Wiki pages are Markdown synthesis maintained
-by agents, with YAML frontmatter where useful, Obsidian-style `[[wikilinks]]`
-where they add navigational value, explicit source/provenance links, confidence
-or caveat notes when claims are incomplete, and no secrets, credentials,
-customer data, private conversations, auth files, `.env` content, token-bearing
-logs, or proprietary third-party content unless explicitly approved and
-sanitized.
-
-Ingest path: classify the source with `knowledge-ops`, check for duplicates,
-store or reference it under `knowledge-vault/raw/`, update or create only the
-wiki pages that earn their keep, update `knowledge-vault/index.md`, and append
-`knowledge-vault/log.md`. Query path: read `knowledge-vault/index.md` first,
-then only relevant wiki pages and source records. Lint path: check stale pages,
-contradictions, orphans, missing links, duplicates, missing frontmatter, source
-or provenance gaps, and sensitive-source leakage.
-
-Do not duplicate the same fact into agent memory, project memory, OpenKB, and
-the wiki unless explicitly requested. Apply the Ponytail minimalism guardrail:
-do not create pages, folders, schemas, assets, or tooling unless they earn their
-keep; prefer the index and plain Markdown before search infrastructure.
+Do not duplicate the same fact across stores. Apply the Ponytail minimalism
+guardrail: do not create pages, folders, schemas, assets, or tooling unless
+they earn their keep.
 
 ## Autonomous Senior Engineer Operating Model
 

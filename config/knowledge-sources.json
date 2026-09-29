@@ -1,0 +1,697 @@
+{
+  "schema": "seabridge.knowledge-sources.v1",
+  "updatedAt": "2026-09-28",
+  "trustStates": ["unreviewed", "verified", "governed", "superseded"],
+  "sources": [
+    {
+      "id": "governed-repo-docs",
+      "title": "Repository AGENTS.md, docs, ADRs and ECC skills",
+      "authority": "canonical",
+      "lifecycle": "active",
+      "informationTypes": ["engineering-rules", "coding-standards", "architecture-decisions", "api-contracts", "runbooks", "agent-skills"],
+      "canonicalStore": {
+        "kind": "git-docs",
+        "location": "each repo: AGENTS.md, docs/, and everything-claude-code:skills/, protocols/, docs/decisions/"
+      },
+      "owner": "Alejandro (operator); each repo owns its own docs",
+      "scope": { "levels": ["workspace", "project"] },
+      "sensitivity": "internal",
+      "tenantData": "forbidden",
+      "trustStates": ["verified", "governed", "superseded"],
+      "retention": {
+        "policy": "Kept in git history indefinitely.",
+        "supersession": "Superseded docs are marked superseded and point to their replacement; dated reports are never rewritten."
+      },
+      "readers": ["operator", "coding-agents", "ci"],
+      "writers": ["operator", "coding-agents"],
+      "agentAccess": "propose-only",
+      "derivedFrom": [],
+      "derivedProjections": [],
+      "citation": {
+        "required": true,
+        "identifier": "repo + path (+ heading)",
+        "version": "git commit SHA"
+      },
+      "health": {
+        "mechanism": "Instruction-stack check and instruction eval scenarios in ECC",
+        "freshness": "git log date of the cited file",
+        "command": "node scripts/check-instruction-stack.js"
+      },
+      "state": {
+        "status": "operational",
+        "verifiedAt": "2026-09-28",
+        "evidence": "AGENTS.md present and read in ECC and manageesg-backend; instruction-stack checker present in ECC."
+      }
+    },
+    {
+      "id": "repo-source-code",
+      "title": "Product and agent-system source code",
+      "authority": "canonical",
+      "lifecycle": "active",
+      "informationTypes": ["source-code"],
+      "canonicalStore": {
+        "kind": "git-repo",
+        "location": "manageesg-backend, manageesg-frontend, everything-claude-code, openseabri, autoresearch"
+      },
+      "owner": "Alejandro (operator)",
+      "scope": { "levels": ["project"] },
+      "sensitivity": "confidential",
+      "tenantData": "forbidden",
+      "trustStates": ["verified", "governed", "superseded"],
+      "retention": {
+        "policy": "Kept in git history indefinitely.",
+        "supersession": "Replaced by later commits; code is truth only at a named commit."
+      },
+      "readers": ["operator", "coding-agents", "ci", "graph-builders"],
+      "writers": ["operator", "coding-agents"],
+      "agentAccess": "read-write",
+      "derivedFrom": [],
+      "derivedProjections": ["graphify-code-graph"],
+      "citation": {
+        "required": true,
+        "identifier": "repo + path:line",
+        "version": "git commit SHA"
+      },
+      "health": {
+        "mechanism": "Each repo's own test suites and hooks",
+        "freshness": "Remote branch tip"
+      },
+      "state": {
+        "status": "operational",
+        "verifiedAt": "2026-09-28",
+        "evidence": "All five repos present with git remotes."
+      }
+    },
+    {
+      "id": "ecc-memory-vault",
+      "title": "ECC Memory Vault (coding-agent memory)",
+      "authority": "canonical",
+      "lifecycle": "active",
+      "informationTypes": ["agent-handoffs", "agent-discoveries", "agent-pending-decisions", "resumable-task-context", "agent-working-preferences"],
+      "canonicalStore": {
+        "kind": "ecc-memory-vault",
+        "location": "<repo>:.ecc/memory (project, team); ~/.ecc/memory (user)"
+      },
+      "owner": "Alejandro (operator)",
+      "scope": {
+        "levels": ["project", "team", "user"],
+        "notes": "Project scope resolves to each checkout and is git-ignored, so on this machine (many worktrees) cross-session memory goes to the user scope, tagged repo-<name>. Team scope is reviewed before it is shared. User scope is recalled only on an explicit request."
+      },
+      "sensitivity": "internal",
+      "tenantData": "forbidden",
+      "trustStates": ["unreviewed", "superseded"],
+      "retention": {
+        "policy": "Kept until superseded or rejected. Only durable, reusable context is written; raw transcripts are never stored.",
+        "supersession": "Status becomes superseded with a link to the replacement; accepted knowledge is promoted into governed-repo-docs."
+      },
+      "readers": ["operator", "coding-agents"],
+      "writers": ["operator", "coding-agents"],
+      "agentAccess": "read-write",
+      "derivedFrom": [],
+      "derivedProjections": [],
+      "citation": {
+        "required": true,
+        "identifier": "ecc.memory.v1 memory id",
+        "version": "updatedAt"
+      },
+      "health": {
+        "mechanism": "ecc.memory.v1 format validator (scripts/lib/memory-vault-format.js); ECC memory CLI and MCP server",
+        "freshness": "updatedAt per memory",
+        "command": "node scripts/memory.js"
+      },
+      "state": {
+        "status": "operational",
+        "verifiedAt": "2026-09-28",
+        "evidence": "User scope initialized at ~/.ecc/memory on 2026-09-28; memory doctor ok with 8 memories (7 module-status handoffs and 1 runbook migrated from Claude auto-memory, customer identifiers removed); search --scope user returns them and default-scope search does not.",
+        "gaps": [
+          "Project and team scopes are not initialized in any repo.",
+          "No harness is configured to start ecc-memory-mcp; agents use the CLI."
+        ]
+      }
+    },
+    {
+      "id": "gbrain",
+      "title": "GBrain business and world knowledge",
+      "authority": "canonical",
+      "lifecycle": "active",
+      "informationTypes": ["organizations", "people", "business-relationships", "meetings", "market-research", "business-strategy"],
+      "canonicalStore": {
+        "kind": "gbrain",
+        "location": "~/.gbrain/brain.pglite (local PGLite)"
+      },
+      "owner": "Alejandro (operator)",
+      "scope": {
+        "levels": ["user"],
+        "notes": "The operator's own knowledge about SeaBridgeAI's business. Not customer data and not coding-agent memory."
+      },
+      "sensitivity": "confidential",
+      "tenantData": "forbidden",
+      "trustStates": ["unreviewed", "verified", "superseded"],
+      "retention": {
+        "policy": "Kept until superseded; original sources are cited on each page.",
+        "supersession": "Superseded pages keep a timeline entry pointing to the newer page."
+      },
+      "readers": ["operator", "coding-agents"],
+      "writers": ["operator"],
+      "agentAccess": "propose-only",
+      "derivedFrom": [],
+      "derivedProjections": [],
+      "citation": {
+        "required": true,
+        "identifier": "GBrain page slug",
+        "version": "page updated timestamp"
+      },
+      "health": {
+        "mechanism": "gbrain stats and gbrain doctor --json (serialize: PGLite is single-writer)",
+        "freshness": "Page timestamps and timeline entries",
+        "command": "gbrain stats"
+      },
+      "state": {
+        "status": "degraded",
+        "verifiedAt": "2026-09-28",
+        "evidence": "gbrain 0.22.4; stats: 37,995 pages (28,011 concept, 9,920 code, about 10 business-typed), 0 embedded, 0 links.",
+        "gaps": [
+          "The corpus is mostly repo source imported in May 2026, which overlaps graphify-code-graph; the target role is business knowledge only.",
+          "Demoted to reference/experiment on 2026-07-07 (docs/decisions/knowledge-workspace/2026-07-07-graphify-falkordb-gbrain-integration.md).",
+          "Clearing the code corpus deletes database content, so the operator runs it; the prepared commands are in docs/design/seabridge-knowledge-architecture.md.",
+          "Embeddings stay off: 0.22.4 embeds only through OpenAI, and the 2026-07-07 attempt was blocked as data exfiltration. Search is keyword-only.",
+          "Upstream GBrain 0.56.2.0 (_upstream/gbrain, 2026-09-24) has local embedding recipes (Ollama, LM Studio, llama-server); using them needs an operator-approved upgrade.",
+          "MCP is configured only in openseabri/.mcp.json and an uncommitted ECC knowledge profile."
+        ]
+      }
+    },
+    {
+      "id": "obsidian-knowledge-workspace",
+      "title": "Obsidian vault over approved Markdown (SeaBridgeAI knowledge workspace)",
+      "authority": "interface",
+      "lifecycle": "active",
+      "informationTypes": [],
+      "canonicalStore": {
+        "kind": "obsidian-vault",
+        "location": "SeaBridgeAI knowledge workspace folder (sibling of the repos; not version-controlled)"
+      },
+      "owner": "Alejandro (operator)",
+      "scope": { "levels": ["workspace"] },
+      "sensitivity": "internal",
+      "tenantData": "forbidden",
+      "trustStates": ["unreviewed", "verified", "superseded"],
+      "retention": {
+        "policy": "Notes link to canonical sources instead of restating them.",
+        "supersession": "Superseded notes are marked in frontmatter, not deleted."
+      },
+      "readers": ["operator", "coding-agents"],
+      "writers": ["operator"],
+      "agentAccess": "propose-only",
+      "derivedFrom": [],
+      "derivedProjections": [],
+      "citation": {
+        "required": true,
+        "identifier": "Vault-relative note path",
+        "version": "Frontmatter updated date (no version control)"
+      },
+      "health": {
+        "mechanism": "vaultsafe validator in the knowledge workspace",
+        "freshness": "Frontmatter updated field",
+        "command": "python tools/knowledge/vaultsafe.py validate ."
+      },
+      "state": {
+        "status": "operational",
+        "verifiedAt": "2026-09-28",
+        "evidence": "Registered in Obsidian's app config; 17 Markdown notes. On 2026-09-28 its five decision notes were copied unchanged into everything-claude-code docs/decisions/knowledge-workspace/ and the originals marked status: superseded with a pointer; what remains is navigation.",
+        "gaps": [
+          "Not version-controlled; acceptable now that it owns no canonical content.",
+          "vaultsafe validate fails on one pre-existing unresolved link in Welcome.md.",
+          "Obsidian also registers manageesg-backend graphify-out as a vault; that and each repo's graphify-obsidian folder are generated views of graphify-code-graph."
+        ]
+      }
+    },
+    {
+      "id": "ecc-knowledge-vault",
+      "title": "ECC standalone knowledge-vault folder",
+      "authority": "cache",
+      "lifecycle": "deprecated",
+      "informationTypes": [],
+      "canonicalStore": {
+        "kind": "markdown-folder",
+        "location": "everything-claude-code:knowledge-vault/"
+      },
+      "owner": "Alejandro (operator)",
+      "scope": { "levels": ["project"] },
+      "sensitivity": "internal",
+      "tenantData": "forbidden",
+      "trustStates": ["unreviewed", "superseded"],
+      "retention": {
+        "policy": "No new writes. Its one page restates docs/SKILL-PLACEMENT-POLICY.md.",
+        "supersession": "Retired 2026-09-28 and superseded by governed-repo-docs; removing the folder is an operator action (git rm -r knowledge-vault)."
+      },
+      "readers": ["operator", "coding-agents"],
+      "writers": [],
+      "agentAccess": "read-only",
+      "derivedFrom": [],
+      "derivedProjections": [],
+      "citation": {
+        "required": true,
+        "identifier": "Folder-relative path",
+        "version": "git commit SHA"
+      },
+      "health": {
+        "mechanism": "None; retiring",
+        "freshness": "Last ingest 2026-07-06"
+      },
+      "state": {
+        "status": "retiring",
+        "verifiedAt": "2026-09-28",
+        "evidence": "Four tracked files from one trial ingest of docs/SKILL-PLACEMENT-POLICY.md on 2026-07-06; index.md marked superseded and the AGENTS_SYSTEM.md protocol replaced by Knowledge Placement on 2026-09-28."
+      }
+    },
+    {
+      "id": "harness-memory",
+      "title": "Vendor harness memory (Claude auto-memory, Codex and Gemini equivalents)",
+      "authority": "cache",
+      "lifecycle": "active",
+      "informationTypes": [],
+      "canonicalStore": {
+        "kind": "harness-memory",
+        "location": "~/.claude/projects/<project>/memory and each harness's own memory folder"
+      },
+      "owner": "Alejandro (operator)",
+      "scope": { "levels": ["user"] },
+      "sensitivity": "internal",
+      "tenantData": "forbidden",
+      "trustStates": ["unreviewed", "superseded"],
+      "retention": {
+        "policy": "Harness-private convenience copy; never the only home of cross-agent knowledge.",
+        "supersession": "Entries are updated or deleted by the harness; durable ones move to ecc-memory-vault."
+      },
+      "readers": ["operator", "coding-agents"],
+      "writers": ["operator", "coding-agents"],
+      "agentAccess": "read-write",
+      "derivedFrom": [],
+      "derivedProjections": [],
+      "citation": {
+        "required": false,
+        "identifier": "Memory file name",
+        "version": "File modified time"
+      },
+      "health": {
+        "mechanism": "None shared across harnesses",
+        "freshness": "File modified time"
+      },
+      "state": {
+        "status": "degraded",
+        "verifiedAt": "2026-09-28",
+        "evidence": "Claude auto-memory for manageesg-backend holds 8 project-status entries and 1 runbook; on 2026-09-28 the 7 module-status entries and the runbook were copied, sanitized, into ecc-memory-vault user scope.",
+        "gaps": ["The Claude entries still contain customer names and property, meter and account identifiers, which this contract forbids in harness memory; scrubbing them is an operator decision because other sessions rely on them."]
+      }
+    },
+    {
+      "id": "mcp-memory",
+      "title": "Generic MCP memory server (knowledge-graph entities)",
+      "authority": "cache",
+      "lifecycle": "deprecated",
+      "informationTypes": [],
+      "canonicalStore": {
+        "kind": "mcp-memory",
+        "location": "MCP memory server entity store"
+      },
+      "owner": "Alejandro (operator)",
+      "scope": { "levels": ["user"] },
+      "sensitivity": "internal",
+      "tenantData": "forbidden",
+      "trustStates": ["unreviewed", "superseded"],
+      "retention": {
+        "policy": "No new writes.",
+        "supersession": "Superseded by ecc-memory-vault."
+      },
+      "readers": ["operator"],
+      "writers": [],
+      "agentAccess": "none",
+      "derivedFrom": [],
+      "derivedProjections": [],
+      "citation": {
+        "required": false,
+        "identifier": "Entity name",
+        "version": "None"
+      },
+      "health": {
+        "mechanism": "None; retiring",
+        "freshness": "Unknown"
+      },
+      "state": {
+        "status": "retiring",
+        "verifiedAt": "2026-09-28",
+        "evidence": "No memory server is configured in the ECC, backend, or frontend .mcp.json; the graph was empty on 2026-07-07; knowledge-ops stopped instructing mcp__memory__* writes on 2026-09-28."
+      }
+    },
+    {
+      "id": "issue-tracker",
+      "title": "GitHub issues and pull requests",
+      "authority": "canonical",
+      "lifecycle": "active",
+      "informationTypes": ["active-work-items", "review-state"],
+      "canonicalStore": {
+        "kind": "issue-tracker",
+        "location": "github:seabridge-sustainability/*"
+      },
+      "owner": "Alejandro (operator)",
+      "scope": { "levels": ["project"] },
+      "sensitivity": "internal",
+      "tenantData": "forbidden",
+      "trustStates": ["unreviewed", "verified", "superseded"],
+      "retention": {
+        "policy": "Execution state, not durable knowledge; closed items keep their history.",
+        "supersession": "Durable conclusions are promoted into governed-repo-docs."
+      },
+      "readers": ["operator", "coding-agents", "ci"],
+      "writers": ["operator", "coding-agents", "ci"],
+      "agentAccess": "propose-only",
+      "derivedFrom": [],
+      "derivedProjections": [],
+      "citation": {
+        "required": true,
+        "identifier": "Issue or PR URL",
+        "version": "Comment or event timestamp"
+      },
+      "health": {
+        "mechanism": "GitHub",
+        "freshness": "Issue updated time"
+      },
+      "state": {
+        "status": "operational",
+        "verifiedAt": "2026-09-28",
+        "evidence": "Repos use github.com/seabridge-sustainability remotes."
+      }
+    },
+    {
+      "id": "platform-knowledge-documents",
+      "title": "Platform knowledge ingestion: tenant documents, versions and chunks",
+      "authority": "canonical",
+      "lifecycle": "active",
+      "informationTypes": ["tenant-documents", "document-versions", "document-chunks"],
+      "canonicalStore": {
+        "kind": "mongodb",
+        "location": "manageesg-backend:mongodb (app/models/knowledge.py)",
+        "collections": ["knowledge_source_resources", "knowledge_source_versions", "knowledge_chunks", "knowledge_ingestion_jobs"]
+      },
+      "owner": "manageesg-backend platform",
+      "scope": {
+        "levels": ["tenant"],
+        "isolationKey": "tenant_id + company_id, then allowed_user_ids for restricted sources"
+      },
+      "sensitivity": "tenant-confidential",
+      "tenantData": "required",
+      "trustStates": ["unreviewed", "verified", "superseded"],
+      "retention": {
+        "policy": "Per tenant retention; versions are immutable once ready.",
+        "supersession": "A new SourceResourceVersion supersedes the previous one; chunks belong to exactly one version."
+      },
+      "readers": ["tenant-users", "platform-services", "platform-agents"],
+      "writers": ["tenant-users", "platform-services"],
+      "agentAccess": "none",
+      "derivedFrom": [],
+      "derivedProjections": ["platform-structured-rag"],
+      "citation": {
+        "required": true,
+        "identifier": "resource id + version id + chunk id",
+        "version": "SourceResourceVersion content_hash and parser_version"
+      },
+      "health": {
+        "mechanism": "knowledge_ingestion_jobs state via GET /api/v1/knowledge/{company_id}/ingestion-jobs/{job_id}",
+        "freshness": "Version ready time and ingestion job state"
+      },
+      "state": {
+        "status": "implemented-unverified",
+        "verifiedAt": "2026-09-28",
+        "evidence": "Models, service, and /api/v1/knowledge endpoints exist; runtime not observed in this pass.",
+        "gaps": [
+          "search() loads up to 500 scoped chunks and ranks them by substring match in Python although the knowledge_chunk_text text index exists (Phase 6).",
+          "As of 2026-09-28 the module (app/models/knowledge.py, app/services/knowledge.py, app/api/v1/endpoints/knowledge.py) is another session's uncommitted work in the main checkout, so the fix belongs to that work."
+        ]
+      }
+    },
+    {
+      "id": "platform-product-records",
+      "title": "Platform product facts and evidence packages",
+      "authority": "canonical",
+      "lifecycle": "active",
+      "informationTypes": ["product-facts", "evidence-packages"],
+      "canonicalStore": {
+        "kind": "mongodb",
+        "location": "manageesg-backend:mongodb (Beanie models in app/models)",
+        "collections": ["evidence_packages"]
+      },
+      "owner": "manageesg-backend platform",
+      "scope": {
+        "levels": ["tenant"],
+        "isolationKey": "tenant_id + company_id"
+      },
+      "sensitivity": "tenant-confidential",
+      "tenantData": "required",
+      "trustStates": ["unreviewed", "verified", "superseded"],
+      "retention": {
+        "policy": "Per tenant and per module retention rules in the backend.",
+        "supersession": "Module-specific: records keep source, version and provenance fields; missing values stay missing, never zero."
+      },
+      "readers": ["tenant-users", "platform-services", "platform-agents"],
+      "writers": ["tenant-users", "platform-services"],
+      "agentAccess": "none",
+      "derivedFrom": [],
+      "derivedProjections": ["sustainability-graph"],
+      "citation": {
+        "required": true,
+        "identifier": "Model name + record id",
+        "version": "Record updated_at; evidence packages list processed_resource_ids"
+      },
+      "health": {
+        "mechanism": "Module test manifests and endpoint health",
+        "freshness": "Record updated_at"
+      },
+      "state": {
+        "status": "implemented-unverified",
+        "verifiedAt": "2026-09-28",
+        "evidence": "Beanie models exist, including evidence_packages keyed by tenant_id and company_id; runtime not observed in this pass."
+      }
+    },
+    {
+      "id": "platform-agent-memory",
+      "title": "Platform agent memory: tenant and user preferences, corrections, workflow context",
+      "authority": "canonical",
+      "lifecycle": "active",
+      "informationTypes": ["tenant-user-preferences", "agent-corrections", "agent-workflow-context"],
+      "canonicalStore": {
+        "kind": "mongodb",
+        "location": "manageesg-backend:mongodb (seabridge_ai/src/sustainability_ai/memory)",
+        "collections": ["agent_memory"]
+      },
+      "owner": "manageesg-backend platform",
+      "scope": {
+        "levels": ["tenant", "user"],
+        "isolationKey": "namespace tenant:{tenant_id}[:user|agent|deal|property:{id}] with a tenant_id filter on every read"
+      },
+      "sensitivity": "tenant-confidential",
+      "tenantData": "required",
+      "trustStates": ["unreviewed", "verified", "superseded"],
+      "retention": {
+        "policy": "Scoped operational memory; deletable per record via DELETE /api/v1/memory/{memory_id}.",
+        "supersession": "Newer corrections replace older ones within the same namespace."
+      },
+      "readers": ["tenant-users", "platform-services", "platform-agents"],
+      "writers": ["tenant-users", "platform-services", "platform-agents"],
+      "agentAccess": "none",
+      "derivedFrom": [],
+      "derivedProjections": [],
+      "citation": {
+        "required": true,
+        "identifier": "agent_memory record id + namespace",
+        "version": "Record updated time"
+      },
+      "health": {
+        "mechanism": "Memory audit (memory/audit.py) and /api/v1/memory endpoints",
+        "freshness": "Record updated time"
+      },
+      "state": {
+        "status": "implemented-unverified",
+        "verifiedAt": "2026-09-28",
+        "evidence": "MemoryStore reads always filter by tenant_id; namespace helpers embed tenant isolation; runtime not observed in this pass."
+      }
+    },
+    {
+      "id": "platform-structured-rag",
+      "title": "Structured RAG / PageIndex document trees",
+      "authority": "projection",
+      "lifecycle": "active",
+      "informationTypes": ["structured-document-navigation"],
+      "canonicalStore": {
+        "kind": "mongodb",
+        "location": "manageesg-backend:mongodb (ai_agents/structured_rag/storage.py)",
+        "collections": ["structured_indexes"]
+      },
+      "owner": "manageesg-backend platform",
+      "scope": {
+        "levels": ["tenant"],
+        "isolationKey": "company_id (no tenant_id field today)"
+      },
+      "sensitivity": "tenant-confidential",
+      "tenantData": "required",
+      "trustStates": ["unreviewed", "verified", "superseded"],
+      "retention": {
+        "policy": "Rebuildable from the source document.",
+        "supersession": "Upserted per source_record_id; a rebuild replaces the tree."
+      },
+      "readers": ["tenant-users", "platform-services", "platform-agents"],
+      "writers": ["platform-services"],
+      "agentAccess": "none",
+      "derivedFrom": ["platform-knowledge-documents"],
+      "derivedProjections": [],
+      "citation": {
+        "required": true,
+        "identifier": "source_record_id + tree node",
+        "version": "Index build time"
+      },
+      "health": {
+        "mechanism": "Index document status field",
+        "freshness": "Index build time"
+      },
+      "state": {
+        "status": "implemented-unverified",
+        "verifiedAt": "2026-09-28",
+        "evidence": "structured_indexes collection keyed by company_id, deal_id or property_id, and status.",
+        "gaps": [
+          "Keyed by source_record_id, not yet linked to knowledge_source_versions ids (Phase 6).",
+          "Scoped by company_id only; no tenant_id field."
+        ]
+      }
+    },
+    {
+      "id": "sustainability-graph",
+      "title": "Sustainability Graph (product and domain relationships)",
+      "authority": "projection",
+      "lifecycle": "active",
+      "informationTypes": ["sustainability-relationships"],
+      "canonicalStore": {
+        "kind": "mongodb",
+        "location": "manageesg-backend:mongodb (app/models/sustainability_graph.py)",
+        "collections": ["sustainability_graph_nodes", "sustainability_graph_edges", "sustainability_graph_index_runs"]
+      },
+      "owner": "manageesg-backend platform",
+      "scope": {
+        "levels": ["tenant"],
+        "isolationKey": "company_id; nodes carry source_model + source_id"
+      },
+      "sensitivity": "tenant-confidential",
+      "tenantData": "required",
+      "trustStates": ["unreviewed", "verified", "superseded"],
+      "retention": {
+        "policy": "Rebuildable by the indexer from platform records.",
+        "supersession": "Nodes are soft-deleted (is_deleted) when their source record goes away."
+      },
+      "readers": ["tenant-users", "platform-services", "platform-agents"],
+      "writers": ["platform-services"],
+      "agentAccess": "none",
+      "derivedFrom": ["platform-product-records"],
+      "derivedProjections": [],
+      "citation": {
+        "required": true,
+        "identifier": "Graph node id + source_model + source_id",
+        "version": "sustainability_graph_index_runs run id"
+      },
+      "health": {
+        "mechanism": "sustainability_graph_index_runs",
+        "freshness": "Latest index run time"
+      },
+      "state": {
+        "status": "implemented-unverified",
+        "verifiedAt": "2026-09-28",
+        "evidence": "Indexer, retriever, and /api/v1/sustainability-graph endpoints exist; runtime not observed in this pass.",
+        "gaps": ["Label search is an unanchored case-insensitive regex scoped by company_id; since 79829f01d (2026-09-28) it matches in Mongo instead of filtering a fetched window of limit x 5 nodes."]
+      }
+    },
+    {
+      "id": "graphify-code-graph",
+      "title": "Graphify code graphs per repo",
+      "authority": "projection",
+      "lifecycle": "active",
+      "informationTypes": ["code-relationships"],
+      "canonicalStore": {
+        "kind": "graphify-files",
+        "location": "<repo>:graphify-out/ (graph.json ignored, GRAPH_REPORT.md tracked)"
+      },
+      "owner": "Alejandro (operator)",
+      "scope": { "levels": ["project"] },
+      "sensitivity": "confidential",
+      "tenantData": "forbidden",
+      "trustStates": ["unreviewed", "superseded"],
+      "retention": {
+        "policy": "Rebuildable; never hand-edited.",
+        "supersession": "Each rebuild replaces the previous output."
+      },
+      "readers": ["operator", "coding-agents"],
+      "writers": ["graph-builders"],
+      "agentAccess": "read-only",
+      "derivedFrom": ["repo-source-code"],
+      "derivedProjections": ["falkordb-code-graph"],
+      "citation": {
+        "required": true,
+        "identifier": "repo + graph node source_file:source_location",
+        "version": "Source commit (not recorded yet)"
+      },
+      "health": {
+        "mechanism": "GRAPH_REPORT.md header and file time",
+        "freshness": "graph.json modified time compared with the repo tip"
+      },
+      "state": {
+        "status": "degraded",
+        "verifiedAt": "2026-09-28",
+        "evidence": "graph.json dates: manageesg-backend 2026-09-28, manageesg-frontend 2026-09-19, everything-claude-code 2026-07-07, autoresearch 2026-05-18, openseabri 2026-05-16.",
+        "gaps": [
+          "No source commit, build time, or schema version is recorded with the output (Phase 4).",
+          "Three of five graphs are more than two months old."
+        ]
+      }
+    },
+    {
+      "id": "falkordb-code-graph",
+      "title": "FalkorDB code-graph index",
+      "authority": "projection",
+      "lifecycle": "active",
+      "informationTypes": [],
+      "canonicalStore": {
+        "kind": "falkordb",
+        "location": "falkordb: one graph per repo in the local Docker container"
+      },
+      "owner": "Alejandro (operator)",
+      "scope": { "levels": ["project"] },
+      "sensitivity": "confidential",
+      "tenantData": "forbidden",
+      "trustStates": ["unreviewed", "superseded"],
+      "retention": {
+        "policy": "Rebuildable from graphify-code-graph; never the only copy of anything.",
+        "supersession": "A reload replaces a repo's graph."
+      },
+      "readers": ["operator", "coding-agents"],
+      "writers": ["graph-builders"],
+      "agentAccess": "read-only",
+      "derivedFrom": ["graphify-code-graph"],
+      "derivedProjections": [],
+      "citation": {
+        "required": true,
+        "identifier": "graph name + node id",
+        "version": "Source graphify build (not recorded yet)"
+      },
+      "health": {
+        "mechanism": "GRAPH.LIST and a smoke test against the expected graph names",
+        "freshness": "Not recorded yet (Phase 4)"
+      },
+      "state": {
+        "status": "degraded",
+        "verifiedAt": "2026-09-28",
+        "evidence": "Container up; GRAPH.LIST returned manageesg, frontend, autoresearch, ecc, openseabri.",
+        "gaps": [
+          "The loader is manageesg-backend scripts/graph/load_all_repos_to_falkordb.py; its --only flag documented elsewhere does not filter (per the 2026-07-07 decision note). ECC agentic-stack/falkordb_etl.py, which wrote stale names and deleted graphs, was retired to a stub that refuses to run on 2026-09-28.",
+          "Graphs carry no source commit, build time, or freshness metadata.",
+          "The FalkorDB MCP server runs npx @falkordb/mcpserver@latest, which is unpinned."
+        ]
+      }
+    }
+  ]
+}
