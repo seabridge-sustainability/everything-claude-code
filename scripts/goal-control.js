@@ -19,7 +19,9 @@ const {
   captureRepositoryState,
   makeReceiptId,
   relativeEvidenceRef,
+  repositoryFingerprint,
   sha256File,
+  verifyCapturedRepositoryState,
   withFileLock,
   writeYaml,
 } = require('./lib/goal-store');
@@ -101,6 +103,25 @@ function parseNumber(value, name) {
   return parsed;
 }
 
+function parseRepoSpec(value) {
+  const separator = value.indexOf('=');
+  if (separator > 0) {
+    return { repoId: value.slice(0, separator), repoPath: value.slice(separator + 1) };
+  }
+  return { repoId: null, repoPath: value };
+}
+
+function captureRepositories(args, paths) {
+  const values = optionValues(args, '--repo');
+  return (values.length ? values : [process.cwd()]).map(value => {
+    const spec = parseRepoSpec(value);
+    return captureRepositoryState(spec.repoPath, {
+      repoId: spec.repoId || undefined,
+      excludePaths: [paths.directory],
+    });
+  });
+}
+
 function commandInit(args) {
   const paths = pathsFrom(args);
   const source = optionValue(args, '--from');
@@ -168,7 +189,6 @@ function commandRecord(args) {
   if (!acceptanceId || !stage || !environment || !evidenceValues.length) {
     throw new Error('record requires --acceptance, --stage, --environment, and at least one --evidence KIND=FILE');
   }
-  const repo = optionValue(args, '--repo', process.cwd());
   const observedAt = optionValue(args, '--observed-at', new Date().toISOString());
   const proof = goal.user_visible_proofs.find(item => item.id === acceptanceId);
   if (!proof) throw new Error(`record references missing proof: ${acceptanceId}`);
@@ -178,6 +198,7 @@ function commandRecord(args) {
     proof.allowed_result_classes.length === 1 ? proof.allowed_result_classes[0] : null,
   );
   if (!resultClass) throw new Error('record requires --result-class when the proof permits multiple classes');
+  const repositoryStates = captureRepositories(args, paths);
   const receipt = {
     schema: 'ecc.outcome-receipt.v1',
     receipt_id: optionValue(args, '--receipt-id', makeReceiptId(acceptanceId, observedAt)),
@@ -190,7 +211,8 @@ function commandRecord(args) {
     subject_scope: optionValue(args, '--subject-scope'),
     observed_at: observedAt,
     environment,
-    commit: optionValue(args, '--commit', captureRepositoryState(repo).head),
+    commit: optionValue(args, '--commit', repositoryStates[0].head),
+    repository_fingerprints: repositoryStates.map(repositoryFingerprint),
     evidence: evidenceValues.map(parseEvidence),
     limitations: optionValues(args, '--limitation'),
     source_harness: optionValue(args, '--source-harness', process.env.ECC_SOURCE_HARNESS || 'unknown'),
@@ -210,8 +232,7 @@ function commandResume(args, handoff = false) {
   const nextAction = optionValue(args, '--next-action');
   if (!nextAction) throw new Error(`${handoff ? 'handoff' : 'resume'} requires --next-action`);
   const observedAt = optionValue(args, '--observed-at', new Date().toISOString());
-  const repositories = optionValues(args, '--repo');
-  const states = (repositories.length ? repositories : [process.cwd()]).map(captureRepositoryState);
+  const states = captureRepositories(args, paths);
   const receipt = {
     schema: 'ecc.resume-receipt.v1',
     receipt_id: optionValue(args, '--receipt-id', makeReceiptId(handoff ? 'handoff' : 'resume', observedAt)),
@@ -284,6 +305,15 @@ function main(args = process.argv.slice(2)) {
   const nowRaw = optionValue(args, '--now');
   const now = nowRaw ? new Date(nowRaw) : new Date();
   validateBundle(bundle);
+  if (bundle.resume) {
+    const recordedStates = bundle.resume.repository_states || [bundle.resume.repository_state];
+    for (const recorded of recordedStates) {
+      const live = verifyCapturedRepositoryState(recorded, { excludePaths: [paths.directory] });
+      if (!live.matches) {
+        throw new Error(`resume receipt repository ${recorded.repo_id} is stale: ${live.mismatches.join('; ')}`);
+      }
+    }
+  }
   const verification = verifyBundleEvidence(bundle, { roots: optionValues(args, '--evidence-root') });
 
   if (command === 'validate') {
@@ -339,6 +369,7 @@ module.exports = {
   optionValue,
   optionBoolean,
   optionValues,
+  parseRepoSpec,
   pathsFrom,
   renderStatus,
 };

@@ -1,6 +1,6 @@
 # State
 
-- Current phase: Phase 3 - exact repository-state binding
+- Current phase: Phase 4 - runtime-neutral enforcement
 - Forecast: On track for the next checkpoint; whole-project completion remains
   unforecast until the runtime capability audit is complete.
 - Last verified: 2026-09-29
@@ -15,8 +15,11 @@
 - Phase 2 result: Changed, missing, empty, and URI-only artifacts fail hash
   verification. Authentic, fixture, source-native, provisional, and independently
   validated result classes remain separate.
-- Next checkpoint: A dirty-diff or second-repository change invalidates a claim
-  even when the Git commit hash is unchanged.
+- Phase 3 result: Claims bind to named repositories, HEAD, staged and unstaged
+  changes, untracked content, and lockfiles. Live recapture rejects stale resume
+  state even when HEAD is unchanged.
+- Next checkpoint: A controlled task started through each enforcement tier is
+  admitted automatically or explicitly reported as instruction-only fallback.
 - Blocked lanes: Live paid behavioral evaluation lacks a numeric USD ceiling.
 - Independent work: Phases 1-9 and local rollout validation do not require a
   paid call and continue.

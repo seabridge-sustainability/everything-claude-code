@@ -6,7 +6,7 @@
 | R2 | Automatic controlled-goal admission and resume | Pending | Fresh-session runtime smoke tests |
 | R3 | Atomic writable goal commands | In progress | Real CLI journey in a temporary Git repository |
 | R4 | Evidence contents and hashes are verified | Verified locally | Mutation tests for missing, changed, empty, and URI-only artifacts |
-| R5 | Proof binds to exact multi-repository state | Pending | Dirty-diff and cross-repo mismatch tests |
+| R5 | Proof binds to exact multi-repository state | Verified locally | Dirty-diff and cross-repo mismatch tests |
 | R6 | Owner corrections invalidate obsolete execution | Pending | Correction adversarial test |
 | R7 | Parallel work counts only after integration | Pending | Assignment and fan-in receipt tests |
 | R8 | Progress watchdog detects activity plateaus | Pending | Simulated plateau and tactic-change tests |

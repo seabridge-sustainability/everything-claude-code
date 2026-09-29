@@ -143,6 +143,15 @@ function validateBundle({ goal, outcomes = [], resume = null }) {
     if (receipt.stage !== proof.required_stage) {
       throw new Error(`outcome receipt ${receipt.receipt_id} uses ${receipt.stage}; proof ${proof.id} requires its own ${proof.required_stage} receipt`);
     }
+    ensureUniqueIds(receipt.repository_fingerprints.map(item => item.repo_id), `repository fingerprint in ${receipt.receipt_id}`);
+    if (receipt.commit !== receipt.repository_fingerprints[0].head) {
+      throw new Error(`outcome receipt ${receipt.receipt_id} commit does not match its primary repository fingerprint`);
+    }
+    const fingerprintIds = new Set(receipt.repository_fingerprints.map(item => item.repo_id));
+    const missingRepositories = proof.required_repositories.filter(repoId => !fingerprintIds.has(repoId));
+    if (missingRepositories.length) {
+      throw new Error(`outcome receipt ${receipt.receipt_id} lacks required repositories: ${missingRepositories.join(', ')}`);
+    }
     const evidenceKinds = new Set(receipt.evidence.map(item => item.kind));
     const missingKinds = proof.required_evidence_kinds.filter(kind => !evidenceKinds.has(kind));
     if (missingKinds.length) {
@@ -219,6 +228,14 @@ function validateBundle({ goal, outcomes = [], resume = null }) {
     for (const lane of resume.blocked_lanes) {
       if (!lanes.has(lane)) throw new Error(`resume receipt references missing blocked lane ${lane}`);
     }
+    const repositoryStates = resume.repository_states || [resume.repository_state];
+    ensureUniqueIds(repositoryStates.map(state => state.repo_id), 'resume repository');
+    if (!repositoryStates.some(state => (
+      state.repo_id === resume.repository_state.repo_id
+      && state.tree_fingerprint === resume.repository_state.tree_fingerprint
+    ))) {
+      throw new Error('resume primary repository_state is missing from repository_states');
+    }
   }
   return { goal, outcomes, resume };
 }
@@ -259,6 +276,7 @@ function buildStatus(goal, outcomes = [], now = new Date()) {
       outcome: receipt ? receipt.outcome : null,
       commit: receipt ? receipt.commit : null,
       environment: receipt ? receipt.environment : null,
+      repository_fingerprints: receipt ? receipt.repository_fingerprints : [],
     };
   });
   const required = proofs.filter(proof => proof.required);
@@ -307,6 +325,26 @@ function evaluateClaim(claim, bundle, options = {}) {
   const status = buildStatus(goal, outcomes, now);
   const unmet = status.proofs.filter(proof => proof.required && !proof.met);
   const laneById = new Map(goal.lanes.map(lane => [lane.id, lane]));
+  const resumeRepositories = new Map(
+    (resume?.repository_states || (resume ? [resume.repository_state] : []))
+      .map(state => [state.repo_id, state]),
+  );
+  function repositoryBindingReasons(proofs) {
+    const bindingReasons = [];
+    for (const proof of proofs.filter(item => item.stage_met)) {
+      for (const fingerprint of proof.repository_fingerprints) {
+        const current = resumeRepositories.get(fingerprint.repo_id);
+        if (!current) {
+          bindingReasons.push(`${proof.id} has no current resume state for repository ${fingerprint.repo_id}`);
+          continue;
+        }
+        if (current.head !== fingerprint.head || current.tree_fingerprint !== fingerprint.tree_fingerprint) {
+          bindingReasons.push(`${proof.id} evidence is stale for repository ${fingerprint.repo_id}`);
+        }
+      }
+    }
+    return bindingReasons;
+  }
   const latestObservedAt = status.proofs
     .map(proof => proof.observed_at)
     .filter(Boolean)
@@ -333,6 +371,7 @@ function evaluateClaim(claim, bundle, options = {}) {
     if (staleCommits.length) {
       reasons.push(`required proofs are not bound to current HEAD: ${staleCommits.map(proof => proof.id).join(', ')}`);
     }
+    reasons.push(...repositoryBindingReasons(status.proofs.filter(proof => proof.required)));
   } else if (claim === 'blocked') {
     if (status.complete) reasons.push('all required proofs are met; use complete rather than blocked');
     if (!resume) reasons.push('a current resume receipt is required for a blocked claim');
@@ -365,6 +404,7 @@ function evaluateClaim(claim, bundle, options = {}) {
     if (resume && checkpoint?.commit && checkpoint.commit !== resume.repository_state.head) {
       reasons.push('promised checkpoint evidence is not bound to current HEAD');
     }
+    if (checkpoint) reasons.push(...repositoryBindingReasons([checkpoint]));
     if (forecast.state !== 'on_track') reasons.push(`forecast state is ${forecast.state}, not on_track`);
     if (!['medium', 'high'].includes(forecast.confidence)) reasons.push('forecast confidence must be medium or high');
     if (!forecast.basis || !forecast.basis.trim()) reasons.push('forecast basis is missing');

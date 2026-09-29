@@ -14,6 +14,8 @@
 | 1 | Runtime defect | Fixed | Git porcelain whitespace preserved for dirty paths |
 | 2 | Evidence mutation suite | Passed | Changed, missing, and URI-only artifacts rejected |
 | 2 | Result-class semantics | Passed | Fixture, activity, provisional, and hidden results rejected where disallowed |
+| 3 | Dirty-tree binding | Passed | Uncommitted tracked change invalidated a fresh claim |
+| 3 | Cross-repository requirement | Passed | Missing frontend fingerprint rejected |
 
 Mocked, fixture, static, and source-only checks remain labelled as such. They do
 not satisfy authentic user-facing, real-property, deployment, or independent

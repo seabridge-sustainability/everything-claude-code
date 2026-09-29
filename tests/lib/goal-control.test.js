@@ -12,10 +12,32 @@ const {
   evaluateClaim,
   validateBundle,
 } = require('../../scripts/lib/goal-control');
+const { captureRepositoryState } = require('../../scripts/lib/goal-store');
 const yaml = require('js-yaml');
 
 const CLI = path.join(__dirname, '..', '..', 'scripts', 'goal-control.js');
 const ECC = path.join(__dirname, '..', '..', 'scripts', 'ecc.js');
+const DUMMY_HEAD = 'a'.repeat(40);
+const DUMMY_TREE = 'c'.repeat(64);
+
+function repositoryState(overrides = {}) {
+  return {
+    repo_id: 'backend',
+    repo_root: 'C:/worktree',
+    head: DUMMY_HEAD,
+    branch: 'development',
+    worktree: 'C:/worktree',
+    dirty_paths: [],
+    origin: 'https://example.invalid/backend.git',
+    staged_diff_sha256: '1'.repeat(64),
+    unstaged_diff_sha256: '2'.repeat(64),
+    untracked_sha256: '3'.repeat(64),
+    lockfiles_sha256: '4'.repeat(64),
+    tree_fingerprint: DUMMY_TREE,
+    lockfiles: [],
+    ...overrides,
+  };
+}
 
 function goal(overrides = {}) {
   return {
@@ -32,6 +54,7 @@ function goal(overrides = {}) {
         lane_id: 'product',
         required_stage: 'ui_displayed',
         required_evidence_kinds: ['browser'],
+        required_repositories: [],
         allowed_result_classes: ['user_visible_result'],
         acceptance_predicate: 'A non-null result is visible through the authentic property UI.',
         requires_authentic: true,
@@ -45,6 +68,7 @@ function goal(overrides = {}) {
         lane_id: 'science',
         required_stage: 'independently_validated',
         required_evidence_kinds: ['independent_validation'],
+        required_repositories: [],
         allowed_result_classes: ['independently_validated_score'],
         acceptance_predicate: 'An independent method validates the property result.',
         requires_authentic: true,
@@ -108,7 +132,13 @@ function outcome(id, acceptanceId, stage, observedAt = '2026-09-29T13:00:00Z') {
     subject_scope: 'real_property',
     observed_at: observedAt,
     environment: 'development',
-    commit: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+    commit: DUMMY_HEAD,
+    repository_fingerprints: [{
+      repo_id: 'backend',
+      repo_root: 'C:/worktree',
+      head: DUMMY_HEAD,
+      tree_fingerprint: DUMMY_TREE,
+    }],
     evidence: [{ kind: evidenceKind, ref: `artifact://${id}`, sha256: 'b'.repeat(64) }],
     limitations: [],
     source_harness: 'codex',
@@ -124,13 +154,8 @@ function resume(overrides = {}) {
     receipt_id: 'resume-1',
     goal_id: 'openaccess-product',
     observed_at: '2026-09-29T13:30:00Z',
-    repository_state: {
-      repo_root: 'C:/worktree',
-      head: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-      branch: 'development',
-      worktree: 'C:/worktree',
-      dirty_paths: [],
-    },
+    repository_state: repositoryState(),
+    repository_states: [repositoryState()],
     inherited_claims: [
       { claim: 'Heat API works.', status: 'verified_current', evidence: 'test://heat' },
     ],
@@ -376,6 +401,7 @@ test('denies on-track when checkpoint evidence predates the promised window', ()
 test('denies on-track when checkpoint evidence belongs to a different commit', () => {
   const stale = outcome('r1', 'heat-browser', 'ui_displayed');
   stale.commit = 'cccccccccccccccccccccccccccccccccccccccc';
+  stale.repository_fingerprints[0].head = stale.commit;
   const result = evaluateClaim('on-track', {
     goal: goal(),
     outcomes: [stale],
@@ -394,6 +420,7 @@ test('an optional proof still must be demonstrated when used as a forecast check
         lane_id: 'product',
         required_stage: 'ui_displayed',
         required_evidence_kinds: ['browser'],
+        required_repositories: [],
         allowed_result_classes: ['user_visible_result'],
         acceptance_predicate: 'The authentic heat result is visible.',
         requires_authentic: true,
@@ -452,12 +479,21 @@ test('CLI accepts the documented YAML active-goal format', () => {
 
 test('real CLI rejects the five-day SeaBridge counterexample for complete, on-track, and whole-goal blocked', () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-goal-red-team-'));
+  const repoDir = path.join(dir, 'repo');
+  fs.mkdirSync(repoDir);
+  runGit(['init', '--initial-branch=development'], repoDir);
+  runGit(['config', 'user.email', 'goal-control@example.invalid'], repoDir);
+  runGit(['config', 'user.name', 'ECC Goal Test'], repoDir);
+  fs.writeFileSync(path.join(repoDir, 'README.md'), '# Counterexample repository\n');
+  runGit(['add', 'README.md'], repoDir);
+  runGit(['commit', '-m', 'test: initialize counterexample repository'], repoDir);
+  const counterexampleState = captureRepositoryState(repoDir, { repoId: 'backend' });
   const incidentProofs = [
-    { id: 'heat-source', description: 'One property heat result.', lane_id: 'product', required_stage: 'authentic_input_processed', required_evidence_kinds: ['runtime'], allowed_result_classes: ['source_native_indicator'], acceptance_predicate: 'A source-native indicator is processed for a real property.', requires_authentic: true, requires_user_visible: false, subject_scope: 'real_property', required: true },
-    { id: 'hazard-ui', description: 'Hazard gauges show authentic values.', lane_id: 'product', required_stage: 'ui_displayed', required_evidence_kinds: ['browser'], allowed_result_classes: ['user_visible_result'], acceptance_predicate: 'Authentic hazard values are visible.', requires_authentic: true, requires_user_visible: true, subject_scope: 'real_property', required: true },
-    { id: 'risk-score', description: 'Admitted 0-100 score is served.', lane_id: 'product', required_stage: 'api_served', required_evidence_kinds: ['api'], allowed_result_classes: ['provisional_score'], acceptance_predicate: 'The provisional admitted score is served and labelled.', requires_authentic: true, requires_user_visible: false, subject_scope: 'real_property', required: true },
-    { id: 'resilience', description: 'Validated resilience result.', lane_id: 'science', required_stage: 'independently_validated', required_evidence_kinds: ['independent_validation'], allowed_result_classes: ['independently_validated_score'], acceptance_predicate: 'An independent method validates the resilience result.', requires_authentic: true, requires_user_visible: false, subject_scope: 'real_property', required: true },
-    { id: 'finance', description: 'Finance output is exported.', lane_id: 'product', required_stage: 'export_verified', required_evidence_kinds: ['export'], allowed_result_classes: ['user_visible_result'], acceptance_predicate: 'The authentic finance result exports.', requires_authentic: true, requires_user_visible: true, subject_scope: 'real_property', required: true },
+    { id: 'heat-source', description: 'One property heat result.', lane_id: 'product', required_stage: 'authentic_input_processed', required_evidence_kinds: ['runtime'], required_repositories: [], allowed_result_classes: ['source_native_indicator'], acceptance_predicate: 'A source-native indicator is processed for a real property.', requires_authentic: true, requires_user_visible: false, subject_scope: 'real_property', required: true },
+    { id: 'hazard-ui', description: 'Hazard gauges show authentic values.', lane_id: 'product', required_stage: 'ui_displayed', required_evidence_kinds: ['browser'], required_repositories: [], allowed_result_classes: ['user_visible_result'], acceptance_predicate: 'Authentic hazard values are visible.', requires_authentic: true, requires_user_visible: true, subject_scope: 'real_property', required: true },
+    { id: 'risk-score', description: 'Admitted 0-100 score is served.', lane_id: 'product', required_stage: 'api_served', required_evidence_kinds: ['api'], required_repositories: [], allowed_result_classes: ['provisional_score'], acceptance_predicate: 'The provisional admitted score is served and labelled.', requires_authentic: true, requires_user_visible: false, subject_scope: 'real_property', required: true },
+    { id: 'resilience', description: 'Validated resilience result.', lane_id: 'science', required_stage: 'independently_validated', required_evidence_kinds: ['independent_validation'], required_repositories: [], allowed_result_classes: ['independently_validated_score'], acceptance_predicate: 'An independent method validates the resilience result.', requires_authentic: true, requires_user_visible: false, subject_scope: 'real_property', required: true },
+    { id: 'finance', description: 'Finance output is exported.', lane_id: 'product', required_stage: 'export_verified', required_evidence_kinds: ['export'], required_repositories: [], allowed_result_classes: ['user_visible_result'], acceptance_predicate: 'The authentic finance result exports.', requires_authentic: true, requires_user_visible: true, subject_scope: 'real_property', required: true },
   ];
   const incidentGoal = status => goal({
     status,
@@ -473,6 +509,8 @@ test('real CLI rejects the five-day SeaBridge counterexample for complete, on-tr
     dir,
   );
   const incidentResume = resume({
+    repository_state: counterexampleState,
+    repository_states: [counterexampleState],
     last_user_visible_result: 'One property-linked heat observation; all product gauges remain null.',
     blocked_lanes: ['science'],
     independent_work_remaining: ['Implement the admitted score, hazard UI, and finance export.'],
@@ -526,6 +564,7 @@ test('real CLI creates, checkpoints, records, resumes, hands off, and claims a g
         lane_id: 'delivery',
         required_stage: 'ui_displayed',
         required_evidence_kinds: ['browser'],
+        required_repositories: [],
         allowed_result_classes: ['user_visible_result'],
         acceptance_predicate: 'The CLI result is visible.',
         requires_authentic: true,
@@ -644,6 +683,93 @@ test('CLI rejects changed, missing, and URI-only evidence artifacts', () => {
     result = run(CLI, ['validate', '--goal', goalPath, '--outcomes', outcomesPath], dir);
     assert.strictEqual(result.status, 1);
     assert.match(result.stderr, /unverifiable URI/);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('claim rejects proof bound to a stale dirty-tree fingerprint', () => {
+  const staleTree = outcome('stale-tree', 'heat-browser', 'ui_displayed');
+  staleTree.repository_fingerprints[0].tree_fingerprint = 'd'.repeat(64);
+  const result = evaluateClaim('on-track', {
+    goal: goal(),
+    outcomes: [staleTree],
+    resume: resume({ observed_at: '2026-09-29T14:00:00Z' }),
+  }, { now: '2026-09-29T17:00:00Z' });
+  assert.strictEqual(result.allowed, false);
+  assert.match(result.reasons.join(' '), /stale for repository backend/);
+});
+
+test('proof requiring multiple repositories rejects a one-repository receipt', () => {
+  const crossRepoGoal = goal({
+    user_visible_proofs: [{
+      ...goal().user_visible_proofs[0],
+      required_repositories: ['backend', 'frontend'],
+    }],
+    forecast: {
+      ...goal().forecast,
+      critical_path: ['heat-browser'],
+      checkpoint_proof_id: 'heat-browser',
+    },
+  });
+  assert.throws(
+    () => validateBundle({
+      goal: crossRepoGoal,
+      outcomes: [outcome('backend-only', 'heat-browser', 'ui_displayed')],
+    }),
+    /lacks required repositories: frontend/,
+  );
+});
+
+test('real CLI invalidates a fresh claim after an uncommitted source change', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-goal-dirty-tree-'));
+  try {
+    runGit(['init', '--initial-branch=development'], dir);
+    runGit(['config', 'user.email', 'goal-control@example.invalid'], dir);
+    runGit(['config', 'user.name', 'ECC Goal Test'], dir);
+    fs.writeFileSync(path.join(dir, 'README.md'), '# Before\n');
+    runGit(['add', 'README.md'], dir);
+    runGit(['commit', '-m', 'test: initialize dirty-tree repository'], dir);
+
+    const dirtyGoal = goal({
+      goal_id: 'dirty-tree',
+      status: 'complete',
+      user_visible_proofs: [{
+        ...goal().user_visible_proofs[0],
+        id: 'dirty-proof',
+        lane_id: 'delivery',
+        required_repositories: [],
+      }],
+      lanes: [{ id: 'delivery', description: 'Delivery', status: 'complete', blocker: null, next_action: null }],
+      forecast: {
+        ...goal().forecast,
+        critical_path: ['dirty-proof'],
+        checkpoint_proof_id: 'dirty-proof',
+      },
+    });
+    const seed = path.join(dir, 'goal.yaml');
+    const evidence = path.join(dir, 'browser.json');
+    fs.writeFileSync(seed, yaml.dump(dirtyGoal, { noRefs: true }));
+    fs.writeFileSync(evidence, '{"visible":true}');
+    assert.strictEqual(run(CLI, ['init', '--from', seed], dir).status, 0);
+    assert.strictEqual(run(CLI, [
+      'record', '--acceptance', 'dirty-proof', '--stage', 'ui_displayed',
+      '--environment', 'local', '--evidence', `browser=${evidence}`,
+      '--repo', `backend=${dir}`,
+      '--authenticity', 'authentic', '--user-visible', 'true',
+      '--subject-scope', 'real_property', '--receipt-id', 'dirty-proof-001',
+    ], dir).status, 0);
+    assert.strictEqual(run(CLI, [
+      'resume', '--repo', `backend=${dir}`, '--next-action', 'Verify.',
+      '--last-result', 'Visible authentic result.', '--receipt-id', 'dirty-resume-001',
+    ], dir).status, 0);
+    let claim = run(CLI, ['claim', 'complete', '--json'], dir);
+    assert.strictEqual(claim.status, 0, claim.stderr);
+
+    fs.writeFileSync(path.join(dir, 'README.md'), '# After uncommitted change\n');
+    claim = run(CLI, ['claim', 'complete', '--json'], dir);
+    assert.strictEqual(claim.status, 1);
+    assert.match(claim.stderr, /resume receipt repository backend is stale.*tree fingerprint/);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }

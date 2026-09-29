@@ -40,6 +40,7 @@ user_visible_proofs:
     lane_id: product
     required_stage: export_verified
     required_evidence_kinds: [browser, export]
+    required_repositories: [backend, frontend]
     allowed_result_classes: [user_visible_result]
     acceptance_predicate: An authentic report is visible and exports consistently.
     requires_authentic: true
@@ -87,7 +88,7 @@ receipt advances only its named acceptance proof. Tests, commits, plans, source
 inventories, and reports are not user-visible receipts by themselves.
 
 ```json
-{"schema":"ecc.outcome-receipt.v1","receipt_id":"report-export-001","goal_id":"example-feature","acceptance_id":"report-export","stage":"export_verified","result_class":"user_visible_result","authenticity":"authentic","user_visible":true,"subject_scope":"real_property","observed_at":"2026-10-01T17:10:00Z","environment":"development","commit":"0123456789abcdef0123456789abcdef01234567","evidence":[{"kind":"browser","ref":"artifacts/agent-runs/report-export/browser.png","sha256":"1111111111111111111111111111111111111111111111111111111111111111"},{"kind":"export","ref":"artifacts/agent-runs/report-export/report.pdf","sha256":"2222222222222222222222222222222222222222222222222222222222222222"}],"limitations":["Development environment only."],"source_harness":"codex","status":"accepted","outcome":"pass","supersedes":[]}
+{"schema":"ecc.outcome-receipt.v1","receipt_id":"report-export-001","goal_id":"example-feature","acceptance_id":"report-export","stage":"export_verified","result_class":"user_visible_result","authenticity":"authentic","user_visible":true,"subject_scope":"real_property","observed_at":"2026-10-01T17:10:00Z","environment":"development","commit":"0123456789abcdef0123456789abcdef01234567","repository_fingerprints":[{"repo_id":"backend","repo_root":"C:/work/backend","head":"0123456789abcdef0123456789abcdef01234567","tree_fingerprint":"3333333333333333333333333333333333333333333333333333333333333333"},{"repo_id":"frontend","repo_root":"C:/work/frontend","head":"fedcba9876543210fedcba9876543210fedcba98","tree_fingerprint":"4444444444444444444444444444444444444444444444444444444444444444"}],"evidence":[{"kind":"browser","ref":"artifacts/agent-runs/report-export/browser.png","sha256":"1111111111111111111111111111111111111111111111111111111111111111"},{"kind":"export","ref":"artifacts/agent-runs/report-export/report.pdf","sha256":"2222222222222222222222222222222222222222222222222222222222222222"}],"limitations":["Development environment only."],"source_harness":"codex","status":"accepted","outcome":"pass","supersedes":[]}
 ```
 
 Never overwrite a false or stale receipt. Append a `retracted` receipt whose
@@ -104,6 +105,12 @@ lanes, safe independent work, and observed/approved spending or an explicit
 unknown value. A handoff cannot authorize actions or
 prove its own completion claim.
 
+Each named repository state includes HEAD, staged and unstaged diff hashes,
+untracked-file content, dependency lockfile hashes, and one combined tree
+fingerprint. Goal-ledger files are excluded so recording a receipt cannot
+invalidate itself. Claim evaluation recaptures each live repository and rejects
+a stale resume receipt even when HEAD has not changed.
+
 ## Commands
 
 ```powershell
@@ -111,8 +118,10 @@ ecc goal init --from goal-seed.yaml
 ecc goal checkpoint --proof report-export --at 2026-10-01T18:00:00Z `
   --started-at 2026-10-01T14:00:00Z --basis "First vertical slice" --hours 4
 ecc goal record --acceptance report-export --stage export_verified `
-  --environment development --evidence browser=browser.png --evidence export=report.pdf
-ecc goal resume --repo . --next-action "Verify the export" --last-result "Report rendered"
+  --environment development --evidence browser=browser.png --evidence export=report.pdf `
+  --repo backend=../backend --repo frontend=../frontend
+ecc goal resume --repo backend=../backend --repo frontend=../frontend `
+  --next-action "Verify the export" --last-result "Report rendered"
 ecc goal handoff --repo . --next-action "Continue the verified export lane"
 ecc goal validate
 ecc goal status --json

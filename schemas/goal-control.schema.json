@@ -48,6 +48,7 @@
         "lane_id",
         "required_stage",
         "required_evidence_kinds",
+        "required_repositories",
         "allowed_result_classes",
         "acceptance_predicate",
         "requires_authentic",
@@ -64,6 +65,11 @@
           "type": "array",
           "minItems": 1,
           "items": { "$ref": "#/$defs/evidenceKind" },
+          "uniqueItems": true
+        },
+        "required_repositories": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/nonEmptyString" },
           "uniqueItems": true
         },
         "allowed_result_classes": {
@@ -234,6 +240,7 @@
         "observed_at",
         "environment",
         "commit",
+        "repository_fingerprints",
         "evidence",
         "limitations",
         "source_harness",
@@ -256,6 +263,11 @@
         "commit": {
           "type": "string",
           "pattern": "^[a-fA-F0-9]{7,64}$"
+        },
+        "repository_fingerprints": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/repositoryFingerprint" }
         },
         "evidence": {
           "type": "array",
@@ -299,8 +311,22 @@
     "repositoryState": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["repo_root", "head", "branch", "worktree", "dirty_paths"],
+      "required": [
+        "repo_id",
+        "repo_root",
+        "head",
+        "branch",
+        "worktree",
+        "dirty_paths",
+        "staged_diff_sha256",
+        "unstaged_diff_sha256",
+        "untracked_sha256",
+        "lockfiles_sha256",
+        "tree_fingerprint",
+        "lockfiles"
+      ],
       "properties": {
+        "repo_id": { "$ref": "#/$defs/nonEmptyString" },
         "repo_root": { "$ref": "#/$defs/nonEmptyString" },
         "head": { "$ref": "#/$defs/nonEmptyString" },
         "branch": { "$ref": "#/$defs/nullableString" },
@@ -310,7 +336,36 @@
           "items": { "$ref": "#/$defs/nonEmptyString" },
           "uniqueItems": true
         },
-        "origin": { "$ref": "#/$defs/nullableString" }
+        "origin": { "$ref": "#/$defs/nullableString" },
+        "staged_diff_sha256": { "type": "string", "pattern": "^[a-fA-F0-9]{64}$" },
+        "unstaged_diff_sha256": { "type": "string", "pattern": "^[a-fA-F0-9]{64}$" },
+        "untracked_sha256": { "type": "string", "pattern": "^[a-fA-F0-9]{64}$" },
+        "lockfiles_sha256": { "type": "string", "pattern": "^[a-fA-F0-9]{64}$" },
+        "tree_fingerprint": { "type": "string", "pattern": "^[a-fA-F0-9]{64}$" },
+        "lockfiles": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/lockfileFingerprint" }
+        }
+      }
+    },
+    "lockfileFingerprint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "$ref": "#/$defs/nonEmptyString" },
+        "sha256": { "type": "string", "pattern": "^[a-fA-F0-9]{64}$" }
+      }
+    },
+    "repositoryFingerprint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repo_id", "repo_root", "head", "tree_fingerprint"],
+      "properties": {
+        "repo_id": { "$ref": "#/$defs/nonEmptyString" },
+        "repo_root": { "$ref": "#/$defs/nonEmptyString" },
+        "head": { "$ref": "#/$defs/nonEmptyString" },
+        "tree_fingerprint": { "type": "string", "pattern": "^[a-fA-F0-9]{64}$" }
       }
     },
     "spendingState": {
@@ -342,6 +397,7 @@
         "goal_id",
         "observed_at",
         "repository_state",
+        "repository_states",
         "inherited_claims",
         "last_user_visible_result",
         "next_action",
