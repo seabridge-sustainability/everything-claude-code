@@ -13,6 +13,8 @@ const DEFINITIONS = {
   resume: 'resumeReceipt',
   assignment: 'assignment',
   integration: 'integrationReceipt',
+  watchdog: 'watchdogPolicy',
+  activity: 'activityEvent',
 };
 
 let schema;
@@ -158,13 +160,37 @@ function validateGoalSemantics(goal) {
   return goal;
 }
 
-function validateBundle({ goal, outcomes = [], resume = null, assignments = [], integrations = [] }) {
+function validateBundle({
+  goal,
+  outcomes = [],
+  resume = null,
+  assignments = [],
+  integrations = [],
+  watchdog = null,
+  activity = [],
+}) {
   assertDocument('goal', goal, 'active goal');
   validateGoalSemantics(goal);
   ensureUniqueIds(outcomes.map(receipt => receipt.receipt_id), 'outcome receipt');
   const receiptIds = new Set(outcomes.map(receipt => receipt.receipt_id));
   const receiptById = new Map(outcomes.map(receipt => [receipt.receipt_id, receipt]));
   const proofById = new Map(goal.user_visible_proofs.map(proof => [proof.id, proof]));
+  if (watchdog) {
+    assertDocument('watchdog', watchdog, 'watchdog policy');
+    if (watchdog.goal_id !== goal.goal_id) {
+      throw new Error(`watchdog policy belongs to goal ${watchdog.goal_id}, not ${goal.goal_id}`);
+    }
+    parseIso(watchdog.updated_at, 'watchdog policy updated_at');
+  }
+  ensureUniqueIds(activity.map(item => item.event_id), 'activity event');
+  for (const event of activity) {
+    assertDocument('activity', event, `activity event ${event.event_id || '<unknown>'}`);
+    if (event.goal_id !== goal.goal_id) {
+      throw new Error(`activity event ${event.event_id} belongs to goal ${event.goal_id}, not ${goal.goal_id}`);
+    }
+    parseIso(event.observed_at, `activity event ${event.event_id}.observed_at`);
+  }
+  if (activity.length && !watchdog) throw new Error('activity events require a watchdog policy');
   ensureUniqueIds(assignments.map(item => item.assignment_id), 'assignment');
   const assignmentById = new Map(assignments.map(item => [item.assignment_id, item]));
   for (const assignment of assignments) {
@@ -337,7 +363,59 @@ function validateBundle({ goal, outcomes = [], resume = null, assignments = [], 
       }
     }
   }
-  return { goal, outcomes, resume, assignments, integrations };
+  return { goal, outcomes, resume, assignments, integrations, watchdog, activity };
+}
+
+function evaluateWatchdog(goal, outcomes = [], policy = null, activity = [], now = new Date()) {
+  if (!policy) return { configured: false, healthy: true, breaches: [], metrics: null };
+  const latestProofAt = [...latestOutcomeByProof(outcomes).values()]
+    .filter(receipt => receipt.outcome === 'pass')
+    .map(receipt => Date.parse(receipt.observed_at))
+    .sort((left, right) => left - right)
+    .at(-1) || Date.parse(goal.updated_at);
+  const tacticChangeAt = activity
+    .filter(event => event.kind === 'tactic_change' && Date.parse(event.observed_at) <= now.getTime())
+    .map(event => Date.parse(event.observed_at))
+    .sort((left, right) => left - right)
+    .at(-1) || 0;
+  const windowStart = Math.max(latestProofAt, tacticChangeAt, Date.parse(policy.updated_at));
+  const currentEvents = activity.filter(event => {
+    const observedAt = Date.parse(event.observed_at);
+    return observedAt > windowStart && observedAt <= now.getTime();
+  });
+  const sum = kind => currentEvents
+    .filter(event => event.kind === kind)
+    .reduce((total, event) => total + event.count, 0);
+  const activityCount = currentEvents
+    .filter(event => ['tool_call', 'retry', 'ci_run'].includes(event.kind))
+    .reduce((total, event) => total + event.count, 0);
+  const retries = sum('retry');
+  const ciRuns = sum('ci_run');
+  const costUsd = currentEvents.reduce((total, event) => total + event.cost_usd, 0);
+  const hoursWithoutProof = Math.max(0, (now.getTime() - windowStart) / 3600000);
+  const breaches = [];
+  if (activityCount > policy.max_activity_without_proof) breaches.push('activity_without_proof');
+  if (hoursWithoutProof > policy.window_hours) breaches.push('proof_window_elapsed');
+  if (retries > policy.max_retries) breaches.push('retry_budget');
+  if (ciRuns > policy.max_ci_runs) breaches.push('ci_budget');
+  if (costUsd > policy.max_cost_usd) breaches.push('cost_budget');
+  return {
+    configured: true,
+    healthy: breaches.length === 0,
+    breaches,
+    window_started_at: new Date(windowStart).toISOString(),
+    tactic_id: currentEvents.at(-1)?.tactic_id || activity
+      .filter(event => event.kind === 'tactic_change')
+      .sort((left, right) => Date.parse(left.observed_at) - Date.parse(right.observed_at))
+      .at(-1)?.tactic_id || null,
+    metrics: {
+      activity_without_proof: activityCount,
+      hours_without_proof: hoursWithoutProof,
+      retries,
+      ci_runs: ciRuns,
+      cost_usd: costUsd,
+    },
+  };
 }
 
 function buildParallelStatus(assignments = [], integrations = [], now = new Date(), correction = null) {
@@ -461,9 +539,10 @@ function buildStatus(goal, outcomes = [], now = new Date()) {
 function evaluateClaim(claim, bundle, options = {}) {
   const now = options.now instanceof Date ? options.now : new Date(options.now || Date.now());
   if (!Number.isFinite(now.getTime())) throw new Error('claim evaluation time must be valid');
-  const { goal, outcomes, resume, assignments, integrations } = validateBundle(bundle);
+  const { goal, outcomes, resume, assignments, integrations, watchdog, activity } = validateBundle(bundle);
   const status = buildStatus(goal, outcomes, now);
   status.parallel = buildParallelStatus(assignments, integrations, now, latestExecutableCorrection(goal));
+  status.watchdog = evaluateWatchdog(goal, outcomes, watchdog, activity, now);
   const unmet = status.proofs.filter(proof => proof.required && !proof.met);
   const laneById = new Map(goal.lanes.map(lane => [lane.id, lane]));
   const resumeRepositories = new Map(
@@ -576,6 +655,7 @@ function evaluateClaim(claim, bundle, options = {}) {
     if (forecast.checkpoint_overdue) reasons.push(`forecast checkpoint ${forecast.checkpoint_proof_id} is overdue and unmet`);
     if (status.parallel.expired) reasons.push(`${status.parallel.expired} delegated assignment lease(s) expired without integration`);
     if (status.parallel.stale) reasons.push(`${status.parallel.stale} delegated assignment(s) belong to a superseded owner plan`);
+    if (!status.watchdog.healthy) reasons.push(`progress watchdog requires a tactic change: ${status.watchdog.breaches.join(', ')}`);
   } else {
     throw new Error(`unsupported claim: ${claim}`);
   }
@@ -593,6 +673,7 @@ module.exports = {
   buildStatus,
   buildParallelStatus,
   evaluateClaim,
+  evaluateWatchdog,
   formatErrors,
   latestExecutableCorrection,
   readJsonLines,

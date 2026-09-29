@@ -78,6 +78,9 @@ This document lists each slash command and the primary agent(s) or skills it inv
 | `ecc goal record` | goal protocol / `scripts/goal-control.js` | Hash local evidence and append an outcome receipt |
 | `ecc goal assign` | goal protocol / `scripts/goal-control.js` | Issue a scoped delegated assignment with a lease and hard tool, retry, CI, and cost budgets |
 | `ecc goal integrate` | goal protocol / `scripts/goal-control.js` | Record parent-reviewed integration evidence; worker self-attestation cannot complete an assignment |
+| `ecc goal watch-config` | goal protocol / `scripts/goal-control.js` | Set the proof window and activity, retry, CI, and cost ceilings for a controlled goal |
+| `ecc goal activity` | goal protocol / `scripts/goal-control.js` | Append measured activity or an explicit tactic change without misclassifying it as product evidence |
+| `ecc goal watch` | goal protocol / `scripts/goal-control.js` | Detect activity plateaus and budget breaches; require a tactic change before on-track is available |
 | `ecc goal resume` | goal protocol / `scripts/goal-control.js` | Capture repository state before continuing inherited work |
 | `ecc goal handoff` | goal protocol / `scripts/goal-control.js` | Record successor-ready current state and history |
 | `ecc goal validate` | goal protocol / `scripts/goal-control.js` | Validate portable active-goal, outcome, and resume records |

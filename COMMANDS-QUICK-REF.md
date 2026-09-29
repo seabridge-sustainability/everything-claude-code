@@ -27,6 +27,8 @@ Parallel work is bounded with `ecc goal assign` and counted only after the paren
 
 When the owner changes direction, record it with `ecc goal correct`, then create a fresh resume receipt whose next action matches the correction. Work or delegated plans from before that correction cannot support a current progress claim.
 
+Configure long-goal proof and spending limits with `ecc goal watch-config`, record measured work with `ecc goal activity`, and check `ecc goal watch`. Activity without a new proof, or retry/CI/cost overruns, requires a real tactic change before the system permits “on track.”
+
 | Command | What it does |
 |---------|-------------|
 | `/plan` | Restate requirements, assess risks, write step-by-step implementation plan — **waits for your confirm before touching code** |

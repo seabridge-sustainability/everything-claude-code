@@ -9,6 +9,7 @@ const {
   buildParallelStatus,
   buildStatus,
   evaluateClaim,
+  evaluateWatchdog,
   readJsonLines,
   readStructuredFile,
   validateBundle,
@@ -66,6 +67,8 @@ function pathsFrom(args) {
     resumeHistory: optionValue(args, '--resume-history', path.join(directory, 'resume-history.jsonl')),
     assignments: optionValue(args, '--assignments', path.join(directory, 'assignments.jsonl')),
     integrations: optionValue(args, '--integrations', path.join(directory, 'integrations.jsonl')),
+    watchdog: optionValue(args, '--watchdog', path.join(directory, 'watchdog-policy.yaml')),
+    activity: optionValue(args, '--activity', path.join(directory, 'activity.jsonl')),
   };
 }
 
@@ -78,6 +81,10 @@ function loadBundle(args) {
       outcomes: readJsonLines(paths.outcomes),
       assignments: readJsonLines(paths.assignments),
       integrations: readJsonLines(paths.integrations),
+      watchdog: paths.watchdog && fs.existsSync(path.resolve(paths.watchdog))
+        ? readStructuredFile(paths.watchdog)
+        : null,
+      activity: readJsonLines(paths.activity),
       resume: paths.resume && fs.existsSync(path.resolve(paths.resume))
         ? readStructuredFile(paths.resume)
         : null,
@@ -86,7 +93,7 @@ function loadBundle(args) {
 }
 
 function help() {
-  process.stdout.write(`ECC outcome control\n\nUsage:\n  ecc goal init --from FILE [--dir DIR]\n  ecc goal checkpoint --proof ID --at ISO --started-at ISO --basis TEXT --hours N [--confidence LEVEL]\n  ecc goal correct --instruction TEXT --priority TEXT --proof ID --next-action TEXT --at ISO --started-at ISO --basis TEXT --hours N\n  ecc goal record --acceptance ID --stage STAGE --environment NAME --evidence KIND=FILE [options]\n    options: --result-class CLASS --authenticity CLASS --user-visible true|false --subject-scope SCOPE\n  ecc goal assign --description TEXT --acceptance ID --owner-runtime NAME --owner-agent ID --scope PATH --lease-until ISO [budgets]\n  ecc goal integrate --assignment ID --integrator ID --evidence KIND=FILE --repo ID=DIR --tool-calls N --retries N --ci-runs N --cost-usd N\n  ecc goal resume --next-action TEXT [--repo DIR ...] [--last-result TEXT] [options]\n  ecc goal handoff --next-action TEXT [resume options]\n  ecc goal validate [--goal FILE] [--outcomes FILE] [--resume FILE]\n  ecc goal status [--goal FILE] [--outcomes FILE] [--json] [--now ISO]\n  ecc goal claim <complete|blocked|on-track> [--goal FILE] [--outcomes FILE] [--resume FILE] [--json] [--now ISO]\n\nDefaults:\n  directory:    .ecc/goal\n  goal:         active-goal.yaml\n  outcomes:     outcomes.jsonl\n  assignments:  assignments.jsonl\n  integrations: integrations.jsonl\n  resume:       resume-receipt.yaml (loaded when present)\n\nWrites are local, atomic, and lock-protected. The command never calls a model, provider, CI service, or deployment API.\n`);
+  process.stdout.write(`ECC outcome control\n\nUsage:\n  ecc goal init --from FILE [--dir DIR]\n  ecc goal checkpoint --proof ID --at ISO --started-at ISO --basis TEXT --hours N [--confidence LEVEL]\n  ecc goal correct --instruction TEXT --priority TEXT --proof ID --next-action TEXT --at ISO --started-at ISO --basis TEXT --hours N\n  ecc goal record --acceptance ID --stage STAGE --environment NAME --evidence KIND=FILE [options]\n    options: --result-class CLASS --authenticity CLASS --user-visible true|false --subject-scope SCOPE\n  ecc goal assign --description TEXT --acceptance ID --owner-runtime NAME --owner-agent ID --scope PATH --lease-until ISO [budgets]\n  ecc goal integrate --assignment ID --integrator ID --evidence KIND=FILE --repo ID=DIR --tool-calls N --retries N --ci-runs N --cost-usd N\n  ecc goal watch-config --window-hours N --max-activity N --max-retries N --max-ci-runs N --max-cost-usd N\n  ecc goal activity --kind KIND --tactic ID [--count N] [--cost-usd N]\n  ecc goal watch [--json] [--now ISO]\n  ecc goal resume --next-action TEXT [--repo DIR ...] [--last-result TEXT] [options]\n  ecc goal handoff --next-action TEXT [resume options]\n  ecc goal validate [--goal FILE] [--outcomes FILE] [--resume FILE]\n  ecc goal status [--goal FILE] [--outcomes FILE] [--json] [--now ISO]\n  ecc goal claim <complete|blocked|on-track> [--goal FILE] [--outcomes FILE] [--resume FILE] [--json] [--now ISO]\n\nDefaults:\n  directory:    .ecc/goal\n  goal:         active-goal.yaml\n  outcomes:     outcomes.jsonl\n  assignments:  assignments.jsonl\n  integrations: integrations.jsonl\n  resume:       resume-receipt.yaml (loaded when present)\n\nWrites are local, atomic, and lock-protected. The command never calls a model, provider, CI service, or deployment API.\n`);
 }
 
 function parseEvidence(value) {
@@ -154,8 +161,64 @@ function commandInit(args) {
     if (!fs.existsSync(path.resolve(paths.outcomes))) atomicWrite(paths.outcomes, '');
     if (!fs.existsSync(path.resolve(paths.assignments))) atomicWrite(paths.assignments, '');
     if (!fs.existsSync(path.resolve(paths.integrations))) atomicWrite(paths.integrations, '');
+    if (!fs.existsSync(path.resolve(paths.activity))) atomicWrite(paths.activity, '');
     return { initialized: true, idempotent: existed, goal_id: goal.goal_id, paths };
   });
+}
+
+function commandWatchConfig(args) {
+  const paths = pathsFrom(args);
+  const goal = readStructuredFile(paths.goal);
+  const required = ['--window-hours', '--max-activity', '--max-retries', '--max-ci-runs', '--max-cost-usd'];
+  if (required.some(name => optionValue(args, name) === null)) {
+    throw new Error('watch-config requires --window-hours, --max-activity, --max-retries, --max-ci-runs, and --max-cost-usd');
+  }
+  const policy = {
+    schema: 'ecc.watchdog-policy.v1',
+    goal_id: goal.goal_id,
+    window_hours: parseNumber(optionValue(args, '--window-hours'), '--window-hours'),
+    max_activity_without_proof: parseInteger(optionValue(args, '--max-activity'), '--max-activity'),
+    max_retries: parseInteger(optionValue(args, '--max-retries'), '--max-retries'),
+    max_ci_runs: parseInteger(optionValue(args, '--max-ci-runs'), '--max-ci-runs'),
+    max_cost_usd: parseNumber(optionValue(args, '--max-cost-usd'), '--max-cost-usd'),
+    updated_at: optionValue(args, '--updated-at', new Date().toISOString()),
+  };
+  assertDocument('watchdog', policy, 'watchdog policy');
+  withFileLock(`${paths.watchdog}.lock`, () => writeYaml(paths.watchdog, policy));
+  return { configured: true, policy, paths };
+}
+
+function commandActivity(args) {
+  const paths = pathsFrom(args);
+  const goal = readStructuredFile(paths.goal);
+  const kind = optionValue(args, '--kind');
+  const tacticId = optionValue(args, '--tactic');
+  if (!kind || !tacticId) throw new Error('activity requires --kind and --tactic');
+  if (!fs.existsSync(path.resolve(paths.watchdog))) throw new Error('activity requires a watchdog policy; run watch-config first');
+  const observedAt = optionValue(args, '--observed-at', new Date().toISOString());
+  const event = {
+    schema: 'ecc.activity-event.v1',
+    event_id: optionValue(args, '--event-id', makeReceiptId(kind, observedAt)),
+    goal_id: goal.goal_id,
+    observed_at: observedAt,
+    kind,
+    count: parseInteger(optionValue(args, '--count', kind === 'tactic_change' ? '0' : '1'), '--count'),
+    cost_usd: parseNumber(optionValue(args, '--cost-usd', '0'), '--cost-usd'),
+    tactic_id: tacticId,
+    source_harness: optionValue(args, '--source-harness', process.env.ECC_SOURCE_HARNESS || 'unknown'),
+  };
+  assertDocument('activity', event, `activity event ${event.event_id}`);
+  const activity = readJsonLines(paths.activity);
+  validateBundle({
+    goal,
+    outcomes: readJsonLines(paths.outcomes),
+    assignments: readJsonLines(paths.assignments),
+    integrations: readJsonLines(paths.integrations),
+    watchdog: readStructuredFile(paths.watchdog),
+    activity: [...activity, event],
+  });
+  const write = appendJsonLine(paths.activity, event, 'event_id');
+  return { recorded: true, ...write, event, paths };
 }
 
 function commandAssign(args) {
@@ -198,8 +261,10 @@ function commandAssign(args) {
     resume: null,
     assignments: [...assignments, assignment],
     integrations: readJsonLines(paths.integrations),
+    watchdog: fs.existsSync(path.resolve(paths.watchdog)) ? readStructuredFile(paths.watchdog) : null,
+    activity: readJsonLines(paths.activity),
   });
-  const write = appendJsonLine(paths.assignments, assignment);
+  const write = appendJsonLine(paths.assignments, assignment, 'assignment_id');
   return { assigned: true, ...write, assignment, paths };
 }
 
@@ -242,6 +307,8 @@ function commandIntegrate(args) {
     resume: null,
     assignments: readJsonLines(paths.assignments),
     integrations: [...integrations, receipt],
+    watchdog: fs.existsSync(path.resolve(paths.watchdog)) ? readStructuredFile(paths.watchdog) : null,
+    activity: readJsonLines(paths.activity),
   });
   const write = appendJsonLine(paths.integrations, receipt);
   return { integrated: receipt.outcome === 'pass', ...write, receipt, paths };
@@ -382,6 +449,8 @@ function commandRecord(args) {
     resume: null,
     assignments: readJsonLines(paths.assignments),
     integrations: readJsonLines(paths.integrations),
+    watchdog: fs.existsSync(path.resolve(paths.watchdog)) ? readStructuredFile(paths.watchdog) : null,
+    activity: readJsonLines(paths.activity),
   });
   const write = appendJsonLine(paths.outcomes, receipt);
   return { recorded: true, ...write, receipt, paths };
@@ -425,6 +494,8 @@ function commandResume(args, handoff = false) {
     resume: receipt,
     assignments: readJsonLines(paths.assignments),
     integrations: readJsonLines(paths.integrations),
+    watchdog: fs.existsSync(path.resolve(paths.watchdog)) ? readStructuredFile(paths.watchdog) : null,
+    activity: readJsonLines(paths.activity),
   });
   withFileLock(`${paths.resume}.lock`, () => writeYaml(paths.resume, receipt));
   appendJsonLine(paths.resumeHistory, receipt);
@@ -476,6 +547,14 @@ function main(args = process.argv.slice(2)) {
     process.stdout.write(`${JSON.stringify(commandIntegrate(args), null, 2)}\n`);
     return 0;
   }
+  if (command === 'watch-config') {
+    process.stdout.write(`${JSON.stringify(commandWatchConfig(args), null, 2)}\n`);
+    return 0;
+  }
+  if (command === 'activity') {
+    process.stdout.write(`${JSON.stringify(commandActivity(args), null, 2)}\n`);
+    return 0;
+  }
   if (command === 'resume' || command === 'handoff') {
     process.stdout.write(`${JSON.stringify(commandResume(args, command === 'handoff'), null, 2)}\n`);
     return 0;
@@ -503,6 +582,8 @@ function main(args = process.argv.slice(2)) {
       outcomes: bundle.outcomes.length,
       assignments: bundle.assignments.length,
       integrations: bundle.integrations.length,
+      activity_events: bundle.activity.length,
+      watchdog_configured: Boolean(bundle.watchdog),
       evidence_artifacts: verification.length,
       resume_receipt: Boolean(bundle.resume),
       paths,
@@ -521,6 +602,12 @@ function main(args = process.argv.slice(2)) {
     );
     process.stdout.write(args.includes('--json') ? `${JSON.stringify(status, null, 2)}\n` : renderStatus(status));
     return status.complete ? 0 : 2;
+  }
+
+  if (command === 'watch') {
+    const result = evaluateWatchdog(bundle.goal, bundle.outcomes, bundle.watchdog, bundle.activity, now);
+    process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+    return result.healthy ? 0 : 2;
   }
 
   if (command === 'claim') {
@@ -553,6 +640,8 @@ module.exports = {
   commandCorrect,
   commandAssign,
   commandIntegrate,
+  commandActivity,
+  commandWatchConfig,
   commandInit,
   commandRecord,
   commandResume,

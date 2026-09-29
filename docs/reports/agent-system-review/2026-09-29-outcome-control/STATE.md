@@ -1,8 +1,8 @@
 # State
 
-- Current phase: Phase 7 - progress and budget watchdog
+- Current phase: Phase 8 - risk-scaled proof profiles
 - Forecast: On track for the next checkpoint; whole-project completion remains
-  unforecast until activity plateaus and retry/cost/CI overruns change the tactic.
+  unforecast until repository-realistic proof profiles have negative controls.
 - Last verified: 2026-09-29
 - Delivered commit: `3c4ce1278f88a9a8aeb571fdd242e4ba51c97dfc`
 - Delivered remote: `origin/main`
@@ -29,8 +29,11 @@
 - Phase 6 result: The latest owner correction atomically replaces priority,
   checkpoint, and next action. Old resume receipts and pre-correction delegated
   plans cannot support current progress claims.
-- Next checkpoint: Repeated activity without new product proof, or a breached
-  retry/cost/CI budget, marks the tactic off track and requires a change.
+- Phase 7 result: Tool activity, retries, CI runs, elapsed proof windows, and
+  cost are measured separately from outcomes. A plateau or budget breach rejects
+  on-track until a distinct tactic-change event resets the bounded window.
+- Next checkpoint: Backend, frontend, cross-repo, security, AI-grounding,
+  sustainability, export, deploy, and docs tasks select explicit proof profiles.
 - Blocked lanes: None. A later approved live behavioral-eval batch is capped at
   the canonical USD 5 total default unless Alejandro supplies a lower ceiling.
 - Independent work: Offline implementation and validation continue before any

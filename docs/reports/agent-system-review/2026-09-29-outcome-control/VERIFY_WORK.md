@@ -30,6 +30,11 @@
 | 6 | Stale-plan negative controls | Passed | Old resume receipt, old next action, and post-correction use of an old assignment rejected |
 | 6 | Real CLI correction journey | Passed | `correct` invalidated old state; a fresh matching `resume` restored validation |
 | 6 | Focused outcome suite | 35 passed | `node --test tests/lib/goal-control.test.js` |
+| 7 | Plateau and budget simulation | Passed | Activity, CI, and cost breaches made the watchdog unhealthy |
+| 7 | Tactic-change recovery | Passed | Replaying activity under a distinct tactic restored only a fresh bounded window |
+| 7 | Claim gate | Passed | Watchdog breach rejects `on-track` while leaving proven completion semantics separate |
+| 7 | Real CLI watchdog journey | Passed | `watch` exited 2 before and 0 after an explicit tactic change |
+| 7 | Focused outcome suite | 38 passed | `node --test tests/lib/goal-control.test.js` |
 
 Mocked, fixture, static, and source-only checks remain labelled as such. They do
 not satisfy authentic user-facing, real-property, deployment, or independent

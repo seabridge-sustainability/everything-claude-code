@@ -414,6 +414,40 @@
         "cost_usd": { "type": "number", "minimum": 0 }
       }
     },
+    "watchdogPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema", "goal_id", "window_hours", "max_activity_without_proof",
+        "max_retries", "max_ci_runs", "max_cost_usd", "updated_at"
+      ],
+      "properties": {
+        "schema": { "const": "ecc.watchdog-policy.v1" },
+        "goal_id": { "$ref": "#/$defs/nonEmptyString" },
+        "window_hours": { "type": "number", "exclusiveMinimum": 0 },
+        "max_activity_without_proof": { "type": "integer", "minimum": 0 },
+        "max_retries": { "type": "integer", "minimum": 0 },
+        "max_ci_runs": { "type": "integer", "minimum": 0 },
+        "max_cost_usd": { "type": "number", "minimum": 0 },
+        "updated_at": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "activityEvent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "event_id", "goal_id", "observed_at", "kind", "count", "cost_usd", "tactic_id", "source_harness"],
+      "properties": {
+        "schema": { "const": "ecc.activity-event.v1" },
+        "event_id": { "$ref": "#/$defs/nonEmptyString" },
+        "goal_id": { "$ref": "#/$defs/nonEmptyString" },
+        "observed_at": { "$ref": "#/$defs/nonEmptyString" },
+        "kind": { "type": "string", "enum": ["tool_call", "retry", "ci_run", "cost", "tactic_change"] },
+        "count": { "type": "integer", "minimum": 0 },
+        "cost_usd": { "type": "number", "minimum": 0 },
+        "tactic_id": { "$ref": "#/$defs/nonEmptyString" },
+        "source_harness": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
     "assignment": {
       "type": "object",
       "additionalProperties": false,

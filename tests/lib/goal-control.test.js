@@ -10,6 +10,7 @@ const { spawnSync } = require('child_process');
 const {
   buildStatus,
   evaluateClaim,
+  evaluateWatchdog,
   validateBundle,
 } = require('../../scripts/lib/goal-control');
 const { captureRepositoryState } = require('../../scripts/lib/goal-store');
@@ -220,6 +221,35 @@ function integration(overrides = {}) {
   };
 }
 
+function watchdogPolicy(overrides = {}) {
+  return {
+    schema: 'ecc.watchdog-policy.v1',
+    goal_id: 'openaccess-product',
+    window_hours: 4,
+    max_activity_without_proof: 2,
+    max_retries: 1,
+    max_ci_runs: 0,
+    max_cost_usd: 0,
+    updated_at: '2026-09-29T12:00:00Z',
+    ...overrides,
+  };
+}
+
+function activityEvent(id, kind, observedAt, overrides = {}) {
+  return {
+    schema: 'ecc.activity-event.v1',
+    event_id: id,
+    goal_id: 'openaccess-product',
+    observed_at: observedAt,
+    kind,
+    count: kind === 'tactic_change' ? 0 : 1,
+    cost_usd: 0,
+    tactic_id: 'tactic-a',
+    source_harness: 'codex',
+    ...overrides,
+  };
+}
+
 function run(script, args, cwd) {
   return spawnSync('node', [script, ...args], { cwd, encoding: 'utf8' });
 }
@@ -385,6 +415,42 @@ test('latest owner correction controls priority, checkpoint, and next action', (
   }, { now: '2026-09-29T17:00:00Z' });
   assert.strictEqual(stalePlan.allowed, false);
   assert.match(stalePlan.reasons.join(' '), /superseded owner plan/);
+});
+
+test('watchdog detects activity plateau and budget overruns until tactic changes', () => {
+  const events = [
+    activityEvent('a1', 'tool_call', '2026-09-29T13:00:00Z'),
+    activityEvent('a2', 'retry', '2026-09-29T13:10:00Z'),
+    activityEvent('a3', 'tool_call', '2026-09-29T13:20:00Z'),
+    activityEvent('a4', 'ci_run', '2026-09-29T13:30:00Z'),
+    activityEvent('a5', 'cost', '2026-09-29T13:40:00Z', { cost_usd: 1 }),
+  ];
+  const unhealthy = evaluateWatchdog(goal(), [], watchdogPolicy(), events, new Date('2026-09-29T14:00:00Z'));
+  assert.strictEqual(unhealthy.healthy, false);
+  assert.deepStrictEqual(unhealthy.breaches.sort(), ['activity_without_proof', 'ci_budget', 'cost_budget'].sort());
+
+  const changed = evaluateWatchdog(goal(), [], watchdogPolicy(), [
+    ...events,
+    activityEvent('change-1', 'tactic_change', '2026-09-29T14:05:00Z', { tactic_id: 'tactic-b' }),
+  ], new Date('2026-09-29T14:10:00Z'));
+  assert.strictEqual(changed.healthy, true);
+  assert.strictEqual(changed.tactic_id, 'tactic-b');
+});
+
+test('watchdog breach rejects an on-track claim', () => {
+  const result = evaluateClaim('on-track', {
+    goal: goal(),
+    outcomes: [outcome('r1', 'heat-browser', 'ui_displayed')],
+    resume: resume({ observed_at: '2026-09-29T14:00:00Z' }),
+    watchdog: watchdogPolicy(),
+    activity: [
+      activityEvent('p1', 'tool_call', '2026-09-29T13:10:00Z'),
+      activityEvent('p2', 'tool_call', '2026-09-29T13:20:00Z'),
+      activityEvent('p3', 'tool_call', '2026-09-29T13:30:00Z'),
+    ],
+  }, { now: '2026-09-29T17:00:00Z' });
+  assert.strictEqual(result.allowed, false);
+  assert.match(result.reasons.join(' '), /watchdog requires a tactic change/);
 });
 
 test('denies blocked when one provider lane is blocked but independent product work remains', () => {
@@ -981,6 +1047,37 @@ test('real CLI owner correction invalidates a stale plan until resume is refresh
     ], dir).status, 0);
     validation = run(CLI, ['validate'], dir);
     assert.strictEqual(validation.status, 0, validation.stderr);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('real CLI watchdog changes from off track to healthy only after tactic reset', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-goal-watchdog-'));
+  try {
+    const seed = path.join(dir, 'goal.yaml');
+    fs.writeFileSync(seed, yaml.dump(goal({ goal_id: 'watchdog-goal' }), { noRefs: true }));
+    assert.strictEqual(run(CLI, ['init', '--from', seed], dir).status, 0);
+    assert.strictEqual(run(CLI, [
+      'watch-config', '--window-hours', '4', '--max-activity', '2', '--max-retries', '1',
+      '--max-ci-runs', '0', '--max-cost-usd', '0', '--updated-at', '2026-09-29T12:00:00Z',
+    ], dir).status, 0);
+    for (const [id, at] of [['w1', '2026-09-29T13:00:00Z'], ['w2', '2026-09-29T13:10:00Z'], ['w3', '2026-09-29T13:20:00Z']]) {
+      const recorded = run(CLI, [
+        'activity', '--kind', 'tool_call', '--tactic', 'tactic-a', '--event-id', id, '--observed-at', at,
+      ], dir);
+      assert.strictEqual(recorded.status, 0, recorded.stderr || recorded.stdout);
+    }
+    let watch = run(CLI, ['watch', '--now', '2026-09-29T14:00:00Z'], dir);
+    assert.strictEqual(watch.status, 2, watch.stderr);
+    assert.match(watch.stdout, /activity_without_proof/);
+    assert.strictEqual(run(CLI, [
+      'activity', '--kind', 'tactic_change', '--tactic', 'tactic-b',
+      '--event-id', 'watch-change', '--observed-at', '2026-09-29T14:05:00Z',
+    ], dir).status, 0);
+    watch = run(CLI, ['watch', '--now', '2026-09-29T14:10:00Z'], dir);
+    assert.strictEqual(watch.status, 0, watch.stderr || watch.stdout);
+    assert.match(watch.stdout, /"healthy": true/);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }
