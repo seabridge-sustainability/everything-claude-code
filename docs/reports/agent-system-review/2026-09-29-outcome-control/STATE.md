@@ -1,8 +1,8 @@
 # State
 
-- Current phase: Phase 9 - behavioral and adversarial evaluation
-- Forecast: On track for offline evaluation; live provider sampling remains
-  optional and capped by the approved USD 5 total default.
+- Current phase: Phase 10 - product repository rollout
+- Forecast: On track for local adapter synchronization; each product repository
+  will be integrated only through its normal branch and isolated worktree.
 - Last verified: 2026-09-29
 - Delivered commit: `3c4ce1278f88a9a8aeb571fdd242e4ba51c97dfc`
 - Delivered remote: `origin/main`
@@ -35,10 +35,14 @@
 - Phase 8 result: Nine risk-scaled profiles define minimum evidence kinds,
   repository coverage, authenticity, user visibility, subject scope, and
   forbidden activity-only results. Model or runtime selection cannot weaken them.
-- Next checkpoint: Offline adversarial replay yields identical verdicts across
-  all 18 runtimes; any live sample is separately metered and budget-capped.
-- Blocked lanes: None. A later approved live behavioral-eval batch is capped at
-  the canonical USD 5 total default unless Alejandro supplies a lower ceiling.
+- Phase 9 result: The actual public bridge admitted a verified goal and rejected
+  an all-null completion identically across all 18 runtimes and all seven model
+  families, with zero provider calls. The separate live plan is nine calls,
+  USD 5 total, and explicitly identifies Codex/Gemini as soft-budget harnesses.
+- Next checkpoint: Backend, frontend, and other managed repository adapters
+  synchronize to the canonical goal block and pass drift checks.
+- Blocked lanes: None. Live provider sampling is not required for the offline
+  enforcement claim and was intentionally not spent during this phase.
 - Independent work: Offline implementation and validation continue before any
   optional live model call.
 - Prior turn classification: Planning-only; no progress.

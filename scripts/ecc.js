@@ -55,6 +55,10 @@ const COMMANDS = {
     script: 'goal-runtime-bridge.js',
     description: 'Apply the same outcome gate across coding-agent runtimes and models',
   },
+  'goal-eval': {
+    script: 'eval-goal-runtime-offline.js',
+    description: 'Replay the offline outcome gate across every registered runtime and model family',
+  },
   'install-plan': {
     script: 'install-plan.js',
     description: 'Alias for plan',
@@ -126,6 +130,7 @@ const PRIMARY_COMMANDS = [
   'memory',
   'goal',
   'goal-runtime',
+  'goal-eval',
   'list-installed',
   'doctor',
   'feedback',
@@ -194,6 +199,7 @@ Examples:
   ecc goal claim blocked --resume .ecc/goal/resume-receipt.yaml
   ecc goal-runtime admit --runtime codex --mode controlled
   ecc goal-runtime final --runtime claude --claim complete
+  ecc goal-eval
   ecc list-installed --json
   ecc doctor --target cursor
   ecc feedback

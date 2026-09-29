@@ -31,6 +31,8 @@ Configure long-goal proof and spending limits with `ecc goal watch-config`, reco
 
 Select a minimum evidence contract from `ecc goal profiles`: backend, frontend, cross-repo, security, AI-grounding, sustainability, export, deploy, or docs. A repository can require more evidence, but a runtime or model cannot reduce the selected profile.
 
+Run `ecc goal-eval` for the provider-free 18-runtime enforcement replay. The separate Codex/Claude/Gemini behavioral harness is plan-only unless its explicit live gate, nine-call maximum, total USD ceiling, and soft-budget acknowledgement all pass.
+
 | Command | What it does |
 |---------|-------------|
 | `/plan` | Restate requirements, assess risks, write step-by-step implementation plan — **waits for your confirm before touching code** |

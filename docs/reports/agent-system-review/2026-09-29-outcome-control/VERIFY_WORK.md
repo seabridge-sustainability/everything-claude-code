@@ -39,6 +39,10 @@
 | 8 | Cross-repo negative control | Passed | Missing API evidence and second repository rejected |
 | 8 | Unknown profile control | Passed | Model-shaped ad hoc profile rejected |
 | 8 | Focused outcome suite | 39 passed | `node --test tests/lib/goal-control.test.js` |
+| 9 | Offline runtime replay | 18/18 passed | Valid admission/completion allowed; all-null completion denied through the public bridge |
+| 9 | Model-family coverage | 7/7 passed | GPT, Claude, Gemini, GLM, DeepSeek, Nemotron, and Fable labels produced the same policy outcome |
+| 9 | Provider use | 0 calls | Offline fixture used local Git repositories and hashed artifacts only |
+| 9 | Live behavioral plan | Verified, not executed | 9-call hard limit, USD 5 total, soft-budget warning for Codex and Gemini |
 
 Mocked, fixture, static, and source-only checks remain labelled as such. They do
 not satisfy authentic user-facing, real-property, deployment, or independent

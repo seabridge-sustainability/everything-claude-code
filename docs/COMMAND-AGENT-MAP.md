@@ -89,6 +89,7 @@ This document lists each slash command and the primary agent(s) or skills it inv
 | `ecc goal claim` | goal protocol / `scripts/goal-control.js` | Gate complete, blocked, and on-track claims against current receipts |
 | `ecc goal-runtime admit` | goal protocol / `scripts/goal-runtime-bridge.js` | Apply risk-scaled admission through the same canonical engine for every registered runtime and model |
 | `ecc goal-runtime final` | goal protocol / `scripts/goal-runtime-bridge.js` | Gate a runtime's complete, blocked, or on-track claim against the active goal evidence |
+| `ecc goal-eval` | goal protocol / `scripts/eval-goal-runtime-offline.js` | Replay valid completion and all-null rejection through all 18 runtime adapters without provider calls |
 | `ecc-memory-mcp` | unified-memory / `scripts/memory-mcp.mjs` | Optional stdio MCP adapter; exposes save/search/read/doctor only |
 
 ## Direct-Use Agents
