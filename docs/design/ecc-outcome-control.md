@@ -2,8 +2,8 @@
 
 ECC outcome control prevents long-running agents from reporting activity as
 delivery. It is deliberately small and portable: human-readable goal and resume
-records, append-only JSONL outcome receipts, and a read-only validator shared by
-every harness.
+records, append-only JSONL outcome receipts, atomic local writers, and a claim
+validator shared by every harness.
 
 Use it automatically for multi-day, multi-agent, provider-dependent, or
 inherited goals. Goal admission and every handoff must refresh the active goal,
@@ -94,6 +94,13 @@ prove its own completion claim.
 ## Commands
 
 ```powershell
+ecc goal init --from goal-seed.yaml
+ecc goal checkpoint --proof report-export --at 2026-10-01T18:00:00Z `
+  --started-at 2026-10-01T14:00:00Z --basis "First vertical slice" --hours 4
+ecc goal record --acceptance report-export --stage export_verified `
+  --environment development --evidence browser=browser.png --evidence export=report.pdf
+ecc goal resume --repo . --next-action "Verify the export" --last-result "Report rendered"
+ecc goal handoff --repo . --next-action "Continue the verified export lane"
 ecc goal validate
 ecc goal status --json
 ecc goal claim on-track
@@ -111,9 +118,15 @@ gate. Complete and on-track claims also compare the relevant receipt commit to
 the current HEAD recorded by the fresh resume receipt, so success from an older
 revision cannot silently cover newer code.
 
-The command never creates or rewrites records. Exit code `0` means the requested
-claim is supported, `2` means the documents are valid but the claim is not
-supported, and `1` means input or schema validation failed.
+The write commands use same-directory atomic replacement and exclusive lock
+files. `init` is create-only unless the requested goal is byte-equivalent,
+`record` appends an idempotent outcome receipt, and `resume`/`handoff` preserve
+an append-only history while refreshing the current resume record. They never
+invoke a model, provider, CI service, deployment, or cloud API.
+
+For claim commands, exit code `0` means the requested claim is supported, `2`
+means the documents are valid but the claim is not supported, and `1` means
+input or schema validation failed.
 
 The canonical schema is `schemas/goal-control.schema.json`. Runtime and browser
 evidence remain authoritative; the ledger only makes their relationship to the

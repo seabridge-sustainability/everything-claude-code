@@ -72,6 +72,11 @@ This document lists each slash command and the primary agent(s) or skills it inv
 | `ecc memory search` | unified-memory / `scripts/memory.js` | Bounded lexical search over selected vault scopes |
 | `ecc memory read` | unified-memory / `scripts/memory.js` | Read one memory plus derived backlinks |
 | `ecc memory doctor` | unified-memory / `scripts/memory.js` | Audit malformed files, duplicate IDs, broken links, and symlinks |
+| `ecc goal init` | goal protocol / `scripts/goal-control.js` | Create a controlled goal from a reviewed YAML or JSON contract |
+| `ecc goal checkpoint` | goal protocol / `scripts/goal-control.js` | Refresh the promised next proof and forecast |
+| `ecc goal record` | goal protocol / `scripts/goal-control.js` | Hash local evidence and append an outcome receipt |
+| `ecc goal resume` | goal protocol / `scripts/goal-control.js` | Capture repository state before continuing inherited work |
+| `ecc goal handoff` | goal protocol / `scripts/goal-control.js` | Record successor-ready current state and history |
 | `ecc goal validate` | goal protocol / `scripts/goal-control.js` | Validate portable active-goal, outcome, and resume records |
 | `ecc goal status` | goal protocol / `scripts/goal-control.js` | Report demonstrated proof stages rather than activity totals |
 | `ecc goal claim` | goal protocol / `scripts/goal-control.js` | Gate complete, blocked, and on-track claims against current receipts |

@@ -259,7 +259,8 @@
           "type": "array",
           "items": { "$ref": "#/$defs/nonEmptyString" },
           "uniqueItems": true
-        }
+        },
+        "origin": { "$ref": "#/$defs/nullableString" }
       }
     },
     "spendingState": {
@@ -305,6 +306,11 @@
         "goal_id": { "$ref": "#/$defs/nonEmptyString" },
         "observed_at": { "$ref": "#/$defs/nonEmptyString" },
         "repository_state": { "$ref": "#/$defs/repositoryState" },
+        "repository_states": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/repositoryState" }
+        },
         "inherited_claims": {
           "type": "array",
           "minItems": 1,

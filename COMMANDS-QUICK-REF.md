@@ -162,11 +162,17 @@ harnesses.
 
 ## Long-Goal Outcome Control
 
-These read-only commands validate `.ecc/goal/` records. Use them for long,
-resumed, provider-dependent, or multi-agent goals rather than ordinary fixes.
+These local commands create and validate `.ecc/goal/` records. Use them for
+long, resumed, provider-dependent, or multi-agent goals rather than ordinary
+fixes. Write commands are atomic and never call a model or remote service.
 
 | Command | Purpose |
 |---|---|
+| `ecc goal init --from <file>` | Create an active goal and empty outcome ledger without overwriting a different goal |
+| `ecc goal checkpoint ...` | Refresh the next proof checkpoint and evidence-based forecast |
+| `ecc goal record ...` | Hash local evidence and append an idempotent outcome receipt |
+| `ecc goal resume ...` | Capture current repository state and refresh the resume receipt |
+| `ecc goal handoff ...` | Preserve a resume-history entry for the successor |
 | `ecc goal validate` | Validate the active goal, outcome receipts, and current resume receipt |
 | `ecc goal status --json` | Show user-visible proof progress separately from activity |
 | `ecc goal claim on-track` | Require a current-HEAD proof receipt inside the promised checkpoint window |

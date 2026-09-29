@@ -130,6 +130,12 @@ function run(script, args, cwd) {
   return spawnSync('node', [script, ...args], { cwd, encoding: 'utf8' });
 }
 
+function runGit(args, cwd) {
+  const result = spawnSync('git', args, { cwd, encoding: 'utf8' });
+  assert.strictEqual(result.status, 0, result.stderr);
+  return result.stdout.trim();
+}
+
 const tests = [];
 function test(name, fn) { tests.push([name, fn]); }
 
@@ -420,6 +426,111 @@ test('real CLI rejects the five-day SeaBridge counterexample for complete, on-tr
       assert.strictEqual(result.status, 2, `${claim}: ${result.stderr}`);
       assert.strictEqual(JSON.parse(result.stdout).allowed, false, claim);
     }
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('real CLI creates, checkpoints, records, resumes, hands off, and claims a goal', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-goal-lifecycle-'));
+  try {
+    runGit(['init', '--initial-branch=development'], dir);
+    runGit(['config', 'user.email', 'goal-control@example.invalid'], dir);
+    runGit(['config', 'user.name', 'ECC Goal Test'], dir);
+    fs.writeFileSync(path.join(dir, 'README.md'), '# Goal lifecycle\n');
+    runGit(['add', 'README.md'], dir);
+    runGit(['commit', '-m', 'test: initialize goal fixture'], dir);
+
+    const lifecycleGoal = goal({
+      goal_id: 'cli-lifecycle',
+      status: 'complete',
+      user_visible_proofs: [{
+        id: 'cli-result',
+        description: 'The real CLI records and validates an authentic result.',
+        lane_id: 'delivery',
+        required_stage: 'ui_displayed',
+        required_evidence_kinds: ['browser'],
+        required: true,
+      }],
+      lanes: [{
+        id: 'delivery',
+        description: 'CLI delivery',
+        status: 'complete',
+        blocker: null,
+        next_action: null,
+      }],
+      forecast: {
+        ...goal().forecast,
+        critical_path: ['cli-result'],
+        checkpoint_proof_id: 'cli-result',
+      },
+    });
+    const seed = path.join(dir, 'goal-seed.yaml');
+    fs.writeFileSync(seed, yaml.dump(lifecycleGoal, { noRefs: true, lineWidth: 120 }));
+    const initialized = run(CLI, ['init', '--from', seed], dir);
+    assert.strictEqual(initialized.status, 0, initialized.stderr);
+    assert.strictEqual(JSON.parse(initialized.stdout).idempotent, false);
+    const repeated = run(CLI, ['init', '--from', seed], dir);
+    assert.strictEqual(repeated.status, 0, repeated.stderr);
+    assert.strictEqual(JSON.parse(repeated.stdout).idempotent, true);
+
+    const checkpointed = run(CLI, [
+      'checkpoint', '--proof', 'cli-result', '--at', '2026-09-29T18:00:00Z',
+      '--started-at', '2026-09-29T12:00:00Z', '--basis', 'Direct CLI lifecycle.',
+      '--hours', '1', '--confidence', 'high', '--observed-at', '2026-09-29T12:00:00Z',
+    ], dir);
+    assert.strictEqual(checkpointed.status, 0, checkpointed.stderr);
+
+    const evidence = path.join(dir, 'browser-result.json');
+    fs.writeFileSync(evidence, JSON.stringify({ rendered: true, value: 42 }));
+    const recorded = run(CLI, [
+      'record', '--acceptance', 'cli-result', '--stage', 'ui_displayed',
+      '--environment', 'local-cli', '--evidence', `browser=${evidence}`,
+      '--receipt-id', 'cli-result-001', '--observed-at', '2026-09-29T13:00:00Z',
+      '--source-harness', 'test',
+    ], dir);
+    assert.strictEqual(recorded.status, 0, recorded.stderr);
+    const receipt = JSON.parse(recorded.stdout).receipt;
+    assert.match(receipt.evidence[0].sha256, /^[a-f0-9]{64}$/);
+
+    const resumed = run(CLI, [
+      'resume', '--repo', dir, '--next-action', 'Verify the completion claim.',
+      '--last-result', 'The real CLI rendered value 42.', '--receipt-id', 'resume-cli-001',
+      '--observed-at', '2026-09-29T14:00:00Z', '--source-harness', 'test',
+    ], dir);
+    assert.strictEqual(resumed.status, 0, resumed.stderr);
+    const resumeReceipt = JSON.parse(resumed.stdout).receipt;
+    assert.strictEqual(resumeReceipt.repository_states.length, 1);
+    assert.ok(resumeReceipt.repository_state.dirty_paths.includes('browser-result.json'));
+
+    const claim = run(CLI, ['claim', 'complete', '--json', '--now', '2026-09-29T15:00:00Z'], dir);
+    assert.strictEqual(claim.status, 0, claim.stderr);
+    assert.strictEqual(JSON.parse(claim.stdout).allowed, true);
+
+    const handedOff = run(CLI, [
+      'handoff', '--repo', dir, '--next-action', 'Start the next verified phase.',
+      '--last-result', 'The real CLI rendered value 42.', '--receipt-id', 'handoff-cli-001',
+      '--observed-at', '2026-09-29T15:00:00Z', '--source-harness', 'test',
+    ], dir);
+    assert.strictEqual(handedOff.status, 0, handedOff.stderr);
+    assert.strictEqual(JSON.parse(handedOff.stdout).handoff_created, true);
+    assert.strictEqual(fs.readFileSync(path.join(dir, '.ecc', 'goal', 'resume-history.jsonl'), 'utf8').trim().split(/\r?\n/).length, 2);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('init refuses to overwrite a different active goal', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-goal-init-conflict-'));
+  try {
+    const first = path.join(dir, 'first.yaml');
+    const second = path.join(dir, 'second.yaml');
+    fs.writeFileSync(first, yaml.dump(goal(), { noRefs: true }));
+    fs.writeFileSync(second, yaml.dump(goal({ objective: 'A conflicting objective.' }), { noRefs: true }));
+    assert.strictEqual(run(CLI, ['init', '--from', first], dir).status, 0);
+    const conflict = run(CLI, ['init', '--from', second], dir);
+    assert.strictEqual(conflict.status, 1);
+    assert.match(conflict.stderr, /already exists with different content/);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }

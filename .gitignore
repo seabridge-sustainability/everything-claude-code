@@ -133,6 +133,9 @@ references/get-shit-done-temp/
 # GSD working state (project-local planning directory)
 .planning/
 
+# Local long-goal receipts can contain repository paths and runtime evidence.
+.ecc/goal/
+
 # MCP Toolbox real configs (examples are committed; real configs with credentials are not)
 configs/mcp-toolbox/tools.dev.yaml
 configs/mcp-toolbox/tools.staging.yaml
