@@ -19,7 +19,12 @@ let failed = 0;
 const run = (name, fn) => { if (test(name, fn)) passed++; else failed++; };
 
 const HOOK = path.resolve(__dirname, '../../scripts/git-hooks/graphify-rebuild.sh');
-const BOUNDARY = '# SeaBridgeAI knowledge boundary (test)\ndocs/reports/\n';
+const BOUNDARY = [
+  '# SeaBridgeAI knowledge boundary (test)',
+  'docs/reports/', 'reports/', 'artifacts/', 'logs/', '/data/',
+  '**/site-packages/', 'references/', 'vendor/', 'third_party/', '*.env', '.env.*',
+  '',
+].join('\n');
 
 banner('graphify git hook');
 
@@ -132,9 +137,15 @@ try {
     assert.deepStrictEqual(calls(1500), []);
   });
 
-  run('fails closed when .graphifyignore lacks the knowledge boundary', () => {
+  run('fails closed when .graphifyignore lacks the knowledge boundary marker', () => {
     const leaky = makeRepo('leaky', 'node_modules/\n');
     commitFile(leaky, 'src/app.py');
+    assert.deepStrictEqual(calls(1500), []);
+  });
+
+  run('fails closed when the marker exists but a required exclusion is missing', () => {
+    const incomplete = makeRepo('incomplete', '# SeaBridgeAI knowledge boundary\ndocs/reports/\n');
+    commitFile(incomplete, 'src/app.py');
     assert.deepStrictEqual(calls(1500), []);
   });
 

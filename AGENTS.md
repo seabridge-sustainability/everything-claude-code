@@ -1,6 +1,6 @@
 # Everything Claude Code (ECC) — Agent Instructions
 
-This is a **production-ready AI coding plugin** providing 75 specialized agents, 383 skills, 96 commands, and automated hook workflows for software development.
+This is a **production-ready AI coding plugin** providing 75 specialized agents, 382 skills, 96 commands, and automated hook workflows for software development.
 
 **Version:** 2.2.2
 
@@ -10,7 +10,7 @@ SYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1 · SeaBridgeAI fork; canonical path `C:\Use
 
 ```
 agents/          — 75 specialized subagents
-skills/          — 383 workflow skills and domain knowledge
+skills/          — 382 workflow skills and domain knowledge
 commands/        — 96 slash commands
 hooks/           — Trigger-based automations
 rules/           — Always-follow guidelines (common + per-language)

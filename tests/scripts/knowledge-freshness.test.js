@@ -12,7 +12,15 @@ const os = require('os');
 const path = require('path');
 const { execFileSync } = require('child_process');
 
-const { builtAtCommitFromGraph, graphStatus, build, wikiStatus, parseFrontmatter } = require('../../scripts/knowledge-freshness');
+const {
+  REQUIRED_GRAPHIFY_IGNORES,
+  builtAtCommitFromGraph,
+  graphBoundaryStatus,
+  graphStatus,
+  build,
+  wikiStatus,
+  parseFrontmatter,
+} = require('../../scripts/knowledge-freshness');
 const { test, banner, section, summary } = require('../lib/helpers/mini-test-runner');
 
 let passed = 0;
@@ -30,6 +38,11 @@ function makeRepo(name) {
   git(repo, 'config', 'user.name', 'Test');
   git(repo, 'config', 'commit.gpgsign', 'false');
   git(repo, 'config', 'core.autocrlf', 'false');
+  fs.writeFileSync(path.join(repo, '.graphifyignore'), [
+    '# SeaBridgeAI knowledge boundary (test)',
+    ...REQUIRED_GRAPHIFY_IGNORES,
+    '',
+  ].join('\n'));
   return repo;
 }
 
@@ -65,6 +78,17 @@ try {
     const status = graphStatus(repo);
     assert.strictEqual(status.status, 'missing');
     assert.match(status.rebuild, /graphify update/);
+  });
+
+  run('a marker without the complete privacy boundary is unsafe', () => {
+    const unsafe = makeRepo('unsafe');
+    commit(unsafe, 'src/a.py', 'x = 1\n');
+    fs.writeFileSync(path.join(unsafe, '.graphifyignore'), '# SeaBridgeAI knowledge boundary\ndocs/reports/\n');
+    const boundary = graphBoundaryStatus(unsafe);
+    assert.strictEqual(boundary.safe, false);
+    assert.match(boundary.problems.join(' '), /artifacts\//);
+    assert.strictEqual(graphStatus(unsafe).status, 'unsafe');
+    assert.throws(() => build(unsafe, { bin: process.execPath }), /Unsafe Graphify boundary/);
   });
 
   run('a graph built at HEAD is fresh', () => {

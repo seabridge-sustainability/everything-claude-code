@@ -239,7 +239,7 @@ function brokenPathRefs(text, repo, workspace) {
   while ((m = re.exec(text)) !== null) {
     let ref = m[1].replace(/[),.;:]+$/, '');
     if (/[<>*{}|$]|^https?:|^--?|^\.\\venv|\(|=/.test(ref)) continue;
-    if (/^(?:artifacts|logs|docs\/reports|graphify\/output)[\\/]/.test(ref)) continue;
+    if (/^(?:artifacts|logs|docs\/reports|graphify(?:-out|\/output))[\\/]/.test(ref)) continue;
     const home = /^~[\\/]/.test(ref);
     const abs = /^[A-Za-z]:\\/.test(ref);
     if (!abs && !/[\\/]/.test(ref)) continue;

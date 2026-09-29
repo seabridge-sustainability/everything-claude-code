@@ -43,6 +43,15 @@
 | 9 | Model-family coverage | 7/7 passed | GPT, Claude, Gemini, GLM, DeepSeek, Nemotron, and Fable labels produced the same policy outcome |
 | 9 | Provider use | 0 calls | Offline fixture used local Git repositories and hashed artifacts only |
 | 9 | Live behavioral plan | Verified, not executed | 9-call hard limit, USD 5 total, soft-budget warning for Codex and Gemini |
+| 10 | Product instruction stacks | 6/6 passed | Ten harness views per repo, canonical drift checks, 16 KB startup budget |
+| 10 | Product remote delivery | 6/6 confirmed | `ls-remote` matched each isolated worktree HEAD on its normal branch |
+| 10 | GitHub Actions discipline | Passed | One `[skip actions]` batch push per repo; no dispatches or reruns |
+| 11 | Knowledge-source registry | 51 passed | Tenant stores remain inaccessible to coding agents; GBrain remains retired |
+| 11 | Freshness and wiki checks | 15 passed | Missing/stale/unsafe graphs and stale wiki sources are distinguished |
+| 11 | Graph hook privacy controls | 8 passed | Marker-only and missing-boundary configurations fail closed |
+| 11 | Managed graph boundaries | 6/6 safe | ECC plus five first-party product graph roots contain every required exclusion |
+| Final | Complete ECC regression suite | 4,794/4,794 passed | `node tests/run-all.js`; platform-specific unavailable cases remained explicit skips |
+| Final | Diff integrity | Passed | `git diff --check` after generated catalog and Context Hub synchronization |
 
 Mocked, fixture, static, and source-only checks remain labelled as such. They do
 not satisfy authentic user-facing, real-property, deployment, or independent

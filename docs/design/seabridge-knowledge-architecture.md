@@ -95,13 +95,15 @@ node scripts/knowledge-freshness.js wiki <workspace>   # stale pages, missing so
   cached. `graph.json` embeds `built_at_commit`.
 - **Build:** `node scripts/knowledge-freshness.js build <repo>` runs
   `graphify update` and writes `graphify-out/BUILD_INFO.json` (source commit,
-  dirty flag, build time, Graphify version).
+  dirty flag, build time, Graphify version). It fails before Graphify starts if
+  `.graphifyignore` is missing any required privacy exclusion.
 - **Automatic rebuilds:** `scripts/git-hooks/graphify-rebuild.sh` installed as
   `post-commit` and `post-checkout` (installed in manageesg-backend and
   autoresearch). It rebuilds only in a repo's main checkout (never from a
   linked worktree), only after code changes or a branch switch that moves
-  HEAD, and refuses to build unless `.graphifyignore` carries the knowledge
-  boundary. After a commit it re-extracts only the changed files, which
+  HEAD, and refuses to build unless `.graphifyignore` carries the complete
+  knowledge boundary (the marker alone is insufficient). After a commit it
+  re-extracts only the changed files, which
   measured 2 to 3 times faster than `graphify update`, and writes
   `BUILD_INFO.json`.
 - **Boundary:** each repo's `.graphifyignore` excludes reports, artifacts, logs,
@@ -165,11 +167,11 @@ rollback.
    Rollback before removal: `docker stop falkordb; docker rename falkordb
    falkordb-v4.20.7; docker rename falkordb-old-v4.18.1 falkordb; docker start
    falkordb`. The pre-upgrade data copy is `E:\falkordb-backup\falkordb-data-2026-09-29`.
-4. **manageesg-frontend:** the knowledge-boundary `.graphifyignore` and the
-   read-order row are committed on a detached worktree (`2ae0e8c7`) but not
-   pushed; push it to `development`, then install the hook from
-   `scripts/git-hooks/graphify-rebuild.sh` as `post-commit` and `post-checkout`.
-   (openseabri and autoresearch landed on 2026-09-29.)
+4. **Optional graph hooks:** the knowledge boundaries are on the normal branches
+   of backend, frontend, OpenSeaBri, autoresearch, CLIMADA, and ECC. Install the
+   current `scripts/git-hooks/graphify-rebuild.sh` as `post-commit` and
+   `post-checkout` only in a main checkout that should maintain a local graph;
+   the hook never runs from linked worktrees and validates the full boundary.
 5. **Obsidian installer shell:** the app package is 1.13.7 via the official
    auto-update; the machine-wide installer shell (1.12.7) updates with an
    elevated `winget upgrade --id Obsidian.Obsidian --exact`.

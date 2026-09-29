@@ -1151,9 +1151,13 @@ function runTests() {
       assert.strictEqual(settings.includeCoAuthoredBy, false, 'Claude co-author attribution should be disabled by default');
       assert.deepStrictEqual(settings.env, { MY_VAR: '1' }, 'existing env should be preserved');
       assert.deepStrictEqual(
-        settings.hooks.UserPromptSubmit,
-        [{ matcher: '*', hooks: [{ type: 'command', command: 'echo custom-submit' }] }],
-        'unrelated existing hooks should be preserved'
+        settings.hooks.UserPromptSubmit[0],
+        { matcher: '*', hooks: [{ type: 'command', command: 'echo custom-submit' }] },
+        'existing UserPromptSubmit entries should retain their order and content'
+      );
+      assert.ok(
+        settings.hooks.UserPromptSubmit.some(entry => entry.id === 'user-prompt:goal-runtime-admit'),
+        'managed goal admission should be registered alongside user hooks'
       );
       assert.deepStrictEqual(
         settings.hooks.PreToolUse[0],

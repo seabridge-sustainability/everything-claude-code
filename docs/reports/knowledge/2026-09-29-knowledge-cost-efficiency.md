@@ -103,8 +103,9 @@ Findings:
 
 ## Adopted
 
-1. Knowledge boundary in every repo's `.graphifyignore`, enforced by the hook
-   (fail closed).
+1. Knowledge boundary in every repo's `.graphifyignore`, enforced by the
+   freshness command and hook against the complete required exclusion set (fail
+   closed; a marker comment alone is not sufficient).
 2. One Graphify install, pinned (`graphifyy==0.9.71`), AST only; no LLM for code.
 3. Hooks rebuild only in a repo's main checkout, never from worktrees (the old
    backend hook rebuilt the main checkout after every worktree commit, and the

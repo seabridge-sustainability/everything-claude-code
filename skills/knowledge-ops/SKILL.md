@@ -45,10 +45,11 @@ Measured on 2026-09-29 (`docs/reports/knowledge/2026-09-29-knowledge-cost-effici
 - **Business knowledge and decisions:** the operator wiki's `index.md`, then the
   one page it points to.
 
-Check freshness before trusting a graph or a wiki page:
+Check privacy boundary and freshness before trusting a graph or a wiki page:
 `node scripts/knowledge-freshness.js graphs <repo>` or `wiki <workspace>`. A
-stale result means rebuild (`graphify update <repo>`, local AST, no LLM) or read
-the raw source; never use it silently.
+result of `unsafe` means repair `.graphifyignore` before any build or query. A
+stale result means rebuild (`node scripts/knowledge-freshness.js build <repo>`,
+local AST, no LLM) or read the raw source; never use it silently.
 
 ## ECC Memory Vault
 

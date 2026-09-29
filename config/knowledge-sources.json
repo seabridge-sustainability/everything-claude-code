@@ -1,6 +1,6 @@
 {
   "schema": "seabridge.knowledge-sources.v1",
-  "updatedAt": "2026-09-28",
+  "updatedAt": "2026-09-29",
   "trustStates": ["unreviewed", "verified", "governed", "superseded"],
   "sources": [
     {
@@ -51,7 +51,7 @@
       "informationTypes": ["source-code"],
       "canonicalStore": {
         "kind": "git-repo",
-        "location": "manageesg-backend, manageesg-frontend, everything-claude-code, openseabri, autoresearch"
+        "location": "manageesg-backend, manageesg-frontend, everything-claude-code, openseabri, autoresearch, climada-stack"
       },
       "owner": "Alejandro (operator)",
       "scope": { "levels": ["project"] },
@@ -663,7 +663,7 @@
       "citation": {
         "required": true,
         "identifier": "repo + graph node source_file:source_location",
-        "version": "Source commit (not recorded yet)"
+        "version": "Source commit in graph.json built_at_commit and BUILD_INFO.json"
       },
       "health": {
         "mechanism": "knowledge-freshness.js graphs compares graph.json built_at_commit with the repo HEAD and changed code files",
@@ -676,7 +676,7 @@
         "evidence": "graphifyy 0.4.23 -> 0.9.71 (pipx, upstream Graphify-Labs/graphify; the github.com/sharkkyyy10/graphify- link is a stale personal fork and was not used). Rollback: pipx install --force graphifyy==0.4.23. All five repos rebuilt from clean worktrees at their remote tips with the local AST pass and the knowledge boundary: manageesg-backend 91,703 nodes, everything-claude-code 35,756, manageesg-frontend 11,001, openseabri 4,386, autoresearch 288. graph.json embeds built_at_commit; BUILD_INFO.json adds build time and version; knowledge-freshness.js graphs reports FRESH or STALE.",
         "gaps": [
           "The shared main checkouts still hold graphs from older Graphify versions until their hooks or an operator rebuild refresh them; knowledge-freshness.js reports them as unknown or stale.",
-          "manageesg-frontend has no graphify hook yet, and its knowledge-boundary .graphifyignore commit is waiting to be pushed."
+          "CLIMADA now has a first-party-only knowledge boundary, but no local graph has been built; frontend and CLIMADA do not install graph hooks by default."
         ]
       }
     },
@@ -707,7 +707,7 @@
       "citation": {
         "required": true,
         "identifier": "graph name + node id",
-        "version": "Source graphify build (not recorded yet)"
+        "version": "GraphMeta source_commit, built_at, and graphify_version"
       },
       "health": {
         "mechanism": "agentic-stack/falkordb_smoke.py (exactly five graphs, non-empty, GraphMeta present)",

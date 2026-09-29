@@ -5,7 +5,7 @@ metadata:
   languages: "english"
   versions: "2.2.2"
   revision: 1
-  updated-on: "2026-09-28"
+  updated-on: "2026-09-29"
   source: official
   tags: "ecc,agents,instructions"
 ---
@@ -18,7 +18,7 @@ metadata:
 
 # Everything Claude Code (ECC) — Agent Instructions
 
-This is a **production-ready AI coding plugin** providing 75 specialized agents, 383 skills, 96 commands, and automated hook workflows for software development.
+This is a **production-ready AI coding plugin** providing 75 specialized agents, 382 skills, 96 commands, and automated hook workflows for software development.
 
 **Version:** 2.2.2
 
@@ -28,7 +28,7 @@ SYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1 · SeaBridgeAI fork; canonical path `C:\Use
 
 ```
 agents/          — 75 specialized subagents
-skills/          — 383 workflow skills and domain knowledge
+skills/          — 382 workflow skills and domain knowledge
 commands/        — 96 slash commands
 hooks/           — Trigger-based automations
 rules/           — Always-follow guidelines (common + per-language)
@@ -61,6 +61,12 @@ For non-trivial work, settle what done means and how you will prove it before ed
 
 - **Scope from evidence.** Build what the request needs, grounded in the current code, git history, tests, and the current plan. Do not invent product functionality or sustainability, emissions, climate, or financial data; preserve source, provenance, and units. Treat memory, handoffs, and old summaries as leads to verify, not facts.
 - **Done means** the requested behavior works, tests that would catch its failure pass, there are no unexplained regressions, and you know the state of the tree. Scale checks to risk: tenant isolation, auth, persistence, AI grounding, and cross-repo contracts warrant broader tests. Do not re-run checks nothing has changed since.
+- **Outcomes over activity.** For long, resumed, provider-dependent, or multi-agent work, automatically create or refresh `.ecc/goal` state at admission and handoff, then validate it before implementation. Keep the owner priority and user-visible proofs separate from tests, commits, reports, and source inventories. Re-verify inherited claims. A blocked lane is not a blocked goal while safe independent work remains. Green tests or CI cannot make an all-null product on track. A missed proof checkpoint makes the forecast off track; withdraw the estimate instead of redefining ready. Enforce status claims with `ecc goal`.
+- **One gate for every agent and model.** Controlled work must pass `ecc goal-runtime admit --runtime <runtime> --mode controlled` before implementation and `ecc goal-runtime final --runtime <runtime> --claim <complete|blocked|on-track>` before a status claim. Native hooks enforce this where the runtime exposes reliable prompt and final-response events; every other adapter uses the same wrapper commands. Runtime and model names are telemetry only and never change the proof required.
+- **Parallel work is leased, bounded, and integrated.** Give each delegated assignment an owner, acceptance proof, non-overlapping scope, expiry, and hard tool/retry/CI/cost budgets with `ecc goal assign`. A worker's completion message is not progress evidence. The parent must inspect and integrate the result, record `ecc goal integrate`, and still satisfy the product proof. Expired, over-budget, self-integrated, or stale-tree assignments fail closed.
+- **Owner corrections are executable.** The newest owner correction replaces the working priority, promised proof checkpoint, and immediate next action through `ecc goal correct`. Refresh the resume receipt before continuing. Pre-correction assignments and inherited plans cannot justify an on-track or completion claim after the correction.
+- **Activity is not progress.** Controlled long work uses an explicit `ecc goal watch-config` policy and records bounded retries, CI runs, tool activity, and cost. If the proof window or any budget is exceeded without new outcome evidence, `ecc goal watch` makes on-track unavailable until the tactic changes. Do not repeat the same failed approach under a new label.
+- **Use the proof profile, not a model-specific shortcut.** Every controlled goal selects one of the backend, frontend, cross-repo, security, AI-grounding, sustainability, export, deploy, or docs profiles shown by `ecc goal profiles`. Profiles define minimum evidence kinds, repository coverage, authenticity, visibility, and subject scope. Repository rules may add evidence but no runtime or model may remove profile requirements.
 - **Verify behavior, not only code.** Static checks may be necessary, but they may not prove the changed workflow. For observable UI, API, mobile, CLI, or integration behavior, use the available browser, terminal, endpoint client, simulator, or equivalent runtime surface and inspect the result. Judge it against existing performance budgets, accessibility rules, and design-system constraints; do not invent a passing threshold. Turn a repeated manual QA sequence into a narrowly triggered skill or script with setup, evidence, and failure handling.
 - **When stuck,** change strategy after two failures of the same approach. Keep working on independent parts; stop only at an approval boundary or an external dependency, and name it.
 - **Report** what changed, how it was verified, what remains or is risky, and any check you skipped and why. Never call unverified work done.
@@ -159,7 +165,7 @@ Respect each repository's existing CI and coverage thresholds; there is no unive
 3. **Verify** — Run proportional code checks and observe changed behavior through the actual runtime surface when available
 4. **Review** — Review non-trivial or high-risk diffs; address material findings and rerun only affected checks
 5. **Capture knowledge in the right place** — personal notes → auto memory; team/project knowledge → the project's existing docs structure; do not duplicate; if no obvious location, ask before creating a new top-level file
-6. **Commit when explicitly approved** — Conventional commits format (`<type>: <description>`; feat, fix, refactor, docs, test, chore, perf, ci), comprehensive PR summaries; push only after the separate push approval gate is satisfied
+6. **Commit and push only when explicitly approved** — Conventional commits format (`<type>: <description>`; feat, fix, refactor, docs, test, chore, perf, ci), comprehensive PR summaries. One bounded advance approval may cover commit, remote-tip integration, and one completed-batch push; do not create a second approval gate for steps already named in that sequence
 
 ## Contributing Formats
 

@@ -67,6 +67,13 @@
         "fingerprint": "ad75ab423357"
       }
     ],
+    "UserPromptSubmit": [
+      {
+        "id": "user-prompt:goal-runtime-admit",
+        "description": "Require controlled Claude goals to pass canonical admission",
+        "fingerprint": "f9829cdc0bcd"
+      }
+    ],
     "PostToolUse": [
       {
         "id": "post:dispatcher:sync",
@@ -92,6 +99,11 @@
       }
     ],
     "Stop": [
+      {
+        "id": "stop:goal-runtime-final",
+        "description": "Reject unsupported controlled-goal final claims",
+        "fingerprint": "e881156d9e7a"
+      },
       {
         "id": "stop:plan-canvas-pending",
         "description": "Deliver undelivered Plan Canvas browser feedback before the agent stops",

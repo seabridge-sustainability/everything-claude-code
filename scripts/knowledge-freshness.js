@@ -20,6 +20,20 @@ const { execFileSync } = require('child_process');
 const BUILD_INFO_SCHEMA = 'seabridge.graph-build.v1';
 const CODE_FILE = /\.(py|pyi|ts|tsx|js|jsx|mjs|cjs|go|rs|java|kt|kts|cs|cpp|cc|cxx|c|h|hpp|rb|php|swift|scala|lua|sh|ps1)$/i;
 const TAIL_BYTES = 4096;
+const KNOWLEDGE_BOUNDARY_MARKER = 'SeaBridgeAI knowledge boundary';
+const REQUIRED_GRAPHIFY_IGNORES = Object.freeze([
+  'docs/reports/',
+  'reports/',
+  'artifacts/',
+  'logs/',
+  '/data/',
+  '**/site-packages/',
+  'references/',
+  'vendor/',
+  'third_party/',
+  '*.env',
+  '.env.*',
+]);
 
 function git(repo, args) {
   return execFileSync('git', ['-C', repo, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
@@ -35,6 +49,23 @@ function tryGit(repo, args) {
 
 function outDir(repo) {
   return path.join(repo, 'graphify-out');
+}
+
+/** Fail closed unless a repo excludes every sensitive/generated graph source. */
+function graphBoundaryStatus(repo) {
+  const file = path.join(path.resolve(repo), '.graphifyignore');
+  if (!fs.existsSync(file)) {
+    return { safe: false, file, problems: ['missing .graphifyignore'] };
+  }
+  const lines = new Set(fs.readFileSync(file, 'utf8').split(/\r?\n/).map(line => line.trim()));
+  const problems = [];
+  if (![...lines].some(line => line.includes(KNOWLEDGE_BOUNDARY_MARKER))) {
+    problems.push(`missing '${KNOWLEDGE_BOUNDARY_MARKER}' marker`);
+  }
+  for (const pattern of REQUIRED_GRAPHIFY_IGNORES) {
+    if (!lines.has(pattern)) problems.push(`missing required exclusion '${pattern}'`);
+  }
+  return { safe: problems.length === 0, file, problems };
 }
 
 /** Read built_at_commit from the end of graph.json without parsing the whole file. */
@@ -75,6 +106,16 @@ function graphStatus(repo) {
   const graphPath = path.join(outDir(root), 'graph.json');
   const head = tryGit(root, ['rev-parse', 'HEAD']);
   if (!head) return { repo: root, status: 'error', detail: 'not a git repository' };
+  const boundary = graphBoundaryStatus(root);
+  if (!boundary.safe) {
+    return {
+      repo: root,
+      head,
+      status: 'unsafe',
+      detail: boundary.problems.join('; '),
+      fix: `repair ${boundary.file} before building or reading a code graph`,
+    };
+  }
   if (!fs.existsSync(graphPath)) {
     return { repo: root, status: 'missing', detail: 'no graphify-out/graph.json', rebuild: `graphify update "${root}"` };
   }
@@ -120,6 +161,10 @@ function graphifyVersion(bin, prefix) {
 
 function build(repo, { bin = process.env.GRAPHIFY_BIN || 'graphify', binPrefix = [], env = process.env } = {}) {
   const root = path.resolve(repo);
+  const boundary = graphBoundaryStatus(root);
+  if (!boundary.safe) {
+    throw new Error(`Unsafe Graphify boundary for ${root}: ${boundary.problems.join('; ')}`);
+  }
   const head = git(root, ['rev-parse', 'HEAD']);
   const dirty = changedCodeFiles(root, 'HEAD').length > 0;
   execFileSync(bin, [...binPrefix, 'update', root], { stdio: 'inherit', env: { ...env, GRAPHIFY_NO_TIPS: '1' } });
@@ -242,4 +287,14 @@ function main(argv) {
 
 if (require.main === module) process.exit(main(process.argv.slice(2)));
 
-module.exports = { builtAtCommitFromGraph, graphStatus, build, wikiStatus, parseFrontmatter, main };
+module.exports = {
+  KNOWLEDGE_BOUNDARY_MARKER,
+  REQUIRED_GRAPHIFY_IGNORES,
+  builtAtCommitFromGraph,
+  graphBoundaryStatus,
+  graphStatus,
+  build,
+  wikiStatus,
+  parseFrontmatter,
+  main,
+};

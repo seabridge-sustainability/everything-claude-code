@@ -8,6 +8,7 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 
 const hook = path.join(__dirname, '..', '..', 'scripts', 'hooks', 'goal-runtime-gate.js');
+const { run } = require('../../scripts/hooks/goal-runtime-gate');
 
 function invoke(runtime, phase, payload, cwd) {
   return spawnSync(process.execPath, [hook, runtime, phase], {
@@ -34,6 +35,19 @@ const tests = [
     const result = invoke('cursor', 'final', { response: 'The goal is fully complete.' }, workspace);
     assert.strictEqual(result.status, 2);
     assert.match(result.stderr, /complete claim requires/);
+  }],
+  ['lifecycle runner derives the final phase from the stable hook id', () => {
+    const previous = process.cwd();
+    try {
+      process.chdir(workspace);
+      const result = run(JSON.stringify({ response: 'The goal is fully complete.' }), {
+        hookId: 'stop:goal-runtime-final',
+      });
+      assert.strictEqual(result.exitCode, 2);
+      assert.strictEqual(result.stdout, '');
+    } finally {
+      process.chdir(previous);
+    }
   }],
 ];
 

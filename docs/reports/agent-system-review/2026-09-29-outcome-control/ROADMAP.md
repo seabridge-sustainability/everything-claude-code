@@ -12,5 +12,5 @@
 | 7 | Progress watchdog | Proof-velocity and budget stop rules | Plateau simulation | Complete |
 | 8 | Proof profiles | Risk-scaled task profiles | Profile negative controls | Complete |
 | 9 | Behavior evaluation | Offline matrix and capped live plan | Same verdict across runtimes | Complete |
-| 10 | Repository rollout | Product adapters synchronized | Branch and remote evidence | Active |
-| 11 | Knowledge hygiene | First-party graph and retention rules | Freshness and privacy checks | Pending |
+| 10 | Repository rollout | Product adapters synchronized | Branch and remote evidence | Complete |
+| 11 | Knowledge hygiene | First-party graph and retention rules | Freshness and privacy checks | Complete |

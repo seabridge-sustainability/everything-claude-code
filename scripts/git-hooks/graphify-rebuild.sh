@@ -17,7 +17,13 @@
 [ "$(git rev-parse --git-dir)" = "$(git rev-parse --git-common-dir)" ] || exit 0
 
 TOP=$(git rev-parse --show-toplevel) || exit 0
-grep -q "SeaBridgeAI knowledge boundary" "$TOP/.graphifyignore" 2>/dev/null || exit 0
+IGNORE="$TOP/.graphifyignore"
+grep -q "SeaBridgeAI knowledge boundary" "$IGNORE" 2>/dev/null || exit 0
+for pattern in \
+  'docs/reports/' 'reports/' 'artifacts/' 'logs/' '/data/' \
+  '**/site-packages/' 'references/' 'vendor/' 'third_party/' '*.env' '.env.*'; do
+  grep -Fqx "$pattern" "$IGNORE" 2>/dev/null || exit 0
+done
 command -v graphify >/dev/null 2>&1 || exit 0
 
 CODE_RE='\.(py|pyi|ts|tsx|js|jsx|mjs|cjs|go|rs|java|kt|kts|cs|cpp|cc|c|h|hpp|rb|php|swift|scala|lua|sh|ps1)$'

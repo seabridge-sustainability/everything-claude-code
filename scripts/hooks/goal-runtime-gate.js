@@ -55,6 +55,12 @@ function main(args = process.argv.slice(2), raw = readInput()) {
   return 2;
 }
 
+function run(raw, context = {}) {
+  const hookId = String(context.hookId || process.env.ECC_HOOK_ID || '');
+  const phase = hookId === 'stop:goal-runtime-final' ? 'final' : 'admit';
+  return { exitCode: main(['claude', phase], raw), stdout: '' };
+}
+
 if (require.main === module) process.exitCode = main();
 
-module.exports = { MAX_INPUT_BYTES, main, payloadModel, readInput };
+module.exports = { MAX_INPUT_BYTES, main, payloadModel, readInput, run };
