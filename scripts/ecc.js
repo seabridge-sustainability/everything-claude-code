@@ -47,6 +47,10 @@ const COMMANDS = {
     script: 'memory.js',
     description: 'Share durable context across Claude, Codex, Hermes, and other harnesses',
   },
+  goal: {
+    script: 'goal-control.js',
+    description: 'Validate outcome evidence and completion, blocker, or forecast claims',
+  },
   'install-plan': {
     script: 'install-plan.js',
     description: 'Alias for plan',
@@ -116,6 +120,7 @@ const PRIMARY_COMMANDS = [
   'ito',
   'nasiko',
   'memory',
+  'goal',
   'list-installed',
   'doctor',
   'feedback',
@@ -180,6 +185,8 @@ Examples:
   ecc memory init
   ecc memory handoff --from codex --target claude --title "Continue migration" --stdin
   ecc memory search "migration blockers" --target-harness hermes
+  ecc goal validate --goal .ecc/goal/active-goal.yaml --outcomes .ecc/goal/outcomes.jsonl
+  ecc goal claim blocked --resume .ecc/goal/resume-receipt.yaml
   ecc list-installed --json
   ecc doctor --target cursor
   ecc feedback

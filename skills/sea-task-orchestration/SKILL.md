@@ -25,6 +25,20 @@ Lane map; owned file scopes; execution order; dropped-requirement check; handoff
 
 Confirm lanes are independent before parallel work; verify no lane can push, commit, install globally, or run live costs without approval; verify every lane has tests or checks.
 
+## Integration-Ready Lanes
+
+Each lane must end in runnable integrated code, an acceptance receipt, a lawful
+evidence-backed rejection, or a precise blocker plus next executable operation.
+A research note, source inventory, test count, or subagent success does not
+close a product proof. The fan-in owner integrates completed vertical slices
+before expanding research lanes when user-visible progress is flat.
+
+Track blockers per lane. Do not mark the overall goal blocked when any required
+proof still has a safe active lane. Tie paid calls and discretionary CI to the
+specific proof they are expected to unlock, a cost ceiling, and a stop rule.
+At fan-out, initialize the active-goal record and checkpoint; at fan-in, append
+receipts for demonstrated outcomes and validate the next status claim.
+
 ## GSD Controlled Execution
 
 Call `sea-gsd-controlled-execution` for complex multi-phase work, cross-repo phase plans, context rot, milestone tracking, or any task where requirements could be dropped across a long session. Decompose work into phases, maintain structured artifacts, verify every phase, and preserve concise state summaries.
@@ -33,7 +47,7 @@ Do not use GSD autonomous/yolo execution, automatic commits, automatic pushes, a
 
 ## Failure Conditions
 
-Stop if requirements conflict, tasks share unsafe write scope, approval is missing, or an autonomous loop would run without review.
+Stop if requirements conflict, tasks share unsafe write scope, approval is missing, an autonomous loop would run without review, or parallel activity continues across a missed outcome checkpoint without rebaselining.
 
 ## SeaBridgeAI Sustainability And Data-Integrity Requirements
 

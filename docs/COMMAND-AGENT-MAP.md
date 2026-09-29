@@ -15,7 +15,6 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 8. **Behavioral-eval cost ceiling:** live model evals still require explicit current-session approval and the harness approval gate. If that approval names the eval batch but omits a number, use a maximum total ceiling of USD 5 for one batch (never per call), keep the hard nine-call limit, and require the soft-budget acknowledgement for harnesses without provider-enforced caps. A lower user-supplied ceiling wins. Never treat missing cost telemetry as proof of zero cost, and never start a second batch without new approval.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
-
 This document lists each slash command and the primary agent(s) or skills it invokes, plus notable direct-invoke agents. Use it to discover which commands use which agents and to keep refactoring consistent.
 
 | Command | Primary agent(s) | Notes |
@@ -73,6 +72,9 @@ This document lists each slash command and the primary agent(s) or skills it inv
 | `ecc memory search` | unified-memory / `scripts/memory.js` | Bounded lexical search over selected vault scopes |
 | `ecc memory read` | unified-memory / `scripts/memory.js` | Read one memory plus derived backlinks |
 | `ecc memory doctor` | unified-memory / `scripts/memory.js` | Audit malformed files, duplicate IDs, broken links, and symlinks |
+| `ecc goal validate` | goal protocol / `scripts/goal-control.js` | Validate portable active-goal, outcome, and resume records |
+| `ecc goal status` | goal protocol / `scripts/goal-control.js` | Report demonstrated proof stages rather than activity totals |
+| `ecc goal claim` | goal protocol / `scripts/goal-control.js` | Gate complete, blocked, and on-track claims against current receipts |
 | `ecc-memory-mcp` | unified-memory / `scripts/memory-mcp.mjs` | Optional stdio MCP adapter; exposes save/search/read/doctor only |
 
 ## Direct-Use Agents

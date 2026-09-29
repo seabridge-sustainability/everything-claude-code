@@ -228,6 +228,39 @@ For multi-phase tasks (per the Multi-Phase Complexity Trigger above), the agent 
 - Next action.
 - Validation status.
 
+### Outcome Control For Long Or Inherited Goals
+
+For multi-day, multi-agent, provider-dependent, or resumed work, keep activity
+separate from demonstrated outcomes. Maintain a compact active-goal record with
+the current owner priority, user-visible proofs, independent lanes, forecast
+checkpoint, and explicit supersession of conflicting older plans. Tests,
+commits, source inventories, reports, and subagent completion are activity; they
+do not advance a user-visible proof without a matching runtime receipt.
+
+For every goal in this category, create or refresh the portable `.ecc/goal/`
+artifacts during goal admission, before delegating work, and again when a new
+session inherits the goal. This is part of the normal workflow, not an optional
+reporting step. Validate them with `ecc goal` before implementation continues:
+
+- `active-goal.yaml` — the current objective, owner corrections, proofs, lanes,
+  and forecast. Later owner corrections replace conflicting execution order;
+  do not append a new priority while continuing to execute the old one.
+- `outcomes.jsonl` — create-only receipts for demonstrated stages such as
+  authentic input, API, UI, export, independent validation, and deployed browser
+  acceptance. State limitations explicitly.
+- `resume-receipt.yaml` — the successor's fresh verification of repository
+  state, inherited claims, last user-visible result, blockers, independent work,
+  and exact next action.
+
+Before claiming `complete`, `blocked`, or `on track`, run the corresponding
+`ecc goal claim` check. An `on track` claim requires a fresh resume receipt and
+at least one authentic, non-null product outcome; green tests or CI alone are
+insufficient. A blocked provider or scientific lane does not block the
+whole goal while another required proof has a safe independent lane. If a
+forecast checkpoint expires without its promised proof, mark the goal off track,
+withdraw the prior estimate, and change tactics; never redefine "ready" to
+preserve a date.
+
 Keep updates concise and tied to phase changes, findings, or blockers. Do not
 emit repetitive status messages or interrupt tool work that is still running.
 

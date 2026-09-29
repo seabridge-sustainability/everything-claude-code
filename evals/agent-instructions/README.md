@@ -13,10 +13,12 @@ node scripts\eval-instruction-scenarios.js --ref HEAD  # same, as committed (use
 node tests\ci\instruction-stack.test.js              # the checker's own tests
 ```
 
-`scenarios.json` holds ten representative SeaBridgeAI tasks (single-file bug,
+`scenarios.json` holds fifteen representative SeaBridgeAI tasks (single-file bug,
 cross-file feature, backend+frontend contract change, tenant bug, Mongo-sensitive
 change, concurrent worktree, plan-only request, handoff continuation, external
-provider blocker, ambiguous failing test). Each lists the guidance an agent's
+provider blocker, ambiguous failing test, outcome-versus-activity accounting,
+lane-versus-goal blockers, handoff admission, forecast correction, and the
+all-null-product control). Each lists the guidance an agent's
 startup instructions must deliver and the scaffolding that would push the wrong
 behaviour. Patterns are concept-level on purpose, so the old and new wording can
 both satisfy them; a pattern that only matches new phrasing makes the eval circular.
@@ -77,6 +79,19 @@ silently combined into an 18-call spend.
 npm run agent-behavior:seabridge-plan
 node scripts/eval-agent-behavior.js --plan --config evals/agent-behavior/seabridge-scenarios.json --budget-usd 3
 ```
+
+The outcome-control pack targets the long-task failure mode where activity is
+reported as delivery, one blocked lane becomes a blocked goal, or an expired
+forecast is preserved by redefining "ready". Planning it makes no model calls:
+
+```powershell
+npm run agent-behavior:outcome-plan
+node scripts/eval-agent-behavior.js --plan --config evals/agent-behavior/outcome-control-scenarios.json --budget-usd 3
+```
+
+Run this pack only with the same explicit live-eval approval and budget gates
+described below. It is a separate nine-run batch; never append it silently to
+another behavioral replay.
 
 ```powershell
 $env:SEABRIDGE_AGENT_EVAL_APPROVED='1' # set only after current-session approval

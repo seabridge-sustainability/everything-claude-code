@@ -27,6 +27,15 @@ If a command or approach fails twice, do not repeat it blindly. Inspect logs, ch
 
 Every final report must include files changed, commands run, tests run, validation results, errors encountered, fixes applied, unverified items, remaining risks, and whether the DoD is satisfied. If no tests were run, state why, what validation substituted for tests, and what risk remains.
 
+For multi-day, multi-agent, provider-dependent, or resumed goals, automatically
+create or refresh `.ecc/goal/active-goal.yaml`, create-only `outcomes.jsonl`,
+and a fresh resume receipt at goal admission and every handoff. Validate them
+before implementation continues. Verify inherited claims against the current
+tree and runtime. A blocked lane is not a blocked goal while safe independent
+work remains. Green tests or CI cannot make an all-null product "on track".
+Missed user-visible checkpoints invalidate the forecast; withdraw the estimate
+instead of redefining "ready". Enforce status claims with `ecc goal claim`.
+
 SeaBridgeAI extensions:
 
 - Respect tenant, company, property, user, and permission scope.

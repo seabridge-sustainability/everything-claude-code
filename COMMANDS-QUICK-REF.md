@@ -159,6 +159,21 @@ harnesses.
 | `ecc memory search` | Search memories by text, scope, kind, or target harness |
 | `ecc memory read` | Read a memory and its backlinks by stable ID |
 | `ecc memory doctor` | Report malformed files, duplicate IDs, broken links, and skipped symlinks |
+
+## Long-Goal Outcome Control
+
+These read-only commands validate `.ecc/goal/` records. Use them for long,
+resumed, provider-dependent, or multi-agent goals rather than ordinary fixes.
+
+| Command | Purpose |
+|---|---|
+| `ecc goal validate` | Validate the active goal, outcome receipts, and current resume receipt |
+| `ecc goal status --json` | Show user-visible proof progress separately from activity |
+| `ecc goal claim on-track` | Require a current-HEAD proof receipt inside the promised checkpoint window |
+| `ecc goal claim blocked --resume <file>` | Prove every unmet lane is blocked and no safe independent work remains |
+| `ecc goal claim complete` | Prove every required outcome has claim-specific evidence at current HEAD |
+
+Design and examples: `docs/design/ecc-outcome-control.md`.
 | `ecc-memory-mcp` | Start the optional local stdio MCP server |
 
 Pass memory bodies with `--stdin` or `--body-file`; they are intentionally not

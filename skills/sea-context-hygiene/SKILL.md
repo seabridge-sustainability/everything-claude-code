@@ -25,6 +25,20 @@ Compact state summary; artifact paths; next action; unverified items.
 
 Confirm summary lists files, tests, decisions, blockers, and next step. Preserve citations/provenance for sustainability findings.
 
+## Outcome-First Handoffs
+
+For a resumed long goal, lead with what the user can inspect now and what has
+not been demonstrated. Then record the active objective, last user-visible
+receipt, repository state, inherited claims classified as current/stale/
+unverified/contradicted, spend state, blockers, safe independent work, and the
+exact next operation. Activity totals come afterward.
+
+For every long or inherited goal, create or refresh
+`.ecc/goal/resume-receipt.yaml` and run `ecc goal validate` before continuing.
+Do not make this conditional on the predecessor mentioning the control. Never
+inherit a percentage, completion claim, or forecast merely because a handoff
+states it.
+
 ## GSD Controlled Execution
 
 Call `sea-gsd-controlled-execution` when context rot is likely: long sessions, many phases, broad planning, repeated verification failures, or multi-agent handoffs. Store durable state in GSD-style artifacts instead of relying on chat history.
@@ -33,7 +47,7 @@ Every artifact must preserve scope, assumptions, user-approved decisions, files 
 
 ## Failure Conditions
 
-Fail if raw logs overwhelm context, evidence is omitted, data caveats are compressed away, or next action is vague.
+Fail if raw logs overwhelm context, evidence is omitted, data caveats are compressed away, the handoff leads with activity while the outcome is absent, inherited claims are not re-verified, or next action is vague.
 
 ## SeaBridgeAI Sustainability And Data-Integrity Requirements
 

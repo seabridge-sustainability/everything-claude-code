@@ -43,7 +43,17 @@ const WORKSPACE = path.resolve(
 );
 const SCENARIOS = process.env.SEABRIDGE_INSTRUCTION_SCENARIOS
   || path.resolve(__dirname, '..', 'evals', 'agent-instructions', 'scenarios.json');
-const REPOS = ['manageesg-backend', 'manageesg-frontend', 'autoresearch'];
+const ECC_REPO = path.resolve(__dirname, '..');
+const REPOS = ['manageesg-backend', 'manageesg-frontend', 'autoresearch', 'everything-claude-code'];
+
+function resolveRepo(repoName) {
+  // Worktrees are often outside the SeaBridgeAI parent directory. Always score
+  // this checkout's ECC instructions rather than a sibling checkout that may be
+  // stale or dirty; product repositories still resolve through the workspace.
+  return repoName === 'everything-claude-code'
+    ? ECC_REPO
+    : path.join(WORKSPACE, repoName);
+}
 
 function reader(repo, ref) {
   return (rel) => {
@@ -84,7 +94,7 @@ function expand(read, rel, depth = 0, seen = new Set()) {
 }
 
 function stacks(repoName, ref) {
-  const repo = path.join(WORKSPACE, repoName);
+    const repo = resolveRepo(repoName);
   const read = reader(repo, ref);
   const out = {};
   const agents = read('AGENTS.md');

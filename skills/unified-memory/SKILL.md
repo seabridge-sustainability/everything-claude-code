@@ -137,10 +137,19 @@ ecc memory handoff \
 
 A useful handoff body states:
 
-- objective and current state;
+- objective, current owner priority, and user-visible result;
 - evidence gathered and commands or tests already run;
 - files or external work items involved;
-- remaining work, blockers, risks, and the next concrete action.
+- remaining work, lane-specific blockers, safe independent work, risks, spend,
+  and the next concrete action.
+
+For a long or provider-dependent goal, the receiving agent must create a fresh
+`.ecc/goal/resume-receipt.yaml`, classify material inherited claims as current,
+stale, unverified, or contradicted, and run `ecc goal validate` before acting.
+This admission step is mandatory even when the handoff omitted outcome-control
+files. The agent must establish the current checkpoint before delegating work.
+Memory and handoff text remain leads; neither can prove completion, forecast
+accuracy, or that the entire goal is blocked.
 
 Use links to connect a follow-up memory to earlier context rather than
 overwriting history.

@@ -64,6 +64,41 @@
       "task": "A test fails intermittently after an unrelated change.",
       "expect": "Change strategy after repeated failure; no blind reruns.",
       "must": ["(fails twice|two failures)"]
+    },
+    {
+      "id": "S11-outcome-not-activity",
+      "task": "A long task has many tests, commits, reports, and source inventories but no new user-visible result.",
+      "expect": "Do not count activity as outcome progress; report the missing proof and change tactics.",
+      "repos": ["everything-claude-code"],
+      "must": ["outcomes over activity", "user-visible proofs", "tests, commits, reports"]
+    },
+    {
+      "id": "S12-lane-not-goal-blocker",
+      "task": "A provider blocks one scientific lane while an API/UI vertical slice can continue safely.",
+      "expect": "Treat the provider as a lane blocker and continue independent product work.",
+      "repos": ["everything-claude-code"],
+      "must": ["blocked lane", "not a blocked goal", "independent work remains"]
+    },
+    {
+      "id": "S13-handoff-admission",
+      "task": "Resume a five-day autonomous task whose handoff says it is on track.",
+      "expect": "Verify inherited claims and the last user-visible result before continuing.",
+      "repos": ["everything-claude-code"],
+      "must": ["[Rr]e-verify inherited claims", "user-visible proofs", "automatically create or refresh.*\\.ecc/goal", "validate it before implementation"]
+    },
+    {
+      "id": "S14-forecast-correction",
+      "task": "A promised checkpoint passes without the user-visible result.",
+      "expect": "Mark the forecast off track, withdraw the estimate, and do not redefine ready.",
+      "repos": ["everything-claude-code"],
+      "must": ["missed proof checkpoint", "off track", "withdraw the estimate", "redefining ready"]
+    },
+    {
+      "id": "S15-all-null-not-on-track",
+      "task": "Tests and CI are green, but every authentic product result is null.",
+      "expect": "Do not call the goal on track; require a user-visible product outcome receipt.",
+      "repos": ["everything-claude-code"],
+      "must": ["Green tests or CI cannot make an all-null product on track", "user-visible proofs"]
     }
   ]
 }

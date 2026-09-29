@@ -1,0 +1,330 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "ecc.goal-control.v1",
+  "title": "ECC Outcome Control Schema",
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "nullableString": {
+      "type": ["string", "null"]
+    },
+    "stage": {
+      "type": "string",
+      "enum": [
+        "source_identified",
+        "source_acquired",
+        "calculation_implemented",
+        "authentic_input_processed",
+        "api_served",
+        "ui_displayed",
+        "export_verified",
+        "independently_validated",
+        "deployed_browser_accepted"
+      ]
+    },
+    "proof": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "description", "lane_id", "required_stage", "required_evidence_kinds", "required"],
+      "properties": {
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "description": { "$ref": "#/$defs/nonEmptyString" },
+        "lane_id": { "$ref": "#/$defs/nonEmptyString" },
+        "required_stage": { "$ref": "#/$defs/stage" },
+        "required_evidence_kinds": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/evidenceKind" },
+          "uniqueItems": true
+        },
+        "required": { "type": "boolean" }
+      }
+    },
+    "lane": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "description", "status", "blocker", "next_action"],
+      "properties": {
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "description": { "$ref": "#/$defs/nonEmptyString" },
+        "status": {
+          "type": "string",
+          "enum": ["active", "blocked", "complete", "deferred"]
+        },
+        "blocker": { "$ref": "#/$defs/nullableString" },
+        "next_action": { "$ref": "#/$defs/nullableString" }
+      }
+    },
+    "ownerCorrection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "recorded_at", "instruction", "replaces"],
+      "properties": {
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "recorded_at": { "$ref": "#/$defs/nonEmptyString" },
+        "instruction": { "$ref": "#/$defs/nonEmptyString" },
+        "replaces": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/nonEmptyString" },
+          "uniqueItems": true
+        }
+      }
+    },
+    "forecast": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "confidence",
+        "basis",
+        "critical_path",
+        "likely_hours",
+        "next_checkpoint_at",
+        "checkpoint_started_at",
+        "checkpoint_proof_id",
+        "updated_at"
+      ],
+      "properties": {
+        "state": {
+          "type": "string",
+          "enum": ["not_set", "on_track", "at_risk", "off_track"]
+        },
+        "confidence": {
+          "type": "string",
+          "enum": ["none", "low", "medium", "high"]
+        },
+        "basis": { "$ref": "#/$defs/nullableString" },
+        "critical_path": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/nonEmptyString" },
+          "uniqueItems": true
+        },
+        "likely_hours": {
+          "type": ["number", "null"],
+          "minimum": 0
+        },
+        "next_checkpoint_at": { "$ref": "#/$defs/nullableString" },
+        "checkpoint_started_at": { "$ref": "#/$defs/nullableString" },
+        "checkpoint_proof_id": { "$ref": "#/$defs/nullableString" },
+        "updated_at": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "activeGoal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "goal_id",
+        "objective",
+        "current_priority",
+        "non_goals",
+        "user_visible_proofs",
+        "lanes",
+        "owner_corrections",
+        "forecast",
+        "status",
+        "updated_at"
+      ],
+      "properties": {
+        "schema": { "const": "ecc.active-goal.v1" },
+        "goal_id": { "$ref": "#/$defs/nonEmptyString" },
+        "objective": { "$ref": "#/$defs/nonEmptyString" },
+        "current_priority": { "$ref": "#/$defs/nonEmptyString" },
+        "non_goals": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/nonEmptyString" },
+          "uniqueItems": true
+        },
+        "user_visible_proofs": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/proof" }
+        },
+        "lanes": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/lane" }
+        },
+        "owner_corrections": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ownerCorrection" }
+        },
+        "forecast": { "$ref": "#/$defs/forecast" },
+        "status": {
+          "type": "string",
+          "enum": ["active", "off_track", "blocked", "complete"]
+        },
+        "updated_at": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "evidenceKind": {
+      "type": "string",
+      "enum": ["command", "test", "runtime", "api", "browser", "export", "source", "independent_validation", "deployment", "other"]
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "ref", "sha256"],
+      "properties": {
+        "kind": { "$ref": "#/$defs/evidenceKind" },
+        "ref": { "$ref": "#/$defs/nonEmptyString" },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-fA-F0-9]{64}$"
+        }
+      }
+    },
+    "outcomeReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "receipt_id",
+        "goal_id",
+        "acceptance_id",
+        "stage",
+        "observed_at",
+        "environment",
+        "commit",
+        "evidence",
+        "limitations",
+        "source_harness",
+        "status",
+        "outcome",
+        "supersedes"
+      ],
+      "properties": {
+        "schema": { "const": "ecc.outcome-receipt.v1" },
+        "receipt_id": { "$ref": "#/$defs/nonEmptyString" },
+        "goal_id": { "$ref": "#/$defs/nonEmptyString" },
+        "acceptance_id": { "$ref": "#/$defs/nonEmptyString" },
+        "stage": { "$ref": "#/$defs/stage" },
+        "observed_at": { "$ref": "#/$defs/nonEmptyString" },
+        "environment": { "$ref": "#/$defs/nonEmptyString" },
+        "commit": {
+          "type": "string",
+          "pattern": "^[a-fA-F0-9]{7,64}$"
+        },
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/evidence" }
+        },
+        "limitations": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/nonEmptyString" },
+          "uniqueItems": true
+        },
+        "source_harness": { "$ref": "#/$defs/nonEmptyString" },
+        "status": {
+          "type": "string",
+          "enum": ["accepted", "retracted"]
+        },
+        "outcome": {
+          "type": "string",
+          "enum": ["pass", "fail"]
+        },
+        "supersedes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/nonEmptyString" },
+          "uniqueItems": true
+        }
+      }
+    },
+    "claimCheck": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["claim", "status", "evidence"],
+      "properties": {
+        "claim": { "$ref": "#/$defs/nonEmptyString" },
+        "status": {
+          "type": "string",
+          "enum": ["verified_current", "verified_stale", "unverified", "contradicted"]
+        },
+        "evidence": { "$ref": "#/$defs/nullableString" }
+      }
+    },
+    "repositoryState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repo_root", "head", "branch", "worktree", "dirty_paths"],
+      "properties": {
+        "repo_root": { "$ref": "#/$defs/nonEmptyString" },
+        "head": { "$ref": "#/$defs/nonEmptyString" },
+        "branch": { "$ref": "#/$defs/nullableString" },
+        "worktree": { "$ref": "#/$defs/nonEmptyString" },
+        "dirty_paths": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/nonEmptyString" },
+          "uniqueItems": true
+        }
+      }
+    },
+    "spendingState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["observed_usd", "approved_ceiling_usd", "ci_runs", "verified_at"],
+      "properties": {
+        "observed_usd": {
+          "type": ["number", "null"],
+          "minimum": 0
+        },
+        "approved_ceiling_usd": {
+          "type": ["number", "null"],
+          "minimum": 0
+        },
+        "ci_runs": {
+          "type": ["integer", "null"],
+          "minimum": 0
+        },
+        "verified_at": { "$ref": "#/$defs/nullableString" }
+      }
+    },
+    "resumeReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "receipt_id",
+        "goal_id",
+        "observed_at",
+        "repository_state",
+        "inherited_claims",
+        "last_user_visible_result",
+        "next_action",
+        "blocked_lanes",
+        "independent_work_remaining",
+        "spending",
+        "source_harness"
+      ],
+      "properties": {
+        "schema": { "const": "ecc.resume-receipt.v1" },
+        "receipt_id": { "$ref": "#/$defs/nonEmptyString" },
+        "goal_id": { "$ref": "#/$defs/nonEmptyString" },
+        "observed_at": { "$ref": "#/$defs/nonEmptyString" },
+        "repository_state": { "$ref": "#/$defs/repositoryState" },
+        "inherited_claims": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/claimCheck" }
+        },
+        "last_user_visible_result": { "$ref": "#/$defs/nullableString" },
+        "next_action": { "$ref": "#/$defs/nonEmptyString" },
+        "blocked_lanes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/nonEmptyString" },
+          "uniqueItems": true
+        },
+        "independent_work_remaining": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/nonEmptyString" },
+          "uniqueItems": true
+        },
+        "spending": { "$ref": "#/$defs/spendingState" },
+        "source_harness": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    }
+  }
+}
