@@ -31,3 +31,33 @@ references/
 
 # Agentic-stack episodic log — raw experience JSONL is not knowledge worth graphing
 agentic-stack/.agent/memory/episodic/
+
+# SeaBridgeAI knowledge boundary (2026-09-29, knowledge-ops): graphs hold code
+# structure only. No reports, run artifacts, logs, local data, vendored or
+# upstream code; reports and artifacts can quote customer data.
+docs/reports/
+reports/
+artifacts/
+logs/
+/data/
+**/site-packages/
+_upstream/
+references/
+vendor/
+third_party/
+*.env
+.env.*
+# Translated doc mirrors duplicate the English docs.
+docs/de-DE/
+docs/es/
+docs/ja-JP/
+docs/ko-KR/
+docs/pt-BR/
+docs/ru/
+docs/th/
+docs/tr/
+docs/uk-UA/
+docs/ur/
+docs/vi-VN/
+docs/zh-CN/
+docs/zh-TW/

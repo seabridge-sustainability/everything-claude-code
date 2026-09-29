@@ -3,7 +3,7 @@
 **Source:** `everything-claude-code/external/mcp-toolbox/`
 **Version:** 1.2.0 (commit `8d2d521`, 2026-05-08)
 **License:** Apache 2.0
-**Repository:** https://github.com/googleapis/mcp-toolbox
+**Repository:** <https://github.com/googleapis/mcp-toolbox>
 
 ---
 
@@ -308,7 +308,7 @@ npx @toolbox-sdk/server --prebuilt=mongodb --stdio
 
 > Do not overwrite existing `.mcp.json` entries without backing up first.
 > Add `toolbox-mongo` and `toolbox-postgres` as new entries alongside existing
-> `gitnexus` and `gbrain` servers.
+> the existing `gitnexus` server.
 
 ---
 

@@ -1,7 +1,7 @@
 interface:
-  display_name: "GBrain"
-  short_description: "Operate GBrain for brain-first retrieval, OpenClaw/Hermes routing, and minion jobs"
+  display_name: "GBrain (retired)"
+  short_description: "Retired 2026-09-29; use knowledge-ops instead"
   brand_color: "#7C3AED"
-  default_prompt: "Use GBrain for brain-first lookup and OpenClaw/Hermes skill routing"
+  default_prompt: "$gbrain is retired; use $knowledge-ops instead"
 policy:
-  allow_implicit_invocation: true
+  allow_implicit_invocation: false

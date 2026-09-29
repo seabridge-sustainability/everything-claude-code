@@ -1,10 +1,13 @@
 """Smoke-test queries across the loaded FalkorDB graphs.
 
-Confirms:
-  1. All 8 named graphs exist
-  2. Each graph has nodes AND edges (this was the bug with the first load)
-  3. A multi-hop query works on the backend graph
-  4. A cross-graph correlation works (backend + frontend)
+Confirms, and exits non-zero otherwise:
+  1. Exactly the five expected graphs exist (no stale extra names)
+  2. Each graph has nodes AND edges
+  3. Each graph has a GraphMeta node with its source commit (freshness)
+  4. A multi-hop query works on the backend graph
+  5. A cross-graph correlation works (backend + frontend)
+
+Analytical queries pass their own timeout; the server default is 1 s.
 
 Usage:
   PY=C:/Users/adelm/pipx/venvs/graphifyy/Scripts/python.exe
@@ -17,6 +20,7 @@ from falkordb import FalkorDB
 
 HOST = "localhost"
 PORT = 6380
+HEAVY_QUERY_TIMEOUT_MS = 60_000
 
 EXPECTED = [
     "manageesg",
@@ -33,9 +37,13 @@ def main() -> int:
     print(f"FalkorDB @ {HOST}:{PORT}")
     print(f"Graphs present: {len(graphs)}  ->  {graphs}")
 
+    problems = []
     missing = [g for g in EXPECTED if g not in graphs]
+    unexpected = [g for g in graphs if g not in EXPECTED]
     if missing:
-        print(f"  MISSING: {missing}")
+        problems.append(f"missing graphs {missing}")
+    if unexpected:
+        problems.append(f"unexpected graphs {unexpected}")
 
     print("\n--- node/edge counts per graph ---")
     for g_name in EXPECTED:
@@ -49,9 +57,18 @@ def main() -> int:
             "MATCH ()-[r]->() RETURN type(r) AS t, count(r) AS c "
             "ORDER BY c DESC LIMIT 5"
         ).result_set
-        print(f"  {g_name:25s}  {n:>6} nodes  {e:>7} edges")
+        meta = g.query(
+            "MATCH (m:GraphMeta) RETURN m.source_commit, m.graphify_version, m.built_at"
+        ).result_set
+        commit, version, built_at = meta[0] if meta else ("", "", "")
+        print(f"  {g_name:25s}  {n:>6} nodes  {e:>7} edges  built {built_at} "
+              f"at {str(commit)[:9]} with graphify {version}")
         for t, c in rels:
             print(f"      :{t:30s}  {c}")
+        if not n or not e:
+            problems.append(f"{g_name} is empty")
+        if not commit:
+            problems.append(f"{g_name} has no GraphMeta source commit")
 
     print("\n--- multi-hop test on manageesg ---")
     be = db.select_graph("manageesg")
@@ -62,7 +79,7 @@ def main() -> int:
     RETURN a.label AS from_node, b.label AS to_node, length(p) AS hops
     LIMIT 5
     """
-    res = be.query(q)
+    res = be.query(q, timeout=HEAVY_QUERY_TIMEOUT_MS)
     print(f"  AI Manager -> MCP (2-3 hops): {len(res.result_set)} paths")
     for row in res.result_set:
         print(f"    {row[0]!r:45s} -> {row[2]}h -> {row[1]!r}")
@@ -71,7 +88,8 @@ def main() -> int:
     res = be.query(
         "MATCH (n:Node) OPTIONAL MATCH (n)-[r]-() "
         "RETURN n.label, n.source_file, count(r) AS deg "
-        "ORDER BY deg DESC LIMIT 10"
+        "ORDER BY deg DESC LIMIT 10",
+        timeout=HEAVY_QUERY_TIMEOUT_MS,
     )
     for row in res.result_set:
         print(f"    deg={row[2]:>4}  {row[0]!r:50s}  {row[1]}")
@@ -81,19 +99,25 @@ def main() -> int:
     fe_labels = {
         r[0].lower()
         for r in fe.query(
-            "MATCH (n:Node) WHERE n.file_type = 'code' RETURN DISTINCT n.label"
+            "MATCH (n:Node) WHERE n.file_type = 'code' RETURN DISTINCT n.label",
+            timeout=HEAVY_QUERY_TIMEOUT_MS,
         ).result_set
     }
     be_labels = {
         r[0].lower()
         for r in be.query(
-            "MATCH (n:Node) WHERE n.file_type = 'code' RETURN DISTINCT n.label"
+            "MATCH (n:Node) WHERE n.file_type = 'code' RETURN DISTINCT n.label",
+            timeout=HEAVY_QUERY_TIMEOUT_MS,
         ).result_set
     }
     shared = sorted(fe_labels & be_labels)
     print(f"  frontend_labels={len(fe_labels)}  backend_labels={len(be_labels)}  shared={len(shared)}")
     print(f"  sample shared: {shared[:15]}")
 
+    if problems:
+        print("\nFAIL: " + "; ".join(problems))
+        return 1
+    print("\nPASS: exactly five graphs, all loaded with freshness metadata")
     return 0
 
 

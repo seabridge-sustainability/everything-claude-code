@@ -22,9 +22,6 @@
 [submodule "references/awesome-llm-apps"]
 	path = references/awesome-llm-apps
 	url = https://github.com/Shubhamsaboo/awesome-llm-apps.git
-[submodule "references/gbrain"]
-	path = references/gbrain
-	url = https://github.com/garrytan/gbrain.git
 [submodule "references/text-to-cad"]
 	path = references/text-to-cad
 	url = https://github.com/earthtojake/text-to-cad.git

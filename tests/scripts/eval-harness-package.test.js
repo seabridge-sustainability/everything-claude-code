@@ -18,6 +18,14 @@ const command = (binary, args, options = {}) => spawnSync(binary, args, {
   env: childEnv, ...options,
 });
 
+// Git Bash puts GNU tar first on PATH, which reads "C:" in an archive path as a
+// remote host; Windows' bundled bsdtar handles drive letters.
+function archiveCommand(platform = process.platform, environment = process.env) {
+  if (platform !== 'win32') return 'tar';
+  const windowsRoot = environment.SystemRoot || environment.WINDIR || 'C:\\Windows';
+  return path.join(windowsRoot, 'System32', 'tar.exe');
+}
+
 function sourceFiles(relative) {
   const dir = path.join(repo, relative);
   return fs.readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
@@ -61,7 +69,7 @@ try {
     assert.ok(archive, 'packing must succeed before extracting');
     const extract = path.join(work, 'extracted');
     fs.mkdirSync(extract);
-    const unpack = command('tar', ['-xzf', archive, '-C', extract]);
+    const unpack = command(archiveCommand(), ['-xzf', archive, '-C', extract]);
     assert.strictEqual(unpack.status, 0, unpack.error?.message || unpack.stderr);
     const installed = path.join(extract, 'package');
     assert.ok(!fs.existsSync(path.join(installed, 'node_modules')));

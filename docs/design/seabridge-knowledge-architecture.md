@@ -1,18 +1,21 @@
 # SeaBridgeAI Knowledge Architecture
 
-Status: accepted 2026-09-28; Phases 1 and 2 done, Phases 3 and 4 done except
-the operator actions listed under [Decisions](#decisions-2026-09-28).
-Machine-readable contract: `config/knowledge-sources.json`, validated by
-`schemas/knowledge-sources.schema.json` and `scripts/lib/knowledge-sources.js`.
-The `knowledge-ops` skill is the router agents use.
+Status: accepted; updated 2026-09-29. Machine-readable contract:
+`config/knowledge-sources.json`, validated by `schemas/knowledge-sources.schema.json`
+and `scripts/lib/knowledge-sources.js`. Agents route through the
+`knowledge-ops` skill. Freshness: `scripts/knowledge-freshness.js`.
+
+This repository is public. It holds the contract and the tooling, never
+confidential knowledge; platform store details and open hardening items live in
+the private product repositories.
 
 ## Capability
 
 Every coding agent, the platform, and the operator can tell, for any piece of
 information, where it lives, who may read and write it, whether it may contain
-customer data, and whether it is a source of truth or a rebuildable view. There
-is no single knowledge database. Each existing store keeps its job, and the
-registry states each job once.
+customer data, whether it is a source of truth or a rebuildable view, and
+whether a generated view is stale. There is no single knowledge database; each
+store keeps one job, and the registry states it once.
 
 ## Layers
 
@@ -21,180 +24,156 @@ registry states each job once.
 | Repository `AGENTS.md`, `docs/`, ECC skills | Engineering rules, standards, ADRs, API contracts, runbooks | canonical, governed | forbidden |
 | Repository source code | What the software does, at a commit | canonical, governed | forbidden |
 | ECC Memory Vault | Coding-agent handoffs, discoveries, pending decisions, resumable context, working preferences | canonical, always unreviewed | forbidden |
-| GBrain | The operator's business knowledge: organizations, people, relationships, meetings, research, strategy | canonical | forbidden |
-| Obsidian | A human interface over approved Markdown | interface, owns nothing | forbidden |
+| Operator wiki (private workspace git repo) | Business knowledge, research notes, internal decisions | canonical; pages cite their sources | forbidden |
+| Obsidian | A viewer over the operator wiki and the generated code vaults | interface, owns nothing | forbidden |
 | GitHub issues and PRs | Active work and review state | canonical, not durable knowledge | forbidden |
-| Platform knowledge (Mongo) | Tenant documents, versions, chunks | canonical | required, tenant-filtered |
-| Platform product records (Mongo) | Product facts, evidence packages | canonical | required, tenant-filtered |
-| Platform agent memory (Mongo) | Tenant and user preferences, corrections, workflow context | canonical | required, tenant-filtered |
-| Structured RAG / PageIndex | Document navigation trees | projection of platform knowledge | required |
-| Sustainability Graph | Product and domain relationships | projection of product records | required |
+| Platform stores (tenant documents, product records, agent memory) | Customer data | canonical | required, tenant-filtered |
+| Platform projections (document trees, sustainability graph) | Rebuildable views of platform stores | projection | required |
 | Graphify | Code relationships per repo | projection of source code | forbidden |
-| FalkorDB | Query index over Graphify | projection of Graphify, read-only for agents | forbidden |
+| FalkorDB | Optional query index over Graphify | projection of Graphify, read-only for agents | forbidden |
 | Harness memory (Claude auto-memory and similar) | Harness-private convenience copies | cache, owns nothing | forbidden |
 
-Retired: the ECC `knowledge-vault/` folder (its one page restates
-`docs/SKILL-PLACEMENT-POLICY.md`), the generic MCP memory server, and ECC's
-`agentic-stack/falkordb_etl.py` loader. The two stores are registered as
-`deprecated` with no writers, so nothing routes to them; the loader is a stub
-that refuses to run.
-
-On this machine sessions run in many worktrees, and the Memory Vault's project
-scope resolves to each checkout, so cross-session memory uses the **user** scope
-(`~/.ecc/memory`) with a `repo-<name>` tag.
+Retired: GBrain (2026-09-29), the ECC `knowledge-vault/` folder, the generic MCP
+memory server, and `agentic-stack/falkordb_etl.py`. The registry marks each
+`deprecated` with no writers, so nothing routes to them.
 
 ## Rules
 
-1. **One home per information type.** Each information type is owned by exactly
-   one active source. Interfaces and caches own none. The validator rejects a
-   second owner.
+1. **One home per information type.** Each type is owned by exactly one active
+   source; the validator rejects a second owner. Interfaces and caches own none.
 2. **Customer data stays in the platform.** Only `mongodb` stores may declare
-   `tenantData: "required"`, and they must name the isolation key that every
-   read filters on before ranking. Agent memory, GBrain, Obsidian, Markdown
-   folders, code graphs, harness memory, git, and the issue tracker are
-   tenant-forbidden by store kind in code, so editing a flag in the JSON cannot
-   relax the rule. A tenant source cannot list a tenant-forbidden projection.
-3. **Coding agents never read tenant stores.** Every tenant source declares
-   `agentAccess: "none"` and does not list `coding-agents` as a reader.
-4. **Projections are rebuildable and read-only for agents.** A projection names
-   the sources it is rebuilt from, both sides of every link agree, and agents
-   get `read-only` access. Nothing canonical is ever derived.
-5. **Trust states are shared.** `unreviewed` → `verified` → `governed`, with
-   `superseded` at any point. Only version-controlled repository content can be
-   `governed`. ECC Memory Vault entries are only ever `unreviewed` or
-   `superseded`; accepted knowledge is promoted out of the vault into governed
-   docs, matching `schemas/memory.schema.json`.
+   `tenantData: "required"`, and they must name the isolation key every read
+   filters on. Agent memory, the wiki, Obsidian, Markdown folders, code graphs,
+   harness memory, git, and the issue tracker are tenant-forbidden by store kind
+   in code, so no JSON flag can relax the rule.
+3. **Coding agents never read tenant stores.** Tenant sources declare
+   `agentAccess: "none"`.
+4. **Projections are rebuildable and read-only for agents**, and name the sources
+   they are rebuilt from.
+5. **Shared trust states:** `unreviewed` → `verified` → `governed`, with
+   `superseded` at any point. Only version-controlled content can be governed.
+   Memory Vault entries stay `unreviewed` until promoted into governed docs.
 6. **Observed state, not configuration.** Each source records `state.status`
-   with the date and evidence it was observed. A config file existing is
-   `configured-unverified`; code that exists but was not seen running is
-   `implemented-unverified`.
-7. **Locations are logical.** `repo:path`, `~/path`, `mongodb:collection`; no
-   absolute machine paths and never a connection string.
-8. **No raw transcripts.** Conversations are never ingested automatically; only
-   reviewed summaries with provenance are promoted.
+   with the date and evidence it was observed.
+7. **Locations are logical**: `repo:path`, `~/path`; never an absolute machine
+   path or a connection string.
+8. **No raw transcripts, secrets, or `.env` content anywhere.**
 
 ## Where does it go
 
-`routeInformationType(registry, type, { containsTenantData })` answers this in
-code and refuses rather than falling back when customer data would cross the
-boundary.
+`routeInformationType(registry, type, { containsTenantData })` answers this and
+refuses, rather than falling back, when customer data would cross the boundary.
 
 | Information | Goes to |
 | --- | --- |
-| A formatting or workflow preference for coding agents | ECC Memory Vault (`agent-working-preferences`) |
-| A handoff, discovery, or resumable task context | ECC Memory Vault |
-| A company, person, relationship, or meeting | GBrain |
+| A handoff, discovery, preference, or resumable task context | ECC Memory Vault (user scope on this machine) |
+| A company, person, relationship, meeting, research note, or internal decision | Operator wiki |
 | A coding standard, rule, ADR, API contract, or runbook | Governed repository docs |
-| A tenant's uploaded document | Platform knowledge |
-| A product user's preference or an agent correction | Platform agent memory |
-| Who calls what in the code | Graphify (FalkorDB when fresh) |
+| A tenant's document, a product user's preference, an agent correction | The platform, tenant-scoped |
+| Who calls what in the code | Graphify (FalkorDB when loaded) |
 | What someone is working on now | GitHub issue or PR |
 
-## Verified inventory, 2026-09-28
+## Read order
 
-Observed read-only before Phases 2 to 4 (the registry holds the current state):
-
-- **Git.** ECC `main` is 16 commits behind origin with other sessions' edits in
-  progress, including an uncommitted `config/mcp-profiles/`. The paths this work
-  touches are identical on both sides. The backend and frontend checkouts are
-  shared by many sessions (97 and 43 worktrees respectively). OpenSeaBri is clean.
-- **ECC Memory Vault.** Not initialized: no `.ecc/memory` in ECC, backend,
-  frontend, or the user home. The CLI (`scripts/memory.js`) and MCP server
-  (`scripts/memory-mcp.mjs`) exist.
-- **GBrain 0.22.4.** 37,995 pages (28,011 `concept`, 9,920 `code`, about ten
-  business-typed), 0 embedded, 0 links. MCP is configured only in OpenSeaBri and
-  the uncommitted ECC knowledge profile.
-- **Obsidian.** The app registers two vaults: the SeaBridgeAI knowledge
-  workspace (17 notes, not version-controlled, last updated 2026-07-07) and
-  `manageesg-backend/graphify-out`. Seven more generated `graphify-obsidian/`
-  vaults sit in the other repos and `_upstream` mirrors.
-- **Graphify.** `graph.json` exists for all five repos; dates range from
-  2026-05-16 (openseabri) to 2026-09-28 (backend). No commit or build metadata.
-- **FalkorDB.** Docker container `falkordb` on host port 6380. `GRAPH.LIST`:
-  `manageesg`, `frontend`, `autoresearch`, `ecc`, `openseabri`.
-- **Platform.** Knowledge search loads up to 500 scoped chunks and ranks by
-  substring in Python although the `knowledge_chunk_text` index exists.
-  Sustainability Graph search fetches `limit × 5` nodes before keyword-filtering.
-  Structured RAG is scoped by `company_id` only.
-
-## Findings that change the plan
-
-- **GBrain does not hold business knowledge yet.** Over 99% of it is a copy of
-  repo source imported in May, which duplicates Graphify, and it was demoted to
-  reference/experiment on 2026-07-07. Giving it the business-knowledge role
-  means a scoped re-ingest, and that needs a decision on embeddings: 0.22.4
-  embeds through an external provider, which would send its contents off the
-  machine.
-- **There were two FalkorDB loaders.** The backend's
-  `scripts/graph/load_all_repos_to_falkordb.py` writes the short names that the
-  current graphs and `agentic-stack/falkordb_smoke.py` use. ECC's
-  `agentic-stack/falkordb_etl.py` wrote repo-directory names that were dropped
-  as stale on 2026-07-07, and it deleted each graph before reloading although
-  its docstring said it merged. The 2026-07-07 note records old-name graphs
-  reappearing after cleanup, which matches that loader. It is retired.
-- **The Obsidian workspace held canonical notes without version control.** Its
-  five decision notes are now in
-  [`docs/decisions/knowledge-workspace/`](../decisions/knowledge-workspace/),
-  unchanged, and the originals are marked superseded.
-- **Harness memory was carrying project status and customer identifiers.**
-  Claude auto-memory for the backend held module-status entries other agents
-  could not read. Sanitized copies are now in the Memory Vault. The originals
-  still name customers and property, meter and account IDs.
-
-## Enforcement
+Measured, not assumed (see the cost report below): grep and read the source
+for targeted code lookups; use a budgeted `graphify query` or `graphify
+affected` for relationship and impact questions; skim `GRAPH_REPORT.md` only to
+orient; start business and decision questions at the operator wiki's
+`index.md`. Check freshness first; stale output is rebuilt or bypassed, never
+used silently.
 
 ```bash
-node tests/lib/knowledge-sources.test.js
+node scripts/knowledge-freshness.js graphs <repo>...   # FRESH / STALE / MISSING / UNKNOWN
+node scripts/knowledge-freshness.js wiki <workspace>   # stale pages, missing sources, unindexed pages
 ```
 
-The test validates the real registry and runs negative cases for missing scope,
-owner, canonical store, and sensitivity, every tenant-boundary rule, trust
-states, projection links, lifecycle, duplicate owners, and routing. Each tenant
-boundary check was disabled in turn to confirm a test fails without it.
-`tests/run-all.js` picks the file up automatically.
+## Code graphs
 
-## Decisions, 2026-09-28
+- **Tool:** Graphify from PyPI `graphifyy` (upstream Graphify-Labs/graphify),
+  installed with pipx and pinned to an exact version. Only the local
+  tree-sitter pass is used (`graphify update`): no LLM, no API key, content-hash
+  cached. `graph.json` embeds `built_at_commit`.
+- **Build:** `node scripts/knowledge-freshness.js build <repo>` runs
+  `graphify update` and writes `graphify-out/BUILD_INFO.json` (source commit,
+  dirty flag, build time, Graphify version).
+- **Automatic rebuilds:** `scripts/git-hooks/graphify-rebuild.sh` installed as
+  `post-commit` and `post-checkout` (installed in manageesg-backend and
+  autoresearch). It rebuilds only in a repo's main checkout (never from a
+  linked worktree), only after code changes or a branch switch that moves
+  HEAD, and refuses to build unless `.graphifyignore` carries the knowledge
+  boundary. After a commit it re-extracts only the changed files, which
+  measured 2 to 3 times faster than `graphify update`, and writes
+  `BUILD_INFO.json`.
+- **Boundary:** each repo's `.graphifyignore` excludes reports, artifacts, logs,
+  local data, site-packages, `_upstream/`, `references/`, and vendored code,
+  because reports and artifacts can quote customer data.
+- **FalkorDB (optional):** the backend loader
+  `scripts/graph/load_all_repos_to_falkordb.py` loads each repo's graph in
+  batches and writes a `GraphMeta` node with the source commit, build time, and
+  Graphify version. Verify with `agentic-stack/falkordb_smoke.py`. The image
+  and the MCP server are pinned by version.
+- **Obsidian view:** on demand, per repo:
+  `graphify export obsidian --graph graphify-out/graph.json --dir graphify-out/obsidian`.
+  It is generated (openseabri: 4,687 notes, 9.1 MB, 19 s), overwritten on each
+  export, and never edited or committed; the backend graph would be roughly 20
+  times larger, so export only the repo being studied.
 
-Approved by Alejandro on 2026-09-28.
+## Operator wiki
 
-1. **`knowledge-vault/` is retired.** Its index is marked superseded, and the
-   `AGENTS_SYSTEM.md` LLM Wiki protocol is replaced by a Knowledge Placement
-   section. Agents do not delete source folders, so removing the folder is an
-   operator action: `git rm -r knowledge-vault` in ECC, reversible with
-   `git revert`.
-2. **GBrain becomes business-only, without external embeddings.** 0.22.4
-   embeds only through OpenAI (`references/gbrain/src/core/embedding.ts`), and
-   the 2026-07-07 attempt was blocked as exfiltration, so no provider is
-   enabled. Upstream 0.56.2.0 has local recipes (Ollama, LM Studio,
-   llama-server); adopting one needs an approved upgrade. Clearing the code
-   corpus deletes database content, so the operator runs it. `sources remove`
-   may miss code pages recorded under `default`, so set the whole brain aside
-   instead. Stop GBrain MCP clients first. Then, in PowerShell:
+The SeaBridgeAI workspace folder is a local git repository with no remote. It
+follows the Karpathy LLM-wiki pattern: raw sources stay the truth; pages under
+`wiki/` are syntheses with `updated:` and `sources:`; `index.md` is read first;
+`log.md` is append-only; the workspace `AGENTS.md` (Wiki) holds the rules. A
+plain Markdown wiki was chosen over Graphify's document mode, which needs an
+LLM pass per document; see `docs/reports/knowledge/2026-09-29-knowledge-cost-efficiency.md`.
+
+## Decisions
+
+- 2026-09-28: registry and router adopted; `knowledge-vault/` retired; the
+  backend FalkorDB loader is the only loader; Obsidian decision notes moved out
+  of the unversioned vault.
+- 2026-09-29: GBrain removed from every config, wrapper, submodule, and doc.
+  The operator wiki (private) owns business knowledge; the decision notes moved
+  there because this repository is public. Graphify, FalkorDB, and Obsidian
+  upgraded and pinned.
+
+## Operator actions
+
+Agents do not delete data, folders, or repositories, and do not push where no
+approval covers it. These are prepared for the operator; each lists its
+rollback.
+
+1. **GBrain data.** Stop any GBrain process, then in PowerShell:
 
    ```powershell
-   New-Item -ItemType Directory -Force E:\gbrain-archive
-   robocopy "$HOME\.gbrain\brain.pglite" E:\gbrain-archive\brain.pglite-2026-09-28 /E
-   Rename-Item "$HOME\.gbrain\brain.pglite" brain.pglite.code-corpus-2026-09-28
-   gbrain init
-   gbrain import <business-notes-dir> --no-embed
+   robocopy "$HOME\.gbrain" E:\gbrain-archive\gbrain-2026-09-29 /E /COPY:DAT /R:1 /W:1
+   $src = (Get-ChildItem -Recurse -File -Force "$HOME\.gbrain" | Measure-Object Length -Sum).Sum
+   $dst = (Get-ChildItem -Recurse -File -Force E:\gbrain-archive\gbrain-2026-09-29 | Measure-Object Length -Sum).Sum
+   if ($src -ne $dst) { throw "backup size mismatch: $src vs $dst" }
+   Remove-Item -Recurse -Force "$HOME\.gbrain"
+   bun remove -g gbrain
    ```
 
-   Rollback: delete the new `brain.pglite` and rename the old one back. No
-   business corpus exists yet, so the new brain starts empty.
-3. **Obsidian's decision notes moved to ECC.** The five decision notes are in
-   `docs/decisions/knowledge-workspace/`, unchanged apart from a provenance
-   line. The originals are marked `status: superseded` with a pointer. The
-   workspace stays outside git as a navigation interface.
-4. **The backend FalkorDB loader is the only loader.** ECC's
-   `agentic-stack/falkordb_etl.py` is a stub that refuses to run.
-
-## Still open
-
-- Whether to scrub customer identifiers from the Claude auto-memory entries
-  (other sessions read them).
-- Upgrading GBrain for local embeddings, and which business sources to import.
-- Platform knowledge search (Phase 6): the module is another session's
-  uncommitted work, so its text-index fix belongs to that work. The
-  Sustainability Graph window bug is fixed in manageesg-backend `79829f01d`.
-- Structured RAG has no `tenant_id` field; adding one needs a data migration.
-- Graphify and FalkorDB outputs still record no source commit or build time.
+   Rollback: `robocopy E:\gbrain-archive\gbrain-2026-09-29 "$HOME\.gbrain" /E`
+   and `bun add -g gbrain@0.22.4`.
+2. **Retired folders in this repository:**
+   `git rm -r knowledge-vault skills/gbrain .agents/skills/gbrain` and commit.
+   The `references/gbrain` clone left on disk by the removed submodule can then
+   be deleted. Rollback: `git revert <commit>`.
+3. **Old FalkorDB container and image** (after the new one has run cleanly):
+   `docker rm falkordb-old-v4.18.1` and `docker image rm d6aa9598b79c`.
+   Rollback before removal: `docker stop falkordb; docker rename falkordb
+   falkordb-v4.20.7; docker rename falkordb-old-v4.18.1 falkordb; docker start
+   falkordb`. The pre-upgrade data copy is `E:\falkordb-backup\falkordb-data-2026-09-29`.
+4. **Pushes without agent approval:** openseabri
+   (`git -C <workspace>\openseabri push origin main`, two commits) and
+   autoresearch (`git -C <workspace>\autoresearch pull --no-rebase origin master`,
+   then `push origin master`).
+5. **manageesg-frontend:** the knowledge-boundary `.graphifyignore` patch is
+   prepared (not applied, because frontend commits are reserved for consumer
+   changes); `git apply` it, commit to `development`, and install the hook
+   from `scripts/git-hooks/graphify-rebuild.sh` as `post-commit` and
+   `post-checkout`.
+6. **Obsidian installer shell:** the app package is 1.13.7 via the official
+   auto-update; the machine-wide installer shell (1.12.7) updates with an
+   elevated `winget upgrade --id Obsidian.Obsidian --exact`.

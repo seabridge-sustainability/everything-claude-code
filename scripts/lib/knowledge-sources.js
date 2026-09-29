@@ -148,6 +148,7 @@ function crossEntryErrors(registry) {
       continue;
     }
     if (source.writers.length === 0) add('LIFECYCLE', id, 'an active or planned source needs at least one writer');
+    if (source.readers.length === 0) add('LIFECYCLE', id, 'an active or planned source needs at least one reader');
 
     for (const type of source.informationTypes) {
       if (typeOwners.has(type)) add('ROUTING', id, `information type '${type}' is already owned by '${typeOwners.get(type)}'`);

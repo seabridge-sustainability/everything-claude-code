@@ -121,8 +121,8 @@
       },
       "state": {
         "status": "operational",
-        "verifiedAt": "2026-09-28",
-        "evidence": "User scope initialized at ~/.ecc/memory on 2026-09-28; memory doctor ok with 8 memories (7 module-status handoffs and 1 runbook migrated from Claude auto-memory, customer identifiers removed); search --scope user returns them and default-scope search does not.",
+        "verifiedAt": "2026-09-29",
+        "evidence": "User scope at ~/.ecc/memory; memory doctor ok. Holds sanitized module-status handoffs, a test-infrastructure runbook, the knowledge-architecture handoffs, and an owner note for the platform knowledge-search fix; search --scope user returns them and default-scope search does not.",
         "gaps": [
           "Project and team scopes are not initialized in any repo.",
           "No harness is configured to start ecc-memory-mcp; agents use the CLI."
@@ -130,54 +130,89 @@
       }
     },
     {
-      "id": "gbrain",
-      "title": "GBrain business and world knowledge",
+      "id": "operator-wiki",
+      "title": "Operator wiki (private LLM wiki: business knowledge, research, internal decisions)",
       "authority": "canonical",
       "lifecycle": "active",
-      "informationTypes": ["organizations", "people", "business-relationships", "meetings", "market-research", "business-strategy"],
+      "informationTypes": ["organizations", "people", "business-relationships", "meetings", "market-research", "business-strategy", "research-notes", "internal-decisions"],
       "canonicalStore": {
-        "kind": "gbrain",
-        "location": "~/.gbrain/brain.pglite (local PGLite)"
+        "kind": "git-docs",
+        "location": "SeaBridgeAI workspace folder (sibling of the repos): index.md, log.md, wiki/ pages; a local git repository with no remote"
       },
       "owner": "Alejandro (operator)",
       "scope": {
-        "levels": ["user"],
-        "notes": "The operator's own knowledge about SeaBridgeAI's business. Not customer data and not coding-agent memory."
+        "levels": ["workspace"],
+        "notes": "Karpathy LLM-wiki pattern. Raw sources (code, governed docs, dated reports, operator-provided material) stay the truth; each page cites them. Private because everything-claude-code is a public repository."
       },
       "sensitivity": "confidential",
       "tenantData": "forbidden",
       "trustStates": ["unreviewed", "verified", "superseded"],
       "retention": {
-        "policy": "Kept until superseded; original sources are cited on each page.",
-        "supersession": "Superseded pages keep a timeline entry pointing to the newer page."
+        "policy": "Kept in the workspace git history; log.md is append-only.",
+        "supersession": "A superseded page keeps its file with status: superseded and superseded_by."
       },
       "readers": ["operator", "coding-agents"],
-      "writers": ["operator"],
-      "agentAccess": "propose-only",
+      "writers": ["operator", "coding-agents"],
+      "agentAccess": "read-write",
       "derivedFrom": [],
       "derivedProjections": [],
       "citation": {
         "required": true,
-        "identifier": "GBrain page slug",
-        "version": "page updated timestamp"
+        "identifier": "Workspace-relative page path; each page lists its sources",
+        "version": "Workspace git commit SHA"
       },
       "health": {
-        "mechanism": "gbrain stats and gbrain doctor --json (serialize: PGLite is single-writer)",
-        "freshness": "Page timestamps and timeline entries",
-        "command": "gbrain stats"
+        "mechanism": "vaultsafe validate (links, frontmatter) and the knowledge freshness check (sources newer than the page)",
+        "freshness": "Page updated frontmatter compared with its cited sources",
+        "command": "node scripts/knowledge-freshness.js wiki <workspace>"
       },
       "state": {
-        "status": "degraded",
-        "verifiedAt": "2026-09-28",
-        "evidence": "gbrain 0.22.4; stats: 37,995 pages (28,011 concept, 9,920 code, about 10 business-typed), 0 embedded, 0 links.",
+        "status": "operational",
+        "verifiedAt": "2026-09-29",
+        "evidence": "Workspace initialized as a local git repository with no remote (1a25b99 snapshot, 799b4f2 restructure): index.md, append-only log.md, wiki/maps (7 current maps with sources:, 2 superseded), wiki/decisions (4 dated records), rules in the workspace AGENTS.md (Wiki). vaultsafe validate PASS; knowledge-freshness wiki reports every page fresh except two maps whose cited registry is missing from the shared ECC checkout, which is behind origin.",
         "gaps": [
-          "The corpus is mostly repo source imported in May 2026, which overlaps graphify-code-graph; the target role is business knowledge only.",
-          "Demoted to reference/experiment on 2026-07-07 (docs/decisions/knowledge-workspace/2026-07-07-graphify-falkordb-gbrain-integration.md).",
-          "Clearing the code corpus deletes database content, so the operator runs it; the prepared commands are in docs/design/seabridge-knowledge-architecture.md.",
-          "Embeddings stay off: 0.22.4 embeds only through OpenAI, and the 2026-07-07 attempt was blocked as data exfiltration. Search is keyword-only.",
-          "Upstream GBrain 0.56.2.0 (_upstream/gbrain, 2026-09-24) has local embedding recipes (Ollama, LM Studio, llama-server); using them needs an operator-approved upgrade.",
-          "MCP is configured only in openseabri/.mcp.json and an uncommitted ECC knowledge profile."
+          "No business or research pages yet; the operator adds sources under raw/ or cites repo files.",
+          "The shared everything-claude-code checkout is behind origin, so pages citing new ECC files report a missing source there until it is updated."
         ]
+      }
+    },
+    {
+      "id": "gbrain",
+      "title": "GBrain (retired)",
+      "authority": "cache",
+      "lifecycle": "deprecated",
+      "informationTypes": [],
+      "canonicalStore": {
+        "kind": "gbrain",
+        "location": "~/.gbrain/brain.pglite (local PGLite)"
+      },
+      "owner": "Alejandro (operator)",
+      "scope": { "levels": ["user"] },
+      "sensitivity": "confidential",
+      "tenantData": "forbidden",
+      "trustStates": ["unreviewed", "superseded"],
+      "retention": {
+        "policy": "No reads or writes. Removed from every MCP config, wrapper, and doc on 2026-09-29.",
+        "supersession": "Superseded by operator-wiki; deleting the local data is an operator action (runbook in docs/design/seabridge-knowledge-architecture.md)."
+      },
+      "readers": [],
+      "writers": [],
+      "agentAccess": "none",
+      "derivedFrom": [],
+      "derivedProjections": [],
+      "citation": {
+        "required": false,
+        "identifier": "None",
+        "version": "None"
+      },
+      "health": {
+        "mechanism": "None; retired",
+        "freshness": "None"
+      },
+      "state": {
+        "status": "retiring",
+        "verifiedAt": "2026-09-29",
+        "evidence": "gbrain 0.22.4 held 37,995 pages, over 99% a copy of repo source, 0 embedded, 0 links. Operator removed it on 2026-09-29; the data (about 1.4 GB) remains until the operator runs the deletion runbook."
       }
     },
     {
@@ -188,7 +223,7 @@
       "informationTypes": [],
       "canonicalStore": {
         "kind": "obsidian-vault",
-        "location": "SeaBridgeAI knowledge workspace folder (sibling of the repos; not version-controlled)"
+        "location": "SeaBridgeAI workspace folder (the operator-wiki git repository), opened as an Obsidian vault"
       },
       "owner": "Alejandro (operator)",
       "scope": { "levels": ["workspace"] },
@@ -216,12 +251,11 @@
       },
       "state": {
         "status": "operational",
-        "verifiedAt": "2026-09-28",
-        "evidence": "Registered in Obsidian's app config; 17 Markdown notes. On 2026-09-28 its five decision notes were copied unchanged into everything-claude-code docs/decisions/knowledge-workspace/ and the originals marked status: superseded with a pointer; what remains is navigation.",
+        "verifiedAt": "2026-09-29",
+        "evidence": "Obsidian desktop app package 1.12.7 -> 1.13.7 through its own GitHub auto-update (obsidian.log: hash and signature verified; update check reports up to date against latest 1.13.7; 1.13.8 is an Android-only release). The installer shell stays 1.12.7. The vault now sits inside the git-backed operator-wiki and owns no content.",
         "gaps": [
-          "Not version-controlled; acceptable now that it owns no canonical content.",
-          "vaultsafe validate fails on one pre-existing unresolved link in Welcome.md.",
-          "Obsidian also registers manageesg-backend graphify-out as a vault; that and each repo's graphify-obsidian folder are generated views of graphify-code-graph."
+          "The machine-wide installer shell (1.12.7) updates only through an elevated installer run.",
+          "Obsidian also registers manageesg-backend graphify-out as a vault; that is a generated view of graphify-code-graph."
         ]
       }
     },
@@ -299,9 +333,11 @@
       },
       "state": {
         "status": "degraded",
-        "verifiedAt": "2026-09-28",
-        "evidence": "Claude auto-memory for manageesg-backend holds 8 project-status entries and 1 runbook; on 2026-09-28 the 7 module-status entries and the runbook were copied, sanitized, into ecc-memory-vault user scope.",
-        "gaps": ["The Claude entries still contain customer names and property, meter and account identifiers, which this contract forbids in harness memory; scrubbing them is an operator decision because other sessions rely on them."]
+        "verifiedAt": "2026-09-29",
+        "evidence": "Claude auto-memory for manageesg-backend: 10 project and reference entries; sanitized copies of the module-status entries live in ecc-memory-vault.",
+        "gaps": [
+          "Four entries still contain customer names and property, meter, account, and record identifiers, which this contract forbids. A scrubbed replacement for each, with a diff, is prepared for the operator; it is not applied because the operator reviews the diff first."
+        ]
       }
     },
     {
@@ -423,10 +459,7 @@
         "status": "implemented-unverified",
         "verifiedAt": "2026-09-28",
         "evidence": "Models, service, and /api/v1/knowledge endpoints exist; runtime not observed in this pass.",
-        "gaps": [
-          "search() loads up to 500 scoped chunks and ranks them by substring match in Python although the knowledge_chunk_text text index exists (Phase 6).",
-          "As of 2026-09-28 the module (app/models/knowledge.py, app/services/knowledge.py, app/api/v1/endpoints/knowledge.py) is another session's uncommitted work in the main checkout, so the fix belongs to that work."
-        ]
+        "gaps": ["The module was not yet on the integration branch on 2026-09-29. Open hardening items are tracked in the private manageesg-backend repository."]
       }
     },
     {
@@ -529,7 +562,7 @@
       "owner": "manageesg-backend platform",
       "scope": {
         "levels": ["tenant"],
-        "isolationKey": "company_id (no tenant_id field today)"
+        "isolationKey": "company_id + source_record_id (tenant equals company by platform convention)"
       },
       "sensitivity": "tenant-confidential",
       "tenantData": "required",
@@ -556,10 +589,7 @@
         "status": "implemented-unverified",
         "verifiedAt": "2026-09-28",
         "evidence": "structured_indexes collection keyed by company_id, deal_id or property_id, and status.",
-        "gaps": [
-          "Keyed by source_record_id, not yet linked to knowledge_source_versions ids (Phase 6).",
-          "Scoped by company_id only; no tenant_id field."
-        ]
+        "gaps": ["A tenant_id field is planned as defense in depth (plan in manageesg-backend docs/plans). Open hardening items are tracked in the private manageesg-backend repository."]
       }
     },
     {
@@ -603,7 +633,7 @@
         "status": "implemented-unverified",
         "verifiedAt": "2026-09-28",
         "evidence": "Indexer, retriever, and /api/v1/sustainability-graph endpoints exist; runtime not observed in this pass.",
-        "gaps": ["Label search is an unanchored case-insensitive regex scoped by company_id; since 79829f01d (2026-09-28) it matches in Mongo instead of filtering a fetched window of limit x 5 nodes."]
+        "gaps": ["Open hardening items are tracked in the private manageesg-backend repository."]
       }
     },
     {
@@ -614,7 +644,7 @@
       "informationTypes": ["code-relationships"],
       "canonicalStore": {
         "kind": "graphify-files",
-        "location": "<repo>:graphify-out/ (graph.json ignored, GRAPH_REPORT.md tracked)"
+        "location": "<repo>:graphify-out/ (graph.json, GRAPH_REPORT.md, BUILD_INFO.json)"
       },
       "owner": "Alejandro (operator)",
       "scope": { "levels": ["project"] },
@@ -636,16 +666,18 @@
         "version": "Source commit (not recorded yet)"
       },
       "health": {
-        "mechanism": "GRAPH_REPORT.md header and file time",
-        "freshness": "graph.json modified time compared with the repo tip"
+        "mechanism": "knowledge-freshness.js graphs compares graph.json built_at_commit with the repo HEAD and changed code files",
+        "freshness": "built_at_commit plus BUILD_INFO.json builtAt",
+        "command": "node scripts/knowledge-freshness.js graphs <repo>"
       },
       "state": {
-        "status": "degraded",
-        "verifiedAt": "2026-09-28",
-        "evidence": "graph.json dates: manageesg-backend 2026-09-28, manageesg-frontend 2026-09-19, everything-claude-code 2026-07-07, autoresearch 2026-05-18, openseabri 2026-05-16.",
+        "status": "operational",
+        "verifiedAt": "2026-09-29",
+        "evidence": "graphifyy 0.4.23 -> 0.9.71 (pipx, upstream Graphify-Labs/graphify; the github.com/sharkkyyy10/graphify- link is a stale personal fork and was not used). Rollback: pipx install --force graphifyy==0.4.23. All five repos rebuilt from clean worktrees at their remote tips with the local AST pass and the knowledge boundary: manageesg-backend 91,703 nodes, everything-claude-code 35,756, manageesg-frontend 11,001, openseabri 4,386, autoresearch 288. graph.json embeds built_at_commit; BUILD_INFO.json adds build time and version; knowledge-freshness.js graphs reports FRESH or STALE.",
         "gaps": [
-          "No source commit, build time, or schema version is recorded with the output (Phase 4).",
-          "Three of five graphs are more than two months old."
+          "The shared main checkouts still hold graphs from older Graphify versions until their hooks or an operator rebuild refresh them; knowledge-freshness.js reports them as unknown or stale.",
+          "openseabri and everything-claude-code commit generated graphify-out files; untracking them is a follow-up.",
+          "manageesg-frontend has no graphify hook and its .graphifyignore lacks the boundary until the prepared patch lands."
         ]
       }
     },
@@ -679,17 +711,17 @@
         "version": "Source graphify build (not recorded yet)"
       },
       "health": {
-        "mechanism": "GRAPH.LIST and a smoke test against the expected graph names",
-        "freshness": "Not recorded yet (Phase 4)"
+        "mechanism": "agentic-stack/falkordb_smoke.py (exactly five graphs, non-empty, GraphMeta present)",
+        "freshness": "GraphMeta source_commit, built_at, graphify_version per graph",
+        "command": "python agentic-stack/falkordb_smoke.py"
       },
       "state": {
-        "status": "degraded",
-        "verifiedAt": "2026-09-28",
-        "evidence": "Container up; GRAPH.LIST returned manageesg, frontend, autoresearch, ecc, openseabri.",
+        "status": "operational",
+        "verifiedAt": "2026-09-29",
+        "evidence": "Image falkordb/falkordb v4.18.1 (untagged latest) -> v4.20.7 pinned by digest sha256:13996aa523f0dd283f6bd6df6620b094dcea525452417c4d6ef9bef15dc9998d; client falkordb 1.6.0 -> 1.7.1 in the graphify venv; MCP server pinned at @falkordb/mcpserver@1.3.0. Data backed up before the upgrade. The batched backend loader reloaded all five graphs with 0 errors (backend 91,703 nodes and 253,896 edges in 20.7 s) and wrote a GraphMeta node per graph. falkordb_smoke.py PASS: exactly five graphs, each non-empty with a source commit.",
         "gaps": [
-          "The loader is manageesg-backend scripts/graph/load_all_repos_to_falkordb.py; its --only flag documented elsewhere does not filter (per the 2026-07-07 decision note). ECC agentic-stack/falkordb_etl.py, which wrote stale names and deleted graphs, was retired to a stub that refuses to run on 2026-09-28.",
-          "Graphs carry no source commit, build time, or freshness metadata.",
-          "The FalkorDB MCP server runs npx @falkordb/mcpserver@latest, which is unpinned."
+          "The previous container is kept stopped as falkordb-old-v4.18.1 for rollback; removing it and its image is an operator action.",
+          "Analytical queries over the backend graph need a per-query timeout above the 1 s server default."
         ]
       }
     }

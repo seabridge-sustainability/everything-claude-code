@@ -59,7 +59,7 @@ Agent configuration security means checking the instructions and tool wiring tha
 
 ## Why This Matters For SeaBridgeAI
 
-Claude Code, Codex, OpenCode, OpenClaw, MCP servers, local LLM tools, browser automation, GBrain, Local Deep Research, Unsloth, MCP Toolbox, and Graphify/FalkorDB create a broader agent attack surface:
+Claude Code, Codex, OpenCode, OpenClaw, MCP servers, local LLM tools, browser automation, Local Deep Research, Unsloth, MCP Toolbox, and Graphify/FalkorDB create a broader agent attack surface:
 
 - MCP server configs may grant shell, filesystem, browser, database, or network access.
 - Local tool execution may run PowerShell, Bash, Node, Python, Docker, or package managers.
@@ -119,7 +119,7 @@ Decision: clone for evaluation and add safe local advisory wrappers. Do not add 
 
 | Repo | Agent-governance scan value | Likely risk areas | Recommendation |
 |---|---|---|---|
-| `everything-claude-code` | Highest | MCP catalogs, Claude hooks, skill/plugin manifests, local LLM configs, GBrain, MCP Toolbox, Local Deep Research, Unsloth, Superpowers, cross-agent compatibility | Pilot first; advisory-only |
+| `everything-claude-code` | Highest | MCP catalogs, Claude hooks, skill/plugin manifests, local LLM configs, MCP Toolbox, Local Deep Research, Unsloth, Superpowers, cross-agent compatibility | Pilot first; advisory-only |
 | `manageesg-backend` | High | DB access, backend automation, `.mcp.json`, `.gemini`, `opencode.jsonc`, shell scripts, CI with secrets references | Local scan before agent/tooling changes |
 | `manageesg-frontend` | Medium | Browser automation, Playwright auth state, `.claude/settings*`, `.mcp.json`, local dev scripts | Advisory scan before CI |
 | `openseabri` | High | Homeowner/privacy-sensitive workflows, document access, `.mcp.json`, Claude settings, browser automation | Good candidate for advisory CI after ECC pilot |
@@ -171,7 +171,7 @@ Decision: clone for evaluation and add safe local advisory wrappers. Do not add 
 
 - Treat prompts, fine-tuning datasets, evaluation corpora, generated reports, and model artifacts as possible data exfiltration paths.
 - Do not train on secrets, customer data, tenant records, private docs, auth state, screenshots, or generated logs unless explicitly approved and scrubbed.
-- Keep Unsloth, Local Deep Research, GBrain, Graphify/FalkorDB, and MCP Toolbox as opt-in local tools with separate artifact paths.
+- Keep Unsloth, Local Deep Research, Graphify/FalkorDB, and MCP Toolbox as opt-in local tools with separate artifact paths.
 - Long-running GPU jobs and live provider calls require approval.
 
 ## AGENTS.md / CLAUDE.md Trust Boundaries

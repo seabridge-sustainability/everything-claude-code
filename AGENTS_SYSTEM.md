@@ -272,9 +272,11 @@ Where a piece of information lives is decided by
   go to the ECC Memory Vault (`scripts/memory.js`, user scope on this machine);
 - engineering rules, decisions, API contracts, and runbooks go to governed repo
   docs;
-- the operator's business knowledge goes to GBrain, proposed by agents and
-  written by the operator;
+- the operator's business knowledge, research, and internal decisions go to the
+  private operator wiki (the SeaBridgeAI workspace, a local git repository);
 - customer and tenant data never leaves the platform's tenant-scoped stores.
+
+This repository is public: nothing confidential goes into it.
 
 Obsidian is an interface over Markdown and owns nothing. The ECC
 `knowledge-vault/` LLM Wiki trial is retired (2026-09-28): read it only as

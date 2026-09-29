@@ -1,6 +1,6 @@
 ---
 name: knowledge-ops
-description: Decide where a piece of SeaBridgeAI knowledge lives before saving, searching, syncing, or deduplicating it. Routes through the knowledge-source registry (config/knowledge-sources.json) to the ECC Memory Vault, governed repo docs, GBrain, the issue tracker, or the platform. Use when asked to save, remember, ingest, sync, or look up knowledge.
+description: Decide where a piece of SeaBridgeAI knowledge lives before saving, searching, syncing, or deduplicating it. Routes through the knowledge-source registry (config/knowledge-sources.json) to the ECC Memory Vault, governed repo docs, the private operator wiki, the issue tracker, or the platform. Use when asked to save, remember, ingest, sync, or look up knowledge.
 metadata:
   origin: ECC
 ---
@@ -27,9 +27,28 @@ hold customer data; the router then refuses every store outside the platform.
 | Working preference for coding agents | ECC Memory Vault, `--kind preference` | Same |
 | Coding standard, rule, ADR, API contract, runbook | Governed repo docs | Edit the owning repo's `AGENTS.md` or `docs/` and commit under that repo's rules |
 | What someone is working on now | GitHub issue or PR | `gh` |
-| Company, person, relationship, meeting, research | GBrain | Propose it to the operator; agents do not write GBrain |
-| Who calls what in the code | Graphify, then FalkorDB | Read-only; rebuild with the owning repo's graph scripts |
+| Company, person, relationship, meeting, research, internal decision | Operator wiki (private workspace repo) | Follow the workspace `AGENTS.md` (Wiki): cite sources, update `index.md`, append `log.md` |
+| Who calls what in the code | Graphify, then FalkorDB | Read-only; rebuild with `graphify update .` |
 | Anything that may contain customer or tenant data | The platform only | Never any store above; the router refuses |
+
+## Read order
+
+Measured on 2026-09-29 (`docs/reports/knowledge/2026-09-29-knowledge-cost-efficiency.md`):
+
+- **Targeted code lookup** (where is X, what calls Y): grep and read the source
+  first. It was the cheapest and most accurate option.
+- **Relationships or impact** (what depends on X, what breaks if X changes):
+  `graphify query "<question>" --budget 2000` or `graphify affected "<symbol>"`,
+  then confirm in the source.
+- **Orientation in an unfamiliar repo:** skim the top of
+  `graphify-out/GRAPH_REPORT.md`; do not read it whole (18k to 27k tokens).
+- **Business knowledge and decisions:** the operator wiki's `index.md`, then the
+  one page it points to.
+
+Check freshness before trusting a graph or a wiki page:
+`node scripts/knowledge-freshness.js graphs <repo>` or `wiki <workspace>`. A
+stale result means rebuild (`graphify update <repo>`, local AST, no LLM) or read
+the raw source; never use it silently.
 
 ## ECC Memory Vault
 
@@ -54,6 +73,8 @@ vault entry superseded.
 - Never store raw transcripts, credentials, `.env` content, or customer data.
 - Harness memory (Claude auto-memory and similar) is a private cache. Anything
   another agent needs goes to the vault.
-- Do not write to retired stores: the ECC `knowledge-vault/` folder and the MCP
-  memory server.
+- Do not write to retired stores: GBrain, the ECC `knowledge-vault/` folder, and
+  the MCP memory server.
+- This repository is public. Confidential knowledge goes to the operator wiki,
+  never here.
 - Obsidian is an interface over Markdown and owns nothing.
