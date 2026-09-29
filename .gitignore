@@ -143,3 +143,5 @@ docs/reports/security/agentshield/
 docs/reports/security/raw/
 # Stray directory some tests create when ECC_AGENT_DATA_HOME is unset
 undefined/
+# All graphify output is generated; freshness lives in graphify-out/BUILD_INFO.json (2026-09-29).
+graphify-out/
