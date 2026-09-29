@@ -11,6 +11,7 @@ const {
   buildStatus,
   evaluateClaim,
   evaluateWatchdog,
+  loadProofProfiles,
   validateBundle,
 } = require('../../scripts/lib/goal-control');
 const { captureRepositoryState } = require('../../scripts/lib/goal-store');
@@ -45,6 +46,7 @@ function goal(overrides = {}) {
     schema: 'ecc.active-goal.v1',
     goal_id: 'openaccess-product',
     mode: 'controlled',
+    proof_profile: 'frontend',
     objective: 'Show authentic property results end to end.',
     current_priority: 'Complete the first US vertical slice.',
     non_goals: ['Do not call provisional output independently validated.'],
@@ -55,7 +57,7 @@ function goal(overrides = {}) {
         lane_id: 'product',
         required_stage: 'ui_displayed',
         required_evidence_kinds: ['browser'],
-        required_repositories: [],
+        required_repositories: ['backend'],
         allowed_result_classes: ['user_visible_result'],
         acceptance_predicate: 'A non-null result is visible through the authentic property UI.',
         requires_authentic: true,
@@ -69,7 +71,7 @@ function goal(overrides = {}) {
         lane_id: 'science',
         required_stage: 'independently_validated',
         required_evidence_kinds: ['independent_validation'],
-        required_repositories: [],
+        required_repositories: ['backend'],
         allowed_result_classes: ['independently_validated_score'],
         acceptance_predicate: 'An independent method validates the property result.',
         requires_authentic: true,
@@ -453,6 +455,30 @@ test('watchdog breach rejects an on-track claim', () => {
   assert.match(result.reasons.join(' '), /watchdog requires a tactic change/);
 });
 
+test('proof profiles cover nine task classes and reject under-specified cross-repo proof', () => {
+  const profiles = loadProofProfiles();
+  assert.deepStrictEqual([...profiles.keys()].sort(), [
+    'ai-grounding', 'backend', 'cross-repo', 'deploy', 'docs', 'export', 'frontend', 'security', 'sustainability',
+  ]);
+  const baseProof = goal().user_visible_proofs[0];
+  const underSpecified = goal({
+    proof_profile: 'cross-repo',
+    user_visible_proofs: [{ ...baseProof, required_repositories: ['backend'] }],
+    forecast: { ...goal().forecast, critical_path: ['heat-browser'], checkpoint_proof_id: 'heat-browser' },
+  });
+  assert.throws(() => validateBundle({ goal: underSpecified }), /requires evidence kinds: api/);
+  const completeProfile = {
+    ...underSpecified,
+    user_visible_proofs: [{
+      ...baseProof,
+      required_evidence_kinds: ['api', 'browser'],
+      required_repositories: ['backend', 'frontend'],
+    }],
+  };
+  assert.doesNotThrow(() => validateBundle({ goal: completeProfile }));
+  assert.throws(() => validateBundle({ goal: { ...goal(), proof_profile: 'frontier-model-special' } }), /unknown proof profile/);
+});
+
 test('denies blocked when one provider lane is blocked but independent product work remains', () => {
   const result = evaluateClaim('blocked', {
     goal: goal({ status: 'blocked' }),
@@ -639,7 +665,7 @@ test('an optional proof still must be demonstrated when used as a forecast check
         lane_id: 'product',
         required_stage: 'ui_displayed',
         required_evidence_kinds: ['browser'],
-        required_repositories: [],
+        required_repositories: ['backend'],
         allowed_result_classes: ['user_visible_result'],
         acceptance_predicate: 'The authentic heat result is visible.',
         requires_authentic: true,
@@ -708,11 +734,11 @@ test('real CLI rejects the five-day SeaBridge counterexample for complete, on-tr
   runGit(['commit', '-m', 'test: initialize counterexample repository'], repoDir);
   const counterexampleState = captureRepositoryState(repoDir, { repoId: 'backend' });
   const incidentProofs = [
-    { id: 'heat-source', description: 'One property heat result.', lane_id: 'product', required_stage: 'authentic_input_processed', required_evidence_kinds: ['runtime'], required_repositories: [], allowed_result_classes: ['source_native_indicator'], acceptance_predicate: 'A source-native indicator is processed for a real property.', requires_authentic: true, requires_user_visible: false, subject_scope: 'real_property', required: true },
-    { id: 'hazard-ui', description: 'Hazard gauges show authentic values.', lane_id: 'product', required_stage: 'ui_displayed', required_evidence_kinds: ['browser'], required_repositories: [], allowed_result_classes: ['user_visible_result'], acceptance_predicate: 'Authentic hazard values are visible.', requires_authentic: true, requires_user_visible: true, subject_scope: 'real_property', required: true },
-    { id: 'risk-score', description: 'Admitted 0-100 score is served.', lane_id: 'product', required_stage: 'api_served', required_evidence_kinds: ['api'], required_repositories: [], allowed_result_classes: ['provisional_score'], acceptance_predicate: 'The provisional admitted score is served and labelled.', requires_authentic: true, requires_user_visible: false, subject_scope: 'real_property', required: true },
-    { id: 'resilience', description: 'Validated resilience result.', lane_id: 'science', required_stage: 'independently_validated', required_evidence_kinds: ['independent_validation'], required_repositories: [], allowed_result_classes: ['independently_validated_score'], acceptance_predicate: 'An independent method validates the resilience result.', requires_authentic: true, requires_user_visible: false, subject_scope: 'real_property', required: true },
-    { id: 'finance', description: 'Finance output is exported.', lane_id: 'product', required_stage: 'export_verified', required_evidence_kinds: ['export'], required_repositories: [], allowed_result_classes: ['user_visible_result'], acceptance_predicate: 'The authentic finance result exports.', requires_authentic: true, requires_user_visible: true, subject_scope: 'real_property', required: true },
+    { id: 'heat-source', description: 'One property heat result.', lane_id: 'product', required_stage: 'authentic_input_processed', required_evidence_kinds: ['runtime'], required_repositories: ['backend'], allowed_result_classes: ['source_native_indicator'], acceptance_predicate: 'A source-native indicator is processed for a real property.', requires_authentic: true, requires_user_visible: false, subject_scope: 'real_property', required: true },
+    { id: 'hazard-ui', description: 'Hazard gauges show authentic values.', lane_id: 'product', required_stage: 'ui_displayed', required_evidence_kinds: ['browser'], required_repositories: ['backend'], allowed_result_classes: ['user_visible_result'], acceptance_predicate: 'Authentic hazard values are visible.', requires_authentic: true, requires_user_visible: true, subject_scope: 'real_property', required: true },
+    { id: 'risk-score', description: 'Admitted 0-100 score is served.', lane_id: 'product', required_stage: 'api_served', required_evidence_kinds: ['api'], required_repositories: ['backend'], allowed_result_classes: ['provisional_score'], acceptance_predicate: 'The provisional admitted score is served and labelled.', requires_authentic: true, requires_user_visible: false, subject_scope: 'real_property', required: true },
+    { id: 'resilience', description: 'Validated resilience result.', lane_id: 'science', required_stage: 'independently_validated', required_evidence_kinds: ['independent_validation'], required_repositories: ['backend'], allowed_result_classes: ['independently_validated_score'], acceptance_predicate: 'An independent method validates the resilience result.', requires_authentic: true, requires_user_visible: false, subject_scope: 'real_property', required: true },
+    { id: 'finance', description: 'Finance output is exported.', lane_id: 'product', required_stage: 'export_verified', required_evidence_kinds: ['export'], required_repositories: ['backend'], allowed_result_classes: ['user_visible_result'], acceptance_predicate: 'The authentic finance result exports.', requires_authentic: true, requires_user_visible: true, subject_scope: 'real_property', required: true },
   ];
   const incidentGoal = status => goal({
     status,
@@ -783,7 +809,7 @@ test('real CLI creates, checkpoints, records, resumes, hands off, and claims a g
         lane_id: 'delivery',
         required_stage: 'ui_displayed',
         required_evidence_kinds: ['browser'],
-        required_repositories: [],
+        required_repositories: ['backend'],
         allowed_result_classes: ['user_visible_result'],
         acceptance_predicate: 'The CLI result is visible.',
         requires_authentic: true,
@@ -825,6 +851,7 @@ test('real CLI creates, checkpoints, records, resumes, hands off, and claims a g
     const recorded = run(CLI, [
       'record', '--acceptance', 'cli-result', '--stage', 'ui_displayed',
       '--environment', 'local-cli', '--evidence', `browser=${evidence}`,
+      '--repo', `backend=${dir}`,
       '--authenticity', 'authentic', '--user-visible', 'true', '--subject-scope', 'local_cli',
       '--receipt-id', 'cli-result-001', '--observed-at', '2026-09-29T13:00:00Z',
       '--source-harness', 'test',
@@ -834,7 +861,7 @@ test('real CLI creates, checkpoints, records, resumes, hands off, and claims a g
     assert.match(receipt.evidence[0].sha256, /^[a-f0-9]{64}$/);
 
     const resumed = run(CLI, [
-      'resume', '--repo', dir, '--next-action', 'Verify the completion claim.',
+      'resume', '--repo', `backend=${dir}`, '--next-action', 'Verify the completion claim.',
       '--last-result', 'The real CLI rendered value 42.', '--receipt-id', 'resume-cli-001',
       '--observed-at', '2026-09-29T14:00:00Z', '--source-harness', 'test',
     ], dir);
@@ -848,7 +875,7 @@ test('real CLI creates, checkpoints, records, resumes, hands off, and claims a g
     assert.strictEqual(JSON.parse(claim.stdout).allowed, true);
 
     const handedOff = run(CLI, [
-      'handoff', '--repo', dir, '--next-action', 'Start the next verified phase.',
+      'handoff', '--repo', `backend=${dir}`, '--next-action', 'Start the next verified phase.',
       '--last-result', 'The real CLI rendered value 42.', '--receipt-id', 'handoff-cli-001',
       '--observed-at', '2026-09-29T15:00:00Z', '--source-harness', 'test',
     ], dir);
@@ -1100,7 +1127,7 @@ test('real CLI invalidates a fresh claim after an uncommitted source change', ()
         ...goal().user_visible_proofs[0],
         id: 'dirty-proof',
         lane_id: 'delivery',
-        required_repositories: [],
+        required_repositories: ['backend'],
       }],
       lanes: [{ id: 'delivery', description: 'Delivery', status: 'complete', blocker: null, next_action: null }],
       forecast: {

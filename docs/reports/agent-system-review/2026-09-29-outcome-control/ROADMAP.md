@@ -10,7 +10,7 @@
 | 5 | Parallel control | Assignment and integration receipts | Fan-out/fan-in adversarial tests | Complete |
 | 6 | Owner corrections | Executable priority supersession | Stale-plan rejection | Complete |
 | 7 | Progress watchdog | Proof-velocity and budget stop rules | Plateau simulation | Complete |
-| 8 | Proof profiles | Risk-scaled task profiles | Profile negative controls | Active |
-| 9 | Behavior evaluation | Offline matrix and capped live plan | Same verdict across runtimes | Pending |
+| 8 | Proof profiles | Risk-scaled task profiles | Profile negative controls | Complete |
+| 9 | Behavior evaluation | Offline matrix and capped live plan | Same verdict across runtimes | Active |
 | 10 | Repository rollout | Product adapters synchronized | Branch and remote evidence | Pending |
 | 11 | Knowledge hygiene | First-party graph and retention rules | Freshness and privacy checks | Pending |

@@ -1,0 +1,96 @@
+{
+  "version": 1,
+  "policy": "Profiles define minimum evidence for a task class. Repository rules may add stricter proofs; no model or runtime may weaken them.",
+  "profiles": [
+    {
+      "id": "backend",
+      "description": "Backend logic or API behavior with tenant-aware runtime verification.",
+      "required_evidence_kinds": ["test", "api"],
+      "minimum_repositories": 1,
+      "requires_authentic": true,
+      "requires_user_visible": false,
+      "requires_subject_scope": false,
+      "forbidden_result_classes": ["engineering_activity"]
+    },
+    {
+      "id": "frontend",
+      "description": "Browser-observable UI behavior, accessibility, and design-system acceptance.",
+      "required_evidence_kinds": ["browser"],
+      "minimum_repositories": 1,
+      "requires_authentic": true,
+      "requires_user_visible": true,
+      "requires_subject_scope": false,
+      "forbidden_result_classes": ["engineering_activity"]
+    },
+    {
+      "id": "cross-repo",
+      "description": "Consumer-visible contract behavior spanning at least two repositories.",
+      "required_evidence_kinds": ["api", "browser"],
+      "minimum_repositories": 2,
+      "requires_authentic": true,
+      "requires_user_visible": true,
+      "requires_subject_scope": false,
+      "forbidden_result_classes": ["engineering_activity"]
+    },
+    {
+      "id": "security",
+      "description": "Security boundary with a negative control and runtime observation.",
+      "required_evidence_kinds": ["test", "runtime"],
+      "minimum_repositories": 1,
+      "requires_authentic": false,
+      "requires_user_visible": false,
+      "requires_subject_scope": false,
+      "forbidden_result_classes": ["engineering_activity"]
+    },
+    {
+      "id": "ai-grounding",
+      "description": "Grounded AI output with source provenance and an authentic runtime result.",
+      "required_evidence_kinds": ["source", "runtime"],
+      "minimum_repositories": 1,
+      "requires_authentic": true,
+      "requires_user_visible": false,
+      "requires_subject_scope": true,
+      "forbidden_result_classes": ["engineering_activity"]
+    },
+    {
+      "id": "sustainability",
+      "description": "Sustainability, climate, GIS, or LCA calculation with source and calculation checks.",
+      "required_evidence_kinds": ["source", "test"],
+      "minimum_repositories": 1,
+      "requires_authentic": true,
+      "requires_user_visible": false,
+      "requires_subject_scope": true,
+      "forbidden_result_classes": ["engineering_activity"]
+    },
+    {
+      "id": "export",
+      "description": "User-downloadable or machine-consumable export inspected as an artifact.",
+      "required_evidence_kinds": ["export"],
+      "minimum_repositories": 1,
+      "requires_authentic": true,
+      "requires_user_visible": true,
+      "requires_subject_scope": false,
+      "forbidden_result_classes": ["engineering_activity"]
+    },
+    {
+      "id": "deploy",
+      "description": "Deployed acceptance with deployment evidence and a browser-observed result.",
+      "required_evidence_kinds": ["deployment", "browser"],
+      "minimum_repositories": 1,
+      "requires_authentic": true,
+      "requires_user_visible": true,
+      "requires_subject_scope": false,
+      "forbidden_result_classes": ["engineering_activity"]
+    },
+    {
+      "id": "docs",
+      "description": "Documentation or instruction behavior verified through its real rendering or validation surface.",
+      "required_evidence_kinds": ["runtime"],
+      "minimum_repositories": 1,
+      "requires_authentic": false,
+      "requires_user_visible": false,
+      "requires_subject_scope": false,
+      "forbidden_result_classes": ["engineering_activity"]
+    }
+  ]
+}

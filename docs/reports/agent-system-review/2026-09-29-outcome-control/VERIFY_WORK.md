@@ -35,6 +35,10 @@
 | 7 | Claim gate | Passed | Watchdog breach rejects `on-track` while leaving proven completion semantics separate |
 | 7 | Real CLI watchdog journey | Passed | `watch` exited 2 before and 0 after an explicit tactic change |
 | 7 | Focused outcome suite | 38 passed | `node --test tests/lib/goal-control.test.js` |
+| 8 | Profile catalog | 9 profiles | Backend, frontend, cross-repo, security, AI-grounding, sustainability, export, deploy, docs |
+| 8 | Cross-repo negative control | Passed | Missing API evidence and second repository rejected |
+| 8 | Unknown profile control | Passed | Model-shaped ad hoc profile rejected |
+| 8 | Focused outcome suite | 39 passed | `node --test tests/lib/goal-control.test.js` |
 
 Mocked, fixture, static, and source-only checks remain labelled as such. They do
 not satisfy authentic user-facing, real-property, deployment, or independent

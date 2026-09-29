@@ -30,6 +30,7 @@ or customer inputs in these files.
 schema: ecc.active-goal.v1
 goal_id: example-feature
 mode: controlled
+proof_profile: frontend
 objective: A real user can export the new report from the browser.
 current_priority: Complete one authentic API-to-browser-to-export slice.
 non_goals:

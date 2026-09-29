@@ -6,6 +6,7 @@ const Ajv = require('ajv');
 const yaml = require('js-yaml');
 
 const SCHEMA_PATH = path.join(__dirname, '..', '..', 'schemas', 'goal-control.schema.json');
+const PROFILE_PATH = path.join(__dirname, '..', '..', 'manifests', 'goal-proof-profiles.json');
 
 const DEFINITIONS = {
   goal: 'activeGoal',
@@ -18,11 +19,51 @@ const DEFINITIONS = {
 };
 
 let schema;
+let proofProfiles;
 const validators = new Map();
 
 function loadSchema() {
   if (!schema) schema = JSON.parse(fs.readFileSync(SCHEMA_PATH, 'utf8'));
   return schema;
+}
+
+function loadProofProfiles() {
+  if (!proofProfiles) {
+    const manifest = JSON.parse(fs.readFileSync(PROFILE_PATH, 'utf8'));
+    proofProfiles = new Map(manifest.profiles.map(profile => [profile.id, profile]));
+  }
+  return proofProfiles;
+}
+
+function validateProofProfile(goal, profiles = loadProofProfiles()) {
+  const profile = profiles.get(goal.proof_profile);
+  if (!profile) throw new Error(`unknown proof profile: ${goal.proof_profile}`);
+  const requiredProofs = goal.user_visible_proofs.filter(proof => proof.required);
+  const required = requiredProofs.length ? requiredProofs : goal.user_visible_proofs;
+  const evidenceKinds = new Set(required.flatMap(proof => proof.required_evidence_kinds));
+  const repositories = new Set(required.flatMap(proof => proof.required_repositories));
+  const resultClasses = new Set(required.flatMap(proof => proof.allowed_result_classes));
+  const missingKinds = profile.required_evidence_kinds.filter(kind => !evidenceKinds.has(kind));
+  if (missingKinds.length) {
+    throw new Error(`proof profile ${profile.id} requires evidence kinds: ${missingKinds.join(', ')}`);
+  }
+  if (repositories.size < profile.minimum_repositories) {
+    throw new Error(`proof profile ${profile.id} requires at least ${profile.minimum_repositories} repositories`);
+  }
+  if (profile.requires_authentic && !required.some(proof => proof.requires_authentic)) {
+    throw new Error(`proof profile ${profile.id} requires authentic evidence`);
+  }
+  if (profile.requires_user_visible && !required.some(proof => proof.requires_user_visible)) {
+    throw new Error(`proof profile ${profile.id} requires a user-visible proof`);
+  }
+  if (profile.requires_subject_scope && required.some(proof => !proof.subject_scope)) {
+    throw new Error(`proof profile ${profile.id} requires subject scope on every required proof`);
+  }
+  const forbidden = profile.forbidden_result_classes.filter(item => resultClasses.has(item));
+  if (forbidden.length) {
+    throw new Error(`proof profile ${profile.id} forbids result classes: ${forbidden.join(', ')}`);
+  }
+  return profile;
 }
 
 function validatorFor(kind) {
@@ -157,6 +198,7 @@ function validateGoalSemantics(goal) {
       throw new Error(`forecast checkpoint does not match latest owner correction ${latestCorrection.id}`);
     }
   }
+  validateProofProfile(goal);
   return goal;
 }
 
@@ -676,8 +718,10 @@ module.exports = {
   evaluateWatchdog,
   formatErrors,
   latestExecutableCorrection,
+  loadProofProfiles,
   readJsonLines,
   readStructuredFile,
   validateBundle,
   validateGoalSemantics,
+  validateProofProfile,
 };

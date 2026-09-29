@@ -165,6 +165,7 @@
         "schema",
         "goal_id",
         "mode",
+        "proof_profile",
         "objective",
         "current_priority",
         "non_goals",
@@ -182,6 +183,7 @@
           "type": "string",
           "enum": ["lightweight", "standard", "controlled"]
         },
+        "proof_profile": { "$ref": "#/$defs/nonEmptyString" },
         "objective": { "$ref": "#/$defs/nonEmptyString" },
         "current_priority": { "$ref": "#/$defs/nonEmptyString" },
         "non_goals": {

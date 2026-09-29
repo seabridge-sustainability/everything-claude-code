@@ -29,6 +29,8 @@ When the owner changes direction, record it with `ecc goal correct`, then create
 
 Configure long-goal proof and spending limits with `ecc goal watch-config`, record measured work with `ecc goal activity`, and check `ecc goal watch`. Activity without a new proof, or retry/CI/cost overruns, requires a real tactic change before the system permits “on track.”
 
+Select a minimum evidence contract from `ecc goal profiles`: backend, frontend, cross-repo, security, AI-grounding, sustainability, export, deploy, or docs. A repository can require more evidence, but a runtime or model cannot reduce the selected profile.
+
 | Command | What it does |
 |---------|-------------|
 | `/plan` | Restate requirements, assess risks, write step-by-step implementation plan — **waits for your confirm before touching code** |

@@ -1,8 +1,8 @@
 # State
 
-- Current phase: Phase 8 - risk-scaled proof profiles
-- Forecast: On track for the next checkpoint; whole-project completion remains
-  unforecast until repository-realistic proof profiles have negative controls.
+- Current phase: Phase 9 - behavioral and adversarial evaluation
+- Forecast: On track for offline evaluation; live provider sampling remains
+  optional and capped by the approved USD 5 total default.
 - Last verified: 2026-09-29
 - Delivered commit: `3c4ce1278f88a9a8aeb571fdd242e4ba51c97dfc`
 - Delivered remote: `origin/main`
@@ -32,8 +32,11 @@
 - Phase 7 result: Tool activity, retries, CI runs, elapsed proof windows, and
   cost are measured separately from outcomes. A plateau or budget breach rejects
   on-track until a distinct tactic-change event resets the bounded window.
-- Next checkpoint: Backend, frontend, cross-repo, security, AI-grounding,
-  sustainability, export, deploy, and docs tasks select explicit proof profiles.
+- Phase 8 result: Nine risk-scaled profiles define minimum evidence kinds,
+  repository coverage, authenticity, user visibility, subject scope, and
+  forbidden activity-only results. Model or runtime selection cannot weaken them.
+- Next checkpoint: Offline adversarial replay yields identical verdicts across
+  all 18 runtimes; any live sample is separately metered and budget-capped.
 - Blocked lanes: None. A later approved live behavioral-eval batch is capped at
   the canonical USD 5 total default unless Alejandro supplies a lower ceiling.
 - Independent work: Offline implementation and validation continue before any
