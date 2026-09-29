@@ -11,6 +11,8 @@ const DEFINITIONS = {
   goal: 'activeGoal',
   outcome: 'outcomeReceipt',
   resume: 'resumeReceipt',
+  assignment: 'assignment',
+  integration: 'integrationReceipt',
 };
 
 let schema;
@@ -124,13 +126,64 @@ function validateGoalSemantics(goal) {
   return goal;
 }
 
-function validateBundle({ goal, outcomes = [], resume = null }) {
+function validateBundle({ goal, outcomes = [], resume = null, assignments = [], integrations = [] }) {
   assertDocument('goal', goal, 'active goal');
   validateGoalSemantics(goal);
   ensureUniqueIds(outcomes.map(receipt => receipt.receipt_id), 'outcome receipt');
   const receiptIds = new Set(outcomes.map(receipt => receipt.receipt_id));
   const receiptById = new Map(outcomes.map(receipt => [receipt.receipt_id, receipt]));
   const proofById = new Map(goal.user_visible_proofs.map(proof => [proof.id, proof]));
+  ensureUniqueIds(assignments.map(item => item.assignment_id), 'assignment');
+  const assignmentById = new Map(assignments.map(item => [item.assignment_id, item]));
+  for (const assignment of assignments) {
+    assertDocument('assignment', assignment, `assignment ${assignment.assignment_id || '<unknown>'}`);
+    if (assignment.goal_id !== goal.goal_id) {
+      throw new Error(`assignment ${assignment.assignment_id} belongs to goal ${assignment.goal_id}, not ${goal.goal_id}`);
+    }
+    const missingProofs = assignment.acceptance_ids.filter(id => !proofById.has(id));
+    if (missingProofs.length) {
+      throw new Error(`assignment ${assignment.assignment_id} references missing proofs: ${missingProofs.join(', ')}`);
+    }
+    const issuedAt = parseIso(assignment.issued_at, `assignment ${assignment.assignment_id}.issued_at`);
+    const expiresAt = parseIso(assignment.lease_expires_at, `assignment ${assignment.assignment_id}.lease_expires_at`);
+    if (expiresAt <= issuedAt) throw new Error(`assignment ${assignment.assignment_id} lease must expire after it is issued`);
+  }
+  ensureUniqueIds(integrations.map(item => item.receipt_id), 'integration receipt');
+  const integrationsByAssignmentAndTime = new Map();
+  for (const receipt of integrations) {
+    assertDocument('integration', receipt, `integration receipt ${receipt.receipt_id || '<unknown>'}`);
+    if (receipt.goal_id !== goal.goal_id) {
+      throw new Error(`integration receipt ${receipt.receipt_id} belongs to goal ${receipt.goal_id}, not ${goal.goal_id}`);
+    }
+    const assignment = assignmentById.get(receipt.assignment_id);
+    if (!assignment) throw new Error(`integration receipt ${receipt.receipt_id} references missing assignment ${receipt.assignment_id}`);
+    if (receipt.integrator === assignment.owner_agent) {
+      throw new Error(`integration receipt ${receipt.receipt_id} must be recorded by the parent/integrator, not assignment owner ${assignment.owner_agent}`);
+    }
+    const observedAt = parseIso(receipt.observed_at, `integration receipt ${receipt.receipt_id}.observed_at`);
+    if (observedAt < Date.parse(assignment.issued_at) || observedAt > Date.parse(assignment.lease_expires_at)) {
+      throw new Error(`integration receipt ${receipt.receipt_id} falls outside assignment ${assignment.assignment_id} lease`);
+    }
+    ensureUniqueIds(receipt.repository_fingerprints.map(item => item.repo_id), `repository fingerprint in ${receipt.receipt_id}`);
+    const limits = assignment.budget;
+    const usage = receipt.usage;
+    for (const [used, limit] of [
+      ['tool_calls', 'max_tool_calls'],
+      ['retries', 'max_retries'],
+      ['ci_runs', 'max_ci_runs'],
+      ['cost_usd', 'max_cost_usd'],
+    ]) {
+      if (usage[used] > limits[limit]) {
+        throw new Error(`integration receipt ${receipt.receipt_id} exceeds assignment ${assignment.assignment_id} ${limit}`);
+      }
+    }
+    const key = `${receipt.assignment_id}\u0000${receipt.observed_at}`;
+    const prior = integrationsByAssignmentAndTime.get(key);
+    if (prior && prior.outcome !== receipt.outcome) {
+      throw new Error(`contradictory integration receipts ${prior.receipt_id} and ${receipt.receipt_id}`);
+    }
+    integrationsByAssignmentAndTime.set(key, receipt);
+  }
   for (const receipt of outcomes) {
     assertDocument('outcome', receipt, `outcome receipt ${receipt.receipt_id || '<unknown>'}`);
     if (receipt.goal_id !== goal.goal_id) {
@@ -237,7 +290,39 @@ function validateBundle({ goal, outcomes = [], resume = null }) {
       throw new Error('resume primary repository_state is missing from repository_states');
     }
   }
-  return { goal, outcomes, resume };
+  return { goal, outcomes, resume, assignments, integrations };
+}
+
+function buildParallelStatus(assignments = [], integrations = [], now = new Date()) {
+  const latestByAssignment = new Map();
+  for (const receipt of integrations) {
+    const existing = latestByAssignment.get(receipt.assignment_id);
+    if (!existing || Date.parse(receipt.observed_at) > Date.parse(existing.observed_at)) {
+      latestByAssignment.set(receipt.assignment_id, receipt);
+    }
+  }
+  const items = assignments.map(assignment => {
+    const integration = latestByAssignment.get(assignment.assignment_id) || null;
+    const integrated = integration?.outcome === 'pass';
+    return {
+      assignment_id: assignment.assignment_id,
+      owner_runtime: assignment.owner_runtime,
+      owner_agent: assignment.owner_agent,
+      lease_expires_at: assignment.lease_expires_at,
+      lease_expired: !integrated && now.getTime() > Date.parse(assignment.lease_expires_at),
+      integrated,
+      integration_receipt_id: integration?.receipt_id || null,
+      integration_outcome: integration?.outcome || null,
+      repository_fingerprints: integration?.repository_fingerprints || [],
+    };
+  });
+  return {
+    assignments: items,
+    total: items.length,
+    integrated: items.filter(item => item.integrated).length,
+    pending: items.filter(item => !item.integrated).length,
+    expired: items.filter(item => item.lease_expired).length,
+  };
 }
 
 function latestOutcomeByProof(outcomes) {
@@ -321,8 +406,9 @@ function buildStatus(goal, outcomes = [], now = new Date()) {
 function evaluateClaim(claim, bundle, options = {}) {
   const now = options.now instanceof Date ? options.now : new Date(options.now || Date.now());
   if (!Number.isFinite(now.getTime())) throw new Error('claim evaluation time must be valid');
-  const { goal, outcomes, resume } = validateBundle(bundle);
+  const { goal, outcomes, resume, assignments, integrations } = validateBundle(bundle);
   const status = buildStatus(goal, outcomes, now);
+  status.parallel = buildParallelStatus(assignments, integrations, now);
   const unmet = status.proofs.filter(proof => proof.required && !proof.met);
   const laneById = new Map(goal.lanes.map(lane => [lane.id, lane]));
   const resumeRepositories = new Map(
@@ -340,6 +426,20 @@ function evaluateClaim(claim, bundle, options = {}) {
         }
         if (current.head !== fingerprint.head || current.tree_fingerprint !== fingerprint.tree_fingerprint) {
           bindingReasons.push(`${proof.id} evidence is stale for repository ${fingerprint.repo_id}`);
+        }
+      }
+    }
+    return bindingReasons;
+  }
+  function parallelBindingReasons() {
+    const bindingReasons = [];
+    for (const assignment of status.parallel.assignments.filter(item => item.integrated)) {
+      for (const fingerprint of assignment.repository_fingerprints) {
+        const current = resumeRepositories.get(fingerprint.repo_id);
+        if (!current) {
+          bindingReasons.push(`assignment ${assignment.assignment_id} has no current resume state for repository ${fingerprint.repo_id}`);
+        } else if (current.head !== fingerprint.head || current.tree_fingerprint !== fingerprint.tree_fingerprint) {
+          bindingReasons.push(`assignment ${assignment.assignment_id} integration is stale for repository ${fingerprint.repo_id}`);
         }
       }
     }
@@ -372,6 +472,10 @@ function evaluateClaim(claim, bundle, options = {}) {
       reasons.push(`required proofs are not bound to current HEAD: ${staleCommits.map(proof => proof.id).join(', ')}`);
     }
     reasons.push(...repositoryBindingReasons(status.proofs.filter(proof => proof.required)));
+    if (status.parallel.pending) {
+      reasons.push(`${status.parallel.pending} delegated assignment(s) lack a passing parent integration receipt`);
+    }
+    reasons.push(...parallelBindingReasons());
   } else if (claim === 'blocked') {
     if (status.complete) reasons.push('all required proofs are met; use complete rather than blocked');
     if (!resume) reasons.push('a current resume receipt is required for a blocked claim');
@@ -415,6 +519,7 @@ function evaluateClaim(claim, bundle, options = {}) {
       reasons.push('forecast checkpoint must be refreshed to a future time');
     }
     if (forecast.checkpoint_overdue) reasons.push(`forecast checkpoint ${forecast.checkpoint_proof_id} is overdue and unmet`);
+    if (status.parallel.expired) reasons.push(`${status.parallel.expired} delegated assignment lease(s) expired without integration`);
   } else {
     throw new Error(`unsupported claim: ${claim}`);
   }
@@ -430,6 +535,7 @@ function evaluateClaim(claim, bundle, options = {}) {
 module.exports = {
   assertDocument,
   buildStatus,
+  buildParallelStatus,
   evaluateClaim,
   formatErrors,
   readJsonLines,

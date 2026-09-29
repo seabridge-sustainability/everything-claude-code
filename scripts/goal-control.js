@@ -6,6 +6,7 @@ const fs = require('fs');
 const path = require('path');
 const {
   assertDocument,
+  buildParallelStatus,
   buildStatus,
   evaluateClaim,
   readJsonLines,
@@ -62,6 +63,8 @@ function pathsFrom(args) {
     outcomes: optionValue(args, '--outcomes', path.join(directory, 'outcomes.jsonl')),
     resume: optionValue(args, '--resume', path.join(directory, 'resume-receipt.yaml')),
     resumeHistory: optionValue(args, '--resume-history', path.join(directory, 'resume-history.jsonl')),
+    assignments: optionValue(args, '--assignments', path.join(directory, 'assignments.jsonl')),
+    integrations: optionValue(args, '--integrations', path.join(directory, 'integrations.jsonl')),
   };
 }
 
@@ -72,6 +75,8 @@ function loadBundle(args) {
     bundle: {
       goal: readStructuredFile(paths.goal),
       outcomes: readJsonLines(paths.outcomes),
+      assignments: readJsonLines(paths.assignments),
+      integrations: readJsonLines(paths.integrations),
       resume: paths.resume && fs.existsSync(path.resolve(paths.resume))
         ? readStructuredFile(paths.resume)
         : null,
@@ -80,7 +85,7 @@ function loadBundle(args) {
 }
 
 function help() {
-  process.stdout.write(`ECC outcome control\n\nUsage:\n  ecc goal init --from FILE [--dir DIR]\n  ecc goal checkpoint --proof ID --at ISO --started-at ISO --basis TEXT --hours N [--confidence LEVEL]\n  ecc goal record --acceptance ID --stage STAGE --environment NAME --evidence KIND=FILE [options]\n    options: --result-class CLASS --authenticity CLASS --user-visible true|false --subject-scope SCOPE\n  ecc goal resume --next-action TEXT [--repo DIR ...] [--last-result TEXT] [options]\n  ecc goal handoff --next-action TEXT [resume options]\n  ecc goal validate [--goal FILE] [--outcomes FILE] [--resume FILE]\n  ecc goal status [--goal FILE] [--outcomes FILE] [--json] [--now ISO]\n  ecc goal claim <complete|blocked|on-track> [--goal FILE] [--outcomes FILE] [--resume FILE] [--json] [--now ISO]\n\nDefaults:\n  directory: .ecc/goal\n  goal:      active-goal.yaml\n  outcomes:  outcomes.jsonl\n  resume:    resume-receipt.yaml (loaded when present)\n\nWrites are local, atomic, and lock-protected. The command never calls a model, provider, CI service, or deployment API.\n`);
+  process.stdout.write(`ECC outcome control\n\nUsage:\n  ecc goal init --from FILE [--dir DIR]\n  ecc goal checkpoint --proof ID --at ISO --started-at ISO --basis TEXT --hours N [--confidence LEVEL]\n  ecc goal record --acceptance ID --stage STAGE --environment NAME --evidence KIND=FILE [options]\n    options: --result-class CLASS --authenticity CLASS --user-visible true|false --subject-scope SCOPE\n  ecc goal assign --description TEXT --acceptance ID --owner-runtime NAME --owner-agent ID --scope PATH --lease-until ISO [budgets]\n  ecc goal integrate --assignment ID --integrator ID --evidence KIND=FILE --repo ID=DIR --tool-calls N --retries N --ci-runs N --cost-usd N\n  ecc goal resume --next-action TEXT [--repo DIR ...] [--last-result TEXT] [options]\n  ecc goal handoff --next-action TEXT [resume options]\n  ecc goal validate [--goal FILE] [--outcomes FILE] [--resume FILE]\n  ecc goal status [--goal FILE] [--outcomes FILE] [--json] [--now ISO]\n  ecc goal claim <complete|blocked|on-track> [--goal FILE] [--outcomes FILE] [--resume FILE] [--json] [--now ISO]\n\nDefaults:\n  directory:    .ecc/goal\n  goal:         active-goal.yaml\n  outcomes:     outcomes.jsonl\n  assignments:  assignments.jsonl\n  integrations: integrations.jsonl\n  resume:       resume-receipt.yaml (loaded when present)\n\nWrites are local, atomic, and lock-protected. The command never calls a model, provider, CI service, or deployment API.\n`);
 }
 
 function parseEvidence(value) {
@@ -100,6 +105,12 @@ function parseEvidence(value) {
 function parseNumber(value, name) {
   const parsed = Number(value);
   if (!Number.isFinite(parsed) || parsed < 0) throw new Error(`${name} must be a non-negative number`);
+  return parsed;
+}
+
+function parseInteger(value, name) {
+  const parsed = parseNumber(value, name);
+  if (!Number.isSafeInteger(parsed)) throw new Error(`${name} must be a non-negative integer`);
   return parsed;
 }
 
@@ -140,8 +151,99 @@ function commandInit(args) {
       writeYaml(paths.goal, goal);
     }
     if (!fs.existsSync(path.resolve(paths.outcomes))) atomicWrite(paths.outcomes, '');
+    if (!fs.existsSync(path.resolve(paths.assignments))) atomicWrite(paths.assignments, '');
+    if (!fs.existsSync(path.resolve(paths.integrations))) atomicWrite(paths.integrations, '');
     return { initialized: true, idempotent: existed, goal_id: goal.goal_id, paths };
   });
+}
+
+function commandAssign(args) {
+  const paths = pathsFrom(args);
+  const goal = readStructuredFile(paths.goal);
+  const description = optionValue(args, '--description');
+  const acceptanceIds = optionValues(args, '--acceptance');
+  const ownerRuntime = optionValue(args, '--owner-runtime');
+  const ownerAgent = optionValue(args, '--owner-agent');
+  const scopePaths = optionValues(args, '--scope');
+  const leaseExpiresAt = optionValue(args, '--lease-until');
+  if (!description || !acceptanceIds.length || !ownerRuntime || !ownerAgent || !scopePaths.length || !leaseExpiresAt) {
+    throw new Error('assign requires --description, --acceptance, --owner-runtime, --owner-agent, --scope, and --lease-until');
+  }
+  const issuedAt = optionValue(args, '--issued-at', new Date().toISOString());
+  const assignment = {
+    schema: 'ecc.assignment.v1',
+    assignment_id: optionValue(args, '--assignment-id', makeReceiptId('assignment', issuedAt)),
+    goal_id: goal.goal_id,
+    description,
+    acceptance_ids: acceptanceIds,
+    owner_runtime: ownerRuntime,
+    owner_agent: ownerAgent,
+    scope_paths: scopePaths,
+    issued_at: issuedAt,
+    lease_expires_at: leaseExpiresAt,
+    budget: {
+      max_tool_calls: parseInteger(optionValue(args, '--max-tool-calls', '25'), '--max-tool-calls'),
+      max_retries: parseInteger(optionValue(args, '--max-retries', '2'), '--max-retries'),
+      max_ci_runs: parseInteger(optionValue(args, '--max-ci-runs', '0'), '--max-ci-runs'),
+      max_cost_usd: parseNumber(optionValue(args, '--max-cost-usd', '0'), '--max-cost-usd'),
+    },
+    source_harness: optionValue(args, '--source-harness', process.env.ECC_SOURCE_HARNESS || 'unknown'),
+  };
+  assertDocument('assignment', assignment, `assignment ${assignment.assignment_id}`);
+  const assignments = readJsonLines(paths.assignments);
+  validateBundle({
+    goal,
+    outcomes: readJsonLines(paths.outcomes),
+    resume: null,
+    assignments: [...assignments, assignment],
+    integrations: readJsonLines(paths.integrations),
+  });
+  const write = appendJsonLine(paths.assignments, assignment);
+  return { assigned: true, ...write, assignment, paths };
+}
+
+function commandIntegrate(args) {
+  const paths = pathsFrom(args);
+  const goal = readStructuredFile(paths.goal);
+  const assignmentId = optionValue(args, '--assignment');
+  const integrator = optionValue(args, '--integrator');
+  const evidenceValues = optionValues(args, '--evidence');
+  const requiredUsage = ['--tool-calls', '--retries', '--ci-runs', '--cost-usd'];
+  if (!assignmentId || !integrator || !evidenceValues.length || requiredUsage.some(name => optionValue(args, name) === null)) {
+    throw new Error('integrate requires --assignment, --integrator, --evidence, --tool-calls, --retries, --ci-runs, and --cost-usd');
+  }
+  const observedAt = optionValue(args, '--observed-at', new Date().toISOString());
+  const states = captureRepositories(args, paths);
+  const receipt = {
+    schema: 'ecc.integration-receipt.v1',
+    receipt_id: optionValue(args, '--receipt-id', makeReceiptId(`integration-${assignmentId}`, observedAt)),
+    goal_id: goal.goal_id,
+    assignment_id: assignmentId,
+    observed_at: observedAt,
+    integrator,
+    repository_fingerprints: states.map(repositoryFingerprint),
+    evidence: evidenceValues.map(parseEvidence),
+    usage: {
+      tool_calls: parseInteger(optionValue(args, '--tool-calls'), '--tool-calls'),
+      retries: parseInteger(optionValue(args, '--retries'), '--retries'),
+      ci_runs: parseInteger(optionValue(args, '--ci-runs'), '--ci-runs'),
+      cost_usd: parseNumber(optionValue(args, '--cost-usd'), '--cost-usd'),
+    },
+    outcome: optionValue(args, '--outcome', 'pass'),
+    limitations: optionValues(args, '--limitation'),
+    source_harness: optionValue(args, '--source-harness', process.env.ECC_SOURCE_HARNESS || 'unknown'),
+  };
+  assertDocument('integration', receipt, `integration receipt ${receipt.receipt_id}`);
+  const integrations = readJsonLines(paths.integrations);
+  validateBundle({
+    goal,
+    outcomes: readJsonLines(paths.outcomes),
+    resume: null,
+    assignments: readJsonLines(paths.assignments),
+    integrations: [...integrations, receipt],
+  });
+  const write = appendJsonLine(paths.integrations, receipt);
+  return { integrated: receipt.outcome === 'pass', ...write, receipt, paths };
 }
 
 function commandCheckpoint(args) {
@@ -221,7 +323,13 @@ function commandRecord(args) {
     supersedes: optionValues(args, '--supersedes'),
   };
   assertDocument('outcome', receipt, `outcome receipt ${receipt.receipt_id}`);
-  validateBundle({ goal, outcomes: [...readJsonLines(paths.outcomes), receipt], resume: null });
+  validateBundle({
+    goal,
+    outcomes: [...readJsonLines(paths.outcomes), receipt],
+    resume: null,
+    assignments: readJsonLines(paths.assignments),
+    integrations: readJsonLines(paths.integrations),
+  });
   const write = appendJsonLine(paths.outcomes, receipt);
   return { recorded: true, ...write, receipt, paths };
 }
@@ -258,7 +366,13 @@ function commandResume(args, handoff = false) {
     source_harness: optionValue(args, '--source-harness', process.env.ECC_SOURCE_HARNESS || 'unknown'),
   };
   assertDocument('resume', receipt, 'resume receipt');
-  validateBundle({ goal, outcomes: readJsonLines(paths.outcomes), resume: receipt });
+  validateBundle({
+    goal,
+    outcomes: readJsonLines(paths.outcomes),
+    resume: receipt,
+    assignments: readJsonLines(paths.assignments),
+    integrations: readJsonLines(paths.integrations),
+  });
   withFileLock(`${paths.resume}.lock`, () => writeYaml(paths.resume, receipt));
   appendJsonLine(paths.resumeHistory, receipt);
   return { [handoff ? 'handoff_created' : 'resumed']: true, receipt, paths };
@@ -271,6 +385,7 @@ function renderStatus(status) {
     `User-visible proofs: ${status.completed_proofs}/${status.required_proofs}`,
     `Forecast: ${status.forecast.state} (${status.forecast.confidence})`,
   ];
+  if (status.parallel) rows.push(`Delegated assignments: ${status.parallel.integrated}/${status.parallel.total} integrated`);
   if (status.forecast.checkpoint_overdue) rows.push('Checkpoint: OVERDUE');
   for (const proof of status.proofs) {
     rows.push(`  ${proof.met ? 'PASS' : 'OPEN'} ${proof.id}: ${proof.achieved_stage || 'no receipt'} / ${proof.required_stage}`);
@@ -294,6 +409,14 @@ function main(args = process.argv.slice(2)) {
   }
   if (command === 'record') {
     process.stdout.write(`${JSON.stringify(commandRecord(args), null, 2)}\n`);
+    return 0;
+  }
+  if (command === 'assign') {
+    process.stdout.write(`${JSON.stringify(commandAssign(args), null, 2)}\n`);
+    return 0;
+  }
+  if (command === 'integrate') {
+    process.stdout.write(`${JSON.stringify(commandIntegrate(args), null, 2)}\n`);
     return 0;
   }
   if (command === 'resume' || command === 'handoff') {
@@ -321,6 +444,8 @@ function main(args = process.argv.slice(2)) {
       valid: true,
       goal_id: bundle.goal.goal_id,
       outcomes: bundle.outcomes.length,
+      assignments: bundle.assignments.length,
+      integrations: bundle.integrations.length,
       evidence_artifacts: verification.length,
       resume_receipt: Boolean(bundle.resume),
       paths,
@@ -331,6 +456,7 @@ function main(args = process.argv.slice(2)) {
 
   if (command === 'status') {
     const status = buildStatus(bundle.goal, bundle.outcomes, now);
+    status.parallel = buildParallelStatus(bundle.assignments, bundle.integrations, now);
     process.stdout.write(args.includes('--json') ? `${JSON.stringify(status, null, 2)}\n` : renderStatus(status));
     return status.complete ? 0 : 2;
   }
@@ -362,6 +488,8 @@ if (require.main === module) {
 
 module.exports = {
   commandCheckpoint,
+  commandAssign,
+  commandIntegrate,
   commandInit,
   commandRecord,
   commandResume,
@@ -370,6 +498,7 @@ module.exports = {
   optionBoolean,
   optionValues,
   parseRepoSpec,
+  parseInteger,
   pathsFrom,
   renderStatus,
 };

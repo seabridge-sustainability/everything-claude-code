@@ -1,8 +1,8 @@
 # State
 
-- Current phase: Phase 5 - parallel assignment and integration control
+- Current phase: Phase 6 - owner-correction priority control
 - Forecast: On track for the next checkpoint; whole-project completion remains
-  unforecast until the parallel-control negative cases pass.
+  unforecast until stale-plan execution is rejected after a new owner correction.
 - Last verified: 2026-09-29
 - Delivered commit: `3c4ce1278f88a9a8aeb571fdd242e4ba51c97dfc`
 - Delivered remote: `origin/main`
@@ -23,8 +23,11 @@
   Claude and Cursor use verified native prompt/final hooks; runtimes without
   reliable equivalent events use the same explicit wrapper instead of claiming
   false hook parity.
-- Next checkpoint: Parallel assignments require ownership, leases, bounded
-  budgets, and an integration receipt before the parent can count them done.
+- Phase 5 result: Delegated work has named ownership, acceptance proofs,
+  non-overlapping scope, expiry, and hard tool/retry/CI/cost budgets. Parent
+  integration is separate from worker completion and bound to current repo state.
+- Next checkpoint: The latest owner correction changes the executable priority,
+  checkpoint, and next action; a stale pre-correction plan is rejected.
 - Blocked lanes: None. A later approved live behavioral-eval batch is capped at
   the canonical USD 5 total default unless Alejandro supplies a lower ceiling.
 - Independent work: Offline implementation and validation continue before any

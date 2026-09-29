@@ -67,6 +67,18 @@ function verifyBundleEvidence(bundle, options = {}) {
       }
     }
   }
+  for (const receipt of bundle.integrations || []) {
+    for (const item of receipt.evidence || []) {
+      try {
+        verified.push({
+          receipt_id: receipt.receipt_id,
+          ...verifyEvidenceItem(item, { roots }),
+        });
+      } catch (error) {
+        throw new Error(`integration receipt ${receipt.receipt_id}: ${error.message}`);
+      }
+    }
+  }
   return verified;
 }
 

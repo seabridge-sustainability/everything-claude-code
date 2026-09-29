@@ -388,6 +388,89 @@
         "verified_at": { "$ref": "#/$defs/nullableString" }
       }
     },
+    "assignmentBudget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["max_tool_calls", "max_retries", "max_ci_runs", "max_cost_usd"],
+      "properties": {
+        "max_tool_calls": { "type": "integer", "minimum": 0 },
+        "max_retries": { "type": "integer", "minimum": 0 },
+        "max_ci_runs": { "type": "integer", "minimum": 0 },
+        "max_cost_usd": { "type": "number", "minimum": 0 }
+      }
+    },
+    "assignmentUsage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tool_calls", "retries", "ci_runs", "cost_usd"],
+      "properties": {
+        "tool_calls": { "type": "integer", "minimum": 0 },
+        "retries": { "type": "integer", "minimum": 0 },
+        "ci_runs": { "type": "integer", "minimum": 0 },
+        "cost_usd": { "type": "number", "minimum": 0 }
+      }
+    },
+    "assignment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema", "assignment_id", "goal_id", "description", "acceptance_ids",
+        "owner_runtime", "owner_agent", "scope_paths", "issued_at",
+        "lease_expires_at", "budget", "source_harness"
+      ],
+      "properties": {
+        "schema": { "const": "ecc.assignment.v1" },
+        "assignment_id": { "$ref": "#/$defs/nonEmptyString" },
+        "goal_id": { "$ref": "#/$defs/nonEmptyString" },
+        "description": { "$ref": "#/$defs/nonEmptyString" },
+        "acceptance_ids": {
+          "type": "array", "minItems": 1, "uniqueItems": true,
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        },
+        "owner_runtime": { "$ref": "#/$defs/nonEmptyString" },
+        "owner_agent": { "$ref": "#/$defs/nonEmptyString" },
+        "scope_paths": {
+          "type": "array", "minItems": 1, "uniqueItems": true,
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        },
+        "issued_at": { "$ref": "#/$defs/nonEmptyString" },
+        "lease_expires_at": { "$ref": "#/$defs/nonEmptyString" },
+        "budget": { "$ref": "#/$defs/assignmentBudget" },
+        "source_harness": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "integrationReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema", "receipt_id", "goal_id", "assignment_id", "observed_at",
+        "integrator", "repository_fingerprints", "evidence", "usage",
+        "outcome", "limitations", "source_harness"
+      ],
+      "properties": {
+        "schema": { "const": "ecc.integration-receipt.v1" },
+        "receipt_id": { "$ref": "#/$defs/nonEmptyString" },
+        "goal_id": { "$ref": "#/$defs/nonEmptyString" },
+        "assignment_id": { "$ref": "#/$defs/nonEmptyString" },
+        "observed_at": { "$ref": "#/$defs/nonEmptyString" },
+        "integrator": { "$ref": "#/$defs/nonEmptyString" },
+        "repository_fingerprints": {
+          "type": "array", "minItems": 1,
+          "items": { "$ref": "#/$defs/repositoryFingerprint" }
+        },
+        "evidence": {
+          "type": "array", "minItems": 1,
+          "items": { "$ref": "#/$defs/evidence" }
+        },
+        "usage": { "$ref": "#/$defs/assignmentUsage" },
+        "outcome": { "type": "string", "enum": ["pass", "fail"] },
+        "limitations": {
+          "type": "array", "uniqueItems": true,
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        },
+        "source_harness": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
     "resumeReceipt": {
       "type": "object",
       "additionalProperties": false,

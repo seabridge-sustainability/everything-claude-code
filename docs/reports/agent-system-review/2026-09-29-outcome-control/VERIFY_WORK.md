@@ -23,6 +23,9 @@
 | 4 | Focused outcome suite | 28 passed | `node --test tests/lib/goal-control.test.js` |
 | 4 | Instruction scenarios | 76/76 | ECC worktree adapters pass; product drift is deferred to Phase 10 rollout |
 | 4 | Publish surface | 2 passed | Runtime bridge and library ship in the npm package |
+| 5 | Parallel adversarial cases | Passed | Missing integration, worker self-integration, expired lease, budget overrun, and stale tree rejected |
+| 5 | Real CLI fan-out/fan-in | Passed | `assign` created bounded work; `complete` failed before and passed after parent `integrate` plus fresh resume |
+| 5 | Focused outcome suite | 33 passed | `node --test tests/lib/goal-control.test.js` |
 
 Mocked, fixture, static, and source-only checks remain labelled as such. They do
 not satisfy authentic user-facing, real-property, deployment, or independent

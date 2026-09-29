@@ -174,6 +174,52 @@ function resume(overrides = {}) {
   };
 }
 
+function assignment(overrides = {}) {
+  return {
+    schema: 'ecc.assignment.v1',
+    assignment_id: 'assign-heat',
+    goal_id: 'openaccess-product',
+    description: 'Implement and verify the heat result.',
+    acceptance_ids: ['heat-browser'],
+    owner_runtime: 'claude',
+    owner_agent: 'worker-heat',
+    scope_paths: ['app/heat/**'],
+    issued_at: '2026-09-29T12:00:00Z',
+    lease_expires_at: '2026-09-29T18:00:00Z',
+    budget: {
+      max_tool_calls: 25,
+      max_retries: 2,
+      max_ci_runs: 0,
+      max_cost_usd: 0,
+    },
+    source_harness: 'codex',
+    ...overrides,
+  };
+}
+
+function integration(overrides = {}) {
+  return {
+    schema: 'ecc.integration-receipt.v1',
+    receipt_id: 'integration-heat',
+    goal_id: 'openaccess-product',
+    assignment_id: 'assign-heat',
+    observed_at: '2026-09-29T14:00:00Z',
+    integrator: 'parent-agent',
+    repository_fingerprints: [{
+      repo_id: 'backend',
+      repo_root: 'C:/worktree',
+      head: DUMMY_HEAD,
+      tree_fingerprint: DUMMY_TREE,
+    }],
+    evidence: [{ kind: 'test', ref: 'artifact://integration', sha256: 'e'.repeat(64) }],
+    usage: { tool_calls: 10, retries: 1, ci_runs: 0, cost_usd: 0 },
+    outcome: 'pass',
+    limitations: [],
+    source_harness: 'codex',
+    ...overrides,
+  };
+}
+
 function run(script, args, cwd) {
   return spawnSync('node', [script, ...args], { cwd, encoding: 'utf8' });
 }
@@ -232,6 +278,70 @@ test('allows complete only when every required proof has sufficient evidence', (
     resume: resume({ observed_at: '2026-09-29T14:00:00Z' }),
   });
   assert.strictEqual(result.allowed, true);
+});
+
+test('parent cannot count delegated work complete without a passing integration receipt', () => {
+  const base = {
+    goal: goal({ status: 'complete' }),
+    outcomes: [
+      outcome('r1', 'heat-browser', 'ui_displayed'),
+      outcome('r2', 'flood-validation', 'independently_validated'),
+    ],
+    resume: resume({ observed_at: '2026-09-29T15:00:00Z' }),
+    assignments: [assignment()],
+  };
+  const missing = evaluateClaim('complete', base, { now: '2026-09-29T15:00:00Z' });
+  assert.strictEqual(missing.allowed, false);
+  assert.match(missing.reasons.join(' '), /lack a passing parent integration receipt/);
+
+  const integrated = evaluateClaim('complete', {
+    ...base,
+    integrations: [integration()],
+  }, { now: '2026-09-29T15:00:00Z' });
+  assert.strictEqual(integrated.allowed, true);
+});
+
+test('assignment integration enforces owner separation, lease, and budgets', () => {
+  assert.throws(() => validateBundle({
+    goal: goal(), assignments: [assignment()], integrations: [integration({ integrator: 'worker-heat' })],
+  }), /parent\/integrator/);
+  assert.throws(() => validateBundle({
+    goal: goal(), assignments: [assignment()], integrations: [integration({ observed_at: '2026-09-29T19:00:00Z' })],
+  }), /outside assignment.*lease/);
+  assert.throws(() => validateBundle({
+    goal: goal(), assignments: [assignment()], integrations: [integration({ usage: { tool_calls: 26, retries: 1, ci_runs: 0, cost_usd: 0 } })],
+  }), /exceeds assignment.*max_tool_calls/);
+});
+
+test('completion rejects an integration receipt bound to stale repository state', () => {
+  const stale = integration({
+    repository_fingerprints: [{
+      repo_id: 'backend', repo_root: 'C:/worktree', head: DUMMY_HEAD, tree_fingerprint: 'f'.repeat(64),
+    }],
+  });
+  const result = evaluateClaim('complete', {
+    goal: goal({ status: 'complete' }),
+    outcomes: [
+      outcome('r1', 'heat-browser', 'ui_displayed'),
+      outcome('r2', 'flood-validation', 'independently_validated'),
+    ],
+    resume: resume({ observed_at: '2026-09-29T15:00:00Z' }),
+    assignments: [assignment()],
+    integrations: [stale],
+  }, { now: '2026-09-29T15:00:00Z' });
+  assert.strictEqual(result.allowed, false);
+  assert.match(result.reasons.join(' '), /integration is stale/);
+});
+
+test('expired delegated lease makes an on-track claim fail', () => {
+  const result = evaluateClaim('on-track', {
+    goal: goal(),
+    outcomes: [outcome('r1', 'heat-browser', 'ui_displayed')],
+    resume: resume({ observed_at: '2026-09-29T14:00:00Z' }),
+    assignments: [assignment({ lease_expires_at: '2026-09-29T16:00:00Z' })],
+  }, { now: '2026-09-29T17:00:00Z' });
+  assert.strictEqual(result.allowed, false);
+  assert.match(result.reasons.join(' '), /lease.*expired/);
 });
 
 test('denies blocked when one provider lane is blocked but independent product work remains', () => {
@@ -719,6 +829,79 @@ test('proof requiring multiple repositories rejects a one-repository receipt', (
     }),
     /lacks required repositories: frontend/,
   );
+});
+
+test('real CLI assigns bounded work and requires parent integration before completion', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-goal-parallel-'));
+  try {
+    runGit(['init', '--initial-branch=development'], dir);
+    runGit(['config', 'user.email', 'goal-control@example.invalid'], dir);
+    runGit(['config', 'user.name', 'ECC Goal Test'], dir);
+    fs.writeFileSync(path.join(dir, 'README.md'), '# Parallel test\n');
+    runGit(['add', 'README.md'], dir);
+    runGit(['commit', '-m', 'test: initialize parallel repository'], dir);
+
+    const parallelGoal = goal({
+      goal_id: 'parallel-goal',
+      status: 'complete',
+      user_visible_proofs: [{
+        ...goal().user_visible_proofs[0],
+        id: 'parallel-proof',
+        lane_id: 'delivery',
+      }],
+      lanes: [{ id: 'delivery', description: 'Delivery', status: 'complete', blocker: null, next_action: null }],
+      forecast: {
+        ...goal().forecast,
+        critical_path: ['parallel-proof'],
+        checkpoint_proof_id: 'parallel-proof',
+      },
+    });
+    const seed = path.join(dir, 'goal.yaml');
+    const browserEvidence = path.join(dir, 'browser.json');
+    const integrationEvidence = path.join(dir, 'integration.txt');
+    fs.writeFileSync(seed, yaml.dump(parallelGoal, { noRefs: true }));
+    fs.writeFileSync(browserEvidence, '{"visible":true}');
+    fs.writeFileSync(integrationEvidence, 'parent verified integration');
+    assert.strictEqual(run(CLI, ['init', '--from', seed], dir).status, 0);
+    assert.strictEqual(run(CLI, [
+      'assign', '--assignment-id', 'parallel-assignment',
+      '--description', 'Deliver the visible parallel proof.', '--acceptance', 'parallel-proof',
+      '--owner-runtime', 'claude', '--owner-agent', 'worker-one', '--scope', 'README.md',
+      '--issued-at', '2026-09-29T12:00:00Z', '--lease-until', '2026-09-29T18:00:00Z',
+      '--max-tool-calls', '10', '--max-retries', '1', '--max-ci-runs', '0', '--max-cost-usd', '0',
+    ], dir).status, 0);
+    assert.strictEqual(run(CLI, [
+      'record', '--acceptance', 'parallel-proof', '--stage', 'ui_displayed',
+      '--environment', 'local', '--evidence', `browser=${browserEvidence}`,
+      '--repo', `backend=${dir}`, '--authenticity', 'authentic', '--user-visible', 'true',
+      '--subject-scope', 'real_property', '--receipt-id', 'parallel-outcome',
+      '--observed-at', '2026-09-29T14:00:00Z',
+    ], dir).status, 0);
+    assert.strictEqual(run(CLI, [
+      'resume', '--repo', `backend=${dir}`, '--next-action', 'Integrate worker output.',
+      '--last-result', 'Visible authentic result.', '--receipt-id', 'parallel-resume-before',
+      '--observed-at', '2026-09-29T14:30:00Z',
+    ], dir).status, 0);
+    let claim = run(CLI, ['claim', 'complete', '--json', '--now', '2026-09-29T14:30:00Z'], dir);
+    assert.strictEqual(claim.status, 2, claim.stderr);
+    assert.match(claim.stdout, /lack a passing parent integration receipt/);
+
+    assert.strictEqual(run(CLI, [
+      'integrate', '--assignment', 'parallel-assignment', '--integrator', 'parent-agent',
+      '--evidence', `test=${integrationEvidence}`, '--repo', `backend=${dir}`,
+      '--tool-calls', '8', '--retries', '1', '--ci-runs', '0', '--cost-usd', '0',
+      '--receipt-id', 'parallel-integration', '--observed-at', '2026-09-29T15:00:00Z',
+    ], dir).status, 0);
+    assert.strictEqual(run(CLI, [
+      'resume', '--repo', `backend=${dir}`, '--next-action', 'Report verified completion.',
+      '--last-result', 'Visible authentic result.', '--receipt-id', 'parallel-resume-after',
+      '--observed-at', '2026-09-29T15:30:00Z',
+    ], dir).status, 0);
+    claim = run(CLI, ['claim', 'complete', '--json', '--now', '2026-09-29T15:30:00Z'], dir);
+    assert.strictEqual(claim.status, 0, claim.stderr || claim.stdout);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
 });
 
 test('real CLI invalidates a fresh claim after an uncommitted source change', () => {
