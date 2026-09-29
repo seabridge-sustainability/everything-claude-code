@@ -676,8 +676,7 @@
         "evidence": "graphifyy 0.4.23 -> 0.9.71 (pipx, upstream Graphify-Labs/graphify; the github.com/sharkkyyy10/graphify- link is a stale personal fork and was not used). Rollback: pipx install --force graphifyy==0.4.23. All five repos rebuilt from clean worktrees at their remote tips with the local AST pass and the knowledge boundary: manageesg-backend 91,703 nodes, everything-claude-code 35,756, manageesg-frontend 11,001, openseabri 4,386, autoresearch 288. graph.json embeds built_at_commit; BUILD_INFO.json adds build time and version; knowledge-freshness.js graphs reports FRESH or STALE.",
         "gaps": [
           "The shared main checkouts still hold graphs from older Graphify versions until their hooks or an operator rebuild refresh them; knowledge-freshness.js reports them as unknown or stale.",
-          "openseabri and everything-claude-code commit generated graphify-out files; untracking them is a follow-up.",
-          "manageesg-frontend has no graphify hook and its .graphifyignore lacks the boundary until the prepared patch lands."
+          "manageesg-frontend has no graphify hook yet, and its knowledge-boundary .graphifyignore commit is waiting to be pushed."
         ]
       }
     },

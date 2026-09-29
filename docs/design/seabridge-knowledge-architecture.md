@@ -165,15 +165,11 @@ rollback.
    Rollback before removal: `docker stop falkordb; docker rename falkordb
    falkordb-v4.20.7; docker rename falkordb-old-v4.18.1 falkordb; docker start
    falkordb`. The pre-upgrade data copy is `E:\falkordb-backup\falkordb-data-2026-09-29`.
-4. **Pushes without agent approval:** openseabri
-   (`git -C <workspace>\openseabri push origin main`, two commits) and
-   autoresearch (`git -C <workspace>\autoresearch pull --no-rebase origin master`,
-   then `push origin master`).
-5. **manageesg-frontend:** the knowledge-boundary `.graphifyignore` patch is
-   prepared (not applied, because frontend commits are reserved for consumer
-   changes); `git apply` it, commit to `development`, and install the hook
-   from `scripts/git-hooks/graphify-rebuild.sh` as `post-commit` and
-   `post-checkout`.
-6. **Obsidian installer shell:** the app package is 1.13.7 via the official
+4. **manageesg-frontend:** the knowledge-boundary `.graphifyignore` and the
+   read-order row are committed on a detached worktree (`2ae0e8c7`) but not
+   pushed; push it to `development`, then install the hook from
+   `scripts/git-hooks/graphify-rebuild.sh` as `post-commit` and `post-checkout`.
+   (openseabri and autoresearch landed on 2026-09-29.)
+5. **Obsidian installer shell:** the app package is 1.13.7 via the official
    auto-update; the machine-wide installer shell (1.12.7) updates with an
    elevated `winget upgrade --id Obsidian.Obsidian --exact`.
