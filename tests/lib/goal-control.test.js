@@ -1,6 +1,7 @@
 'use strict';
 
 const assert = require('assert');
+const crypto = require('crypto');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -20,6 +21,7 @@ function goal(overrides = {}) {
   return {
     schema: 'ecc.active-goal.v1',
     goal_id: 'openaccess-product',
+    mode: 'controlled',
     objective: 'Show authentic property results end to end.',
     current_priority: 'Complete the first US vertical slice.',
     non_goals: ['Do not call provisional output independently validated.'],
@@ -30,6 +32,11 @@ function goal(overrides = {}) {
         lane_id: 'product',
         required_stage: 'ui_displayed',
         required_evidence_kinds: ['browser'],
+        allowed_result_classes: ['user_visible_result'],
+        acceptance_predicate: 'A non-null result is visible through the authentic property UI.',
+        requires_authentic: true,
+        requires_user_visible: true,
+        subject_scope: 'real_property',
         required: true,
       },
       {
@@ -38,6 +45,11 @@ function goal(overrides = {}) {
         lane_id: 'science',
         required_stage: 'independently_validated',
         required_evidence_kinds: ['independent_validation'],
+        allowed_result_classes: ['independently_validated_score'],
+        acceptance_predicate: 'An independent method validates the property result.',
+        requires_authentic: true,
+        requires_user_visible: false,
+        subject_scope: 'real_property',
         required: true,
       },
     ],
@@ -77,12 +89,23 @@ function outcome(id, acceptanceId, stage, observedAt = '2026-09-29T13:00:00Z') {
     export_verified: 'export',
     api_served: 'api',
   }[stage] || 'runtime';
+  const resultClass = {
+    ui_displayed: 'user_visible_result',
+    independently_validated: 'independently_validated_score',
+    export_verified: 'user_visible_result',
+    api_served: 'user_visible_result',
+    authentic_input_processed: 'source_native_indicator',
+  }[stage] || 'other';
   return {
     schema: 'ecc.outcome-receipt.v1',
     receipt_id: id,
     goal_id: 'openaccess-product',
     acceptance_id: acceptanceId,
     stage,
+    result_class: resultClass,
+    authenticity: 'authentic',
+    user_visible: ['ui_displayed', 'export_verified'].includes(stage),
+    subject_scope: 'real_property',
     observed_at: observedAt,
     environment: 'development',
     commit: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
@@ -134,6 +157,20 @@ function runGit(args, cwd) {
   const result = spawnSync('git', args, { cwd, encoding: 'utf8' });
   assert.strictEqual(result.status, 0, result.stderr);
   return result.stdout.trim();
+}
+
+function materializeEvidence(receipt, dir) {
+  receipt.evidence = receipt.evidence.map((item, index) => {
+    const fileName = `${receipt.receipt_id}-${index}-${item.kind}.json`;
+    const content = JSON.stringify({ receipt_id: receipt.receipt_id, kind: item.kind, observed: true });
+    fs.writeFileSync(path.join(dir, fileName), content);
+    return {
+      ...item,
+      ref: fileName,
+      sha256: crypto.createHash('sha256').update(content).digest('hex'),
+    };
+  });
+  return receipt;
 }
 
 const tests = [];
@@ -257,6 +294,36 @@ test('rejects generic or unhashed evidence for a claim-specific proof', () => {
   assert.throws(() => validateBundle({ goal: goal(), outcomes: [unhashed] }), /invalid outcome receipt/);
 });
 
+test('keeps authentic, fixture, provisional, and independently validated results distinct', () => {
+  const fixture = outcome('fixture', 'heat-browser', 'ui_displayed');
+  fixture.authenticity = 'fixture';
+  assert.throws(
+    () => validateBundle({ goal: goal(), outcomes: [fixture] }),
+    /requires authentic evidence/,
+  );
+
+  const provisional = outcome('provisional', 'flood-validation', 'independently_validated');
+  provisional.result_class = 'provisional_score';
+  assert.throws(
+    () => validateBundle({ goal: goal(), outcomes: [provisional] }),
+    /allows independently_validated_score|cannot call a provisional score independently validated/,
+  );
+
+  const activity = outcome('activity', 'heat-browser', 'ui_displayed');
+  activity.result_class = 'engineering_activity';
+  assert.throws(
+    () => validateBundle({ goal: goal(), outcomes: [activity] }),
+    /engineering_activity|engineering activity/,
+  );
+
+  const hidden = outcome('hidden', 'heat-browser', 'ui_displayed');
+  hidden.user_visible = false;
+  assert.throws(
+    () => validateBundle({ goal: goal(), outcomes: [hidden] }),
+    /requires a user-visible result/,
+  );
+});
+
 test('a create-only retraction removes a superseded successful outcome', () => {
   const accepted = outcome('r1', 'heat-browser', 'ui_displayed');
   const retracted = {
@@ -327,6 +394,11 @@ test('an optional proof still must be demonstrated when used as a forecast check
         lane_id: 'product',
         required_stage: 'ui_displayed',
         required_evidence_kinds: ['browser'],
+        allowed_result_classes: ['user_visible_result'],
+        acceptance_predicate: 'The authentic heat result is visible.',
+        requires_authentic: true,
+        requires_user_visible: true,
+        subject_scope: 'real_property',
         required: false,
       },
     ],
@@ -349,7 +421,8 @@ test('CLI and ecc router return exit 2 for unsupported progress claims', () => {
     const goalPath = path.join(dir, 'goal.json');
     const outcomesPath = path.join(dir, 'outcomes.jsonl');
     fs.writeFileSync(goalPath, JSON.stringify(goal(), null, 2));
-    fs.writeFileSync(outcomesPath, `${JSON.stringify(outcome('r1', 'heat-browser', 'ui_displayed'))}\n`);
+    const receipt = materializeEvidence(outcome('r1', 'heat-browser', 'ui_displayed'), dir);
+    fs.writeFileSync(outcomesPath, `${JSON.stringify(receipt)}\n`);
     const args = ['claim', 'complete', '--goal', goalPath, '--outcomes', outcomesPath, '--json'];
     const direct = run(CLI, args, dir);
     assert.strictEqual(direct.status, 2, direct.stderr);
@@ -380,11 +453,11 @@ test('CLI accepts the documented YAML active-goal format', () => {
 test('real CLI rejects the five-day SeaBridge counterexample for complete, on-track, and whole-goal blocked', () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-goal-red-team-'));
   const incidentProofs = [
-    { id: 'heat-source', description: 'One property heat result.', lane_id: 'product', required_stage: 'authentic_input_processed', required_evidence_kinds: ['runtime'], required: true },
-    { id: 'hazard-ui', description: 'Hazard gauges show authentic values.', lane_id: 'product', required_stage: 'ui_displayed', required_evidence_kinds: ['browser'], required: true },
-    { id: 'risk-score', description: 'Admitted 0-100 score is served.', lane_id: 'product', required_stage: 'api_served', required_evidence_kinds: ['api'], required: true },
-    { id: 'resilience', description: 'Validated resilience result.', lane_id: 'science', required_stage: 'independently_validated', required_evidence_kinds: ['independent_validation'], required: true },
-    { id: 'finance', description: 'Finance output is exported.', lane_id: 'product', required_stage: 'export_verified', required_evidence_kinds: ['export'], required: true },
+    { id: 'heat-source', description: 'One property heat result.', lane_id: 'product', required_stage: 'authentic_input_processed', required_evidence_kinds: ['runtime'], allowed_result_classes: ['source_native_indicator'], acceptance_predicate: 'A source-native indicator is processed for a real property.', requires_authentic: true, requires_user_visible: false, subject_scope: 'real_property', required: true },
+    { id: 'hazard-ui', description: 'Hazard gauges show authentic values.', lane_id: 'product', required_stage: 'ui_displayed', required_evidence_kinds: ['browser'], allowed_result_classes: ['user_visible_result'], acceptance_predicate: 'Authentic hazard values are visible.', requires_authentic: true, requires_user_visible: true, subject_scope: 'real_property', required: true },
+    { id: 'risk-score', description: 'Admitted 0-100 score is served.', lane_id: 'product', required_stage: 'api_served', required_evidence_kinds: ['api'], allowed_result_classes: ['provisional_score'], acceptance_predicate: 'The provisional admitted score is served and labelled.', requires_authentic: true, requires_user_visible: false, subject_scope: 'real_property', required: true },
+    { id: 'resilience', description: 'Validated resilience result.', lane_id: 'science', required_stage: 'independently_validated', required_evidence_kinds: ['independent_validation'], allowed_result_classes: ['independently_validated_score'], acceptance_predicate: 'An independent method validates the resilience result.', requires_authentic: true, requires_user_visible: false, subject_scope: 'real_property', required: true },
+    { id: 'finance', description: 'Finance output is exported.', lane_id: 'product', required_stage: 'export_verified', required_evidence_kinds: ['export'], allowed_result_classes: ['user_visible_result'], acceptance_predicate: 'The authentic finance result exports.', requires_authentic: true, requires_user_visible: true, subject_scope: 'real_property', required: true },
   ];
   const incidentGoal = status => goal({
     status,
@@ -395,7 +468,10 @@ test('real CLI rejects the five-day SeaBridge counterexample for complete, on-tr
       checkpoint_proof_id: 'hazard-ui',
     },
   });
-  const heatReceipt = outcome('heat-only', 'heat-source', 'authentic_input_processed');
+  const heatReceipt = materializeEvidence(
+    outcome('heat-only', 'heat-source', 'authentic_input_processed'),
+    dir,
+  );
   const incidentResume = resume({
     last_user_visible_result: 'One property-linked heat observation; all product gauges remain null.',
     blocked_lanes: ['science'],
@@ -450,6 +526,11 @@ test('real CLI creates, checkpoints, records, resumes, hands off, and claims a g
         lane_id: 'delivery',
         required_stage: 'ui_displayed',
         required_evidence_kinds: ['browser'],
+        allowed_result_classes: ['user_visible_result'],
+        acceptance_predicate: 'The CLI result is visible.',
+        requires_authentic: true,
+        requires_user_visible: true,
+        subject_scope: 'local_cli',
         required: true,
       }],
       lanes: [{
@@ -486,6 +567,7 @@ test('real CLI creates, checkpoints, records, resumes, hands off, and claims a g
     const recorded = run(CLI, [
       'record', '--acceptance', 'cli-result', '--stage', 'ui_displayed',
       '--environment', 'local-cli', '--evidence', `browser=${evidence}`,
+      '--authenticity', 'authentic', '--user-visible', 'true', '--subject-scope', 'local_cli',
       '--receipt-id', 'cli-result-001', '--observed-at', '2026-09-29T13:00:00Z',
       '--source-harness', 'test',
     ], dir);
@@ -531,6 +613,37 @@ test('init refuses to overwrite a different active goal', () => {
     const conflict = run(CLI, ['init', '--from', second], dir);
     assert.strictEqual(conflict.status, 1);
     assert.match(conflict.stderr, /already exists with different content/);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('CLI rejects changed, missing, and URI-only evidence artifacts', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-goal-evidence-mutation-'));
+  try {
+    const goalPath = path.join(dir, 'goal.json');
+    const outcomesPath = path.join(dir, 'outcomes.jsonl');
+    fs.writeFileSync(goalPath, JSON.stringify(goal(), null, 2));
+
+    const changed = materializeEvidence(outcome('changed', 'heat-browser', 'ui_displayed'), dir);
+    fs.writeFileSync(outcomesPath, `${JSON.stringify(changed)}\n`);
+    fs.writeFileSync(path.join(dir, changed.evidence[0].ref), '{"mutated":true}');
+    let result = run(CLI, ['validate', '--goal', goalPath, '--outcomes', outcomesPath], dir);
+    assert.strictEqual(result.status, 1);
+    assert.match(result.stderr, /hash mismatch/);
+
+    const missing = materializeEvidence(outcome('missing', 'heat-browser', 'ui_displayed'), dir);
+    fs.unlinkSync(path.join(dir, missing.evidence[0].ref));
+    fs.writeFileSync(outcomesPath, `${JSON.stringify(missing)}\n`);
+    result = run(CLI, ['validate', '--goal', goalPath, '--outcomes', outcomesPath], dir);
+    assert.strictEqual(result.status, 1);
+    assert.match(result.stderr, /not found/);
+
+    const uri = outcome('uri', 'heat-browser', 'ui_displayed');
+    fs.writeFileSync(outcomesPath, `${JSON.stringify(uri)}\n`);
+    result = run(CLI, ['validate', '--goal', goalPath, '--outcomes', outcomesPath], dir);
+    assert.strictEqual(result.status, 1);
+    assert.match(result.stderr, /unverifiable URI/);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }

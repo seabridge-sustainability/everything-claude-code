@@ -12,6 +12,8 @@
 | 1 | Public CLI delivery checkpoint | Allowed | `ecc goal init`, `record`, `resume`, and `claim complete` |
 | 1 | Evidence artifact | SHA-256 recorded | `1a28d2be529431297ebc4efa335c343e274ee14e29b1dfec621bdac594104e5a` |
 | 1 | Runtime defect | Fixed | Git porcelain whitespace preserved for dirty paths |
+| 2 | Evidence mutation suite | Passed | Changed, missing, and URI-only artifacts rejected |
+| 2 | Result-class semantics | Passed | Fixture, activity, provisional, and hidden results rejected where disallowed |
 
 Mocked, fixture, static, and source-only checks remain labelled as such. They do
 not satisfy authentic user-facing, real-property, deployment, or independent

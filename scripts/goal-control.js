@@ -23,6 +23,7 @@ const {
   withFileLock,
   writeYaml,
 } = require('./lib/goal-store');
+const { verifyBundleEvidence } = require('./lib/goal-evidence');
 
 const DEFAULT_DIR = path.join('.ecc', 'goal');
 
@@ -41,6 +42,14 @@ function optionValues(args, name) {
     values.push(args[index + 1]);
   }
   return values;
+}
+
+function optionBoolean(args, name, fallback = false) {
+  const value = optionValue(args, name);
+  if (value === null) return fallback;
+  if (value === 'true') return true;
+  if (value === 'false') return false;
+  throw new Error(`${name} must be true or false`);
 }
 
 function pathsFrom(args) {
@@ -69,7 +78,7 @@ function loadBundle(args) {
 }
 
 function help() {
-  process.stdout.write(`ECC outcome control\n\nUsage:\n  ecc goal init --from FILE [--dir DIR]\n  ecc goal checkpoint --proof ID --at ISO --started-at ISO --basis TEXT --hours N [--confidence LEVEL]\n  ecc goal record --acceptance ID --stage STAGE --environment NAME --evidence KIND=FILE [options]\n  ecc goal resume --next-action TEXT [--repo DIR ...] [--last-result TEXT] [options]\n  ecc goal handoff --next-action TEXT [resume options]\n  ecc goal validate [--goal FILE] [--outcomes FILE] [--resume FILE]\n  ecc goal status [--goal FILE] [--outcomes FILE] [--json] [--now ISO]\n  ecc goal claim <complete|blocked|on-track> [--goal FILE] [--outcomes FILE] [--resume FILE] [--json] [--now ISO]\n\nDefaults:\n  directory: .ecc/goal\n  goal:      active-goal.yaml\n  outcomes:  outcomes.jsonl\n  resume:    resume-receipt.yaml (loaded when present)\n\nWrites are local, atomic, and lock-protected. The command never calls a model, provider, CI service, or deployment API.\n`);
+  process.stdout.write(`ECC outcome control\n\nUsage:\n  ecc goal init --from FILE [--dir DIR]\n  ecc goal checkpoint --proof ID --at ISO --started-at ISO --basis TEXT --hours N [--confidence LEVEL]\n  ecc goal record --acceptance ID --stage STAGE --environment NAME --evidence KIND=FILE [options]\n    options: --result-class CLASS --authenticity CLASS --user-visible true|false --subject-scope SCOPE\n  ecc goal resume --next-action TEXT [--repo DIR ...] [--last-result TEXT] [options]\n  ecc goal handoff --next-action TEXT [resume options]\n  ecc goal validate [--goal FILE] [--outcomes FILE] [--resume FILE]\n  ecc goal status [--goal FILE] [--outcomes FILE] [--json] [--now ISO]\n  ecc goal claim <complete|blocked|on-track> [--goal FILE] [--outcomes FILE] [--resume FILE] [--json] [--now ISO]\n\nDefaults:\n  directory: .ecc/goal\n  goal:      active-goal.yaml\n  outcomes:  outcomes.jsonl\n  resume:    resume-receipt.yaml (loaded when present)\n\nWrites are local, atomic, and lock-protected. The command never calls a model, provider, CI service, or deployment API.\n`);
 }
 
 function parseEvidence(value) {
@@ -161,12 +170,24 @@ function commandRecord(args) {
   }
   const repo = optionValue(args, '--repo', process.cwd());
   const observedAt = optionValue(args, '--observed-at', new Date().toISOString());
+  const proof = goal.user_visible_proofs.find(item => item.id === acceptanceId);
+  if (!proof) throw new Error(`record references missing proof: ${acceptanceId}`);
+  const resultClass = optionValue(
+    args,
+    '--result-class',
+    proof.allowed_result_classes.length === 1 ? proof.allowed_result_classes[0] : null,
+  );
+  if (!resultClass) throw new Error('record requires --result-class when the proof permits multiple classes');
   const receipt = {
     schema: 'ecc.outcome-receipt.v1',
     receipt_id: optionValue(args, '--receipt-id', makeReceiptId(acceptanceId, observedAt)),
     goal_id: goal.goal_id,
     acceptance_id: acceptanceId,
     stage,
+    result_class: resultClass,
+    authenticity: optionValue(args, '--authenticity', 'unknown'),
+    user_visible: optionBoolean(args, '--user-visible', false),
+    subject_scope: optionValue(args, '--subject-scope'),
     observed_at: observedAt,
     environment,
     commit: optionValue(args, '--commit', captureRepositoryState(repo).head),
@@ -262,13 +283,15 @@ function main(args = process.argv.slice(2)) {
   const { paths, bundle } = loadBundle(args);
   const nowRaw = optionValue(args, '--now');
   const now = nowRaw ? new Date(nowRaw) : new Date();
+  validateBundle(bundle);
+  const verification = verifyBundleEvidence(bundle, { roots: optionValues(args, '--evidence-root') });
 
   if (command === 'validate') {
-    validateBundle(bundle);
     const result = {
       valid: true,
       goal_id: bundle.goal.goal_id,
       outcomes: bundle.outcomes.length,
+      evidence_artifacts: verification.length,
       resume_receipt: Boolean(bundle.resume),
       paths,
     };
@@ -277,7 +300,6 @@ function main(args = process.argv.slice(2)) {
   }
 
   if (command === 'status') {
-    validateBundle(bundle);
     const status = buildStatus(bundle.goal, bundle.outcomes, now);
     process.stdout.write(args.includes('--json') ? `${JSON.stringify(status, null, 2)}\n` : renderStatus(status));
     return status.complete ? 0 : 2;
@@ -315,6 +337,7 @@ module.exports = {
   commandResume,
   main,
   optionValue,
+  optionBoolean,
   optionValues,
   pathsFrom,
   renderStatus,

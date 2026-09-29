@@ -148,6 +148,27 @@ function validateBundle({ goal, outcomes = [], resume = null }) {
     if (missingKinds.length) {
       throw new Error(`outcome receipt ${receipt.receipt_id} lacks required evidence kinds: ${missingKinds.join(', ')}`);
     }
+    if (!proof.allowed_result_classes.includes(receipt.result_class)) {
+      throw new Error(`outcome receipt ${receipt.receipt_id} uses result class ${receipt.result_class}; proof ${proof.id} allows ${proof.allowed_result_classes.join(', ')}`);
+    }
+    if (proof.requires_authentic && receipt.authenticity !== 'authentic') {
+      throw new Error(`outcome receipt ${receipt.receipt_id} is ${receipt.authenticity}; proof ${proof.id} requires authentic evidence`);
+    }
+    if (proof.requires_user_visible && receipt.user_visible !== true) {
+      throw new Error(`outcome receipt ${receipt.receipt_id} is not user-visible; proof ${proof.id} requires a user-visible result`);
+    }
+    if (proof.subject_scope && receipt.subject_scope !== proof.subject_scope) {
+      throw new Error(`outcome receipt ${receipt.receipt_id} has subject scope ${receipt.subject_scope || '<none>'}; proof ${proof.id} requires ${proof.subject_scope}`);
+    }
+    if (receipt.result_class === 'engineering_activity' && receipt.outcome === 'pass') {
+      throw new Error(`outcome receipt ${receipt.receipt_id} cannot use engineering activity as a passing product outcome`);
+    }
+    if (receipt.result_class === 'independently_validated_score' && receipt.stage !== 'independently_validated') {
+      throw new Error(`outcome receipt ${receipt.receipt_id} labels a score independently validated without the independently_validated stage`);
+    }
+    if (receipt.result_class === 'provisional_score' && receipt.stage === 'independently_validated') {
+      throw new Error(`outcome receipt ${receipt.receipt_id} cannot call a provisional score independently validated`);
+    }
     parseIso(receipt.observed_at, `outcome receipt ${receipt.receipt_id}.observed_at`);
     for (const superseded of receipt.supersedes) {
       if (superseded === receipt.receipt_id) {

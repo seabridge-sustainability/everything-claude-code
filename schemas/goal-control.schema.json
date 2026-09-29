@@ -24,10 +24,37 @@
         "deployed_browser_accepted"
       ]
     },
+    "resultClass": {
+      "type": "string",
+      "enum": [
+        "source_native_indicator",
+        "provisional_score",
+        "independently_validated_score",
+        "user_visible_result",
+        "engineering_activity",
+        "other"
+      ]
+    },
+    "authenticity": {
+      "type": "string",
+      "enum": ["authentic", "fixture", "mock", "synthetic", "unknown"]
+    },
     "proof": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "description", "lane_id", "required_stage", "required_evidence_kinds", "required"],
+      "required": [
+        "id",
+        "description",
+        "lane_id",
+        "required_stage",
+        "required_evidence_kinds",
+        "allowed_result_classes",
+        "acceptance_predicate",
+        "requires_authentic",
+        "requires_user_visible",
+        "subject_scope",
+        "required"
+      ],
       "properties": {
         "id": { "$ref": "#/$defs/nonEmptyString" },
         "description": { "$ref": "#/$defs/nonEmptyString" },
@@ -39,6 +66,16 @@
           "items": { "$ref": "#/$defs/evidenceKind" },
           "uniqueItems": true
         },
+        "allowed_result_classes": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/resultClass" },
+          "uniqueItems": true
+        },
+        "acceptance_predicate": { "$ref": "#/$defs/nonEmptyString" },
+        "requires_authentic": { "type": "boolean" },
+        "requires_user_visible": { "type": "boolean" },
+        "subject_scope": { "$ref": "#/$defs/nullableString" },
         "required": { "type": "boolean" }
       }
     },
@@ -117,6 +154,7 @@
       "required": [
         "schema",
         "goal_id",
+        "mode",
         "objective",
         "current_priority",
         "non_goals",
@@ -130,6 +168,10 @@
       "properties": {
         "schema": { "const": "ecc.active-goal.v1" },
         "goal_id": { "$ref": "#/$defs/nonEmptyString" },
+        "mode": {
+          "type": "string",
+          "enum": ["lightweight", "standard", "controlled"]
+        },
         "objective": { "$ref": "#/$defs/nonEmptyString" },
         "current_priority": { "$ref": "#/$defs/nonEmptyString" },
         "non_goals": {
@@ -185,6 +227,10 @@
         "goal_id",
         "acceptance_id",
         "stage",
+        "result_class",
+        "authenticity",
+        "user_visible",
+        "subject_scope",
         "observed_at",
         "environment",
         "commit",
@@ -201,6 +247,10 @@
         "goal_id": { "$ref": "#/$defs/nonEmptyString" },
         "acceptance_id": { "$ref": "#/$defs/nonEmptyString" },
         "stage": { "$ref": "#/$defs/stage" },
+        "result_class": { "$ref": "#/$defs/resultClass" },
+        "authenticity": { "$ref": "#/$defs/authenticity" },
+        "user_visible": { "type": "boolean" },
+        "subject_scope": { "$ref": "#/$defs/nullableString" },
         "observed_at": { "$ref": "#/$defs/nonEmptyString" },
         "environment": { "$ref": "#/$defs/nonEmptyString" },
         "commit": {

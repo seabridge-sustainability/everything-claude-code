@@ -29,6 +29,7 @@ or customer inputs in these files.
 ```yaml
 schema: ecc.active-goal.v1
 goal_id: example-feature
+mode: controlled
 objective: A real user can export the new report from the browser.
 current_priority: Complete one authentic API-to-browser-to-export slice.
 non_goals:
@@ -39,6 +40,11 @@ user_visible_proofs:
     lane_id: product
     required_stage: export_verified
     required_evidence_kinds: [browser, export]
+    allowed_result_classes: [user_visible_result]
+    acceptance_predicate: An authentic report is visible and exports consistently.
+    requires_authentic: true
+    requires_user_visible: true
+    subject_scope: real_property
     required: true
 lanes:
   - id: product
@@ -67,6 +73,13 @@ Proof stages are independent claim types, not a ladder: scientific validation
 does not prove that an API, UI, export, or deployment worked. Create separate
 proofs for each result the goal requires.
 
+Result classes are also independent. A `source_native_indicator` proves only
+that the native source value was processed. A `provisional_score` must remain
+labelled provisional. Only an `independently_validated_score` paired with the
+independent-validation stage can satisfy that claim. Proofs marked
+`requires_authentic` reject mock, fixture, synthetic, and unknown receipts, so
+fixture runs cannot satisfy real-property acceptance.
+
 ## Outcome receipt
 
 Each line of `outcomes.jsonl` is one `ecc.outcome-receipt.v1` JSON object. A
@@ -74,7 +87,7 @@ receipt advances only its named acceptance proof. Tests, commits, plans, source
 inventories, and reports are not user-visible receipts by themselves.
 
 ```json
-{"schema":"ecc.outcome-receipt.v1","receipt_id":"report-export-001","goal_id":"example-feature","acceptance_id":"report-export","stage":"export_verified","observed_at":"2026-10-01T17:10:00Z","environment":"development","commit":"0123456789abcdef0123456789abcdef01234567","evidence":[{"kind":"browser","ref":"artifacts/agent-runs/report-export/browser.png","sha256":"1111111111111111111111111111111111111111111111111111111111111111"},{"kind":"export","ref":"artifacts/agent-runs/report-export/report.pdf","sha256":"2222222222222222222222222222222222222222222222222222222222222222"}],"limitations":["Development environment only."],"source_harness":"codex","status":"accepted","outcome":"pass","supersedes":[]}
+{"schema":"ecc.outcome-receipt.v1","receipt_id":"report-export-001","goal_id":"example-feature","acceptance_id":"report-export","stage":"export_verified","result_class":"user_visible_result","authenticity":"authentic","user_visible":true,"subject_scope":"real_property","observed_at":"2026-10-01T17:10:00Z","environment":"development","commit":"0123456789abcdef0123456789abcdef01234567","evidence":[{"kind":"browser","ref":"artifacts/agent-runs/report-export/browser.png","sha256":"1111111111111111111111111111111111111111111111111111111111111111"},{"kind":"export","ref":"artifacts/agent-runs/report-export/report.pdf","sha256":"2222222222222222222222222222222222222222222222222222222222222222"}],"limitations":["Development environment only."],"source_harness":"codex","status":"accepted","outcome":"pass","supersedes":[]}
 ```
 
 Never overwrite a false or stale receipt. Append a `retracted` receipt whose
@@ -117,6 +130,11 @@ environment. Tests, CI, commits, and source inventories cannot satisfy that
 gate. Complete and on-track claims also compare the relevant receipt commit to
 the current HEAD recorded by the fresh resume receipt, so success from an older
 revision cannot silently cover newer code.
+
+Validation reopens every local evidence artifact and recomputes its SHA-256.
+Missing files, empty files, changed contents, and URI-only references fail the
+gate. Use `--evidence-root DIR` when a relative artifact is outside the current
+repository; the current resume receipt's repository roots are also searched.
 
 The write commands use same-directory atomic replacement and exclusive lock
 files. `init` is create-only unless the requested goal is byte-equivalent,
