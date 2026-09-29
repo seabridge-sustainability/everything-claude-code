@@ -25,6 +25,8 @@ For long, resumed, multi-agent, cross-repository, provider-dependent, or high-ri
 
 Parallel work is bounded with `ecc goal assign` and counted only after the parent records `ecc goal integrate`. A worker's “done” message never substitutes for parent integration evidence, a current repository fingerprint, or the product proof itself.
 
+When the owner changes direction, record it with `ecc goal correct`, then create a fresh resume receipt whose next action matches the correction. Work or delegated plans from before that correction cannot support a current progress claim.
+
 | Command | What it does |
 |---------|-------------|
 | `/plan` | Restate requirements, assess risks, write step-by-step implementation plan — **waits for your confirm before touching code** |

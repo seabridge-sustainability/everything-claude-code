@@ -344,6 +344,49 @@ test('expired delegated lease makes an on-track claim fail', () => {
   assert.match(result.reasons.join(' '), /lease.*expired/);
 });
 
+test('latest owner correction controls priority, checkpoint, and next action', () => {
+  const corrected = {
+    id: 'owner-executable-1',
+    recorded_at: '2026-09-29T14:00:00Z',
+    instruction: 'Stop expanding research and restore the visible heat result.',
+    priority: 'Restore the authentic heat UI result.',
+    checkpoint_proof_id: 'heat-browser',
+    next_action: 'Run the authentic heat browser path.',
+    source_harness: 'codex',
+    replaces: [],
+  };
+  const correctedGoal = goal({
+    current_priority: corrected.priority,
+    owner_corrections: [goal().owner_corrections[0], corrected],
+    updated_at: corrected.recorded_at,
+    forecast: { ...goal().forecast, checkpoint_proof_id: 'heat-browser', updated_at: corrected.recorded_at },
+  });
+  assert.throws(() => validateBundle({
+    goal: { ...correctedGoal, current_priority: 'Continue the old research plan.' },
+  }), /current priority does not match latest owner correction/);
+  assert.throws(() => validateBundle({
+    goal: correctedGoal,
+    resume: resume({ observed_at: '2026-09-29T14:30:00Z', next_action: 'Continue the old research plan.' }),
+  }), /resume next action does not match latest owner correction/);
+  assert.doesNotThrow(() => validateBundle({
+    goal: correctedGoal,
+    resume: resume({ observed_at: '2026-09-29T14:30:00Z', next_action: corrected.next_action }),
+  }));
+  assert.throws(() => validateBundle({
+    goal: correctedGoal,
+    assignments: [assignment()],
+    integrations: [integration({ observed_at: '2026-09-29T15:00:00Z' })],
+  }), /superseded owner plan/);
+  const stalePlan = evaluateClaim('on-track', {
+    goal: correctedGoal,
+    outcomes: [outcome('r1', 'heat-browser', 'ui_displayed')],
+    resume: resume({ observed_at: '2026-09-29T14:30:00Z', next_action: corrected.next_action }),
+    assignments: [assignment()],
+  }, { now: '2026-09-29T17:00:00Z' });
+  assert.strictEqual(stalePlan.allowed, false);
+  assert.match(stalePlan.reasons.join(' '), /superseded owner plan/);
+});
+
 test('denies blocked when one provider lane is blocked but independent product work remains', () => {
   const result = evaluateClaim('blocked', {
     goal: goal({ status: 'blocked' }),
@@ -899,6 +942,45 @@ test('real CLI assigns bounded work and requires parent integration before compl
     ], dir).status, 0);
     claim = run(CLI, ['claim', 'complete', '--json', '--now', '2026-09-29T15:30:00Z'], dir);
     assert.strictEqual(claim.status, 0, claim.stderr || claim.stdout);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('real CLI owner correction invalidates a stale plan until resume is refreshed', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-goal-correction-'));
+  try {
+    runGit(['init', '--initial-branch=development'], dir);
+    runGit(['config', 'user.email', 'goal-control@example.invalid'], dir);
+    runGit(['config', 'user.name', 'ECC Goal Test'], dir);
+    fs.writeFileSync(path.join(dir, 'README.md'), '# Correction test\n');
+    runGit(['add', 'README.md'], dir);
+    runGit(['commit', '-m', 'test: initialize correction repository'], dir);
+    const seed = path.join(dir, 'goal.yaml');
+    fs.writeFileSync(seed, yaml.dump(goal({ goal_id: 'correction-goal' }), { noRefs: true }));
+    assert.strictEqual(run(CLI, ['init', '--from', seed], dir).status, 0);
+    assert.strictEqual(run(CLI, [
+      'resume', '--repo', `backend=${dir}`, '--next-action', 'Continue the old research plan.',
+      '--receipt-id', 'correction-resume-old', '--observed-at', '2026-09-29T13:00:00Z',
+    ], dir).status, 0);
+    assert.strictEqual(run(CLI, [
+      'correct', '--correction-id', 'correction-new',
+      '--instruction', 'Restore the authentic UI result before more research.',
+      '--priority', 'Restore the authentic heat UI result.', '--proof', 'heat-browser',
+      '--next-action', 'Run the authentic heat browser path.',
+      '--started-at', '2026-09-29T14:00:00Z', '--at', '2026-09-29T18:00:00Z',
+      '--basis', 'Owner correction requires the first vertical slice.', '--hours', '4',
+      '--recorded-at', '2026-09-29T14:00:00Z',
+    ], dir).status, 0);
+    let validation = run(CLI, ['validate'], dir);
+    assert.strictEqual(validation.status, 1);
+    assert.match(validation.stderr, /resume receipt predates latest owner correction/);
+    assert.strictEqual(run(CLI, [
+      'resume', '--repo', `backend=${dir}`, '--next-action', 'Run the authentic heat browser path.',
+      '--receipt-id', 'correction-resume-new', '--observed-at', '2026-09-29T14:30:00Z',
+    ], dir).status, 0);
+    validation = run(CLI, ['validate'], dir);
+    assert.strictEqual(validation.status, 0, validation.stderr);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }

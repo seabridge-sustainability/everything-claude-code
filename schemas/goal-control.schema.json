@@ -108,6 +108,10 @@
         "id": { "$ref": "#/$defs/nonEmptyString" },
         "recorded_at": { "$ref": "#/$defs/nonEmptyString" },
         "instruction": { "$ref": "#/$defs/nonEmptyString" },
+        "priority": { "$ref": "#/$defs/nonEmptyString" },
+        "checkpoint_proof_id": { "$ref": "#/$defs/nonEmptyString" },
+        "next_action": { "$ref": "#/$defs/nonEmptyString" },
+        "source_harness": { "$ref": "#/$defs/nonEmptyString" },
         "replaces": {
           "type": "array",
           "items": { "$ref": "#/$defs/nonEmptyString" },

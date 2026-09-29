@@ -13,6 +13,7 @@ const {
   readStructuredFile,
   validateBundle,
   validateGoalSemantics,
+  latestExecutableCorrection,
 } = require('./lib/goal-control');
 const {
   appendJsonLine,
@@ -85,7 +86,7 @@ function loadBundle(args) {
 }
 
 function help() {
-  process.stdout.write(`ECC outcome control\n\nUsage:\n  ecc goal init --from FILE [--dir DIR]\n  ecc goal checkpoint --proof ID --at ISO --started-at ISO --basis TEXT --hours N [--confidence LEVEL]\n  ecc goal record --acceptance ID --stage STAGE --environment NAME --evidence KIND=FILE [options]\n    options: --result-class CLASS --authenticity CLASS --user-visible true|false --subject-scope SCOPE\n  ecc goal assign --description TEXT --acceptance ID --owner-runtime NAME --owner-agent ID --scope PATH --lease-until ISO [budgets]\n  ecc goal integrate --assignment ID --integrator ID --evidence KIND=FILE --repo ID=DIR --tool-calls N --retries N --ci-runs N --cost-usd N\n  ecc goal resume --next-action TEXT [--repo DIR ...] [--last-result TEXT] [options]\n  ecc goal handoff --next-action TEXT [resume options]\n  ecc goal validate [--goal FILE] [--outcomes FILE] [--resume FILE]\n  ecc goal status [--goal FILE] [--outcomes FILE] [--json] [--now ISO]\n  ecc goal claim <complete|blocked|on-track> [--goal FILE] [--outcomes FILE] [--resume FILE] [--json] [--now ISO]\n\nDefaults:\n  directory:    .ecc/goal\n  goal:         active-goal.yaml\n  outcomes:     outcomes.jsonl\n  assignments:  assignments.jsonl\n  integrations: integrations.jsonl\n  resume:       resume-receipt.yaml (loaded when present)\n\nWrites are local, atomic, and lock-protected. The command never calls a model, provider, CI service, or deployment API.\n`);
+  process.stdout.write(`ECC outcome control\n\nUsage:\n  ecc goal init --from FILE [--dir DIR]\n  ecc goal checkpoint --proof ID --at ISO --started-at ISO --basis TEXT --hours N [--confidence LEVEL]\n  ecc goal correct --instruction TEXT --priority TEXT --proof ID --next-action TEXT --at ISO --started-at ISO --basis TEXT --hours N\n  ecc goal record --acceptance ID --stage STAGE --environment NAME --evidence KIND=FILE [options]\n    options: --result-class CLASS --authenticity CLASS --user-visible true|false --subject-scope SCOPE\n  ecc goal assign --description TEXT --acceptance ID --owner-runtime NAME --owner-agent ID --scope PATH --lease-until ISO [budgets]\n  ecc goal integrate --assignment ID --integrator ID --evidence KIND=FILE --repo ID=DIR --tool-calls N --retries N --ci-runs N --cost-usd N\n  ecc goal resume --next-action TEXT [--repo DIR ...] [--last-result TEXT] [options]\n  ecc goal handoff --next-action TEXT [resume options]\n  ecc goal validate [--goal FILE] [--outcomes FILE] [--resume FILE]\n  ecc goal status [--goal FILE] [--outcomes FILE] [--json] [--now ISO]\n  ecc goal claim <complete|blocked|on-track> [--goal FILE] [--outcomes FILE] [--resume FILE] [--json] [--now ISO]\n\nDefaults:\n  directory:    .ecc/goal\n  goal:         active-goal.yaml\n  outcomes:     outcomes.jsonl\n  assignments:  assignments.jsonl\n  integrations: integrations.jsonl\n  resume:       resume-receipt.yaml (loaded when present)\n\nWrites are local, atomic, and lock-protected. The command never calls a model, provider, CI service, or deployment API.\n`);
 }
 
 function parseEvidence(value) {
@@ -281,6 +282,58 @@ function commandCheckpoint(args) {
   });
 }
 
+function commandCorrect(args) {
+  const paths = pathsFrom(args);
+  const required = ['--instruction', '--priority', '--proof', '--next-action', '--at', '--started-at', '--basis', '--hours'];
+  const values = Object.fromEntries(required.map(name => [name, optionValue(args, name)]));
+  if (required.some(name => values[name] === null)) {
+    throw new Error('correct requires --instruction, --priority, --proof, --next-action, --at, --started-at, --basis, and --hours');
+  }
+  return withFileLock(`${paths.goal}.lock`, () => {
+    const goal = readStructuredFile(paths.goal);
+    if (!goal.user_visible_proofs.some(item => item.id === values['--proof'])) {
+      throw new Error(`owner correction references missing proof: ${values['--proof']}`);
+    }
+    const recordedAt = optionValue(args, '--recorded-at', new Date().toISOString());
+    const priorExecutable = goal.owner_corrections
+      .filter(item => item.priority)
+      .sort((left, right) => Date.parse(left.recorded_at) - Date.parse(right.recorded_at))
+      .at(-1);
+    const correction = {
+      id: optionValue(args, '--correction-id', makeReceiptId('owner-correction', recordedAt)),
+      recorded_at: recordedAt,
+      instruction: values['--instruction'],
+      priority: values['--priority'],
+      checkpoint_proof_id: values['--proof'],
+      next_action: values['--next-action'],
+      source_harness: optionValue(args, '--source-harness', process.env.ECC_SOURCE_HARNESS || 'unknown'),
+      replaces: [...new Set([
+        ...optionValues(args, '--replaces'),
+        ...(priorExecutable ? [priorExecutable.id] : []),
+      ])],
+    };
+    goal.owner_corrections.push(correction);
+    goal.current_priority = correction.priority;
+    goal.forecast = {
+      ...goal.forecast,
+      state: optionValue(args, '--state', 'at_risk'),
+      confidence: optionValue(args, '--confidence', 'low'),
+      basis: values['--basis'],
+      likely_hours: parseNumber(values['--hours'], '--hours'),
+      next_checkpoint_at: values['--at'],
+      checkpoint_started_at: values['--started-at'],
+      checkpoint_proof_id: values['--proof'],
+      updated_at: recordedAt,
+    };
+    goal.status = optionValue(args, '--goal-status', 'active');
+    goal.updated_at = recordedAt;
+    assertDocument('goal', goal, 'active goal');
+    validateGoalSemantics(goal);
+    writeYaml(paths.goal, goal);
+    return { corrected: true, goal_id: goal.goal_id, correction, paths };
+  });
+}
+
 function commandRecord(args) {
   const paths = pathsFrom(args);
   const goal = readStructuredFile(paths.goal);
@@ -407,6 +460,10 @@ function main(args = process.argv.slice(2)) {
     process.stdout.write(`${JSON.stringify(commandCheckpoint(args), null, 2)}\n`);
     return 0;
   }
+  if (command === 'correct') {
+    process.stdout.write(`${JSON.stringify(commandCorrect(args), null, 2)}\n`);
+    return 0;
+  }
   if (command === 'record') {
     process.stdout.write(`${JSON.stringify(commandRecord(args), null, 2)}\n`);
     return 0;
@@ -456,7 +513,12 @@ function main(args = process.argv.slice(2)) {
 
   if (command === 'status') {
     const status = buildStatus(bundle.goal, bundle.outcomes, now);
-    status.parallel = buildParallelStatus(bundle.assignments, bundle.integrations, now);
+    status.parallel = buildParallelStatus(
+      bundle.assignments,
+      bundle.integrations,
+      now,
+      latestExecutableCorrection(bundle.goal),
+    );
     process.stdout.write(args.includes('--json') ? `${JSON.stringify(status, null, 2)}\n` : renderStatus(status));
     return status.complete ? 0 : 2;
   }
@@ -488,6 +550,7 @@ if (require.main === module) {
 
 module.exports = {
   commandCheckpoint,
+  commandCorrect,
   commandAssign,
   commandIntegrate,
   commandInit,

@@ -26,6 +26,10 @@
 | 5 | Parallel adversarial cases | Passed | Missing integration, worker self-integration, expired lease, budget overrun, and stale tree rejected |
 | 5 | Real CLI fan-out/fan-in | Passed | `assign` created bounded work; `complete` failed before and passed after parent `integrate` plus fresh resume |
 | 5 | Focused outcome suite | 33 passed | `node --test tests/lib/goal-control.test.js` |
+| 6 | Owner correction semantics | Passed | Priority, checkpoint, and next action must match the latest executable correction |
+| 6 | Stale-plan negative controls | Passed | Old resume receipt, old next action, and post-correction use of an old assignment rejected |
+| 6 | Real CLI correction journey | Passed | `correct` invalidated old state; a fresh matching `resume` restored validation |
+| 6 | Focused outcome suite | 35 passed | `node --test tests/lib/goal-control.test.js` |
 
 Mocked, fixture, static, and source-only checks remain labelled as such. They do
 not satisfy authentic user-facing, real-property, deployment, or independent

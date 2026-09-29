@@ -74,6 +74,7 @@ This document lists each slash command and the primary agent(s) or skills it inv
 | `ecc memory doctor` | unified-memory / `scripts/memory.js` | Audit malformed files, duplicate IDs, broken links, and symlinks |
 | `ecc goal init` | goal protocol / `scripts/goal-control.js` | Create a controlled goal from a reviewed YAML or JSON contract |
 | `ecc goal checkpoint` | goal protocol / `scripts/goal-control.js` | Refresh the promised next proof and forecast |
+| `ecc goal correct` | goal protocol / `scripts/goal-control.js` | Make the newest owner correction replace priority, checkpoint, and next action; stale plans fail validation |
 | `ecc goal record` | goal protocol / `scripts/goal-control.js` | Hash local evidence and append an outcome receipt |
 | `ecc goal assign` | goal protocol / `scripts/goal-control.js` | Issue a scoped delegated assignment with a lease and hard tool, retry, CI, and cost budgets |
 | `ecc goal integrate` | goal protocol / `scripts/goal-control.js` | Record parent-reviewed integration evidence; worker self-attestation cannot complete an assignment |

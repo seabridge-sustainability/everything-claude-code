@@ -1,8 +1,8 @@
 # State
 
-- Current phase: Phase 6 - owner-correction priority control
+- Current phase: Phase 7 - progress and budget watchdog
 - Forecast: On track for the next checkpoint; whole-project completion remains
-  unforecast until stale-plan execution is rejected after a new owner correction.
+  unforecast until activity plateaus and retry/cost/CI overruns change the tactic.
 - Last verified: 2026-09-29
 - Delivered commit: `3c4ce1278f88a9a8aeb571fdd242e4ba51c97dfc`
 - Delivered remote: `origin/main`
@@ -26,8 +26,11 @@
 - Phase 5 result: Delegated work has named ownership, acceptance proofs,
   non-overlapping scope, expiry, and hard tool/retry/CI/cost budgets. Parent
   integration is separate from worker completion and bound to current repo state.
-- Next checkpoint: The latest owner correction changes the executable priority,
-  checkpoint, and next action; a stale pre-correction plan is rejected.
+- Phase 6 result: The latest owner correction atomically replaces priority,
+  checkpoint, and next action. Old resume receipts and pre-correction delegated
+  plans cannot support current progress claims.
+- Next checkpoint: Repeated activity without new product proof, or a breached
+  retry/cost/CI budget, marks the tactic off track and requires a change.
 - Blocked lanes: None. A later approved live behavioral-eval batch is capped at
   the canonical USD 5 total default unless Alejandro supplies a lower ceiling.
 - Independent work: Offline implementation and validation continue before any

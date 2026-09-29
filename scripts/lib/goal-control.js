@@ -94,6 +94,13 @@ function parseIso(value, label) {
   return timestamp;
 }
 
+function latestExecutableCorrection(goal) {
+  return goal.owner_corrections
+    .filter(correction => correction.priority && correction.checkpoint_proof_id && correction.next_action)
+    .sort((left, right) => Date.parse(left.recorded_at) - Date.parse(right.recorded_at))
+    .at(-1) || null;
+}
+
 function validateGoalSemantics(goal) {
   ensureUniqueIds(goal.user_visible_proofs.map(proof => proof.id), 'proof');
   ensureUniqueIds(goal.lanes.map(lane => lane.id), 'lane');
@@ -122,6 +129,31 @@ function validateGoalSemantics(goal) {
   }
   for (const correction of goal.owner_corrections) {
     parseIso(correction.recorded_at, `owner correction ${correction.id}.recorded_at`);
+    const executableFields = ['priority', 'checkpoint_proof_id', 'next_action', 'source_harness'];
+    const present = executableFields.filter(field => correction[field]);
+    if (present.length && present.length !== executableFields.length) {
+      throw new Error(`owner correction ${correction.id} must define priority, checkpoint_proof_id, next_action, and source_harness together`);
+    }
+    if (correction.checkpoint_proof_id && !proofs.has(correction.checkpoint_proof_id)) {
+      throw new Error(`owner correction ${correction.id} references missing proof ${correction.checkpoint_proof_id}`);
+    }
+  }
+  const executable = goal.owner_corrections
+    .filter(correction => correction.priority)
+    .sort((left, right) => Date.parse(left.recorded_at) - Date.parse(right.recorded_at));
+  for (let index = 1; index < executable.length; index += 1) {
+    if (!executable[index].replaces.includes(executable[index - 1].id)) {
+      throw new Error(`owner correction ${executable[index].id} must replace prior executable correction ${executable[index - 1].id}`);
+    }
+  }
+  const latestCorrection = executable.at(-1);
+  if (latestCorrection) {
+    if (goal.current_priority !== latestCorrection.priority) {
+      throw new Error(`current priority does not match latest owner correction ${latestCorrection.id}`);
+    }
+    if (goal.forecast.checkpoint_proof_id !== latestCorrection.checkpoint_proof_id) {
+      throw new Error(`forecast checkpoint does not match latest owner correction ${latestCorrection.id}`);
+    }
   }
   return goal;
 }
@@ -150,6 +182,7 @@ function validateBundle({ goal, outcomes = [], resume = null, assignments = [], 
   }
   ensureUniqueIds(integrations.map(item => item.receipt_id), 'integration receipt');
   const integrationsByAssignmentAndTime = new Map();
+  const currentCorrection = latestExecutableCorrection(goal);
   for (const receipt of integrations) {
     assertDocument('integration', receipt, `integration receipt ${receipt.receipt_id || '<unknown>'}`);
     if (receipt.goal_id !== goal.goal_id) {
@@ -163,6 +196,11 @@ function validateBundle({ goal, outcomes = [], resume = null, assignments = [], 
     const observedAt = parseIso(receipt.observed_at, `integration receipt ${receipt.receipt_id}.observed_at`);
     if (observedAt < Date.parse(assignment.issued_at) || observedAt > Date.parse(assignment.lease_expires_at)) {
       throw new Error(`integration receipt ${receipt.receipt_id} falls outside assignment ${assignment.assignment_id} lease`);
+    }
+    if (currentCorrection
+        && Date.parse(assignment.issued_at) < Date.parse(currentCorrection.recorded_at)
+        && observedAt > Date.parse(currentCorrection.recorded_at)) {
+      throw new Error(`integration receipt ${receipt.receipt_id} uses assignment ${assignment.assignment_id} from a superseded owner plan`);
     }
     ensureUniqueIds(receipt.repository_fingerprints.map(item => item.repo_id), `repository fingerprint in ${receipt.receipt_id}`);
     const limits = assignment.budget;
@@ -289,11 +327,20 @@ function validateBundle({ goal, outcomes = [], resume = null, assignments = [], 
     ))) {
       throw new Error('resume primary repository_state is missing from repository_states');
     }
+    const correction = latestExecutableCorrection(goal);
+    if (correction) {
+      if (Date.parse(resume.observed_at) < Date.parse(correction.recorded_at)) {
+        throw new Error(`resume receipt predates latest owner correction ${correction.id}`);
+      }
+      if (resume.next_action !== correction.next_action) {
+        throw new Error(`resume next action does not match latest owner correction ${correction.id}`);
+      }
+    }
   }
   return { goal, outcomes, resume, assignments, integrations };
 }
 
-function buildParallelStatus(assignments = [], integrations = [], now = new Date()) {
+function buildParallelStatus(assignments = [], integrations = [], now = new Date(), correction = null) {
   const latestByAssignment = new Map();
   for (const receipt of integrations) {
     const existing = latestByAssignment.get(receipt.assignment_id);
@@ -304,12 +351,18 @@ function buildParallelStatus(assignments = [], integrations = [], now = new Date
   const items = assignments.map(assignment => {
     const integration = latestByAssignment.get(assignment.assignment_id) || null;
     const integrated = integration?.outcome === 'pass';
+    const stale = Boolean(
+      correction
+      && Date.parse(assignment.issued_at) < Date.parse(correction.recorded_at)
+      && (!integration || Date.parse(integration.observed_at) > Date.parse(correction.recorded_at)),
+    );
     return {
       assignment_id: assignment.assignment_id,
       owner_runtime: assignment.owner_runtime,
       owner_agent: assignment.owner_agent,
       lease_expires_at: assignment.lease_expires_at,
       lease_expired: !integrated && now.getTime() > Date.parse(assignment.lease_expires_at),
+      stale_owner_plan: stale,
       integrated,
       integration_receipt_id: integration?.receipt_id || null,
       integration_outcome: integration?.outcome || null,
@@ -322,6 +375,7 @@ function buildParallelStatus(assignments = [], integrations = [], now = new Date
     integrated: items.filter(item => item.integrated).length,
     pending: items.filter(item => !item.integrated).length,
     expired: items.filter(item => item.lease_expired).length,
+    stale: items.filter(item => item.stale_owner_plan).length,
   };
 }
 
@@ -400,6 +454,7 @@ function buildStatus(goal, outcomes = [], now = new Date()) {
       checkpoint_overdue: checkpointOverdue,
       checkpoint_receipt_in_window: checkpointReceiptInWindow,
     },
+    owner_correction: latestExecutableCorrection(goal),
   };
 }
 
@@ -408,7 +463,7 @@ function evaluateClaim(claim, bundle, options = {}) {
   if (!Number.isFinite(now.getTime())) throw new Error('claim evaluation time must be valid');
   const { goal, outcomes, resume, assignments, integrations } = validateBundle(bundle);
   const status = buildStatus(goal, outcomes, now);
-  status.parallel = buildParallelStatus(assignments, integrations, now);
+  status.parallel = buildParallelStatus(assignments, integrations, now, latestExecutableCorrection(goal));
   const unmet = status.proofs.filter(proof => proof.required && !proof.met);
   const laneById = new Map(goal.lanes.map(lane => [lane.id, lane]));
   const resumeRepositories = new Map(
@@ -520,6 +575,7 @@ function evaluateClaim(claim, bundle, options = {}) {
     }
     if (forecast.checkpoint_overdue) reasons.push(`forecast checkpoint ${forecast.checkpoint_proof_id} is overdue and unmet`);
     if (status.parallel.expired) reasons.push(`${status.parallel.expired} delegated assignment lease(s) expired without integration`);
+    if (status.parallel.stale) reasons.push(`${status.parallel.stale} delegated assignment(s) belong to a superseded owner plan`);
   } else {
     throw new Error(`unsupported claim: ${claim}`);
   }
@@ -538,6 +594,7 @@ module.exports = {
   buildParallelStatus,
   evaluateClaim,
   formatErrors,
+  latestExecutableCorrection,
   readJsonLines,
   readStructuredFile,
   validateBundle,
