@@ -60,6 +60,21 @@ function runExistingHook(scriptName, stdinData) {
   }
 }
 
+function runGoalRuntime(runtime, phase, stdinData) {
+  const scriptPath = path.join(getPluginRoot(), 'scripts', 'hooks', 'goal-runtime-gate.js');
+  try {
+    execFileSync('node', [scriptPath, runtime, phase], {
+      input: typeof stdinData === 'string' ? stdinData : JSON.stringify(stdinData),
+      stdio: ['pipe', 'pipe', 'pipe'],
+      timeout: 30000,
+      cwd: process.cwd(),
+    });
+  } catch (error) {
+    if (error.stderr) process.stderr.write(String(error.stderr));
+    process.exit(2);
+  }
+}
+
 function hookEnabled(hookId, allowedProfiles = ['standard', 'strict']) {
   const rawProfile = String(process.env.ECC_HOOK_PROFILE || 'standard').toLowerCase();
   const profile = ['minimal', 'standard', 'strict'].includes(rawProfile) ? rawProfile : 'standard';
@@ -78,4 +93,4 @@ function hookEnabled(hookId, allowedProfiles = ['standard', 'strict']) {
   return allowedProfiles.includes(profile);
 }
 
-module.exports = { readStdin, getPluginRoot, transformToClaude, runExistingHook, hookEnabled };
+module.exports = { readStdin, getPluginRoot, transformToClaude, runExistingHook, runGoalRuntime, hookEnabled };

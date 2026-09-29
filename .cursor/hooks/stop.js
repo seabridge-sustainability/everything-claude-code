@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-const { readStdin, runExistingHook, transformToClaude, hookEnabled } = require('./adapter');
+const { readStdin, runExistingHook, runGoalRuntime, transformToClaude, hookEnabled } = require('./adapter');
 readStdin().then(raw => {
   const input = JSON.parse(raw || '{}');
   const claudeInput = transformToClaude(input);
@@ -16,6 +16,8 @@ readStdin().then(raw => {
   if (hookEnabled('stop:cost-tracker', ['minimal', 'standard', 'strict'])) {
     runExistingHook('cost-tracker.js', claudeInput);
   }
+
+  runGoalRuntime('cursor', 'final', raw);
 
   process.stdout.write(raw);
 }).catch(() => process.exit(0));

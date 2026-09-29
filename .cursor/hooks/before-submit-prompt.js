@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-const { readStdin } = require('./adapter');
+const { readStdin, runGoalRuntime } = require('./adapter');
 readStdin().then(raw => {
   try {
     const input = JSON.parse(raw);
@@ -19,5 +19,6 @@ readStdin().then(raw => {
       }
     }
   } catch {}
+  runGoalRuntime('cursor', 'admit', raw);
   process.stdout.write(raw);
 }).catch(() => process.exit(0));

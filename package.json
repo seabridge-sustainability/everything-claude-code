@@ -121,6 +121,7 @@
     "scripts/ecc.js",
     "scripts/feedback.js",
     "scripts/goal-control.js",
+    "scripts/goal-runtime-bridge.js",
     "scripts/memory.js",
     "scripts/memory-mcp.mjs",
     "scripts/gemini-adapt-agents.js",

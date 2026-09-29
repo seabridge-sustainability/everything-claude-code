@@ -21,6 +21,8 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 
 ## Core Workflow
 
+For long, resumed, multi-agent, cross-repository, provider-dependent, or high-risk work, run `ecc goal-runtime admit --runtime <runtime> --mode controlled` before implementation. Before claiming complete, blocked, or on track, run `ecc goal-runtime final --runtime <runtime> --claim <complete|blocked|on-track>`. The runtime and model name are telemetry only; all agents use the same evidence gate.
+
 | Command | What it does |
 |---------|-------------|
 | `/plan` | Restate requirements, assess risks, write step-by-step implementation plan — **waits for your confirm before touching code** |

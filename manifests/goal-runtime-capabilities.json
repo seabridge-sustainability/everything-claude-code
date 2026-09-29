@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "canonical_engine": "scripts/goal-control.js",
+  "model_policy": "Model identity is telemetry only and cannot change admission, evidence, budget, or claim decisions.",
+  "runtimes": [
+    { "id": "codex", "tier": "hybrid", "admission": "wrapper", "final_claim": "wrapper", "native_events": ["SessionStart"], "instruction_entry": "AGENTS.md", "evidence": ["hooks/codex-hooks.json"] },
+    { "id": "claude", "tier": "native", "admission": "native", "final_claim": "native", "native_events": ["UserPromptSubmit", "Stop"], "instruction_entry": "CLAUDE.md", "evidence": ["hooks/hooks.json"] },
+    { "id": "gemini", "tier": "wrapper", "admission": "wrapper", "final_claim": "wrapper", "native_events": [], "instruction_entry": "GEMINI.md", "evidence": [".gemini/settings.json"] },
+    { "id": "opencode", "tier": "hybrid", "admission": "wrapper", "final_claim": "wrapper", "native_events": ["session.created", "session.idle"], "instruction_entry": "AGENTS.md", "evidence": [".opencode/plugins/ecc-hooks.ts"] },
+    { "id": "copilot", "tier": "instruction", "admission": "instruction", "final_claim": "instruction", "native_events": [], "instruction_entry": ".github/copilot-instructions.md", "evidence": [".github/copilot-instructions.md"] },
+    { "id": "cursor", "tier": "native", "admission": "native", "final_claim": "native", "native_events": ["beforeSubmitPrompt", "stop"], "instruction_entry": "AGENTS.md", "evidence": [".cursor/hooks.json", ".cursor/hooks/before-submit-prompt.js", ".cursor/hooks/stop.js"] },
+    { "id": "qwen", "tier": "wrapper", "admission": "wrapper", "final_claim": "wrapper", "native_events": [], "instruction_entry": "AGENTS.md", "evidence": ["manifests/instruction-adapters.json"] },
+    { "id": "antigravity", "tier": "wrapper", "admission": "wrapper", "final_claim": "wrapper", "native_events": [], "instruction_entry": ".agents/rules/seabridge-agent-baseline.md", "evidence": ["manifests/instruction-adapters.json"] },
+    { "id": "kiro", "tier": "wrapper", "admission": "wrapper", "final_claim": "wrapper", "native_events": [], "instruction_entry": "AGENTS.md", "evidence": ["manifests/instruction-adapters.json"] },
+    { "id": "cline", "tier": "wrapper", "admission": "wrapper", "final_claim": "wrapper", "native_events": [], "instruction_entry": ".clinerules", "evidence": ["manifests/instruction-adapters.json"] },
+    { "id": "windsurf", "tier": "wrapper", "admission": "wrapper", "final_claim": "wrapper", "native_events": [], "instruction_entry": "AGENTS.md", "evidence": ["manifests/instruction-adapters.json"] },
+    { "id": "hermes", "tier": "wrapper", "admission": "wrapper", "final_claim": "wrapper", "native_events": [], "instruction_entry": "AGENTS.md", "evidence": ["manifests/instruction-adapters.json"] },
+    { "id": "kimi", "tier": "wrapper", "admission": "wrapper", "final_claim": "wrapper", "native_events": [], "instruction_entry": "AGENTS.md", "evidence": ["manifests/instruction-adapters.json"] },
+    { "id": "openclaw", "tier": "wrapper", "admission": "wrapper", "final_claim": "wrapper", "native_events": [], "instruction_entry": "AGENTS.md", "evidence": ["manifests/instruction-adapters.json"] },
+    { "id": "adal", "tier": "wrapper", "admission": "wrapper", "final_claim": "wrapper", "native_events": [], "instruction_entry": "AGENTS.md", "evidence": ["manifests/instruction-adapters.json"] },
+    { "id": "joycode", "tier": "wrapper", "admission": "wrapper", "final_claim": "wrapper", "native_events": [], "instruction_entry": "AGENTS.md", "evidence": ["manifests/instruction-adapters.json"] },
+    { "id": "codebuddy", "tier": "wrapper", "admission": "wrapper", "final_claim": "wrapper", "native_events": [], "instruction_entry": "AGENTS.md", "evidence": ["manifests/instruction-adapters.json"] },
+    { "id": "zed", "tier": "wrapper", "admission": "wrapper", "final_claim": "wrapper", "native_events": [], "instruction_entry": "AGENTS.md", "evidence": ["manifests/instruction-adapters.json"] }
+  ],
+  "model_families": [
+    { "id": "gpt", "policy": "inherited_from_runtime" },
+    { "id": "claude", "policy": "inherited_from_runtime" },
+    { "id": "gemini", "policy": "inherited_from_runtime" },
+    { "id": "glm", "policy": "inherited_from_runtime" },
+    { "id": "deepseek", "policy": "inherited_from_runtime" },
+    { "id": "nemotron", "policy": "inherited_from_runtime" },
+    { "id": "fable", "policy": "inherited_from_runtime" }
+  ],
+  "last_verified_at": "2026-09-29"
+}

@@ -51,6 +51,10 @@ const COMMANDS = {
     script: 'goal-control.js',
     description: 'Validate outcome evidence and completion, blocker, or forecast claims',
   },
+  'goal-runtime': {
+    script: 'goal-runtime-bridge.js',
+    description: 'Apply the same outcome gate across coding-agent runtimes and models',
+  },
   'install-plan': {
     script: 'install-plan.js',
     description: 'Alias for plan',
@@ -121,6 +125,7 @@ const PRIMARY_COMMANDS = [
   'nasiko',
   'memory',
   'goal',
+  'goal-runtime',
   'list-installed',
   'doctor',
   'feedback',
@@ -187,6 +192,8 @@ Examples:
   ecc memory search "migration blockers" --target-harness hermes
   ecc goal validate --goal .ecc/goal/active-goal.yaml --outcomes .ecc/goal/outcomes.jsonl
   ecc goal claim blocked --resume .ecc/goal/resume-receipt.yaml
+  ecc goal-runtime admit --runtime codex --mode controlled
+  ecc goal-runtime final --runtime claude --claim complete
   ecc list-installed --json
   ecc doctor --target cursor
   ecc feedback

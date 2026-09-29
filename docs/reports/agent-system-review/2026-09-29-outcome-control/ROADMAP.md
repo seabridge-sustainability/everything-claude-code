@@ -6,8 +6,8 @@
 | 1 | Writable engine | Atomic init/resume/checkpoint/record/handoff | Authentic CLI journey | Complete |
 | 2 | Evidence trust | Content and semantic verifier registry | Artifact mutation tests | Complete |
 | 3 | Exact state binding | Multi-repo and dirty-tree fingerprints | Mismatch tests | Complete |
-| 4 | Runtime enforcement | Capability registry and bridges | Fresh runtime admission tests | Active |
-| 5 | Parallel control | Assignment and integration receipts | Fan-out/fan-in adversarial tests | Pending |
+| 4 | Runtime enforcement | Capability registry and bridges | Fresh runtime admission tests | Complete |
+| 5 | Parallel control | Assignment and integration receipts | Fan-out/fan-in adversarial tests | Active |
 | 6 | Owner corrections | Executable priority supersession | Stale-plan rejection | Pending |
 | 7 | Progress watchdog | Proof-velocity and budget stop rules | Plateau simulation | Pending |
 | 8 | Proof profiles | Risk-scaled task profiles | Profile negative controls | Pending |
