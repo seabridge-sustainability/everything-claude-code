@@ -20,6 +20,15 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 8. **Behavioral-eval cost ceiling:** live model evals still require explicit current-session approval and the harness approval gate. If that approval names the eval batch but omits a number, use a maximum total ceiling of USD 5 for one batch (never per call), keep the hard nine-call limit, and require the soft-budget acknowledgement for harnesses without provider-enforced caps. A lower user-supplied ceiling wins. Never treat missing cost telemetry as proof of zero cost, and never start a second batch without new approval.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
+## Mandatory Actions Cost Control
+
+One integration owner coordinates all sessions per repository. Keep local
+commits reviewable and publish one completed batch per milestone, not a push
+per agent or progress update. Diagnose a failed CI batch locally before one
+corrective batch. At 90% Actions budget usage, exhaustion, or unknown budget
+status, continue locally until Alejandro approves a named release batch with
+its workflow cost exposure. Never raise or remove the hard spending stop.
+
 <!-- SEABRIDGE_GOAL_PROTOCOL_START -->
 ## Goal Protocol Default
 

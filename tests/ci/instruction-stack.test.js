@@ -128,6 +128,16 @@ test('canonical safety rule supports bounded approval and controls Actions cost'
   assert.match(canonical, /hard nine-call limit/);
 });
 
+test('every ECC runtime receives the Actions batch and budget rules', () => {
+  const root = path.resolve(__dirname, '..', '..');
+  for (const stack of lib.effectiveStacks(root)) {
+    assert.match(stack.text, /one integration owner/i, `${stack.harness}: integration owner`);
+    assert.match(stack.text, /90%/i, `${stack.harness}: budget threshold`);
+    assert.match(stack.text, /release batch|completed batch/i, `${stack.harness}: batch`);
+    assert.match(stack.text, /hard spending stop|hard budget/i, `${stack.harness}: spending stop`);
+  }
+});
+
 test('workflow text does not reintroduce a second approval gate', () => {
   const agents = fs.readFileSync(path.resolve(__dirname, '..', '..', 'AGENTS.md'), 'utf8');
   const worktree = fs.readFileSync(

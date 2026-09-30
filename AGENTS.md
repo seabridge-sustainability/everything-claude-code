@@ -36,6 +36,29 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 8. **Behavioral-eval cost ceiling:** live model evals still require explicit current-session approval and the harness approval gate. If that approval names the eval batch but omits a number, use a maximum total ceiling of USD 5 for one batch (never per call), keep the hard nine-call limit, and require the soft-budget acknowledgement for harnesses without provider-enforced caps. A lower user-supplied ceiling wins. Never treat missing cost telemetry as proof of zero cost, and never start a second batch without new approval.
 <!-- SEABRIDGE_SAFETY_RULE_END -->
 
+## GitHub Actions Budget Tripwire
+
+When the organization Actions budget is exhausted, at or above 90%, or cannot
+be verified, continue independent work locally but do not push to a branch that
+triggers hosted Actions, dispatch or rerun a workflow, or deploy. A prior general
+"keep working" or commit/push approval does not waive this cost tripwire. Only
+Alejandro's current-session approval for a named release batch, with the
+expected workflows and cost exposure made explicit, can resume those actions;
+never increase or remove the GitHub hard budget to make a push possible.
+
+For normal operation, one integration owner coordinates all active sessions per
+repository. An individual agent's "one final push" is not a separate allowance.
+Commit task-owned work locally as authorized, keep commits reviewable, run
+focused checks there, and keep intermediate reports and receipts local. Collect
+ready work into one release batch per milestone after checking the current
+Actions budget and queued/running workflows. Local completion and CI or deployed
+acceptance are reported separately.
+Do not use pushes as an iteration or CI-debugging loop. A failing batch permits
+at most one locally verified corrective batch under the same approval only if
+its cost exposure was included; otherwise stop at the cost boundary and report
+the remaining work. Subagents never push. Keep local, CI, and deployed evidence
+distinct; do not skip required checks merely to suppress charges.
+
 <!-- SEABRIDGE_GOAL_PROTOCOL_START -->
 ## Goal Protocol Default
 
