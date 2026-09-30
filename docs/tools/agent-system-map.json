@@ -1,0 +1,1321 @@
+{
+  "schema": "seabridge.agent-system-map.v1",
+  "scope": "ECC agent instructions, runtime adapters, outcome control, evaluation, and CI; no product or tenant data",
+  "extractor": "scripts/agent-system-map.js (deterministic, no LLM)",
+  "sourceFingerprint": "f1f90955b7cfee2916463f6b36e490f6154ffcc52d4a311c4ea0b174a1486bde",
+  "sources": [
+    {
+      "path": ".agents/rules/seabridge-agent-baseline.md",
+      "sha256": "3be5def8513b25134b1291073c76348ad9f58b3393033fc0e0802c628c25502d"
+    },
+    {
+      "path": ".clinerules",
+      "sha256": "bb3092c1566eb218b1df36948fee930a1e3f118d85cc309a0f9f243debf9efd4"
+    },
+    {
+      "path": ".cursor/hooks.json",
+      "sha256": "73a3f8dac5037208ff94abcfc4d893bac8261363df22bf77c1476fce2453aa48"
+    },
+    {
+      "path": ".cursor/hooks/before-submit-prompt.js",
+      "sha256": "922bef0d9855d77314aef10cec4816ab1485f5bed3ff4ffa33372db66df038c4"
+    },
+    {
+      "path": ".cursor/hooks/stop.js",
+      "sha256": "89ab34070c01f9afeb7d764520fd13a1cd1dbd02d1c8446c129fba80ee6d7fe9"
+    },
+    {
+      "path": ".cursor/rules/common-agents.md",
+      "sha256": "b46ffb936389edf9bbb17783b04917ea56be711518fe94d2424339af5da252c4"
+    },
+    {
+      "path": ".gemini/settings.json",
+      "sha256": "7f2a02e5d1999309cbfc836b7e9f0e1b4ea0b387625ff95a0c3fe53e52ab2553"
+    },
+    {
+      "path": ".github/copilot-instructions.md",
+      "sha256": "67dee1c05b021bc93d66904e0c1b76ed60c93b79b891dbe20880846003846be9"
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "sha256": "e2df5b1af7076ae31a9f98fd8fab3dbd6be2bc3221f27513a053c7ffaa62ddc6"
+    },
+    {
+      "path": ".github/workflows/harness.yml",
+      "sha256": "a15aa5aec922f10676e5648982338bebad8b7907c41d085181a1a65746cb2065"
+    },
+    {
+      "path": ".opencode/plugins/ecc-hooks.ts",
+      "sha256": "01ba90da81fe4c89dbd4205225a659092567003f835dcd370fb6a290e0fe555b"
+    },
+    {
+      "path": "AGENTS.md",
+      "sha256": "0609c38308ff47aa9e282b79b5949f7a90ce1bbc024108cfad6de3b9cdc0fcb0"
+    },
+    {
+      "path": "CLAUDE.md",
+      "sha256": "796f0ca83ba8018132cea2705cbec33e129aa1fe7e3e8c177099e733b395a686"
+    },
+    {
+      "path": "CODEX.md",
+      "sha256": "656ab37237e8877b6216c43b22d007a76f739f70c606c7141980c8e5c021a2b1"
+    },
+    {
+      "path": "GEMINI.md",
+      "sha256": "06bfa4f81b786120f5674c63bbc9936fb3b705c4612fc552b5c45b5c72da0925"
+    },
+    {
+      "path": "OPENCODE.md",
+      "sha256": "7ffc45c369a3cca7aab6bfa9031d30bea89feb1c890c94741708a9b1002ae0ae"
+    },
+    {
+      "path": "hooks/codex-hooks.json",
+      "sha256": "57edf21eb83d9c8144cfdc19f621700a854b6fd4abc4c368ddaeb5c74488b43c"
+    },
+    {
+      "path": "hooks/hooks.json",
+      "sha256": "f3d9ea7173200ab076f68184f8773ff9d1d389709b7ee29307affb62a094fbd7"
+    },
+    {
+      "path": "manifests/goal-proof-profiles.json",
+      "sha256": "af2d25840a53f745fcb95878aee1deda25609186a3039529a841d78bf63e25f7"
+    },
+    {
+      "path": "manifests/goal-runtime-capabilities.json",
+      "sha256": "8770791730ddca7e7c89a4065edb2d095685df96a38b9a06aad4fcfc696736be"
+    },
+    {
+      "path": "manifests/instruction-adapters.json",
+      "sha256": "9426fac48f4e39d4a9ad7af84dbc4725257d29ce9a8ad3cee1db0fe94d5b8041"
+    },
+    {
+      "path": "protocols/GOAL_PROTOCOL.md",
+      "sha256": "638fb19839de1e513d6323d881fb25b845e51fe5ce4b9084ab9c169df70382bf"
+    },
+    {
+      "path": "protocols/GOAL_PROTOCOL_SHORT.md",
+      "sha256": "6e4644023644f2584d0e1eded457f30cf5063fff3d0325bc25dcc481da31973d"
+    },
+    {
+      "path": "protocols/SAFETY_AUTHORIZATION_RULE.md",
+      "sha256": "18faf8ce860f4555ddfe822a3f9f6d5437549043862288a4fb66b0674333a9bc"
+    },
+    {
+      "path": "scripts/agent-behavior-report.js",
+      "sha256": "3d4771c19519db89902822e9b8964194a15dc367f61070764296a3fd880eb3cf"
+    },
+    {
+      "path": "scripts/agent-system-map.js",
+      "sha256": "f3a26195cffe123955509aa386936ea23a90b4c0c577198c31ed4f711a2dcb49"
+    },
+    {
+      "path": "scripts/check-instruction-stack.js",
+      "sha256": "f9a0afc5ed99e3167458b24a971cfa17a40be98994de9bd7b7cfb4bd5245f257"
+    },
+    {
+      "path": "scripts/eval-goal-runtime-offline.js",
+      "sha256": "bd1a0e4dae82e12fb755f5081a0b3f32e0e90114d5d54ed4f5232ad26f906dbb"
+    },
+    {
+      "path": "scripts/goal-control.js",
+      "sha256": "3d6e238c3b5b2932014dde576b0635f9d7877c1c932df3071732281ca6e1bb12"
+    },
+    {
+      "path": "scripts/goal-runtime-bridge.js",
+      "sha256": "93a93c15617276b4b3a064a53bbf8a1a308440526c5a5ec9799987b2ede42130"
+    },
+    {
+      "path": "scripts/knowledge-freshness.js",
+      "sha256": "26d2fa61ab786ea0d046504f3efbf39a7f1ca42c61170773664ad68f39997915"
+    },
+    {
+      "path": "scripts/knowledge-query.js",
+      "sha256": "40c2986a5d283841bfa733563fe2a797e5606789570d4863cfe99b332e8796d3"
+    },
+    {
+      "path": "tests/ci/instruction-stack.test.js",
+      "sha256": "226e6d27610fedba5de8a0f99c509c0d87d866318fdcca7ba4341d766fc594b8"
+    },
+    {
+      "path": "tests/lib/goal-control.test.js",
+      "sha256": "c43b84829844add9d29fc046872394ec5921f7df20abb93007080de90bf2cbe3"
+    },
+    {
+      "path": "tests/scripts/knowledge-freshness.test.js",
+      "sha256": "8bbeef823bab5ef5dd9c56a113444ce4ed65d468143731657f5edd6eaac0a2a2"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "file:.agents/rules/seabridge-agent-baseline.md",
+      "type": "source",
+      "path": ".agents/rules/seabridge-agent-baseline.md",
+      "sha256": "3be5def8513b25134b1291073c76348ad9f58b3393033fc0e0802c628c25502d"
+    },
+    {
+      "id": "file:.clinerules",
+      "type": "source",
+      "path": ".clinerules",
+      "sha256": "bb3092c1566eb218b1df36948fee930a1e3f118d85cc309a0f9f243debf9efd4"
+    },
+    {
+      "id": "file:.cursor/hooks.json",
+      "type": "source",
+      "path": ".cursor/hooks.json",
+      "sha256": "73a3f8dac5037208ff94abcfc4d893bac8261363df22bf77c1476fce2453aa48"
+    },
+    {
+      "id": "file:.cursor/hooks/before-submit-prompt.js",
+      "type": "source",
+      "path": ".cursor/hooks/before-submit-prompt.js",
+      "sha256": "922bef0d9855d77314aef10cec4816ab1485f5bed3ff4ffa33372db66df038c4"
+    },
+    {
+      "id": "file:.cursor/hooks/stop.js",
+      "type": "source",
+      "path": ".cursor/hooks/stop.js",
+      "sha256": "89ab34070c01f9afeb7d764520fd13a1cd1dbd02d1c8446c129fba80ee6d7fe9"
+    },
+    {
+      "id": "file:.cursor/rules/common-agents.md",
+      "type": "source",
+      "path": ".cursor/rules/common-agents.md",
+      "sha256": "b46ffb936389edf9bbb17783b04917ea56be711518fe94d2424339af5da252c4"
+    },
+    {
+      "id": "file:.gemini/settings.json",
+      "type": "source",
+      "path": ".gemini/settings.json",
+      "sha256": "7f2a02e5d1999309cbfc836b7e9f0e1b4ea0b387625ff95a0c3fe53e52ab2553"
+    },
+    {
+      "id": "file:.github/copilot-instructions.md",
+      "type": "source",
+      "path": ".github/copilot-instructions.md",
+      "sha256": "67dee1c05b021bc93d66904e0c1b76ed60c93b79b891dbe20880846003846be9"
+    },
+    {
+      "id": "file:.github/workflows/ci.yml",
+      "type": "source",
+      "path": ".github/workflows/ci.yml",
+      "sha256": "e2df5b1af7076ae31a9f98fd8fab3dbd6be2bc3221f27513a053c7ffaa62ddc6"
+    },
+    {
+      "id": "file:.github/workflows/harness.yml",
+      "type": "source",
+      "path": ".github/workflows/harness.yml",
+      "sha256": "a15aa5aec922f10676e5648982338bebad8b7907c41d085181a1a65746cb2065"
+    },
+    {
+      "id": "file:.opencode/plugins/ecc-hooks.ts",
+      "type": "source",
+      "path": ".opencode/plugins/ecc-hooks.ts",
+      "sha256": "01ba90da81fe4c89dbd4205225a659092567003f835dcd370fb6a290e0fe555b"
+    },
+    {
+      "id": "file:AGENTS.md",
+      "type": "source",
+      "path": "AGENTS.md",
+      "sha256": "0609c38308ff47aa9e282b79b5949f7a90ce1bbc024108cfad6de3b9cdc0fcb0"
+    },
+    {
+      "id": "file:CLAUDE.md",
+      "type": "source",
+      "path": "CLAUDE.md",
+      "sha256": "796f0ca83ba8018132cea2705cbec33e129aa1fe7e3e8c177099e733b395a686"
+    },
+    {
+      "id": "file:CODEX.md",
+      "type": "source",
+      "path": "CODEX.md",
+      "sha256": "656ab37237e8877b6216c43b22d007a76f739f70c606c7141980c8e5c021a2b1"
+    },
+    {
+      "id": "file:GEMINI.md",
+      "type": "source",
+      "path": "GEMINI.md",
+      "sha256": "06bfa4f81b786120f5674c63bbc9936fb3b705c4612fc552b5c45b5c72da0925"
+    },
+    {
+      "id": "file:hooks/codex-hooks.json",
+      "type": "source",
+      "path": "hooks/codex-hooks.json",
+      "sha256": "57edf21eb83d9c8144cfdc19f621700a854b6fd4abc4c368ddaeb5c74488b43c"
+    },
+    {
+      "id": "file:hooks/hooks.json",
+      "type": "source",
+      "path": "hooks/hooks.json",
+      "sha256": "f3d9ea7173200ab076f68184f8773ff9d1d389709b7ee29307affb62a094fbd7"
+    },
+    {
+      "id": "file:manifests/goal-proof-profiles.json",
+      "type": "source",
+      "path": "manifests/goal-proof-profiles.json",
+      "sha256": "af2d25840a53f745fcb95878aee1deda25609186a3039529a841d78bf63e25f7"
+    },
+    {
+      "id": "file:manifests/goal-runtime-capabilities.json",
+      "type": "source",
+      "path": "manifests/goal-runtime-capabilities.json",
+      "sha256": "8770791730ddca7e7c89a4065edb2d095685df96a38b9a06aad4fcfc696736be"
+    },
+    {
+      "id": "file:manifests/instruction-adapters.json",
+      "type": "source",
+      "path": "manifests/instruction-adapters.json",
+      "sha256": "9426fac48f4e39d4a9ad7af84dbc4725257d29ce9a8ad3cee1db0fe94d5b8041"
+    },
+    {
+      "id": "file:OPENCODE.md",
+      "type": "source",
+      "path": "OPENCODE.md",
+      "sha256": "7ffc45c369a3cca7aab6bfa9031d30bea89feb1c890c94741708a9b1002ae0ae"
+    },
+    {
+      "id": "file:protocols/GOAL_PROTOCOL_SHORT.md",
+      "type": "source",
+      "path": "protocols/GOAL_PROTOCOL_SHORT.md",
+      "sha256": "6e4644023644f2584d0e1eded457f30cf5063fff3d0325bc25dcc481da31973d"
+    },
+    {
+      "id": "file:protocols/GOAL_PROTOCOL.md",
+      "type": "source",
+      "path": "protocols/GOAL_PROTOCOL.md",
+      "sha256": "638fb19839de1e513d6323d881fb25b845e51fe5ce4b9084ab9c169df70382bf"
+    },
+    {
+      "id": "file:protocols/SAFETY_AUTHORIZATION_RULE.md",
+      "type": "source",
+      "path": "protocols/SAFETY_AUTHORIZATION_RULE.md",
+      "sha256": "18faf8ce860f4555ddfe822a3f9f6d5437549043862288a4fb66b0674333a9bc"
+    },
+    {
+      "id": "file:scripts/agent-behavior-report.js",
+      "type": "source",
+      "path": "scripts/agent-behavior-report.js",
+      "sha256": "3d4771c19519db89902822e9b8964194a15dc367f61070764296a3fd880eb3cf"
+    },
+    {
+      "id": "file:scripts/agent-system-map.js",
+      "type": "source",
+      "path": "scripts/agent-system-map.js",
+      "sha256": "f3a26195cffe123955509aa386936ea23a90b4c0c577198c31ed4f711a2dcb49"
+    },
+    {
+      "id": "file:scripts/check-instruction-stack.js",
+      "type": "source",
+      "path": "scripts/check-instruction-stack.js",
+      "sha256": "f9a0afc5ed99e3167458b24a971cfa17a40be98994de9bd7b7cfb4bd5245f257"
+    },
+    {
+      "id": "file:scripts/eval-goal-runtime-offline.js",
+      "type": "source",
+      "path": "scripts/eval-goal-runtime-offline.js",
+      "sha256": "bd1a0e4dae82e12fb755f5081a0b3f32e0e90114d5d54ed4f5232ad26f906dbb"
+    },
+    {
+      "id": "file:scripts/goal-control.js",
+      "type": "source",
+      "path": "scripts/goal-control.js",
+      "sha256": "3d6e238c3b5b2932014dde576b0635f9d7877c1c932df3071732281ca6e1bb12"
+    },
+    {
+      "id": "file:scripts/goal-runtime-bridge.js",
+      "type": "source",
+      "path": "scripts/goal-runtime-bridge.js",
+      "sha256": "93a93c15617276b4b3a064a53bbf8a1a308440526c5a5ec9799987b2ede42130"
+    },
+    {
+      "id": "file:scripts/knowledge-freshness.js",
+      "type": "source",
+      "path": "scripts/knowledge-freshness.js",
+      "sha256": "26d2fa61ab786ea0d046504f3efbf39a7f1ca42c61170773664ad68f39997915"
+    },
+    {
+      "id": "file:scripts/knowledge-query.js",
+      "type": "source",
+      "path": "scripts/knowledge-query.js",
+      "sha256": "40c2986a5d283841bfa733563fe2a797e5606789570d4863cfe99b332e8796d3"
+    },
+    {
+      "id": "file:tests/ci/instruction-stack.test.js",
+      "type": "source",
+      "path": "tests/ci/instruction-stack.test.js",
+      "sha256": "226e6d27610fedba5de8a0f99c509c0d87d866318fdcca7ba4341d766fc594b8"
+    },
+    {
+      "id": "file:tests/lib/goal-control.test.js",
+      "type": "source",
+      "path": "tests/lib/goal-control.test.js",
+      "sha256": "c43b84829844add9d29fc046872394ec5921f7df20abb93007080de90bf2cbe3"
+    },
+    {
+      "id": "file:tests/scripts/knowledge-freshness.test.js",
+      "type": "source",
+      "path": "tests/scripts/knowledge-freshness.test.js",
+      "sha256": "8bbeef823bab5ef5dd9c56a113444ce4ed65d468143731657f5edd6eaac0a2a2"
+    },
+    {
+      "id": "runtime:adal",
+      "type": "runtime",
+      "mode": "canonical"
+    },
+    {
+      "id": "runtime:antigravity",
+      "type": "runtime",
+      "mode": "embedded"
+    },
+    {
+      "id": "runtime:claude",
+      "type": "runtime",
+      "mode": "import"
+    },
+    {
+      "id": "runtime:cline",
+      "type": "runtime",
+      "mode": "embedded"
+    },
+    {
+      "id": "runtime:codebuddy",
+      "type": "runtime",
+      "mode": "canonical"
+    },
+    {
+      "id": "runtime:codex",
+      "type": "runtime",
+      "mode": "canonical"
+    },
+    {
+      "id": "runtime:copilot",
+      "type": "runtime",
+      "mode": "embedded"
+    },
+    {
+      "id": "runtime:cursor",
+      "type": "runtime",
+      "mode": "canonical"
+    },
+    {
+      "id": "runtime:gemini",
+      "type": "runtime",
+      "mode": "import"
+    },
+    {
+      "id": "runtime:hermes",
+      "type": "runtime",
+      "mode": "canonical"
+    },
+    {
+      "id": "runtime:joycode",
+      "type": "runtime",
+      "mode": "canonical"
+    },
+    {
+      "id": "runtime:kimi",
+      "type": "runtime",
+      "mode": "canonical"
+    },
+    {
+      "id": "runtime:kiro",
+      "type": "runtime",
+      "mode": "canonical"
+    },
+    {
+      "id": "runtime:openclaw",
+      "type": "runtime",
+      "mode": "canonical"
+    },
+    {
+      "id": "runtime:opencode",
+      "type": "runtime",
+      "mode": "canonical"
+    },
+    {
+      "id": "runtime:qwen",
+      "type": "runtime",
+      "mode": "canonical"
+    },
+    {
+      "id": "runtime:windsurf",
+      "type": "runtime",
+      "mode": "canonical"
+    },
+    {
+      "id": "runtime:zed",
+      "type": "runtime",
+      "mode": "canonical"
+    }
+  ],
+  "edges": [
+    {
+      "from": "file:.cursor/hooks.json",
+      "to": "file:.cursor/hooks/before-submit-prompt.js",
+      "type": "mentions-path",
+      "evidence": ".cursor/hooks.json"
+    },
+    {
+      "from": "file:.cursor/hooks.json",
+      "to": "file:.cursor/hooks/stop.js",
+      "type": "mentions-path",
+      "evidence": ".cursor/hooks.json"
+    },
+    {
+      "from": "file:.github/workflows/harness.yml",
+      "to": "file:AGENTS.md",
+      "type": "mentions-path",
+      "evidence": ".github/workflows/harness.yml"
+    },
+    {
+      "from": "file:.github/workflows/harness.yml",
+      "to": "file:CLAUDE.md",
+      "type": "mentions-path",
+      "evidence": ".github/workflows/harness.yml"
+    },
+    {
+      "from": "file:.opencode/plugins/ecc-hooks.ts",
+      "to": "file:CLAUDE.md",
+      "type": "mentions-path",
+      "evidence": ".opencode/plugins/ecc-hooks.ts"
+    },
+    {
+      "from": "file:AGENTS.md",
+      "to": "file:CLAUDE.md",
+      "type": "mentions-path",
+      "evidence": "AGENTS.md"
+    },
+    {
+      "from": "file:AGENTS.md",
+      "to": "file:protocols/SAFETY_AUTHORIZATION_RULE.md",
+      "type": "mentions-path",
+      "evidence": "AGENTS.md"
+    },
+    {
+      "from": "file:AGENTS.md",
+      "to": "file:scripts/agent-system-map.js",
+      "type": "mentions-path",
+      "evidence": "AGENTS.md"
+    },
+    {
+      "from": "file:AGENTS.md",
+      "to": "file:scripts/check-instruction-stack.js",
+      "type": "mentions-path",
+      "evidence": "AGENTS.md"
+    },
+    {
+      "from": "file:AGENTS.md",
+      "to": "file:scripts/knowledge-query.js",
+      "type": "mentions-path",
+      "evidence": "AGENTS.md"
+    },
+    {
+      "from": "file:AGENTS.md",
+      "to": "file:tests/ci/instruction-stack.test.js",
+      "type": "mentions-path",
+      "evidence": "AGENTS.md"
+    },
+    {
+      "from": "file:CLAUDE.md",
+      "to": "file:AGENTS.md",
+      "type": "mentions-path",
+      "evidence": "CLAUDE.md"
+    },
+    {
+      "from": "file:CLAUDE.md",
+      "to": "file:AGENTS.md",
+      "type": "verified-import",
+      "evidence": "CLAUDE.md"
+    },
+    {
+      "from": "file:CODEX.md",
+      "to": "file:AGENTS.md",
+      "type": "mentions-path",
+      "evidence": "CODEX.md"
+    },
+    {
+      "from": "file:GEMINI.md",
+      "to": "file:AGENTS.md",
+      "type": "mentions-path",
+      "evidence": "GEMINI.md"
+    },
+    {
+      "from": "file:GEMINI.md",
+      "to": "file:AGENTS.md",
+      "type": "verified-import",
+      "evidence": "GEMINI.md"
+    },
+    {
+      "from": "file:manifests/goal-runtime-capabilities.json",
+      "to": "file:.agents/rules/seabridge-agent-baseline.md",
+      "type": "mentions-path",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "file:manifests/goal-runtime-capabilities.json",
+      "to": "file:.clinerules",
+      "type": "mentions-path",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "file:manifests/goal-runtime-capabilities.json",
+      "to": "file:.cursor/hooks.json",
+      "type": "mentions-path",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "file:manifests/goal-runtime-capabilities.json",
+      "to": "file:.cursor/hooks/before-submit-prompt.js",
+      "type": "mentions-path",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "file:manifests/goal-runtime-capabilities.json",
+      "to": "file:.cursor/hooks/stop.js",
+      "type": "mentions-path",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "file:manifests/goal-runtime-capabilities.json",
+      "to": "file:.gemini/settings.json",
+      "type": "mentions-path",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "file:manifests/goal-runtime-capabilities.json",
+      "to": "file:.github/copilot-instructions.md",
+      "type": "mentions-path",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "file:manifests/goal-runtime-capabilities.json",
+      "to": "file:.opencode/plugins/ecc-hooks.ts",
+      "type": "mentions-path",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "file:manifests/goal-runtime-capabilities.json",
+      "to": "file:AGENTS.md",
+      "type": "mentions-path",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "file:manifests/goal-runtime-capabilities.json",
+      "to": "file:CLAUDE.md",
+      "type": "mentions-path",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "file:manifests/goal-runtime-capabilities.json",
+      "to": "file:GEMINI.md",
+      "type": "mentions-path",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "file:manifests/goal-runtime-capabilities.json",
+      "to": "file:hooks/codex-hooks.json",
+      "type": "mentions-path",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "file:manifests/goal-runtime-capabilities.json",
+      "to": "file:hooks/hooks.json",
+      "type": "mentions-path",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "file:manifests/goal-runtime-capabilities.json",
+      "to": "file:manifests/instruction-adapters.json",
+      "type": "mentions-path",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "file:manifests/goal-runtime-capabilities.json",
+      "to": "file:scripts/goal-control.js",
+      "type": "mentions-path",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "file:manifests/instruction-adapters.json",
+      "to": "file:.agents/rules/seabridge-agent-baseline.md",
+      "type": "mentions-path",
+      "evidence": "manifests/instruction-adapters.json"
+    },
+    {
+      "from": "file:manifests/instruction-adapters.json",
+      "to": "file:.clinerules",
+      "type": "mentions-path",
+      "evidence": "manifests/instruction-adapters.json"
+    },
+    {
+      "from": "file:manifests/instruction-adapters.json",
+      "to": "file:.github/copilot-instructions.md",
+      "type": "mentions-path",
+      "evidence": "manifests/instruction-adapters.json"
+    },
+    {
+      "from": "file:manifests/instruction-adapters.json",
+      "to": "file:AGENTS.md",
+      "type": "mentions-path",
+      "evidence": "manifests/instruction-adapters.json"
+    },
+    {
+      "from": "file:manifests/instruction-adapters.json",
+      "to": "file:CLAUDE.md",
+      "type": "mentions-path",
+      "evidence": "manifests/instruction-adapters.json"
+    },
+    {
+      "from": "file:manifests/instruction-adapters.json",
+      "to": "file:GEMINI.md",
+      "type": "mentions-path",
+      "evidence": "manifests/instruction-adapters.json"
+    },
+    {
+      "from": "file:OPENCODE.md",
+      "to": "file:AGENTS.md",
+      "type": "mentions-path",
+      "evidence": "OPENCODE.md"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:.agents/rules/seabridge-agent-baseline.md",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:.clinerules",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:.cursor/hooks.json",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:.cursor/hooks/before-submit-prompt.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:.cursor/hooks/stop.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:.cursor/rules/common-agents.md",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:.gemini/settings.json",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:.github/copilot-instructions.md",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:.github/workflows/ci.yml",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:.github/workflows/harness.yml",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:.opencode/plugins/ecc-hooks.ts",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:AGENTS.md",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:CLAUDE.md",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:CODEX.md",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:GEMINI.md",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:hooks/codex-hooks.json",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:hooks/hooks.json",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:manifests/goal-proof-profiles.json",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:manifests/goal-runtime-capabilities.json",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:manifests/instruction-adapters.json",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:OPENCODE.md",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:protocols/GOAL_PROTOCOL_SHORT.md",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:protocols/GOAL_PROTOCOL.md",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:protocols/SAFETY_AUTHORIZATION_RULE.md",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:scripts/agent-behavior-report.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:scripts/check-instruction-stack.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:scripts/eval-goal-runtime-offline.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:scripts/goal-control.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:scripts/goal-runtime-bridge.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:scripts/knowledge-freshness.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:scripts/knowledge-query.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:tests/ci/instruction-stack.test.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:tests/lib/goal-control.test.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:tests/scripts/knowledge-freshness.test.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/check-instruction-stack.js",
+      "to": "file:.agents/rules/seabridge-agent-baseline.md",
+      "type": "mentions-path",
+      "evidence": "scripts/check-instruction-stack.js"
+    },
+    {
+      "from": "file:scripts/check-instruction-stack.js",
+      "to": "file:.clinerules",
+      "type": "mentions-path",
+      "evidence": "scripts/check-instruction-stack.js"
+    },
+    {
+      "from": "file:scripts/check-instruction-stack.js",
+      "to": "file:.github/copilot-instructions.md",
+      "type": "mentions-path",
+      "evidence": "scripts/check-instruction-stack.js"
+    },
+    {
+      "from": "file:scripts/check-instruction-stack.js",
+      "to": "file:AGENTS.md",
+      "type": "mentions-path",
+      "evidence": "scripts/check-instruction-stack.js"
+    },
+    {
+      "from": "file:scripts/check-instruction-stack.js",
+      "to": "file:CLAUDE.md",
+      "type": "mentions-path",
+      "evidence": "scripts/check-instruction-stack.js"
+    },
+    {
+      "from": "file:scripts/check-instruction-stack.js",
+      "to": "file:GEMINI.md",
+      "type": "mentions-path",
+      "evidence": "scripts/check-instruction-stack.js"
+    },
+    {
+      "from": "file:scripts/check-instruction-stack.js",
+      "to": "file:manifests/instruction-adapters.json",
+      "type": "mentions-path",
+      "evidence": "scripts/check-instruction-stack.js"
+    },
+    {
+      "from": "file:tests/ci/instruction-stack.test.js",
+      "to": "file:.github/copilot-instructions.md",
+      "type": "mentions-path",
+      "evidence": "tests/ci/instruction-stack.test.js"
+    },
+    {
+      "from": "file:tests/ci/instruction-stack.test.js",
+      "to": "file:AGENTS.md",
+      "type": "mentions-path",
+      "evidence": "tests/ci/instruction-stack.test.js"
+    },
+    {
+      "from": "file:tests/ci/instruction-stack.test.js",
+      "to": "file:CLAUDE.md",
+      "type": "mentions-path",
+      "evidence": "tests/ci/instruction-stack.test.js"
+    },
+    {
+      "from": "file:tests/ci/instruction-stack.test.js",
+      "to": "file:CODEX.md",
+      "type": "mentions-path",
+      "evidence": "tests/ci/instruction-stack.test.js"
+    },
+    {
+      "from": "file:tests/ci/instruction-stack.test.js",
+      "to": "file:GEMINI.md",
+      "type": "mentions-path",
+      "evidence": "tests/ci/instruction-stack.test.js"
+    },
+    {
+      "from": "file:tests/ci/instruction-stack.test.js",
+      "to": "file:manifests/instruction-adapters.json",
+      "type": "mentions-path",
+      "evidence": "tests/ci/instruction-stack.test.js"
+    },
+    {
+      "from": "file:tests/ci/instruction-stack.test.js",
+      "to": "file:OPENCODE.md",
+      "type": "mentions-path",
+      "evidence": "tests/ci/instruction-stack.test.js"
+    },
+    {
+      "from": "file:tests/ci/instruction-stack.test.js",
+      "to": "file:scripts/check-instruction-stack.js",
+      "type": "mentions-path",
+      "evidence": "tests/ci/instruction-stack.test.js"
+    },
+    {
+      "from": "file:tests/scripts/knowledge-freshness.test.js",
+      "to": "file:scripts/knowledge-freshness.js",
+      "type": "mentions-path",
+      "evidence": "tests/scripts/knowledge-freshness.test.js"
+    },
+    {
+      "from": "runtime:adal",
+      "to": "file:AGENTS.md",
+      "type": "instruction-entry",
+      "evidence": "manifests/instruction-adapters.json"
+    },
+    {
+      "from": "runtime:adal",
+      "to": "file:AGENTS.md",
+      "type": "runtime-entry",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "runtime:adal",
+      "to": "file:manifests/instruction-adapters.json",
+      "type": "runtime-evidence",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "runtime:antigravity",
+      "to": "file:.agents/rules/seabridge-agent-baseline.md",
+      "type": "instruction-entry",
+      "evidence": "manifests/instruction-adapters.json"
+    },
+    {
+      "from": "runtime:antigravity",
+      "to": "file:.agents/rules/seabridge-agent-baseline.md",
+      "type": "runtime-entry",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "runtime:antigravity",
+      "to": "file:manifests/instruction-adapters.json",
+      "type": "runtime-evidence",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "runtime:claude",
+      "to": "file:CLAUDE.md",
+      "type": "instruction-entry",
+      "evidence": "manifests/instruction-adapters.json"
+    },
+    {
+      "from": "runtime:claude",
+      "to": "file:CLAUDE.md",
+      "type": "runtime-entry",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "runtime:claude",
+      "to": "file:hooks/hooks.json",
+      "type": "runtime-evidence",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "runtime:cline",
+      "to": "file:.clinerules",
+      "type": "instruction-entry",
+      "evidence": "manifests/instruction-adapters.json"
+    },
+    {
+      "from": "runtime:cline",
+      "to": "file:.clinerules",
+      "type": "runtime-entry",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "runtime:cline",
+      "to": "file:manifests/instruction-adapters.json",
+      "type": "runtime-evidence",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "runtime:codebuddy",
+      "to": "file:AGENTS.md",
+      "type": "instruction-entry",
+      "evidence": "manifests/instruction-adapters.json"
+    },
+    {
+      "from": "runtime:codebuddy",
+      "to": "file:AGENTS.md",
+      "type": "runtime-entry",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "runtime:codebuddy",
+      "to": "file:manifests/instruction-adapters.json",
+      "type": "runtime-evidence",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "runtime:codex",
+      "to": "file:AGENTS.md",
+      "type": "instruction-entry",
+      "evidence": "manifests/instruction-adapters.json"
+    },
+    {
+      "from": "runtime:codex",
+      "to": "file:AGENTS.md",
+      "type": "runtime-entry",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "runtime:codex",
+      "to": "file:hooks/codex-hooks.json",
+      "type": "runtime-evidence",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "runtime:copilot",
+      "to": "file:.github/copilot-instructions.md",
+      "type": "instruction-entry",
+      "evidence": "manifests/instruction-adapters.json"
+    },
+    {
+      "from": "runtime:copilot",
+      "to": "file:.github/copilot-instructions.md",
+      "type": "runtime-entry",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "runtime:copilot",
+      "to": "file:.github/copilot-instructions.md",
+      "type": "runtime-evidence",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "runtime:cursor",
+      "to": "file:.cursor/hooks.json",
+      "type": "runtime-evidence",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "runtime:cursor",
+      "to": "file:.cursor/hooks/before-submit-prompt.js",
+      "type": "runtime-evidence",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "runtime:cursor",
+      "to": "file:.cursor/hooks/stop.js",
+      "type": "runtime-evidence",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "runtime:cursor",
+      "to": "file:AGENTS.md",
+      "type": "instruction-entry",
+      "evidence": "manifests/instruction-adapters.json"
+    },
+    {
+      "from": "runtime:cursor",
+      "to": "file:AGENTS.md",
+      "type": "runtime-entry",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "runtime:gemini",
+      "to": "file:.gemini/settings.json",
+      "type": "runtime-evidence",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "runtime:gemini",
+      "to": "file:GEMINI.md",
+      "type": "instruction-entry",
+      "evidence": "manifests/instruction-adapters.json"
+    },
+    {
+      "from": "runtime:gemini",
+      "to": "file:GEMINI.md",
+      "type": "runtime-entry",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "runtime:hermes",
+      "to": "file:AGENTS.md",
+      "type": "instruction-entry",
+      "evidence": "manifests/instruction-adapters.json"
+    },
+    {
+      "from": "runtime:hermes",
+      "to": "file:AGENTS.md",
+      "type": "runtime-entry",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "runtime:hermes",
+      "to": "file:manifests/instruction-adapters.json",
+      "type": "runtime-evidence",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "runtime:joycode",
+      "to": "file:AGENTS.md",
+      "type": "instruction-entry",
+      "evidence": "manifests/instruction-adapters.json"
+    },
+    {
+      "from": "runtime:joycode",
+      "to": "file:AGENTS.md",
+      "type": "runtime-entry",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "runtime:joycode",
+      "to": "file:manifests/instruction-adapters.json",
+      "type": "runtime-evidence",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "runtime:kimi",
+      "to": "file:AGENTS.md",
+      "type": "instruction-entry",
+      "evidence": "manifests/instruction-adapters.json"
+    },
+    {
+      "from": "runtime:kimi",
+      "to": "file:AGENTS.md",
+      "type": "runtime-entry",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "runtime:kimi",
+      "to": "file:manifests/instruction-adapters.json",
+      "type": "runtime-evidence",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "runtime:kiro",
+      "to": "file:AGENTS.md",
+      "type": "instruction-entry",
+      "evidence": "manifests/instruction-adapters.json"
+    },
+    {
+      "from": "runtime:kiro",
+      "to": "file:AGENTS.md",
+      "type": "runtime-entry",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "runtime:kiro",
+      "to": "file:manifests/instruction-adapters.json",
+      "type": "runtime-evidence",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "runtime:openclaw",
+      "to": "file:AGENTS.md",
+      "type": "instruction-entry",
+      "evidence": "manifests/instruction-adapters.json"
+    },
+    {
+      "from": "runtime:openclaw",
+      "to": "file:AGENTS.md",
+      "type": "runtime-entry",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "runtime:openclaw",
+      "to": "file:manifests/instruction-adapters.json",
+      "type": "runtime-evidence",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "runtime:opencode",
+      "to": "file:.opencode/plugins/ecc-hooks.ts",
+      "type": "runtime-evidence",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "runtime:opencode",
+      "to": "file:AGENTS.md",
+      "type": "instruction-entry",
+      "evidence": "manifests/instruction-adapters.json"
+    },
+    {
+      "from": "runtime:opencode",
+      "to": "file:AGENTS.md",
+      "type": "runtime-entry",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "runtime:qwen",
+      "to": "file:AGENTS.md",
+      "type": "instruction-entry",
+      "evidence": "manifests/instruction-adapters.json"
+    },
+    {
+      "from": "runtime:qwen",
+      "to": "file:AGENTS.md",
+      "type": "runtime-entry",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "runtime:qwen",
+      "to": "file:manifests/instruction-adapters.json",
+      "type": "runtime-evidence",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "runtime:windsurf",
+      "to": "file:AGENTS.md",
+      "type": "instruction-entry",
+      "evidence": "manifests/instruction-adapters.json"
+    },
+    {
+      "from": "runtime:windsurf",
+      "to": "file:AGENTS.md",
+      "type": "runtime-entry",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "runtime:windsurf",
+      "to": "file:manifests/instruction-adapters.json",
+      "type": "runtime-evidence",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "runtime:zed",
+      "to": "file:AGENTS.md",
+      "type": "instruction-entry",
+      "evidence": "manifests/instruction-adapters.json"
+    },
+    {
+      "from": "runtime:zed",
+      "to": "file:AGENTS.md",
+      "type": "runtime-entry",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    },
+    {
+      "from": "runtime:zed",
+      "to": "file:manifests/instruction-adapters.json",
+      "type": "runtime-evidence",
+      "evidence": "manifests/goal-runtime-capabilities.json"
+    }
+  ],
+  "build": {
+    "generatedAt": "2026-09-30T18:36:20.135Z",
+    "sourceCommit": "e7c6a2eb96bc3d51f5fd541ec00ecc30ca0708bf",
+    "sourceDirty": true
+  }
+}

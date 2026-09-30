@@ -132,11 +132,21 @@ explicitly requested.
 
 ## graphify — Knowledge Graph
 
-ECC has a graphify knowledge graph at `graphify-out/`.
+Graphify code graphs are local, rebuildable projections under `graphify-out/`.
+They may be missing from a worktree or stale after source changes. Search current
+source first; use `node scripts/knowledge-query.js <repo> <symbol>` for a bounded
+relationship lookup only after the graph freshness gate passes. Do not load a
+whole `GRAPH_REPORT.md` as startup context or rebuild the large graph after each
+edit. A missing edge is not proof of no dependency.
 
-- Before architecture/codebase questions, read `graphify-out/GRAPH_REPORT.md`.
-- If `graphify-out/wiki/index.md` exists, navigate it instead of raw files.
-- After modifying code files, run `graphify update .` (AST-only, no API cost).
+The coding-agent policy and runtime layer has a separate, small deterministic
+map at `docs/tools/agent-system-map.json`. Run
+`node scripts/agent-system-map.js check` before using it. The map records exact
+source hashes and evidence-labelled entry/import/reference edges; it does not
+prove that a live agent obeyed an instruction. Build it locally at an instruction
+milestone with `node scripts/agent-system-map.js build` and run the focused
+adapter and behavioral tests. No model call or GitHub Action is needed to build
+or check this map.
 
 ## paper2agent / paper2agent-bench (autoresearch)
 
