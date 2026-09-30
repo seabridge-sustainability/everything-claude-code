@@ -9,8 +9,13 @@ metadata:
 
 A router, not a store. `config/knowledge-sources.json` names one owner for each
 information type, and `docs/design/seabridge-knowledge-architecture.md` explains
-the rules. Before using a store, read its registry entry: its `agentAccess`,
-`writers`, and `state.gaps` apply.
+the rules. Before using a store, read its registry entry: its `agentAccess` and
+`writers` apply. The public registry contains policy, not observed runtime
+state. The ignored `config/knowledge-sources.private.local.json` inventory is
+keyed by public source `id` and contains dated observations; it is never merged
+into routing. Check it or the authorized live store before claiming a source is
+operational. If the inventory is absent or stale, status is unverified. Treat
+logical `canonicalStore.location` values as aliases, not filesystem paths.
 
 ## Route first
 

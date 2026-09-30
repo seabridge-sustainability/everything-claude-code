@@ -65,6 +65,13 @@ run('loadRegistry returns the parsed registry', () => {
   assert.strictEqual(loadRegistry().sources.length, REAL.sources.length);
 });
 
+run('public registry contains routing policy, not local observations', () => {
+  for (const source of REAL.sources) {
+    assert.ok(!Object.hasOwn(source, 'state'), source.id);
+    assert.ok(!Object.hasOwn(source.canonicalStore, 'collections'), source.id);
+  }
+});
+
 run('every agent, personal, and code-graph store forbids tenant data', () => {
   const protectedKinds = ['ecc-memory-vault', 'gbrain', 'obsidian-vault', 'graphify-files', 'falkordb'];
   for (const kind of protectedKinds) {
@@ -264,6 +271,49 @@ run('rejects absolute machine paths in locations', () => {
   assertError(errors, 'MACHINE_PATH', 'operator-wiki');
 });
 
+run('rejects a private local inventory marker in non-location text fields', () => {
+  for (const field of ['policy', 'supersession']) {
+    const errors = errorsAfter(r => {
+      sourceOf(r, 'operator-wiki').retention[field] = 'C:\\Users\\PRIVATE_INVENTORY_MARKER\\observations.json';
+    });
+    assertError(errors, 'MACHINE_PATH', `retention.${field}`);
+  }
+  const errors = errorsAfter(r => {
+    sourceOf(r, 'operator-wiki').scope.notes = '/Users/PRIVATE_INVENTORY_MARKER/observations.json';
+  });
+  assertError(errors, 'MACHINE_PATH', 'scope.notes');
+});
+
+run('rejects alternate host-path forms anywhere in a public source', () => {
+  const paths = [
+    '\\\\private-server\\share\\inventory.json',
+    '/mnt/c/private/inventory.json',
+    '/opt/seabridge/inventory.json',
+    '/tmp/inventory.json',
+    '~/private/inventory.json',
+    'file:///C:/private/inventory.json',
+  ];
+  for (const privatePath of paths) {
+    const errors = errorsAfter(r => {
+      sourceOf(r, 'operator-wiki').scope.notes = `local inventory: ${privatePath}`;
+    });
+    assertError(errors, 'MACHINE_PATH', 'scope.notes');
+  }
+});
+
+run('the privacy split advances the public schema version', () => {
+  assert.strictEqual(REAL.schema, 'seabridge.knowledge-sources.v2');
+  const errors = errorsAfter(r => { r.schema = 'seabridge.knowledge-sources.v1'; });
+  assertError(errors, 'SCHEMA', '/schema');
+});
+
+run('rejects observed state in the public routing registry', () => {
+  const errors = errorsAfter(r => {
+    sourceOf(r, 'operator-wiki').state = { status: 'operational', verifiedAt: '2026-09-30', evidence: 'private observation' };
+  });
+  assertError(errors, 'SCHEMA', 'state');
+});
+
 section('routing:');
 
 const ROUTES = [
@@ -274,6 +324,28 @@ const ROUTES = [
   ['tenant-user-preferences', 'platform-agent-memory', 'a product user preference goes to platform agent memory'],
   ['code-relationships', 'graphify-code-graph', 'code relationships come from the graphify projection'],
 ];
+
+const ROUTE_SNAPSHOT = {
+  'governed-repo-docs': ['engineering-rules', 'coding-standards', 'architecture-decisions', 'api-contracts', 'runbooks', 'agent-skills'],
+  'repo-source-code': ['source-code'],
+  'ecc-memory-vault': ['agent-handoffs', 'agent-discoveries', 'agent-pending-decisions', 'resumable-task-context', 'agent-working-preferences'],
+  'operator-wiki': ['organizations', 'people', 'business-relationships', 'meetings', 'market-research', 'business-strategy', 'research-notes', 'internal-decisions'],
+  'issue-tracker': ['active-work-items', 'review-state'],
+  'platform-knowledge-documents': ['tenant-documents', 'document-versions', 'document-chunks'],
+  'platform-product-records': ['product-facts', 'evidence-packages'],
+  'platform-agent-memory': ['tenant-user-preferences', 'agent-corrections', 'agent-workflow-context'],
+  'platform-structured-rag': ['structured-document-navigation'],
+  'sustainability-graph': ['sustainability-relationships'],
+  'graphify-code-graph': ['code-relationships'],
+};
+
+run('redaction preserves the complete information-type routing table', () => {
+  const actual = Object.fromEntries(REAL.sources.filter(s => s.informationTypes.length).map(s => [s.id, s.informationTypes]));
+  assert.deepStrictEqual(actual, ROUTE_SNAPSHOT);
+  for (const [id, types] of Object.entries(ROUTE_SNAPSHOT)) {
+    for (const type of types) assert.strictEqual(routeInformationType(REAL, type).id, id);
+  }
+});
 
 for (const [type, expected, label] of ROUTES) {
   run(label, () => {

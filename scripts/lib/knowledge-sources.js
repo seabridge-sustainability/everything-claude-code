@@ -45,7 +45,17 @@ const TENANT_CAPABLE_STORE_KINDS = new Set(['mongodb']);
 // accepted knowledge is promoted out of the vault into governed documentation.
 const VAULT_TRUST_STATES = new Set(['unreviewed', 'superseded']);
 
-const ABSOLUTE_MACHINE_PATH = /(^|[\s:])([A-Za-z]:[\\/]|\/(Users|home)\/)/;
+const ABSOLUTE_MACHINE_PATH = /(^|[\s:(="',;])([A-Za-z]:[\\/]|\\\\[^\\\s]+\\[^\\\s]+|\/(Users|home|mnt|opt|tmp)(\/|$)|~\/|file:\/\/\/(?:[A-Za-z]:\/|(?:Users|home|mnt|opt|tmp)\/))/i;
+
+function visitStrings(value, pathParts, visit) {
+  if (typeof value === 'string') {
+    visit(value, pathParts.join('.'));
+  } else if (Array.isArray(value)) {
+    value.forEach((item, index) => visitStrings(item, [...pathParts, index], visit));
+  } else if (value && typeof value === 'object') {
+    Object.entries(value).forEach(([key, item]) => visitStrings(item, [...pathParts, key], visit));
+  }
+}
 
 let compiledValidator = null;
 
@@ -62,10 +72,12 @@ function schemaErrors(data) {
   if (validate(data)) return [];
   return validate.errors.map(error => {
     const missing = error.params && error.params.missingProperty;
+    const extra = error.params && error.params.additionalProperty;
     const where = error.instancePath || '/';
+    const fieldPath = missing || extra ? `${where}/${missing || extra}` : where;
     return {
       code: missing ? 'MISSING_FIELD' : 'SCHEMA',
-      path: missing ? `${where}/${missing}` : where,
+      path: fieldPath,
       message: missing ? `missing required field '${missing}'` : error.message,
     };
   });
@@ -87,9 +99,13 @@ function crossEntryErrors(registry) {
     const { id, authority, lifecycle, canonicalStore, tenantData, scope } = source;
     const kind = canonicalStore.kind;
 
-    if (ABSOLUTE_MACHINE_PATH.test(canonicalStore.location)) {
-      add('MACHINE_PATH', id, 'location must be logical (repo:path, ~/path, mongodb:collection), not an absolute machine path');
-    }
+    // Public registry text is a policy contract, never a local inventory. A
+    // machine path in notes/evidence is as much a leak as one in location.
+    visitStrings(source, [], (value, field) => {
+      if (ABSOLUTE_MACHINE_PATH.test(value)) {
+        add('MACHINE_PATH', id, `${field} must not contain an absolute machine path`);
+      }
+    });
 
     // Tenant boundary.
     if (TENANT_FORBIDDEN_STORE_KINDS.has(kind)) {

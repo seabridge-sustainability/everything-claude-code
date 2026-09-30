@@ -1,13 +1,14 @@
 # SeaBridgeAI Knowledge Architecture
 
-Status: accepted; updated 2026-09-29. Machine-readable contract:
+Status: accepted; updated 2026-09-30. Machine-readable contract:
 `config/knowledge-sources.json`, validated by `schemas/knowledge-sources.schema.json`
 and `scripts/lib/knowledge-sources.js`. Agents route through the
 `knowledge-ops` skill. Freshness: `scripts/knowledge-freshness.js`.
 
-This repository is public. It holds the contract and the tooling, never
-confidential knowledge; platform store details and open hardening items live in
-the private product repositories.
+This repository is public. It holds routing and safety policy, not a local
+operational inventory. Private observed state and host-specific evidence live in
+a local-only inventory; platform implementation details and open hardening items
+live in the private product repositories.
 
 ## Capability
 
@@ -53,10 +54,16 @@ memory server, and `agentic-stack/falkordb_etl.py`. The registry marks each
 5. **Shared trust states:** `unreviewed` → `verified` → `governed`, with
    `superseded` at any point. Only version-controlled content can be governed.
    Memory Vault entries stay `unreviewed` until promoted into governed docs.
-6. **Observed state, not configuration.** Each source records `state.status`
-   with the date and evidence it was observed.
-7. **Locations are logical**: `repo:path`, `~/path`; never an absolute machine
-   path or a connection string.
+6. **Observed state is private.** The public v2 registry declares intended
+   routing and safety policy. The ignored
+   `config/knowledge-sources.private.local.json` inventory uses schema
+   `seabridge.knowledge-observations.local.v1`, a capture date, and observations
+   keyed by public source `id` with `state` and optional `redactedFields`.
+   It is never merged into the router or shipped. If absent or stale, treat
+   operational status as unverified and inspect the live store under its own
+   authorization boundary.
+7. **Locations are logical aliases**, never absolute machine paths or connection
+   strings. Private operational locations are not merged into the public router.
 8. **No raw transcripts, secrets, or `.env` content anywhere.**
 
 ## Where does it go
@@ -98,10 +105,10 @@ node scripts/knowledge-freshness.js wiki <workspace>   # current, stale or unver
   build time and Graphify version. It fails before Graphify starts if
   `.graphifyignore` is missing any required privacy exclusion.
 - **Automatic rebuilds:** `scripts/git-hooks/graphify-rebuild.sh` is a template
-  for `post-commit` and `post-checkout`. At this review, the backend has an
-  older installed hook; AutoResearch and frontend have no verified installation.
-  Align installed hooks only after their shared validator paths are current and
-  custom hook content has been preserved. The template rebuilds only in a repo's main checkout (never from a
+  for `post-commit` and `post-checkout`. Audit each checkout's effective hook
+  configuration before claiming adoption. Align installed hooks only after its
+  validator paths are current and custom hook content has been preserved.
+  The template rebuilds only in a repo's main checkout (never from a
   linked worktree), only after code changes or a branch switch that moves
   HEAD, and refuses to build unless `.graphifyignore` carries the complete
   knowledge boundary (the marker alone is insufficient). After a commit it
@@ -118,9 +125,8 @@ node scripts/knowledge-freshness.js wiki <workspace>   # current, stale or unver
   and the MCP server are pinned by version.
 - **Obsidian view:** on demand, per repo:
   `graphify export obsidian --graph graphify-out/graph.json --dir graphify-out/obsidian`.
-  It is generated (openseabri: 4,687 notes, 9.1 MB, 19 s), overwritten on each
-  export, and never edited or committed; the backend graph would be roughly 20
-  times larger, so export only the repo being studied.
+  It is generated, overwritten on each export, and never edited or committed;
+  export only the repo being studied to bound time and storage.
 
 ## Operator wiki
 
@@ -144,37 +150,9 @@ LLM pass per document; see `docs/reports/knowledge/2026-09-29-knowledge-cost-eff
 
 ## Operator actions
 
-Agents do not delete data, folders, or repositories, and do not push where no
-approval covers it. These are prepared for the operator; each lists its
-rollback.
-
-1. **GBrain data.** Stop any GBrain process, then in PowerShell:
-
-   ```powershell
-   robocopy "$HOME\.gbrain" E:\gbrain-archive\gbrain-2026-09-29 /E /COPY:DAT /R:1 /W:1
-   $src = (Get-ChildItem -Recurse -File -Force "$HOME\.gbrain" | Measure-Object Length -Sum).Sum
-   $dst = (Get-ChildItem -Recurse -File -Force E:\gbrain-archive\gbrain-2026-09-29 | Measure-Object Length -Sum).Sum
-   if ($src -ne $dst) { throw "backup size mismatch: $src vs $dst" }
-   Remove-Item -Recurse -Force "$HOME\.gbrain"
-   bun remove -g gbrain
-   ```
-
-   Rollback: `robocopy E:\gbrain-archive\gbrain-2026-09-29 "$HOME\.gbrain" /E`
-   and `bun add -g gbrain@0.22.4`.
-2. **Retired folders in this repository:**
-   `git rm -r knowledge-vault skills/gbrain .agents/skills/gbrain` and commit.
-   The `references/gbrain` clone left on disk by the removed submodule can then
-   be deleted. Rollback: `git revert <commit>`.
-3. **Old FalkorDB container and image** (after the new one has run cleanly):
-   `docker rm falkordb-old-v4.18.1` and `docker image rm d6aa9598b79c`.
-   Rollback before removal: `docker stop falkordb; docker rename falkordb
-   falkordb-v4.20.7; docker rename falkordb-old-v4.18.1 falkordb; docker start
-   falkordb`. The pre-upgrade data copy is `E:\falkordb-backup\falkordb-data-2026-09-29`.
-4. **Optional graph hooks:** the knowledge boundaries are on the normal branches
-   of backend, frontend, OpenSeaBri, autoresearch, CLIMADA, and ECC. Install the
-   current `scripts/git-hooks/graphify-rebuild.sh` as `post-commit` and
-   `post-checkout` only in a main checkout that should maintain a local graph;
-   the hook never runs from linked worktrees and validates the full boundary.
-5. **Obsidian installer shell:** the app package is 1.13.7 via the official
-   auto-update; the machine-wide installer shell (1.12.7) updates with an
-   elevated `winget upgrade --id Obsidian.Obsidian --exact`.
+Agents do not delete data, folders, repositories, or infrastructure. Retirement
+and rollback instructions involving local data, containers, and installed tools
+belong in the private operator inventory, where targets can be verified against
+the current machine. Optional graph hooks may be installed in an intended main
+checkout after preserving any existing custom hooks and validating its knowledge
+boundary; linked worktrees do not auto-rebuild graphs.

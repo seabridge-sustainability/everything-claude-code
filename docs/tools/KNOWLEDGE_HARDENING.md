@@ -91,6 +91,22 @@ detection needs a separate content audit.
 
 ## Phased adoption
 
+Before claiming the intended ECC and backend checkouts have the required local
+configuration, run
+`node scripts/knowledge-adoption.js <ecc-checkout> <backend-checkout> --json`.
+It is read-only and exits nonzero unless at least two distinct Git repositories
+are supplied, each effective boundary is safe, both active Git hooks exactly
+match the reviewed executable template, and private project/user memory roots
+stay outside source repositories with isolated project scopes. It reports
+disabled, missing, drifted, non-executable, and unrelated hooks separately
+without printing hook contents or private memory paths. `configured` is only a
+configuration receipt for the named checkouts: it does not prove that a graph is
+fresh or that live agents inherit the memory override. Check graph freshness
+separately and verify a live agent session before claiming runtime adoption. A
+nonzero result is not permission to replace custom hooks or change
+`core.hooksPath`. Intentionally disabled hooks require an explicit manual
+freshness workflow; green source tests alone do not make those checkouts current.
+
 1. Run the registry, freshness, hook, query, and smoke-contract tests locally.
 2. Validate the loader against synthetic snapshots, then obtain approval for a
    non-production real-database generation/cutover test before production use.
