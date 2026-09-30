@@ -1,7 +1,7 @@
 """Offline snapshot and read-only query contracts; no database or provider access."""
 import importlib.util
-from pathlib import Path
 import unittest
+from pathlib import Path
 
 spec = importlib.util.spec_from_file_location('smoke', Path(__file__).parents[1] / 'agentic-stack/falkordb_smoke.py')
 smoke = importlib.util.module_from_spec(spec)
