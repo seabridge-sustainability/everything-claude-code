@@ -96,6 +96,11 @@ function crossEntryErrors(registry) {
       if (source.sensitivity === 'tenant-confidential') add('TENANT_BOUNDARY', id, `store kind '${kind}' cannot be tenant-confidential`);
       if (source.writers.includes('tenant-users')) add('TENANT_BOUNDARY', id, `tenant users cannot write to store kind '${kind}'`);
     }
+    if (tenantData === 'required' || source.sensitivity === 'tenant-confidential') {
+      if (source.agentAccess !== 'none' || source.readers.includes('coding-agents') || source.writers.includes('coding-agents')) {
+        add('TENANT_BOUNDARY', id, 'tenant stores must not grant coding-agent access');
+      }
+    }
     if (tenantData === 'required') {
       if (!TENANT_CAPABLE_STORE_KINDS.has(kind)) add('TENANT_BOUNDARY', id, `tenant data can only live in platform stores, not '${kind}'`);
       if (!scope.levels.includes('tenant')) add('TENANT_SCOPE', id, "tenant data requires scope level 'tenant'");

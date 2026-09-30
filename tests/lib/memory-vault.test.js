@@ -130,11 +130,59 @@ test('honors explicit project and user vault root overrides', () => {
         ECC_MEMORY_USER_ROOT: userVault,
       },
     });
-    assert.strictEqual(roots.project, path.join(projectVault, 'project'));
+    assert.ok(roots.project.startsWith(path.join(projectVault, 'project') + path.sep));
+    assert.match(path.basename(roots.project), /^[a-f0-9]{24}$/);
     assert.strictEqual(roots.team, path.join(projectVault, 'team'));
     assert.strictEqual(roots.user, userVault);
   } finally {
     fs.rmSync(fixture.root, { recursive: true, force: true });
+  }
+});
+
+test('shared project override isolates different repos and joins linked worktrees', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-memory-override-'));
+  const repo = path.join(root,'repo');
+  const linked = path.join(root,'linked');
+  const other = path.join(root,'other');
+  const projectVault = path.join(root,'shared-memory');
+  try {
+    fs.mkdirSync(repo); fs.mkdirSync(other);
+    for (const dir of [repo,other]) {
+      const init = spawnSync('git',['-C',dir,'init','-q'],{encoding:'utf8'});
+      assert.strictEqual(init.status,0,init.stderr);
+    }
+    const first = spawnSync('git',['-C',repo,'-c','user.name=Fixture','-c','user.email=fixture@example.invalid',
+      'commit','--allow-empty','-qm','fixture'],{encoding:'utf8'});
+    assert.strictEqual(first.status,0,first.stderr);
+    const add = spawnSync('git',['-C',repo,'worktree','add','--detach',linked],{encoding:'utf8'});
+    assert.strictEqual(add.status,0,add.stderr);
+    const env = {ECC_MEMORY_PROJECT_ROOT:projectVault};
+    const primary = resolveVaultRoots({cwd:repo,env});
+    const sibling = resolveVaultRoots({cwd:linked,env});
+    const independent = resolveVaultRoots({cwd:other,env});
+    assert.strictEqual(primary.project,sibling.project);
+    assert.notStrictEqual(primary.project,independent.project);
+    assert.strictEqual(primary.team,independent.team);
+  } finally {
+    fs.rmSync(root,{recursive:true,force:true});
+  }
+});
+
+test('case-distinct repository paths keep separate memory scopes on case-sensitive systems', () => {
+  if (process.platform === 'win32') return;
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-memory-case-'));
+  try {
+    const upper = path.join(root, 'Repo');
+    const lower = path.join(root, 'repo');
+    fs.mkdirSync(upper); fs.mkdirSync(lower);
+    for (const dir of [upper, lower]) {
+      assert.strictEqual(spawnSync('git', ['-C', dir, 'init', '-q'], {encoding:'utf8'}).status, 0);
+    }
+    const env = {ECC_MEMORY_PROJECT_ROOT:path.join(root, 'shared-memory')};
+    assert.notStrictEqual(resolveVaultRoots({cwd:upper,env}).project,
+      resolveVaultRoots({cwd:lower,env}).project);
+  } finally {
+    fs.rmSync(root, {recursive:true,force:true});
   }
 });
 

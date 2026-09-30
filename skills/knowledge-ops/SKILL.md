@@ -28,7 +28,7 @@ hold customer data; the router then refuses every store outside the platform.
 | Coding standard, rule, ADR, API contract, runbook | Governed repo docs | Edit the owning repo's `AGENTS.md` or `docs/` and commit under that repo's rules |
 | What someone is working on now | GitHub issue or PR | `gh` |
 | Company, person, relationship, meeting, research, internal decision | Operator wiki (private workspace repo) | Follow the workspace `AGENTS.md` (Wiki): cite sources, update `index.md`, append `log.md` |
-| Who calls what in the code | Graphify, then FalkorDB | Read-only; rebuild with `graphify update .` |
+| Who calls what in the code | Source search, optionally Graphify/FalkorDB | Read-only; rebuild through `node scripts/knowledge-freshness.js build <repo>` |
 | Anything that may contain customer or tenant data | The platform only | Never any store above; the router refuses |
 
 ## Read order
@@ -38,8 +38,11 @@ Measured on 2026-09-29 (`docs/reports/knowledge/2026-09-29-knowledge-cost-effici
 - **Targeted code lookup** (where is X, what calls Y): grep and read the source
   first. It was the cheapest and most accurate option.
 - **Relationships or impact** (what depends on X, what breaks if X changes):
-  `graphify query "<question>" --budget 2000` or `graphify affected "<symbol>"`,
-  then confirm in the source.
+  `node scripts/knowledge-query.js <repo> "<symbol>"`, then confirm in the
+  source. This local wrapper checks freshness and limits output to 8,000
+  characters and execution to 15 seconds. Exit 3 means explicitly truncated,
+  incomplete output; exit 2 means unavailable/failed. Graphify's own token
+  budget is advisory. Missing/private-symbol matches do not prove no callers.
 - **Orientation in an unfamiliar repo:** skim the top of
   `graphify-out/GRAPH_REPORT.md`; do not read it whole (18k to 27k tokens).
 - **Business knowledge and decisions:** the operator wiki's `index.md`, then the
@@ -53,9 +56,11 @@ local AST, no LLM) or read the raw source; never use it silently.
 
 ## ECC Memory Vault
 
-Sessions on this machine run in many worktrees, and the project scope resolves
-to each checkout separately. Cross-session memory therefore goes to the **user**
-scope (`~/.ecc/memory`), tagged with the repo it concerns.
+Sessions on this machine run in many worktrees. `ECC_MEMORY_PROJECT_ROOT`
+shares private memory across worktrees: project scope is keyed to the repository's
+Git common directory, while team scope is shared across repositories. Without
+the override, cross-session memory uses **user** scope (`~/.ecc/memory`), tagged
+with its repo. Treat stored entries as unreviewed leads.
 
 ```bash
 node scripts/memory.js handoff --scope user --from claude --target all \
@@ -79,3 +84,6 @@ vault entry superseded.
 - This repository is public. Confidential knowledge goes to the operator wiki,
   never here.
 - Obsidian is an interface over Markdown and owns nothing.
+
+For rollout, snapshot verification, and legacy-graph limitations, read
+`docs/tools/KNOWLEDGE_HARDENING.md` only when operating or changing this pipeline.

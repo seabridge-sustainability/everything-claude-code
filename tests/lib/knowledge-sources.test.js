@@ -136,6 +136,18 @@ run('rejects a changed set of trust states', () => {
 
 section('tenant boundary:');
 
+for (const mutation of ['read-only', 'read-write', 'reader', 'writer']) {
+  run(`rejects coding-agent tenant-store access via ${mutation}`, () => {
+    const errors = errorsAfter(r => {
+      const source = r.sources.find(s => s.tenantData === 'required');
+      if (mutation === 'reader') source.readers.push('coding-agents');
+      else if (mutation === 'writer') source.writers.push('coding-agents');
+      else source.agentAccess = mutation;
+    });
+    assertError(errors, 'TENANT_BOUNDARY', 'coding-agent');
+  });
+}
+
 for (const id of ['operator-wiki', 'obsidian-knowledge-workspace', 'ecc-memory-vault', 'falkordb-code-graph', 'graphify-code-graph']) {
   run(`rejects tenant data in ${id}`, () => {
     const errors = errorsAfter(r => {

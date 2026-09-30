@@ -1,6 +1,7 @@
 'use strict';
 
 const crypto = require('crypto');
+const { execFileSync } = require('child_process');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -56,6 +57,19 @@ function resolveOverride(value, cwd) {
   return path.resolve(cwd, asNonEmptyString(value, 'memory root override', 4096));
 }
 
+function repositoryMemoryKey(projectRoot) {
+  let identity = projectRoot;
+  try {
+    const common = execFileSync('git', ['-C', projectRoot, 'rev-parse', '--git-common-dir'],
+      { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+    if (common) identity = path.resolve(projectRoot, common);
+  } catch {
+    // A non-Git workspace is still isolated by its absolute project root.
+  }
+  const canonical = path.normalize(identity);
+  return crypto.createHash('sha256').update(process.platform === 'win32' ? canonical.toLowerCase() : canonical).digest('hex').slice(0, 24);
+}
+
 function resolveVaultRoots(options = {}) {
   const cwd = path.resolve(options.cwd || process.cwd());
   const env = options.env || process.env;
@@ -71,7 +85,9 @@ function resolveVaultRoots(options = {}) {
     : path.join(homeDir, '.ecc', 'memory');
 
   const roots = {
-    project: path.join(projectVault, 'project'),
+    project: env.ECC_MEMORY_PROJECT_ROOT
+      ? path.join(projectVault, 'project', repositoryMemoryKey(projectRoot))
+      : path.join(projectVault, 'project'),
     team: path.join(projectVault, 'team'),
     user: userVault,
   };

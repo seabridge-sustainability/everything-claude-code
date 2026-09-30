@@ -100,7 +100,7 @@ For SeaBridgeAI work, the risk-scaled Goal Protocol above supersedes generic rul
 
 - The full roster of ECC subagents, GSD lifecycle agents and commands, and gstack skills is in `docs/tools/ECC_AGENT_ROSTER.md`. Load it only when delegating or when a `/gsd-*` or gstack command is requested.
 - rtk, caveman, codeburn, designlang, Open Design, Vibium, Google Agent Skills, token-retry loops, memory routing, graphify and paper2agent are documented in `docs/tools/ECC_TOOLING_REFERENCE.md`. Model/prompt/skill changes use `docs/tools/MODEL_PROMPTING_AND_SKILL_POLICY.md`. Load either reference only when its subject is needed. Token-retry loops are opt-in only. Playwright is canonical for SeaBridge browser QA; Vibium is secondary inspection.
-- For architecture questions start at `graphify-out/GRAPH_REPORT.md`.
+- For architecture questions, search and read the relevant source first. For caller/impact relationships use `node scripts/knowledge-query.js <repo> <symbol>` after a verified graph build; it rejects unsafe/stale graphs and bounds output. A truncated result is incomplete. Never load `GRAPH_REPORT.md` whole or treat a missing graph edge as proof of no dependency.
 
 ## Security Guidelines
 

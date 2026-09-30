@@ -76,15 +76,14 @@ refuses, rather than falling back, when customer data would cross the boundary.
 ## Read order
 
 Measured, not assumed (see the cost report below): grep and read the source
-for targeted code lookups; use a budgeted `graphify query` or `graphify
-affected` for relationship and impact questions; skim `GRAPH_REPORT.md` only to
-orient; start business and decision questions at the operator wiki's
+for targeted code lookups; use `node scripts/knowledge-query.js <repo> <symbol>`
+for bounded relationship context; start business and decision questions at the operator wiki's
 `index.md`. Check freshness first; stale output is rebuilt or bypassed, never
 used silently.
 
 ```bash
 node scripts/knowledge-freshness.js graphs <repo>...   # FRESH / STALE / MISSING / UNKNOWN
-node scripts/knowledge-freshness.js wiki <workspace>   # stale pages, missing sources, unindexed pages
+node scripts/knowledge-freshness.js wiki <workspace>   # current, stale or unverified citations
 ```
 
 ## Code graphs
@@ -94,25 +93,28 @@ node scripts/knowledge-freshness.js wiki <workspace>   # stale pages, missing so
   tree-sitter pass is used (`graphify update`): no LLM, no API key, content-hash
   cached. `graph.json` embeds `built_at_commit`.
 - **Build:** `node scripts/knowledge-freshness.js build <repo>` runs
-  `graphify update` and writes `graphify-out/BUILD_INFO.json` (source commit,
-  dirty flag, build time, Graphify version). It fails before Graphify starts if
+  `graphify update` and writes a v3 `graphify-out/BUILD_INFO.json` binding graph
+  digest, source/config fingerprint, extraction and verified commits, dirty flag,
+  build time and Graphify version. It fails before Graphify starts if
   `.graphifyignore` is missing any required privacy exclusion.
-- **Automatic rebuilds:** `scripts/git-hooks/graphify-rebuild.sh` installed as
-  `post-commit` and `post-checkout` (installed in manageesg-backend and
-  autoresearch). It rebuilds only in a repo's main checkout (never from a
+- **Automatic rebuilds:** `scripts/git-hooks/graphify-rebuild.sh` is a template
+  for `post-commit` and `post-checkout`. At this review, the backend has an
+  older installed hook; AutoResearch and frontend have no verified installation.
+  Align installed hooks only after their shared validator paths are current and
+  custom hook content has been preserved. The template rebuilds only in a repo's main checkout (never from a
   linked worktree), only after code changes or a branch switch that moves
   HEAD, and refuses to build unless `.graphifyignore` carries the complete
   knowledge boundary (the marker alone is insufficient). After a commit it
-  re-extracts only the changed files, which
-  measured 2 to 3 times faster than `graphify update`, and writes
+  re-extracts only the changed files and writes
   `BUILD_INFO.json`.
-- **Boundary:** each repo's `.graphifyignore` excludes reports, artifacts, logs,
+- **Boundary:** a verified repo's `.graphifyignore` must exclude reports, artifacts, logs,
   local data, site-packages, `_upstream/`, `references/`, and vendored code,
   because reports and artifacts can quote customer data.
 - **FalkorDB (optional):** the backend loader
   `scripts/graph/load_all_repos_to_falkordb.py` loads each repo's graph in
-  batches and writes a `GraphMeta` node with the source commit, build time, and
-  Graphify version. Verify with `agentic-stack/falkordb_smoke.py`. The image
+  batches into a new generation and writes verified `GraphMeta` with the source
+  commit, graph digest and counts only after a complete load. Verify the intended
+  generation with `agentic-stack/falkordb_smoke.py --expected-snapshots`. The image
   and the MCP server are pinned by version.
 - **Obsidian view:** on demand, per repo:
   `graphify export obsidian --graph graphify-out/graph.json --dir graphify-out/obsidian`.
@@ -124,7 +126,8 @@ node scripts/knowledge-freshness.js wiki <workspace>   # stale pages, missing so
 
 The SeaBridgeAI workspace folder is a local git repository with no remote. It
 follows the Karpathy LLM-wiki pattern: raw sources stay the truth; pages under
-`wiki/` are syntheses with `updated:` and `sources:`; `index.md` is read first;
+`wiki/` are syntheses with `updated:`, `sources:` and matching `source_hashes:`;
+pages without hashes are unverified. `index.md` is read first;
 `log.md` is append-only; the workspace `AGENTS.md` (Wiki) holds the rules. A
 plain Markdown wiki was chosen over Graphify's document mode, which needs an
 LLM pass per document; see `docs/reports/knowledge/2026-09-29-knowledge-cost-efficiency.md`.

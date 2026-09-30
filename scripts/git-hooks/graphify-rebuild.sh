@@ -17,17 +17,18 @@
 [ "$(git rev-parse --git-dir)" = "$(git rev-parse --git-common-dir)" ] || exit 0
 
 TOP=$(git rev-parse --show-toplevel) || exit 0
-IGNORE="$TOP/.graphifyignore"
-grep -q "SeaBridgeAI knowledge boundary" "$IGNORE" 2>/dev/null || exit 0
-for pattern in \
-  'docs/reports/' 'reports/' 'artifacts/' 'logs/' '/data/' \
-  '**/site-packages/' 'references/' 'vendor/' 'third_party/' '*.env' '.env.*'; do
-  grep -Fqx "$pattern" "$IGNORE" 2>/dev/null || exit 0
-done
+# One validator for manual builds and installed hooks. Explicit override supports
+# nonstandard layouts; missing validator fails closed, without downloading tools.
+CHECK="${GRAPHIFY_BOUNDARY_CHECK:-$TOP/scripts/knowledge-freshness.js}"
+if [ -z "$GRAPHIFY_BOUNDARY_CHECK" ] && [ ! -f "$CHECK" ]; then
+  CHECK="$TOP/../everything-claude-code/scripts/knowledge-freshness.js"
+fi
+[ -f "$CHECK" ] || exit 0
+command -v node >/dev/null 2>&1 || exit 0
+node "$CHECK" boundary "$TOP" >/dev/null 2>&1 || exit 0
 command -v graphify >/dev/null 2>&1 || exit 0
 
-CODE_RE='\.(py|pyi|ts|tsx|js|jsx|mjs|cjs|go|rs|java|kt|kts|cs|cpp|cc|c|h|hpp|rb|php|swift|scala|lua|sh|ps1)$'
-CHANGED=""
+CHANGED=()
 case "$(basename "$0")" in
   post-checkout)
     # Branch switches only, and only when HEAD actually moved: full rebuild.
@@ -35,8 +36,21 @@ case "$(basename "$0")" in
     [ "$1" != "$2" ] || exit 0
     ;;
   *)
-    CHANGED=$(git diff --name-only HEAD~1 HEAD 2>/dev/null | grep -E "$CODE_RE")
-    [ -n "$CHANGED" ] || exit 0
+    # Use the last graph snapshot, not just the last commit. NUL-separated arrays
+    # preserve spaces and wildcard characters in paths.
+    BASE=$(node "$CHECK" built-commit "$TOP" 2>/dev/null)
+    if [ -n "$BASE" ] && git cat-file -e "$BASE^{commit}" 2>/dev/null; then
+      while IFS= read -r -d '' file; do
+        CHANGED+=("$file")
+      done < <(node "$CHECK" changed-inputs "$TOP" "$BASE")
+      [ "${#CHANGED[@]}" -gt 0 ] || exit 0
+      for file in "${CHANGED[@]}"; do
+        if [ "$file" = ".graphifyignore" ] || [ "$file" = ".gitignore" ]; then
+          CHANGED=()
+          break
+        fi
+      done
+    fi
     ;;
 esac
 
@@ -51,30 +65,23 @@ if [ -z "$PY" ]; then
 fi
 
 REBUILD='
-import datetime, json, sys
-from importlib.metadata import version
+import sys
 from pathlib import Path
 from graphify.watch import _rebuild_code
 root = Path(sys.argv[1])
 changed = [root / p for p in sys.argv[2:]] or None
-if not _rebuild_code(root, changed_paths=changed, block_on_lock=True):
+# No queued rebuilds: a later hook or explicit freshness check handles missed work.
+if not _rebuild_code(root, changed_paths=changed, block_on_lock=False):
     sys.exit(1)
-tail = (root / "graphify-out" / "graph.json").read_bytes()[-4096:].decode("utf-8", "ignore")
-commit = tail.split("\"built_at_commit\": \"")[-1].split("\"")[0] if "built_at_commit" in tail else ""
-info = {"schema": "seabridge.graph-build.v1", "sourceCommit": commit, "sourceDirty": False,
-        "builtAt": datetime.datetime.now(datetime.timezone.utc).isoformat(),
-        "graphifyVersion": version("graphifyy"),
-        "mode": "code-ast incremental" if changed else "code-ast full"}
-(root / "graphify-out" / "BUILD_INFO.json").write_text(json.dumps(info, indent=2) + "\n")
 '
 
 mkdir -p "$TOP/graphify-out"
 LOG="$TOP/graphify-out/.last-hook-build.log"
+BEFORE=$(node "$CHECK" snapshot "$TOP") || exit 0
 if [ -n "$PY" ] && "$PY" -c "import graphify.watch" >/dev/null 2>&1; then
-  # shellcheck disable=SC2086
-  ( GRAPHIFY_NO_TIPS=1 "$PY" -c "$REBUILD" "$TOP" $CHANGED > "$LOG" 2>&1 ) &
+  ( GRAPHIFY_OUT="$TOP/graphify-out" GRAPHIFY_NO_TIPS=1 "$PY" -c "$REBUILD" "$TOP" "${CHANGED[@]}" && node "$CHECK" stamp "$TOP" "$BEFORE" ) > "$LOG" 2>&1 &
 else
-  ( GRAPHIFY_NO_TIPS=1 graphify update "$TOP" > "$LOG" 2>&1 ) &
+  ( GRAPHIFY_OUT="$TOP/graphify-out" GRAPHIFY_NO_TIPS=1 graphify update "$TOP" && node "$CHECK" stamp "$TOP" "$BEFORE" ) > "$LOG" 2>&1 &
 fi
 disown 2>/dev/null
 exit 0
