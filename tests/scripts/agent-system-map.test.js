@@ -52,6 +52,17 @@ run('unchanged fixture is fresh but edited policy fails closed', () => {
   } finally { fs.rmSync(dir, { recursive: true, force: true }); }
 });
 
+run('Windows and Linux checkout line endings have the same source fingerprint', () => {
+  const dir = fixture();
+  try {
+    writeMap(dir);
+    const target = path.join(dir, '.clinerules');
+    const source = fs.readFileSync(target, 'utf8').replace(/\r\n/g, '\n');
+    fs.writeFileSync(target, source.replace(/\n/g, '\r\n'));
+    assert.strictEqual(check(dir).fresh, true);
+  } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+});
+
 run('tampered map and missing source fail closed', () => {
   const dir = fixture();
   try {

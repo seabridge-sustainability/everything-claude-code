@@ -38,7 +38,9 @@ function sourceRows(root, sources = SOURCES) {
   return [...sources].sort().map(relative => {
     const full = file(root, relative);
     if (!fs.existsSync(full) || !fs.lstatSync(full).isFile()) throw new Error(`missing regular source: ${relative}`);
-    const data = fs.readFileSync(full);
+    // Git may check out text with CRLF on Windows and LF in Linux CI.
+    // Hash normalized content so the same committed source has one fingerprint.
+    const data = fs.readFileSync(full, 'utf8').replace(/\r\n/g, '\n');
     return { path: relative, sha256: hash(data) };
   });
 }
