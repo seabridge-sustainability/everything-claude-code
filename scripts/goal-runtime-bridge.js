@@ -15,6 +15,7 @@ const {
 } = require('./lib/goal-runtime');
 
 const GOAL_CLI = path.join(__dirname, 'goal-control.js');
+const { checkSession } = require('./lib/session-coordination');
 
 function optionValue(args, name, fallback = null) {
   const index = args.indexOf(name);
@@ -67,12 +68,15 @@ function main(args = process.argv.slice(2)) {
   const goalDir = optionValue(args, '--dir', path.join('.ecc', 'goal'));
   const goalPath = optionValue(args, '--goal', path.join(goalDir, 'active-goal.yaml'));
   const model = optionValue(args, '--model');
+  const sessionId = optionValue(args, '--session', process.env.ECC_SESSION_ID);
 
   if (command === 'admit') {
     const suppliedText = optionValue(args, '--text', hookText(readStdin()));
     let mode = optionValue(args, '--mode', 'auto');
+    if (!['auto', 'controlled', 'standard', 'lightweight'].includes(mode)) throw new Error('invalid task mode');
     if (mode === 'auto') mode = fs.existsSync(path.resolve(goalPath)) ? 'controlled' : classifyTaskText(suppliedText).mode;
     const goalExists = fs.existsSync(path.resolve(goalPath));
+    if (goalExists) mode = 'controlled'; // An active controlled goal cannot be downgraded by a wrapper flag.
     let goalValid = false;
     let validationError = null;
     if (goalExists) {
@@ -81,6 +85,15 @@ function main(args = process.argv.slice(2)) {
       validationError = goalValid ? null : (result.stderr || result.stdout).trim();
     }
     const decision = admissionDecision({ runtimeId, mode, goalExists, goalValid, model }, capabilities);
+    if (decision.admitted && mode === 'controlled') {
+      try {
+        decision.session = checkSession({ sessionId }).id;
+      } catch (error) {
+        decision.admitted = false;
+        decision.reason = `session coordination: ${error.message}`;
+        decision.next_action = 'Register an isolated worktree and task write scopes with ecc session register, then pass --session or ECC_SESSION_ID.';
+      }
+    }
     if (validationError) decision.validation_error = validationError;
     process.stdout.write(`${JSON.stringify(decision, null, 2)}\n`);
     return decision.admitted ? 0 : 2;
@@ -95,6 +108,11 @@ function main(args = process.argv.slice(2)) {
     }
     if (!fs.existsSync(path.resolve(goalPath))) {
       process.stderr.write(`goal runtime: ${claim} claim requires ${goalPath}\n`);
+      return 2;
+    }
+    try { checkSession({ sessionId }); }
+    catch (error) {
+      process.stderr.write(`session coordination: ${error.message}\n`);
       return 2;
     }
     const result = runGoal(['claim', claim, '--goal', goalPath, '--dir', goalDir, '--json']);

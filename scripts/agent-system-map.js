@@ -17,6 +17,8 @@ const SOURCES = Object.freeze([
   '.clinerules', '.cursor/rules/common-agents.md',
   'protocols/SAFETY_AUTHORIZATION_RULE.md', 'protocols/GOAL_PROTOCOL.md',
   'protocols/GOAL_PROTOCOL_SHORT.md',
+  'protocols/CONCURRENT_SESSION_PROTOCOL.md', 'scripts/session-coordinate.js',
+  'scripts/lib/session-coordination.js',
   'manifests/instruction-adapters.json', 'manifests/goal-runtime-capabilities.json',
   'manifests/goal-proof-profiles.json',
   'scripts/check-instruction-stack.js', 'scripts/goal-control.js',

@@ -2,15 +2,15 @@
   "schema": "seabridge.agent-system-map.v1",
   "scope": "ECC agent instructions, runtime adapters, outcome control, evaluation, and CI; no product or tenant data",
   "extractor": "scripts/agent-system-map.js (deterministic, no LLM)",
-  "sourceFingerprint": "0d10912dc99169d746988ace1fd32977261c064c03fe5706cd45a2d7513fd26d",
+  "sourceFingerprint": "753d131147a0acbfe4b267d38ac667d73c8d1bf2eb2529f806981587d736c18d",
   "sources": [
     {
       "path": ".agents/rules/seabridge-agent-baseline.md",
-      "sha256": "3be5def8513b25134b1291073c76348ad9f58b3393033fc0e0802c628c25502d"
+      "sha256": "3c0d48ab0693dfe4ab7ab8a965518c0fe1efbbc2d0792e53fe1f66657f6eac3e"
     },
     {
       "path": ".clinerules",
-      "sha256": "e3d247aab85ad2b81edad701c400ab24243cdea494380dc99f7f4847808fd9ec"
+      "sha256": "d2faed521096e3bfb66d54601e3ee44824b3a426fffb4eeb9e11074527fe7073"
     },
     {
       "path": ".cursor/hooks.json",
@@ -34,7 +34,7 @@
     },
     {
       "path": ".github/copilot-instructions.md",
-      "sha256": "67dee1c05b021bc93d66904e0c1b76ed60c93b79b891dbe20880846003846be9"
+      "sha256": "25824da60ff85c6532a2d47eff39393ff3fe91aeca82433ad4cbe909c0e76551"
     },
     {
       "path": ".github/workflows/ci.yml",
@@ -50,7 +50,7 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "0609c38308ff47aa9e282b79b5949f7a90ce1bbc024108cfad6de3b9cdc0fcb0"
+      "sha256": "93da91a535b64c5f26cdda7ea29ec6f2069b279a42bd1f40a056456a66b3f789"
     },
     {
       "path": "CLAUDE.md",
@@ -89,12 +89,16 @@
       "sha256": "9426fac48f4e39d4a9ad7af84dbc4725257d29ce9a8ad3cee1db0fe94d5b8041"
     },
     {
+      "path": "protocols/CONCURRENT_SESSION_PROTOCOL.md",
+      "sha256": "5927e803bb0e57fbfaf20d50ae7ac112a33928c749077bf82ebb63a3bfd47d9e"
+    },
+    {
       "path": "protocols/GOAL_PROTOCOL.md",
-      "sha256": "638fb19839de1e513d6323d881fb25b845e51fe5ce4b9084ab9c169df70382bf"
+      "sha256": "9baaade7b34a4c403cd1e06bf3c9377a637fc6f26821cf64e62e06fb4dbd493a"
     },
     {
       "path": "protocols/GOAL_PROTOCOL_SHORT.md",
-      "sha256": "6e4644023644f2584d0e1eded457f30cf5063fff3d0325bc25dcc481da31973d"
+      "sha256": "daa920f0c4991672d560bdcb54dd0163c44377a3af5bc139f7b9517127faa8f8"
     },
     {
       "path": "protocols/SAFETY_AUTHORIZATION_RULE.md",
@@ -106,7 +110,7 @@
     },
     {
       "path": "scripts/agent-system-map.js",
-      "sha256": "a3e2030b071e4300158751d305e4f606c3a5f7b1df207b3a2abc04b8026cd7a4"
+      "sha256": "1bcddd77700b901ab5a991b7ac8468e40a0ca209ffa8033c8a84334dbec4011f"
     },
     {
       "path": "scripts/check-instruction-stack.js",
@@ -114,7 +118,7 @@
     },
     {
       "path": "scripts/eval-goal-runtime-offline.js",
-      "sha256": "bd1a0e4dae82e12fb755f5081a0b3f32e0e90114d5d54ed4f5232ad26f906dbb"
+      "sha256": "907f5e66b9b3440e39fcf4d77f4172354c8f3bcffd8d46746080281b30e9ec78"
     },
     {
       "path": "scripts/goal-control.js",
@@ -122,7 +126,7 @@
     },
     {
       "path": "scripts/goal-runtime-bridge.js",
-      "sha256": "93a93c15617276b4b3a064a53bbf8a1a308440526c5a5ec9799987b2ede42130"
+      "sha256": "bc0bed2d09433ac486c15777044015b664eac4bdfe118176ec49652119895078"
     },
     {
       "path": "scripts/knowledge-freshness.js",
@@ -133,8 +137,16 @@
       "sha256": "40c2986a5d283841bfa733563fe2a797e5606789570d4863cfe99b332e8796d3"
     },
     {
+      "path": "scripts/lib/session-coordination.js",
+      "sha256": "b82cee74ad6a665084919d8944c2cdffcd44bfe203c2327fc19531089c5c0235"
+    },
+    {
+      "path": "scripts/session-coordinate.js",
+      "sha256": "9ccf302729db0753c7b68f0a0d0f6a5e5835a02eaccdb32089a1b525b8e03c7f"
+    },
+    {
       "path": "tests/ci/instruction-stack.test.js",
-      "sha256": "a132249f28be5db34161dcdf3d47f98253783b36bde2ed566fc4fb6f707d97b8"
+      "sha256": "e29d3d37b9730ffd8c998bf170206eb7eba927e22e481180dfaee235285de440"
     },
     {
       "path": "tests/lib/goal-control.test.js",
@@ -150,13 +162,13 @@
       "id": "file:.agents/rules/seabridge-agent-baseline.md",
       "type": "source",
       "path": ".agents/rules/seabridge-agent-baseline.md",
-      "sha256": "3be5def8513b25134b1291073c76348ad9f58b3393033fc0e0802c628c25502d"
+      "sha256": "3c0d48ab0693dfe4ab7ab8a965518c0fe1efbbc2d0792e53fe1f66657f6eac3e"
     },
     {
       "id": "file:.clinerules",
       "type": "source",
       "path": ".clinerules",
-      "sha256": "e3d247aab85ad2b81edad701c400ab24243cdea494380dc99f7f4847808fd9ec"
+      "sha256": "d2faed521096e3bfb66d54601e3ee44824b3a426fffb4eeb9e11074527fe7073"
     },
     {
       "id": "file:.cursor/hooks.json",
@@ -192,7 +204,7 @@
       "id": "file:.github/copilot-instructions.md",
       "type": "source",
       "path": ".github/copilot-instructions.md",
-      "sha256": "67dee1c05b021bc93d66904e0c1b76ed60c93b79b891dbe20880846003846be9"
+      "sha256": "25824da60ff85c6532a2d47eff39393ff3fe91aeca82433ad4cbe909c0e76551"
     },
     {
       "id": "file:.github/workflows/ci.yml",
@@ -216,7 +228,7 @@
       "id": "file:AGENTS.md",
       "type": "source",
       "path": "AGENTS.md",
-      "sha256": "0609c38308ff47aa9e282b79b5949f7a90ce1bbc024108cfad6de3b9cdc0fcb0"
+      "sha256": "93da91a535b64c5f26cdda7ea29ec6f2069b279a42bd1f40a056456a66b3f789"
     },
     {
       "id": "file:CLAUDE.md",
@@ -273,16 +285,22 @@
       "sha256": "7ffc45c369a3cca7aab6bfa9031d30bea89feb1c890c94741708a9b1002ae0ae"
     },
     {
+      "id": "file:protocols/CONCURRENT_SESSION_PROTOCOL.md",
+      "type": "source",
+      "path": "protocols/CONCURRENT_SESSION_PROTOCOL.md",
+      "sha256": "5927e803bb0e57fbfaf20d50ae7ac112a33928c749077bf82ebb63a3bfd47d9e"
+    },
+    {
       "id": "file:protocols/GOAL_PROTOCOL_SHORT.md",
       "type": "source",
       "path": "protocols/GOAL_PROTOCOL_SHORT.md",
-      "sha256": "6e4644023644f2584d0e1eded457f30cf5063fff3d0325bc25dcc481da31973d"
+      "sha256": "daa920f0c4991672d560bdcb54dd0163c44377a3af5bc139f7b9517127faa8f8"
     },
     {
       "id": "file:protocols/GOAL_PROTOCOL.md",
       "type": "source",
       "path": "protocols/GOAL_PROTOCOL.md",
-      "sha256": "638fb19839de1e513d6323d881fb25b845e51fe5ce4b9084ab9c169df70382bf"
+      "sha256": "9baaade7b34a4c403cd1e06bf3c9377a637fc6f26821cf64e62e06fb4dbd493a"
     },
     {
       "id": "file:protocols/SAFETY_AUTHORIZATION_RULE.md",
@@ -300,7 +318,7 @@
       "id": "file:scripts/agent-system-map.js",
       "type": "source",
       "path": "scripts/agent-system-map.js",
-      "sha256": "a3e2030b071e4300158751d305e4f606c3a5f7b1df207b3a2abc04b8026cd7a4"
+      "sha256": "1bcddd77700b901ab5a991b7ac8468e40a0ca209ffa8033c8a84334dbec4011f"
     },
     {
       "id": "file:scripts/check-instruction-stack.js",
@@ -312,7 +330,7 @@
       "id": "file:scripts/eval-goal-runtime-offline.js",
       "type": "source",
       "path": "scripts/eval-goal-runtime-offline.js",
-      "sha256": "bd1a0e4dae82e12fb755f5081a0b3f32e0e90114d5d54ed4f5232ad26f906dbb"
+      "sha256": "907f5e66b9b3440e39fcf4d77f4172354c8f3bcffd8d46746080281b30e9ec78"
     },
     {
       "id": "file:scripts/goal-control.js",
@@ -324,7 +342,7 @@
       "id": "file:scripts/goal-runtime-bridge.js",
       "type": "source",
       "path": "scripts/goal-runtime-bridge.js",
-      "sha256": "93a93c15617276b4b3a064a53bbf8a1a308440526c5a5ec9799987b2ede42130"
+      "sha256": "bc0bed2d09433ac486c15777044015b664eac4bdfe118176ec49652119895078"
     },
     {
       "id": "file:scripts/knowledge-freshness.js",
@@ -339,10 +357,22 @@
       "sha256": "40c2986a5d283841bfa733563fe2a797e5606789570d4863cfe99b332e8796d3"
     },
     {
+      "id": "file:scripts/lib/session-coordination.js",
+      "type": "source",
+      "path": "scripts/lib/session-coordination.js",
+      "sha256": "b82cee74ad6a665084919d8944c2cdffcd44bfe203c2327fc19531089c5c0235"
+    },
+    {
+      "id": "file:scripts/session-coordinate.js",
+      "type": "source",
+      "path": "scripts/session-coordinate.js",
+      "sha256": "9ccf302729db0753c7b68f0a0d0f6a5e5835a02eaccdb32089a1b525b8e03c7f"
+    },
+    {
       "id": "file:tests/ci/instruction-stack.test.js",
       "type": "source",
       "path": "tests/ci/instruction-stack.test.js",
-      "sha256": "a132249f28be5db34161dcdf3d47f98253783b36bde2ed566fc4fb6f707d97b8"
+      "sha256": "e29d3d37b9730ffd8c998bf170206eb7eba927e22e481180dfaee235285de440"
     },
     {
       "id": "file:tests/lib/goal-control.test.js",
@@ -449,6 +479,18 @@
   ],
   "edges": [
     {
+      "from": "file:.agents/rules/seabridge-agent-baseline.md",
+      "to": "file:protocols/CONCURRENT_SESSION_PROTOCOL.md",
+      "type": "mentions-path",
+      "evidence": ".agents/rules/seabridge-agent-baseline.md"
+    },
+    {
+      "from": "file:.clinerules",
+      "to": "file:protocols/CONCURRENT_SESSION_PROTOCOL.md",
+      "type": "mentions-path",
+      "evidence": ".clinerules"
+    },
+    {
       "from": "file:.cursor/hooks.json",
       "to": "file:.cursor/hooks/before-submit-prompt.js",
       "type": "mentions-path",
@@ -459,6 +501,12 @@
       "to": "file:.cursor/hooks/stop.js",
       "type": "mentions-path",
       "evidence": ".cursor/hooks.json"
+    },
+    {
+      "from": "file:.github/copilot-instructions.md",
+      "to": "file:protocols/CONCURRENT_SESSION_PROTOCOL.md",
+      "type": "mentions-path",
+      "evidence": ".github/copilot-instructions.md"
     },
     {
       "from": "file:.github/workflows/ci.yml",
@@ -493,6 +541,12 @@
     {
       "from": "file:AGENTS.md",
       "to": "file:CLAUDE.md",
+      "type": "mentions-path",
+      "evidence": "AGENTS.md"
+    },
+    {
+      "from": "file:AGENTS.md",
+      "to": "file:protocols/CONCURRENT_SESSION_PROTOCOL.md",
       "type": "mentions-path",
       "evidence": "AGENTS.md"
     },
@@ -689,6 +743,18 @@
       "evidence": "OPENCODE.md"
     },
     {
+      "from": "file:protocols/GOAL_PROTOCOL_SHORT.md",
+      "to": "file:protocols/CONCURRENT_SESSION_PROTOCOL.md",
+      "type": "mentions-path",
+      "evidence": "protocols/GOAL_PROTOCOL_SHORT.md"
+    },
+    {
+      "from": "file:protocols/GOAL_PROTOCOL.md",
+      "to": "file:protocols/CONCURRENT_SESSION_PROTOCOL.md",
+      "type": "mentions-path",
+      "evidence": "protocols/GOAL_PROTOCOL.md"
+    },
+    {
       "from": "file:scripts/agent-system-map.js",
       "to": "file:.agents/rules/seabridge-agent-baseline.md",
       "type": "mentions-path",
@@ -816,6 +882,12 @@
     },
     {
       "from": "file:scripts/agent-system-map.js",
+      "to": "file:protocols/CONCURRENT_SESSION_PROTOCOL.md",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
       "to": "file:protocols/GOAL_PROTOCOL_SHORT.md",
       "type": "mentions-path",
       "evidence": "scripts/agent-system-map.js"
@@ -871,6 +943,18 @@
     {
       "from": "file:scripts/agent-system-map.js",
       "to": "file:scripts/knowledge-query.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:scripts/lib/session-coordination.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:scripts/session-coordinate.js",
       "type": "mentions-path",
       "evidence": "scripts/agent-system-map.js"
     },
@@ -1326,8 +1410,8 @@
     }
   ],
   "build": {
-    "generatedAt": "2026-09-30T19:58:40.885Z",
-    "sourceCommit": "21df4c3f177fc7aa0b4887bd67bd4bb50773b4bb",
+    "generatedAt": "2026-09-30T21:58:04.849Z",
+    "sourceCommit": "88b3de520863a7759513200cdc793e0fa0df1619",
     "sourceDirty": true
   }
 }

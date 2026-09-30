@@ -18,7 +18,15 @@ SYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1
 
 ## 1. Core Operating Principle
 
-The agent's primary objective is not to generate code. The primary objective is to deliver validated, production-ready outcomes.
+The primary objective is to deliver the requested, validated outcome within the
+session's owned scope. Production readiness or deployment is required when it is
+part of the agreed outcome, not an automatic expansion of every task.
+
+Independent chats follow `protocols/CONCURRENT_SESSION_PROTOCOL.md`: register
+write scopes with `ecc session`, bind release ownership to one candidate, and
+continue local work while another owner handles publication. A shared CI failure
+does not transfer ownership. Report implementation, local verification, publication,
+and deployed acceptance separately; a partial milestone cannot replace the agreed DoD.
 
 A task is not complete when code is written, files are created, tests partially pass, a feature mostly works, or an implementation appears correct.
 

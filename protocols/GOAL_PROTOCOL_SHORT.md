@@ -15,6 +15,11 @@ Before implementation, establish:
 - Validation plan.
 - Edge cases and regression checks.
 
+For controlled work, also register a unique session and write scopes with `ecc session`.
+Follow `protocols/CONCURRENT_SESSION_PROTOCOL.md`: no silent ownership takeover,
+bounded CI attribution, and one release owner for a fixed candidate while others
+work locally. Report local completion, publication and deployed acceptance separately.
+
 Run the loop:
 
 Analyze -> Plan -> Implement -> Test -> Verify -> Review -> Fix -> Re-test -> Re-verify -> Complete.

@@ -9,6 +9,7 @@ const { loadCapabilities } = require('./lib/goal-runtime');
 
 const GOAL = path.join(__dirname, 'goal-control.js');
 const BRIDGE = path.join(__dirname, 'goal-runtime-bridge.js');
+const SESSION = path.join(__dirname, 'session-coordinate.js');
 
 function runNode(script, args, cwd, expected) {
   const result = spawnSync(process.execPath, [script, ...args], {
@@ -71,6 +72,8 @@ function createFixture(root, complete) {
   fs.writeFileSync(path.join(root, 'README.md'), '# Offline goal runtime fixture\n');
   runGit(['add', 'README.md'], root);
   runGit(['commit', '-m', 'test: initialize offline goal fixture'], root);
+  runNode(SESSION, ['register', '--session', 'offline-eval', '--scope', 'README.md',
+    '--objective', 'Offline gate evaluation', '--done-when', 'Synthetic artifact verified'], root, [0]);
   const seed = path.join(root, 'goal.json');
   const goalDir = path.join(root, '.ecc', 'goal');
   fs.writeFileSync(seed, `${JSON.stringify(goalDocument(complete ? 'offline-valid' : 'offline-all-null'), null, 2)}\n`);
@@ -108,19 +111,23 @@ function evaluate() {
     const results = capabilities.runtimes.map((runtime, index) => {
       const model = `${models[index % models.length]}/offline-eval`;
       const admit = runNode(BRIDGE, [
-        'admit', '--runtime', runtime.id, '--model', model, '--mode', 'controlled', '--dir', validGoalDir,
+        'admit', '--runtime', runtime.id, '--model', model, '--mode', 'controlled', '--dir', validGoalDir, '--session', 'offline-eval',
       ], validRoot, [0]);
+      const unowned = runNode(BRIDGE, [
+        'admit', '--runtime', runtime.id, '--model', model, '--mode', 'lightweight', '--dir', validGoalDir, '--session', 'unregistered-chat',
+      ], validRoot, [2]);
       const valid = runNode(BRIDGE, [
-        'final', '--runtime', runtime.id, '--model', model, '--claim', 'complete', '--dir', validGoalDir,
+        'final', '--runtime', runtime.id, '--model', model, '--claim', 'complete', '--dir', validGoalDir, '--session', 'offline-eval',
       ], validRoot, [0]);
       const allNull = runNode(BRIDGE, [
-        'final', '--runtime', runtime.id, '--model', model, '--claim', 'complete', '--dir', invalidGoalDir,
+        'final', '--runtime', runtime.id, '--model', model, '--claim', 'complete', '--dir', invalidGoalDir, '--session', 'offline-eval',
       ], invalidRoot, [2]);
       return {
         runtime: runtime.id,
         model,
         tier: runtime.tier,
         admitted_valid_goal: admit.status === 0,
+        rejected_unregistered_session: JSON.parse(unowned.stdout).admitted === false,
         allowed_verified_complete: JSON.parse(valid.stdout).allowed === true,
         rejected_all_null_complete: JSON.parse(allNull.stdout).allowed === false,
       };
@@ -132,6 +139,7 @@ function evaluate() {
       model_families_covered: [...new Set(results.map(result => result.model.split('/')[0]))],
       passed: results.every(result => (
         result.admitted_valid_goal
+        && result.rejected_unregistered_session
         && result.allowed_verified_complete
         && result.rejected_all_null_complete
       )),

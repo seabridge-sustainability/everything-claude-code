@@ -24,7 +24,11 @@ function block(text, start, end) {
 
 const canonical = read('AGENTS.md');
 const contract = STARTS.map(([start, end]) => block(canonical, start, end)).join('\n\n');
+const costControl = canonical.match(/^## GitHub Actions Budget Tripwire[\s\S]*?(?=^## |^<!-- SEABRIDGE_GOAL_PROTOCOL_START -->)/m)?.[0]?.trim();
+if (!costControl) throw new Error('Missing canonical Actions budget tripwire');
 const compact = [
+  costControl,
+  '',
   'Load task-specific skills and large references only when their trigger fits.',
   'Use focused local checks first and broaden validation only for changed contracts, failures, or material risk.',
   'Repository rules and configured thresholds override generic examples.',

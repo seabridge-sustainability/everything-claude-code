@@ -122,6 +122,7 @@
     "scripts/feedback.js",
     "scripts/goal-control.js",
     "scripts/goal-runtime-bridge.js",
+    "scripts/session-coordinate.js",
     "scripts/eval-goal-runtime-offline.js",
     "scripts/memory.js",
     "scripts/memory-mcp.mjs",

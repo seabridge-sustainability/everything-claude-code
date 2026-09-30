@@ -138,6 +138,16 @@ test('every ECC runtime receives the Actions batch and budget rules', () => {
   }
 });
 
+test('all runtime instructions retain independent-session scope and separate delivery milestones', () => {
+  const root = path.resolve(__dirname, '..', '..');
+  for (const stack of lib.effectiveStacks(root)) {
+    assert.match(stack.text, /ecc session register/, stack.harness);
+    assert.match(stack.text, /check-write/, stack.harness);
+    assert.match(stack.text, /Only the release lease owner publishes a fixed candidate/, stack.harness);
+    assert.match(stack.text, /implementation, verification, publication, and deployment separately/, stack.harness);
+  }
+});
+
 test('workflow text does not reintroduce a second approval gate', () => {
   const agents = fs.readFileSync(path.resolve(__dirname, '..', '..', 'AGENTS.md'), 'utf8');
   const worktree = fs.readFileSync(

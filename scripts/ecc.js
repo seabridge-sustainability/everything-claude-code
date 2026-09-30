@@ -55,6 +55,10 @@ const COMMANDS = {
     script: 'goal-runtime-bridge.js',
     description: 'Apply the same outcome gate across coding-agent runtimes and models',
   },
+  session: {
+    script: 'session-coordinate.js',
+    description: 'Reserve local session write scopes and serialize release candidates across worktrees',
+  },
   'goal-eval': {
     script: 'eval-goal-runtime-offline.js',
     description: 'Replay the offline outcome gate across every registered runtime and model family',
@@ -130,6 +134,7 @@ const PRIMARY_COMMANDS = [
   'memory',
   'goal',
   'goal-runtime',
+  'session',
   'goal-eval',
   'list-installed',
   'doctor',

@@ -35,6 +35,16 @@ function main(args = process.argv.slice(2), raw = readInput()) {
 
   const bridge = path.resolve(__dirname, '..', 'goal-runtime-bridge.js');
   const bridgeArgs = [bridge, phase === 'final' ? 'final-hook' : 'admit', '--runtime', runtime];
+  // Never infer ownership from cwd or the newest branch tip. Native session IDs
+  // may be used at registration; wrappers can pass ECC_SESSION_ID explicitly.
+  let sessionId = process.env.ECC_SESSION_ID;
+  if (!sessionId) {
+    try {
+      const payload = JSON.parse(raw || '{}');
+      sessionId = payload.session_id || payload.conversation_id;
+    } catch { /* The bridge will reject controlled work without a session. */ }
+  }
+  if (typeof sessionId === 'string') bridgeArgs.push('--session', sessionId);
   if (phase === 'admit') bridgeArgs.push('--mode', 'auto');
   const model = payloadModel(raw);
   if (model) bridgeArgs.push('--model', model);
