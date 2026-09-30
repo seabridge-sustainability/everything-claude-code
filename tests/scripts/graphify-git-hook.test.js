@@ -47,8 +47,9 @@ fs.writeFileSync(stamp, [
   "fs.writeFileSync(path.join(root,'graphify-out/graph.json'), JSON.stringify({nodes:[{id:'a',_origin:'ast',source_file:'src/app.py'}],built_at_commit:cp.execFileSync('git',['-C',root,'rev-parse','HEAD'],{encoding:'utf8'}).trim()}));",
 ].join('\n'));
 
-// Fake CLI: records `graphify <args>` as "cli <args>".
-fs.writeFileSync(path.join(bin, 'graphify'), `#!/bin/bash\nnode "${posix(stamp)}" "$2"\necho "cli $@" >> "${posix(marker)}"\n`, { mode: 0o755 });
+// Fake CLI: report a version for the build-receipt probe, and record only
+// actual builds. The hook's stamp step invokes `graphify --version` on Linux.
+fs.writeFileSync(path.join(bin, 'graphify'), `#!/bin/bash\nif [ "$1" = "--version" ]; then echo 'graphifyy 1.2.3'; exit 0; fi\nnode "${posix(stamp)}" "$2"\necho "cli $@" >> "${posix(marker)}"\n`, { mode: 0o755 });
 
 // Fake interpreter: passes the import probe and records the rebuild call as
 // "incremental <root> <changed files...>".
