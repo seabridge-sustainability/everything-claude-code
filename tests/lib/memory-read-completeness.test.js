@@ -18,7 +18,10 @@ async function main() {
     try {
       process.env.ECC_MEMORY_PROJECT_ROOT = path.join(dir, 'vault');
       process.env.ECC_MEMORY_USER_ROOT = path.join(dir, 'user');
-      const roots = core.resolveVaultRoots({ cwd: dir, homeDir: dir, env: {
+      // Match the MCP tool's current-project identity while redirecting all
+      // storage into the disposable vault. A different cwd yields a different
+      // repository key and silently tests a different project directory.
+      const roots = core.resolveVaultRoots({ cwd: process.cwd(), homeDir: dir, env: {
         ECC_MEMORY_PROJECT_ROOT: path.join(dir, 'vault'), ECC_MEMORY_USER_ROOT: path.join(dir, 'user'),
       } });
       core.initializeVault({ roots, scopes: ['project', 'team'] });
@@ -49,6 +52,11 @@ async function main() {
   check('complete direct lookup preserves body and unreviewed status', ({ read }) => {
     const result = read(); assert.equal(result.memory.trust, 'unreviewed');
     assert.equal(result.memory.body, 'Synthetic state; no authority.');
+  });
+  check('MCP and direct lookup use the same disposable project vault', ({ mcp }) => {
+    const result = mcp(); assert.equal(result.isError, undefined);
+    const memory = JSON.parse(result.content[0].text).memory;
+    assert.equal(memory.body, 'Synthetic state; no authority.');
   });
   check('complete missing lookup remains not found', ({ read }) => {
     assert.throws(() => read('mem_synthetic_missing'), /not found/);
