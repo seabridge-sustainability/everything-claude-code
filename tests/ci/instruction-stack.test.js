@@ -152,6 +152,13 @@ test('workflow text does not reintroduce a second approval gate', () => {
   assert.match(worktree, /restart the agent session/);
 });
 
+test('cheap CI validation runs effective instructions and the fresh system map', () => {
+  const ci = fs.readFileSync(path.resolve(__dirname, '..', '..', '.github', 'workflows', 'ci.yml'), 'utf8');
+  const validate = ci.split('  validate:\n')[1]?.split('\n  python-tests:')[0] || '';
+  assert.match(validate, /node scripts\/check-instruction-stack\.js --workspace "\$RUNNER_TEMP"/);
+  assert.match(validate, /node scripts\/agent-system-map\.js check/);
+});
+
 test('default instructions require runtime evidence without unconditional test expansion', () => {
   const agents = fs.readFileSync(path.resolve(__dirname, '..', '..', 'AGENTS.md'), 'utf8');
   const goalSync = fs.readFileSync(path.resolve(__dirname, '..', '..', 'scripts', 'sync-goal-protocol.ps1'), 'utf8');

@@ -78,7 +78,7 @@ function buildMap(root = ROOT, sources = SOURCES) {
       edge(`runtime:${runtime.id}`, runtime.instruction_entry, 'runtime-entry', 'manifests/goal-runtime-capabilities.json');
     }
     for (const evidence of runtime.evidence || []) {
-      if (known.has(evidence)) edge(`runtime:${runtime.id}`, evidence, 'runtime-evidence', 'manifests/goal-runtime-capabilities.json');
+      edge(`runtime:${runtime.id}`, evidence, 'runtime-evidence', 'manifests/goal-runtime-capabilities.json');
     }
   }
   // Exact, scoped path mentions are navigation edges, not semantic claims.

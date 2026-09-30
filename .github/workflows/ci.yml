@@ -263,6 +263,12 @@ jobs:
         run: node scripts/ci/validate-agents.js
         continue-on-error: false
 
+      - name: Validate effective ECC agent instructions
+        run: node scripts/check-instruction-stack.js --workspace "$RUNNER_TEMP"
+
+      - name: Validate source-bound agent-system map
+        run: node scripts/agent-system-map.js check
+
       - name: Validate hooks
         run: node scripts/ci/validate-hooks.js
         continue-on-error: false

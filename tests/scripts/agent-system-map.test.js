@@ -84,4 +84,15 @@ run('declared import without the actual adapter import cannot be certified', () 
   } finally { fs.rmSync(dir, { recursive: true, force: true }); }
 });
 
+run('new runtime evidence outside the declared map scope fails closed', () => {
+  const dir = fixture();
+  try {
+    const manifestPath = path.join(dir, 'manifests/goal-runtime-capabilities.json');
+    const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+    manifest.runtimes.find(runtime => runtime.id === 'claude').evidence.push('hooks/new-control.json');
+    fs.writeFileSync(manifestPath, JSON.stringify(manifest));
+    assert.throws(() => buildMap(dir), /out-of-scope target hooks\/new-control\.json/);
+  } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+});
+
 summary(passed, failed);
