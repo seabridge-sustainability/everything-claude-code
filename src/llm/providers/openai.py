@@ -28,11 +28,10 @@ class OpenAIProvider(LLMProvider):
     provider_type = ProviderType.OPENAI
 
     def __init__(self, api_key: str | None = None, base_url: str | None = None) -> None:
-        self.client = OpenAI(
-            api_key=api_key or os.environ.get("OPENAI_API_KEY"),
-            base_url=base_url,
-            _enforce_credentials=False,
-        )
+        self.api_key = api_key or os.environ.get("OPENAI_API_KEY")
+        # Construct lazily when unconfigured; recent SDKs require credentials
+        # at client initialization and no longer accept _enforce_credentials.
+        self.client = OpenAI(api_key=self.api_key, base_url=base_url) if self.api_key else None
         self._models = [
             ModelInfo(
                 name="gpt-4o",
@@ -69,6 +68,8 @@ class OpenAIProvider(LLMProvider):
         ]
 
     def generate(self, input: LLMInput) -> LLMOutput:
+        if self.client is None:
+            raise AuthenticationError("OpenAI API key is not configured", provider=ProviderType.OPENAI)
         try:
             params: dict[str, Any] = {
                 "model": input.model or "gpt-4o-mini",
@@ -125,7 +126,7 @@ class OpenAIProvider(LLMProvider):
         return self._models.copy()
 
     def validate_config(self) -> bool:
-        return bool(self.client.api_key)
+        return bool(self.api_key)
 
     def get_default_model(self) -> str:
         return "gpt-4o-mini"

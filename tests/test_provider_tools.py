@@ -5,7 +5,10 @@ from types import SimpleNamespace
 
 import pytest
 
+from llm.core.interface import AuthenticationError
 from llm.core.types import LLMInput, Message, Role, ToolDefinition
+from llm.providers.astraflow import AstraflowProvider
+from llm.providers.atlas import AtlasProvider
 from llm.providers.claude import ClaudeProvider
 from llm.providers.constants import EMPTY_FILTERED_RESPONSE_ERROR
 from llm.providers.ollama import OllamaProvider
@@ -94,6 +97,16 @@ def test_openai_provider_can_be_constructed_without_credentials(monkeypatch):
     provider = OpenAIProvider()
 
     assert provider.validate_config() is False
+
+
+def test_openai_compatible_providers_fail_closed_without_credentials(monkeypatch):
+    for name in ("OPENAI_API_KEY", "ATLAS_API_KEY", "ATLASCLOUD_API_KEY", "ASTRAFLOW_API_KEY"):
+        monkeypatch.delenv(name, raising=False)
+    for provider_type in (OpenAIProvider, AtlasProvider, AstraflowProvider):
+        provider = provider_type()
+        assert provider.validate_config() is False
+        with pytest.raises(AuthenticationError, match="not configured"):
+            provider.generate(LLMInput(messages=[Message(role=Role.USER, content="hi")]))
 
 
 def test_openai_provider_rejects_empty_or_filtered_responses():

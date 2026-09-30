@@ -56,7 +56,7 @@ class _AstraflowBaseProvider(LLMProvider):
         env_model = os.environ.get(self.model_env)
         fallback_model = os.environ.get(self.fallback_model_env) if self.fallback_model_env else None
         self.default_model = default_model or env_model or fallback_model or DEFAULT_ASTRAFLOW_MODEL
-        self.client = OpenAI(api_key=self.api_key, base_url=self.base_url, _enforce_credentials=False)
+        self.client = OpenAI(api_key=self.api_key, base_url=self.base_url) if self.api_key else None
         self._models = [
             ModelInfo(
                 name=self.default_model,
@@ -67,6 +67,8 @@ class _AstraflowBaseProvider(LLMProvider):
         ]
 
     def generate(self, llm_input: LLMInput) -> LLMOutput:
+        if self.client is None:
+            raise AuthenticationError("Astraflow API key is not configured", provider=self.provider_type)
         try:
             params: dict[str, Any] = {
                 "model": llm_input.model or self.default_model,
