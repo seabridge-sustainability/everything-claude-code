@@ -27,14 +27,19 @@ const SOURCES = Object.freeze([
   'scripts/agent-behavior-report.js', 'scripts/eval-agent-behavior.js',
   'scripts/ci/detect-ci-scope.js', 'scripts/knowledge-adoption.js',
   'scripts/knowledge-retrieval-eval.js', 'scripts/knowledge-freshness.js',
-  'scripts/knowledge-query.js', 'hooks/hooks.json', 'hooks/codex-hooks.json',
+  'scripts/knowledge-query.js', 'scripts/memory.js', 'scripts/memory-mcp.mjs',
+  'scripts/lib/memory-vault.js', 'scripts/lib/memory-vault-format.js',
+  'schemas/memory.schema.json', 'docs/design/ecc-memory-vault.md',
+  'hooks/hooks.json', 'hooks/codex-hooks.json',
   '.cursor/hooks.json', '.cursor/hooks/before-submit-prompt.js',
   '.cursor/hooks/stop.js', '.opencode/plugins/ecc-hooks.ts',
   '.gemini/settings.json', '.github/workflows/ci.yml',
   '.github/workflows/harness.yml', 'tests/ci/instruction-stack.test.js',
   'tests/ci/agent-adoption-doctor.test.js', 'tests/ci/agent-behavior-eval.test.js',
   'tests/ci/agent-behavior-report.test.js', 'tests/ci/workflow-cost-contract.test.js',
-  'tests/lib/goal-control.test.js', 'tests/scripts/knowledge-freshness.test.js',
+  'tests/lib/goal-control.test.js', 'tests/lib/memory-vault.test.js',
+  'tests/lib/memory-schema.test.js', 'tests/scripts/memory.test.js',
+  'tests/scripts/memory-mcp.test.js', 'tests/scripts/knowledge-freshness.test.js',
   'tests/scripts/knowledge-retrieval-eval.test.js',
 ]);
 
@@ -89,6 +94,23 @@ function buildMap(root = ROOT, sources = SOURCES) {
     for (const evidence of runtime.evidence || []) {
       edge(`runtime:${runtime.id}`, evidence, 'runtime-evidence', 'manifests/goal-runtime-capabilities.json');
     }
+  }
+  // Verify the memory control path rather than leaving its new source nodes as
+  // disconnected inventory. These edges are only emitted while the imports exist.
+  for (const [from, to, importText] of [
+    ['scripts/memory.js', 'scripts/lib/memory-vault.js', "require('./lib/memory-vault')"],
+    ['scripts/memory-mcp.mjs', 'scripts/lib/memory-vault.js', "require('./lib/memory-vault.js')"],
+    ['scripts/lib/memory-vault.js', 'scripts/lib/memory-vault-format.js', "require('./memory-vault-format')"],
+    ['scripts/knowledge-adoption.js', 'scripts/lib/memory-vault.js', "require('./lib/memory-vault')"],
+    ['tests/lib/memory-vault.test.js', 'scripts/lib/memory-vault.js', "require('../../scripts/lib/memory-vault')"],
+    ['tests/lib/memory-schema.test.js', 'schemas/memory.schema.json', "require('../../schemas/memory.schema.json')"],
+    ['tests/lib/memory-schema.test.js', 'scripts/lib/memory-vault.js', "require('../../scripts/lib/memory-vault')"],
+    ['tests/scripts/memory-mcp.test.js', 'scripts/lib/memory-vault.js', "require('../../scripts/lib/memory-vault')"],
+  ]) {
+    if (!fs.readFileSync(file(root, from), 'utf8').includes(importText)) {
+      throw new Error(`declared memory import missing from ${from}: ${importText}`);
+    }
+    edge(`file:${from}`, to, 'verified-code-import', from);
   }
   // Exact, scoped path mentions are navigation edges, not semantic claims.
   for (const row of rows) {

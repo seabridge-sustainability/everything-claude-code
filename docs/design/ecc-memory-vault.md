@@ -4,7 +4,10 @@
 
 An operator can save, inspect, search, and hand off durable context through one
 human-readable vault that Claude Code, Codex, Hermes, OpenCode, and other
-harnesses can share. Project and team memories live under `.ecc/memory/`; user
+harnesses can share. New project and team memories default to the repository's
+shared `.git/ecc-memory/` directory; linked worktrees use that same vault without
+dirtying the main checkout. An existing `.ecc/memory/` vault remains in use.
+Different repositories remain isolated. User
 memories live under `~/.ecc/memory/`. The same `ecc.memory.v1` documents are
 available through the `ecc memory` CLI and an opt-in local stdio MCP server, so
 knowledge transfer does not depend on email, one vendor's transcript format, or
@@ -86,7 +89,7 @@ OS accounts, containers, or equivalent filesystem isolation.
 ### Surfaces
 
 ```text
-<repo>/.ecc/memory/
+<repo>/.git/ecc-memory/ (or an existing <repo>/.ecc/memory/)
 ├── project/
 │   ├── contexts/
 │   ├── decisions/
@@ -105,12 +108,14 @@ OS accounts, containers, or equivalent filesystem isolation.
 
 The project scope is repo-local operator context and receives its own
 fail-closed `.gitignore`: initialization and writes stop if the protection file
-exists with unexpected content. The team scope is intended to be inspected by
-a human before it is committed, but committed vault entries remain unreviewed
-context. The user scope follows the operator across repos and is recalled only
-when explicitly requested.
+exists with unexpected content. The new default vault is local Git metadata,
+not a committed or remote backup; export reviewed team knowledge into governed
+repository documentation when sharing it beyond this machine. Committed legacy
+or explicitly relocated vault entries remain unreviewed context. The user scope
+follows the operator across repos and is recalled only when explicitly requested.
 `ECC_MEMORY_PROJECT_ROOT` and `ECC_MEMORY_USER_ROOT` may override the two vault
-locations explicitly.
+locations explicitly. A shared override is still required to put team memories
+from different repositories in one vault; it does not happen automatically.
 
 ### Document contract
 

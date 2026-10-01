@@ -34,6 +34,8 @@ run('map covers canonical policy, all adapters, outcome gate, and CI with bounde
   for (const required of ['file:AGENTS.md', 'file:protocols/GOAL_PROTOCOL.md',
     'file:scripts/goal-control.js', 'file:.github/workflows/ci.yml',
     'file:scripts/agent-adoption-doctor.js', 'file:scripts/knowledge-retrieval-eval.js',
+    'file:scripts/lib/memory-vault.js', 'file:scripts/memory-mcp.mjs',
+    'file:schemas/memory.schema.json',
     'file:scripts/ci/detect-ci-scope.js', 'file:tests/ci/workflow-cost-contract.test.js',
     'runtime:codex', 'runtime:claude', 'runtime:gemini', 'runtime:opencode']) {
     assert.ok(ids.has(required), required);
@@ -41,6 +43,8 @@ run('map covers canonical policy, all adapters, outcome gate, and CI with bounde
   assert.strictEqual(map.nodes.filter(node => node.type === 'runtime').length, 18);
   assert.ok(map.edges.some(edge => edge.from === 'file:CLAUDE.md' && edge.to === 'file:AGENTS.md' && edge.type === 'verified-import'));
   assert.ok(map.edges.some(edge => edge.from === 'runtime:claude' && edge.to === 'file:hooks/hooks.json' && edge.type === 'runtime-evidence'));
+  assert.ok(map.edges.some(edge => edge.from === 'file:scripts/memory.js'
+    && edge.to === 'file:scripts/lib/memory-vault.js' && edge.type === 'verified-code-import'));
   assert.ok(map.sources.every(row => !/^(?:data|artifacts|logs|graphify-out)\//.test(row.path)));
   assert.strictEqual(map.coverage.semanticIndex, 'not-run');
   assert.ok(map.coverage.excludedRoots.includes('data/'));
@@ -64,6 +68,26 @@ run('unchanged fixture is fresh but edited policy fails closed', () => {
     assert.strictEqual(check(dir).fresh, true);
     fs.appendFileSync(path.join(dir, 'AGENTS.md'), '\n# changed rule\n');
     assert.strictEqual(check(dir).fresh, false);
+  } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+});
+
+run('memory control changes make the map stale', () => {
+  const dir = fixture();
+  try {
+    writeMap(dir);
+    assert.strictEqual(check(dir).fresh, true);
+    fs.appendFileSync(path.join(dir, 'scripts/lib/memory-vault.js'), '\n// changed memory behavior\n');
+    assert.strictEqual(check(dir).fresh, false);
+  } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+});
+
+run('broken memory import cannot be certified', () => {
+  const dir = fixture();
+  try {
+    const target = path.join(dir, 'scripts/memory.js');
+    fs.writeFileSync(target, fs.readFileSync(target, 'utf8')
+      .replace("require('./lib/memory-vault')", "require('./lib/missing-vault')"));
+    assert.throws(() => buildMap(dir), /declared memory import missing/);
   } finally { fs.rmSync(dir, { recursive: true, force: true }); }
 });
 

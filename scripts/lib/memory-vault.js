@@ -53,6 +53,28 @@ function findNearestProjectRoot(cwd) {
   }
 }
 
+// The common Git directory is shared by linked worktrees and ignored by Git.
+// Preserve an existing legacy vault, but keep new vaults out of source trees.
+function defaultMemoryVault(projectRoot) {
+  try {
+    const common = execFileSync('git', ['-C', projectRoot, 'rev-parse', '--git-common-dir'],
+      { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 5000 }).trim();
+    if (!common) throw new Error('No common Git directory');
+    const commonPath = path.resolve(projectRoot, common);
+    if (path.basename(commonPath).toLowerCase() !== '.git') throw new Error('Nonstandard common Git directory');
+    const mainRoot = path.dirname(commonPath);
+    const marker = path.join(mainRoot, '.git');
+    if (!fs.lstatSync(marker).isDirectory()
+      || fs.realpathSync(marker) !== fs.realpathSync(commonPath)) throw new Error('Unverified common Git directory');
+    const legacy = path.join(mainRoot, '.ecc', 'memory');
+    return fs.existsSync(legacy)
+      ? { root: legacy, boundary: mainRoot }
+      : { root: path.join(commonPath, 'ecc-memory'), boundary: commonPath };
+  } catch {
+    return { root: path.join(projectRoot, '.ecc', 'memory'), boundary: projectRoot };
+  }
+}
+
 function resolveOverride(value, cwd) {
   return path.resolve(cwd, asNonEmptyString(value, 'memory root override', 4096));
 }
@@ -77,9 +99,10 @@ function resolveVaultRoots(options = {}) {
     options.homeDir || env.HOME || env.USERPROFILE || os.homedir()
   );
   const projectRoot = findNearestProjectRoot(cwd);
+  const defaultVault = env.ECC_MEMORY_PROJECT_ROOT ? null : defaultMemoryVault(projectRoot);
   const projectVault = env.ECC_MEMORY_PROJECT_ROOT
     ? resolveOverride(env.ECC_MEMORY_PROJECT_ROOT, cwd)
-    : path.join(projectRoot, '.ecc', 'memory');
+    : defaultVault.root;
   const userVault = env.ECC_MEMORY_USER_ROOT
     ? resolveOverride(env.ECC_MEMORY_USER_ROOT, cwd)
     : path.join(homeDir, '.ecc', 'memory');
@@ -95,10 +118,10 @@ function resolveVaultRoots(options = {}) {
     value: Object.freeze({
       project: env.ECC_MEMORY_PROJECT_ROOT
         ? realpathNearestExisting(projectVault)
-        : projectRoot,
+        : defaultVault.boundary,
       team: env.ECC_MEMORY_PROJECT_ROOT
         ? realpathNearestExisting(projectVault)
-        : projectRoot,
+        : defaultVault.boundary,
       user: env.ECC_MEMORY_USER_ROOT
         ? realpathNearestExisting(userVault)
         : homeDir,

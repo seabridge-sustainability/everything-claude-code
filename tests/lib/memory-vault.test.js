@@ -168,6 +168,71 @@ test('shared project override isolates different repos and joins linked worktree
   }
 });
 
+test('default project memory follows the common Git checkout across worktrees', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-memory-worktrees-'));
+  const repo = path.join(root, 'repo');
+  const linked = path.join(root, 'linked');
+  const other = path.join(root, 'other');
+  try {
+    fs.mkdirSync(repo); fs.mkdirSync(other);
+    for (const dir of [repo, other]) {
+      const init = spawnSync('git', ['-C', dir, 'init', '-q'], { encoding: 'utf8' });
+      assert.strictEqual(init.status, 0, init.stderr);
+    }
+    const first = spawnSync('git', ['-C', repo, '-c', 'user.name=Fixture',
+      '-c', 'user.email=fixture@example.invalid', 'commit', '--allow-empty', '-qm', 'fixture'],
+    { encoding: 'utf8' });
+    assert.strictEqual(first.status, 0, first.stderr);
+    const add = spawnSync('git', ['-C', repo, 'worktree', 'add', '--detach', linked],
+      { encoding: 'utf8' });
+    assert.strictEqual(add.status, 0, add.stderr);
+
+    const primary = resolveVaultRoots({ cwd: repo, env: {} });
+    const sibling = resolveVaultRoots({ cwd: linked, env: {} });
+    const independent = resolveVaultRoots({ cwd: other, env: {} });
+    assert.strictEqual(primary.project, path.join(repo, '.git', 'ecc-memory', 'project'));
+    assert.strictEqual(primary.project, sibling.project);
+    assert.strictEqual(primary.team, sibling.team);
+    assert.notStrictEqual(primary.project, independent.project);
+
+    saveMemory({ title: 'Worktree handoff', body: 'Resume the checked task.',
+      kind: 'handoff', scope: 'project', sourceHarness: 'codex',
+      targetHarnesses: ['claude'] }, fixedOptions(sibling, 'mem_20260726_worktree'));
+    assert.deepStrictEqual(searchMemories('worktree', { roots: primary }).results
+      .map(result => result.memory.id), ['mem_20260726_worktree']);
+    assert.deepStrictEqual(searchMemories('worktree', { roots: independent }).results, []);
+    assert.strictEqual(fs.existsSync(path.join(repo, '.ecc', 'memory')), false);
+    assert.strictEqual(fs.existsSync(path.join(linked, '.ecc', 'memory')), false);
+    assert.strictEqual(spawnSync('git', ['-C', repo, 'status', '--porcelain'],
+      { encoding: 'utf8' }).stdout.trim(), '');
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('existing repo-local memory remains visible from linked worktrees', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-memory-legacy-worktree-'));
+  const repo = path.join(root, 'repo');
+  const linked = path.join(root, 'linked');
+  try {
+    fs.mkdirSync(repo);
+    assert.strictEqual(spawnSync('git', ['-C', repo, 'init', '-q'],
+      { encoding: 'utf8' }).status, 0);
+    assert.strictEqual(spawnSync('git', ['-C', repo, '-c', 'user.name=Fixture',
+      '-c', 'user.email=fixture@example.invalid', 'commit', '--allow-empty', '-qm', 'fixture'],
+    { encoding: 'utf8' }).status, 0);
+    assert.strictEqual(spawnSync('git', ['-C', repo, 'worktree', 'add', '--detach', linked],
+      { encoding: 'utf8' }).status, 0);
+    fs.mkdirSync(path.join(repo, '.ecc', 'memory'), { recursive: true });
+    const primary = resolveVaultRoots({ cwd: repo, env: {} });
+    const sibling = resolveVaultRoots({ cwd: linked, env: {} });
+    assert.strictEqual(primary.project, path.join(repo, '.ecc', 'memory', 'project'));
+    assert.strictEqual(primary.project, sibling.project);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
 test('case-distinct repository paths keep separate memory scopes on case-sensitive systems', () => {
   if (process.platform === 'win32') return;
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-memory-case-'));
