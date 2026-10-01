@@ -13,7 +13,7 @@
     ],
     "semanticIndex": "not-run"
   },
-  "sourceFingerprint": "421ea4ba8c2e5a850821b5c4a08d4a2c7b08f8c9990a257eaea46dd1efb2133b",
+  "sourceFingerprint": "f81fd1b1e9eca64574e92bdfa95489992c07d82482df5e8fa3ce95596725521e",
   "sources": [
     {
       "path": ".agents/rules/seabridge-agent-baseline.md",
@@ -193,7 +193,7 @@
     },
     {
       "path": "tests/ci/workflow-cost-contract.test.js",
-      "sha256": "a40dbc2031e738f43b0240d35ea383469ef9d5719119f973fcdefecd4c4bd7b4"
+      "sha256": "596d7cb633a490d0132838e195a482565db117209c4f87f14cf1d4b7f76b60da"
     },
     {
       "path": "tests/lib/goal-control.test.js",
@@ -477,7 +477,7 @@
       "id": "file:tests/ci/workflow-cost-contract.test.js",
       "type": "source",
       "path": "tests/ci/workflow-cost-contract.test.js",
-      "sha256": "a40dbc2031e738f43b0240d35ea383469ef9d5719119f973fcdefecd4c4bd7b4"
+      "sha256": "596d7cb633a490d0132838e195a482565db117209c4f87f14cf1d4b7f76b60da"
     },
     {
       "id": "file:tests/lib/goal-control.test.js",
@@ -1641,8 +1641,8 @@
     }
   ],
   "build": {
-    "generatedAt": "2026-10-01T19:43:52.421Z",
-    "sourceCommit": "a844833d920e62c33009e97e16792828fefc209d",
+    "generatedAt": "2026-10-01T19:51:30.572Z",
+    "sourceCommit": "cd9e81f457ed6ec3563df2b0b8e8b2dc34257484",
     "sourceDirty": false
   }
 }

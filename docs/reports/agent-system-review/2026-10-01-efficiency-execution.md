@@ -12,6 +12,7 @@ Make the coding-agent control plane cheaper to operate and harder to mistake act
 - [x] Phase 1: verify the backend and frontend CI cost controls already present on their remote development branches; do not duplicate another session's work.
 - [x] Phase 1: read the live organization Actions hard budget. The final pre-release check on 2026-10-01 showed $32.77 of $150 (22%), with stop-usage enabled.
 - [x] Phase 1: keep the backend's existing single test gate and serialized exact-SHA deployment; add ECC report-only CI routing. The dependency-free IOC scan still runs on reports; dependency installation and npm audit run on source/manifest changes or an unknown comparison. Local workflow contract tests pass. Frontend already cancels superseded CI. No backend or frontend workflow change was needed.
+- [x] Phase 1: stop a separate known-failing ECC schedule. Monthly Metrics Snapshot failed in August, September and October because this repository has Issues disabled (`has_issues=false`; October run `36913642092` returned HTTP 410). The scheduled trigger is removed; manual dispatch remains available after a durable metrics destination is restored. The workflow cost contract checks this state.
 - [x] Phase 2: reconcile the 18 instruction adapters with enforcement/adoption status; add a local adoption doctor and negative controls. File readiness is not live activation.
 - [x] Phase 3: add offline outcome/cost adversarial evaluations and a comparable cost-per-success report. The five synthetic SeaBridge tasks now cover backend tenant isolation, frontend browser QA, cross-repo contracts, security review with an embedded hostile comment, and stale handoff evidence. Each has an offline scoring control. The 15-call all-harness plan exceeds the nine-call hard batch limit, so later live comparisons must select bounded subsets. No paid model trials were run. CI minutes and deployments remain unknown unless telemetry is supplied.
 - [x] Phase 4: validate source-bound long-goal handoffs and test retrieval, scope, unknown-result, and poisoning cases. Retrieval output remains untrusted context, not instructions.
@@ -20,7 +21,7 @@ Make the coding-agent control plane cheaper to operate and harder to mistake act
 - [x] Phase 6: produce a local release/cost report separating verification, publication, CI, deployment, and acceptance.
 - [x] Run focused and broad local checks, review the task-owned diff, and prepare one release candidate per changed repository. ECC: 4,795/4,795 local tests; frontend: 18/18 file-readiness checks. The frontend branch integrated a disjoint remote climate change once before release.
 - [x] Recheck the hard budget, current remote tip, and running workflows before the first release. ECC `main` was published at `c6b29cf793e6c23d62f1ad0ea5c58a1a2d26d396` with CI run `36912539841` successful; frontend `development` was published at `0b025b01bf77f09ef53383f662ec8248f70ee837` with CI run `36912644802` successful. Both isolated release worktrees were clean.
-- [ ] Publish this small five-task evaluation/map/report follow-up as one ECC batch only after local checks and a fresh budget/remote inspection; bind its CI to the new SHA.
+- [ ] Publish this small five-task evaluation, failed-schedule fix, map, and report follow-up as one ECC batch only after local checks and a fresh budget/remote inspection; bind its CI to the new SHA.
 
 ## Current limitations
 
@@ -38,7 +39,7 @@ The Actions tripwire is a mandatory human/agent pre-release check in the canonic
 | Publication | ECC `main` `c6b29cf793e6c23d62f1ad0ea5c58a1a2d26d396`; frontend `development` `0b025b01bf77f09ef53383f662ec8248f70ee837`. Both matched `git ls-remote`. The five-task fixture follow-up is local at this report cut. | A subsequent local commit is not published until its own SHA is checked. |
 | Hosted CI | ECC run `36912539841` and frontend run `36912644802` both succeeded on the exact published SHAs. | These runs precede the five-task fixture follow-up; its CI must be checked separately. |
 | Deployment and user acceptance | Not requested or performed by this agent-system release. | File readiness is not runtime adoption or product acceptance. |
-| Actions spending | Live organization page: $32.77 of $150 before the first pushes, $32.84 after both CI runs, 22% utilization, stop-usage enabled. | The $0.07 organization-wide movement is not a per-run cost attribution; billing may lag or include other sessions. |
+| Actions spending | Live organization page: $32.77 of $150 before the first pushes, $32.84 after both CI runs, and $33.46 before this follow-up, still 22% utilization with stop-usage enabled. | The organization-wide movement is not a per-run cost attribution; billing may lag or include other sessions. |
 
 ## Minimal project-memory handoff
 
@@ -59,7 +60,7 @@ At admission, correction, and handoff, refresh the controlled goal's resume rece
 
 ## Graph build receipt
 
-The deterministic control-plane map at `docs/tools/agent-system-map.json` has 66 nodes and 175 evidence-labelled edges. It was rebuilt at `2026-10-01T19:43:52.421Z` from clean source commit `a844833d920e62c33009e97e16792828fefc209d`, with `sourceDirty=false`, generator version 2, no semantic indexing, and zero model calls. `node scripts/agent-system-map.js check` passed. Its SHA-256 is `7A2B13069E1EB358D2151347BE56BDE051CC68C4898A493615B70A4A888B4C51`. This is the authoritative agent-control map; its freshness is content-bound, not proof of live vendor enforcement.
+The deterministic control-plane map at `docs/tools/agent-system-map.json` has 66 nodes and 175 evidence-labelled edges. It was rebuilt at `2026-10-01T19:51:30.572Z` from clean source commit `cd9e81f457ed6ec3563df2b0b8e8b2dc34257484`, with `sourceDirty=false`, generator version 2, no semantic indexing, and zero model calls. `node scripts/agent-system-map.js check` passed. Its SHA-256 is `AF457090854D15B9314476EE633CF13F9DB916A9C133086F719419AA19DD6DBA`. This is the authoritative agent-control map; its freshness is content-bound, not proof of live vendor enforcement.
 
 The separate local Graphify 0.3.17 corpus is `E:\cas-agent-graph-20261001`, sourced from ECC commit `858ebabb606b3490a933238e488fdf3cabdff24f`. Its explicit 16-file allowlist is:
 
