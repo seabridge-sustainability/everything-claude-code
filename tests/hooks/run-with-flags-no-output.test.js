@@ -68,11 +68,11 @@ function run(args, env = {}, input = payload) {
   });
 }
 
-function runConfiguredHook(entry, env = {}, input = payload) {
+function runConfiguredHook(entry, env = {}, input = payload, cwd = repoRoot) {
   return spawnSync(entry.hooks[0].command, {
     input,
     encoding: 'utf8',
-    cwd: repoRoot,
+    cwd,
     env: {
       ...process.env,
       CLAUDE_PLUGIN_ROOT: repoRoot,
@@ -388,6 +388,9 @@ else failed++;
 for (const [eventName, entries] of Object.entries(hooksConfig.hooks)) {
   if (eventName === 'Stop') continue;
   for (const entry of entries) {
+    // The controlled-goal admission gate is deliberately outside the optional
+    // hook-profile switch. Test its fail-closed behavior separately below.
+    if (entry.id === 'user-prompt:goal-runtime-admit') continue;
     if (
       test(`${eventName}/${entry.id} registered disabled path stays silent`, () => {
         const result = runConfiguredHook(entry, { ECC_HOOKS_ENABLED: '0' });
@@ -398,6 +401,28 @@ for (const [eventName, entries] of Object.entries(hooksConfig.hooks)) {
     else failed++;
   }
 }
+
+const admissionEntry = hooksConfig.hooks.UserPromptSubmit.find(
+  entry => entry.id === 'user-prompt:goal-runtime-admit'
+);
+if (
+  test('controlled goal admission still blocks with optional hooks disabled', () => {
+    assert.ok(admissionEntry, 'mandatory admission hook must be registered');
+    const controlledRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-mandatory-goal-gate-'));
+    try {
+      const goalDir = path.join(controlledRoot, '.ecc', 'goal');
+      fs.mkdirSync(goalDir, { recursive: true });
+      fs.writeFileSync(path.join(goalDir, 'active-goal.yaml'), 'invalid: [\n');
+      const result = runConfiguredHook(admissionEntry, { ECC_HOOKS_ENABLED: '0' }, payload, controlledRoot);
+      assert.strictEqual(result.status, 2, result.stderr);
+      assert.strictEqual(result.stdout, '');
+      assert.match(result.stderr, /goal|admitted|validation/i);
+    } finally {
+      fs.rmSync(controlledRoot, { recursive: true, force: true });
+    }
+  })
+) passed++;
+else failed++;
 
 const sessionEndEntry = hooksConfig.hooks.SessionEnd.find(entry => entry.id === 'session:end:marker');
 if (
