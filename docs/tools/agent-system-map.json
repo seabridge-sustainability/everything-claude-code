@@ -2,7 +2,18 @@
   "schema": "seabridge.agent-system-map.v1",
   "scope": "ECC agent instructions, runtime adapters, outcome control, evaluation, and CI; no product or tenant data",
   "extractor": "scripts/agent-system-map.js (deterministic, no LLM)",
-  "sourceFingerprint": "753d131147a0acbfe4b267d38ac667d73c8d1bf2eb2529f806981587d736c18d",
+  "generatorVersion": 2,
+  "coverage": {
+    "excludedRoots": [
+      "artifacts/",
+      "data/",
+      "graphify-out/",
+      "logs/",
+      "vendor/"
+    ],
+    "semanticIndex": "not-run"
+  },
+  "sourceFingerprint": "39a3b857e1fcbfb5c405079dbc042bb3c702278499b12fcd08776582c357195a",
   "sources": [
     {
       "path": ".agents/rules/seabridge-agent-baseline.md",
@@ -38,7 +49,7 @@
     },
     {
       "path": ".github/workflows/ci.yml",
-      "sha256": "6cbab6fe97d55156b1cc1f2bc5f398d1d0060e7b59ff211241fe1ca56d55aa63"
+      "sha256": "681e1c11a2e7e4e0c3d51115fe2bcf8f9a97dca62c2d8bc67e9fb71c9a7f75a8"
     },
     {
       "path": ".github/workflows/harness.yml",
@@ -105,16 +116,28 @@
       "sha256": "18faf8ce860f4555ddfe822a3f9f6d5437549043862288a4fb66b0674333a9bc"
     },
     {
+      "path": "scripts/agent-adoption-doctor.js",
+      "sha256": "9431e805a7fc9da394c5c669b95223f2b6e6a3fc0c14d53f2da6e438065a005c"
+    },
+    {
       "path": "scripts/agent-behavior-report.js",
-      "sha256": "3d4771c19519db89902822e9b8964194a15dc367f61070764296a3fd880eb3cf"
+      "sha256": "48139c727a436b111fba37da44a39b68e012bbda975d847f50fbb287fd9c418e"
     },
     {
       "path": "scripts/agent-system-map.js",
-      "sha256": "1bcddd77700b901ab5a991b7ac8468e40a0ca209ffa8033c8a84334dbec4011f"
+      "sha256": "9e631880a1e8a239b0488022811f1b309289ffffc4d81a4fce57ab2cc4cd23da"
     },
     {
       "path": "scripts/check-instruction-stack.js",
       "sha256": "f9a0afc5ed99e3167458b24a971cfa17a40be98994de9bd7b7cfb4bd5245f257"
+    },
+    {
+      "path": "scripts/ci/detect-ci-scope.js",
+      "sha256": "13db9838821cb515b90ba160725253a1b4852feb57bfd289236f883057e72d78"
+    },
+    {
+      "path": "scripts/eval-agent-behavior.js",
+      "sha256": "d7e041676f28796af99916e1823f5ed279c096450f88abc9e6cef6974651c5ff"
     },
     {
       "path": "scripts/eval-goal-runtime-offline.js",
@@ -129,12 +152,20 @@
       "sha256": "bc0bed2d09433ac486c15777044015b664eac4bdfe118176ec49652119895078"
     },
     {
+      "path": "scripts/knowledge-adoption.js",
+      "sha256": "da178739c10c0f315055dc66a0a62b234ee19167c6fbf3d569943d992ce4d305"
+    },
+    {
       "path": "scripts/knowledge-freshness.js",
       "sha256": "26d2fa61ab786ea0d046504f3efbf39a7f1ca42c61170773664ad68f39997915"
     },
     {
       "path": "scripts/knowledge-query.js",
       "sha256": "40c2986a5d283841bfa733563fe2a797e5606789570d4863cfe99b332e8796d3"
+    },
+    {
+      "path": "scripts/knowledge-retrieval-eval.js",
+      "sha256": "2f24f69e853ffe8077903ef6fcd3b6443a1da73cf46dba830a57df84896d816a"
     },
     {
       "path": "scripts/lib/session-coordination.js",
@@ -145,8 +176,24 @@
       "sha256": "9ccf302729db0753c7b68f0a0d0f6a5e5835a02eaccdb32089a1b525b8e03c7f"
     },
     {
+      "path": "tests/ci/agent-adoption-doctor.test.js",
+      "sha256": "b226ccdba5b14852b07543e373a16374045fbe6c3593f476b6ebdccfe008e9bd"
+    },
+    {
+      "path": "tests/ci/agent-behavior-eval.test.js",
+      "sha256": "790233e460dd6eea180776303a6801ae6318df22459cd1f6d593f77736cb4524"
+    },
+    {
+      "path": "tests/ci/agent-behavior-report.test.js",
+      "sha256": "c288a16167c7a5f5b42b51c37e49847b992bc74ae6681694590215ca5a323b68"
+    },
+    {
       "path": "tests/ci/instruction-stack.test.js",
       "sha256": "e29d3d37b9730ffd8c998bf170206eb7eba927e22e481180dfaee235285de440"
+    },
+    {
+      "path": "tests/ci/workflow-cost-contract.test.js",
+      "sha256": "a40dbc2031e738f43b0240d35ea383469ef9d5719119f973fcdefecd4c4bd7b4"
     },
     {
       "path": "tests/lib/goal-control.test.js",
@@ -155,6 +202,10 @@
     {
       "path": "tests/scripts/knowledge-freshness.test.js",
       "sha256": "8bbeef823bab5ef5dd9c56a113444ce4ed65d468143731657f5edd6eaac0a2a2"
+    },
+    {
+      "path": "tests/scripts/knowledge-retrieval-eval.test.js",
+      "sha256": "356799d3edc96c3b74602d9750a0db0ce8c7b00adae243a73949e350e04d9f7a"
     }
   ],
   "nodes": [
@@ -210,7 +261,7 @@
       "id": "file:.github/workflows/ci.yml",
       "type": "source",
       "path": ".github/workflows/ci.yml",
-      "sha256": "6cbab6fe97d55156b1cc1f2bc5f398d1d0060e7b59ff211241fe1ca56d55aa63"
+      "sha256": "681e1c11a2e7e4e0c3d51115fe2bcf8f9a97dca62c2d8bc67e9fb71c9a7f75a8"
     },
     {
       "id": "file:.github/workflows/harness.yml",
@@ -309,22 +360,40 @@
       "sha256": "18faf8ce860f4555ddfe822a3f9f6d5437549043862288a4fb66b0674333a9bc"
     },
     {
+      "id": "file:scripts/agent-adoption-doctor.js",
+      "type": "source",
+      "path": "scripts/agent-adoption-doctor.js",
+      "sha256": "9431e805a7fc9da394c5c669b95223f2b6e6a3fc0c14d53f2da6e438065a005c"
+    },
+    {
       "id": "file:scripts/agent-behavior-report.js",
       "type": "source",
       "path": "scripts/agent-behavior-report.js",
-      "sha256": "3d4771c19519db89902822e9b8964194a15dc367f61070764296a3fd880eb3cf"
+      "sha256": "48139c727a436b111fba37da44a39b68e012bbda975d847f50fbb287fd9c418e"
     },
     {
       "id": "file:scripts/agent-system-map.js",
       "type": "source",
       "path": "scripts/agent-system-map.js",
-      "sha256": "1bcddd77700b901ab5a991b7ac8468e40a0ca209ffa8033c8a84334dbec4011f"
+      "sha256": "9e631880a1e8a239b0488022811f1b309289ffffc4d81a4fce57ab2cc4cd23da"
     },
     {
       "id": "file:scripts/check-instruction-stack.js",
       "type": "source",
       "path": "scripts/check-instruction-stack.js",
       "sha256": "f9a0afc5ed99e3167458b24a971cfa17a40be98994de9bd7b7cfb4bd5245f257"
+    },
+    {
+      "id": "file:scripts/ci/detect-ci-scope.js",
+      "type": "source",
+      "path": "scripts/ci/detect-ci-scope.js",
+      "sha256": "13db9838821cb515b90ba160725253a1b4852feb57bfd289236f883057e72d78"
+    },
+    {
+      "id": "file:scripts/eval-agent-behavior.js",
+      "type": "source",
+      "path": "scripts/eval-agent-behavior.js",
+      "sha256": "d7e041676f28796af99916e1823f5ed279c096450f88abc9e6cef6974651c5ff"
     },
     {
       "id": "file:scripts/eval-goal-runtime-offline.js",
@@ -345,6 +414,12 @@
       "sha256": "bc0bed2d09433ac486c15777044015b664eac4bdfe118176ec49652119895078"
     },
     {
+      "id": "file:scripts/knowledge-adoption.js",
+      "type": "source",
+      "path": "scripts/knowledge-adoption.js",
+      "sha256": "da178739c10c0f315055dc66a0a62b234ee19167c6fbf3d569943d992ce4d305"
+    },
+    {
       "id": "file:scripts/knowledge-freshness.js",
       "type": "source",
       "path": "scripts/knowledge-freshness.js",
@@ -355,6 +430,12 @@
       "type": "source",
       "path": "scripts/knowledge-query.js",
       "sha256": "40c2986a5d283841bfa733563fe2a797e5606789570d4863cfe99b332e8796d3"
+    },
+    {
+      "id": "file:scripts/knowledge-retrieval-eval.js",
+      "type": "source",
+      "path": "scripts/knowledge-retrieval-eval.js",
+      "sha256": "2f24f69e853ffe8077903ef6fcd3b6443a1da73cf46dba830a57df84896d816a"
     },
     {
       "id": "file:scripts/lib/session-coordination.js",
@@ -369,10 +450,34 @@
       "sha256": "9ccf302729db0753c7b68f0a0d0f6a5e5835a02eaccdb32089a1b525b8e03c7f"
     },
     {
+      "id": "file:tests/ci/agent-adoption-doctor.test.js",
+      "type": "source",
+      "path": "tests/ci/agent-adoption-doctor.test.js",
+      "sha256": "b226ccdba5b14852b07543e373a16374045fbe6c3593f476b6ebdccfe008e9bd"
+    },
+    {
+      "id": "file:tests/ci/agent-behavior-eval.test.js",
+      "type": "source",
+      "path": "tests/ci/agent-behavior-eval.test.js",
+      "sha256": "790233e460dd6eea180776303a6801ae6318df22459cd1f6d593f77736cb4524"
+    },
+    {
+      "id": "file:tests/ci/agent-behavior-report.test.js",
+      "type": "source",
+      "path": "tests/ci/agent-behavior-report.test.js",
+      "sha256": "c288a16167c7a5f5b42b51c37e49847b992bc74ae6681694590215ca5a323b68"
+    },
+    {
       "id": "file:tests/ci/instruction-stack.test.js",
       "type": "source",
       "path": "tests/ci/instruction-stack.test.js",
       "sha256": "e29d3d37b9730ffd8c998bf170206eb7eba927e22e481180dfaee235285de440"
+    },
+    {
+      "id": "file:tests/ci/workflow-cost-contract.test.js",
+      "type": "source",
+      "path": "tests/ci/workflow-cost-contract.test.js",
+      "sha256": "a40dbc2031e738f43b0240d35ea383469ef9d5719119f973fcdefecd4c4bd7b4"
     },
     {
       "id": "file:tests/lib/goal-control.test.js",
@@ -385,6 +490,12 @@
       "type": "source",
       "path": "tests/scripts/knowledge-freshness.test.js",
       "sha256": "8bbeef823bab5ef5dd9c56a113444ce4ed65d468143731657f5edd6eaac0a2a2"
+    },
+    {
+      "id": "file:tests/scripts/knowledge-retrieval-eval.test.js",
+      "type": "source",
+      "path": "tests/scripts/knowledge-retrieval-eval.test.js",
+      "sha256": "356799d3edc96c3b74602d9750a0db0ce8c7b00adae243a73949e350e04d9f7a"
     },
     {
       "id": "runtime:adal",
@@ -517,6 +628,12 @@
     {
       "from": "file:.github/workflows/ci.yml",
       "to": "file:scripts/check-instruction-stack.js",
+      "type": "mentions-path",
+      "evidence": ".github/workflows/ci.yml"
+    },
+    {
+      "from": "file:.github/workflows/ci.yml",
+      "to": "file:scripts/ci/detect-ci-scope.js",
       "type": "mentions-path",
       "evidence": ".github/workflows/ci.yml"
     },
@@ -755,6 +872,24 @@
       "evidence": "protocols/GOAL_PROTOCOL.md"
     },
     {
+      "from": "file:scripts/agent-adoption-doctor.js",
+      "to": "file:AGENTS.md",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-adoption-doctor.js"
+    },
+    {
+      "from": "file:scripts/agent-adoption-doctor.js",
+      "to": "file:manifests/goal-runtime-capabilities.json",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-adoption-doctor.js"
+    },
+    {
+      "from": "file:scripts/agent-adoption-doctor.js",
+      "to": "file:manifests/instruction-adapters.json",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-adoption-doctor.js"
+    },
+    {
       "from": "file:scripts/agent-system-map.js",
       "to": "file:.agents/rules/seabridge-agent-baseline.md",
       "type": "mentions-path",
@@ -906,6 +1041,12 @@
     },
     {
       "from": "file:scripts/agent-system-map.js",
+      "to": "file:scripts/agent-adoption-doctor.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
       "to": "file:scripts/agent-behavior-report.js",
       "type": "mentions-path",
       "evidence": "scripts/agent-system-map.js"
@@ -913,6 +1054,18 @@
     {
       "from": "file:scripts/agent-system-map.js",
       "to": "file:scripts/check-instruction-stack.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:scripts/ci/detect-ci-scope.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:scripts/eval-agent-behavior.js",
       "type": "mentions-path",
       "evidence": "scripts/agent-system-map.js"
     },
@@ -936,6 +1089,12 @@
     },
     {
       "from": "file:scripts/agent-system-map.js",
+      "to": "file:scripts/knowledge-adoption.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
       "to": "file:scripts/knowledge-freshness.js",
       "type": "mentions-path",
       "evidence": "scripts/agent-system-map.js"
@@ -943,6 +1102,12 @@
     {
       "from": "file:scripts/agent-system-map.js",
       "to": "file:scripts/knowledge-query.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:scripts/knowledge-retrieval-eval.js",
       "type": "mentions-path",
       "evidence": "scripts/agent-system-map.js"
     },
@@ -960,7 +1125,31 @@
     },
     {
       "from": "file:scripts/agent-system-map.js",
+      "to": "file:tests/ci/agent-adoption-doctor.test.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:tests/ci/agent-behavior-eval.test.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:tests/ci/agent-behavior-report.test.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
       "to": "file:tests/ci/instruction-stack.test.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:tests/ci/workflow-cost-contract.test.js",
       "type": "mentions-path",
       "evidence": "scripts/agent-system-map.js"
     },
@@ -973,6 +1162,12 @@
     {
       "from": "file:scripts/agent-system-map.js",
       "to": "file:tests/scripts/knowledge-freshness.test.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:tests/scripts/knowledge-retrieval-eval.test.js",
       "type": "mentions-path",
       "evidence": "scripts/agent-system-map.js"
     },
@@ -1017,6 +1212,30 @@
       "to": "file:manifests/instruction-adapters.json",
       "type": "mentions-path",
       "evidence": "scripts/check-instruction-stack.js"
+    },
+    {
+      "from": "file:tests/ci/agent-adoption-doctor.test.js",
+      "to": "file:.clinerules",
+      "type": "mentions-path",
+      "evidence": "tests/ci/agent-adoption-doctor.test.js"
+    },
+    {
+      "from": "file:tests/ci/agent-adoption-doctor.test.js",
+      "to": "file:AGENTS.md",
+      "type": "mentions-path",
+      "evidence": "tests/ci/agent-adoption-doctor.test.js"
+    },
+    {
+      "from": "file:tests/ci/agent-adoption-doctor.test.js",
+      "to": "file:CLAUDE.md",
+      "type": "mentions-path",
+      "evidence": "tests/ci/agent-adoption-doctor.test.js"
+    },
+    {
+      "from": "file:tests/ci/agent-adoption-doctor.test.js",
+      "to": "file:GEMINI.md",
+      "type": "mentions-path",
+      "evidence": "tests/ci/agent-adoption-doctor.test.js"
     },
     {
       "from": "file:tests/ci/instruction-stack.test.js",
@@ -1065,6 +1284,18 @@
       "to": "file:scripts/check-instruction-stack.js",
       "type": "mentions-path",
       "evidence": "tests/ci/instruction-stack.test.js"
+    },
+    {
+      "from": "file:tests/ci/workflow-cost-contract.test.js",
+      "to": "file:.github/workflows/ci.yml",
+      "type": "mentions-path",
+      "evidence": "tests/ci/workflow-cost-contract.test.js"
+    },
+    {
+      "from": "file:tests/ci/workflow-cost-contract.test.js",
+      "to": "file:AGENTS.md",
+      "type": "mentions-path",
+      "evidence": "tests/ci/workflow-cost-contract.test.js"
     },
     {
       "from": "file:tests/scripts/knowledge-freshness.test.js",
@@ -1410,8 +1641,8 @@
     }
   ],
   "build": {
-    "generatedAt": "2026-09-30T21:58:04.849Z",
-    "sourceCommit": "88b3de520863a7759513200cdc793e0fa0df1619",
-    "sourceDirty": true
+    "generatedAt": "2026-10-01T18:29:13.075Z",
+    "sourceCommit": "dc186edb98fc3d380dfe31f652927738d9d09b7d",
+    "sourceDirty": false
   }
 }
