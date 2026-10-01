@@ -32,4 +32,9 @@ assert.equal(classify(['docs/reports/2026-10-01.md']).reportOnly, true);
 assert.equal(classify(['docs/reports/2026-10-01.md', 'AGENTS.md']).core, true);
 assert.equal(classify([], true).core, true, 'unknown comparison must fail safe to full CI');
 
+const monthly = yaml.load(fs.readFileSync(path.join(root, '.github/workflows/monthly-metrics.yml'), 'utf8'));
+assert.ok(Object.hasOwn(monthly.on, 'workflow_dispatch'), 'metrics workflow keeps manual recovery path');
+assert.ok(!Object.hasOwn(monthly.on, 'schedule'),
+  'disabled Issues must not trigger a known-failing monthly Actions run');
+
 console.log('ECC CI cost contract: report-only isolation and fail-safe full checks passed');

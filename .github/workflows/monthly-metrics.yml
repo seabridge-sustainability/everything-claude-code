@@ -1,8 +1,9 @@
 name: Monthly Metrics Snapshot
 
 on:
-  schedule:
-    - cron: '0 14 1 * *' # Monthly on the 1st at 14:00 UTC
+  # Scheduling is suspended while repository Issues are disabled: the August,
+  # September and October runs all failed with HTTP 410 when creating the issue.
+  # Restore a durable output destination before re-enabling the monthly trigger.
   workflow_dispatch:
 
 permissions:
