@@ -33,6 +33,8 @@ run('map covers canonical policy, all adapters, outcome gate, and CI with bounde
   const ids = new Set(map.nodes.map(node => node.id));
   for (const required of ['file:AGENTS.md', 'file:protocols/GOAL_PROTOCOL.md',
     'file:scripts/goal-control.js', 'file:.github/workflows/ci.yml',
+    'file:scripts/agent-adoption-doctor.js', 'file:scripts/knowledge-retrieval-eval.js',
+    'file:scripts/ci/detect-ci-scope.js', 'file:tests/ci/workflow-cost-contract.test.js',
     'runtime:codex', 'runtime:claude', 'runtime:gemini', 'runtime:opencode']) {
     assert.ok(ids.has(required), required);
   }
@@ -40,6 +42,19 @@ run('map covers canonical policy, all adapters, outcome gate, and CI with bounde
   assert.ok(map.edges.some(edge => edge.from === 'file:CLAUDE.md' && edge.to === 'file:AGENTS.md' && edge.type === 'verified-import'));
   assert.ok(map.edges.some(edge => edge.from === 'runtime:claude' && edge.to === 'file:hooks/hooks.json' && edge.type === 'runtime-evidence'));
   assert.ok(map.sources.every(row => !/^(?:data|artifacts|logs|graphify-out)\//.test(row.path)));
+  assert.strictEqual(map.coverage.semanticIndex, 'not-run');
+  assert.ok(map.coverage.excludedRoots.includes('data/'));
+});
+
+run('a map built from dirty sources cannot be used as release evidence', () => {
+  const dir = fixture();
+  try {
+    const target = writeMap(dir);
+    const data = JSON.parse(fs.readFileSync(target, 'utf8'));
+    data.build.sourceDirty = true;
+    fs.writeFileSync(target, JSON.stringify(data));
+    assert.match(check(dir).reason, /dirty source files/);
+  } finally { fs.rmSync(dir, { recursive: true, force: true }); }
 });
 
 run('unchanged fixture is fresh but edited policy fails closed', () => {

@@ -5,7 +5,7 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const { execFileSync } = require('node:child_process');
-const { inspect, inspectHook, inspectMemory, within } = require('../../scripts/knowledge-adoption');
+const { inspect, inspectHook, inspectMemory, inspectMemoryContent, within } = require('../../scripts/knowledge-adoption');
 const { test, summary } = require('../lib/helpers/mini-test-runner');
 
 let passed = 0; let failed = 0;
@@ -110,7 +110,13 @@ try {
       boundary: () => ({ safe: true }),
       env: { ECC_MEMORY_PROJECT_ROOT: path.join(fixture, 'private-memory') },
     };
-    assert.equal(inspect(repos, options).status, 'configured');
+    assert.equal(inspect(repos, options).status, 'configured-but-empty');
+    assert.deepEqual(inspectMemoryContent(repos, options.env), { status: 'empty', count: 0 });
+    assert.deepEqual(inspectMemoryContent(repos, options.env, undefined,
+      () => ({ ok: true, memoryCount: 1 })), { status: 'populated', count: 2 });
+    assert.equal(inspect(repos, { ...options, doctor: () => ({ ok: true, memoryCount: 1 }) }).status, 'configured');
+    assert.equal(inspect(repos, { ...options, doctor: () => ({ ok: false, memoryCount: 0 }) }).status,
+      'invalid-or-incomplete');
     assert.equal(inspect([repos[0]], options).status, 'incomplete-scope');
     assert.equal(inspect([repos[0], repos[0]], options).status, 'incomplete-scope');
     const raw = execFileSync('git', ['-C', repos[1], 'rev-parse', '--git-path', 'hooks/post-commit'],

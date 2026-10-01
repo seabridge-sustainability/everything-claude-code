@@ -8,7 +8,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { execFileSync } = require('node:child_process');
 const { graphBoundaryStatus } = require('./knowledge-freshness');
-const { resolveVaultRoots } = require('./lib/memory-vault');
+const { doctorMemoryVault, resolveVaultRoots } = require('./lib/memory-vault');
 const { isWithinRoot, realpathNearestExisting } = require('./lib/path-safety');
 
 const TEMPLATE = path.join(__dirname, 'git-hooks', 'graphify-rebuild.sh');
@@ -87,6 +87,22 @@ function inspectMemory(repos, env = process.env, resolveRoots = resolveVaultRoot
   }
 }
 
+function inspectMemoryContent(repos, env = process.env, resolveRoots = resolveVaultRoots, doctor = doctorMemoryVault) {
+  if (!env.ECC_MEMORY_PROJECT_ROOT) return { status: 'unconfigured', count: 0 };
+  try {
+    let count = 0;
+    for (const repo of repos) {
+      const roots = resolveRoots({ cwd: repo, env });
+      const result = doctor({ roots, scopes: ['project'] });
+      if (!result.ok) return { status: 'invalid-or-incomplete', count };
+      count += result.memoryCount;
+    }
+    return { status: count > 0 ? 'populated' : 'empty', count };
+  } catch {
+    return { status: 'invalid-or-incomplete', count: 0 };
+  }
+}
+
 function inspect(repos, options = {}) {
   try {
     if (repos.length < 2 || new Set(repos.map(repo => commonGitRoot(path.resolve(repo)))).size < 2) {
@@ -109,12 +125,20 @@ function inspect(repos, options = {}) {
     };
   });
   const memory = inspectMemory(repos.map(repo => path.resolve(repo)), options.env || process.env, options.resolveRoots);
+  const content = memory.status === 'configured-and-isolated'
+    ? inspectMemoryContent(repos.map(repo => path.resolve(repo)), options.env || process.env,
+      options.resolveRoots, options.doctor)
+    : { status: 'not-checked', count: 0 };
+  const wiringReady = rows.every(row => row.boundary === 'safe'
+    && row.postCommit.status === 'current' && row.postCheckout.status === 'current')
+    && memory.status === 'configured-and-isolated';
   return {
-    status: rows.every(row => row.boundary === 'safe'
-      && row.postCommit.status === 'current' && row.postCheckout.status === 'current')
-      && memory.status === 'configured-and-isolated' ? 'configured' : 'not-configured',
+    status: !wiringReady ? 'not-configured'
+      : content.status === 'populated' ? 'configured'
+        : content.status === 'empty' ? 'configured-but-empty' : 'invalid-or-incomplete',
     repos: rows,
     memory,
+    content,
   };
 }
 
@@ -130,4 +154,4 @@ function main(args = process.argv.slice(2)) {
 }
 
 if (require.main === module) process.exitCode = main();
-module.exports = { inspect, inspectHook, inspectMemory, main, within };
+module.exports = { inspect, inspectHook, inspectMemory, inspectMemoryContent, main, within };

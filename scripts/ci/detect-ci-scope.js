@@ -10,6 +10,9 @@ const ZERO_SHA = /^0+$/;
 const PACKAGE_FILES = /^(?:package(?:-lock)?\.json|npm-shrinkwrap\.json|\.npmrc|yarn\.lock|\.yarnrc\.ya?ml|pnpm-lock\.yaml|pnpm-workspace\.yaml|bun\.lockb?|bunfig\.toml|\.opencode\/package(?:-lock)?\.json)$/;
 const INSTALLER_SCRIPTS = /^scripts\/(?:ecc\.js|setup\.js|install-|build-opencode|lib\/(?:install(?:\/|-)|(?:claude|codex)-plugin-setup))/;
 const INSTALLER_TESTS = /^tests\/(?:lib\/(?:install|claude|codex|opencode)|scripts\/(?:install|setup|build-opencode|ecc-universal))/;
+// Generated reports and handoffs are evidence, not executable source. Keep a
+// lightweight validation job for these changes instead of the full matrix.
+const REPORT_ONLY = /^docs\/(?:reports|handoffs|plans)\//;
 
 const patterns = {
   compatibility: [
@@ -43,7 +46,8 @@ function normalize(file) {
 
 function classify(files, failSafe = false) {
   const normalized = files.map(normalize).filter(Boolean);
-  const result = {};
+  const reportOnly = !failSafe && normalized.length > 0 && normalized.every(file => REPORT_ONLY.test(file));
+  const result = { core: !reportOnly, reportOnly };
   for (const [scope, matchers] of Object.entries(patterns)) {
     result[scope] = failSafe || normalized.some(file => matchers.some(pattern => pattern.test(file)));
   }
@@ -79,7 +83,7 @@ function main(args = process.argv.slice(2)) {
   const result = { ...classify(detected.files, detected.failSafe), reason: detected.reason };
   const outputPath = optionValue(args, '--github-output');
   if (outputPath) {
-    const lines = ['compatibility', 'platform', 'packed']
+    const lines = ['core', 'reportOnly', 'compatibility', 'platform', 'packed']
       .map(key => `${key}=${result[key] ? 'true' : 'false'}`)
       .join('\n');
     fs.appendFileSync(path.resolve(outputPath), `${lines}\n`, 'utf8');

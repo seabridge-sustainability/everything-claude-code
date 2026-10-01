@@ -39,10 +39,18 @@ assert.strictEqual(infraSeparated.infraFailures, 1);
 
 const report = buildReport(rows);
 assert.deepStrictEqual(Object.keys(report.byHarness), ['codex', 'gemini']);
+assert.deepStrictEqual(Object.keys(report.byModel), ['unreported']);
 assert.strictEqual(report.byHarness.gemini.costPerSuccessUsd, null);
+assert.strictEqual(report.overall.ciMinutes, null);
+const measured = aggregateGroup([{ ...rows[0], ciMinutes: 4, cancelledCiMinutes: 1, deployments: 0 },
+  { ...rows[1], ciMinutes: 6, cancelledCiMinutes: 2, deployments: 1 }]);
+assert.strictEqual(measured.ciMinutes, 10);
+assert.strictEqual(measured.cancelledCiMinutes, 3);
+assert.strictEqual(measured.deployments, 1);
 assert.match(renderMarkdown(report), /Cost \/ success/);
 assert.match(renderMarkdown(report), /unknown/);
 assert.match(renderMarkdown(report), /Infra/);
+assert.match(renderMarkdown(report), /Cancelled CI min/);
 
 const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-agent-roi-'));
 try {
@@ -55,4 +63,4 @@ try {
 
 assert.throws(() => confinedWritePath(path.resolve('outside-roi.md')), /must stay under/);
 
-console.log('agent behavior ROI report: 14 checks passed');
+console.log('agent behavior ROI report: cost, model, CI, and deploy coverage checks passed');

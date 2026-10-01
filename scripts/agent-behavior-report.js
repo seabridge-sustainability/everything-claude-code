@@ -55,6 +55,8 @@ function aggregateGroup(results) {
   const knownCosts = results.filter(result => Number.isFinite(result.costUsd));
   const totalElapsedMs = results.reduce((sum, result) => sum + (Number(result.elapsedMs) || 0), 0);
   const observedCostUsd = knownCosts.reduce((sum, result) => sum + Number(result.costUsd), 0);
+  const observedMetric = field => results.every(result => Number.isFinite(result[field]))
+    ? results.reduce((sum, result) => sum + result[field], 0) : null;
   return {
     runs: results.length,
     validRuns: valid.length,
@@ -70,7 +72,10 @@ function aggregateGroup(results) {
     costCoverage: results.length ? knownCosts.length / results.length : 0,
     costPerSuccessUsd: successful.length > 0 && knownCosts.length === results.length
       ? observedCostUsd / successful.length
-      : null
+      : null,
+    ciMinutes: observedMetric('ciMinutes'),
+    cancelledCiMinutes: observedMetric('cancelledCiMinutes'),
+    deployments: observedMetric('deployments')
   };
 }
 
@@ -79,12 +84,17 @@ function buildReport(results) {
   for (const harness of [...new Set(results.map(result => result.harness))].sort()) {
     byHarness[harness] = aggregateGroup(results.filter(result => result.harness === harness));
   }
+  const byModel = {};
+  for (const model of [...new Set(results.map(result => result.model || 'unreported'))].sort()) {
+    byModel[model] = aggregateGroup(results.filter(result => (result.model || 'unreported') === model));
+  }
   return {
     schemaVersion: 1,
     generatedAt: new Date().toISOString(),
     sourceFiles: [...new Set(results.map(result => result.source))].sort(),
     overall: aggregateGroup(results),
-    byHarness
+    byHarness,
+    byModel
   };
 }
 
@@ -96,13 +106,13 @@ function renderMarkdown(report) {
   const lines = [
     '# Agent behavior ROI',
     '',
-    '| Harness | Success / valid | Infra | Median time | Time / success | Cost / success | Cost coverage | Tokens | Tools | Retries |',
-    '|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|'
+    '| Harness | Success / valid | Infra | Median time | Time / success | Cost / success | Cost coverage | Tokens | Tools | Retries | CI min | Cancelled CI min | Deploys |',
+    '|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|'
   ];
   for (const [harness, row] of Object.entries(report.byHarness)) {
-    lines.push(`| ${harness} | ${row.successes}/${row.validRuns} (${(row.passRate * 100).toFixed(1)}%) | ${row.infraFailures} | ${(row.medianElapsedMs / 1000).toFixed(2)}s | ${row.elapsedPerSuccessMs === null ? 'n/a' : `${(row.elapsedPerSuccessMs / 1000).toFixed(2)}s`} | ${formatMoney(row.costPerSuccessUsd)} | ${(row.costCoverage * 100).toFixed(0)}% | ${row.tokens} | ${row.toolCalls} | ${row.retries} |`);
+    lines.push(`| ${harness} | ${row.successes}/${row.validRuns} (${(row.passRate * 100).toFixed(1)}%) | ${row.infraFailures} | ${(row.medianElapsedMs / 1000).toFixed(2)}s | ${row.elapsedPerSuccessMs === null ? 'n/a' : `${(row.elapsedPerSuccessMs / 1000).toFixed(2)}s`} | ${formatMoney(row.costPerSuccessUsd)} | ${(row.costCoverage * 100).toFixed(0)}% | ${row.tokens} | ${row.toolCalls} | ${row.retries} | ${row.ciMinutes ?? 'unknown'} | ${row.cancelledCiMinutes ?? 'unknown'} | ${row.deployments ?? 'unknown'} |`);
   }
-  lines.push('', `Runs: ${report.overall.runs}. Cost per success includes failed-attempt spend and is reported only when every run supplied provider cost telemetry.`);
+  lines.push('', `Runs: ${report.overall.runs}. Cost per success includes failed-attempt spend and is reported only when every run supplied provider cost telemetry. CI and deployment totals are unknown unless every row supplied them.`);
   return `${lines.join('\n')}\n`;
 }
 

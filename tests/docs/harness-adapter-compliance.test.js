@@ -8,7 +8,9 @@ const {
   ADAPTER_RECORDS,
   extractMatrixBlock,
   renderMarkdownTable,
+  renderRuntimeTable,
   validateAdapterRecords,
+  validateRuntimeRegistry,
 } = require('../../scripts/lib/harness-adapter-compliance');
 
 const repoRoot = path.resolve(__dirname, '..', '..');
@@ -76,6 +78,15 @@ test('adapter compliance source data validates required evidence fields', () => 
 test('adapter compliance matrix is generated from source data', () => {
   const source = read('docs/architecture/harness-adapter-compliance.md');
   assert.strictEqual(extractMatrixBlock(source), renderMarkdownTable());
+});
+
+test('18-runtime outcome registry is complete and the separate table is generated', () => {
+  const source = read('docs/architecture/harness-adapter-compliance.md');
+  const expected = renderRuntimeTable(repoRoot);
+  assert.deepStrictEqual(validateRuntimeRegistry(repoRoot), []);
+  assert.strictEqual(expected.split('\n').length - 2, 18);
+  assert.ok(source.includes(expected));
+  assert.ok(source.includes('does **not** prove'));
 });
 
 test('adapter compliance matrix extraction tolerates Windows line endings', () => {

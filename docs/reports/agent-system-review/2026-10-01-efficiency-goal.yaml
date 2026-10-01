@@ -1,0 +1,92 @@
+schema: ecc.active-goal.v1
+goal_id: coding-agent-efficiency-20261001
+mode: controlled
+proof_profile: docs
+objective: Improve and verify the SeaBridgeAI coding-agent system, knowledge continuity, graph freshness, and release cost controls across ECC, backend, and frontend.
+current_priority: Complete local implementation and verification before one budget-aware publication batch.
+non_goals:
+  - Do not overwrite concurrent session work or claim hosted acceptance from local tests.
+  - Do not spend on live model calls or semantic graph extraction without a fixed ceiling.
+user_visible_proofs:
+  - id: ci-cost-control
+    description: Backend and frontend workflows avoid duplicate validation and stale deployment.
+    lane_id: ci
+    required_stage: calculation_implemented
+    required_evidence_kinds: [runtime]
+    required_repositories: [manageesg-backend, manageesg-frontend]
+    allowed_result_classes: [other]
+    acceptance_predicate: Current remote workflows pass contract checks for concurrency, CI dependency, and deployment SHA.
+    requires_authentic: false
+    requires_user_visible: false
+    subject_scope: null
+    required: true
+  - id: universal-adoption
+    description: Every advertised agent adapter has a truthful install and enforcement status.
+    lane_id: adapters
+    required_stage: calculation_implemented
+    required_evidence_kinds: [runtime]
+    required_repositories: [everything-claude-code]
+    allowed_result_classes: [other]
+    acceptance_predicate: Adoption doctor and negative controls pass on the clean ECC checkout.
+    requires_authentic: false
+    requires_user_visible: false
+    subject_scope: null
+    required: true
+  - id: knowledge-evals
+    description: Handoff, retrieval, and cost-eval fixtures reject unsafe or unsupported success claims.
+    lane_id: knowledge
+    required_stage: calculation_implemented
+    required_evidence_kinds: [runtime]
+    required_repositories: [everything-claude-code]
+    allowed_result_classes: [other]
+    acceptance_predicate: Offline negative controls and memory doctor pass without paid calls.
+    requires_authentic: false
+    requires_user_visible: false
+    subject_scope: null
+    required: true
+  - id: graph-freshness
+    description: Agent-system map and local code graph represent the current source with provenance.
+    lane_id: graph
+    required_stage: calculation_implemented
+    required_evidence_kinds: [runtime]
+    required_repositories: [everything-claude-code]
+    allowed_result_classes: [other]
+    acceptance_predicate: Deterministic map freshness check and safe code graph manifest pass.
+    requires_authentic: false
+    requires_user_visible: false
+    subject_scope: null
+    required: true
+lanes:
+  - id: ci
+    description: GitHub Actions cost controls
+    status: active
+    blocker: null
+    next_action: Verify current remote workflow topology and close remaining gaps.
+  - id: adapters
+    description: Cross-agent adoption and enforcement
+    status: active
+    blocker: null
+    next_action: Compare instruction registry, runtime capabilities, and installed surfaces.
+  - id: knowledge
+    description: Memory and behavioral evaluations
+    status: active
+    blocker: null
+    next_action: Add source-bound retrieval and replay negative controls.
+  - id: graph
+    description: Agent control-plane and code graph freshness
+    status: active
+    blocker: null
+    next_action: Rebuild deterministic map and safe local code graph.
+owner_corrections: []
+forecast:
+  state: not_set
+  confidence: none
+  basis: null
+  critical_path: [ci-cost-control, universal-adoption, knowledge-evals, graph-freshness]
+  likely_hours: null
+  next_checkpoint_at: null
+  checkpoint_started_at: null
+  checkpoint_proof_id: null
+  updated_at: '2026-10-01T15:41:00Z'
+status: active
+updated_at: '2026-10-01T15:41:00Z'

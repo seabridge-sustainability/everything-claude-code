@@ -5,6 +5,8 @@ const path = require('path');
 
 const MATRIX_BLOCK_START = '<!-- harness-adapter-compliance:matrix-start -->';
 const MATRIX_BLOCK_END = '<!-- harness-adapter-compliance:matrix-end -->';
+const RUNTIME_BLOCK_START = '<!-- harness-adapter-compliance:runtimes-start -->';
+const RUNTIME_BLOCK_END = '<!-- harness-adapter-compliance:runtimes-end -->';
 
 const COMPLIANCE_STATES = Object.freeze({
   Native: 'ECC can install or verify the surface directly for this harness.',
@@ -456,6 +458,40 @@ function extractMatrixBlock(markdown) {
   return normalized.slice(start + MATRIX_BLOCK_START.length, end).trim();
 }
 
+function runtimeRegistries(repoRoot) {
+  const adapters = JSON.parse(fs.readFileSync(path.join(repoRoot, 'manifests/instruction-adapters.json'), 'utf8')).adapters;
+  const capabilities = JSON.parse(fs.readFileSync(path.join(repoRoot, 'manifests/goal-runtime-capabilities.json'), 'utf8')).runtimes;
+  if (!Array.isArray(adapters) || !Array.isArray(capabilities)) throw new Error('runtime registries must be arrays');
+  return { adapters, capabilities };
+}
+
+function validateRuntimeRegistry(repoRoot) {
+  const { adapters, capabilities } = runtimeRegistries(repoRoot);
+  const errors = [];
+  const byId = new Map(capabilities.map(item => [item.id, item]));
+  if (byId.size !== capabilities.length) errors.push('duplicate runtime capability');
+  if (new Set(adapters.map(item => item.id)).size !== adapters.length) errors.push('duplicate instruction adapter');
+  for (const adapter of adapters) {
+    const capability = byId.get(adapter.id);
+    if (!capability) errors.push(`missing runtime capability: ${adapter.id}`);
+    else if (capability.instruction_entry !== adapter.entry) errors.push(`runtime entry drift: ${adapter.id}`);
+  }
+  for (const capability of capabilities) {
+    if (!adapters.some(adapter => adapter.id === capability.id)) errors.push(`unmatched runtime capability: ${capability.id}`);
+  }
+  return errors;
+}
+
+function renderRuntimeTable(repoRoot) {
+  const { adapters, capabilities } = runtimeRegistries(repoRoot);
+  const byId = new Map(capabilities.map(item => [item.id, item]));
+  return [
+    '| Runtime | Outcome gate tier | Instruction entry |',
+    '| --- | --- | --- |',
+    ...adapters.map(adapter => `| ${adapter.id} | ${byId.get(adapter.id)?.tier || 'missing'} | \`${adapter.entry}\` |`),
+  ].join('\n');
+}
+
 function validateDocumentation(options = {}) {
   const repoRoot = options.repoRoot || path.resolve(__dirname, '..', '..');
   const docPath = options.docPath || path.join(repoRoot, 'docs', 'architecture', 'harness-adapter-compliance.md');
@@ -470,6 +506,15 @@ function validateDocumentation(options = {}) {
     errors.push(`matrix block in ${path.relative(repoRoot, docPath)} is not generated from adapter records`);
   }
 
+  errors.push(...validateRuntimeRegistry(repoRoot));
+  const runtimeStart = source.indexOf(RUNTIME_BLOCK_START);
+  const runtimeEnd = source.indexOf(RUNTIME_BLOCK_END);
+  const actualRuntime = runtimeStart >= 0 && runtimeEnd > runtimeStart
+    ? source.slice(runtimeStart + RUNTIME_BLOCK_START.length, runtimeEnd).trim() : null;
+  if (actualRuntime !== renderRuntimeTable(repoRoot)) {
+    errors.push('18-runtime outcome table is missing or stale');
+  }
+
   return errors;
 }
 
@@ -478,10 +523,14 @@ module.exports = {
   COMPLIANCE_STATES,
   MATRIX_BLOCK_END,
   MATRIX_BLOCK_START,
+  RUNTIME_BLOCK_END,
+  RUNTIME_BLOCK_START,
   REQUIRED_FIELDS,
   extractMatrixBlock,
   renderMarkdownTable,
+  renderRuntimeTable,
   renderStateTable,
   validateAdapterRecords,
   validateDocumentation,
+  validateRuntimeRegistry,
 };

@@ -52,6 +52,38 @@ The matrix below is rendered from
 
 ## Scorecard Onramp
 
+The matrix above tracks 12 broad harness and orchestration surfaces, including
+reference-only tools; it is not the 18-runtime outcome contract. The current
+instruction and gate registries below have exactly 18 matching runtime IDs.
+`node scripts/agent-adoption-doctor.js --json` verifies the packaged files and
+project instruction entry. A ready result does **not** prove that a user's
+installation loaded the hook, invoked its wrapper, or obeyed the outcome gate.
+Instruction-only runtimes cannot claim native enforcement. A controlled live
+smoke receipt is still required for activation claims.
+
+<!-- harness-adapter-compliance:runtimes-start -->
+| Runtime | Outcome gate tier | Instruction entry |
+| --- | --- | --- |
+| codex | hybrid | `AGENTS.md` |
+| claude | native | `CLAUDE.md` |
+| gemini | wrapper | `GEMINI.md` |
+| opencode | hybrid | `AGENTS.md` |
+| copilot | instruction | `.github/copilot-instructions.md` |
+| cursor | native | `AGENTS.md` |
+| qwen | wrapper | `AGENTS.md` |
+| antigravity | wrapper | `.agents/rules/seabridge-agent-baseline.md` |
+| kiro | wrapper | `AGENTS.md` |
+| cline | wrapper | `.clinerules` |
+| windsurf | wrapper | `AGENTS.md` |
+| hermes | wrapper | `AGENTS.md` |
+| kimi | wrapper | `AGENTS.md` |
+| openclaw | wrapper | `AGENTS.md` |
+| adal | wrapper | `AGENTS.md` |
+| joycode | wrapper | `AGENTS.md` |
+| codebuddy | wrapper | `AGENTS.md` |
+| zed | wrapper | `AGENTS.md` |
+<!-- harness-adapter-compliance:runtimes-end -->
+
 Use this sequence before asking ECC to make a team or repo setup more
 autonomous:
 

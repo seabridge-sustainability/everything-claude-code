@@ -6,9 +6,16 @@ const { classify, gitChangedFiles, normalize } = require('../../scripts/ci/detec
 assert.strictEqual(normalize('.\\scripts\\hooks\\runner.js'), 'scripts/hooks/runner.js');
 
 assert.deepStrictEqual(
-  (({ compatibility, platform, packed }) => ({ compatibility, platform, packed }))(classify(['docs/guide.md'])),
-  { compatibility: false, platform: false, packed: false }
+  (({ compatibility, platform, packed, core, reportOnly }) => ({ compatibility, platform, packed, core, reportOnly }))(classify(['docs/guide.md'])),
+  { compatibility: false, platform: false, packed: false, core: true, reportOnly: false }
 );
+
+const reports = classify(['docs/reports/generated.md', 'docs/handoffs/next.md']);
+assert.equal(reports.core, false);
+assert.equal(reports.reportOnly, true);
+assert.equal(classify(['docs/reports/generated.md', 'AGENTS.md']).core, true);
+assert.equal(classify(['docs/reports/generated.md'], true).core, true);
+assert.equal(classify(['docs/architecture/security.md']).core, true);
 
 const hooks = classify(['scripts/hooks/plugin-hook-bootstrap.js']);
 assert.strictEqual(hooks.platform, true);
@@ -50,4 +57,4 @@ assert.strictEqual(failSafe.packed, true);
 assert.strictEqual(gitChangedFiles('', 'abc1234').failSafe, true);
 assert.strictEqual(gitChangedFiles('0000000', 'abc1234').failSafe, true);
 
-console.log('CI scope detection: 40 checks passed');
+console.log('CI scope detection: compatibility, platform, packed, and report-only checks passed');

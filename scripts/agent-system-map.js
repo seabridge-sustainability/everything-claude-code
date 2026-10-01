@@ -23,14 +23,19 @@ const SOURCES = Object.freeze([
   'manifests/goal-proof-profiles.json',
   'scripts/check-instruction-stack.js', 'scripts/goal-control.js',
   'scripts/goal-runtime-bridge.js', 'scripts/eval-goal-runtime-offline.js',
-  'scripts/agent-system-map.js',
-  'scripts/agent-behavior-report.js', 'scripts/knowledge-freshness.js',
+  'scripts/agent-system-map.js', 'scripts/agent-adoption-doctor.js',
+  'scripts/agent-behavior-report.js', 'scripts/eval-agent-behavior.js',
+  'scripts/ci/detect-ci-scope.js', 'scripts/knowledge-adoption.js',
+  'scripts/knowledge-retrieval-eval.js', 'scripts/knowledge-freshness.js',
   'scripts/knowledge-query.js', 'hooks/hooks.json', 'hooks/codex-hooks.json',
   '.cursor/hooks.json', '.cursor/hooks/before-submit-prompt.js',
   '.cursor/hooks/stop.js', '.opencode/plugins/ecc-hooks.ts',
   '.gemini/settings.json', '.github/workflows/ci.yml',
   '.github/workflows/harness.yml', 'tests/ci/instruction-stack.test.js',
+  'tests/ci/agent-adoption-doctor.test.js', 'tests/ci/agent-behavior-eval.test.js',
+  'tests/ci/agent-behavior-report.test.js', 'tests/ci/workflow-cost-contract.test.js',
   'tests/lib/goal-control.test.js', 'tests/scripts/knowledge-freshness.test.js',
+  'tests/scripts/knowledge-retrieval-eval.test.js',
 ]);
 
 function hash(value) { return crypto.createHash('sha256').update(value).digest('hex'); }
@@ -100,6 +105,11 @@ function buildMap(root = ROOT, sources = SOURCES) {
     schema: 'seabridge.agent-system-map.v1',
     scope: 'ECC agent instructions, runtime adapters, outcome control, evaluation, and CI; no product or tenant data',
     extractor: 'scripts/agent-system-map.js (deterministic, no LLM)',
+    generatorVersion: 2,
+    coverage: {
+      excludedRoots: ['artifacts/', 'data/', 'graphify-out/', 'logs/', 'vendor/'],
+      semanticIndex: 'not-run',
+    },
     sourceFingerprint: hash(JSON.stringify(rows)),
     sources: rows, nodes, edges,
   };
@@ -124,6 +134,9 @@ function check(root = ROOT, destination = OUTPUT) {
     if (!stored.build || !stored.build.generatedAt || !('sourceCommit' in stored.build)) {
       return { fresh: false, reason: 'map lacks build provenance' };
     }
+    if (stored.build.sourceDirty === true) {
+      return { fresh: false, reason: 'map was built from dirty source files' };
+    }
     const current = buildMap(root);
     delete stored.build; // Build time and Git HEAD are provenance, not the freshness predicate.
     return JSON.stringify(stored) === JSON.stringify(current)
@@ -141,6 +154,9 @@ function main(args = process.argv.slice(2), root = ROOT) {
   if (args[0] === 'build') {
     const map = buildMap(root);
     map.build = buildMetadata(root);
+    if (map.build.sourceDirty === true) {
+      throw new Error('refusing to publish map from dirty source files; commit and rebuild from a clean checkout');
+    }
     const target = file(root, OUTPUT);
     fs.mkdirSync(path.dirname(target), { recursive: true });
     fs.writeFileSync(target, `${JSON.stringify(map, null, 2)}\n`);
