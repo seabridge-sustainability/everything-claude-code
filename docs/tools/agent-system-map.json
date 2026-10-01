@@ -13,7 +13,7 @@
     ],
     "semanticIndex": "not-run"
   },
-  "sourceFingerprint": "39a3b857e1fcbfb5c405079dbc042bb3c702278499b12fcd08776582c357195a",
+  "sourceFingerprint": "421ea4ba8c2e5a850821b5c4a08d4a2c7b08f8c9990a257eaea46dd1efb2133b",
   "sources": [
     {
       "path": ".agents/rules/seabridge-agent-baseline.md",
@@ -181,7 +181,7 @@
     },
     {
       "path": "tests/ci/agent-behavior-eval.test.js",
-      "sha256": "790233e460dd6eea180776303a6801ae6318df22459cd1f6d593f77736cb4524"
+      "sha256": "df0ec3b47c755400d6acd15245ce4cf3c2cd97ada840014e2b96df34d83ea8a9"
     },
     {
       "path": "tests/ci/agent-behavior-report.test.js",
@@ -459,7 +459,7 @@
       "id": "file:tests/ci/agent-behavior-eval.test.js",
       "type": "source",
       "path": "tests/ci/agent-behavior-eval.test.js",
-      "sha256": "790233e460dd6eea180776303a6801ae6318df22459cd1f6d593f77736cb4524"
+      "sha256": "df0ec3b47c755400d6acd15245ce4cf3c2cd97ada840014e2b96df34d83ea8a9"
     },
     {
       "id": "file:tests/ci/agent-behavior-report.test.js",
@@ -1641,8 +1641,8 @@
     }
   ],
   "build": {
-    "generatedAt": "2026-10-01T18:29:13.075Z",
-    "sourceCommit": "dc186edb98fc3d380dfe31f652927738d9d09b7d",
+    "generatedAt": "2026-10-01T19:43:52.421Z",
+    "sourceCommit": "a844833d920e62c33009e97e16792828fefc209d",
     "sourceDirty": false
   }
 }
