@@ -15,14 +15,14 @@ Make the coding-agent control plane cheaper to operate and harder to mistake act
 - [x] Phase 2: reconcile the 18 instruction adapters with enforcement/adoption status; add a local adoption doctor and negative controls. File readiness is not live activation.
 - [x] Phase 3: add offline outcome/cost adversarial evaluations and a comparable cost-per-success report. No paid model trials were run. CI minutes and deployments remain unknown unless telemetry is supplied.
 - [x] Phase 4: validate source-bound long-goal handoffs and test retrieval, scope, unknown-result, and poisoning cases. Retrieval output remains untrusted context, not instructions.
-- [ ] Phase 5: refresh the deterministic ECC map from a clean source commit; reject dirty provenance. Build a privacy-scoped local code graph and record its coverage honestly.
+- [x] Phase 5: refresh the deterministic ECC map from a clean source commit; reject dirty provenance. Build a privacy-scoped local code graph and record its integrity limits honestly.
 - [ ] Phase 6: produce a local release/cost report separating verification, publication, CI, deployment, and acceptance.
 - [ ] Run focused and broad local checks, review the task-owned diff, and prepare one release candidate per changed repository.
 - [ ] Recheck the hard budget, current remote tip, and running workflows before any push; verify published SHA and CI independently.
 
 ## Current limitations
 
-The backend's `AGENTS.md` and Copilot file are leased by another active policy session. This session must not publish overlapping backend policy edits. The frontend's 18-runtime file-readiness check passes in its isolated checkout, but no vendor runtime has been invoked as an activation smoke test. The ECC map cannot be stamped fresh until the source changes are committed and rebuilt from that clean commit. The local code graph will be limited to an explicit code-only corpus; it will not index private memory or claim semantic coverage.
+The backend's `AGENTS.md` and Copilot file are leased by another active policy session. This session must not publish overlapping backend policy edits. The frontend's 18-runtime file-readiness check passes in its isolated checkout, but no vendor runtime has been invoked as an activation smoke test. The deterministic map is now fresh from a clean source commit. The local Graphify graph does not index private memory or claim semantic coverage; its integrity warnings are recorded below. The broad ECC suite has one remaining known test-contract mismatch: an older disabled-hooks assertion treats the mandatory controlled-goal admission gate as optional. The gate itself denies unscoped controlled work as intended; the test must be corrected and re-run.
 
 ## Minimal project-memory handoff
 
@@ -40,6 +40,33 @@ Use this body with `ecc memory handoff` in the private, ignored project scope. R
 ```
 
 At admission, correction, and handoff, refresh the controlled goal's resume receipt and validate the retrieved handoff against its source SHA and current tree. `node scripts/knowledge-retrieval-eval.js` provides offline evaluation primitives for scoped retrieval; a retrieval hit is a citation, not a trusted instruction.
+
+## Graph build receipt
+
+The deterministic control-plane map at `docs/tools/agent-system-map.json` has 66 nodes and 175 evidence-labelled edges. It was built at `2026-10-01T18:29:13.075Z` from source commit `dc186edb98fc3d380dfe31f652927738d9d09b7d`, with `sourceDirty=false`, generator version 2, no semantic indexing, and zero model calls. `node scripts/agent-system-map.js check` passed. Its SHA-256 is `5BF2B4AC3BF8608BBF3129DFB0F610241E638069610694FF43E45328BB7884EF`. This is the authoritative agent-control map; its freshness is content-bound, not proof of live vendor enforcement.
+
+The separate local Graphify 0.3.17 corpus is `E:\cas-agent-graph-20261001`, sourced from ECC commit `858ebabb606b3490a933238e488fdf3cabdff24f`. Its explicit 16-file allowlist is:
+
+```text
+scripts/agent-adoption-doctor.js
+scripts/agent-system-map.js
+scripts/check-instruction-stack.js
+scripts/goal-control.js
+scripts/goal-runtime-bridge.js
+scripts/eval-goal-runtime-offline.js
+scripts/eval-agent-behavior.js
+scripts/agent-behavior-report.js
+scripts/knowledge-adoption.js
+scripts/knowledge-retrieval-eval.js
+scripts/knowledge-freshness.js
+scripts/knowledge-query.js
+scripts/ci/detect-ci-scope.js
+scripts/lib/memory-vault.js
+scripts/lib/harness-adapter-compliance.js
+scripts/lib/goal-control.js
+```
+
+Every copied file's SHA-256 matched its source. The sorted path-and-hash manifest fingerprint is `C6CFCE31296FE8B899FDB683AE94AFDC94B3C5DE4A019B4B58B1CCF84448F4F0`; the local `graphify-out/graph.json` SHA-256 is `AE22D01604B587D4F18BB985BD1E8CBC4103B2B036FB4151A103556663C4B2F6`. Extraction found 16 code files, zero documents/papers/images, and produced 310 raw nodes and 875 edges with `--code-only --no-cluster`. No semantic model call or private memory indexing occurred. The graph is deliberately local and not a replacement for the deterministic map: its read-only diagnostic reported 49 dangling-endpoint edges, 6 self-loops, and 133 same-endpoint collapsed edges. Those limitations must be carried with any query or future rebuild.
 
 ## Phase-by-phase proof
 
