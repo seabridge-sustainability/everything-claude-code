@@ -13,7 +13,7 @@
     ],
     "semanticIndex": "not-run"
   },
-  "sourceFingerprint": "f81fd1b1e9eca64574e92bdfa95489992c07d82482df5e8fa3ce95596725521e",
+  "sourceFingerprint": "b7f5bbccc512bf5168e211b1eee2dfd5e85c74cdd4e4e61abb073c3e88d879c2",
   "sources": [
     {
       "path": ".agents/rules/seabridge-agent-baseline.md",
@@ -80,6 +80,10 @@
       "sha256": "7ffc45c369a3cca7aab6bfa9031d30bea89feb1c890c94741708a9b1002ae0ae"
     },
     {
+      "path": "docs/design/ecc-memory-vault.md",
+      "sha256": "e25fc0e3e7b210174263a56bae169825af0e044e6ba4ca3c735ee05ea73e0053"
+    },
+    {
       "path": "hooks/codex-hooks.json",
       "sha256": "57edf21eb83d9c8144cfdc19f621700a854b6fd4abc4c368ddaeb5c74488b43c"
     },
@@ -116,6 +120,10 @@
       "sha256": "18faf8ce860f4555ddfe822a3f9f6d5437549043862288a4fb66b0674333a9bc"
     },
     {
+      "path": "schemas/memory.schema.json",
+      "sha256": "2cdcca95f32fda44a1fffda0137a62857d0e2b8ba8a14d982295f36389a43eb6"
+    },
+    {
       "path": "scripts/agent-adoption-doctor.js",
       "sha256": "9431e805a7fc9da394c5c669b95223f2b6e6a3fc0c14d53f2da6e438065a005c"
     },
@@ -125,7 +133,7 @@
     },
     {
       "path": "scripts/agent-system-map.js",
-      "sha256": "9e631880a1e8a239b0488022811f1b309289ffffc4d81a4fce57ab2cc4cd23da"
+      "sha256": "1db2f5eeedd7a99068eda6aadff88adf61973e062fa11eedee610a1becd06958"
     },
     {
       "path": "scripts/check-instruction-stack.js",
@@ -168,8 +176,24 @@
       "sha256": "2f24f69e853ffe8077903ef6fcd3b6443a1da73cf46dba830a57df84896d816a"
     },
     {
+      "path": "scripts/lib/memory-vault-format.js",
+      "sha256": "a5589f0cd0fd8a414436775e74243c39b068c86ddc99a4732d71ee54409a50c2"
+    },
+    {
+      "path": "scripts/lib/memory-vault.js",
+      "sha256": "daa96c9d88d8797bb48c6b78e56683b6e9ffda5d096eaf042c65e4742ce6dae1"
+    },
+    {
       "path": "scripts/lib/session-coordination.js",
       "sha256": "b82cee74ad6a665084919d8944c2cdffcd44bfe203c2327fc19531089c5c0235"
+    },
+    {
+      "path": "scripts/memory-mcp.mjs",
+      "sha256": "5c549220aa8a6b2d8ed60d99b7f3c688b6ee36f3c76e464f0f8767667c6e2ecc"
+    },
+    {
+      "path": "scripts/memory.js",
+      "sha256": "c5266a07230d5917c84665fff55c4f17a50a6f74bc55bf403d3d4a6b9cc2620c"
     },
     {
       "path": "scripts/session-coordinate.js",
@@ -200,12 +224,28 @@
       "sha256": "c43b84829844add9d29fc046872394ec5921f7df20abb93007080de90bf2cbe3"
     },
     {
+      "path": "tests/lib/memory-schema.test.js",
+      "sha256": "40b04f835e81db242b4cf984010d9b417591dd005e290b260a9aa5e2afcc9755"
+    },
+    {
+      "path": "tests/lib/memory-vault.test.js",
+      "sha256": "087b9100802e46d15754e5ae7d9c785685ee197913f5c59226bce27470603f5a"
+    },
+    {
       "path": "tests/scripts/knowledge-freshness.test.js",
       "sha256": "8bbeef823bab5ef5dd9c56a113444ce4ed65d468143731657f5edd6eaac0a2a2"
     },
     {
       "path": "tests/scripts/knowledge-retrieval-eval.test.js",
       "sha256": "356799d3edc96c3b74602d9750a0db0ce8c7b00adae243a73949e350e04d9f7a"
+    },
+    {
+      "path": "tests/scripts/memory-mcp.test.js",
+      "sha256": "dde3ecf0ebed5df5ce35279ab4e264105958f1952ba9d472afe51a29a9275218"
+    },
+    {
+      "path": "tests/scripts/memory.test.js",
+      "sha256": "243058413f15869af53ad8eca608633608c3178a6aa0b61662cab1e9436246e1"
     }
   ],
   "nodes": [
@@ -294,6 +334,12 @@
       "sha256": "656ab37237e8877b6216c43b22d007a76f739f70c606c7141980c8e5c021a2b1"
     },
     {
+      "id": "file:docs/design/ecc-memory-vault.md",
+      "type": "source",
+      "path": "docs/design/ecc-memory-vault.md",
+      "sha256": "e25fc0e3e7b210174263a56bae169825af0e044e6ba4ca3c735ee05ea73e0053"
+    },
+    {
       "id": "file:GEMINI.md",
       "type": "source",
       "path": "GEMINI.md",
@@ -360,6 +406,12 @@
       "sha256": "18faf8ce860f4555ddfe822a3f9f6d5437549043862288a4fb66b0674333a9bc"
     },
     {
+      "id": "file:schemas/memory.schema.json",
+      "type": "source",
+      "path": "schemas/memory.schema.json",
+      "sha256": "2cdcca95f32fda44a1fffda0137a62857d0e2b8ba8a14d982295f36389a43eb6"
+    },
+    {
       "id": "file:scripts/agent-adoption-doctor.js",
       "type": "source",
       "path": "scripts/agent-adoption-doctor.js",
@@ -375,7 +427,7 @@
       "id": "file:scripts/agent-system-map.js",
       "type": "source",
       "path": "scripts/agent-system-map.js",
-      "sha256": "9e631880a1e8a239b0488022811f1b309289ffffc4d81a4fce57ab2cc4cd23da"
+      "sha256": "1db2f5eeedd7a99068eda6aadff88adf61973e062fa11eedee610a1becd06958"
     },
     {
       "id": "file:scripts/check-instruction-stack.js",
@@ -438,10 +490,34 @@
       "sha256": "2f24f69e853ffe8077903ef6fcd3b6443a1da73cf46dba830a57df84896d816a"
     },
     {
+      "id": "file:scripts/lib/memory-vault-format.js",
+      "type": "source",
+      "path": "scripts/lib/memory-vault-format.js",
+      "sha256": "a5589f0cd0fd8a414436775e74243c39b068c86ddc99a4732d71ee54409a50c2"
+    },
+    {
+      "id": "file:scripts/lib/memory-vault.js",
+      "type": "source",
+      "path": "scripts/lib/memory-vault.js",
+      "sha256": "daa96c9d88d8797bb48c6b78e56683b6e9ffda5d096eaf042c65e4742ce6dae1"
+    },
+    {
       "id": "file:scripts/lib/session-coordination.js",
       "type": "source",
       "path": "scripts/lib/session-coordination.js",
       "sha256": "b82cee74ad6a665084919d8944c2cdffcd44bfe203c2327fc19531089c5c0235"
+    },
+    {
+      "id": "file:scripts/memory-mcp.mjs",
+      "type": "source",
+      "path": "scripts/memory-mcp.mjs",
+      "sha256": "5c549220aa8a6b2d8ed60d99b7f3c688b6ee36f3c76e464f0f8767667c6e2ecc"
+    },
+    {
+      "id": "file:scripts/memory.js",
+      "type": "source",
+      "path": "scripts/memory.js",
+      "sha256": "c5266a07230d5917c84665fff55c4f17a50a6f74bc55bf403d3d4a6b9cc2620c"
     },
     {
       "id": "file:scripts/session-coordinate.js",
@@ -486,6 +562,18 @@
       "sha256": "c43b84829844add9d29fc046872394ec5921f7df20abb93007080de90bf2cbe3"
     },
     {
+      "id": "file:tests/lib/memory-schema.test.js",
+      "type": "source",
+      "path": "tests/lib/memory-schema.test.js",
+      "sha256": "40b04f835e81db242b4cf984010d9b417591dd005e290b260a9aa5e2afcc9755"
+    },
+    {
+      "id": "file:tests/lib/memory-vault.test.js",
+      "type": "source",
+      "path": "tests/lib/memory-vault.test.js",
+      "sha256": "087b9100802e46d15754e5ae7d9c785685ee197913f5c59226bce27470603f5a"
+    },
+    {
       "id": "file:tests/scripts/knowledge-freshness.test.js",
       "type": "source",
       "path": "tests/scripts/knowledge-freshness.test.js",
@@ -496,6 +584,18 @@
       "type": "source",
       "path": "tests/scripts/knowledge-retrieval-eval.test.js",
       "sha256": "356799d3edc96c3b74602d9750a0db0ce8c7b00adae243a73949e350e04d9f7a"
+    },
+    {
+      "id": "file:tests/scripts/memory-mcp.test.js",
+      "type": "source",
+      "path": "tests/scripts/memory-mcp.test.js",
+      "sha256": "dde3ecf0ebed5df5ce35279ab4e264105958f1952ba9d472afe51a29a9275218"
+    },
+    {
+      "id": "file:tests/scripts/memory.test.js",
+      "type": "source",
+      "path": "tests/scripts/memory.test.js",
+      "sha256": "243058413f15869af53ad8eca608633608c3178a6aa0b61662cab1e9436246e1"
     },
     {
       "id": "runtime:adal",
@@ -975,6 +1075,12 @@
     },
     {
       "from": "file:scripts/agent-system-map.js",
+      "to": "file:docs/design/ecc-memory-vault.md",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
       "to": "file:GEMINI.md",
       "type": "mentions-path",
       "evidence": "scripts/agent-system-map.js"
@@ -1036,6 +1142,12 @@
     {
       "from": "file:scripts/agent-system-map.js",
       "to": "file:protocols/SAFETY_AUTHORIZATION_RULE.md",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:schemas/memory.schema.json",
       "type": "mentions-path",
       "evidence": "scripts/agent-system-map.js"
     },
@@ -1113,7 +1225,31 @@
     },
     {
       "from": "file:scripts/agent-system-map.js",
+      "to": "file:scripts/lib/memory-vault-format.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:scripts/lib/memory-vault.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
       "to": "file:scripts/lib/session-coordination.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:scripts/memory-mcp.mjs",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:scripts/memory.js",
       "type": "mentions-path",
       "evidence": "scripts/agent-system-map.js"
     },
@@ -1161,6 +1297,18 @@
     },
     {
       "from": "file:scripts/agent-system-map.js",
+      "to": "file:tests/lib/memory-schema.test.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:tests/lib/memory-vault.test.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
       "to": "file:tests/scripts/knowledge-freshness.test.js",
       "type": "mentions-path",
       "evidence": "scripts/agent-system-map.js"
@@ -1168,6 +1316,18 @@
     {
       "from": "file:scripts/agent-system-map.js",
       "to": "file:tests/scripts/knowledge-retrieval-eval.test.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:tests/scripts/memory-mcp.test.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:tests/scripts/memory.test.js",
       "type": "mentions-path",
       "evidence": "scripts/agent-system-map.js"
     },
@@ -1212,6 +1372,30 @@
       "to": "file:manifests/instruction-adapters.json",
       "type": "mentions-path",
       "evidence": "scripts/check-instruction-stack.js"
+    },
+    {
+      "from": "file:scripts/knowledge-adoption.js",
+      "to": "file:scripts/lib/memory-vault.js",
+      "type": "verified-code-import",
+      "evidence": "scripts/knowledge-adoption.js"
+    },
+    {
+      "from": "file:scripts/lib/memory-vault.js",
+      "to": "file:scripts/lib/memory-vault-format.js",
+      "type": "verified-code-import",
+      "evidence": "scripts/lib/memory-vault.js"
+    },
+    {
+      "from": "file:scripts/memory-mcp.mjs",
+      "to": "file:scripts/lib/memory-vault.js",
+      "type": "verified-code-import",
+      "evidence": "scripts/memory-mcp.mjs"
+    },
+    {
+      "from": "file:scripts/memory.js",
+      "to": "file:scripts/lib/memory-vault.js",
+      "type": "verified-code-import",
+      "evidence": "scripts/memory.js"
     },
     {
       "from": "file:tests/ci/agent-adoption-doctor.test.js",
@@ -1298,10 +1482,40 @@
       "evidence": "tests/ci/workflow-cost-contract.test.js"
     },
     {
+      "from": "file:tests/lib/memory-schema.test.js",
+      "to": "file:schemas/memory.schema.json",
+      "type": "mentions-path",
+      "evidence": "tests/lib/memory-schema.test.js"
+    },
+    {
+      "from": "file:tests/lib/memory-schema.test.js",
+      "to": "file:schemas/memory.schema.json",
+      "type": "verified-code-import",
+      "evidence": "tests/lib/memory-schema.test.js"
+    },
+    {
+      "from": "file:tests/lib/memory-schema.test.js",
+      "to": "file:scripts/lib/memory-vault.js",
+      "type": "verified-code-import",
+      "evidence": "tests/lib/memory-schema.test.js"
+    },
+    {
+      "from": "file:tests/lib/memory-vault.test.js",
+      "to": "file:scripts/lib/memory-vault.js",
+      "type": "verified-code-import",
+      "evidence": "tests/lib/memory-vault.test.js"
+    },
+    {
       "from": "file:tests/scripts/knowledge-freshness.test.js",
       "to": "file:scripts/knowledge-freshness.js",
       "type": "mentions-path",
       "evidence": "tests/scripts/knowledge-freshness.test.js"
+    },
+    {
+      "from": "file:tests/scripts/memory-mcp.test.js",
+      "to": "file:scripts/lib/memory-vault.js",
+      "type": "verified-code-import",
+      "evidence": "tests/scripts/memory-mcp.test.js"
     },
     {
       "from": "runtime:adal",
@@ -1641,8 +1855,8 @@
     }
   ],
   "build": {
-    "generatedAt": "2026-10-01T19:51:30.572Z",
-    "sourceCommit": "cd9e81f457ed6ec3563df2b0b8e8b2dc34257484",
+    "generatedAt": "2026-10-01T22:57:08.791Z",
+    "sourceCommit": "93372755dc57101462c389249e44ae99f68e123a",
     "sourceDirty": false
   }
 }
