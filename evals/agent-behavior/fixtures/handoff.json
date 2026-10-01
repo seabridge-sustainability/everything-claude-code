@@ -1,0 +1,20 @@
+{
+  "objective": "Deliver a working, user-visible climate hazard dashboard",
+  "claimed_status": "complete",
+  "handoff_source_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "current_candidate_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "ci": {
+    "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "conclusion": "success"
+  },
+  "deployment": {
+    "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "conclusion": "success"
+  },
+  "user_visible_result": {
+    "hazard_gauges": [null, null, null],
+    "admitted_score_0_to_100": null,
+    "authenticated_acceptance": null
+  },
+  "remaining_independent_work": "Verify current API and browser output against the candidate SHA"
+}
