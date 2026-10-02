@@ -109,11 +109,17 @@ polling/schedules when its responsibility ends.
 
 ## Enforcement and limits
 
-All 18 adapters receive the canonical rule. Controlled runtime admission and final checks
+All 18 adapters receive the canonical rule. For local adoption, run
+`node scripts/agent-adoption-doctor.js --adapter-root <clean-ECC-runtime> --project <repo> --installation --json`.
+Its file readiness, installed wiring, and live activation are separate results. A packaged
+Claude hook is not active merely because `hooks/hooks.json` exists: it must be registered
+in project settings or an enabled plugin. Do not enable a prompt-blocking hook until its
+first-prompt goal initialization flow has been verified; a rejected first prompt can strand
+the agent before it can initialize the goal. Controlled runtime admission and final checks
 require a live session bound to the current worktree. `check-write`, `check-changes` and
 `check-release` reject scope/candidate violations; use them in every runtime's workflow.
 This is cooperative enforcement, not an OS sandbox: direct editor/shell calls that bypass
-the commands are not intercepted. Existing native hooks enforce admission/final only;
+the commands are not intercepted. Active native hooks enforce admission/final only;
 do not advertise universal per-edit or per-push interception. Installed hook copies and
 already-running chats need refresh/restart to adopt new code/instructions.
 
