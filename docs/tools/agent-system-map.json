@@ -13,7 +13,7 @@
     ],
     "semanticIndex": "not-run"
   },
-  "sourceFingerprint": "c000e29ea5b9bbfc08a5d44349782596eec590f84ea0de15ae97520849abcdc6",
+  "sourceFingerprint": "e48ee73278a42aaa425740739703239c44481f1ba7993dee8595b4c84efe6057",
   "sources": [
     {
       "path": ".agents/rules/seabridge-agent-baseline.md",
@@ -61,7 +61,7 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "93da91a535b64c5f26cdda7ea29ec6f2069b279a42bd1f40a056456a66b3f789"
+      "sha256": "65df68c2e763fbd387f9477db47ab642c6ece98e66ab723c191bf52331758135"
     },
     {
       "path": "CLAUDE.md",
@@ -125,7 +125,7 @@
     },
     {
       "path": "scripts/agent-adoption-doctor.js",
-      "sha256": "c8a4c290d3702fec5191770e49227c01ec6b2633adba0f91cd7e898137101fbe"
+      "sha256": "8e8f42f8668d410b55896815dd10b01828e2c00195fafe7c9bfb4da16fb6a4f2"
     },
     {
       "path": "scripts/agent-behavior-report.js",
@@ -201,7 +201,7 @@
     },
     {
       "path": "tests/ci/agent-adoption-doctor.test.js",
-      "sha256": "49cfb46d191f2aba70fa3c6e130f89f847ae36c6633c056bd92b0b73d4fbb62a"
+      "sha256": "ea6b87a2f8b07243ca1427ff848a70fb0cad8237e86f2ed368e581ad6a961192"
     },
     {
       "path": "tests/ci/agent-behavior-eval.test.js",
@@ -323,7 +323,7 @@
       "id": "file:AGENTS.md",
       "type": "source",
       "path": "AGENTS.md",
-      "sha256": "93da91a535b64c5f26cdda7ea29ec6f2069b279a42bd1f40a056456a66b3f789"
+      "sha256": "65df68c2e763fbd387f9477db47ab642c6ece98e66ab723c191bf52331758135"
     },
     {
       "id": "file:CLAUDE.md",
@@ -419,7 +419,7 @@
       "id": "file:scripts/agent-adoption-doctor.js",
       "type": "source",
       "path": "scripts/agent-adoption-doctor.js",
-      "sha256": "c8a4c290d3702fec5191770e49227c01ec6b2633adba0f91cd7e898137101fbe"
+      "sha256": "8e8f42f8668d410b55896815dd10b01828e2c00195fafe7c9bfb4da16fb6a4f2"
     },
     {
       "id": "file:scripts/agent-behavior-report.js",
@@ -533,7 +533,7 @@
       "id": "file:tests/ci/agent-adoption-doctor.test.js",
       "type": "source",
       "path": "tests/ci/agent-adoption-doctor.test.js",
-      "sha256": "49cfb46d191f2aba70fa3c6e130f89f847ae36c6633c056bd92b0b73d4fbb62a"
+      "sha256": "ea6b87a2f8b07243ca1427ff848a70fb0cad8237e86f2ed368e581ad6a961192"
     },
     {
       "id": "file:tests/ci/agent-behavior-eval.test.js",
@@ -1907,8 +1907,8 @@
     }
   ],
   "build": {
-    "generatedAt": "2026-10-02T01:48:46.278Z",
-    "sourceCommit": "5846b3d6d7681e08b468a21a4cd9faaf283291c0",
+    "generatedAt": "2026-10-02T02:36:41.795Z",
+    "sourceCommit": "bc9286600f29930029c391229c4b2cab82a69299",
     "sourceDirty": false
   }
 }
