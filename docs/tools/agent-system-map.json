@@ -13,7 +13,7 @@
     ],
     "semanticIndex": "not-run"
   },
-  "sourceFingerprint": "6452465db6098bb2d1b1cddccef2c1f30fc39b02727ba40289c34e204bc5c036",
+  "sourceFingerprint": "c000e29ea5b9bbfc08a5d44349782596eec590f84ea0de15ae97520849abcdc6",
   "sources": [
     {
       "path": ".agents/rules/seabridge-agent-baseline.md",
@@ -105,7 +105,7 @@
     },
     {
       "path": "protocols/CONCURRENT_SESSION_PROTOCOL.md",
-      "sha256": "b0150447919b0be31a6afdcc2e5e85716501cdf59f668ed335c9114b44dde411"
+      "sha256": "5b85ba262afc473caab44ff507d16addd0271b0d20d0986c716f076422e317c1"
     },
     {
       "path": "protocols/GOAL_PROTOCOL.md",
@@ -125,7 +125,7 @@
     },
     {
       "path": "scripts/agent-adoption-doctor.js",
-      "sha256": "9431e805a7fc9da394c5c669b95223f2b6e6a3fc0c14d53f2da6e438065a005c"
+      "sha256": "c8a4c290d3702fec5191770e49227c01ec6b2633adba0f91cd7e898137101fbe"
     },
     {
       "path": "scripts/agent-behavior-report.js",
@@ -201,7 +201,7 @@
     },
     {
       "path": "tests/ci/agent-adoption-doctor.test.js",
-      "sha256": "b226ccdba5b14852b07543e373a16374045fbe6c3593f476b6ebdccfe008e9bd"
+      "sha256": "49cfb46d191f2aba70fa3c6e130f89f847ae36c6633c056bd92b0b73d4fbb62a"
     },
     {
       "path": "tests/ci/agent-behavior-eval.test.js",
@@ -389,7 +389,7 @@
       "id": "file:protocols/CONCURRENT_SESSION_PROTOCOL.md",
       "type": "source",
       "path": "protocols/CONCURRENT_SESSION_PROTOCOL.md",
-      "sha256": "b0150447919b0be31a6afdcc2e5e85716501cdf59f668ed335c9114b44dde411"
+      "sha256": "5b85ba262afc473caab44ff507d16addd0271b0d20d0986c716f076422e317c1"
     },
     {
       "id": "file:protocols/GOAL_PROTOCOL_SHORT.md",
@@ -419,7 +419,7 @@
       "id": "file:scripts/agent-adoption-doctor.js",
       "type": "source",
       "path": "scripts/agent-adoption-doctor.js",
-      "sha256": "9431e805a7fc9da394c5c669b95223f2b6e6a3fc0c14d53f2da6e438065a005c"
+      "sha256": "c8a4c290d3702fec5191770e49227c01ec6b2633adba0f91cd7e898137101fbe"
     },
     {
       "id": "file:scripts/agent-behavior-report.js",
@@ -533,7 +533,7 @@
       "id": "file:tests/ci/agent-adoption-doctor.test.js",
       "type": "source",
       "path": "tests/ci/agent-adoption-doctor.test.js",
-      "sha256": "b226ccdba5b14852b07543e373a16374045fbe6c3593f476b6ebdccfe008e9bd"
+      "sha256": "49cfb46d191f2aba70fa3c6e130f89f847ae36c6633c056bd92b0b73d4fbb62a"
     },
     {
       "id": "file:tests/ci/agent-behavior-eval.test.js",
@@ -970,6 +970,18 @@
       "evidence": "OPENCODE.md"
     },
     {
+      "from": "file:protocols/CONCURRENT_SESSION_PROTOCOL.md",
+      "to": "file:hooks/hooks.json",
+      "type": "mentions-path",
+      "evidence": "protocols/CONCURRENT_SESSION_PROTOCOL.md"
+    },
+    {
+      "from": "file:protocols/CONCURRENT_SESSION_PROTOCOL.md",
+      "to": "file:scripts/agent-adoption-doctor.js",
+      "type": "mentions-path",
+      "evidence": "protocols/CONCURRENT_SESSION_PROTOCOL.md"
+    },
+    {
       "from": "file:protocols/GOAL_PROTOCOL_SHORT.md",
       "to": "file:protocols/CONCURRENT_SESSION_PROTOCOL.md",
       "type": "mentions-path",
@@ -984,6 +996,18 @@
     {
       "from": "file:scripts/agent-adoption-doctor.js",
       "to": "file:AGENTS.md",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-adoption-doctor.js"
+    },
+    {
+      "from": "file:scripts/agent-adoption-doctor.js",
+      "to": "file:CLAUDE.md",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-adoption-doctor.js"
+    },
+    {
+      "from": "file:scripts/agent-adoption-doctor.js",
+      "to": "file:GEMINI.md",
       "type": "mentions-path",
       "evidence": "scripts/agent-adoption-doctor.js"
     },
@@ -1883,8 +1907,8 @@
     }
   ],
   "build": {
-    "generatedAt": "2026-10-02T00:40:34.864Z",
-    "sourceCommit": "fbfb65e767b5ba1f42e5fdfbbbc7322e67467642",
+    "generatedAt": "2026-10-02T01:48:46.278Z",
+    "sourceCommit": "5846b3d6d7681e08b468a21a4cd9faaf283291c0",
     "sourceDirty": false
   }
 }
