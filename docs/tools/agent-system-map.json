@@ -13,7 +13,7 @@
     ],
     "semanticIndex": "not-run"
   },
-  "sourceFingerprint": "b7f5bbccc512bf5168e211b1eee2dfd5e85c74cdd4e4e61abb073c3e88d879c2",
+  "sourceFingerprint": "6452465db6098bb2d1b1cddccef2c1f30fc39b02727ba40289c34e204bc5c036",
   "sources": [
     {
       "path": ".agents/rules/seabridge-agent-baseline.md",
@@ -105,7 +105,7 @@
     },
     {
       "path": "protocols/CONCURRENT_SESSION_PROTOCOL.md",
-      "sha256": "5927e803bb0e57fbfaf20d50ae7ac112a33928c749077bf82ebb63a3bfd47d9e"
+      "sha256": "b0150447919b0be31a6afdcc2e5e85716501cdf59f668ed335c9114b44dde411"
     },
     {
       "path": "protocols/GOAL_PROTOCOL.md",
@@ -133,7 +133,7 @@
     },
     {
       "path": "scripts/agent-system-map.js",
-      "sha256": "1db2f5eeedd7a99068eda6aadff88adf61973e062fa11eedee610a1becd06958"
+      "sha256": "09776ede653c5f86ca989517e0e1e64b6fba43413a1104949f19d2f085e8a1f6"
     },
     {
       "path": "scripts/check-instruction-stack.js",
@@ -185,7 +185,7 @@
     },
     {
       "path": "scripts/lib/session-coordination.js",
-      "sha256": "b82cee74ad6a665084919d8944c2cdffcd44bfe203c2327fc19531089c5c0235"
+      "sha256": "6298ff578353d3ba43016ea7dd028224ae06e648a1ced39ed5549e0a00aa7a10"
     },
     {
       "path": "scripts/memory-mcp.mjs",
@@ -197,7 +197,7 @@
     },
     {
       "path": "scripts/session-coordinate.js",
-      "sha256": "9ccf302729db0753c7b68f0a0d0f6a5e5835a02eaccdb32089a1b525b8e03c7f"
+      "sha256": "7269132695d1102e105826efa5aeb47773ea477a3ffd373a29d3e16753b330ce"
     },
     {
       "path": "tests/ci/agent-adoption-doctor.test.js",
@@ -230,6 +230,10 @@
     {
       "path": "tests/lib/memory-vault.test.js",
       "sha256": "087b9100802e46d15754e5ae7d9c785685ee197913f5c59226bce27470603f5a"
+    },
+    {
+      "path": "tests/lib/session-coordination.test.js",
+      "sha256": "6cbf6c3e3314439d035b4a2e349dcf9968a3fc13b3acaec1b8d9f4c78e20a674"
     },
     {
       "path": "tests/scripts/knowledge-freshness.test.js",
@@ -385,7 +389,7 @@
       "id": "file:protocols/CONCURRENT_SESSION_PROTOCOL.md",
       "type": "source",
       "path": "protocols/CONCURRENT_SESSION_PROTOCOL.md",
-      "sha256": "5927e803bb0e57fbfaf20d50ae7ac112a33928c749077bf82ebb63a3bfd47d9e"
+      "sha256": "b0150447919b0be31a6afdcc2e5e85716501cdf59f668ed335c9114b44dde411"
     },
     {
       "id": "file:protocols/GOAL_PROTOCOL_SHORT.md",
@@ -427,7 +431,7 @@
       "id": "file:scripts/agent-system-map.js",
       "type": "source",
       "path": "scripts/agent-system-map.js",
-      "sha256": "1db2f5eeedd7a99068eda6aadff88adf61973e062fa11eedee610a1becd06958"
+      "sha256": "09776ede653c5f86ca989517e0e1e64b6fba43413a1104949f19d2f085e8a1f6"
     },
     {
       "id": "file:scripts/check-instruction-stack.js",
@@ -505,7 +509,7 @@
       "id": "file:scripts/lib/session-coordination.js",
       "type": "source",
       "path": "scripts/lib/session-coordination.js",
-      "sha256": "b82cee74ad6a665084919d8944c2cdffcd44bfe203c2327fc19531089c5c0235"
+      "sha256": "6298ff578353d3ba43016ea7dd028224ae06e648a1ced39ed5549e0a00aa7a10"
     },
     {
       "id": "file:scripts/memory-mcp.mjs",
@@ -523,7 +527,7 @@
       "id": "file:scripts/session-coordinate.js",
       "type": "source",
       "path": "scripts/session-coordinate.js",
-      "sha256": "9ccf302729db0753c7b68f0a0d0f6a5e5835a02eaccdb32089a1b525b8e03c7f"
+      "sha256": "7269132695d1102e105826efa5aeb47773ea477a3ffd373a29d3e16753b330ce"
     },
     {
       "id": "file:tests/ci/agent-adoption-doctor.test.js",
@@ -572,6 +576,12 @@
       "type": "source",
       "path": "tests/lib/memory-vault.test.js",
       "sha256": "087b9100802e46d15754e5ae7d9c785685ee197913f5c59226bce27470603f5a"
+    },
+    {
+      "id": "file:tests/lib/session-coordination.test.js",
+      "type": "source",
+      "path": "tests/lib/session-coordination.test.js",
+      "sha256": "6cbf6c3e3314439d035b4a2e349dcf9968a3fc13b3acaec1b8d9f4c78e20a674"
     },
     {
       "id": "file:tests/scripts/knowledge-freshness.test.js",
@@ -1309,6 +1319,12 @@
     },
     {
       "from": "file:scripts/agent-system-map.js",
+      "to": "file:tests/lib/session-coordination.test.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
       "to": "file:tests/scripts/knowledge-freshness.test.js",
       "type": "mentions-path",
       "evidence": "scripts/agent-system-map.js"
@@ -1504,6 +1520,18 @@
       "to": "file:scripts/lib/memory-vault.js",
       "type": "verified-code-import",
       "evidence": "tests/lib/memory-vault.test.js"
+    },
+    {
+      "from": "file:tests/lib/session-coordination.test.js",
+      "to": "file:scripts/lib/session-coordination.js",
+      "type": "mentions-path",
+      "evidence": "tests/lib/session-coordination.test.js"
+    },
+    {
+      "from": "file:tests/lib/session-coordination.test.js",
+      "to": "file:scripts/session-coordinate.js",
+      "type": "mentions-path",
+      "evidence": "tests/lib/session-coordination.test.js"
     },
     {
       "from": "file:tests/scripts/knowledge-freshness.test.js",
@@ -1855,8 +1883,8 @@
     }
   ],
   "build": {
-    "generatedAt": "2026-10-01T22:57:08.791Z",
-    "sourceCommit": "93372755dc57101462c389249e44ae99f68e123a",
+    "generatedAt": "2026-10-02T00:40:34.864Z",
+    "sourceCommit": "fbfb65e767b5ba1f42e5fdfbbbc7322e67467642",
     "sourceDirty": false
   }
 }
