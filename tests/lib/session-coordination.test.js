@@ -33,6 +33,16 @@ function register(cwd, sessionId, scopes, now = Date.now()) {
   return execute('register', { cwd, sessionId, scopes, objective: 'owned task', doneWhen: 'local proof', now });
 }
 function invoke(cwd, args) { return spawnSync(process.execPath, [cli, ...args], { cwd, encoding: 'utf8', windowsHide: true }); }
+function budget(now = Date.now()) {
+  return { actionsBudgetStatus: 'known', actionsBudgetUsed: 10, actionsBudgetLimit: 100,
+    actionsBudgetCheckedAt: new Date(now).toISOString(), actionsBudgetSource: 'github-org-budget-ui',
+    actionsStopUsage: 'yes', expectedActionsUsd: 1, expectedWorkflows: 'security-scan' };
+}
+function budgetArgs(now = Date.now()) {
+  return ['--actions-budget-status', 'known', '--actions-budget-used', '10', '--actions-budget-limit', '100',
+    '--actions-budget-checked-at', new Date(now).toISOString(), '--actions-budget-source', 'github-org-budget-ui',
+    '--actions-stop-usage', 'yes', '--expected-actions-usd', '1', '--expected-workflows', 'security-scan'];
+}
 
 after(() => fs.rmSync(workspace, { recursive: true, force: true }));
 
@@ -112,29 +122,49 @@ test('release serializes publication but permits disjoint local work', () => {
   const { root, other, sha } = fixture();
   register(root, 'release', ['README.md']);
   register(other, 'worker', ['app/meter']);
-  execute('release-acquire', { cwd: root, sessionId: 'release', branch: 'development', candidate: sha });
-  assert.throws(() => execute('release-acquire', { cwd: other, sessionId: 'worker', branch: 'development', candidate: sha }), /release owned by release/);
+  execute('release-acquire', { cwd: root, sessionId: 'release', branch: 'development', candidate: sha, ...budget() });
+  assert.throws(() => execute('release-acquire', { cwd: other, sessionId: 'worker', branch: 'development', candidate: sha, ...budget() }), /release owned by release/);
   assert.equal(invoke(other, ['check-write', '--session', 'worker', '--path', 'app/meter/x.py']).status, 0);
   assert.equal(invoke(root, ['check-release', '--session', 'release', '--branch', 'development', '--candidate', sha]).status, 0);
   assert.equal(invoke(root, ['check-release', '--session', 'release', '--branch', 'main', '--candidate', sha]).status, 2);
+});
+
+test('release acquisition records a fresh Actions budget receipt and fails closed at the tripwire', () => {
+  const { root, sha } = fixture();
+  const now = Date.now();
+  register(root, 'release', ['README.md'], now);
+  const base = { cwd: root, sessionId: 'release', branch: 'development', candidate: sha, now };
+  assert.throws(() => execute('release-acquire', base), /actions-budget-source/);
+  assert.throws(() => execute('release-acquire', { ...base, ...budget(now - 3600001) }), /within the last hour/);
+  assert.throws(() => execute('release-acquire', { ...base, ...budget(now), expectedActionsUsd: -1 }), /positive USD/);
+  assert.throws(() => execute('release-acquire', { ...base, ...budget(now), actionsBudgetUsed: ' ' }), /actions-budget-used required/);
+  assert.throws(() => execute('release-acquire', { ...base, ...budget(now), actionsBudgetCheckedAt: '2026-10-01' }), /ISO UTC timestamp/);
+  assert.throws(() => execute('release-acquire', { ...base, ...budget(now), actionsBudgetUsed: 89 }), /owner cost approval/);
+  assert.throws(() => execute('release-acquire', { ...base, ...budget(now), actionsStopUsage: 'no' }), /owner cost approval/);
+  assert.throws(() => execute('release-acquire', { ...base, ...budget(now), actionsBudgetStatus: 'unknown' }), /owner cost approval/);
+  const result = execute('release-acquire', { ...base, ...budget(now), actionsBudgetUsed: 89,
+    ownerCostApproval: 'Alejandro approved this named development security-scan batch' });
+  assert.equal(result.actionsBudget.projectedPercent, 90);
+  assert.equal(result.actionsBudget.expectedWorkflows[0], 'security-scan');
+  assert.equal(result.actionsBudget.source, 'github-org-budget-ui');
 });
 
 test('release expiry is not proof a remote job stopped; it prevents takeover', () => {
   const { root, other, sha } = fixture();
   register(root, 'release', ['README.md'], 100);
   register(other, 'worker', ['app/meter'], 100);
-  execute('release-acquire', { cwd: root, sessionId: 'release', branch: 'development', candidate: sha, ttl: 1, now: 100 });
+  execute('release-acquire', { cwd: root, sessionId: 'release', branch: 'development', candidate: sha, ttl: 1, now: 100, ...budget(100) });
   assert.throws(() => execute('check-release', { cwd: root, sessionId: 'release', branch: 'development', candidate: sha, now: 60200 }), /lease expired/);
-  assert.throws(() => execute('release-acquire', { cwd: other, sessionId: 'worker', branch: 'development', candidate: sha, now: 60200 }), /release owned/);
+  assert.throws(() => execute('release-acquire', { cwd: other, sessionId: 'worker', branch: 'development', candidate: sha, now: 60200, ...budget(60200) }), /release owned/);
   assert.throws(() => execute('close', { cwd: root, sessionId: 'release', now: 60200 }), /terminal status/);
   execute('release-end', { cwd: root, sessionId: 'release', outcome: 'failed', evidence: 'fixture run terminal failure', now: 60200 });
-  execute('release-acquire', { cwd: other, sessionId: 'worker', branch: 'development', candidate: sha, now: 60201 });
+  execute('release-acquire', { cwd: other, sessionId: 'worker', branch: 'development', candidate: sha, now: 60201, ...budget(60201) });
 });
 
 test('changed HEAD never silently retargets an acquired candidate', () => {
   const { root, sha } = fixture();
   register(root, 'release', ['README.md']);
-  execute('release-acquire', { cwd: root, sessionId: 'release', branch: 'development', candidate: sha });
+  execute('release-acquire', { cwd: root, sessionId: 'release', branch: 'development', candidate: sha, ...budget() });
   git(root, '-c', 'core.hooksPath=', 'commit', '--allow-empty', '-m', 'later unrelated fixture');
   assert.equal(invoke(root, ['check-release', '--session', 'release', '--branch', 'development', '--candidate', sha]).status, 2);
 });
@@ -143,9 +173,9 @@ test('dirty candidates and mismatched integration baselines cannot acquire publi
   const { root, sha } = fixture();
   register(root, 'release', ['README.md']);
   fs.appendFileSync(path.join(root, 'README.md'), 'change\n');
-  assert.equal(invoke(root, ['release-acquire', '--session', 'release', '--branch', 'development', '--candidate', sha]).status, 2);
+  assert.equal(invoke(root, ['release-acquire', '--session', 'release', '--branch', 'development', '--candidate', sha, ...budgetArgs()]).status, 2);
   assert.equal(invoke(root, ['release-acquire', '--session', 'release', '--branch', 'development', '--candidate', sha,
-    '--upstream', 'refs/remotes/origin/main']).status, 2);
+    '--upstream', 'refs/remotes/origin/main', ...budgetArgs()]).status, 2);
 });
 
 test('negative control: removing overlap enforcement breaks the denial assertion', () => {

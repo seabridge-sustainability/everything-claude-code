@@ -54,6 +54,50 @@ function expiry(minutes, now) {
   if (!Number.isInteger(n) || n < 1 || n > 1440) throw new Error('ttl-minutes must be 1..1440');
   return now + n * 60000;
 }
+function usd(value, label, allowZero = false) {
+  if (value === undefined || value === null || (typeof value === 'string' && !value.trim())) throw new Error(`${label} required`);
+  const amount = Number(value);
+  if (!Number.isFinite(amount) || (allowZero ? amount < 0 : amount <= 0)) {
+    throw new Error(`${label} must be a finite ${allowZero ? 'non-negative' : 'positive'} USD amount`);
+  }
+  return amount;
+}
+function actionsBudgetReceipt(options, now) {
+  const status = options.actionsBudgetStatus || 'known';
+  if (!['known', 'unknown'].includes(status)) throw new Error('actions-budget-status must be known or unknown');
+  const source = requireText(options.actionsBudgetSource, 'actions-budget-source');
+  if (!['github-org-budget-ui', 'owner-screenshot', 'github-org-billing-export'].includes(source)) {
+    throw new Error('actions-budget-source must identify a current GitHub billing observation');
+  }
+  const checkedAt = requireText(options.actionsBudgetCheckedAt, 'actions-budget-checked-at');
+  if (!/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(?:\.\d+)?Z$/.test(checkedAt)) {
+    throw new Error('actions-budget-checked-at must be an ISO UTC timestamp');
+  }
+  const observed = Date.parse(checkedAt);
+  if (!Number.isFinite(observed) || observed > now + 2 * 60000 || now - observed > 60 * 60000) {
+    throw new Error('Actions budget observation must be within the last hour (and not in the future)');
+  }
+  const expectedUsd = usd(options.expectedActionsUsd, 'expected-actions-usd');
+  const expectedWorkflows = requireText(options.expectedWorkflows, 'expected-workflows')
+    .split(',').map(item => item.trim()).filter(Boolean);
+  if (!expectedWorkflows.length || expectedWorkflows.some(item => !/^[a-zA-Z0-9_. -]{1,80}$/.test(item))) {
+    throw new Error('expected-workflows must name the anticipated Actions jobs');
+  }
+  const stopUsage = options.actionsStopUsage;
+  if (!['yes', 'no', 'unknown'].includes(stopUsage)) throw new Error('actions-stop-usage must be yes, no, or unknown');
+  const usedUsd = status === 'known' ? usd(options.actionsBudgetUsed, 'actions-budget-used', true) : null;
+  const limitUsd = status === 'known' ? usd(options.actionsBudgetLimit, 'actions-budget-limit') : null;
+  const projectedPercent = status === 'known' ? 100 * (usedUsd + expectedUsd) / limitUsd : null;
+  const exceptionNeeded = status === 'unknown' || projectedPercent >= 90 || stopUsage !== 'yes';
+  const ownerCostApproval = options.ownerCostApproval
+    ? requireText(options.ownerCostApproval, 'owner-cost-approval') : null;
+  if (exceptionNeeded && !ownerCostApproval) {
+    throw new Error('named current-session owner cost approval required for unknown/90%+ Actions budget or disabled hard stop');
+  }
+  return { status, source, checkedAt: new Date(observed).toISOString(), usedUsd, limitUsd,
+    expectedUsd, expectedWorkflows, stopUsage, projectedPercent, ownerCostApproval,
+    limitation: 'self-attested receipt; lease does not authorize or verify a push' };
+}
 function read(repo) {
   const file = path.join(repo.directory, 'registry.json');
   if (!fs.existsSync(file)) return { version: 1, sessions: [], release: null, releases: [] };
@@ -184,7 +228,8 @@ function execute(command, options = {}) {
       const paths = changedPaths(repo, session.base, options.upstream);
       if (paths.length) ownedPaths(repo, session, paths);
       if (git(repo.root, ['status', '--porcelain'])) throw new Error('release requires a clean worktree');
-      state.release = { owner: sessionId, branch, candidate, expiresAt: expiry(options.ttl, now) };
+      const actionsBudget = actionsBudgetReceipt(options, now);
+      state.release = { owner: sessionId, branch, candidate, actionsBudget, expiresAt: expiry(options.ttl, now) };
       return state.release;
     }
     const release = state.release;
@@ -200,6 +245,7 @@ function execute(command, options = {}) {
       return release;
     }
     if (command === 'check-release') {
+      if (!release.actionsBudget) throw new Error('release lacks Actions budget receipt; end or re-acquire with a fresh receipt');
       if (release.expiresAt <= now) throw new Error('release lease expired; inspect bound runs before renewal');
       if (options.branch !== release.branch || options.candidate !== release.candidate
           || git(repo.root, ['rev-parse', 'HEAD']) !== release.candidate) throw new Error('release branch/candidate mismatch; never chase the latest shared tip');

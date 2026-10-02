@@ -50,8 +50,11 @@ closes the session, successor registers a new ID and re-verifies evidence.
 Batch locally validated work. The release owner acquires one repository-wide lease for
 the exact target branch and full candidate SHA, from a clean task worktree:
 
-```text
-ecc session release-acquire --session climate-ui-01 --branch development --candidate FULL_HEAD_SHA --ttl-minutes 120
+```powershell
+ecc session release-acquire --session climate-ui-01 --branch development --candidate FULL_HEAD_SHA --ttl-minutes 120 `
+  --actions-budget-status known --actions-budget-used 40.63 --actions-budget-limit 150 `
+  --actions-budget-checked-at 2026-10-01T23:20:00Z --actions-budget-source github-org-budget-ui `
+  --actions-stop-usage yes --expected-actions-usd 1.00 --expected-workflows "Frontend CI"
 ecc session check-release --session climate-ui-01 --branch development --candidate FULL_HEAD_SHA
 ```
 
@@ -61,6 +64,14 @@ renew when needed. Other sessions keep coding/testing/committing locally when ap
 but do not push, rerun, dispatch, or cancel the owner's runs. CI evidence is bound to
 run ID and SHA, never merely "latest green." A newer candidate is not automatically owned
 by this chat. Required development deployment remains automatic after successful CI.
+
+The release-acquire command requires an Actions budget observation no more than one
+hour old, a source, hard-stop status, named expected workflows, and a positive USD
+exposure estimate. It records projected usage in the lease; a missing or stale receipt
+fails closed. If usage plus the estimated batch reaches 90%, the budget is unknown,
+or stop-usage is not enabled, add `--owner-cost-approval` with Alejandro's
+current-session approval for this named batch. This is a cooperative, self-attested
+check, not a GitHub billing API verification or a substitute for approval to push.
 
 After integrating the fetched normal target branch, pass
 `--upstream refs/remotes/origin/development` (or the actual normal target) to

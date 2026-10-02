@@ -37,6 +37,7 @@ const SOURCES = Object.freeze([
   '.github/workflows/harness.yml', 'tests/ci/instruction-stack.test.js',
   'tests/ci/agent-adoption-doctor.test.js', 'tests/ci/agent-behavior-eval.test.js',
   'tests/ci/agent-behavior-report.test.js', 'tests/ci/workflow-cost-contract.test.js',
+  'tests/lib/session-coordination.test.js',
   'tests/lib/goal-control.test.js', 'tests/lib/memory-vault.test.js',
   'tests/lib/memory-schema.test.js', 'tests/scripts/memory.test.js',
   'tests/scripts/memory-mcp.test.js', 'tests/scripts/knowledge-freshness.test.js',
