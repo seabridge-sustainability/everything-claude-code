@@ -41,16 +41,25 @@ function configuredClaudeHooks(homeDir, projectRoot) {
   const settings = [path.join(homeDir, '.claude', 'settings.json'),
     path.join(projectRoot, '.claude', 'settings.json'),
     path.join(projectRoot, '.claude', 'settings.local.json')];
-  const events = { UserPromptSubmit: false, Stop: false };
+  const events = { UserPromptSubmit: false, Stop: false, admissionMode: 'none' };
   for (const file of settings) {
     let parsed;
     try { parsed = JSON.parse(readFile(file)); } catch { continue; }
-    for (const [event, phase] of [['UserPromptSubmit', 'admit'], ['Stop', 'final']]) {
+    for (const [event, phase] of [['UserPromptSubmit', '(?:admit|prepare)'], ['Stop', 'final']]) {
       const entries = parsed?.hooks?.[event] || [];
-      if (Array.isArray(entries) && entries.some(entry => Array.isArray(entry.hooks)
-        && entry.hooks.some(hook => typeof hook.command === 'string'
-          && /(?:goal-runtime-gate|ecc-goal-gate)\.js/i.test(hook.command)
-          && new RegExp(`\\bclaude\\s+${phase}\\b`, 'i').test(hook.command)))) events[event] = true;
+      if (!Array.isArray(entries)) continue;
+      for (const entry of entries) for (const hook of Array.isArray(entry.hooks) ? entry.hooks : []) {
+        if (typeof hook.command !== 'string'
+          || !/(?:goal-runtime-gate|ecc-goal-gate)\.js/i.test(hook.command)
+          || !new RegExp(`\\bclaude\\s+${phase}\\b`, 'i').test(hook.command)) continue;
+        events[event] = true;
+        if (event === 'UserPromptSubmit') {
+          // An `admit` hook can deadlock a first controlled prompt. If both
+          // variants are present, the blocking one still takes precedence.
+          if (/\bclaude\s+admit\b/i.test(hook.command)) events.admissionMode = 'blocking';
+          else if (events.admissionMode === 'none') events.admissionMode = 'advisory';
+        }
+      }
     }
   }
   return events;
@@ -82,16 +91,21 @@ function inspectInstallation({ adapterRoot, projectRoot, homeDir = os.homedir(),
   const openCodeConfigured = pointsToRuntime(openCodeConfig, adapterRoot)
     && /\.opencode\/dist\/plugins/i.test(normalized(openCodeConfig))
     && fs.existsSync(path.join(adapterRoot, '.opencode', 'dist', 'plugins', 'index.js'));
+  const claudeStatus = !claudePointer ? 'not-configured'
+    : eccPlugin || hooks.admissionMode === 'blocking' ? 'first-prompt-deadlock-risk'
+      : hooks.admissionMode === 'advisory' && hooks.Stop ? 'advisory-hook-configured-not-observed'
+        : 'not-configured';
   const rows = [
     { id: 'codex', pointerCurrent: codexPointer, gateConfigured: false, status: codexPointer ? 'instructions-configured-wrapper-required' : 'not-configured' },
-    { id: 'claude', pointerCurrent: claudePointer, gateConfigured: Boolean(eccPlugin || (hooks.UserPromptSubmit && hooks.Stop)),
-      status: claudePointer && (eccPlugin || (hooks.UserPromptSubmit && hooks.Stop)) ? 'hook-configured-not-observed' : 'not-configured',
+    { id: 'claude', pointerCurrent: claudePointer, gateConfigured: false,
+      status: claudeStatus,
       hookEventsConfigured: hooks, pluginLoaded: Boolean(eccPlugin) },
     { id: 'gemini', pointerCurrent: geminiPointer, gateConfigured: false, status: geminiPointer ? 'instructions-configured-wrapper-required' : 'not-configured' },
     { id: 'opencode', pointerCurrent: openCodePointer, gateConfigured: openCodeConfigured,
       status: openCodePointer && openCodeConfigured ? 'plugin-configured-not-observed' : 'not-configured' },
   ];
-  return { status: rows.every(row => row.status !== 'not-configured') ? 'configured-not-observed' : 'incomplete',
+  return { status: rows.every(row => !['not-configured', 'first-prompt-deadlock-risk'].includes(row.status))
+    ? 'configured-not-observed' : 'incomplete',
     activation: 'not-observed', providerCalls: 0, runtimes: rows };
 }
 

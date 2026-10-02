@@ -28,8 +28,8 @@ function payloadModel(raw) {
 function main(args = process.argv.slice(2), raw = readInput()) {
   const runtime = args[0];
   const phase = args[1];
-  if (!runtime || !['admit', 'final'].includes(phase)) {
-    process.stderr.write('goal runtime hook requires <runtime> <admit|final>\n');
+  if (!runtime || !['admit', 'prepare', 'final'].includes(phase)) {
+    process.stderr.write('goal runtime hook requires <runtime> <admit|prepare|final>\n');
     return 2;
   }
 
@@ -57,6 +57,25 @@ function main(args = process.argv.slice(2), raw = readInput()) {
     windowsHide: true,
   });
   if (result.status === 0) return 0;
+
+  // UserPromptSubmit runs before the agent sees the request. Blocking a first
+  // controlled prompt here would make it impossible for the agent to create
+  // the missing goal or register its session. A project-scoped `prepare` hook
+  // lets that prompt through with the exact setup obligation; the explicit
+  // `admit` command remains fail-closed before implementation.
+  if (phase === 'prepare') {
+    let decision;
+    try { decision = JSON.parse(result.stdout || '{}'); } catch { /* provide generic setup context */ }
+    const reason = decision?.admitted === false && decision.runtime === runtime
+      ? decision.reason : 'the runtime check was unavailable';
+    process.stdout.write(`${JSON.stringify({
+      hookSpecificOutput: {
+        hookEventName: 'UserPromptSubmit',
+        additionalContext: `ECC controlled-goal setup pending: ${reason}. Before implementation, register an isolated scoped session with ecc session register, initialize or repair .ecc/goal with ecc goal init and ecc goal validate, then run ecc goal-runtime admit --runtime ${runtime} --mode controlled --session <registered-id>. Do not treat this advisory prompt hook as admission or claim completion from it.`,
+      },
+    })}\n`);
+    return 0;
+  }
 
   const diagnostic = [result.stderr, result.stdout]
     .filter(value => typeof value === 'string' && value.trim())

@@ -31,6 +31,21 @@ const tests = [
     assert.strictEqual(result.status, 2);
     assert.match(result.stderr, /controlled work requires an active goal/);
   }],
+  ['first controlled prompt can reach the agent with setup instructions', () => {
+    const result = invoke('claude', 'prepare', { prompt: 'Continue this long-running multi-agent goal.' }, workspace);
+    assert.strictEqual(result.status, 0, result.stderr);
+    const output = JSON.parse(result.stdout);
+    assert.strictEqual(output.hookSpecificOutput.hookEventName, 'UserPromptSubmit');
+    assert.match(output.hookSpecificOutput.additionalContext, /ecc session register/);
+    assert.match(output.hookSpecificOutput.additionalContext, /ecc goal init/);
+    assert.match(output.hookSpecificOutput.additionalContext, /goal-runtime admit/);
+    assert.doesNotMatch(result.stdout, /Continue this long-running/);
+  }],
+  ['ordinary prompt preparation adds no setup context', () => {
+    const result = invoke('claude', 'prepare', { prompt: 'Explain this file.' }, workspace);
+    assert.strictEqual(result.status, 0, result.stderr);
+    assert.strictEqual(result.stdout, '');
+  }],
   ['unsupported completion claim is blocked without goal state', () => {
     const result = invoke('cursor', 'final', { response: 'The goal is fully complete.' }, workspace);
     assert.strictEqual(result.status, 2);

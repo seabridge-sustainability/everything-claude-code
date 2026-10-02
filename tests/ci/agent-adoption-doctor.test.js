@@ -65,9 +65,17 @@ try {
     Stop: [{ hooks: [{ command: 'node scripts/hooks/goal-runtime-gate.js claude final' }] }],
   } }));
   const configured = inspectInstallation({ adapterRoot, projectRoot: project, homeDir: home, probe });
-  assert.equal(configured.status, 'configured-not-observed');
+  assert.equal(configured.status, 'incomplete');
   assert.equal(configured.activation, 'not-observed');
-  assert.equal(configured.runtimes.find(row => row.id === 'claude').status, 'hook-configured-not-observed');
+  assert.equal(configured.runtimes.find(row => row.id === 'claude').status, 'first-prompt-deadlock-risk');
+  fs.writeFileSync(path.join(project, '.claude', 'settings.json'), JSON.stringify({ hooks: {
+    UserPromptSubmit: [{ hooks: [{ command: 'node scripts/hooks/goal-runtime-gate.js claude prepare' }] }],
+    Stop: [{ hooks: [{ command: 'node scripts/hooks/goal-runtime-gate.js claude final' }] }],
+  } }));
+  const advisory = inspectInstallation({ adapterRoot, projectRoot: project, homeDir: home, probe });
+  assert.equal(advisory.status, 'configured-not-observed');
+  assert.equal(advisory.runtimes.find(row => row.id === 'claude').status, 'advisory-hook-configured-not-observed');
+  assert.equal(advisory.runtimes.find(row => row.id === 'claude').gateConfigured, false);
   fs.writeFileSync(path.join(project, '.claude', 'settings.json'), '{}\n');
   const unrelatedLoaded = () => `> ecc@local\n    Path: ${adapterRoot}\n    Status: disabled\n> other@local\n    Status: loaded\n`;
   assert.equal(inspectInstallation({ adapterRoot, projectRoot: project, homeDir: home,
