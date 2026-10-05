@@ -30,6 +30,7 @@ const compact = [
   costControl,
   '',
   'Load task-specific skills and large references only when their trigger fits.',
+  'No skill is needed for small or single-file work unless a task-specific trigger applies.',
   'Use focused local checks first and broaden validation only for changed contracts, failures, or material risk.',
   'Repository rules and configured thresholds override generic examples.',
 ].join('\n');

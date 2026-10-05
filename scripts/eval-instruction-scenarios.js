@@ -4,12 +4,13 @@
  * loads against representative SeaBridgeAI tasks (evals/agent-instructions/scenarios.json).
  *
  * A scenario passes for a stack when every `must` pattern is present and no
- * `must_not` pattern is. This is a static coverage eval: it proves the guidance is
- * delivered (or that harmful scaffolding is gone), not that a model follows it —
+ * `must_not` pattern is. ECC stacks come from the advertised adapter registry,
+ * including imports and compact generated adapters. This is a static coverage
+ * eval: it proves guidance is delivered, not that a model follows it —
  * pair it with fresh-session probes (see evals/agent-instructions/README.md).
  *
  * Usage: node scripts/eval-instruction-scenarios.js [--workspace <path>]
- *        [--ref <git-ref>] [--json]
+ *        [--repo <name>] [--ref <git-ref>] [--json]
  *        [--advisory] [--allow-missing]
  *   --ref reads every instruction file at that commit (e.g. HEAD for "before").
  */
@@ -94,9 +95,23 @@ function expand(read, rel, depth = 0, seen = new Set()) {
 }
 
 function stacks(repoName, ref) {
-    const repo = resolveRepo(repoName);
+  const repo = resolveRepo(repoName);
   const read = reader(repo, ref);
   const out = {};
+  if (repoName === 'everything-claude-code') {
+    const manifest = read('manifests/instruction-adapters.json');
+    if (!manifest) return out;
+    for (const adapter of JSON.parse(manifest).adapters) {
+      const entry = read(adapter.entry);
+      if (entry === null || entry === undefined) continue;
+      let text = adapter.mode === 'import' ? expand(read, adapter.entry) : entry;
+      if (adapter.id === 'claude') {
+        for (const rule of listRules(repo, ref)) text += '\n' + (read(rule) || '');
+      }
+      out[adapter.id] = text;
+    }
+    return out;
+  }
   const agents = read('AGENTS.md');
   const claude = read('CLAUDE.md');
   if (agents !== null && agents !== undefined) out.codex = agents;
@@ -117,12 +132,19 @@ function stacks(repoName, ref) {
 
 function main(argv) {
   const ref = optionValue(argv, '--ref');
+  const requestedRepo = optionValue(argv, '--repo');
+  if (requestedRepo && !REPOS.includes(requestedRepo)) {
+    throw new Error(`Unknown instruction scenario repo: ${requestedRepo}`);
+  }
   const { scenarios } = JSON.parse(fs.readFileSync(SCENARIOS, 'utf8'));
   const rows = [];
   const missingTargets = [];
-  for (const repo of REPOS) {
+  for (const repo of requestedRepo ? [requestedRepo] : REPOS) {
     const repoStacks = stacks(repo, ref);
-    for (const harness of ['codex', 'claude']) {
+    const expectedHarnesses = repo === 'everything-claude-code'
+      ? JSON.parse(reader(resolveRepo(repo), ref)('manifests/instruction-adapters.json')).adapters.map((a) => a.id)
+      : ['codex', 'claude'];
+    for (const harness of expectedHarnesses) {
       if (!repoStacks[harness]) missingTargets.push(repo + ' / ' + harness);
     }
     for (const [harness, text] of Object.entries(repoStacks)) {

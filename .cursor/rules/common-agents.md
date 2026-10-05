@@ -45,11 +45,13 @@ For the full roster of 68 agents, see `/ecc:ecc-guide`.
 Use parallel tasks only for genuinely independent, non-overlapping work when
 the runtime and user instructions permit it. Keep one integration owner who
 collects the results and verifies the combined change. Work directly for small
-or tightly coupled tasks.
+or tightly coupled tasks. The three lanes below are examples, not a maximum;
+the active runtime sets capacity, and the task's cost budget determines whether
+more lanes are worthwhile.
 
 ```markdown
 # GOOD: Parallel execution
-Launch 3 agents in parallel:
+Launch independent agents concurrently:
 1. Agent 1: Security analysis of auth module
 2. Agent 2: Performance review of cache system
 3. Agent 3: Type checking of utilities

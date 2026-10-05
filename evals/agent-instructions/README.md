@@ -10,7 +10,9 @@ harness changes, and before/after adopting a new model.
 node scripts\check-instruction-stack.js              # budgets, invariants, stale phrases, broken paths, duplication
 node scripts\eval-instruction-scenarios.js           # scenario coverage, working tree
 node scripts\eval-instruction-scenarios.js --ref HEAD  # same, as committed (use for before/after)
+node scripts\eval-instruction-scenarios.js --repo everything-claude-code --ref HEAD  # isolated ECC baseline
 node tests\ci\instruction-stack.test.js              # the checker's own tests
+node tests\ci\instruction-scenarios.test.js            # all 18 adapters plus a negative control; also runs in CI
 ```
 
 `scenarios.json` holds fifteen representative SeaBridgeAI tasks (single-file bug,
@@ -23,10 +25,14 @@ startup instructions must deliver and the scaffolding that would push the wrong
 behaviour. Patterns are concept-level on purpose, so the old and new wording can
 both satisfy them; a pattern that only matches new phrasing makes the eval circular.
 
-The eval scores the **effective** stack: Codex = `AGENTS.md`; Claude Code =
-`CLAUDE.md` with `@` imports expanded plus `.claude/rules` without `paths:`.
-Files that instructions merely *tell* the agent to read are not counted, because
-session logs showed agents rarely read them (1 of 21 backend sessions).
+The eval scores all 18 ECC adapters declared in
+`manifests/instruction-adapters.json`, including imported and generated compact
+stacks. Product-repository scenarios still score Codex and Claude until each
+product adapter has a verified load path. This is delivery evidence, not a
+claim that any live vendor agent obeys the instructions. Claude Code's `@`
+imports and always-loaded `.claude/rules` are expanded; files that merely tell
+an agent to read something are not counted, because session logs showed agents
+rarely read them (1 of 21 backend sessions).
 
 ## 2. Fresh-session probes (tiny, in-harness)
 

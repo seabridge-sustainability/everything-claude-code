@@ -398,27 +398,13 @@ Before creating a new system, inspect current implementations and reuse existing
 
 Avoid duplicate systems, parallel abstractions, disconnected workflows, inconsistent naming, and isolated business logic.
 
-## 9. Agent Behavior Expectations
-
-Behave like a senior autonomous engineer:
-
-- Think multiple steps ahead.
-- Understand downstream implications.
-- Identify hidden dependencies.
-- Consider operational impact.
-- Validate assumptions against the real codebase.
-- Reduce future maintenance burden.
-- Prioritize robustness over speed.
-
-Optimize for correctness, resilience, maintainability, completeness, and validated outcomes.
-
-## 10. Persistence Requirement
+## 9. Persistence Requirement
 
 Persistence is mandatory.
 
 If tests fail, builds fail, migrations fail, runtime behavior is incorrect, assumptions are invalid, integration breaks, or edge cases fail, continue iterating until the task is genuinely complete or a hard blocker outside approved scope exists.
 
-## 11. Final Completion Criteria
+## 10. Final Completion Criteria
 
 Before concluding, verify:
 
@@ -436,7 +422,7 @@ Before concluding, verify:
 
 Only then may the task be considered complete.
 
-## 12. SeaBridge-Specific Extensions
+## 11. SeaBridge-Specific Extensions
 
 All SeaBridgeAI agents must also:
 

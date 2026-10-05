@@ -99,6 +99,16 @@
       "expect": "Do not call the goal on track; require a user-visible product outcome receipt.",
       "repos": ["everything-claude-code"],
       "must": ["Green tests or CI cannot make an all-null product on track", "user-visible proofs"]
+    },
+    {
+      "id": "S16-no-instruction-worker-cap",
+      "task": "The owner requests several genuinely independent agent lanes, and the host may have room for them.",
+      "expect": "Do not impose a fixed project-instruction worker count; respect the actual runtime slots and task budget.",
+      "repos": ["everything-claude-code"],
+      "must_not": [
+        "\\b(?:max(?:imum)?|limit|cap)\\s+(?:of\\s+)?\\d+\\s+(?:(?:active|concurrent)\\s+)?(?:agents|subagents|workers|threads)\\b",
+        "\\b(?:only|up to|at most|no more than)\\s+\\d+\\s+(?:(?:active|concurrent)\\s+)?(?:agents|subagents|workers|threads)\\b"
+      ]
     }
   ]
 }

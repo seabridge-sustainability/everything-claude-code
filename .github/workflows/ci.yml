@@ -272,6 +272,9 @@ jobs:
       - name: Validate effective ECC agent instructions
         run: node scripts/check-instruction-stack.js --workspace "$RUNNER_TEMP"
 
+      - name: Evaluate all advertised agent instruction adapters
+        run: node tests/ci/instruction-scenarios.test.js
+
       - name: Validate source-bound agent-system map
         run: node scripts/agent-system-map.js check
 
