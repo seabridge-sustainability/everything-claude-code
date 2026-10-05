@@ -13,15 +13,15 @@
     ],
     "semanticIndex": "not-run"
   },
-  "sourceFingerprint": "e48ee73278a42aaa425740739703239c44481f1ba7993dee8595b4c84efe6057",
+  "sourceFingerprint": "14c5e11804bee86ba1b4a186f736d4e4f71df8cd37be55f73859833ea0544999",
   "sources": [
     {
       "path": ".agents/rules/seabridge-agent-baseline.md",
-      "sha256": "3c0d48ab0693dfe4ab7ab8a965518c0fe1efbbc2d0792e53fe1f66657f6eac3e"
+      "sha256": "da619053e74e3bf2d0293a24a89b69ec9bb2fb7e0d973a4c3dcf6068e1a1c21d"
     },
     {
       "path": ".clinerules",
-      "sha256": "d2faed521096e3bfb66d54601e3ee44824b3a426fffb4eeb9e11074527fe7073"
+      "sha256": "80203c4fc1b8da17440f99450905911dc8731f3f87a4ad14fe7640be3026226c"
     },
     {
       "path": ".cursor/hooks.json",
@@ -37,7 +37,7 @@
     },
     {
       "path": ".cursor/rules/common-agents.md",
-      "sha256": "b46ffb936389edf9bbb17783b04917ea56be711518fe94d2424339af5da252c4"
+      "sha256": "130938ae786fded3366778582e40d064507e6bafa53251dff50b2cb9a69d7a24"
     },
     {
       "path": ".gemini/settings.json",
@@ -45,11 +45,11 @@
     },
     {
       "path": ".github/copilot-instructions.md",
-      "sha256": "25824da60ff85c6532a2d47eff39393ff3fe91aeca82433ad4cbe909c0e76551"
+      "sha256": "4b8b69481f4bac9f2d7dbdf75f4f2f386efe771f188b56672f848e2479616345"
     },
     {
       "path": ".github/workflows/ci.yml",
-      "sha256": "681e1c11a2e7e4e0c3d51115fe2bcf8f9a97dca62c2d8bc67e9fb71c9a7f75a8"
+      "sha256": "bed23bdccf279575181497a27c1b831c3a5f7e1d84713dabb2391ea5c17bded8"
     },
     {
       "path": ".github/workflows/harness.yml",
@@ -61,7 +61,7 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "65df68c2e763fbd387f9477db47ab642c6ece98e66ab723c191bf52331758135"
+      "sha256": "7d453df6648964a5cfa4a01ed68db4afb11f9a34c4aa09d5065ac22f27249f8a"
     },
     {
       "path": "CLAUDE.md",
@@ -109,7 +109,7 @@
     },
     {
       "path": "protocols/GOAL_PROTOCOL.md",
-      "sha256": "9baaade7b34a4c403cd1e06bf3c9377a637fc6f26821cf64e62e06fb4dbd493a"
+      "sha256": "ce5d4a17d84914c9e6bad53edb7e0222e8b43afaed97000497047e1383dafabc"
     },
     {
       "path": "protocols/GOAL_PROTOCOL_SHORT.md",
@@ -133,7 +133,7 @@
     },
     {
       "path": "scripts/agent-system-map.js",
-      "sha256": "09776ede653c5f86ca989517e0e1e64b6fba43413a1104949f19d2f085e8a1f6"
+      "sha256": "4b981c8f13b77145d102b7c6d4dfefa886d225b41dc2fce4582f22132a3c846b"
     },
     {
       "path": "scripts/check-instruction-stack.js",
@@ -150,6 +150,10 @@
     {
       "path": "scripts/eval-goal-runtime-offline.js",
       "sha256": "907f5e66b9b3440e39fcf4d77f4172354c8f3bcffd8d46746080281b30e9ec78"
+    },
+    {
+      "path": "scripts/eval-instruction-scenarios.js",
+      "sha256": "67002720374e230f3b440056a80eb342fe5b0bbb46686a54cd896633682c4640"
     },
     {
       "path": "scripts/goal-control.js",
@@ -200,6 +204,10 @@
       "sha256": "7269132695d1102e105826efa5aeb47773ea477a3ffd373a29d3e16753b330ce"
     },
     {
+      "path": "scripts/sync-instruction-adapters.js",
+      "sha256": "893890536aca6f7606d3e6316ab0e740a02705e6568a237dc7551bc64179bf10"
+    },
+    {
       "path": "tests/ci/agent-adoption-doctor.test.js",
       "sha256": "ea6b87a2f8b07243ca1427ff848a70fb0cad8237e86f2ed368e581ad6a961192"
     },
@@ -210,6 +218,10 @@
     {
       "path": "tests/ci/agent-behavior-report.test.js",
       "sha256": "c288a16167c7a5f5b42b51c37e49847b992bc74ae6681694590215ca5a323b68"
+    },
+    {
+      "path": "tests/ci/instruction-scenarios.test.js",
+      "sha256": "3d221092c23804b7c1476ac7fdd689141ab5502099ba9abe5c7bf5d49f10c57b"
     },
     {
       "path": "tests/ci/instruction-stack.test.js",
@@ -257,13 +269,13 @@
       "id": "file:.agents/rules/seabridge-agent-baseline.md",
       "type": "source",
       "path": ".agents/rules/seabridge-agent-baseline.md",
-      "sha256": "3c0d48ab0693dfe4ab7ab8a965518c0fe1efbbc2d0792e53fe1f66657f6eac3e"
+      "sha256": "da619053e74e3bf2d0293a24a89b69ec9bb2fb7e0d973a4c3dcf6068e1a1c21d"
     },
     {
       "id": "file:.clinerules",
       "type": "source",
       "path": ".clinerules",
-      "sha256": "d2faed521096e3bfb66d54601e3ee44824b3a426fffb4eeb9e11074527fe7073"
+      "sha256": "80203c4fc1b8da17440f99450905911dc8731f3f87a4ad14fe7640be3026226c"
     },
     {
       "id": "file:.cursor/hooks.json",
@@ -287,7 +299,7 @@
       "id": "file:.cursor/rules/common-agents.md",
       "type": "source",
       "path": ".cursor/rules/common-agents.md",
-      "sha256": "b46ffb936389edf9bbb17783b04917ea56be711518fe94d2424339af5da252c4"
+      "sha256": "130938ae786fded3366778582e40d064507e6bafa53251dff50b2cb9a69d7a24"
     },
     {
       "id": "file:.gemini/settings.json",
@@ -299,13 +311,13 @@
       "id": "file:.github/copilot-instructions.md",
       "type": "source",
       "path": ".github/copilot-instructions.md",
-      "sha256": "25824da60ff85c6532a2d47eff39393ff3fe91aeca82433ad4cbe909c0e76551"
+      "sha256": "4b8b69481f4bac9f2d7dbdf75f4f2f386efe771f188b56672f848e2479616345"
     },
     {
       "id": "file:.github/workflows/ci.yml",
       "type": "source",
       "path": ".github/workflows/ci.yml",
-      "sha256": "681e1c11a2e7e4e0c3d51115fe2bcf8f9a97dca62c2d8bc67e9fb71c9a7f75a8"
+      "sha256": "bed23bdccf279575181497a27c1b831c3a5f7e1d84713dabb2391ea5c17bded8"
     },
     {
       "id": "file:.github/workflows/harness.yml",
@@ -323,7 +335,7 @@
       "id": "file:AGENTS.md",
       "type": "source",
       "path": "AGENTS.md",
-      "sha256": "65df68c2e763fbd387f9477db47ab642c6ece98e66ab723c191bf52331758135"
+      "sha256": "7d453df6648964a5cfa4a01ed68db4afb11f9a34c4aa09d5065ac22f27249f8a"
     },
     {
       "id": "file:CLAUDE.md",
@@ -401,7 +413,7 @@
       "id": "file:protocols/GOAL_PROTOCOL.md",
       "type": "source",
       "path": "protocols/GOAL_PROTOCOL.md",
-      "sha256": "9baaade7b34a4c403cd1e06bf3c9377a637fc6f26821cf64e62e06fb4dbd493a"
+      "sha256": "ce5d4a17d84914c9e6bad53edb7e0222e8b43afaed97000497047e1383dafabc"
     },
     {
       "id": "file:protocols/SAFETY_AUTHORIZATION_RULE.md",
@@ -431,7 +443,7 @@
       "id": "file:scripts/agent-system-map.js",
       "type": "source",
       "path": "scripts/agent-system-map.js",
-      "sha256": "09776ede653c5f86ca989517e0e1e64b6fba43413a1104949f19d2f085e8a1f6"
+      "sha256": "4b981c8f13b77145d102b7c6d4dfefa886d225b41dc2fce4582f22132a3c846b"
     },
     {
       "id": "file:scripts/check-instruction-stack.js",
@@ -456,6 +468,12 @@
       "type": "source",
       "path": "scripts/eval-goal-runtime-offline.js",
       "sha256": "907f5e66b9b3440e39fcf4d77f4172354c8f3bcffd8d46746080281b30e9ec78"
+    },
+    {
+      "id": "file:scripts/eval-instruction-scenarios.js",
+      "type": "source",
+      "path": "scripts/eval-instruction-scenarios.js",
+      "sha256": "67002720374e230f3b440056a80eb342fe5b0bbb46686a54cd896633682c4640"
     },
     {
       "id": "file:scripts/goal-control.js",
@@ -530,6 +548,12 @@
       "sha256": "7269132695d1102e105826efa5aeb47773ea477a3ffd373a29d3e16753b330ce"
     },
     {
+      "id": "file:scripts/sync-instruction-adapters.js",
+      "type": "source",
+      "path": "scripts/sync-instruction-adapters.js",
+      "sha256": "893890536aca6f7606d3e6316ab0e740a02705e6568a237dc7551bc64179bf10"
+    },
+    {
       "id": "file:tests/ci/agent-adoption-doctor.test.js",
       "type": "source",
       "path": "tests/ci/agent-adoption-doctor.test.js",
@@ -546,6 +570,12 @@
       "type": "source",
       "path": "tests/ci/agent-behavior-report.test.js",
       "sha256": "c288a16167c7a5f5b42b51c37e49847b992bc74ae6681694590215ca5a323b68"
+    },
+    {
+      "id": "file:tests/ci/instruction-scenarios.test.js",
+      "type": "source",
+      "path": "tests/ci/instruction-scenarios.test.js",
+      "sha256": "3d221092c23804b7c1476ac7fdd689141ab5502099ba9abe5c7bf5d49f10c57b"
     },
     {
       "id": "file:tests/ci/instruction-stack.test.js",
@@ -748,6 +778,12 @@
       "evidence": ".github/workflows/ci.yml"
     },
     {
+      "from": "file:.github/workflows/ci.yml",
+      "to": "file:tests/ci/instruction-scenarios.test.js",
+      "type": "mentions-path",
+      "evidence": ".github/workflows/ci.yml"
+    },
+    {
       "from": "file:.github/workflows/harness.yml",
       "to": "file:AGENTS.md",
       "type": "mentions-path",
@@ -792,6 +828,12 @@
     {
       "from": "file:AGENTS.md",
       "to": "file:scripts/check-instruction-stack.js",
+      "type": "mentions-path",
+      "evidence": "AGENTS.md"
+    },
+    {
+      "from": "file:AGENTS.md",
+      "to": "file:scripts/eval-instruction-scenarios.js",
       "type": "mentions-path",
       "evidence": "AGENTS.md"
     },
@@ -1223,6 +1265,12 @@
     },
     {
       "from": "file:scripts/agent-system-map.js",
+      "to": "file:scripts/eval-instruction-scenarios.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
       "to": "file:scripts/goal-control.js",
       "type": "mentions-path",
       "evidence": "scripts/agent-system-map.js"
@@ -1295,6 +1343,12 @@
     },
     {
       "from": "file:scripts/agent-system-map.js",
+      "to": "file:scripts/sync-instruction-adapters.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
       "to": "file:tests/ci/agent-adoption-doctor.test.js",
       "type": "mentions-path",
       "evidence": "scripts/agent-system-map.js"
@@ -1308,6 +1362,12 @@
     {
       "from": "file:scripts/agent-system-map.js",
       "to": "file:tests/ci/agent-behavior-report.test.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:tests/ci/instruction-scenarios.test.js",
       "type": "mentions-path",
       "evidence": "scripts/agent-system-map.js"
     },
@@ -1414,6 +1474,24 @@
       "evidence": "scripts/check-instruction-stack.js"
     },
     {
+      "from": "file:scripts/eval-instruction-scenarios.js",
+      "to": "file:AGENTS.md",
+      "type": "mentions-path",
+      "evidence": "scripts/eval-instruction-scenarios.js"
+    },
+    {
+      "from": "file:scripts/eval-instruction-scenarios.js",
+      "to": "file:CLAUDE.md",
+      "type": "mentions-path",
+      "evidence": "scripts/eval-instruction-scenarios.js"
+    },
+    {
+      "from": "file:scripts/eval-instruction-scenarios.js",
+      "to": "file:manifests/instruction-adapters.json",
+      "type": "mentions-path",
+      "evidence": "scripts/eval-instruction-scenarios.js"
+    },
+    {
       "from": "file:scripts/knowledge-adoption.js",
       "to": "file:scripts/lib/memory-vault.js",
       "type": "verified-code-import",
@@ -1436,6 +1514,30 @@
       "to": "file:scripts/lib/memory-vault.js",
       "type": "verified-code-import",
       "evidence": "scripts/memory.js"
+    },
+    {
+      "from": "file:scripts/sync-instruction-adapters.js",
+      "to": "file:.agents/rules/seabridge-agent-baseline.md",
+      "type": "mentions-path",
+      "evidence": "scripts/sync-instruction-adapters.js"
+    },
+    {
+      "from": "file:scripts/sync-instruction-adapters.js",
+      "to": "file:.clinerules",
+      "type": "mentions-path",
+      "evidence": "scripts/sync-instruction-adapters.js"
+    },
+    {
+      "from": "file:scripts/sync-instruction-adapters.js",
+      "to": "file:.github/copilot-instructions.md",
+      "type": "mentions-path",
+      "evidence": "scripts/sync-instruction-adapters.js"
+    },
+    {
+      "from": "file:scripts/sync-instruction-adapters.js",
+      "to": "file:AGENTS.md",
+      "type": "mentions-path",
+      "evidence": "scripts/sync-instruction-adapters.js"
     },
     {
       "from": "file:tests/ci/agent-adoption-doctor.test.js",
@@ -1907,8 +2009,8 @@
     }
   ],
   "build": {
-    "generatedAt": "2026-10-02T02:36:41.795Z",
-    "sourceCommit": "bc9286600f29930029c391229c4b2cab82a69299",
+    "generatedAt": "2026-10-05T17:51:22.692Z",
+    "sourceCommit": "2aa7003f7202d7676b556910ab4e62813a975f4f",
     "sourceDirty": false
   }
 }
