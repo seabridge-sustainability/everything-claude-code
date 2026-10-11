@@ -30,7 +30,7 @@
     ],
     "semanticIndex": "not-run"
   },
-  "sourceFingerprint": "997f6fbe684c9f69eda4975e977cc51135bccdcbc927483262cb0a6ad6d92343",
+  "sourceFingerprint": "c93b3fc95c9fee892acabc3740d7ccf464783a5700dfda75774968bd32736330",
   "sources": [
     {
       "path": "../manageesg-backend/AGENTS.md",
@@ -218,7 +218,7 @@
     },
     {
       "path": "scripts/lib/session-coordination.js",
-      "sha256": "6298ff578353d3ba43016ea7dd028224ae06e648a1ced39ed5549e0a00aa7a10"
+      "sha256": "6c97e86049cb1ea84a994ef45248123c93432629598c4224e34a6095b24e94d7"
     },
     {
       "path": "scripts/memory-mcp.mjs",
@@ -230,7 +230,7 @@
     },
     {
       "path": "scripts/session-coordinate.js",
-      "sha256": "7269132695d1102e105826efa5aeb47773ea477a3ffd373a29d3e16753b330ce"
+      "sha256": "2e6a143d06979b78351341531b49126d2f7dc08d6d80d90f21f68bcb9adceacb"
     },
     {
       "path": "scripts/sync-instruction-adapters.js",
@@ -274,7 +274,7 @@
     },
     {
       "path": "tests/lib/session-coordination.test.js",
-      "sha256": "6cbf6c3e3314439d035b4a2e349dcf9968a3fc13b3acaec1b8d9f4c78e20a674"
+      "sha256": "8f491fc204fd94611d831a15bce04ac20fd9c591f48be67ebc6aa6abdaae16c4"
     },
     {
       "path": "tests/scripts/knowledge-freshness.test.js",
@@ -574,7 +574,7 @@
       "id": "file:scripts/lib/session-coordination.js",
       "type": "source",
       "path": "scripts/lib/session-coordination.js",
-      "sha256": "6298ff578353d3ba43016ea7dd028224ae06e648a1ced39ed5549e0a00aa7a10"
+      "sha256": "6c97e86049cb1ea84a994ef45248123c93432629598c4224e34a6095b24e94d7"
     },
     {
       "id": "file:scripts/memory-mcp.mjs",
@@ -592,7 +592,7 @@
       "id": "file:scripts/session-coordinate.js",
       "type": "source",
       "path": "scripts/session-coordinate.js",
-      "sha256": "7269132695d1102e105826efa5aeb47773ea477a3ffd373a29d3e16753b330ce"
+      "sha256": "2e6a143d06979b78351341531b49126d2f7dc08d6d80d90f21f68bcb9adceacb"
     },
     {
       "id": "file:scripts/sync-instruction-adapters.js",
@@ -658,7 +658,7 @@
       "id": "file:tests/lib/session-coordination.test.js",
       "type": "source",
       "path": "tests/lib/session-coordination.test.js",
-      "sha256": "6cbf6c3e3314439d035b4a2e349dcf9968a3fc13b3acaec1b8d9f4c78e20a674"
+      "sha256": "8f491fc204fd94611d831a15bce04ac20fd9c591f48be67ebc6aa6abdaae16c4"
     },
     {
       "id": "file:tests/scripts/knowledge-freshness.test.js",
@@ -2182,8 +2182,8 @@
     }
   ],
   "build": {
-    "generatedAt": "2026-10-11T18:05:31.668Z",
-    "sourceCommit": "5c62caf95d3ab29f46f3b323f82a6646b49f98d0",
+    "generatedAt": "2026-10-11T18:09:58.323Z",
+    "sourceCommit": "d6c799feb0a5a563e75e69d3d11bed0d6bba6ba6",
     "sourceDirty": false,
     "policyCommit": "b5098421aa393e62b8ba5faeb056cd75a77fb034",
     "policyDirty": false
