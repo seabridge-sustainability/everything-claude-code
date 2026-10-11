@@ -30,7 +30,7 @@
     ],
     "semanticIndex": "not-run"
   },
-  "sourceFingerprint": "4939baaf0eeb4a4ed008b93c342f687e4eeaf39366d35f3d7d93e1a9e521d8dc",
+  "sourceFingerprint": "53914d7c9e8a1ce6c6bfc684f9861430cf9b7af1d218802a073fe1c324150f50",
   "sources": [
     {
       "path": "../manageesg-backend/AGENTS.md",
@@ -198,7 +198,7 @@
     },
     {
       "path": "scripts/hooks/goal-runtime-gate.js",
-      "sha256": "1643302b0535f8972b6dc9a4d18e61951b3842849e3fc2825900d00ac4906ec9"
+      "sha256": "3be8ec7f42e8ea0cbc355bb8789dac14954269d178c9d461b4b1830c4464b2c2"
     },
     {
       "path": "scripts/knowledge-adoption.js",
@@ -274,7 +274,7 @@
     },
     {
       "path": "tests/lib/goal-runtime-hook.test.js",
-      "sha256": "d13f38d860089ec5641e54459f1c088e822cb4988bcf7d5288ce729394d392ab"
+      "sha256": "2bdcf867b0a77b0599020caa8b592d0da29d5416db5040908b8774f43e8fa176"
     },
     {
       "path": "tests/lib/goal-runtime.test.js",
@@ -290,7 +290,7 @@
     },
     {
       "path": "tests/lib/session-coordination.test.js",
-      "sha256": "d029201b684f7ed2337f6a1c18c4ca2101f692200fda6986f348ad5d4f49b1c0"
+      "sha256": "8595369f27be9bdc048608686df48072081e14e9362d437659240f0c659de128"
     },
     {
       "path": "tests/scripts/knowledge-freshness.test.js",
@@ -560,7 +560,7 @@
       "id": "file:scripts/hooks/goal-runtime-gate.js",
       "type": "source",
       "path": "scripts/hooks/goal-runtime-gate.js",
-      "sha256": "1643302b0535f8972b6dc9a4d18e61951b3842849e3fc2825900d00ac4906ec9"
+      "sha256": "3be8ec7f42e8ea0cbc355bb8789dac14954269d178c9d461b4b1830c4464b2c2"
     },
     {
       "id": "file:scripts/knowledge-adoption.js",
@@ -674,7 +674,7 @@
       "id": "file:tests/lib/goal-runtime-hook.test.js",
       "type": "source",
       "path": "tests/lib/goal-runtime-hook.test.js",
-      "sha256": "d13f38d860089ec5641e54459f1c088e822cb4988bcf7d5288ce729394d392ab"
+      "sha256": "2bdcf867b0a77b0599020caa8b592d0da29d5416db5040908b8774f43e8fa176"
     },
     {
       "id": "file:tests/lib/goal-runtime.test.js",
@@ -698,7 +698,7 @@
       "id": "file:tests/lib/session-coordination.test.js",
       "type": "source",
       "path": "tests/lib/session-coordination.test.js",
-      "sha256": "d029201b684f7ed2337f6a1c18c4ca2101f692200fda6986f348ad5d4f49b1c0"
+      "sha256": "8595369f27be9bdc048608686df48072081e14e9362d437659240f0c659de128"
     },
     {
       "id": "file:tests/scripts/knowledge-freshness.test.js",
@@ -2306,10 +2306,10 @@
     }
   ],
   "build": {
-    "generatedAt": "2026-10-11T19:30:30.883Z",
-    "sourceCommit": "ef44a0d90221f2da2b5fc34da5d7a8169436c717",
+    "generatedAt": "2026-10-11T20:29:50.927Z",
+    "sourceCommit": "eef762ba94012df55023ec01b502fe96f4c2874d",
     "sourceDirty": false,
-    "policyCommit": "2ad9fad62e1ca5374d6a9adc210b74d1b22cc558",
+    "policyCommit": "c6124c63e1e37abd33dbfbb8cfc914d79376982e",
     "policyDirty": false
   }
 }
