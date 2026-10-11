@@ -720,3 +720,21 @@ binding. Revert the task-owned backend policy and ECC milestone commits with
 normal `git revert --no-edit` in clean owned worktrees under bounded approval;
 never reset shared work or turn off Git hooks. No provider/data/server rollback is
 needed because those systems were not touched.
+
+Clean-milestone follow-up: map tests now pass14/14 from the task-owned committed
+sibling pair. The existing missing-import diagnostic was preserved to satisfy its
+negative control. Map:87 nodes/248 evidence-labelled edges, sourceCommit
+ ef44a0d90221f2da2b5fc34da5d7a8169436c717, backend policyCommit
+2ad9fad62e1ca5374d6a9adc210b74d1b22cc558; sourceDirty=false, policyDirty=false.
+Total focused checks:90 (25 session +7 hook +39 goal +5 runtime +14 map).
+ECC's inherited core.hooksPath pointed to .git/disabled-hooks. Task commits
+explicitly enabled the existing scripts/codex-git-hooks path for that Git invocation
+only; its secret precommit hook ran. No global/local hook config was disabled or
+changed. The clean snapshot agent-runtime/canonical-skills check also passed.
+No push, release lease, CI run or deployment was attempted: native admission has
+not passed. Remote target verification remains origin/main at
+5aaae8e38d3d7e2e42fb01a3e5bd7c2b36c4d5ed and backend
+origin/seabridge_development at030cc3062da9e9bb67767c6c04942d97e8bb2f4c;
+these local milestone commits are not asserted published. The pilot's audit
+configuration remains isolated and uncommitted, with a frozen binding to the
+ended startup-only native identity; a new native session requires fresh admission.
