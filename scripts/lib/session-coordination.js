@@ -213,6 +213,21 @@ function execute(command, options = {}) {
       if (paths.length) ownedPaths(repo, session, paths);
       return { allowed: true, session: sessionId, paths };
     }
+    if (command === 'handoff-file') {
+      if (options.paths?.length !== 1) throw new Error('handoff requires exactly one file');
+      const relative = safePath(repo, options.paths[0]);
+      if (!session.scopes.includes(relative)) throw new Error('handoff requires an exact owned file scope, not a parent directory');
+      if (session.scopes.length < 2) throw new Error('retain another scope or close the session through its normal lifecycle');
+      const full = path.join(repo.root, relative);
+      if (!fs.lstatSync(full).isFile()) throw new Error('handoff requires a regular file');
+      const evidence = requireText(options.evidence, 'handoff evidence');
+      const sha256 = require('node:crypto').createHash('sha256').update(fs.readFileSync(full)).digest('hex');
+      const receipt = { owner: sessionId, path: relative, sha256, evidence, handedOffAt: now };
+      session.scopes = session.scopes.filter(item => item !== relative);
+      session.updatedAt = now;
+      state.fileHandoffs = [...(state.fileHandoffs || []), receipt];
+      return { ...receipt, releaseUnchanged: true, permissionGranted: false };
+    }
     if (command === 'close') {
       if (state.release?.owner === sessionId) throw new Error('record release terminal status before closing session');
       session.state = 'closed'; session.updatedAt = now;

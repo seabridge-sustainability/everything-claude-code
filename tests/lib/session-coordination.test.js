@@ -46,6 +46,33 @@ function budgetArgs(now = Date.now()) {
 
 after(() => fs.rmSync(workspace, { recursive: true, force: true }));
 
+test('owner CLI can hand off one file without closing product scopes or release lease', () => {
+  const { root, other, sha } = fixture();
+  register(root, 'owner', ['README.md', 'app/product']);
+  const release = execute('release-acquire', { cwd: root, sessionId: 'owner', branch: 'fixture', candidate: sha, ...budget() });
+  const result = invoke(root, ['handoff-file', '--session', 'owner', '--path', 'README.md', '--evidence', 'Owner hands reviewed instruction diff to system manager']);
+  assert.equal(result.status, 0, result.stderr);
+  const state = execute('status', { cwd: root });
+  assert.deepEqual(state.release, release);
+  assert.equal(state.sessions[0].state, 'active');
+  assert.deepEqual(state.sessions[0].scopes, ['app/product']);
+  assert.match(state.fileHandoffs[0].sha256, /^[a-f0-9]{64}$/);
+  register(other, 'recipient', ['README.md']);
+  assert.equal(invoke(root, ['check-write', '--session', 'owner', '--path', 'README.md']).status, 2);
+});
+
+test('file handoff refuses another owner, broad directory, multiple files or empty remainder', () => {
+  const { root, other } = fixture();
+  register(root, 'owner', ['app', 'README.md']);
+  const options = { cwd: root, sessionId: 'owner', evidence: 'reviewed handoff' };
+  assert.throws(() => execute('handoff-file', { ...options, cwd: other, paths: ['README.md'] }), /another worktree/);
+  assert.throws(() => execute('handoff-file', { ...options, paths: ['app/file.md'] }), /exact owned file/);
+  assert.throws(() => execute('handoff-file', { ...options, paths: ['README.md', 'app'] }), /exactly one/);
+  assert.throws(() => execute('handoff-file', { ...options, paths: ['README.md'], evidence: '' }), /evidence required/);
+  execute('handoff-file', { ...options, paths: ['README.md'] });
+  assert.throws(() => execute('handoff-file', { ...options, paths: ['app'] }), /retain another scope/);
+});
+
 test('linked worktrees share registry and overlapping directory/file reservations fail', () => {
   const { root, other } = fixture();
   register(root, 'climate', ['app/climate']);

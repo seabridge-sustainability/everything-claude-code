@@ -266,6 +266,14 @@ savings. Publish each ready batch once; no manual CI dispatches/reruns. Shared
 checkouts and running clients still require coordinated adoption; remaining
 satellite edits are local, not published.
 
+The reservation handoff exposed a real lifecycle gap: narrowing one file was not
+supported without closing the product session. `ecc session handoff-file --path
+<exact-file> --evidence <review>` is now owner-operated in the existing coordinator.
+It verifies the invoking worktree/owner, a single exact regular-file scope and
+nonempty retained scopes; records the content digest; changes no release lease or
+product files. All 18 focused coordination checks pass, including actual CLI
+handoff and refusal controls. It grants no permission and is not a release takeover.
+
 Additional continuation edits: `C:/Users/adelm/SeaBridgeAI/climada-stack/.cursor/rules/karpathy-guidelines.mdc` and `C:/Users/adelm/SeaBridgeAI/autoresearch/.claude/rules/berry.md`.
 
 Loading conclusions were checked against [Codex AGENTS.md discovery](https://learn.chatgpt.com/docs/agent-configuration/agents-md), [Claude memory/imports](https://code.claude.com/docs/en/memory), [Claude skills](https://code.claude.com/docs/en/skills), and [OpenCode rules](https://docs.opencode.ai/docs/rules/). Documentation describes supported loading, not observed obedience in this machine's clients.
