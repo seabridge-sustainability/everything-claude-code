@@ -41,6 +41,39 @@ function safePath(repo, relative) {
   return clean;
 }
 function overlaps(a, b) { return a === b || a.startsWith(`${b}/`) || b.startsWith(`${a}/`); }
+function checkDigest(repo, relative) {
+  const clean = safePath(repo, relative);
+  const full = path.join(repo.root, clean);
+  if (!fs.lstatSync(full).isFile()) throw new Error('loop target/check must be a regular file');
+  return require('node:crypto').createHash('sha256').update(fs.readFileSync(full)).digest('hex');
+}
+function pinLoop(repo, options, scopes) {
+  if (!options.loopTarget && !options.checkFiles?.length) return null;
+  if (!options.loopTarget || !options.checkFiles?.length) throw new Error('loop requires one target and protected check files');
+  const target = safePath(repo, options.loopTarget);
+  checkDigest(repo, target);
+  if (scopes.length !== 1 || scopes[0] !== target) throw new Error('loop scope must be exactly its single target file');
+  const checks = [...new Set(options.checkFiles.map(file => safePath(repo, file)))].map(file => {
+    if (overlaps(target, file)) throw new Error('loop maker cannot own its protected checks');
+    git(repo.root, ['ls-files', '--error-unmatch', '--', file]);
+    if (git(repo.root, ['diff', '--name-only', 'HEAD', '--', file])) throw new Error('protected checks must match committed baseline');
+    return { path: file, sha256: checkDigest(repo, file) };
+  });
+  return { target, checks, baseline: git(repo.root, ['rev-parse', 'HEAD']),
+    limitation: 'cooperative integrity guard, not OS read-only containment' };
+}
+function verifyLoop(repo, session) {
+  if (!session.loop) return;
+  const { target, checks, baseline } = session.loop;
+  if (!target || !Array.isArray(checks) || !checks.length || !/^[a-f0-9]{40,64}$/.test(baseline)
+      || session.scopes.length !== 1 || session.scopes[0] !== target) throw new Error('invalid loop contract');
+  for (const check of checks) {
+    if (!/^[a-f0-9]{64}$/.test(check.sha256) || overlaps(target, check.path)
+        || checkDigest(repo, check.path) !== check.sha256) {
+      throw new Error('protected check changed: do not weaken, relax or rewrite assertions to force a pass');
+    }
+  }
+}
 function requireText(value, label) {
   if (typeof value !== 'string' || !value.trim() || value.length > 2000) throw new Error(`${label} required (max 2000 characters)`);
   return value;
@@ -153,6 +186,7 @@ function checkSession({ cwd, sessionId, now = Date.now() }) {
   const state = read(repo);
   const session = current(state, repo, sessionId, now);
   conflicts(state, repo, session.scopes, session.id, now);
+  verifyLoop(repo, session);
   return session;
 }
 function changedPaths(repo, base, upstream) {
@@ -191,6 +225,8 @@ function execute(command, options = {}) {
       const session = { id: sessionId, state: 'active', worktree: repo.root, scopes,
         objective: requireText(options.objective, 'objective'), doneWhen: requireText(options.doneWhen, 'done-when'),
         base: git(repo.root, ['rev-parse', 'HEAD']), updatedAt: now, expiresAt: expiry(options.ttl, now) };
+      const loop = pinLoop(repo, options, scopes);
+      if (loop) session.loop = loop;
       state.sessions.push(session);
       return session;
     }
@@ -204,12 +240,15 @@ function execute(command, options = {}) {
     }
     const session = current(state, repo, sessionId, now);
     conflicts(state, repo, session.scopes, sessionId, now);
+    if (command !== 'close' && command !== 'release-end') verifyLoop(repo, session);
     if (command === 'check-write') {
       ownedPaths(repo, session, options.paths || []);
       return { allowed: true, session: sessionId, paths: options.paths };
     }
     if (command === 'check-changes') {
-      const paths = changedPaths(repo, session.base, options.upstream);
+      // A moving remote tip must not erase an experiment's original scope fence.
+      const paths = changedPaths(repo, session.loop ? session.loop.baseline : session.base,
+        session.loop ? undefined : options.upstream);
       if (paths.length) ownedPaths(repo, session, paths);
       return { allowed: true, session: sessionId, paths };
     }
