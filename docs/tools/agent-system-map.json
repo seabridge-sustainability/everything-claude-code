@@ -30,7 +30,7 @@
     ],
     "semanticIndex": "not-run"
   },
-  "sourceFingerprint": "506af1d3f75c0194ed6ed28bb1b9daf8bef6c0b1af66b74d2ba107fc091b319d",
+  "sourceFingerprint": "55d2569307f7136d3beb8ee1a6a69514e6f6015116b93a6151e04a4b04749f98",
   "sources": [
     {
       "path": "../manageesg-backend/AGENTS.md",
@@ -137,6 +137,10 @@
       "sha256": "e3bb2ee039fb12e0992a2da98fef4900c8a82cb1e39481c7b0d5392227cf77cc"
     },
     {
+      "path": "package.json",
+      "sha256": "03216f225f1f4ff078a61a804b0ca4478c9fc166e721d87ddabde3a6a7796597"
+    },
+    {
       "path": "protocols/CONCURRENT_SESSION_PROTOCOL.md",
       "sha256": "93e205eb54064c426f70d16b944192447226cd4e46547f37da3ce5c62454c21b"
     },
@@ -151,6 +155,10 @@
     {
       "path": "protocols/SAFETY_AUTHORIZATION_RULE.md",
       "sha256": "93e205eb54064c426f70d16b944192447226cd4e46547f37da3ce5c62454c21b"
+    },
+    {
+      "path": "schemas/coding-execution.schema.json",
+      "sha256": "099ddc0cff0cc450bc96eac2662243f68f823a72737b24e6db7e433aa7d363c5"
     },
     {
       "path": "schemas/goal-control.schema.json",
@@ -170,7 +178,7 @@
     },
     {
       "path": "scripts/agent-system-map.js",
-      "sha256": "6b1a7fdac1c410939b246fd0ef349019c9f2b6238aaddb7583dd367913bf98b8"
+      "sha256": "39adf8b2b3d5baec84a824177dd25efb8f9a1b0e26873dba794b2574f368848c"
     },
     {
       "path": "scripts/check-instruction-stack.js",
@@ -179,6 +187,14 @@
     {
       "path": "scripts/ci/detect-ci-scope.js",
       "sha256": "13db9838821cb515b90ba160725253a1b4852feb57bfd289236f883057e72d78"
+    },
+    {
+      "path": "scripts/coding-execution.js",
+      "sha256": "2190c2a9f7c8010917afa0bb3c91c3fa373b21b507b9acd43b6e9854a58ec2cc"
+    },
+    {
+      "path": "scripts/ecc.js",
+      "sha256": "da70bead4bfce7d0901cbd0c6f19449215f1e73ebe333e937a5e467f48bc7e6c"
     },
     {
       "path": "scripts/eval-agent-behavior.js",
@@ -219,6 +235,10 @@
     {
       "path": "scripts/knowledge-retrieval-eval.js",
       "sha256": "2f24f69e853ffe8077903ef6fcd3b6443a1da73cf46dba830a57df84896d816a"
+    },
+    {
+      "path": "scripts/lib/coding-execution.js",
+      "sha256": "b075848b7498d8975dfedeb212db2776609d97d7e5f47f088fcd40b780dd28be"
     },
     {
       "path": "scripts/lib/memory-vault-format.js",
@@ -279,6 +299,10 @@
     {
       "path": "tests/ci/workflow-cost-contract.test.js",
       "sha256": "596d7cb633a490d0132838e195a482565db117209c4f87f14cf1d4b7f76b60da"
+    },
+    {
+      "path": "tests/lib/coding-execution.test.js",
+      "sha256": "03480465182b76c191f2890dd491b3b6bf981159745d31fcb012a574f121843b"
     },
     {
       "path": "tests/lib/goal-control.test.js",
@@ -483,6 +507,12 @@
       "sha256": "8fbfe1fe8b3798b99daad102dabac6ecef46540f1eabbf41a1b48a1b9428cdc2"
     },
     {
+      "id": "file:package.json",
+      "type": "source",
+      "path": "package.json",
+      "sha256": "03216f225f1f4ff078a61a804b0ca4478c9fc166e721d87ddabde3a6a7796597"
+    },
+    {
       "id": "file:protocols/CONCURRENT_SESSION_PROTOCOL.md",
       "type": "source",
       "path": "protocols/CONCURRENT_SESSION_PROTOCOL.md",
@@ -505,6 +535,12 @@
       "type": "source",
       "path": "protocols/SAFETY_AUTHORIZATION_RULE.md",
       "sha256": "93e205eb54064c426f70d16b944192447226cd4e46547f37da3ce5c62454c21b"
+    },
+    {
+      "id": "file:schemas/coding-execution.schema.json",
+      "type": "source",
+      "path": "schemas/coding-execution.schema.json",
+      "sha256": "099ddc0cff0cc450bc96eac2662243f68f823a72737b24e6db7e433aa7d363c5"
     },
     {
       "id": "file:schemas/goal-control.schema.json",
@@ -534,7 +570,7 @@
       "id": "file:scripts/agent-system-map.js",
       "type": "source",
       "path": "scripts/agent-system-map.js",
-      "sha256": "6b1a7fdac1c410939b246fd0ef349019c9f2b6238aaddb7583dd367913bf98b8"
+      "sha256": "39adf8b2b3d5baec84a824177dd25efb8f9a1b0e26873dba794b2574f368848c"
     },
     {
       "id": "file:scripts/check-instruction-stack.js",
@@ -547,6 +583,18 @@
       "type": "source",
       "path": "scripts/ci/detect-ci-scope.js",
       "sha256": "13db9838821cb515b90ba160725253a1b4852feb57bfd289236f883057e72d78"
+    },
+    {
+      "id": "file:scripts/coding-execution.js",
+      "type": "source",
+      "path": "scripts/coding-execution.js",
+      "sha256": "2190c2a9f7c8010917afa0bb3c91c3fa373b21b507b9acd43b6e9854a58ec2cc"
+    },
+    {
+      "id": "file:scripts/ecc.js",
+      "type": "source",
+      "path": "scripts/ecc.js",
+      "sha256": "da70bead4bfce7d0901cbd0c6f19449215f1e73ebe333e937a5e467f48bc7e6c"
     },
     {
       "id": "file:scripts/eval-agent-behavior.js",
@@ -607,6 +655,12 @@
       "type": "source",
       "path": "scripts/knowledge-retrieval-eval.js",
       "sha256": "2f24f69e853ffe8077903ef6fcd3b6443a1da73cf46dba830a57df84896d816a"
+    },
+    {
+      "id": "file:scripts/lib/coding-execution.js",
+      "type": "source",
+      "path": "scripts/lib/coding-execution.js",
+      "sha256": "b075848b7498d8975dfedeb212db2776609d97d7e5f47f088fcd40b780dd28be"
     },
     {
       "id": "file:scripts/lib/memory-vault-format.js",
@@ -697,6 +751,12 @@
       "type": "source",
       "path": "tests/ci/workflow-cost-contract.test.js",
       "sha256": "596d7cb633a490d0132838e195a482565db117209c4f87f14cf1d4b7f76b60da"
+    },
+    {
+      "id": "file:tests/lib/coding-execution.test.js",
+      "type": "source",
+      "path": "tests/lib/coding-execution.test.js",
+      "sha256": "03480465182b76c191f2890dd491b3b6bf981159745d31fcb012a574f121843b"
     },
     {
       "id": "file:tests/lib/goal-control.test.js",
@@ -876,6 +936,12 @@
     },
     {
       "from": "file:../manageesg-backend/AGENTS.md",
+      "to": "file:package.json",
+      "type": "mentions-path",
+      "evidence": "../manageesg-backend/AGENTS.md"
+    },
+    {
+      "from": "file:../manageesg-backend/AGENTS.md",
       "to": "file:scripts/knowledge-freshness.js",
       "type": "mentions-path",
       "evidence": "../manageesg-backend/AGENTS.md"
@@ -985,6 +1051,12 @@
     {
       "from": "file:.opencode/plugins/ecc-hooks.ts",
       "to": "file:CLAUDE.md",
+      "type": "mentions-path",
+      "evidence": ".opencode/plugins/ecc-hooks.ts"
+    },
+    {
+      "from": "file:.opencode/plugins/ecc-hooks.ts",
+      "to": "file:package.json",
       "type": "mentions-path",
       "evidence": ".opencode/plugins/ecc-hooks.ts"
     },
@@ -1199,6 +1271,90 @@
       "evidence": "OPENCODE.md"
     },
     {
+      "from": "file:package.json",
+      "to": "file:AGENTS.md",
+      "type": "mentions-path",
+      "evidence": "package.json"
+    },
+    {
+      "from": "file:package.json",
+      "to": "file:docs/design/ecc-memory-vault.md",
+      "type": "mentions-path",
+      "evidence": "package.json"
+    },
+    {
+      "from": "file:package.json",
+      "to": "file:scripts/agent-behavior-report.js",
+      "type": "mentions-path",
+      "evidence": "package.json"
+    },
+    {
+      "from": "file:package.json",
+      "to": "file:scripts/coding-execution.js",
+      "type": "mentions-path",
+      "evidence": "package.json"
+    },
+    {
+      "from": "file:package.json",
+      "to": "file:scripts/ecc.js",
+      "type": "mentions-path",
+      "evidence": "package.json"
+    },
+    {
+      "from": "file:package.json",
+      "to": "file:scripts/eval-agent-behavior.js",
+      "type": "mentions-path",
+      "evidence": "package.json"
+    },
+    {
+      "from": "file:package.json",
+      "to": "file:scripts/eval-goal-runtime-offline.js",
+      "type": "mentions-path",
+      "evidence": "package.json"
+    },
+    {
+      "from": "file:package.json",
+      "to": "file:scripts/goal-control.js",
+      "type": "mentions-path",
+      "evidence": "package.json"
+    },
+    {
+      "from": "file:package.json",
+      "to": "file:scripts/goal-runtime-bridge.js",
+      "type": "mentions-path",
+      "evidence": "package.json"
+    },
+    {
+      "from": "file:package.json",
+      "to": "file:scripts/memory-mcp.mjs",
+      "type": "mentions-path",
+      "evidence": "package.json"
+    },
+    {
+      "from": "file:package.json",
+      "to": "file:scripts/memory.js",
+      "type": "mentions-path",
+      "evidence": "package.json"
+    },
+    {
+      "from": "file:package.json",
+      "to": "file:scripts/session-coordinate.js",
+      "type": "mentions-path",
+      "evidence": "package.json"
+    },
+    {
+      "from": "file:package.json",
+      "to": "file:scripts/sync-instruction-adapters.js",
+      "type": "mentions-path",
+      "evidence": "package.json"
+    },
+    {
+      "from": "file:package.json",
+      "to": "file:tests/ci/agent-behavior-eval.test.js",
+      "type": "mentions-path",
+      "evidence": "package.json"
+    },
+    {
       "from": "file:protocols/CONCURRENT_SESSION_PROTOCOL.md",
       "to": "file:../manageesg-backend/AGENTS_SYSTEM.md",
       "type": "mentions-path",
@@ -1249,6 +1405,12 @@
     {
       "from": "file:scripts/agent-adoption-doctor.js",
       "to": "file:manifests/instruction-adapters.json",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-adoption-doctor.js"
+    },
+    {
+      "from": "file:scripts/agent-adoption-doctor.js",
+      "to": "file:package.json",
       "type": "mentions-path",
       "evidence": "scripts/agent-adoption-doctor.js"
     },
@@ -1410,6 +1572,12 @@
     },
     {
       "from": "file:scripts/agent-system-map.js",
+      "to": "file:package.json",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
       "to": "file:protocols/CONCURRENT_SESSION_PROTOCOL.md",
       "type": "mentions-path",
       "evidence": "scripts/agent-system-map.js"
@@ -1429,6 +1597,12 @@
     {
       "from": "file:scripts/agent-system-map.js",
       "to": "file:protocols/SAFETY_AUTHORIZATION_RULE.md",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:schemas/coding-execution.schema.json",
       "type": "mentions-path",
       "evidence": "scripts/agent-system-map.js"
     },
@@ -1465,6 +1639,18 @@
     {
       "from": "file:scripts/agent-system-map.js",
       "to": "file:scripts/ci/detect-ci-scope.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:scripts/coding-execution.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:scripts/ecc.js",
       "type": "mentions-path",
       "evidence": "scripts/agent-system-map.js"
     },
@@ -1525,6 +1711,12 @@
     {
       "from": "file:scripts/agent-system-map.js",
       "to": "file:scripts/knowledge-retrieval-eval.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:scripts/lib/coding-execution.js",
       "type": "mentions-path",
       "evidence": "scripts/agent-system-map.js"
     },
@@ -1615,6 +1807,12 @@
     {
       "from": "file:scripts/agent-system-map.js",
       "to": "file:tests/ci/workflow-cost-contract.test.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:tests/lib/coding-execution.test.js",
       "type": "mentions-path",
       "evidence": "scripts/agent-system-map.js"
     },
@@ -1727,6 +1925,12 @@
       "evidence": "scripts/check-instruction-stack.js"
     },
     {
+      "from": "file:scripts/coding-execution.js",
+      "to": "file:scripts/lib/coding-execution.js",
+      "type": "verified-code-import",
+      "evidence": "scripts/coding-execution.js"
+    },
+    {
       "from": "file:scripts/eval-instruction-scenarios.js",
       "to": "file:AGENTS.md",
       "type": "mentions-path",
@@ -1761,6 +1965,18 @@
       "to": "file:scripts/lib/memory-vault.js",
       "type": "verified-code-import",
       "evidence": "scripts/knowledge-adoption.js"
+    },
+    {
+      "from": "file:scripts/lib/coding-execution.js",
+      "to": "file:schemas/coding-execution.schema.json",
+      "type": "mentions-path",
+      "evidence": "scripts/lib/coding-execution.js"
+    },
+    {
+      "from": "file:scripts/lib/coding-execution.js",
+      "to": "file:scripts/lib/session-coordination.js",
+      "type": "verified-code-import",
+      "evidence": "scripts/lib/coding-execution.js"
     },
     {
       "from": "file:scripts/lib/memory-vault.js",
@@ -1879,6 +2095,12 @@
     {
       "from": "file:tests/ci/agent-adoption-doctor.test.js",
       "to": "file:GEMINI.md",
+      "type": "mentions-path",
+      "evidence": "tests/ci/agent-adoption-doctor.test.js"
+    },
+    {
+      "from": "file:tests/ci/agent-adoption-doctor.test.js",
+      "to": "file:package.json",
       "type": "mentions-path",
       "evidence": "tests/ci/agent-adoption-doctor.test.js"
     },
@@ -2009,6 +2231,30 @@
       "evidence": "tests/ci/workflow-cost-contract.test.js"
     },
     {
+      "from": "file:tests/lib/coding-execution.test.js",
+      "to": "file:scripts/coding-execution.js",
+      "type": "mentions-path",
+      "evidence": "tests/lib/coding-execution.test.js"
+    },
+    {
+      "from": "file:tests/lib/coding-execution.test.js",
+      "to": "file:scripts/ecc.js",
+      "type": "mentions-path",
+      "evidence": "tests/lib/coding-execution.test.js"
+    },
+    {
+      "from": "file:tests/lib/coding-execution.test.js",
+      "to": "file:scripts/lib/coding-execution.js",
+      "type": "mentions-path",
+      "evidence": "tests/lib/coding-execution.test.js"
+    },
+    {
+      "from": "file:tests/lib/coding-execution.test.js",
+      "to": "file:scripts/lib/coding-execution.js",
+      "type": "verified-code-import",
+      "evidence": "tests/lib/coding-execution.test.js"
+    },
+    {
       "from": "file:tests/lib/goal-runtime.test.js",
       "to": "file:hooks/hooks.json",
       "type": "mentions-path",
@@ -2055,6 +2301,12 @@
       "to": "file:scripts/hooks/goal-runtime-gate.js",
       "type": "mentions-path",
       "evidence": "tests/lib/scope-guard-adapters.test.js"
+    },
+    {
+      "from": "file:tests/lib/session-coordination.test.js",
+      "to": "file:package.json",
+      "type": "mentions-path",
+      "evidence": "tests/lib/session-coordination.test.js"
     },
     {
       "from": "file:tests/lib/session-coordination.test.js",
@@ -2424,8 +2676,8 @@
     }
   ],
   "build": {
-    "generatedAt": "2026-10-11T21:00:13.881Z",
-    "sourceCommit": "b976d6c5b91d2ffeb4627b03a738c17c7af4428a",
+    "generatedAt": "2026-10-11T21:09:09.766Z",
+    "sourceCommit": "d692baf69ab7d9110b450ec2f7111b9da9a3c985",
     "sourceDirty": false,
     "policyCommit": "998aa246ea2d26d23aeadadda47e8a84212dc5e7",
     "policyDirty": false
