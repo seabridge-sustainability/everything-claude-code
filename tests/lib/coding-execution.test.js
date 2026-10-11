@@ -25,14 +25,35 @@ function fixture(t, runtimes = ['claude','gemini']) {
     fs.mkdirSync(path.join(root,'.ecc/goal'), { recursive: true }); return root;
   }
   const root = repo('parent'), goal = path.join(root,'.ecc/goal/active-goal.json');
-  fs.writeFileSync(goal, JSON.stringify({ requirement: 'demonstrate controller, not product completion' }));
+  const goalDocument = {
+    schema:'ecc.active-goal.v1',goal_id:'execution',mode:'controlled',proof_profile:'security',
+    objective:'demonstrate controller, not product completion',current_priority:'required output',non_goals:['unrequested refactors'],
+    user_visible_proofs:[{id:'required-output',description:'controller evidence',lane_id:'controller',required_stage:'calculation_implemented',
+      required_evidence_kinds:['test','runtime'],required_repositories:['ecc'],allowed_result_classes:['other'],
+      acceptance_predicate:'code.txt exists with hash',requires_authentic:false,requires_user_visible:false,subject_scope:null,required:true}],
+    lanes:[{id:'controller',description:'controller evidence',status:'active',blocker:null,next_action:'required output'}],owner_corrections:[],
+    forecast:{state:'not_set',confidence:'none',basis:null,critical_path:['required-output'],likely_hours:null,next_checkpoint_at:null,
+      checkpoint_started_at:null,checkpoint_proof_id:null,updated_at:new Date().toISOString()},status:'active',updated_at:new Date().toISOString(),
+  };
+  fs.writeFileSync(goal, JSON.stringify(goalDocument));
   coord.execute('register', { cwd: root, sessionId: 'parent', scopes: ['.ecc/goal'], objective: 'controller', doneWhen: 'checks', ttl:120 });
   const workers = runtimes.map((runtime, index) => {
     const id = `worker-${index}`, workerRepo = repo(id);
     coord.execute('register', { cwd: workerRepo, sessionId: id, scopes: ['code.txt'], objective: 'owned output', doneWhen: 'receipt', ttl:120 });
-    return { id, runtime, agent: id, repo: workerRepo, session: id, scopes: ['code.txt'], requirement: 'required output', acceptance: 'code.txt exists with hash', expires_at: new Date(Date.now()+3600000).toISOString(), max_attempts:3 };
+    return { id, runtime, agent: id, repo: workerRepo, session: id, scopes: ['code.txt'], requirement: 'required output', acceptance: 'code.txt exists with hash', expires_at: new Date(Date.now()+3600000).toISOString(), max_attempts:3,
+      assignment_id:id,assignment_sha256:'0'.repeat(64) };
   });
-  const plan = { version:1, id:'execution', parent:'parent', session:'parent', repo:root, goal_file:goal,
+  const assignmentsFile = path.join(root,'.ecc/goal/assignments.jsonl');
+  const assignments = workers.map(worker => ({schema:'ecc.assignment.v1',assignment_id:worker.id,goal_id:goalDocument.goal_id,
+    description:worker.requirement,acceptance_ids:['required-output'],owner_runtime:worker.runtime,owner_agent:worker.agent,scope_paths:worker.scopes,
+    issued_at:new Date(Date.now()-1000).toISOString(),lease_expires_at:worker.expires_at,
+    budget:{max_tool_calls:10,max_retries:2,max_ci_runs:0,max_cost_usd:0},source_harness:'offline-fixture'}));
+  const writeAssignments = () => {
+    fs.writeFileSync(assignmentsFile,assignments.map(item=>JSON.stringify(item)).join('\n')+'\n');
+    workers.forEach((worker,index)=>{worker.assignment_sha256=c.digest(assignments[index]);});
+  };
+  writeAssignments();
+  const plan = { version:2, id:'execution', parent:'parent', session:'parent', repo:root, goal_file:goal, assignments_file:assignmentsFile,
     goal_sha256:store.sha256File(goal), revision:c.digest('owner revision'), environment:'offline-fixture', critic:'independent-critic', workers,
     limits:{ dispatches:workers.length*3, repairs:2, lease_ms:60000, usd:0 } };
   const file = path.join(root,'.ecc/goal/execution.json');
@@ -40,7 +61,8 @@ function fixture(t, runtimes = ['claude','gemini']) {
     const w = workers.find(w => w.id === id), snapshot = store.captureRepositoryState(w.repo, { excludePaths:[path.join(w.repo,'.ecc/goal')] });
     return { version:1, worker:id, agent:w.agent, runtime:w.runtime, token:state.nodes[id].token, revision:plan.revision, environment:plan.environment,
       status:'pass', head:snapshot.head, tree_fingerprint:snapshot.tree_fingerprint, changed_paths:snapshot.dirty_paths,
-      evidence:[{path:'code.txt',sha256:store.sha256File(path.join(w.repo,'code.txt')),kind:'local-check'}],citations:[],usd:0 };
+      evidence:[{path:'code.txt',sha256:store.sha256File(path.join(w.repo,'code.txt')),kind:'local-check'}],citations:[],usd:0,
+      usage:{tool_calls:1,retries:0,ci_runs:0,cost_usd:0} };
   }
   function joined() {
     let s=c.apply(c.initialize(plan),{type:'dispatch',actor:'parent'});
@@ -53,7 +75,7 @@ function fixture(t, runtimes = ['claude','gemini']) {
     const s=approvedCritic(); return c.apply(s,{type:'synthesis',actor:'parent',output:{version:1,join_sha256:s.join_sha256,claim:'locally-verified',outputs:workers.map(w=>w.id)}});
   }
   const effect = {id:'publish',kind:'push',target:'origin/seabridge_development',payload_sha256:c.digest('exact proposed payload'),candidate:'a'.repeat(40),environment:plan.environment,expected_usd:0};
-  return { plan,file,result,joined,approvedCritic,synthesized,effect };
+  return { plan,file,result,joined,approvedCritic,synthesized,effect,goalDocument,assignments,writeAssignments };
 }
 test('same contract supports parallel Codex/Claude/Gemini/OpenCode workers and a durable join', async t => {
   const f=fixture(t,['codex','claude','gemini','opencode']); c.create(f.file,f.plan); let active=0, peak=0;
@@ -162,7 +184,7 @@ test('committed mutations cannot be omitted and exhausted budgets cannot recover
   fs.writeFileSync(path.join(worker.repo,'code.txt'),'owned committed change');
   execFileSync('git',['add','code.txt'],{cwd:worker.repo}); execFileSync('git',['-c','core.hooksPath=','commit','-qm','owned synthetic change'],{cwd:worker.repo});
   assert.throws(()=>c.apply(s,{type:'result',actor:'worker-0',result:f.result(s)}),/unreported worker mutations/);
-  s=c.apply(s,{type:'result',actor:'worker-0',result:{...f.result(s),changed_paths:['code.txt'],usd:1}});
+  s=c.apply(s,{type:'result',actor:'worker-0',result:{...f.result(s),changed_paths:['code.txt'],usd:1,usage:{tool_calls:1,retries:0,ci_runs:0,cost_usd:1}}});
   assert.equal(s.phase,'budget-exhausted'); s=c.apply(s,{type:'recover',actor:'parent'}); assert.equal(s.phase,'budget-exhausted');
   assert.throws(()=>c.apply(s,{type:'dispatch',actor:'parent'}),/dispatch requires/);
 });
@@ -176,7 +198,7 @@ test('actual process death leaves recoverable own lock; live locks are never sto
 });
 test('worker errors become bounded retry state immediately without relaunching healthy workers', async t => {
   const f=fixture(t,['claude','gemini']); c.create(f.file,f.plan);
-  const state=await c.dispatchParallel(f.file,async w=>{ if(w.id==='worker-0') throw new Error('fixture worker error'); return f.result(c.load(f.file),w.id); });
+  const state=await c.dispatchParallel(f.file,async w=>{ if(w.id==='worker-0') throw Object.assign(new Error('fixture worker error'),{usage:{tool_calls:1,retries:1,ci_runs:0,cost_usd:0}}); return f.result(c.load(f.file),w.id); });
   assert.equal(state.phase,'repair'); assert.equal(state.nodes['worker-0'].status,'pending'); assert.equal(state.nodes['worker-1'].status,'done');
   assert.equal(state.history[0].error,'worker-launch-or-execution-failed');
 });
@@ -191,4 +213,48 @@ test('unverified independent identity fails closed and the existing ECC command 
   assert.throws(()=>engine.apply(s,{type:'critic',actor:f.plan.critic,report:{agent:f.plan.critic,join_sha256:s.join_sha256,accepted:true,rejections:[]}}),/trusted independent critic identity verifier/);
   const r=spawnSync(process.execPath,[path.resolve(__dirname,'../../scripts/ecc.js'),'coding-execution','--help'],{encoding:'utf8',windowsHide:true});
   assert.equal(r.status,0,r.stderr); assert.match(r.stdout,/recover-lock/);
+});
+test('in-scope side tasks, optional prerequisites and legacy unbound plans cannot dispatch', t => {
+  const f=fixture(t,['codex','claude','gemini','opencode']);
+  const original=f.plan.workers[0].requirement;
+  f.plan.workers[0].requirement='unrequested refactor inside code.txt';
+  assert.throws(()=>c.initialize(f.plan),/task differs from approved goal assignment/);
+  f.plan.workers[0].requirement=original;
+  assert.throws(()=>c.initialize({...f.plan,version:1}),/plan:/);
+  f.goalDocument.user_visible_proofs[0].required=false;
+  fs.writeFileSync(f.plan.goal_file,JSON.stringify(f.goalDocument));f.plan.goal_sha256=store.sha256File(f.plan.goal_file);
+  assert.throws(()=>c.initialize(f.plan),/active required outcome/);
+  f.goalDocument.user_visible_proofs[0].required=true;f.goalDocument.lanes[0].status='deferred';
+  fs.writeFileSync(f.plan.goal_file,JSON.stringify(f.goalDocument));f.plan.goal_sha256=store.sha256File(f.plan.goal_file);
+  assert.throws(()=>c.initialize(f.plan),/active required outcome/);
+});
+test('owner corrections require reissued assignments even when a planner refreshes the goal hash', t => {
+  const f=fixture(t,['gemini']);const recorded=new Date().toISOString();
+  f.goalDocument.owner_corrections=[{id:'correction',recorded_at:recorded,instruction:'deliver required output first',replaces:[],
+    priority:'corrected priority',checkpoint_proof_id:'required-output',next_action:'repair observed defect',source_harness:'owner'}];
+  f.goalDocument.current_priority='corrected priority';f.goalDocument.forecast.checkpoint_proof_id='required-output';
+  fs.writeFileSync(f.plan.goal_file,JSON.stringify(f.goalDocument));f.plan.goal_sha256=store.sha256File(f.plan.goal_file);
+  assert.throws(()=>c.initialize(f.plan),/predates current owner correction/);
+  f.assignments[0].issued_at=recorded;f.writeAssignments();
+  assert.equal(c.initialize(f.plan).phase,'planned');
+  f.assignments[0].acceptance_ids=['unrequested-private-documents'];f.writeAssignments();
+  assert.throws(()=>c.initialize(f.plan),/missing proofs/);
+});
+test('assignment usage accumulates across critic repairs and stops repeated checks without another launch', t => {
+  const f=fixture(t,['opencode']);f.assignments[0].budget.max_tool_calls=1;f.writeAssignments();
+  let s=f.joined();s=c.apply(s,{type:'critic',actor:f.plan.critic,report:{agent:f.plan.critic,join_sha256:s.join_sha256,accepted:false,
+    rejections:[{worker:'worker-0',reason:'missing-required-output'}]}});
+  s=c.apply(s,{type:'dispatch',actor:'parent'});
+  assert.equal(s.phase,'budget-exhausted');assert.equal(s.nodes['worker-0'].usage.tool_calls,1);
+  assert.throws(()=>c.apply(s,{type:'dispatch',actor:'parent'}),/dispatch requires/);
+});
+test('failed-attempt spending accumulates and absent error telemetry stops further launches', async t => {
+  const f=fixture(t,['codex']);c.create(f.file,f.plan);
+  let s=await c.dispatchParallel(f.file,async()=>{throw new Error('unknown failed-attempt spend');});
+  assert.equal(s.phase,'budget-exhausted');
+  assert.throws(()=>c.apply(s,{type:'dispatch',actor:'parent'}),/dispatch requires/);
+  const g=fixture(t,['gemini']);let p=c.apply(c.initialize(g.plan),{type:'dispatch',actor:'parent'});
+  p=c.apply(p,{type:'worker-error',actor:'worker-0',worker:'worker-0',token:p.nodes['worker-0'].token,
+    usage:{tool_calls:11,retries:1,ci_runs:0,cost_usd:0}});
+  assert.equal(p.phase,'budget-exhausted');assert.equal(p.nodes['worker-0'].usage.tool_calls,11);
 });

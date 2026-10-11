@@ -10,6 +10,7 @@ const Ajv = require('ajv');
 const { canonicalJson, sha256Buffer, sha256File, captureRepositoryState } = require('./goal-store');
 const { writeFileAtomic } = require('./atomic-write');
 const coordination = require('./session-coordination');
+const goals = require('./goal-control');
 const schema = JSON.parse(fs.readFileSync(path.join(__dirname, '../../schemas/coding-execution.schema.json'), 'utf8'));
 const validators = new Map();
 function assert(kind, value) {
@@ -45,10 +46,31 @@ function checkPlan(plan, now) {
   demand(path.isAbsolute(plan.repo) && path.isAbsolute(plan.goal_file), 'absolute repository and goal paths required');
   inside(plan.repo, plan.goal_file);
   demand(sha256File(plan.goal_file) === plan.goal_sha256, 'owner goal changed; replan and reissue assignments');
+  demand(path.isAbsolute(plan.assignments_file), 'absolute goal assignment path required');
+  inside(plan.repo, plan.assignments_file);
+  const goal = goals.readStructuredFile(plan.goal_file);
+  const assignments = goals.readJsonLines(plan.assignments_file);
+  goals.validateBundle({ goal, assignments });
+  demand(['active', 'off_track'].includes(goal.status), 'goal is not executable');
+  const correction = goals.latestExecutableCorrection(goal);
   const ids = new Set(), agents = new Set([plan.parent, plan.critic]);
   const repositories = new Map(plan.workers.map(worker => [worker.id, coordination.repository(worker.repo).common]));
   demand(plan.parent !== plan.critic, 'critic must be independent of planner');
   for (const worker of plan.workers) {
+    const assignment = assignments.find(item => item.assignment_id === worker.assignment_id);
+    demand(assignment && digest(assignment) === worker.assignment_sha256, 'missing or changed goal assignment');
+    demand(assignment.owner_agent === worker.agent && assignment.owner_runtime === worker.runtime, 'assignment owner/runtime mismatch');
+    demand(assignment.scope_paths.map(coordination.scope).sort().join() === worker.scopes.map(coordination.scope).sort().join(), 'assignment scope mismatch');
+    demand(assignment.description === worker.requirement, 'task differs from approved goal assignment');
+    const proofs = assignment.acceptance_ids.map(id => goal.user_visible_proofs.find(proof => proof.id === id));
+    demand(proofs.every(proof => {
+      const lane=goal.lanes.find(item=>item.id===proof.lane_id);
+      return proof.required && (lane?.status==='active' || (lane?.status==='blocked' && lane.blocker && lane.next_action));
+    }), 'worker must advance an active required outcome or its recorded blocker, not optional or deferred work');
+    demand(worker.acceptance === proofs.map(proof => proof.acceptance_predicate).join('\n'), 'acceptance differs from required goal output');
+    demand(Date.parse(assignment.issued_at) <= now && Date.parse(assignment.lease_expires_at) === Date.parse(worker.expires_at), 'assignment lease mismatch or not yet issued');
+    demand(!correction || Date.parse(assignment.issued_at) >= Date.parse(correction.recorded_at), 'assignment predates current owner correction; reissue it');
+    demand(worker.max_attempts <= assignment.budget.max_retries + 1, 'worker retries exceed goal assignment budget');
     demand(!ids.has(worker.id) && !agents.has(worker.agent), 'duplicate worker or non-independent critic/worker');
     ids.add(worker.id); agents.add(worker.agent);
     demand(path.isAbsolute(worker.repo), 'worker repository must be absolute');
@@ -64,14 +86,14 @@ function checkPlan(plan, now) {
 }
 function initialize(plan, now = Date.now()) {
   checkPlan(plan, now);
-  return { version: 1, plan, plan_sha256: digest(plan), sequence: 0, phase: 'planned',
+  return { version: 2, plan, plan_sha256: digest(plan), sequence: 0, phase: 'planned',
     dispatches: 0, repairs: 0, spent_usd: 0, history: [], nodes: Object.fromEntries(plan.workers.map(worker => [worker.id,
-      { status: 'pending', attempts: 0, token: null, lease_until: null, result: null }])),
+      { status: 'pending', attempts: 0, token: null, lease_until: null, result: null, usage: {tool_calls:0,retries:0,ci_runs:0,cost_usd:0} }])),
     join_sha256: null, critique: null, synthesis: null, effects: {}, audit: [] };
 }
 function validateState(state) {
   assert('state', state);
-  demand(state?.version === 1 && digest(state.plan) === state.plan_sha256, 'invalid execution state/plan fingerprint');
+  demand(state?.version === 2 && digest(state.plan) === state.plan_sha256, 'invalid execution state/plan fingerprint');
   assert('plan', state.plan);
   demand(Object.keys(state.nodes).sort().join() === state.plan.workers.map(w => w.id).sort().join(), 'invalid execution node set');
   demand(['planned','workers','critic','repair','synthesis','approval','effect','completed','reconciliation','budget-exhausted'].includes(state.phase), 'invalid execution phase');
@@ -121,6 +143,16 @@ function maybeJoin(state) {
   state.join_sha256 = digest({ revision: state.plan.revision, results: Object.values(state.nodes).map(node => node.result) });
   state.phase = 'critic';
 }
+function assignmentFor(plan, worker) {
+  return goals.readJsonLines(plan.assignments_file).find(item => item.assignment_id === worker.assignment_id);
+}
+function accountUsage(state, node, worker, usage) {
+  assert('usage', usage);
+  for (const key of Object.keys(node.usage)) node.usage[key] += usage[key];
+  state.spent_usd += usage.cost_usd;
+  const budget = assignmentFor(state.plan, worker).budget;
+  if (state.spent_usd > state.plan.limits.usd || Object.entries(node.usage).some(([key,value]) => value > budget[`max_${key}`])) state.phase = 'budget-exhausted';
+}
 function apply(state, event, options = {}) {
   validateState(state);
   const now = options.now ?? Date.now();
@@ -135,7 +167,12 @@ function apply(state, event, options = {}) {
       parent(); demand(['planned','repair'].includes(next.phase), 'dispatch requires planned/repair phase');
       const pending = plan.workers.filter(worker => next.nodes[worker.id].status === 'pending');
       demand(pending.length > 0, 'no pending nodes'); pending.forEach(live);
-      if (next.spent_usd > plan.limits.usd || next.dispatches + pending.length > plan.limits.dispatches || pending.some(w => next.nodes[w.id].attempts >= w.max_attempts)) {
+      if (next.spent_usd > plan.limits.usd || next.dispatches + pending.length > plan.limits.dispatches || pending.some(w => {
+        const node=next.nodes[w.id],budget=assignmentFor(plan,w).budget;
+        return node.attempts >= w.max_attempts || node.usage.tool_calls >= budget.max_tool_calls
+          || node.usage.retries > budget.max_retries || node.usage.ci_runs > budget.max_ci_runs
+          || (budget.max_cost_usd > 0 && node.usage.cost_usd >= budget.max_cost_usd);
+      })) {
         next.phase = 'budget-exhausted'; break;
       }
       for (const worker of pending) {
@@ -160,8 +197,9 @@ function apply(state, event, options = {}) {
       demand(mutations.every(file => result.changed_paths.map(p => inside(worker.repo, p)).includes(coordination.scope(file))), 'unreported worker mutations');
       const stateNow = captureRepositoryState(worker.repo, { excludePaths: [path.join(worker.repo, '.ecc/goal')] });
       demand([...stateNow.dirty_paths].every(file => result.changed_paths.includes(file)), 'unreported worker mutations');
-      next.spent_usd += result.usd;
-      if (next.spent_usd > plan.limits.usd) { next.phase = 'budget-exhausted'; break; }
+      demand(result.usage.cost_usd === result.usd, 'inconsistent reported worker cost');
+      accountUsage(next,node,worker,result.usage);
+      if (next.phase === 'budget-exhausted') break;
       node.result = result; node.status = 'done'; evidence(); maybeJoin(next); break;
     }
     case 'worker-error': {
@@ -169,7 +207,11 @@ function apply(state, event, options = {}) {
       demand(event.actor === worker.agent, 'worker identity mismatch');
       const node = next.nodes[worker.id]; demand(node.status === 'running' && node.token === event.token, 'stale worker error');
       next.history.push({ error: 'worker-launch-or-execution-failed', worker: worker.id, attempt: node.attempts });
-      node.status = 'pending'; node.token = null; next.phase = 'repair'; break;
+      node.status = 'pending'; node.token = null;
+      // Unknown failed-attempt spending must not buy another attempt.
+      if (!event.usage) { next.phase = 'budget-exhausted'; break; }
+      accountUsage(next,node,worker,event.usage);
+      if (next.phase !== 'budget-exhausted') next.phase = 'repair'; break;
     }
     case 'critic': {
       demand(next.phase === 'critic', 'join barrier not satisfied'); assert('critique', event.report); evidence();
@@ -317,9 +359,13 @@ async function dispatchParallel(file, launch, options = {}) {
   // dispatch tokens BEFORE calling them. No shell or provider is inferred here.
   await Promise.all(running.map(async worker => {
     let result;
-    try { result = await launch({ ...worker, token: state.nodes[worker.id].token, revision: state.plan.revision, environment: state.plan.environment }); }
+    try {
+      const assignment = assignmentFor(state.plan,worker), usage=state.nodes[worker.id].usage;
+      const remaining_budget=Object.fromEntries(Object.entries(usage).map(([key,value])=>[key,Math.max(0,assignment.budget[`max_${key}`]-value)]));
+      result = await launch({ ...worker, assignment, remaining_budget, goal_sha256:state.plan.goal_sha256, token: state.nodes[worker.id].token, revision: state.plan.revision, environment: state.plan.environment });
+    }
     catch (_error) {
-      transaction(file, current => apply(current, { type: 'worker-error', actor: worker.agent, worker: worker.id, token: state.nodes[worker.id].token }, options)); return;
+      transaction(file, current => apply(current, { type: 'worker-error', actor: worker.agent, worker: worker.id, token: state.nodes[worker.id].token, usage:_error?.usage }, options)); return;
     }
     transaction(file, current => apply(current, { type: 'result', actor: worker.agent, result }, options));
   }));
