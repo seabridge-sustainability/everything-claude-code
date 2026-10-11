@@ -279,7 +279,8 @@ function execute(command, options = {}) {
       const candidate = git(repo.root, ['rev-parse', 'HEAD']);
       if (options.candidate !== candidate) throw new Error('candidate must equal the current full HEAD SHA');
       if (options.upstream && options.upstream !== `refs/remotes/origin/${branch}`) throw new Error('upstream must match the release target branch');
-      const paths = changedPaths(repo, session.base, options.upstream);
+      const paths = changedPaths(repo, session.loop ? session.loop.baseline : session.base,
+        session.loop ? undefined : options.upstream);
       if (paths.length) ownedPaths(repo, session, paths);
       if (git(repo.root, ['status', '--porcelain'])) throw new Error('release requires a clean worktree');
       const actionsBudget = actionsBudgetReceipt(options, now);
