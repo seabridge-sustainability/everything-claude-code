@@ -283,7 +283,8 @@ let guardValidator;
 function implementationDigest() {
   const root = path.resolve(__dirname, '../..');
   const files = ['scripts/lib/session-coordination.js', 'scripts/hooks/goal-runtime-gate.js',
-    'scripts/goal-runtime-bridge.js', 'schemas/goal-control.schema.json'];
+    'scripts/goal-runtime-bridge.js', 'schemas/goal-control.schema.json',
+    'scripts/lib/scope-guard-adapters.js', '.opencode/plugins/ecc-scope-guard.ts'];
   return crypto.createHash('sha256').update(files.map(file =>
     crypto.createHash('sha256').update(fs.readFileSync(path.join(root, file))).digest('hex')).join('\n')).digest('hex');
 }

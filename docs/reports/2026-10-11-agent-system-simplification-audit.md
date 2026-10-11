@@ -853,3 +853,100 @@ Blocking is opt-in for newly admitted, registered sessions. Shared root hook
 configuration and active agents remain untouched. Linked-worktree hooks still
 require a reviewed launch layer or separately reviewed root activation. The
 Codex pilot is verified; no other harness or global adoption is asserted.
+
+### Cross-agent correction and Windows denial contracts
+
+The owner's latest correction explicitly requires applicability to Claude,
+Gemini, OpenCode and other coding agents. All 18 instruction adapters continue
+to resolve the same three policy sources; no fourth policy MD was introduced.
+The unchanged instruction-stack checks pass 27 checks, and all 18 applicable
+instruction scenarios pass with their missing-policy negative controls.
+
+`scripts/lib/scope-guard-adapters.js` normalizes Gemini's replace/read tools and
+OpenCode's native tool names/filePath arguments into the existing typed fence.
+Opaque shell, MCP and delegated execution remain denied in block mode. Model
+identity does not select a weaker policy. The new argument adapter and OpenCode
+plugin are included in the immutable guard implementation digest.
+
+Claude PreToolUse and Stop, Gemini BeforeTool and AfterAgent, and Codex use their
+supported JSON denial formats with exit 0. Their negative pre-tool responses
+survived an actual Windows PowerShell -Command wrapper in local tests. Gemini's
+prompt_response field is included in final-claim extraction, so a harmless
+original prompt cannot hide an unsupported completion response.
+Primary contracts: https://code.claude.com/docs/en/hooks and
+https://geminicli.com/docs/hooks/reference/ . These are adapter contract tests,
+not model turns or proof that a running native client loaded the new hooks.
+
+`.opencode/plugins/ecc-scope-guard.ts` is opt-in through the fresh process's
+ECC_SCOPE_GUARD_MODE, ECC_SCOPE_GUARD_ROOT and ECC_SESSION_ID. With no mode it
+returns no hooks. Its real tool.execute.before callback evaluates output.args,
+preserves native session identity and throws before a denied tool can execute.
+It invokes Node explicitly: OpenCode's compiled Bun process.execPath is not the
+Node executable. Missing guard runtime, protected/outside/ADS/trailing-dot writes,
+opaque shell and wrong identity fail closed. Useful reads and an owned write
+pass. Five focused cross-agent tests passed, including execution of this exact
+plugin callback; no OpenCode provider or model was called.
+Primary contract: https://opencode.ai/docs/plugins/ . The plugin controls tools;
+session.idle is not treated as a native completion gate. Explicit controlled-goal
+admission and final wrappers remain required.
+
+`node scripts/scope-guard-adapters.js <runtime> [audit|block]` prints reviewable
+opt-in fragments for Claude, Codex and Gemini, launch requirements for OpenCode,
+and honest instruction/wrapper fallbacks for the other registered agents. It
+does not write a client config, grant trust, bind a session or start a model.
+Default audit is advisory. First register scoped ownership, validate/admit the
+controlled goal and bind the actual native session with a deadline/tool budget.
+Then review the project fragment and run that harness's separate native canary
+before adopting block mode. Never overwrite an existing hooks/MCP configuration
+with a fragment. The fragments include pre-tool and final events; native turn
+identity is not assumed where the client has no equivalent field. Explicit turn
+admission remains a wrapper requirement there.
+
+Windows MXC is a Codex setting on compatible devices, not a universal Claude,
+Gemini or OpenCode sandbox setting. The portable finding is to verify direct Git
+and child-process Git separately, preserve active processes/ACLs, and use native
+control responses rather than assuming a shell preserves exit 2. Running clients,
+shared runtime checkouts, global settings and trust stores remain unchanged.
+Live native interception has been demonstrated only for Codex; other harnesses
+have local adapter evidence and require their own activation/native proof.
+
+### Final source-bound acceptance and CI separation
+
+The ninth and final approved model turn used the corrected adapter sources at
+b976d6c5b91d2ffeb4627b03a738c17c7af4428a and backend policy at
+998aa246ea2d26d23aeadadda47e8a84212dc5e7. It read all three policy files,
+reported five blocked native PreToolUse decisions, zero failed hooks, zero
+negative write callbacks and no executed shell command. One owned positive write
+passed and Stop completed. The receipt records actual native hook/completed
+events, not just the model's response. The updated AGENTS_SYSTEM.md digest was
+6b767d21198d5a15e19161b7d335a982fb3cb3e5cd0db7d1f1f5975a823ecc03.
+All nine model turns are accounted for; the batch is closed and no second batch
+is implied. ChatGPT cost remains unknown. Unsupported Stop completion is checked
+locally for Claude, Codex and Gemini; the native final canary made no unsupported
+completion claim and does not certify that separate negative case natively.
+
+The final focused suite is 96 passing checks: session 25, hook 8, goal 39, runtime
+5, cross-agent adapter 5 and source map 14. Existing instruction-stack 27 checks,
+all 18 adapter scenarios and workflow-cost contract checks also pass. The map is
+rebuilt from clean committed ECC/policy sources and includes the new adapter and
+plugin files. It remains separate from Graphify/FalkorDB.
+
+Initial publication is verified at ECC 11aa04f1c and backend c6124c63e. Backend
+security-scan 38172662936 passed all three jobs. backend-tests 38172663317 ended
+failure at its aggregate gate: test_nvidia_project_config_uses_live_discovered_model_id
+was not in the known-failure baseline. This was the same explicitly recorded
+failure on pre-pilot base 030cc3062; the pilot changed only AGENTS_SYSTEM.md and
+.codex/config.toml. All 19 preceding shard/manifest jobs passed their job contracts;
+the aggregate gate retained the underlying test failure. Deploy was skipped.
+No provider configuration, test assertion or known-failure baseline was changed,
+and no workflow was manually rerun.
+
+ECC's Actions page reports workflows paused on this fork due to usage scale:
+https://github.com/seabridge-sustainability/everything-claude-code/actions .
+The API's enabled flags and queued non-Actions check suite are not CI proof.
+No fork-wide re-enable or dispatch was performed. The final backend correction
+is Markdown only, covered by backend-tests paths-ignore; publication and security
+checks are recorded separately without claiming a repaired provider/deployment.
+Fresh Actions usage was USD 309.63 with the USD 400 hard stop still enforced.
+Conservative corrective-batch exposure remains USD 30 combined, below the 90%
+tripwire. Native/model and Actions ledgers remain separate.

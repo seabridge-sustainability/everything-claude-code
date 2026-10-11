@@ -4,6 +4,7 @@
 const fs = require('fs');
 const path = require('path');
 const { spawnSync } = require('child_process');
+const { normalizePayload, denialOutput } = require('../lib/scope-guard-adapters');
 
 const MAX_INPUT_BYTES = 1024 * 1024;
 
@@ -82,6 +83,11 @@ function main(args = process.argv.slice(2), raw = readInput()) {
     .filter(value => typeof value === 'string' && value.trim())
     .join('\n');
   process.stderr.write(`${diagnostic || 'goal runtime gate could not verify this action'}\n`);
+  if (['claude', 'codex', 'gemini'].includes(runtime) && phase === 'final') {
+    // Preserve Stop control through PowerShell's native exit-code conversion.
+    process.stdout.write(JSON.stringify(denialOutput(runtime, 'final', 'ECC controlled-goal final claim was not admitted. Review the goal evidence before claiming completion.')) + '\n');
+    return 0;
+  }
   return 2;
 }
 
@@ -95,7 +101,7 @@ function guardMain(runtime, mode, event, raw) {
   let decision;
   try {
     if (Buffer.byteLength(raw) >= MAX_INPUT_BYTES) throw new Error('oversized hook input');
-    const payload = JSON.parse(raw);
+    const payload = normalizePayload(runtime, JSON.parse(raw));
     if (!payload || typeof payload !== 'object' || Array.isArray(payload)) throw new Error('invalid hook input');
     const sessionId = process.env.ECC_SESSION_ID || payload.session_id || payload.conversation_id;
     decision = require('../lib/session-coordination').execute('guard-event', {
@@ -110,20 +116,19 @@ function guardMain(runtime, mode, event, raw) {
     process.stderr.write(`audit would-deny: ${reason}\n`);
     return 0;
   }
-  if (event === 'pre' && runtime === 'copilot-cli') {
-    process.stdout.write(JSON.stringify({ permissionDecision: 'deny', permissionDecisionReason: reason }) + '\n');
-  } else if (event === 'pre' && runtime === 'gemini') {
-    process.stdout.write(JSON.stringify({ decision: 'deny', reason }) + '\n');
-  } else if (event === 'pre') {
+  const nativeOutput = denialOutput(runtime, event, reason);
+  if (nativeOutput) {
+    process.stdout.write(JSON.stringify(nativeOutput) + '\n');
+    process.stderr.write(reason + '\n');
+    return 0;
+  }
+  if (event === 'pre') {
     process.stdout.write(JSON.stringify({ hookSpecificOutput: { hookEventName: 'PreToolUse', permissionDecision: 'deny', permissionDecisionReason: reason } }) + '\n');
   } else if (event === 'final' || (event === 'turn' && runtime === 'codex')) {
     process.stdout.write(JSON.stringify({ decision: 'block', reason }) + '\n');
   }
   process.stderr.write(reason + '\n');
-  // PowerShell -Command maps a native nonzero exit to 1. Codex treats that as
-  // a failed advisory hook and continues. Return a supported JSON denial with
-  // exit 0 so its native parser applies the control decision on Windows too.
-  if (runtime === 'codex') return 0;
+  // Clients without a verified JSON contract require a preserving wrapper.
   return 2;
 }
 

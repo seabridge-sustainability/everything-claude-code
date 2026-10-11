@@ -25,10 +25,10 @@ const tests = [
   ['block adapters reject malformed and missing guard state; audit is explicitly advisory', () => {
     for (const runtime of ['claude','codex','copilot-local','copilot-cli','gemini','opencode']) {
       const blocked = spawnSync(process.execPath, [hook, runtime, 'guard', 'block', 'pre'], { cwd: workspace, input: '{malformed secret-example-never-log', encoding: 'utf8' });
-      assert.strictEqual(blocked.status, runtime === 'codex' ? 0 : 2, runtime);
+      assert.strictEqual(blocked.status, ['claude','codex','gemini','copilot-cli'].includes(runtime) ? 0 : 2, runtime);
       assert.doesNotMatch(blocked.stdout + blocked.stderr, /secret-example/);
       const missing = spawnSync(process.execPath, [hook, runtime, 'guard', 'block', 'pre'], { cwd: workspace, input: JSON.stringify({ session_id: 'missing', tool_name: 'Write', tool_input: { file_path: 'outside' } }), encoding: 'utf8' });
-      assert.strictEqual(missing.status, runtime === 'codex' ? 0 : 2, runtime);
+      assert.strictEqual(missing.status, ['claude','codex','gemini','copilot-cli'].includes(runtime) ? 0 : 2, runtime);
       const output = JSON.parse(missing.stdout);
       if (runtime === 'copilot-cli') assert.strictEqual(output.permissionDecision, 'deny');
       else if (runtime === 'gemini') assert.strictEqual(output.decision, 'deny');
@@ -69,6 +69,15 @@ const tests = [
     assert.strictEqual(result.status, 2);
     assert.match(result.stderr, /complete claim requires/);
   }],
+  ['Claude, Codex and Gemini deny unsupported completion through successful native JSON responses', () => {
+    for (const runtime of ['claude', 'codex', 'gemini']) {
+      const result = invoke(runtime, 'final', { response: 'The goal is fully complete.' }, workspace);
+      assert.strictEqual(result.status, 0);
+      assert.strictEqual(JSON.parse(result.stdout).decision, runtime === 'gemini' ? 'deny' : 'block');
+      assert.match(JSON.parse(result.stdout).reason, /not admitted/);
+      assert.match(result.stderr, /complete claim requires/);
+    }
+  }],
   ['lifecycle runner derives the final phase from the stable hook id', () => {
     const previous = process.cwd();
     try {
@@ -76,7 +85,7 @@ const tests = [
       const result = run(JSON.stringify({ response: 'The goal is fully complete.' }), {
         hookId: 'stop:goal-runtime-final',
       });
-      assert.strictEqual(result.exitCode, 2);
+      assert.strictEqual(result.exitCode, 0);
       assert.strictEqual(result.stdout, '');
     } finally {
       process.chdir(previous);
