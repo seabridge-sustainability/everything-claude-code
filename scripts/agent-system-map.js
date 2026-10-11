@@ -20,6 +20,9 @@ const SOURCES = Object.freeze([
   '.clinerules', '.cursor/rules/common-agents.md',
   'protocols/SAFETY_AUTHORIZATION_RULE.md', 'protocols/GOAL_PROTOCOL.md',
   'protocols/GOAL_PROTOCOL_SHORT.md',
+  'commands/goal.md', 'skills/goal-default/SKILL.md',
+  'skills/persistent-goal-execution/SKILL.md',
+  'skills/parallel-execution-optimizer/SKILL.md',
   'protocols/CONCURRENT_SESSION_PROTOCOL.md', 'scripts/session-coordinate.js',
   'scripts/lib/session-coordination.js',
   'scripts/hooks/goal-runtime-gate.js', 'schemas/goal-control.schema.json',
@@ -148,7 +151,7 @@ function buildMap(root = ROOT, sources = SOURCES) {
     schema: 'seabridge.agent-system-map.v1',
     scope: 'Three backend policy sources and ECC loading adapters, outcome control, evaluation, and CI; no product or tenant data',
     extractor: 'scripts/agent-system-map.js (deterministic, no LLM)',
-    generatorVersion: 5,
+    generatorVersion: 6,
     // Generated verification artifact, not a fourth policy source. CI can
     // reproduce the three reviewed, pinned files without a private-repo token.
     policySnapshot: rows.filter(row => row.path.startsWith('../manageesg-backend/'))
