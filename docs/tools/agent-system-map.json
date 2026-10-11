@@ -2,7 +2,7 @@
   "schema": "seabridge.agent-system-map.v1",
   "scope": "Three backend policy sources and ECC loading adapters, outcome control, evaluation, and CI; no product or tenant data",
   "extractor": "scripts/agent-system-map.js (deterministic, no LLM)",
-  "generatorVersion": 5,
+  "generatorVersion": 6,
   "policySnapshot": [
     {
       "path": "../manageesg-backend/AGENTS.md",
@@ -30,7 +30,7 @@
     ],
     "semanticIndex": "not-run"
   },
-  "sourceFingerprint": "921a7be8c69cd44044b022ea33f0c0412da244690180f04cb308c4508d6e4fd3",
+  "sourceFingerprint": "4146e11e5e49b9a1e1a9ac0ffe1995ccc6278ccfe53cfa5877d9ac5c8a4d5a21",
   "sources": [
     {
       "path": "../manageesg-backend/AGENTS.md",
@@ -113,6 +113,10 @@
       "sha256": "8fbfe1fe8b3798b99daad102dabac6ecef46540f1eabbf41a1b48a1b9428cdc2"
     },
     {
+      "path": "commands/goal.md",
+      "sha256": "e8c84b3dfaef005b515669604c77a020d509ad65ef6d64d16bdff858b2bf2bcf"
+    },
+    {
       "path": "docs/design/ecc-memory-vault.md",
       "sha256": "e25fc0e3e7b210174263a56bae169825af0e044e6ba4ca3c735ee05ea73e0053"
     },
@@ -146,11 +150,11 @@
     },
     {
       "path": "protocols/GOAL_PROTOCOL.md",
-      "sha256": "93e205eb54064c426f70d16b944192447226cd4e46547f37da3ce5c62454c21b"
+      "sha256": "70b1769552f0a9c13a159dd3934658a6e9874ce190dc9ce01680305d391843a6"
     },
     {
       "path": "protocols/GOAL_PROTOCOL_SHORT.md",
-      "sha256": "93e205eb54064c426f70d16b944192447226cd4e46547f37da3ce5c62454c21b"
+      "sha256": "70b1769552f0a9c13a159dd3934658a6e9874ce190dc9ce01680305d391843a6"
     },
     {
       "path": "protocols/SAFETY_AUTHORIZATION_RULE.md",
@@ -158,11 +162,11 @@
     },
     {
       "path": "schemas/coding-execution.schema.json",
-      "sha256": "1108f9244a530cd7cefe9ff71c2c19b6c7db34fec67488917b8dde1a1abac915"
+      "sha256": "0a7b8bbefca48831111f8f61a873c7008cd0d9b1ec14a9cceba6950d2217e207"
     },
     {
       "path": "schemas/goal-control.schema.json",
-      "sha256": "5ff9db5ee14c21a5987a9d919a6a6a222e57992077803910257b1af9d3f71867"
+      "sha256": "9204321280297b03de381d54120057eb6ce2faf9ea6176778b6260117318b4c0"
     },
     {
       "path": "schemas/memory.schema.json",
@@ -178,7 +182,7 @@
     },
     {
       "path": "scripts/agent-system-map.js",
-      "sha256": "7a5355bca3b2ef526eb201b0c68ff737ef261a249ad95a9583d5ec5922604219"
+      "sha256": "d2f6908af5e55e7ec38ab7c4e3866df009a99424fedf9f9652adc31cbe030220"
     },
     {
       "path": "scripts/check-instruction-stack.js",
@@ -210,7 +214,7 @@
     },
     {
       "path": "scripts/goal-control.js",
-      "sha256": "3d6e238c3b5b2932014dde576b0635f9d7877c1c932df3071732281ca6e1bb12"
+      "sha256": "50c5403601b1c79272503322f0e77bd10f89efe392790302f0a65e3e3a912d7f"
     },
     {
       "path": "scripts/goal-runtime-bridge.js",
@@ -238,7 +242,7 @@
     },
     {
       "path": "scripts/lib/coding-execution.js",
-      "sha256": "c1ddc4dff824c579015d296173f2b26f772f63dfc553ca25387af07cb45989ec"
+      "sha256": "abc6dc3bf8a5944ecd359eb1ff9004e930149bbc35eafadfb98f1233e26991de"
     },
     {
       "path": "scripts/lib/goal-control.js",
@@ -281,6 +285,18 @@
       "sha256": "2de1e0e12e629a080f90e09b7031540389cc4421638c9e238ba334e006d8899a"
     },
     {
+      "path": "skills/goal-default/SKILL.md",
+      "sha256": "d496a8416d0fed446d7c90f2f7f35249f657f245cf0204ddcf95226515dbddb1"
+    },
+    {
+      "path": "skills/parallel-execution-optimizer/SKILL.md",
+      "sha256": "b9ce5f5d8dcf1343cecb036b3b473eccaf95fbdd91853cc0f680061a1471e01e"
+    },
+    {
+      "path": "skills/persistent-goal-execution/SKILL.md",
+      "sha256": "c8cc096cbee536289230ea44e73250044918c2c51df431aaa784f655eb8b685f"
+    },
+    {
       "path": "tests/ci/agent-adoption-doctor.test.js",
       "sha256": "da718d1b006956584b6431805e097deaa2e343a83c09133f2b01e2c30ef6f088"
     },
@@ -306,7 +322,7 @@
     },
     {
       "path": "tests/lib/coding-execution.test.js",
-      "sha256": "14e38e20c50633f90c6e6eb6e999240a6022a8b78d1377328e1f9db644ed6a63"
+      "sha256": "8888cda4e66da5d04e75842ca4417e59a205620d59fef33634fe5d6ed4482ac5"
     },
     {
       "path": "tests/lib/goal-control.test.js",
@@ -463,6 +479,12 @@
       "sha256": "8fbfe1fe8b3798b99daad102dabac6ecef46540f1eabbf41a1b48a1b9428cdc2"
     },
     {
+      "id": "file:commands/goal.md",
+      "type": "source",
+      "path": "commands/goal.md",
+      "sha256": "e8c84b3dfaef005b515669604c77a020d509ad65ef6d64d16bdff858b2bf2bcf"
+    },
+    {
       "id": "file:docs/design/ecc-memory-vault.md",
       "type": "source",
       "path": "docs/design/ecc-memory-vault.md",
@@ -526,13 +548,13 @@
       "id": "file:protocols/GOAL_PROTOCOL_SHORT.md",
       "type": "source",
       "path": "protocols/GOAL_PROTOCOL_SHORT.md",
-      "sha256": "93e205eb54064c426f70d16b944192447226cd4e46547f37da3ce5c62454c21b"
+      "sha256": "70b1769552f0a9c13a159dd3934658a6e9874ce190dc9ce01680305d391843a6"
     },
     {
       "id": "file:protocols/GOAL_PROTOCOL.md",
       "type": "source",
       "path": "protocols/GOAL_PROTOCOL.md",
-      "sha256": "93e205eb54064c426f70d16b944192447226cd4e46547f37da3ce5c62454c21b"
+      "sha256": "70b1769552f0a9c13a159dd3934658a6e9874ce190dc9ce01680305d391843a6"
     },
     {
       "id": "file:protocols/SAFETY_AUTHORIZATION_RULE.md",
@@ -544,13 +566,13 @@
       "id": "file:schemas/coding-execution.schema.json",
       "type": "source",
       "path": "schemas/coding-execution.schema.json",
-      "sha256": "1108f9244a530cd7cefe9ff71c2c19b6c7db34fec67488917b8dde1a1abac915"
+      "sha256": "0a7b8bbefca48831111f8f61a873c7008cd0d9b1ec14a9cceba6950d2217e207"
     },
     {
       "id": "file:schemas/goal-control.schema.json",
       "type": "source",
       "path": "schemas/goal-control.schema.json",
-      "sha256": "5ff9db5ee14c21a5987a9d919a6a6a222e57992077803910257b1af9d3f71867"
+      "sha256": "9204321280297b03de381d54120057eb6ce2faf9ea6176778b6260117318b4c0"
     },
     {
       "id": "file:schemas/memory.schema.json",
@@ -574,7 +596,7 @@
       "id": "file:scripts/agent-system-map.js",
       "type": "source",
       "path": "scripts/agent-system-map.js",
-      "sha256": "7a5355bca3b2ef526eb201b0c68ff737ef261a249ad95a9583d5ec5922604219"
+      "sha256": "d2f6908af5e55e7ec38ab7c4e3866df009a99424fedf9f9652adc31cbe030220"
     },
     {
       "id": "file:scripts/check-instruction-stack.js",
@@ -622,7 +644,7 @@
       "id": "file:scripts/goal-control.js",
       "type": "source",
       "path": "scripts/goal-control.js",
-      "sha256": "3d6e238c3b5b2932014dde576b0635f9d7877c1c932df3071732281ca6e1bb12"
+      "sha256": "50c5403601b1c79272503322f0e77bd10f89efe392790302f0a65e3e3a912d7f"
     },
     {
       "id": "file:scripts/goal-runtime-bridge.js",
@@ -664,7 +686,7 @@
       "id": "file:scripts/lib/coding-execution.js",
       "type": "source",
       "path": "scripts/lib/coding-execution.js",
-      "sha256": "c1ddc4dff824c579015d296173f2b26f772f63dfc553ca25387af07cb45989ec"
+      "sha256": "abc6dc3bf8a5944ecd359eb1ff9004e930149bbc35eafadfb98f1233e26991de"
     },
     {
       "id": "file:scripts/lib/goal-control.js",
@@ -727,6 +749,24 @@
       "sha256": "2de1e0e12e629a080f90e09b7031540389cc4421638c9e238ba334e006d8899a"
     },
     {
+      "id": "file:skills/goal-default/SKILL.md",
+      "type": "source",
+      "path": "skills/goal-default/SKILL.md",
+      "sha256": "d496a8416d0fed446d7c90f2f7f35249f657f245cf0204ddcf95226515dbddb1"
+    },
+    {
+      "id": "file:skills/parallel-execution-optimizer/SKILL.md",
+      "type": "source",
+      "path": "skills/parallel-execution-optimizer/SKILL.md",
+      "sha256": "b9ce5f5d8dcf1343cecb036b3b473eccaf95fbdd91853cc0f680061a1471e01e"
+    },
+    {
+      "id": "file:skills/persistent-goal-execution/SKILL.md",
+      "type": "source",
+      "path": "skills/persistent-goal-execution/SKILL.md",
+      "sha256": "c8cc096cbee536289230ea44e73250044918c2c51df431aaa784f655eb8b685f"
+    },
+    {
       "id": "file:tests/ci/agent-adoption-doctor.test.js",
       "type": "source",
       "path": "tests/ci/agent-adoption-doctor.test.js",
@@ -766,7 +806,7 @@
       "id": "file:tests/lib/coding-execution.test.js",
       "type": "source",
       "path": "tests/lib/coding-execution.test.js",
-      "sha256": "14e38e20c50633f90c6e6eb6e999240a6022a8b78d1377328e1f9db644ed6a63"
+      "sha256": "8888cda4e66da5d04e75842ca4417e59a205620d59fef33634fe5d6ed4482ac5"
     },
     {
       "id": "file:tests/lib/goal-control.test.js",
@@ -1107,6 +1147,12 @@
       "evidence": "CODEX.md"
     },
     {
+      "from": "file:commands/goal.md",
+      "to": "file:AGENTS.md",
+      "type": "mentions-path",
+      "evidence": "commands/goal.md"
+    },
+    {
       "from": "file:GEMINI.md",
       "to": "file:AGENTS.md",
       "type": "mentions-path",
@@ -1372,13 +1418,25 @@
     },
     {
       "from": "file:protocols/GOAL_PROTOCOL_SHORT.md",
-      "to": "file:../manageesg-backend/AGENTS_SYSTEM.md",
+      "to": "file:../manageesg-backend/AGENTS.md",
+      "type": "mentions-path",
+      "evidence": "protocols/GOAL_PROTOCOL_SHORT.md"
+    },
+    {
+      "from": "file:protocols/GOAL_PROTOCOL_SHORT.md",
+      "to": "file:AGENTS.md",
       "type": "mentions-path",
       "evidence": "protocols/GOAL_PROTOCOL_SHORT.md"
     },
     {
       "from": "file:protocols/GOAL_PROTOCOL.md",
-      "to": "file:../manageesg-backend/AGENTS_SYSTEM.md",
+      "to": "file:../manageesg-backend/AGENTS.md",
+      "type": "mentions-path",
+      "evidence": "protocols/GOAL_PROTOCOL.md"
+    },
+    {
+      "from": "file:protocols/GOAL_PROTOCOL.md",
+      "to": "file:AGENTS.md",
       "type": "mentions-path",
       "evidence": "protocols/GOAL_PROTOCOL.md"
     },
@@ -1529,6 +1587,12 @@
     {
       "from": "file:scripts/agent-system-map.js",
       "to": "file:CODEX.md",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:commands/goal.md",
       "type": "mentions-path",
       "evidence": "scripts/agent-system-map.js"
     },
@@ -1787,6 +1851,24 @@
     {
       "from": "file:scripts/agent-system-map.js",
       "to": "file:scripts/sync-instruction-adapters.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:skills/goal-default/SKILL.md",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:skills/parallel-execution-optimizer/SKILL.md",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:skills/persistent-goal-execution/SKILL.md",
       "type": "mentions-path",
       "evidence": "scripts/agent-system-map.js"
     },
@@ -2097,6 +2179,30 @@
       "evidence": "scripts/sync-instruction-adapters.js"
     },
     {
+      "from": "file:skills/goal-default/SKILL.md",
+      "to": "file:AGENTS.md",
+      "type": "mentions-path",
+      "evidence": "skills/goal-default/SKILL.md"
+    },
+    {
+      "from": "file:skills/parallel-execution-optimizer/SKILL.md",
+      "to": "file:AGENTS.md",
+      "type": "mentions-path",
+      "evidence": "skills/parallel-execution-optimizer/SKILL.md"
+    },
+    {
+      "from": "file:skills/persistent-goal-execution/SKILL.md",
+      "to": "file:AGENTS.md",
+      "type": "mentions-path",
+      "evidence": "skills/persistent-goal-execution/SKILL.md"
+    },
+    {
+      "from": "file:skills/persistent-goal-execution/SKILL.md",
+      "to": "file:schemas/goal-control.schema.json",
+      "type": "mentions-path",
+      "evidence": "skills/persistent-goal-execution/SKILL.md"
+    },
+    {
       "from": "file:tests/ci/agent-adoption-doctor.test.js",
       "to": "file:.clinerules",
       "type": "mentions-path",
@@ -2261,6 +2367,12 @@
     {
       "from": "file:tests/lib/coding-execution.test.js",
       "to": "file:scripts/ecc.js",
+      "type": "mentions-path",
+      "evidence": "tests/lib/coding-execution.test.js"
+    },
+    {
+      "from": "file:tests/lib/coding-execution.test.js",
+      "to": "file:scripts/goal-control.js",
       "type": "mentions-path",
       "evidence": "tests/lib/coding-execution.test.js"
     },
@@ -2698,8 +2810,8 @@
     }
   ],
   "build": {
-    "generatedAt": "2026-10-11T21:22:47.001Z",
-    "sourceCommit": "0803d0488fc6dcee4b83703c53a40247299121cf",
+    "generatedAt": "2026-10-11T23:33:00.502Z",
+    "sourceCommit": "c546a8cb62ac6914957ab63279807e67a6699dc5",
     "sourceDirty": false,
     "policyCommit": "998aa246ea2d26d23aeadadda47e8a84212dc5e7",
     "policyDirty": false
