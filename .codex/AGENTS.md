@@ -1,15 +1,8 @@
-# ECC Codex Supplement
+# SeaBridgeAI core instruction loader
 
-The root `AGENTS.md` is canonical and is already loaded before this directory
-supplement. Do not repeat its safety, goal, testing, or model-routing policy here.
+SYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1
 
-For repository navigation and PR evidence, read
-`docs/CODEX-NAVIGATION-GUIDE.md` only when that work is in scope. Discover skills
-from `.agents/skills/` and load the minimum applicable set.
+<!-- SEABRIDGE_CORE_ENTRY: ../../manageesg-backend/AGENTS.md -->
 
-## External Action Boundaries
-
-Networked tools are read-only by default. Posting, publishing, pushing, merging,
-dispatching paid work, changing third-party resources, or modifying credentials
-requires explicit user approval unless the current session already contains a
-clearly bounded approval covering that action.
+Read and follow `../../manageesg-backend/AGENTS.md` and its shared system import before working.
+This existing file is a loading adapter only. It defines no independent policy.

@@ -12,6 +12,9 @@ const { expandImports } = require('./check-instruction-stack');
 const ROOT = path.resolve(__dirname, '..');
 const OUTPUT = 'docs/tools/agent-system-map.json';
 const SOURCES = Object.freeze([
+  '../manageesg-backend/AGENTS_SYSTEM.md',
+  '../manageesg-backend/AGENTS.md',
+  '../manageesg-backend/CLAUDE.md',
   'AGENTS.md', 'CLAUDE.md', 'GEMINI.md', 'CODEX.md', 'OPENCODE.md',
   '.github/copilot-instructions.md', '.agents/rules/seabridge-agent-baseline.md',
   '.clinerules', '.cursor/rules/common-agents.md',
@@ -128,9 +131,13 @@ function buildMap(root = ROOT, sources = SOURCES) {
   edges.sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b)));
   return {
     schema: 'seabridge.agent-system-map.v1',
-    scope: 'ECC agent instructions, runtime adapters, outcome control, evaluation, and CI; no product or tenant data',
+    scope: 'Three backend policy sources and ECC loading adapters, outcome control, evaluation, and CI; no product or tenant data',
     extractor: 'scripts/agent-system-map.js (deterministic, no LLM)',
-    generatorVersion: 2,
+    generatorVersion: 4,
+    // Generated verification artifact, not a fourth policy source. CI can
+    // reproduce the three reviewed, pinned files without a private-repo token.
+    policySnapshot: rows.filter(row => row.path.startsWith('../manageesg-backend/'))
+      .map(row => ({ ...row, text: fs.readFileSync(file(root, row.path), 'utf8').replace(/\r\n/g, '\n') })),
     coverage: {
       excludedRoots: ['artifacts/', 'data/', 'graphify-out/', 'logs/', 'vendor/'],
       semanticIndex: 'not-run',
@@ -143,12 +150,21 @@ function buildMap(root = ROOT, sources = SOURCES) {
 function buildMetadata(root = ROOT) {
   let sourceCommit = null;
   let sourceDirty = null;
+  let policyCommit = null;
+  let policyDirty = null;
   try {
     sourceCommit = execFileSync('git', ['-C', root, 'rev-parse', 'HEAD'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
-    sourceDirty = Boolean(execFileSync('git', ['-C', root, 'status', '--porcelain=v1', '--', ...SOURCES],
+    sourceDirty = Boolean(execFileSync('git', ['-C', root, 'status', '--porcelain=v1', '--', ...SOURCES.filter(source => !source.startsWith('../'))],
       { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim());
   } catch { /* Fixture or exported corpus outside Git: content hash remains authoritative. */ }
-  return { generatedAt: new Date().toISOString(), sourceCommit, sourceDirty };
+  try {
+    const policyRoot = path.resolve(root, '..', 'manageesg-backend');
+    policyCommit = execFileSync('git', ['-C', policyRoot, 'rev-parse', 'HEAD'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+    policyDirty = Boolean(execFileSync('git', ['-C', policyRoot, 'status', '--porcelain=v1', '--', 'AGENTS_SYSTEM.md', 'AGENTS.md', 'CLAUDE.md'],
+      { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim());
+  } catch { /* Exported fixtures retain content-bound fingerprints. */ }
+  if (policyDirty === true) sourceDirty = true;
+  return { generatedAt: new Date().toISOString(), sourceCommit, sourceDirty, policyCommit, policyDirty };
 }
 
 function check(root = ROOT, destination = OUTPUT) {
@@ -159,7 +175,7 @@ function check(root = ROOT, destination = OUTPUT) {
     if (!stored.build || !stored.build.generatedAt || !('sourceCommit' in stored.build)) {
       return { fresh: false, reason: 'map lacks build provenance' };
     }
-    if (stored.build.sourceDirty === true) {
+    if (stored.build.sourceDirty === true || stored.build.policyDirty === true) {
       return { fresh: false, reason: 'map was built from dirty source files' };
     }
     const current = buildMap(root);
@@ -172,9 +188,49 @@ function check(root = ROOT, destination = OUTPUT) {
   }
 }
 
+function materialize(root = ROOT) {
+  const stored = JSON.parse(fs.readFileSync(file(root, OUTPUT), 'utf8'));
+  if (stored.build?.sourceDirty !== false || stored.build?.policyDirty !== false
+      || !/^[a-f0-9]{40}$/.test(stored.build?.policyCommit || '')) {
+    throw new Error('policy snapshot requires clean, committed source provenance');
+  }
+  const expected = ['AGENTS.md', 'AGENTS_SYSTEM.md', 'CLAUDE.md']
+    .map(name => `../manageesg-backend/${name}`).sort();
+  const snapshot = stored.policySnapshot;
+  if (!Array.isArray(snapshot) || JSON.stringify(snapshot.map(row => row.path).sort()) !== JSON.stringify(expected)) {
+    throw new Error('policy snapshot must contain exactly the three central files');
+  }
+  const destination = path.resolve(root, '..', 'manageesg-backend');
+  if (fs.existsSync(destination) && (!fs.lstatSync(destination).isDirectory() || fs.lstatSync(destination).isSymbolicLink())) {
+    throw new Error('unsafe policy snapshot destination');
+  }
+  // Preflight every row before any write. Never replace a live checkout's policy.
+  for (const row of snapshot) {
+    const source = stored.sources.find(item => item.path === row.path);
+    if (typeof row.text !== 'string' || hash(row.text) !== row.sha256 || source?.sha256 !== row.sha256) {
+      throw new Error('policy snapshot digest mismatch');
+    }
+    const target = file(root, row.path);
+    if (fs.existsSync(target) && (!fs.lstatSync(target).isFile() || hash(fs.readFileSync(target, 'utf8').replace(/\r\n/g, '\n')) !== row.sha256)) {
+      throw new Error('refusing to overwrite existing central policy');
+    }
+  }
+  fs.mkdirSync(destination, { recursive: true });
+  for (const row of snapshot) {
+    const target = file(root, row.path);
+    if (!fs.existsSync(target)) fs.writeFileSync(target, row.text, { flag: 'wx' });
+  }
+  return { policyCommit: stored.build.policyCommit, files: snapshot.length };
+}
+
 function main(args = process.argv.slice(2), root = ROOT) {
-  if (args.length !== 1 || !['build', 'check'].includes(args[0])) {
-    throw new Error('usage: node scripts/agent-system-map.js <build|check>');
+  if (args.length !== 1 || !['build', 'check', 'materialize'].includes(args[0])) {
+    throw new Error('usage: node scripts/agent-system-map.js <build|check|materialize>');
+  }
+  if (args[0] === 'materialize') {
+    const result = materialize(root);
+    process.stdout.write(`Verification snapshot: ${result.files} central files at backend ${result.policyCommit}; not a live freshness or installation claim.\n`);
+    return 0;
   }
   if (args[0] === 'build') {
     const map = buildMap(root);
@@ -197,4 +253,4 @@ if (require.main === module) {
   try { process.exitCode = main(); }
   catch (error) { process.stderr.write(`${error.message}\n`); process.exitCode = 1; }
 }
-module.exports = { SOURCES, OUTPUT, sourceRows, buildMap, buildMetadata, check, main };
+module.exports = { SOURCES, OUTPUT, sourceRows, buildMap, buildMetadata, check, materialize, main };

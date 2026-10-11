@@ -1,10 +1,8 @@
-# SeaBridgeAI Codex Compatibility Note
+# SeaBridgeAI compatibility reference
 
 SYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1
 
-Codex loads the canonical repository contract from `AGENTS.md` automatically.
-This file is a navigation aid only; do not duplicate policy here.
+<!-- SEABRIDGE_CORE_ENTRY: ../manageesg-backend/AGENTS.md -->
 
-For ECC surface ownership and PR evidence, see
-`docs/CODEX-NAVIGATION-GUIDE.md`. Load task-specific skills and references only
-when their trigger fits.
+Read and follow `../manageesg-backend/AGENTS.md` and its shared system import before working.
+This existing file is a loading adapter only. It defines no independent policy.

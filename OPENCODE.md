@@ -1,11 +1,8 @@
-# SeaBridgeAI OpenCode Compatibility Note
+# SeaBridgeAI compatibility reference
 
 SYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1
 
-OpenCode loads the canonical repository contract from `AGENTS.md`; the managed
-`.opencode/opencode.json` names that file explicitly. This file is a navigation
-aid only and must not duplicate the contract.
+<!-- SEABRIDGE_CORE_ENTRY: ../manageesg-backend/AGENTS.md -->
 
-Use optional OpenCode agents and commands only when their trigger fits. Their
-testing and review guidance is subordinate to repository-owned thresholds and
-the risk-scaled verification rules in `AGENTS.md`.
+Read and follow `../manageesg-backend/AGENTS.md` and its shared system import before working.
+This existing file is a loading adapter only. It defines no independent policy.

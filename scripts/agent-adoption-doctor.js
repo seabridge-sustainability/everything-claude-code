@@ -7,6 +7,7 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
+const { stripCode } = require('./check-instruction-stack');
 
 const ROOT = path.resolve(__dirname, '..');
 const MARKERS = ['SEABRIDGE_SAFETY_RULE_START', 'SEABRIDGE_GOAL_PROTOCOL_START'];
@@ -23,6 +24,46 @@ function source(root, relative) {
   }
   return fs.existsSync(candidate) && fs.statSync(candidate).isFile()
     ? fs.readFileSync(candidate, 'utf8') : null;
+}
+
+// Cross-repository policy is limited to the three named central files. Never
+// turn a legitimate loader into permission to read arbitrary parent paths.
+function effectiveSource(projectRoot, relative, seen = new Set()) {
+  const root = path.resolve(projectRoot);
+  const core = path.resolve(root, '..', 'manageesg-backend');
+  const allowed = new Set(['AGENTS.md', 'AGENTS_SYSTEM.md', 'CLAUDE.md']
+    .map(name => path.join(core, name)));
+  function visit(candidate) {
+    const file = path.resolve(candidate);
+    const inside = file === root || file.startsWith(root + path.sep);
+    if (!inside && !allowed.has(file)) throw new Error(`untrusted instruction import: ${file}`);
+    if (!fs.existsSync(file) || !fs.statSync(file).isFile()) throw new Error(`missing instruction source: ${file}`);
+    const actual = fs.realpathSync(file);
+    if (actual !== file && !actual.startsWith(root + path.sep) && !allowed.has(actual)) {
+      throw new Error(`untrusted instruction link: ${file}`);
+    }
+    if (seen.has(file)) return '';
+    seen.add(file);
+    const raw = fs.readFileSync(file, 'utf8').replace(/^\uFEFF/, '');
+    const refs = /(^|\s)@([^\s`]+\.md)\b|<!--\s*SEABRIDGE_CORE_ENTRY:\s*([^\s]+\.md)\s*-->/g;
+    let effective = raw;
+    for (const match of stripCode(raw).matchAll(refs)) {
+      effective += '\n' + visit(path.resolve(path.dirname(file), match[2] || match[3]));
+    }
+    return effective;
+  }
+  source(root, relative); // The entry itself must stay inside the selected repo.
+  return visit(path.resolve(root, relative));
+}
+
+function pluginPeerPresent(adapterRoot) {
+  let directory = path.join(adapterRoot, '.opencode', 'dist', 'tools');
+  while (true) {
+    if (fs.existsSync(path.join(directory, 'node_modules', '@opencode-ai', 'plugin', 'package.json'))) return true;
+    const parent = path.dirname(directory);
+    if (parent === directory) return false;
+    directory = parent;
+  }
 }
 
 function readFile(file) {
@@ -91,6 +132,7 @@ function inspectInstallation({ adapterRoot, projectRoot, homeDir = os.homedir(),
   const openCodeConfigured = pointsToRuntime(openCodeConfig, adapterRoot)
     && /\.opencode\/dist\/plugins/i.test(normalized(openCodeConfig))
     && fs.existsSync(path.join(adapterRoot, '.opencode', 'dist', 'plugins', 'index.js'));
+  const openCodePeer = pluginPeerPresent(adapterRoot);
   const claudeStatus = !claudePointer ? 'not-configured'
     : eccPlugin || hooks.admissionMode === 'blocking' ? 'first-prompt-deadlock-risk'
       : hooks.admissionMode === 'advisory' && hooks.Stop ? 'advisory-hook-configured-not-observed'
@@ -101,10 +143,13 @@ function inspectInstallation({ adapterRoot, projectRoot, homeDir = os.homedir(),
       status: claudeStatus,
       hookEventsConfigured: hooks, pluginLoaded: Boolean(eccPlugin) },
     { id: 'gemini', pointerCurrent: geminiPointer, gateConfigured: false, status: geminiPointer ? 'instructions-configured-wrapper-required' : 'not-configured' },
-    { id: 'opencode', pointerCurrent: openCodePointer, gateConfigured: openCodeConfigured,
-      status: openCodePointer && openCodeConfigured ? 'plugin-configured-not-observed' : 'not-configured' },
+    { id: 'opencode', pointerCurrent: openCodePointer, gateConfigured: openCodeConfigured && openCodePeer,
+      pluginPeerPresent: openCodePeer,
+      status: openCodePointer && openCodeConfigured
+        ? openCodePeer ? 'plugin-configured-not-observed' : 'plugin-dependency-missing'
+        : 'not-configured' },
   ];
-  return { status: rows.every(row => !['not-configured', 'first-prompt-deadlock-risk'].includes(row.status))
+  return { status: rows.every(row => !['not-configured', 'first-prompt-deadlock-risk', 'plugin-dependency-missing'].includes(row.status))
     ? 'configured-not-observed' : 'incomplete',
     activation: 'not-observed', providerCalls: 0, runtimes: rows };
 }
@@ -118,13 +163,14 @@ function inspectRuntime(adapterRoot, projectRoot, adapter, capability) {
   const instruction = source(projectRoot, adapter.entry);
   if (instruction === null) issues.push(`missing project entry ${adapter.entry}`);
   let effective = instruction || '';
+  if (instruction !== null) {
+    try { effective = effectiveSource(projectRoot, adapter.entry); }
+    catch (error) { issues.push(error.message); }
+  }
   if (adapter.mode === 'import') {
     const imported = adapter.imports;
     const importPattern = new RegExp(`@(?:\\./)?${String(imported).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![\\w./-])`);
     if (!imported || !importPattern.test(effective)) issues.push(`broken import of ${imported || 'canonical policy'}`);
-    const canonical = imported ? source(projectRoot, imported) : null;
-    if (canonical === null) issues.push(`missing imported policy ${imported}`);
-    effective += `\n${canonical || ''}`;
   }
   if (adapter.mode === 'canonical' && adapter.entry !== 'AGENTS.md') {
     issues.push('canonical runtime does not use AGENTS.md');
@@ -194,4 +240,4 @@ if (require.main === module) {
   catch (error) { process.stderr.write(`agent adoption doctor: ${error.message}\n`); process.exitCode = 2; }
 }
 
-module.exports = { inspect, inspectInstallation, inspectRuntime, main, source };
+module.exports = { inspect, inspectInstallation, inspectRuntime, main, source, effectiveSource };

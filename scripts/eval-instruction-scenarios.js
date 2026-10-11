@@ -94,10 +94,24 @@ function expand(read, rel, depth = 0, seen = new Set()) {
   return out;
 }
 
+function assertHistoricalLocality(read) {
+  // Never substitute live sibling policy for a repository-local historical ref.
+  for (const entry of ['AGENTS.md', 'CLAUDE.md']) {
+    if (/(?:SEABRIDGE_CORE_ENTRY:|@)[^\n]*\.\.\/manageesg-backend\//.test(read(entry) || '')) {
+      throw new Error('Historical cross-repository instruction evaluation requires bound peer revisions; use the working-tree check until those are supplied.');
+    }
+  }
+}
+
 function stacks(repoName, ref) {
   const repo = resolveRepo(repoName);
+  if (!ref) {
+    const stacks = require('./check-instruction-stack').effectiveStacks(repo);
+    return Object.fromEntries(stacks.filter(stack => repoName === 'everything-claude-code' || ['codex', 'claude'].includes(stack.harness)).map(stack => [stack.harness, stack.text]));
+  }
   const read = reader(repo, ref);
   const out = {};
+  assertHistoricalLocality(read);
   if (repoName === 'everything-claude-code') {
     const manifest = read('manifests/instruction-adapters.json');
     if (!manifest) return out;
@@ -179,6 +193,6 @@ function main(argv) {
   return exitCode;
 }
 
-module.exports = { defaultWorkspace, main };
+module.exports = { defaultWorkspace, main, assertHistoricalLocality };
 
 if (require.main === module) process.exit(main(process.argv.slice(2)));

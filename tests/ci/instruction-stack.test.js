@@ -113,7 +113,7 @@ test('the documented Windows ECC root resolves to the active checkout', () => {
 });
 
 test('canonical safety rule supports bounded approval and controls Actions cost', () => {
-  const canonical = fs.readFileSync(path.resolve(__dirname, '..', '..', 'protocols', 'SAFETY_AUTHORIZATION_RULE.md'), 'utf8');
+  const canonical = lib.expandImports(path.resolve(__dirname, '..', '..', 'protocols', 'SAFETY_AUTHORIZATION_RULE.md')).text;
   assert.match(canonical, /clearly bounded sequence named in advance/);
   assert.match(canonical, /Do not ask again for steps already included/);
   assert.match(canonical, /one integration owner and one completed-batch push per repository/);
@@ -149,13 +149,13 @@ test('all runtime instructions retain independent-session scope and separate del
 });
 
 test('workflow text does not reintroduce a second approval gate', () => {
-  const agents = fs.readFileSync(path.resolve(__dirname, '..', '..', 'AGENTS.md'), 'utf8');
+  const agents = lib.expandImports(path.resolve(__dirname, '..', '..', 'AGENTS.md')).text;
   const worktree = fs.readFileSync(
     path.resolve(__dirname, '..', '..', 'skills', 'sea-git-worktree-isolation', 'SKILL.md'),
     'utf8',
   );
   assert.doesNotMatch(agents, /separate push approval gate/);
-  assert.match(agents, /bounded advance approval may cover commit, remote-tip integration, and one completed-batch push/);
+  assert.match(agents, /clearly bounded sequence named in advance/);
   assert.match(worktree, /Do not demand a second approval/);
   assert.match(worktree, /same-task detached worktree/);
   assert.match(worktree, /reused long-lived worktree/);
@@ -170,9 +170,10 @@ test('cheap CI validation runs effective instructions and the fresh system map',
 });
 
 test('default instructions require runtime evidence without unconditional test expansion', () => {
-  const agents = fs.readFileSync(path.resolve(__dirname, '..', '..', 'AGENTS.md'), 'utf8');
+  const agents = lib.expandImports(path.resolve(__dirname, '..', '..', 'AGENTS.md')).text;
   const goalSync = fs.readFileSync(path.resolve(__dirname, '..', '..', 'scripts', 'sync-goal-protocol.ps1'), 'utf8');
-  for (const text of [agents, goalSync]) {
+  assert.doesNotMatch(goalSync, /parts\.Add|New-GoalBlock/);
+  for (const text of [agents]) {
     assert.match(text, /Verify behavior, not only code/);
     assert.match(text, /(browser|terminal).*(endpoint client|simulator)/s);
     assert.match(text, /performance budgets/);
@@ -181,7 +182,7 @@ test('default instructions require runtime evidence without unconditional test e
     assert.match(text, /repeated manual QA sequence/);
   }
   assert.doesNotMatch(agents, /Minimum coverage:\s*80%/);
-  assert.match(agents, /no universal per-change percentage/);
+  assert.match(agents, /no universal per-change percentage/i);
 });
 
 test('thin navigation files do not duplicate the canonical goal contract', () => {
@@ -193,7 +194,7 @@ test('thin navigation files do not duplicate the canonical goal contract', () =>
   }
 
   const claude = fs.readFileSync(path.join(root, 'CLAUDE.md'), 'utf8');
-  assert.match(claude, /^@AGENTS\.md\s*$/m);
+  assert.match(claude, /^@\.\.\/manageesg-backend\/CLAUDE\.md\s*$/m);
   assert.doesNotMatch(claude, /SEABRIDGE_GOAL_PROTOCOL_START/);
 
   const gemini = fs.readFileSync(path.join(root, 'GEMINI.md'), 'utf8');
@@ -201,12 +202,9 @@ test('thin navigation files do not duplicate the canonical goal contract', () =>
   assert.doesNotMatch(gemini, /SEABRIDGE_GOAL_PROTOCOL_START/);
   assert.doesNotMatch(gemini, /AGENTS_SYSTEM|vendor\/superpowers\/GEMINI/);
 
-  const contextAgents = fs.readFileSync(
-    path.join(root, 'context-hub', 'ecc', 'docs', 'core-agents', 'DOC.md'),
-    'utf8',
-  );
-  assert.match(contextAgents, /Verify behavior, not only code/);
-  assert.doesNotMatch(contextAgents, /Minimum coverage:\s*80%/);
+  const loaded = lib.expandImports(path.join(root, 'AGENTS.md'));
+  assert.ok(loaded.files.some(file => file.endsWith(path.join('manageesg-backend', 'AGENTS_SYSTEM.md'))));
+  assert.strictEqual(loaded.missing.length, 0);
 });
 
 test('registry covers every advertised runtime and all effective ECC adapters pass', () => {
@@ -220,6 +218,15 @@ test('registry covers every advertised runtime and all effective ECC adapters pa
   assert.deepStrictEqual(registry.adapters.map(adapter => adapter.id).sort(), expected.sort());
   const results = lib.checkRepo(root, path.dirname(root), 64 * 1024);
   for (const result of results) assert.deepStrictEqual(result.failures, [], `${result.harness}: ${result.failures.join('; ')}`);
+});
+
+test('Windows forward-slash ECC references resolve and missing files still fail', () => {
+  const repo = fixture({ 'AGENTS.md': GOOD_AGENTS });
+  assert.deepStrictEqual(lib.brokenPathRefs(
+    '`C:/Users/adelm/SeaBridgeAI/everything-claude-code-runtime/AGENTS.md`', repo, repo), []);
+  assert.deepStrictEqual(lib.brokenPathRefs(
+    '`C:/Users/adelm/SeaBridgeAI/everything-claude-code-runtime/missing.md`', repo, repo),
+    ['C:/Users/adelm/SeaBridgeAI/everything-claude-code-runtime/missing.md']);
 });
 
 test('embedded adapter drift is rejected (negative control)', () => {
@@ -245,7 +252,7 @@ test('embedded adapter drift is rejected (negative control)', () => {
 test('product repositories must carry the exact ECC safety and goal blocks', () => {
   const fixture = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-product-policy-'));
   try {
-    const canonicalAgents = fs.readFileSync(path.resolve(__dirname, '..', '..', 'AGENTS.md'), 'utf8');
+    const canonicalAgents = 'SYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1\n' + lib.canonicalBlocks(path.resolve(__dirname, '..', '..')).join('\n');
     fs.writeFileSync(path.join(fixture, 'AGENTS.md'), canonicalAgents);
     let policy = lib.checkRepo(fixture, fixture, 64 * 1024, { enforceCanonicalPolicy: true })
       .find(result => result.harness === 'codex');
@@ -279,7 +286,7 @@ test('missing advertised installer target is rejected (negative control)', () =>
 });
 
 test('model and skill policy is routed on demand and covers the evidence lifecycle', () => {
-  const agents = fs.readFileSync(path.resolve(__dirname, '..', '..', 'AGENTS.md'), 'utf8');
+  const agents = lib.expandImports(path.resolve(__dirname, '..', '..', 'AGENTS.md')).text;
   const policyPath = path.resolve(__dirname, '..', '..', 'docs', 'tools', 'MODEL_PROMPTING_AND_SKILL_POLICY.md');
   const policy = fs.readFileSync(policyPath, 'utf8');
   assert.match(agents, /MODEL_PROMPTING_AND_SKILL_POLICY\.md/);
@@ -387,6 +394,35 @@ test('Kiro generated Markdown and JSON agent descriptions stay in parity', () =>
     const json = JSON.parse(fs.readFileSync(path.join(root, `${name}.json`), 'utf8'));
     assert.strictEqual(json.description, match[1].trim(), `${name} JSON/Markdown description drift`);
   }
+});
+
+
+test('central references resolve and missing shared policy fails all native loaders', () => {
+  const repo = fixture({
+    'AGENTS.md': '<!-- SEABRIDGE_CORE_ENTRY: core/AGENTS.md -->\n',
+    'core/AGENTS.md': '@AGENTS_SYSTEM.md\n',
+    'core/AGENTS_SYSTEM.md': GOOD_AGENTS,
+  });
+  for (const row of lib.checkRepo(repo, repo, 32768)) assert.deepStrictEqual(row.failures, []);
+  fs.renameSync(path.join(repo, 'core', 'AGENTS_SYSTEM.md'), path.join(repo, 'core', 'missing.md'));
+  for (const row of lib.checkRepo(repo, repo, 32768)) {
+    assert.ok(row.failures.some(f => /broken @import|missing invariant/.test(f)), row.harness);
+  }
+});
+
+test('compatibility adapters carry no copies of central safety or goal policy', () => {
+  const root = path.resolve(__dirname, '..', '..');
+  for (const entry of ['AGENTS.md', 'AGENTS_SYSTEM.md', 'AGENT_SKILLS.md',
+    'SEABRIDGE_CODING_AGENT_SYSTEM.md', 'protocols/GOAL_PROTOCOL.md',
+    'protocols/GOAL_PROTOCOL_SHORT.md', 'protocols/SAFETY_AUTHORIZATION_RULE.md',
+    'protocols/CONCURRENT_SESSION_PROTOCOL.md', '.github/copilot-instructions.md',
+    '.agents/rules/seabridge-agent-baseline.md', '.clinerules']) {
+    const text = fs.readFileSync(path.join(root, entry), 'utf8');
+    assert.match(text, /SEABRIDGE_CORE_ENTRY/);
+    assert.doesNotMatch(text, /SEABRIDGE_(?:SAFETY_RULE|GOAL_PROTOCOL)_START/);
+    assert.deepStrictEqual(lib.expandImports(path.join(root, entry)).missing, []);
+  }
+  assert.strictEqual(fs.existsSync(path.join(root, 'protocols/MVP_EXECUTION_FOCUS.md')), false);
 });
 
 console.log(`instruction-stack: ${passed} passed`);

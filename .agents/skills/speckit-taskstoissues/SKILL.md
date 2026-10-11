@@ -6,6 +6,6 @@ description: Callable wrapper for SeaBridgeAI curated Spec Kit task-to-GitHub-is
 # speckit-taskstoissues
 
 Canonical skill:
-`C:\Users\adelm\SeaBridgeAI\everything-claude-code\skills\spec-kit\taskstoissues\SKILL.md`
+`C:\Users\adelm\SeaBridgeAI\everything-claude-code-runtime\skills\spec-kit\taskstoissues\SKILL.md`
 
 Load and follow the canonical skill body. Do not fork behavior here.
