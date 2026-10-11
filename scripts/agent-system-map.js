@@ -23,6 +23,8 @@ const SOURCES = Object.freeze([
   'protocols/CONCURRENT_SESSION_PROTOCOL.md', 'scripts/session-coordinate.js',
   'scripts/lib/session-coordination.js',
   'scripts/hooks/goal-runtime-gate.js', 'schemas/goal-control.schema.json',
+  'scripts/lib/scope-guard-adapters.js', 'scripts/scope-guard-adapters.js',
+  '.opencode/plugins/ecc-scope-guard.ts', 'tests/lib/scope-guard-adapters.test.js',
   'tests/lib/goal-runtime-hook.test.js', 'tests/lib/goal-runtime.test.js',
   'manifests/instruction-adapters.json', 'manifests/goal-runtime-capabilities.json',
   'manifests/goal-proof-profiles.json',

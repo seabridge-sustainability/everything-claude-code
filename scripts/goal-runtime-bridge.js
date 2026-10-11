@@ -37,7 +37,7 @@ function hookText(payload) {
   } catch {
     return payload;
   }
-  const preferred = ['last_assistant_message', 'assistant_response', 'response', 'prompt', 'message', 'text'];
+  const preferred = ['last_assistant_message', 'assistant_response', 'response', 'prompt_response', 'prompt', 'message', 'text'];
   const found = [];
   function visit(item, key = '') {
     if (typeof item === 'string' && preferred.includes(key)) found.push(item);

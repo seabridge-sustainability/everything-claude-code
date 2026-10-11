@@ -853,3 +853,59 @@ Blocking is opt-in for newly admitted, registered sessions. Shared root hook
 configuration and active agents remain untouched. Linked-worktree hooks still
 require a reviewed launch layer or separately reviewed root activation. The
 Codex pilot is verified; no other harness or global adoption is asserted.
+
+### Cross-agent correction and Windows denial contracts
+
+The owner's latest correction explicitly requires applicability to Claude,
+Gemini, OpenCode and other coding agents. All 18 instruction adapters continue
+to resolve the same three policy sources; no fourth policy MD was introduced.
+The unchanged instruction-stack checks pass 27 checks, and all 18 applicable
+instruction scenarios pass with their missing-policy negative controls.
+
+`scripts/lib/scope-guard-adapters.js` normalizes Gemini's replace/read tools and
+OpenCode's native tool names/filePath arguments into the existing typed fence.
+Opaque shell, MCP and delegated execution remain denied in block mode. Model
+identity does not select a weaker policy. The new argument adapter and OpenCode
+plugin are included in the immutable guard implementation digest.
+
+Claude PreToolUse and Stop, Gemini BeforeTool and AfterAgent, and Codex use their
+supported JSON denial formats with exit 0. Their negative pre-tool responses
+survived an actual Windows PowerShell -Command wrapper in local tests. Gemini's
+prompt_response field is included in final-claim extraction, so a harmless
+original prompt cannot hide an unsupported completion response.
+Primary contracts: https://code.claude.com/docs/en/hooks and
+https://geminicli.com/docs/hooks/reference/ . These are adapter contract tests,
+not model turns or proof that a running native client loaded the new hooks.
+
+`.opencode/plugins/ecc-scope-guard.ts` is opt-in through the fresh process's
+ECC_SCOPE_GUARD_MODE, ECC_SCOPE_GUARD_ROOT and ECC_SESSION_ID. With no mode it
+returns no hooks. Its real tool.execute.before callback evaluates output.args,
+preserves native session identity and throws before a denied tool can execute.
+It invokes Node explicitly: OpenCode's compiled Bun process.execPath is not the
+Node executable. Missing guard runtime, protected/outside/ADS/trailing-dot writes,
+opaque shell and wrong identity fail closed. Useful reads and an owned write
+pass. Five focused cross-agent tests passed, including execution of this exact
+plugin callback; no OpenCode provider or model was called.
+Primary contract: https://opencode.ai/docs/plugins/ . The plugin controls tools;
+session.idle is not treated as a native completion gate. Explicit controlled-goal
+admission and final wrappers remain required.
+
+`node scripts/scope-guard-adapters.js <runtime> [audit|block]` prints reviewable
+opt-in fragments for Claude, Codex and Gemini, launch requirements for OpenCode,
+and honest instruction/wrapper fallbacks for the other registered agents. It
+does not write a client config, grant trust, bind a session or start a model.
+Default audit is advisory. First register scoped ownership, validate/admit the
+controlled goal and bind the actual native session with a deadline/tool budget.
+Then review the project fragment and run that harness's separate native canary
+before adopting block mode. Never overwrite an existing hooks/MCP configuration
+with a fragment. The fragments include pre-tool and final events; native turn
+identity is not assumed where the client has no equivalent field. Explicit turn
+admission remains a wrapper requirement there.
+
+Windows MXC is a Codex setting on compatible devices, not a universal Claude,
+Gemini or OpenCode sandbox setting. The portable finding is to verify direct Git
+and child-process Git separately, preserve active processes/ACLs, and use native
+control responses rather than assuming a shell preserves exit 2. Running clients,
+shared runtime checkouts, global settings and trust stores remain unchanged.
+Live native interception has been demonstrated only for Codex; other harnesses
+have local adapter evidence and require their own activation/native proof.
