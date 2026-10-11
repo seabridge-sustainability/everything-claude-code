@@ -909,3 +909,44 @@ control responses rather than assuming a shell preserves exit 2. Running clients
 shared runtime checkouts, global settings and trust stores remain unchanged.
 Live native interception has been demonstrated only for Codex; other harnesses
 have local adapter evidence and require their own activation/native proof.
+
+### Final source-bound acceptance and CI separation
+
+The ninth and final approved model turn used the corrected adapter sources at
+b976d6c5b91d2ffeb4627b03a738c17c7af4428a and backend policy at
+998aa246ea2d26d23aeadadda47e8a84212dc5e7. It read all three policy files,
+reported five blocked native PreToolUse decisions, zero failed hooks, zero
+negative write callbacks and no executed shell command. One owned positive write
+passed and Stop completed. The receipt records actual native hook/completed
+events, not just the model's response. The updated AGENTS_SYSTEM.md digest was
+6b767d21198d5a15e19161b7d335a982fb3cb3e5cd0db7d1f1f5975a823ecc03.
+All nine model turns are accounted for; the batch is closed and no second batch
+is implied. ChatGPT cost remains unknown. Unsupported Stop completion is checked
+locally for Claude, Codex and Gemini; the native final canary made no unsupported
+completion claim and does not certify that separate negative case natively.
+
+The final focused suite is 96 passing checks: session 25, hook 8, goal 39, runtime
+5, cross-agent adapter 5 and source map 14. Existing instruction-stack 27 checks,
+all 18 adapter scenarios and workflow-cost contract checks also pass. The map is
+rebuilt from clean committed ECC/policy sources and includes the new adapter and
+plugin files. It remains separate from Graphify/FalkorDB.
+
+Initial publication is verified at ECC 11aa04f1c and backend c6124c63e. Backend
+security-scan 38172662936 passed all three jobs. backend-tests 38172663317 ended
+failure at its aggregate gate: test_nvidia_project_config_uses_live_discovered_model_id
+was not in the known-failure baseline. This was the same explicitly recorded
+failure on pre-pilot base 030cc3062; the pilot changed only AGENTS_SYSTEM.md and
+.codex/config.toml. All 19 preceding shard/manifest jobs passed their job contracts;
+the aggregate gate retained the underlying test failure. Deploy was skipped.
+No provider configuration, test assertion or known-failure baseline was changed,
+and no workflow was manually rerun.
+
+ECC's Actions page reports workflows paused on this fork due to usage scale:
+https://github.com/seabridge-sustainability/everything-claude-code/actions .
+The API's enabled flags and queued non-Actions check suite are not CI proof.
+No fork-wide re-enable or dispatch was performed. The final backend correction
+is Markdown only, covered by backend-tests paths-ignore; publication and security
+checks are recorded separately without claiming a repaired provider/deployment.
+Fresh Actions usage was USD 309.63 with the USD 400 hard stop still enforced.
+Conservative corrective-batch exposure remains USD 30 combined, below the 90%
+tripwire. Native/model and Actions ledgers remain separate.
