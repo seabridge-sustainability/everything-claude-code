@@ -1,6 +1,6 @@
 # SeaBridgeAI instruction audit and simplification — 2026-10-11
 
-## Outcome and release state
+## Initial audit state (authorized release continuation below)
 
 Local correction is **partial, verified, and unpublished**. This is not a claim that every live agent now complies or that the full rollout is complete. Application code, approved UI, scoring, datasets, databases, Docker services, credentials and other sessions' product changes were not changed. No installs, model/provider calls, GitHub Actions dispatches/reruns, commits, pushes or deployments were made for this audit.
 
@@ -289,6 +289,38 @@ advisories remain and are not claimed fixed. The unrelated ini engine warning
 requires a newer supported Node minor for that dependency; no global upgrade was
 made. Product-repository publication is still serialized behind the existing
 release owner's leases; file handoff does not transfer publication authority.
+
+### Final candidate verification and exact handoff
+
+The current clean backend candidate is `e17e85367` (including `ccde93f36` and
+`b5098421a`); the clean frontend instruction candidate is `dd1ccc96`. Normal
+commit hooks pass in both. The newer published frontend tip carried additional
+Gemini/Windsurf/Copilot/Cline/Antigravity copies absent from the older shared
+checkout; those existing entries are now thin loaders in the candidate. No new
+agent folders or application files were created. Metadata and headings were
+compacted without removing policy to keep every native stack under its existing
+startup-byte budget. Backend 11, frontend 11, ECC 18 adapters plus installer:
+41 effective-stack checks pass against these clean candidates.
+
+ECC `bcff28629ab8f6371c7b212edf900d36cec6ddcd` was pushed and confirmed with
+ls-remote, normal pre-push hooks passing. No workflow run was returned for that
+SHA, so CI success is not established; none was manually dispatched or rerun.
+The final map refresh pins the latest committed backend candidate. This proves
+the reviewed snapshot content, not that the backend candidate is on origin.
+
+Backend/frontend pushes are not claimed: the existing product owner's release
+leases remain reserved, even though the instruction-file reservation was released.
+Do not change or steal those leases. The owner must terminally record or explicitly
+hand off publication authority before these ready commits are included in the
+next consolidated normal-branch batches. Unrelated application changes remain
+untouched. Local/shared adoption and remote publication are distinct.
+
+Remaining limitations: satellite AGENTS migrations with concurrent edits are
+pending; packaged adapters and static delivery do not prove live reads/obedience;
+already running clients may retain old startup context. No global permission
+guard was changed. Graphify/FalkorDB freshness is not established by this system
+map. Existing low/moderate advisories and the separate resume-directory hashing
+defect remain explicitly outside this bounded correction.
 
 Additional continuation edits: `C:/Users/adelm/SeaBridgeAI/climada-stack/.cursor/rules/karpathy-guidelines.mdc` and `C:/Users/adelm/SeaBridgeAI/autoresearch/.claude/rules/berry.md`.
 
