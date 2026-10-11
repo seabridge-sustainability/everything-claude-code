@@ -82,6 +82,11 @@ function main(args = process.argv.slice(2), raw = readInput()) {
     .filter(value => typeof value === 'string' && value.trim())
     .join('\n');
   process.stderr.write(`${diagnostic || 'goal runtime gate could not verify this action'}\n`);
+  if (runtime === 'codex' && phase === 'final') {
+    // Preserve Stop control through PowerShell's native exit-code conversion.
+    process.stdout.write(JSON.stringify({ decision: 'block', reason: 'ECC controlled-goal final claim was not admitted. Review the goal evidence before claiming completion.' }) + '\n');
+    return 0;
+  }
   return 2;
 }
 

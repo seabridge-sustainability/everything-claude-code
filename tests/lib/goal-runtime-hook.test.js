@@ -69,6 +69,13 @@ const tests = [
     assert.strictEqual(result.status, 2);
     assert.match(result.stderr, /complete claim requires/);
   }],
+  ['Codex Stop denies an unsupported completion through a successful JSON hook response', () => {
+    const result = invoke('codex', 'final', { response: 'The goal is fully complete.' }, workspace);
+    assert.strictEqual(result.status, 0);
+    assert.strictEqual(JSON.parse(result.stdout).decision, 'block');
+    assert.match(JSON.parse(result.stdout).reason, /not admitted/);
+    assert.match(result.stderr, /complete claim requires/);
+  }],
   ['lifecycle runner derives the final phase from the stable hook id', () => {
     const previous = process.cwd();
     try {
