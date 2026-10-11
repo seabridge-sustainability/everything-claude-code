@@ -274,6 +274,22 @@ nonempty retained scopes; records the content digest; changes no release lease o
 product files. All 18 focused coordination checks pass, including actual CLI
 handoff and refusal controls. It grants no permission and is not a release takeover.
 
+The owner then executed this handoff and verified its 51 product scopes and lease
+unchanged. The shared frontend AGENTS.md now loads central policy. Seven effective
+frontend instruction stacks pass locally. Removed a duplicate OpenCode instructions
+key (the later key had silently overridden the central paths) and made a redundant
+always-on Cursor pointer opt-in. No frontend application files were edited.
+
+The first ECC push was stopped locally by the normal npm-audit hook, before any
+remote update or CI run. A targeted lockfile-only update changed exactly two
+transitive dependencies within their existing ranges: MCP SDK 1.30.1 to 1.32.1,
+brace-expansion 5.0.9 to 5.0.12. No install scripts or packages were installed by
+that lock update. The high-severity gate now passes; eight existing low/moderate
+advisories remain and are not claimed fixed. The unrelated ini engine warning
+requires a newer supported Node minor for that dependency; no global upgrade was
+made. Product-repository publication is still serialized behind the existing
+release owner's leases; file handoff does not transfer publication authority.
+
 Additional continuation edits: `C:/Users/adelm/SeaBridgeAI/climada-stack/.cursor/rules/karpathy-guidelines.mdc` and `C:/Users/adelm/SeaBridgeAI/autoresearch/.claude/rules/berry.md`.
 
 Loading conclusions were checked against [Codex AGENTS.md discovery](https://learn.chatgpt.com/docs/agent-configuration/agents-md), [Claude memory/imports](https://code.claude.com/docs/en/memory), [Claude skills](https://code.claude.com/docs/en/skills), and [OpenCode rules](https://docs.opencode.ai/docs/rules/). Documentation describes supported loading, not observed obedience in this machine's clients.
