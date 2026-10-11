@@ -174,7 +174,9 @@ test('trusted hook process allows owned write, denies protected tampering, wrong
     cwd: f.root, encoding: 'utf8', env: { ...process.env, ECC_SESSION_ID: 'fence' },
     input: JSON.stringify({ session_id: 'fence', cwd: f.root, tool_name: tool, tool_input: input }), windowsHide: true });
   assert.equal(run('Write', { file_path: 'owned/new.js' }).status, 0);
-  assert.equal(run('Write', { file_path: 'outside.js' }).status, 2);
+  const denied = run('Write', { file_path: 'outside.js' });
+  assert.equal(denied.status, 0);
+  assert.equal(JSON.parse(denied.stdout).hookSpecificOutput.permissionDecision, 'deny');
   assert.equal(f.event('Read', {}, 'pre', { session_id: 'other' }).allowed, false);
   const expired = execute('guard-event', { cwd: f.root, sessionId: 'fence', guardMode: 'block', event: 'pre', now: Date.now() + 700000,
     payload: { session_id: 'fence', cwd: f.root, tool_name: 'Read', tool_input: {} } });
@@ -183,7 +185,9 @@ test('trusted hook process allows owned write, denies protected tampering, wrong
   assert.equal(f.event('Read', {}).allowed, false);
   fs.writeFileSync(path.join(f.root, 'README.md'), 'fixture\n');
   fs.writeFileSync(path.join(f.root, 'foreign.js'), 'outside');
-  assert.equal(run(null, null, 'final').status, 2);
+  const final = run(null, null, 'final');
+  assert.equal(final.status, 0);
+  assert.equal(JSON.parse(final.stdout).decision, 'block');
 });
 
 test('owner CLI can hand off one file without closing product scopes or release lease', () => {

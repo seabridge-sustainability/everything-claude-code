@@ -800,3 +800,56 @@ Only the three central policy MD files remain authority. The task-owned temporar
 project hook configuration is restored to its original dormant configuration after
 closing its binding; the working pilot used explicit launch flags. Reviewable
 native receipts and hook event logs are saved with the projectless task outputs.
+
+### Windows repair and native blocking acceptance
+
+The owner's continuation explicitly authorized fixing Windows sandbox/Git failures
+and finishing the rollout without disrupting agents. This section supersedes the
+previous unresolved Windows/native-block status. The legacy elevated setup log
+identifies a sharing violation (Windows error 32) while changing read/execute ACLs
+on the running Codex node_repl.exe. Its process and ACLs were preserved.
+
+On Windows 11 build 26200.9550, Codex 0.162.1 MXC passed a native read-only
+command/exec probe. Direct Git and Node spawnSync Git both passed under MXC;
+unelevated direct Git passed but both PATH-resolved and absolute spawnSync Git
+reproduced EPERM. This rules out an executable-path repair as the solution.
+Official configuration reference: https://learn.chatgpt.com/docs/windows/windows-sandbox
+
+The isolated backend project now prefers MXC and grants workspace-write access
+only to its existing .git/ecc-coordination directory in addition to the worktree.
+No whole-repository Git directory grant, user/global config, sandbox disabling,
+account/firewall/privilege change, install, server restart or running-agent change
+was made. Legacy fallback remains available on incompatible devices; it is not
+certified there. Fresh admission evidence was required after configuration edits.
+An ordinary native turn using the saved preference (no sandbox override) read the
+three actual MD files, passed ECC admission and ownership checks, then used the
+built-in apply_patch to create the single owned native-shell-canary-mxc.txt.
+
+The first two native negative runs found that PowerShell mapped the Node hook's
+exit 2 to exit 1. Native hook/completed reported failed, and calls continued.
+Restricted client callbacks prevented foreign writes; the harmless shell marker
+did execute. Those runs are retained as failures of enforcement, even though the
+owned positive write succeeded. The Codex scope adapter now returns supported
+JSON denial with exit 0 for pre/turn/final controls; other harness exit contracts
+are retained. Official output contract: https://learn.chatgpt.com/docs/hooks
+
+The corrected native run reported five blocked PreToolUse decisions, no failed
+hooks, no negative write callback and no executed shell command. The cases were
+protected policy write, parent traversal, alternate-data-stream path, trailing-dot
+path and opaque shell. Three successful policy reads and an owned typed write
+also passed; Stop completed. This proves native interception for these cases,
+not merely model self-report or replayed hook payloads. The denial assertions in
+both existing test files now inspect supported JSON decisions instead of the old
+Windows-incompatible exit contract. Broader path/patch/symlink/cap/identity cases
+remain covered by the focused local counterexamples.
+
+Across the full bounded batch, eight actual model turns were used (three earlier,
+two MXC audit and three block attempts), below the nine-call ceiling. Native
+ChatGPT cost telemetry remains unavailable, not zero. No API-key/provider or
+manual Actions run was used. Each task-owned canary process ended; only task
+sessions were closed. All three central MD files remain the instruction authority.
+
+Blocking is opt-in for newly admitted, registered sessions. Shared root hook
+configuration and active agents remain untouched. Linked-worktree hooks still
+require a reviewed launch layer or separately reviewed root activation. The
+Codex pilot is verified; no other harness or global adoption is asserted.
