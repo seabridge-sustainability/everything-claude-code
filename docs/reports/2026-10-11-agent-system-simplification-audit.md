@@ -738,3 +738,65 @@ origin/seabridge_development at030cc3062da9e9bb67767c6c04942d97e8bb2f4c;
 these local milestone commits are not asserted published. The pilot's audit
 configuration remains isolated and uncommitted, with a frozen binding to the
 ended startup-only native identity; a new native session requires fresh admission.
+
+### Continuation: native instruction reads and audit hooks verified
+
+This section supersedes the earlier zero-observation native status. On
+2026-10-11 the owner explicitly approved the isolated trust review and bounded
+native canary for the three audit hooks. No global hooks, running sessions,
+authentication, OS setup or shared checkout were changed.
+
+The installed Codex 0.162.1 loader replaces linked-worktree hook definitions with
+the root checkout's definitions. The exact release source confirms this in
+`codex-rs/config/src/loader/mod.rs`, `merge_root_checkout_project_hooks` and
+`root_checkout_hooks_folder_for_dir`. This explains the empty native hook list;
+the pilot worktree's hook file was not an activation mechanism. Official release
+source: https://github.com/openai/codex/blob/rust-v0.162.1/codex-rs/config/src/loader/mod.rs
+
+The approved three definitions were supplied in the native launch layer. Native
+`hooks/list` first returned their real definition hashes as untrusted, then
+returned all three as trusted using normal hash-bound trust state in that same
+invocation. No trust bypass flag or persisted global trust mutation was used.
+A native config-write attempt was rejected by existing MCP transport validation;
+it did not authorize repairing unrelated user configuration. All ten configured
+MCP servers were explicitly disabled and verified disabled for these sessions.
+
+Three real ChatGPT-authenticated native canary turns ran, within the approved
+batch; no API-key/provider endpoint, install or manual Actions run was used.
+Normal ChatGPT token/USD cost remains unavailable, not zero. Each canary was
+limited to one turn, 12 tools and 240 seconds, with a fresh ECC session/native
+identity and immutable audit binding. All task-owned native processes ended.
+
+1. Default Windows sandbox: native turn/pre/final hooks ran, but two shell reads
+   failed before execution. Independent no-model `command/exec` diagnosis returned
+   `windows sandbox: helper_unknown_error: setup refresh had errors`.
+2. Restricted typed client: native Codex read all three actual core files through
+   typed tools, correctly stated the concurrent-work rule, and created the exact
+   owned `artifacts/agent-runs/scope-guard/native-canary.txt`. Client callbacks
+   exposed only these three reads and this one create-only write; ownership was
+   checked again before writing. Native hooks observed all four typed operations
+   and allowed them. Evidence is a real native tool callback/write, not replayed
+   hook input. The core file SHA256 digests were recorded in the receipt.
+3. Invocation-only `windows.sandbox=unelevated`: ordinary native PowerShell read
+   all three files successfully (exit 0, 17,090 output bytes). ECC admission/write
+   subprocesses then failed (`undefined (reading 'trim')`, `spawnSync git EPERM`).
+   The agent correctly stopped before writing. No OS privilege/ACL repair or
+   sandbox disabling was performed. General CLI coding is therefore not certified.
+
+Native audit totals: three turns, nine tool opportunities, one actual owned write.
+Four typed operations were allowed; five opaque shell operations were classified
+would-deny as designed. Typed guard internal timing was 81.06-87.91 ms; final
+checks were 327.71-365.70 ms. These are internal check durations, not end-to-end
+native hook latency. No claim of a statistical false-positive rate is supported.
+
+The instruction-read acceptance is demonstrated for this Codex pilot, including
+an ordinary shell read and a restricted typed read/write. The 90 local checks
+remain valid. Universal obedience, native block-negative controls, OS containment,
+general Windows CLI coding and other harnesses remain unverified. Phase1 block
+and wider adoption remain held. Publication is still gated by the original full
+native acceptance requirement; no push or CI/deployment claim is made.
+
+Only the three central policy MD files remain authority. The task-owned temporary
+project hook configuration is restored to its original dormant configuration after
+closing its binding; the working pilot used explicit launch flags. Reviewable
+native receipts and hook event logs are saved with the projectless task outputs.
