@@ -55,6 +55,10 @@ const COMMANDS = {
     script: 'goal-runtime-bridge.js',
     description: 'Apply the same outcome gate across coding-agent runtimes and models',
   },
+  'coding-execution': {
+    script: 'coding-execution.js',
+    description: 'Persist runtime-neutral worker joins, critic reviews, recovery and exact-action approval pauses',
+  },
   session: {
     script: 'session-coordinate.js',
     description: 'Reserve local session write scopes and serialize release candidates across worktrees',
@@ -134,6 +138,7 @@ const PRIMARY_COMMANDS = [
   'memory',
   'goal',
   'goal-runtime',
+  'coding-execution',
   'session',
   'goal-eval',
   'list-installed',
