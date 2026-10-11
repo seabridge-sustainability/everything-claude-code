@@ -2,7 +2,7 @@
 
 SYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1
 
-<!-- SEABRIDGE_CORE_ENTRY: ../../manageesg-backend/AGENTS_SYSTEM.md -->
+<!-- SEABRIDGE_CORE_ENTRY: ../../manageesg-backend/AGENTS.md -->
 
-Read and follow `../../manageesg-backend/AGENTS_SYSTEM.md` and its shared system import before working.
+Read `../../manageesg-backend/AGENTS.md` and its `AGENTS_SYSTEM.md` import.
 This existing file is a loading adapter only. It defines no independent policy.

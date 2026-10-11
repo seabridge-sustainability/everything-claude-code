@@ -478,6 +478,36 @@
         "source_harness": { "$ref": "#/$defs/nonEmptyString" }
       }
     },
+    "preservationEvidence": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "sha256", "kind"],
+      "properties": {
+        "path": { "$ref": "#/$defs/nonEmptyString" },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "kind": { "enum": ["local-check", "api", "browser", "save-reopen", "attachment", "export", "scientific-validation"] }
+      }
+    },
+    "changeContract": {
+      "type": "object", "additionalProperties": false,
+      "required": ["version", "requested_delta", "preserved_invariants"],
+      "properties": {
+        "version": { "const": 1 },
+        "requested_delta": { "$ref": "#/$defs/nonEmptyString" },
+        "preserved_invariants": {
+          "type": "array", "minItems": 1,
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["id", "description", "category", "baseline"],
+            "properties": {
+              "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$" },
+              "description": { "$ref": "#/$defs/nonEmptyString" },
+              "category": { "enum": ["design", "content", "data", "calculation", "api", "persistence", "security", "behavior"] },
+              "baseline": { "$ref": "#/$defs/preservationEvidence" }
+            }
+          }
+        }
+      }
+    },
     "assignment": {
       "type": "object",
       "additionalProperties": false,
@@ -504,6 +534,7 @@
         "issued_at": { "$ref": "#/$defs/nonEmptyString" },
         "lease_expires_at": { "$ref": "#/$defs/nonEmptyString" },
         "budget": { "$ref": "#/$defs/assignmentBudget" },
+        "change_contract": { "$ref": "#/$defs/changeContract" },
         "source_harness": { "$ref": "#/$defs/nonEmptyString" }
       }
     },

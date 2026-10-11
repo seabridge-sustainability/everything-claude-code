@@ -62,6 +62,16 @@ function checkPlan(plan, now) {
     demand(assignment.owner_agent === worker.agent && assignment.owner_runtime === worker.runtime, 'assignment owner/runtime mismatch');
     demand(assignment.scope_paths.map(coordination.scope).sort().join() === worker.scopes.map(coordination.scope).sort().join(), 'assignment scope mismatch');
     demand(assignment.description === worker.requirement, 'task differs from approved goal assignment');
+    demand(assignment.change_contract, 'missing requested-change/preservation contract; reissue assignment for v3');
+    demand(assignment.change_contract.requested_delta === assignment.description, 'requested delta differs from goal assignment');
+    const invariantIds = new Set();
+    for (const invariant of assignment.change_contract.preserved_invariants) {
+      demand(!invariantIds.has(invariant.id), 'duplicate preserved invariant'); invariantIds.add(invariant.id);
+      const relative = inside(worker.repo, invariant.baseline.path);
+      demand(!worker.scopes.some(value => coordination.overlaps(coordination.scope(value), relative)), 'preservation baseline must be outside worker write scope');
+      demand(sha256File(path.join(worker.repo, relative)) === invariant.baseline.sha256, 'preservation baseline changed');
+      demand(invariant.category !== 'design' || invariant.baseline.kind === 'browser', 'design preservation needs browser baseline, not private tests');
+    }
     const proofs = assignment.acceptance_ids.map(id => goal.user_visible_proofs.find(proof => proof.id === id));
     demand(proofs.every(proof => {
       const lane=goal.lanes.find(item=>item.id===proof.lane_id);
@@ -86,14 +96,14 @@ function checkPlan(plan, now) {
 }
 function initialize(plan, now = Date.now()) {
   checkPlan(plan, now);
-  return { version: 2, plan, plan_sha256: digest(plan), sequence: 0, phase: 'planned',
+  return { version: 3, plan, plan_sha256: digest(plan), sequence: 0, phase: 'planned',
     dispatches: 0, repairs: 0, spent_usd: 0, history: [], nodes: Object.fromEntries(plan.workers.map(worker => [worker.id,
       { status: 'pending', attempts: 0, token: null, lease_until: null, result: null, usage: {tool_calls:0,retries:0,ci_runs:0,cost_usd:0} }])),
     join_sha256: null, critique: null, synthesis: null, effects: {}, audit: [] };
 }
 function validateState(state) {
   assert('state', state);
-  demand(state?.version === 2 && digest(state.plan) === state.plan_sha256, 'invalid execution state/plan fingerprint');
+  demand(state?.version === 3 && digest(state.plan) === state.plan_sha256, 'invalid execution state/plan fingerprint');
   assert('plan', state.plan);
   demand(Object.keys(state.nodes).sort().join() === state.plan.workers.map(w => w.id).sort().join(), 'invalid execution node set');
   demand(['planned','workers','critic','repair','synthesis','approval','effect','completed','reconciliation','budget-exhausted'].includes(state.phase), 'invalid execution phase');
@@ -122,13 +132,33 @@ function validateState(state) {
   if (['synthesis','approval','effect','completed','reconciliation'].includes(state.phase)) demand(state.critique?.accepted === true && state.critique.join_sha256 === state.join_sha256, 'accepted critic state required');
   if (['approval','effect','completed','reconciliation'].includes(state.phase)) demand(state.synthesis?.join_sha256 === state.join_sha256, 'typed synthesis state required');
 }
-function currentEvidence(state, authorizeCitation) {
+function currentEvidence(state, authorizeCitation, verifyPreservation, requireReview = false) {
   for (const worker of state.plan.workers) {
     const result = state.nodes[worker.id].result;
     if (!result) continue;
     const captured = captureRepositoryState(worker.repo, { excludePaths: [path.join(worker.repo, '.ecc/goal')] });
     demand(captured.head === result.head && captured.tree_fingerprint === result.tree_fingerprint, 'stale worker repository evidence');
-    for (const ref of result.evidence) {
+    const contract = assignmentFor(state.plan, worker).change_contract;
+    if (result.status === 'pass') {
+      demand(result.preservation?.contract_sha256 === digest(contract), 'missing or stale preservation receipt');
+      const checks = result.preservation.checks;
+      demand(checks.length === contract.preserved_invariants.length && new Set(checks.map(check => check.id)).size === checks.length, 'preservation checks must cover each invariant exactly once');
+      for (const invariant of contract.preserved_invariants) {
+        const check = checks.find(item => item.id === invariant.id);
+        demand(check && check.evidence.kind === invariant.baseline.kind, 'missing invariant or wrong preservation evidence kind');
+        demand(inside(worker.repo, check.evidence.path) !== inside(worker.repo, invariant.baseline.path), 'baseline is not post-change preservation evidence');
+      }
+      if (requireReview) {
+        // Hashes establish identity/freshness, not semantic equality. The caller
+        // must supply a trusted, independent comparison of outcome + invariants.
+        demand(typeof verifyPreservation === 'function' && verifyPreservation({
+          worker, assignment: assignmentFor(state.plan, worker), contract, result,
+          revision: state.plan.revision, environment: state.plan.environment,
+          join_sha256: state.join_sha256,
+        }) === true, 'requested outcome and semantic preservation not independently verified');
+      }
+    }
+    for (const ref of [...result.evidence, ...(result.preservation?.checks || []).map(check => check.evidence)]) {
       const relative = inside(worker.repo, ref.path);
       demand(sha256File(path.join(worker.repo, relative)) === ref.sha256, 'stale evidence artifact');
     }
@@ -161,7 +191,7 @@ function apply(state, event, options = {}) {
   const next = structuredClone(state), plan = next.plan;
   const parent = () => demand(event.actor === plan.parent, 'parent/root actor required');
   const live = worker => { workerAuthority(worker, now); demand(Date.parse(worker.expires_at) > now, 'expired assignment'); };
-  const evidence = () => currentEvidence(next, options.authorizeCitation);
+  const evidence = (requireReview = next.critique?.accepted === true) => currentEvidence(next, options.authorizeCitation, options.verifyPreservation, requireReview);
   switch (event.type) {
     case 'dispatch': {
       parent(); demand(['planned','repair'].includes(next.phase), 'dispatch requires planned/repair phase');
@@ -222,6 +252,7 @@ function apply(state, event, options = {}) {
       demand(event.report.accepted ? !event.report.rejections.length && !failures.length : event.report.rejections.length > 0, 'critic decision contradicts outputs');
       demand(failures.every(id => event.report.rejections.some(r => r.worker === id)), 'critic omitted failed output');
       demand(typeof options.verifyCritic === 'function' && options.verifyCritic(event, plan) === true, 'trusted independent critic identity verifier required');
+      if (event.report.accepted) evidence(true);
       next.critique = event.report;
       next.history.push({ join_sha256: next.join_sha256, critique: event.report, results: Object.values(next.nodes).map(n => n.result) });
       if (event.report.accepted) next.phase = 'synthesis';

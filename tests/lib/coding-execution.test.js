@@ -9,6 +9,8 @@ const engine = require('../../scripts/lib/coding-execution');
 // Explicit fixture identity verifier; this is NOT a live-model identity claim.
 const c = { ...engine, apply:(state,event,options={}) => engine.apply(state,event,{
   verifyCritic:(review,plan)=>review.actor===plan.critic && review.actor!==plan.parent && !plan.workers.some(w=>w.agent===review.actor),
+  // Synthetic comparator only: does not certify a live UI or vendor behavior.
+  verifyPreservation:({result})=>result.status==='pass',
   ...options,
 }) };
 const coord = require('../../scripts/lib/session-coordination');
@@ -39,6 +41,7 @@ function fixture(t, runtimes = ['claude','gemini']) {
   coord.execute('register', { cwd: root, sessionId: 'parent', scopes: ['.ecc/goal'], objective: 'controller', doneWhen: 'checks', ttl:120 });
   const workers = runtimes.map((runtime, index) => {
     const id = `worker-${index}`, workerRepo = repo(id);
+    fs.writeFileSync(path.join(workerRepo,'.ecc/goal/baseline.json'),JSON.stringify({design:'approved',data:42}));
     coord.execute('register', { cwd: workerRepo, sessionId: id, scopes: ['code.txt'], objective: 'owned output', doneWhen: 'receipt', ttl:120 });
     return { id, runtime, agent: id, repo: workerRepo, session: id, scopes: ['code.txt'], requirement: 'required output', acceptance: 'code.txt exists with hash', expires_at: new Date(Date.now()+3600000).toISOString(), max_attempts:3,
       assignment_id:id,assignment_sha256:'0'.repeat(64) };
@@ -47,13 +50,15 @@ function fixture(t, runtimes = ['claude','gemini']) {
   const assignments = workers.map(worker => ({schema:'ecc.assignment.v1',assignment_id:worker.id,goal_id:goalDocument.goal_id,
     description:worker.requirement,acceptance_ids:['required-output'],owner_runtime:worker.runtime,owner_agent:worker.agent,scope_paths:worker.scopes,
     issued_at:new Date(Date.now()-1000).toISOString(),lease_expires_at:worker.expires_at,
-    budget:{max_tool_calls:10,max_retries:2,max_ci_runs:0,max_cost_usd:0},source_harness:'offline-fixture'}));
+    budget:{max_tool_calls:10,max_retries:2,max_ci_runs:0,max_cost_usd:0},source_harness:'offline-fixture',
+    change_contract:{version:1,requested_delta:worker.requirement,preserved_invariants:[{id:'preserve',description:'preserve unrelated behavior',category:'behavior',
+      baseline:{path:'.ecc/goal/baseline.json',sha256:store.sha256File(path.join(worker.repo,'.ecc/goal/baseline.json')),kind:'local-check'}}]}}));
   const writeAssignments = () => {
     fs.writeFileSync(assignmentsFile,assignments.map(item=>JSON.stringify(item)).join('\n')+'\n');
     workers.forEach((worker,index)=>{worker.assignment_sha256=c.digest(assignments[index]);});
   };
   writeAssignments();
-  const plan = { version:2, id:'execution', parent:'parent', session:'parent', repo:root, goal_file:goal, assignments_file:assignmentsFile,
+  const plan = { version:3, id:'execution', parent:'parent', session:'parent', repo:root, goal_file:goal, assignments_file:assignmentsFile,
     goal_sha256:store.sha256File(goal), revision:c.digest('owner revision'), environment:'offline-fixture', critic:'independent-critic', workers,
     limits:{ dispatches:workers.length*3, repairs:2, lease_ms:60000, usd:0 } };
   const file = path.join(root,'.ecc/goal/execution.json');
@@ -62,6 +67,8 @@ function fixture(t, runtimes = ['claude','gemini']) {
     return { version:1, worker:id, agent:w.agent, runtime:w.runtime, token:state.nodes[id].token, revision:plan.revision, environment:plan.environment,
       status:'pass', head:snapshot.head, tree_fingerprint:snapshot.tree_fingerprint, changed_paths:snapshot.dirty_paths,
       evidence:[{path:'code.txt',sha256:store.sha256File(path.join(w.repo,'code.txt')),kind:'local-check'}],citations:[],usd:0,
+      preservation:{contract_sha256:c.digest(assignments.find(item=>item.assignment_id===id).change_contract),
+        checks:[{id:'preserve',evidence:{path:'code.txt',sha256:store.sha256File(path.join(w.repo,'code.txt')),kind:'local-check'}}]},
       usage:{tool_calls:1,retries:0,ci_runs:0,cost_usd:0} };
   }
   function joined() {
@@ -257,4 +264,84 @@ test('failed-attempt spending accumulates and absent error telemetry stops furth
   p=c.apply(p,{type:'worker-error',actor:'worker-0',worker:'worker-0',token:p.nodes['worker-0'].token,
     usage:{tool_calls:11,retries:1,ci_runs:0,cost_usd:0}});
   assert.equal(p.phase,'budget-exhausted');assert.equal(p.nodes['worker-0'].usage.tool_calls,11);
+});
+
+test('v3 requires a specific change contract and protects baseline checks', t => {
+  const f=fixture(t,['codex']);
+  assert.throws(()=>c.initialize({...f.plan,version:2}),/plan:/);
+  const contract=f.assignments[0].change_contract;
+  delete f.assignments[0].change_contract;f.writeAssignments();
+  assert.throws(()=>c.initialize(f.plan),/missing requested-change/);
+  f.assignments[0].change_contract=contract;contract.requested_delta='also redesign';f.writeAssignments();
+  assert.throws(()=>c.initialize(f.plan),/requested delta differs/);
+  contract.requested_delta=f.plan.workers[0].requirement;
+  contract.preserved_invariants.push(structuredClone(contract.preserved_invariants[0]));f.writeAssignments();
+  assert.throws(()=>c.initialize(f.plan),/duplicate preserved invariant/);
+  contract.preserved_invariants.pop();contract.preserved_invariants[0].baseline.path='code.txt';f.writeAssignments();
+  assert.throws(()=>c.initialize(f.plan),/outside worker write scope/);
+  contract.preserved_invariants[0].baseline.path='.ecc/goal/baseline.json';f.writeAssignments();
+  fs.writeFileSync(path.join(f.plan.workers[0].repo,'.ecc/goal/baseline.json'),'weakened check');
+  assert.throws(()=>c.initialize(f.plan),/baseline changed/);
+});
+
+test('worker claims, missing invariant receipts and private tests cannot certify design preservation', t => {
+  const f=fixture(t,['claude']);let s=c.apply(c.initialize(f.plan),{type:'dispatch',actor:'parent'});
+  const r=f.result(s);delete r.preservation;
+  assert.throws(()=>c.apply(s,{type:'result',actor:'worker-0',result:r}),/missing or stale preservation/);
+  const duplicate=f.result(s);duplicate.preservation.checks.push(duplicate.preservation.checks[0]);
+  assert.throws(()=>c.apply(s,{type:'result',actor:'worker-0',result:duplicate}),/exactly once/);
+  const old=f.result(s);old.preservation.contract_sha256='0'.repeat(64);
+  assert.throws(()=>c.apply(s,{type:'result',actor:'worker-0',result:old}),/stale preservation/);
+  const baseline=f.result(s);baseline.preservation.checks[0].evidence=f.assignments[0].change_contract.preserved_invariants[0].baseline;
+  assert.throws(()=>c.apply(s,{type:'result',actor:'worker-0',result:baseline}),/not post-change/);
+  const joined=f.joined(),review={type:'critic',actor:f.plan.critic,report:{agent:f.plan.critic,join_sha256:joined.join_sha256,accepted:true,rejections:[]}};
+  assert.throws(()=>c.apply(joined,review,{verifyPreservation:undefined}),/not independently verified/);
+  f.assignments[0].change_contract.preserved_invariants[0].category='design';f.writeAssignments();
+  assert.throws(()=>c.initialize(f.plan),/browser baseline/);
+});
+
+test('in-scope redesign or data changes are rejected across runtime labels; requested edit passes', t => {
+  // Synthetic browser-kind artifacts and a deterministic independent comparator.
+  // This tests the controller, NOT browser execution or native vendor adoption.
+  for(const runtime of ['codex','claude','gemini','opencode']) {
+    const f=fixture(t,[runtime]),w=f.plan.workers[0],invariant=f.assignments[0].change_contract.preserved_invariants[0];
+    w.requirement='Enable existing Save button';f.assignments[0].description=w.requirement;
+    f.assignments[0].change_contract.requested_delta=w.requirement;
+    invariant.category='design';invariant.description='Approved design and displayed data unchanged';invariant.baseline.kind='browser';f.writeAssignments();
+    const verifyPreservation=({contract,result,worker,revision,environment})=>{
+      const before=JSON.parse(fs.readFileSync(path.join(worker.repo,contract.preserved_invariants[0].baseline.path),'utf8'));
+      const after=JSON.parse(fs.readFileSync(path.join(worker.repo,result.preservation.checks[0].evidence.path),'utf8'));
+      return revision===f.plan.revision && environment===f.plan.environment && after.save===true && after.design===before.design && after.data===before.data;
+    };
+    let s=c.apply(c.initialize(f.plan),{type:'dispatch',actor:'parent'});
+    fs.writeFileSync(path.join(w.repo,'code.txt'),JSON.stringify({save:true,design:'unrequested new form',data:0}));
+    const bad=f.result(s);bad.preservation.checks[0].evidence.kind='browser';
+    const privateCheck=structuredClone(bad);privateCheck.preservation.checks[0].evidence.kind='local-check';
+    assert.throws(()=>c.apply(s,{type:'result',actor:w.agent,result:privateCheck}),/wrong preservation evidence kind/);
+    s=c.apply(s,{type:'result',actor:w.agent,result:bad});
+    const review=state=>({type:'critic',actor:f.plan.critic,report:{agent:f.plan.critic,join_sha256:state.join_sha256,accepted:true,rejections:[]}});
+    assert.throws(()=>c.apply(s,review(s),{verifyPreservation}),/not independently verified/);
+    s=c.apply(s,{type:'critic',actor:f.plan.critic,report:{agent:f.plan.critic,join_sha256:s.join_sha256,accepted:false,rejections:[{worker:w.id,reason:'unrequested-semantic-change'}]}});
+    s=c.apply(s,{type:'dispatch',actor:'parent'});
+    fs.writeFileSync(path.join(w.repo,'code.txt'),JSON.stringify({save:true,design:'approved',data:42}));
+    const good=f.result(s);good.preservation.checks[0].evidence.kind='browser';
+    s=c.apply(s,{type:'result',actor:w.agent,result:good});
+    s=c.apply(s,review(s),{verifyPreservation});assert.equal(s.phase,'synthesis');
+    assert.throws(()=>c.apply(s,{type:'synthesis',actor:'parent',output:{version:1,join_sha256:s.join_sha256,claim:'locally-verified',outputs:[w.id]}},{verifyPreservation:()=>false}),/not independently verified/);
+  }
+});
+
+test('actual assignment CLI persists the canonical contract and rejects a widened request', t => {
+  const f=fixture(t,['gemini']),cli=path.resolve(__dirname,'../../scripts/goal-control.js');
+  const contractFile=path.join(f.plan.repo,'.ecc/goal/change-contract.json');
+  const contract=f.assignments[0].change_contract;fs.writeFileSync(contractFile,JSON.stringify(contract));
+  const args=[cli,'assign','--dir',path.dirname(f.plan.goal_file),'--goal',f.plan.goal_file,'--assignment-id','cli-contract',
+    '--description',contract.requested_delta,'--acceptance','required-output','--owner-runtime','gemini','--owner-agent','cli-worker',
+    '--scope','code.txt','--lease-until',f.plan.workers[0].expires_at,'--change-contract',contractFile];
+  const run=()=>spawnSync(process.execPath,args,{encoding:'utf8',windowsHide:true,cwd:f.plan.repo});
+  const good=run();assert.equal(good.status,0,good.stderr);
+  const stored=JSON.parse(good.stdout).assignment;assert.deepEqual(stored.change_contract,contract);
+  contract.requested_delta='also change the design';fs.writeFileSync(contractFile,JSON.stringify(contract));
+  // goal-control CLI uses exit 1; coding-execution CLI uses exit 2.
+  const bad=run();assert.equal(bad.status,1,bad.stdout);assert.match(bad.stderr,/requested delta differs/);
 });

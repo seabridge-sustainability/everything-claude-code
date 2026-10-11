@@ -1,126 +1,59 @@
 ---
 name: goal-default
-description: Defines the SeaBridgeAI goal protocol as the default execution wrapper for coding-agent tasks. Invoke this skill only by the exact name goal-default. Do not invoke Skill(goal); /goal is a user-facing Claude Code slash command, not a callable skill.
+description: Execute or resume an explicit SeaBridgeAI goal using existing goal records, outcome checkpoints and bounded coordination. Small tasks need only a brief acceptance check; do not add a universal planning or review ritual.
 ---
 
-# goal-default
+# Goal Default
 
-## Purpose
+Read `C:/Users/adelm/SeaBridgeAI/manageesg-backend/AGENTS.md` and its
+`AGENTS_SYSTEM.md` import. Those three central files are the instruction authority;
+ECC supplies reusable execution tools, not another policy. This skill grants no
+approval and does not replace host instructions or the latest owner correction.
 
-Apply the canonical SeaBridgeAI `/goal` protocol to every task by default.
+## Invocation and task admission
 
-`/goal` is the default user-facing command for continuous execution. Auto-loop is not a separate mode; it is the behavior triggered by `/goal`.
+Use the client's supported goal entrypoint; if unavailable, execute the user's
+explicit goal through the same contract in plain language. Do not assume every
+client supports `/goal` or `$goal`; do not invoke nonexistent `Skill(goal)`.
 
-Source of truth:
+Small task: identify the requested delta, preserved behavior and relevant check.
+Long/resumed/multi-agent/cross-repo/high-risk task: refresh/validate existing
+`.ecc/goal/active-goal.yaml`, create-only `outcomes.jsonl`, and
+`resume-receipt.yaml`; run `ecc goal-runtime admit` with the actual runtime,
+controlled mode and registered session. No second goal schema or new rulebook.
 
-`C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL.md`
+## Execution
 
-Short embed:
+- Advance a required usable output or an observed blocker; maintain every required
+  component. Build frequent functional increments with eligible data/model and
+  functionality. Do necessary prerequisite, scientific, tenant/security and
+  integration checks; defer unrelated pipeline/governance/cleanup/research work.
+- Apply owner corrections to effective goal state, next action and worker
+  assignments before more implementation. Preserve approved UI/data/contracts.
+- Reuse valid current-session advance authorization for the named sequence and
+  budget. Do not re-ask covered implementation, fixes, integrations or releases.
+  New scope/cost/risk/shared-data/cloud/auth actions need their actual authority;
+  never interpret this skill as blanket approval.
+- Delegate independent required outputs with disjoint ownership, bounded costs,
+  closure reserve and available configured models; reuse workers/worktrees.
+  More agents are not automatically faster or cheaper. Only root integrates/releases.
+- At product checkpoints or suspected drift, use a bounded read-only evaluator;
+  retain deterministic ownership/outcome gates. Reject activity-only progress,
+  partial-MVP completion, stale instructions and unsupported forecasts.
+- Log meaningful evidence/decisions to existing task records, not per-action prose
+  or new Markdown logs. While active, summarize hourly and immediately on a missed
+  checkpoint: demonstrated outcome, full checklist, drift/budgets, blockers and
+  next acceptance attempt. Scheduling or automatic resumes require runtime proof.
+- Verify changed behavior and unresolved risk; stop unchanged reruns. After two
+  failed approaches, change tactics; never reset the checkpoint clock to hide delay.
+  Missing optional inputs block only dependent lanes. Do not stop the whole goal
+  while independent authorized work remains.
 
-`C:\Users\adelm\SeaBridgeAI\everything-claude-code\protocols\GOAL_PROTOCOL_SHORT.md`
+## Completion
 
-## Invocation Patterns
-
-- Claude Code: the user may type `/goal <task>` as a UI slash command. The agent
-  must not invoke `Skill(goal)`. If slash-command execution is unavailable or the
-  user typed `/goal` in plain text, apply this protocol manually or load this
-  skill by its exact name: `goal-default`.
-- Codex: `$goal <task>` or use this skill when slash commands are unavailable.
-- Gemini, OpenCode, Cursor, Copilot, Hermes Agent, Cline, and other agents: treat `goal:`, `/goal`, or any coding-agent task as wrapped by this protocol.
-
-If the runtime cannot invoke slash commands or skills, read the canonical protocol and apply it automatically.
-
-## Required Behavior
-
-Before implementation:
-
-1. State the persistent execution goal and objective.
-2. Define the Definition of Done.
-3. Define the validation plan.
-4. Identify expected work phases.
-5. Identify affected systems, dependencies, constraints, risks, expected artifacts, validation requirements, and likely edge cases.
-6. Define the stuck-task strategy for likely failure modes.
-7. Confirm approval gates for commits, pushes, installs, paid calls, migrations, production data, destructive actions, and protected branches.
-
-During execution:
-
-1. Run Analyze -> Plan -> Implement -> Test -> Verify -> Review -> Fix -> Re-test -> Re-verify -> Complete.
-2. Keep changes aligned with existing architecture and local repo conventions.
-3. Reuse existing SeaBridgeAI backend, frontend, AI-agent, schema, service, prompt, GSD, Spec Kit, skill, and workflow patterns.
-4. Run validation proportional to risk.
-5. Fix failures within scope and rerun validation.
-6. Detect premature completion risk, especially when a non-trivial task appears finished in under 10 minutes.
-7. If the same command or approach fails twice, inspect logs and change strategy instead of retrying blindly.
-
-Before completion:
-
-1. Verify the DoD against fresh evidence.
-2. Report changed files, checks run, validation results, skipped checks with reasons, blockers, and residual risks.
-3. Do not claim complete, fixed, production-ready, safe, passing, or wired without validation evidence.
-4. Do not summarize "done" unless validation passed or a hard blocker is documented.
-
-## Completion Evidence
-
-Every final report must include:
-
-- Files changed.
-- Commands run.
-- Tests run.
-- Validation results.
-- Errors encountered.
-- Fixes applied.
-- Unverified items.
-- Remaining risks.
-- Whether the Definition of Done is satisfied.
-
-If no tests were run, state why tests were not run, what validation was substituted, and what risk remains.
-
-## Stuck-Task Strategy
-
-When stuck:
-
-1. Stop the failing loop.
-2. Summarize the blocker.
-3. Identify root cause candidates.
-4. Try an alternate method.
-5. Reduce scope to isolate failure.
-6. Inspect logs/files manually.
-7. Use a different command or smaller test.
-8. Document what remains blocked if unresolved.
-
-No more than 2 identical retries are allowed without changing something meaningful.
-
-## Planning-Only Tasks
-
-For planning-only work:
-
-- Frame the goal and expected artifact.
-- Define a validation checklist for the plan.
-- Include pass/fail criteria.
-- Do not implement unless explicitly instructed.
-- Document assumptions and open decisions.
-
-## Review And QA Tasks
-
-For review, QA, and judge workflows:
-
-- Define pass/fail criteria before reviewing.
-- Lead with evidence-based findings.
-- Identify missing validation and regression risks.
-- If fixes are made, rerun validation.
-- Do not upgrade unverified claims to verified status.
-
-## Examples
-
-- `/goal fix backend failing tests and validate`
-- `/goal implement Sustainability Procurement module phase 1`
-- `/goal review frontend data-input flow and create a validated fix plan`
-- `/goal map codebase and produce implementation plan`
-- `/goal run full QA pass for Initiatives & Investment`
-- Good: `/goal implement procurement request API, frontend intake form, tests, and validation`
-  - Agent should respond with goal established, DoD, plan, execution phases, and validation plan, then work until tested or blocked with evidence.
-- Bad: "Implemented the feature" after editing one file without running tests or providing validation evidence.
-
-## SeaBridgeAI Safety
-
-This skill never authorizes commits, pushes, dependency installs, paid or live provider calls, migrations, production data changes, destructive operations, protected-branch work, or long-running training jobs. Preserve tenant isolation, permissions, audit trails, source traces, and missing-data behavior.
+Use `ecc goal-runtime final` for the actual runtime/session and evidence-based claim.
+Keep local/API/signed-in UI/Save-reopen/attachments/export/science/publication/deploy
+proof distinct. Blocked is not done; missing required outputs remain incomplete.
+Report changed/verified/unverified/remaining and measured forecast uncertainty.
+No minimum working duration, compulsory TDD/reviewer loop, or claim of native
+protection from instructions alone.

@@ -1,74 +1,59 @@
 ---
 name: parallel-execution-optimizer
-description: Use when the user wants a task done much faster through parallel work, concurrent agents, batched tool calls, isolated worktrees, or many independent verification lanes without losing correctness.
+description: Coordinate independent delivery lanes or perform a bounded read-only goal-drift review when a checkpoint is missed, scope changes or progress becomes activity-only. Not a mandatory reviewer for small edits.
 license: MIT
 metadata:
   origin: ECC
-tools: Read, Write, Edit, Bash, Grep, Glob
+allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 
 # Parallel Execution Optimizer
 
-Use this skill when speed comes from doing independent work at the same time:
-repo inspection, file reads, API checks, browser checks, build/test lanes,
-deploy readbacks, or multi-worktree implementation passes.
+Read the central `C:/Users/adelm/SeaBridgeAI/manageesg-backend/AGENTS.md`
+and its system import. Do not grant new permissions or change the owner goal.
 
-## Core Pattern
+## Independent delivery lanes
 
-Turn urgency into a dependency graph before acting.
+Use existing goal assignments: required output/observed blocker, acceptance,
+disjoint files/worktrees, current goal revision, lease and realistic budget with
+closure/integration reserve. Reuse suitable owned worktrees and completed workers;
+isolate occupied write surfaces, not every micro-task. Measure aggregate RAM/disk
+headroom and honor storage holds. Never stop another session or remove its artifacts.
 
-1. Define the objective and done signal.
-2. Split work into lanes.
-3. Mark each lane as parallel, sequential, or gated.
-4. Run independent reads/checks together.
-5. Keep writes isolated by file, worktree, branch, service, or dataset.
-6. Merge only after evidence shows the lanes are compatible.
-7. End with a verification table, not a vague speed claim.
+Select available configured models/effort for task difficulty and measured quality/
+cost: lighter models for bounded scans/simple edits, stronger ones for ambiguity or
+high-risk work. Requested Astra/Sol/Luna/Terra or Fable/Opus/Sonnet/Haiku families are
+preferences, not a promise all IDs/providers are available. Do not launch every
+family by default, evade quotas, or invent cost telemetry.
 
-## Lane Matrix
+Root dispatches independent lanes and joins verified results; workers never publish.
+Product/backbone checks remain proportional. Keep relevant long-running processes
+task-owned and deliberately polled; do not start needless databases/builds/services.
+Release only consolidated locally verified owned changes through existing gates.
 
-Before a large push, write a compact matrix:
+## Bounded goal-drift evaluator
 
-```text
-Lane | Can run in parallel? | Write surface | Risk | Verification
-Repo scan | yes | none | low | rg/git status outputs
-Backend patch | maybe | src/api | medium | unit tests
-Frontend patch | maybe | app/components | medium | browser screenshot
-Deploy readback | after build | remote service | high | live URL + logs
-```
+For long/multi-agent work, request one read-only independent review at a material
+product checkpoint, missed checkpoint, owner correction or suspected drift.
+Coalesce simultaneous triggers. Do not run a reviewer after every edit/tool call or
+repeat unchanged reviews. Default review allowance: up to 8 tool reads/5 minutes,
+zero CI dispatches/provider API calls; use the assignment's lower budget if present.
+Reuse a qualified available lower-cost worker; if delegation is unavailable, label
+a root self-check as not independent.
 
-Only run lanes in parallel when their write surfaces do not collide.
+Give only current goal/correction/plan, required-output checklist, owned diff and
+relevant fresh receipts/usage. Reviewer output:
+`goal_revision, verdict(aligned|drift|insufficient-evidence), findings(evidence,
+affected_output), next_required_action, uncovered_outputs, budget_risk`.
 
-## Execution Rules
+Reject unrequested edits, pipeline/governance activity without an output dependency,
+private inputs gating public models, tests substituting for runtime product proof,
+one-component completion of a larger MVP, missed checkpoints hidden by ETA prose,
+duplicate CI/worktrees, stale assignments and re-asking valid approval.
+Necessary science/security/tenant/persistence checks are not drift by themselves.
 
-- Batch file reads, searches, status checks, and metadata queries.
-- Use isolated worktrees for large unrelated implementation lanes.
-- Start long-running tests, builds, backfills, and deploys in separate sessions,
-  then poll them deliberately.
-- If a lane discovers a blocker that changes the plan, pause dependent lanes
-  and update the matrix.
-- Never let a background process outlive the turn unless the user explicitly
-  asked for a continuing service.
-- Do not parallelize destructive commands, migrations, writes to the same table,
-  or live customer-impacting deploys without an explicit gate.
-
-## Output Shape
-
-Use this when reporting:
-
-```text
-Parallel execution result:
-- Lanes run: 5
-- Lanes completed: 4
-- Blocked lane: deploy readback, waiting on DNS propagation
-- Fast path found: batched repo scan + focused tests
-- Verification: lint pass, unit pass, live smoke pass
-```
-
-## Failure Modes
-
-- More concurrency that creates conflicting edits.
-- Benchmarking the tool instead of the task.
-- Treating "fast" as done before correctness is proven.
-- Forgetting to poll running sessions.
-- Hiding skipped checks behind a success summary.
+The reviewer cannot edit, push, alter approvals, weaken checks or expand the goal.
+Root verifies findings and redirects affected lanes; continue independent work.
+Store the assessment in existing task records and report it in the next progress
+summary. The v3 controller's trusted independent critic/preservation interface is
+an enforcement seam; a reviewer message alone is neither approval nor native proof.
