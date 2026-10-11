@@ -25,10 +25,10 @@ const tests = [
   ['block adapters reject malformed and missing guard state; audit is explicitly advisory', () => {
     for (const runtime of ['claude','codex','copilot-local','copilot-cli','gemini','opencode']) {
       const blocked = spawnSync(process.execPath, [hook, runtime, 'guard', 'block', 'pre'], { cwd: workspace, input: '{malformed secret-example-never-log', encoding: 'utf8' });
-      assert.strictEqual(blocked.status, 2, runtime);
+      assert.strictEqual(blocked.status, runtime === 'codex' ? 0 : 2, runtime);
       assert.doesNotMatch(blocked.stdout + blocked.stderr, /secret-example/);
       const missing = spawnSync(process.execPath, [hook, runtime, 'guard', 'block', 'pre'], { cwd: workspace, input: JSON.stringify({ session_id: 'missing', tool_name: 'Write', tool_input: { file_path: 'outside' } }), encoding: 'utf8' });
-      assert.strictEqual(missing.status, 2, runtime);
+      assert.strictEqual(missing.status, runtime === 'codex' ? 0 : 2, runtime);
       const output = JSON.parse(missing.stdout);
       if (runtime === 'copilot-cli') assert.strictEqual(output.permissionDecision, 'deny');
       else if (runtime === 'gemini') assert.strictEqual(output.decision, 'deny');

@@ -116,10 +116,14 @@ function guardMain(runtime, mode, event, raw) {
     process.stdout.write(JSON.stringify({ decision: 'deny', reason }) + '\n');
   } else if (event === 'pre') {
     process.stdout.write(JSON.stringify({ hookSpecificOutput: { hookEventName: 'PreToolUse', permissionDecision: 'deny', permissionDecisionReason: reason } }) + '\n');
-  } else if (event === 'final') {
+  } else if (event === 'final' || (event === 'turn' && runtime === 'codex')) {
     process.stdout.write(JSON.stringify({ decision: 'block', reason }) + '\n');
   }
   process.stderr.write(reason + '\n');
+  // PowerShell -Command maps a native nonzero exit to 1. Codex treats that as
+  // a failed advisory hook and continues. Return a supported JSON denial with
+  // exit 0 so its native parser applies the control decision on Windows too.
+  if (runtime === 'codex') return 0;
   return 2;
 }
 
