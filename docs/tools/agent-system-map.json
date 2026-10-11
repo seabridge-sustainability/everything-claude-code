@@ -30,7 +30,7 @@
     ],
     "semanticIndex": "not-run"
   },
-  "sourceFingerprint": "55d2569307f7136d3beb8ee1a6a69514e6f6015116b93a6151e04a4b04749f98",
+  "sourceFingerprint": "921a7be8c69cd44044b022ea33f0c0412da244690180f04cb308c4508d6e4fd3",
   "sources": [
     {
       "path": "../manageesg-backend/AGENTS.md",
@@ -158,7 +158,7 @@
     },
     {
       "path": "schemas/coding-execution.schema.json",
-      "sha256": "099ddc0cff0cc450bc96eac2662243f68f823a72737b24e6db7e433aa7d363c5"
+      "sha256": "1108f9244a530cd7cefe9ff71c2c19b6c7db34fec67488917b8dde1a1abac915"
     },
     {
       "path": "schemas/goal-control.schema.json",
@@ -178,7 +178,7 @@
     },
     {
       "path": "scripts/agent-system-map.js",
-      "sha256": "39adf8b2b3d5baec84a824177dd25efb8f9a1b0e26873dba794b2574f368848c"
+      "sha256": "7a5355bca3b2ef526eb201b0c68ff737ef261a249ad95a9583d5ec5922604219"
     },
     {
       "path": "scripts/check-instruction-stack.js",
@@ -238,7 +238,11 @@
     },
     {
       "path": "scripts/lib/coding-execution.js",
-      "sha256": "b075848b7498d8975dfedeb212db2776609d97d7e5f47f088fcd40b780dd28be"
+      "sha256": "c1ddc4dff824c579015d296173f2b26f772f63dfc553ca25387af07cb45989ec"
+    },
+    {
+      "path": "scripts/lib/goal-control.js",
+      "sha256": "65773a0b6ec8ceac5fc4985f5ea4b56f4d4d7622f5f6e2f9a1d522c6d8fb157f"
     },
     {
       "path": "scripts/lib/memory-vault-format.js",
@@ -302,7 +306,7 @@
     },
     {
       "path": "tests/lib/coding-execution.test.js",
-      "sha256": "03480465182b76c191f2890dd491b3b6bf981159745d31fcb012a574f121843b"
+      "sha256": "14e38e20c50633f90c6e6eb6e999240a6022a8b78d1377328e1f9db644ed6a63"
     },
     {
       "path": "tests/lib/goal-control.test.js",
@@ -540,7 +544,7 @@
       "id": "file:schemas/coding-execution.schema.json",
       "type": "source",
       "path": "schemas/coding-execution.schema.json",
-      "sha256": "099ddc0cff0cc450bc96eac2662243f68f823a72737b24e6db7e433aa7d363c5"
+      "sha256": "1108f9244a530cd7cefe9ff71c2c19b6c7db34fec67488917b8dde1a1abac915"
     },
     {
       "id": "file:schemas/goal-control.schema.json",
@@ -570,7 +574,7 @@
       "id": "file:scripts/agent-system-map.js",
       "type": "source",
       "path": "scripts/agent-system-map.js",
-      "sha256": "39adf8b2b3d5baec84a824177dd25efb8f9a1b0e26873dba794b2574f368848c"
+      "sha256": "7a5355bca3b2ef526eb201b0c68ff737ef261a249ad95a9583d5ec5922604219"
     },
     {
       "id": "file:scripts/check-instruction-stack.js",
@@ -660,7 +664,13 @@
       "id": "file:scripts/lib/coding-execution.js",
       "type": "source",
       "path": "scripts/lib/coding-execution.js",
-      "sha256": "b075848b7498d8975dfedeb212db2776609d97d7e5f47f088fcd40b780dd28be"
+      "sha256": "c1ddc4dff824c579015d296173f2b26f772f63dfc553ca25387af07cb45989ec"
+    },
+    {
+      "id": "file:scripts/lib/goal-control.js",
+      "type": "source",
+      "path": "scripts/lib/goal-control.js",
+      "sha256": "65773a0b6ec8ceac5fc4985f5ea4b56f4d4d7622f5f6e2f9a1d522c6d8fb157f"
     },
     {
       "id": "file:scripts/lib/memory-vault-format.js",
@@ -756,7 +766,7 @@
       "id": "file:tests/lib/coding-execution.test.js",
       "type": "source",
       "path": "tests/lib/coding-execution.test.js",
-      "sha256": "03480465182b76c191f2890dd491b3b6bf981159745d31fcb012a574f121843b"
+      "sha256": "14e38e20c50633f90c6e6eb6e999240a6022a8b78d1377328e1f9db644ed6a63"
     },
     {
       "id": "file:tests/lib/goal-control.test.js",
@@ -1722,6 +1732,12 @@
     },
     {
       "from": "file:scripts/agent-system-map.js",
+      "to": "file:scripts/lib/goal-control.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
       "to": "file:scripts/lib/memory-vault-format.js",
       "type": "mentions-path",
       "evidence": "scripts/agent-system-map.js"
@@ -1970,6 +1986,12 @@
       "from": "file:scripts/lib/coding-execution.js",
       "to": "file:schemas/coding-execution.schema.json",
       "type": "mentions-path",
+      "evidence": "scripts/lib/coding-execution.js"
+    },
+    {
+      "from": "file:scripts/lib/coding-execution.js",
+      "to": "file:scripts/lib/goal-control.js",
+      "type": "verified-code-import",
       "evidence": "scripts/lib/coding-execution.js"
     },
     {
@@ -2676,8 +2698,8 @@
     }
   ],
   "build": {
-    "generatedAt": "2026-10-11T21:09:09.766Z",
-    "sourceCommit": "d692baf69ab7d9110b450ec2f7111b9da9a3c985",
+    "generatedAt": "2026-10-11T21:22:47.001Z",
+    "sourceCommit": "0803d0488fc6dcee4b83703c53a40247299121cf",
     "sourceDirty": false,
     "policyCommit": "998aa246ea2d26d23aeadadda47e8a84212dc5e7",
     "policyDirty": false
