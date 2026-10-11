@@ -325,3 +325,71 @@ defect remain explicitly outside this bounded correction.
 Additional continuation edits: `C:/Users/adelm/SeaBridgeAI/climada-stack/.cursor/rules/karpathy-guidelines.mdc` and `C:/Users/adelm/SeaBridgeAI/autoresearch/.claude/rules/berry.md`.
 
 Loading conclusions were checked against [Codex AGENTS.md discovery](https://learn.chatgpt.com/docs/agent-configuration/agents-md), [Claude memory/imports](https://code.claude.com/docs/en/memory), [Claude skills](https://code.claude.com/docs/en/skills), and [OpenCode rules](https://docs.opencode.ai/docs/rules/). Documentation describes supported loading, not observed obedience in this machine's clients.
+
+### Owner-authorized loop correction and publication (October 11)
+
+Re-read the Climate E529 and Nature October 11 assessments. The principal cause
+was failure to apply existing outcome/correction rules, compounded by stale
+effective assignments, optional-input scope drift, proof-stage confusion and
+weak budget accounting. The evidence does not establish that doctor-skills or
+Docker caused these failures, or establish exact historical wasted costs/RAM.
+
+The release owner has now recorded terminal outcomes and ended both leases,
+without changing product reservations. Backend b271412e5 completed its bound
+checks/deploy; frontend 1013fd2f CI failed. The manager did not repair unrelated
+frontend application failures. New instruction-only batches were pushed once:
+backend seabridge_development at 030cc3062da9e9bb67767c6c04942d97e8bb2f4c;
+frontend development at dd1ccc9647f4e652459d14c5a05b997f2bc86d98.
+Both were confirmed by ls-remote and normal pre-push hooks passed. Their new CI
+runs were pending at inspection; this is publication, not deployment acceptance.
+
+No new Markdown files, test templates or parallel policy sources were created.
+Existing coordinator scripts now accept --loop-target and repeatable --check-file:
+one exact regular-file scope, committed baseline checks, pinned SHA-256 digests,
+maker/check separation and an original scope fence that a moving upstream cannot
+erase. checkSession, check-write, check-changes and release-acquire enforce the
+contract when registered. It is cooperative, not OS isolation; omitting the
+contract in an unwrapped runtime remains an enforcement limitation.
+
+Checks were inspected and not edited: tests/lib/session-coordination.test.js
+SHA-256 8f491fc204fd94611d831a15bce04ac20fd9c591f48be67ebc6aa6abdaae16c4;
+scripts/eval-goal-runtime-offline.js SHA-256
+907f5e66b9b3440e39fcf4d77f4172354c8f3bcffd8d46746080281b30e9ec78.
+The actual CLI denied the maker's request to write its protected check.
+
+Offline results: existing coordination suite 18 passed/0 failed; nine focused
+in-memory/temporary-fixture guard counterexamples passed without adding a test
+file; existing outcome evaluation passed all four decisions for each of 18
+adapters (72/72), covering seven model-family telemetry labels, zero provider
+calls. The initial isolated run could not resolve ajv; reusing the installed
+runtime dependencies via NODE_PATH fixed the environment without an install.
+All 41 clean backend/frontend/ECC effective instruction stacks fit their existing
+budgets and report zero failures. These are gate/delivery checks, not live-model
+obedience measurements or scientific product scores.
+
+Strict compliance: Rule 1 PASS for each isolated implementation chunk, not a
+claim that this cross-repo maintenance release touches only one file overall.
+Rule 2 FAIL for OS-immutable checks (cooperative digest/scope protection passes).
+Rule 3 FAIL for a sandboxed autonomous score-and-revert loop: candidate execution
+remains disabled because the existing harness has no verified OS containment.
+No invented val_bpb or automatic rollback success is claimed. Rejected candidates
+stay unintegrated; the approved root-only fallback for an owned committed delta
+is git revert --no-edit <own-SHA> in a clean isolated worktree. Never apply the
+upstream reset recipe to a shared checkout. Rule 4 PASS for central authority:
+owner corrections replace assignments; unchanged tests stop; real workflow
+receipts, not green activity, determine completion. Recurring verified failures
+update AGENTS_SYSTEM.md, not additional rulebooks.
+
+The named AILabs-Dev/loop-engineering and AILabs-Dev/auto-loop public URLs returned
+404 and could not be independently verified. The audit uses the owner's four
+criteria and Karpathy's accessible program.md: fixed evaluator, train.py-only
+experiments, val_bpb baseline and bounded training. Its reset/indefinite-loop
+instructions do not override SeaBridge ownership, budget or safety controls.
+Reference: https://raw.githubusercontent.com/karpathy/autoresearch/master/program.md
+
+The source-bound system map was rebuilt from clean committed controls and the
+published backend policy: 83 nodes, 234 evidence-labelled edges, zero model calls.
+New generated digest detections were reviewed as digest-only false positives;
+no scanner/assertion was disabled. This does not refresh the separate large
+Graphify/FalkorDB graph. Shared dirty checkouts/running chats may still retain
+old files/context; satellite migrations and OS containment remain unproven.
