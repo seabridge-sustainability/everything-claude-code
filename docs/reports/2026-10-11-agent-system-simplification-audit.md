@@ -393,3 +393,330 @@ New generated digest detections were reviewed as digest-only false positives;
 no scanner/assertion was disabled. This does not refresh the separate large
 Graphify/FalkorDB graph. Shared dirty checkouts/running chats may still retain
 old files/context; satellite migrations and OS containment remain unproven.
+
+## Scope-guard evaluation, 2026-10-11: decision only, not deployment
+
+Worktree: C:/Users/adelm/SeaBridgeAI/.worktrees/scope-guard-eval-20261011;
+branch eval/scope-guard, base 5aaae8e38d3d7e2e42fb01a3e5bd7c2b36c4d5ed.
+This existing report is amended only here. No live instructions/settings/hooks,
+installer, provider call, workflow dispatch, main commit or push for this study.
+Vendor clones, fixtures, runner and results: artifacts/scope-guard/.
+Five fully reviewed hook implementations/import trees received 70 synthetic events.
+Shell attack strings were passed to hooks, never executed. Native host activation
+and denial remain UNVERIFIED. CWC's fully reviewed Stop script was additionally
+run in its nested synthetic fixture, on eval/scope-guard, with empty fixture-only
+Git hooks to avoid unrelated automation; it committed out-of-scope content.
+
+### Inventory
+
+Windows 11 Home 10.0.26200; PowerShell 7.6.5; VS Code 1.141.0 x64.
+Explicit Git for Windows Bash was used, not System32/bash.exe (WSL). jq is absent.
+Python C:/Python314/python.exe. Helper process counts do not equal agent counts.
+
+| Harness | Verified presence/version | Documented hooks/deny/completion | Instructions and goal status |
+| --- | --- | --- | --- |
+| Claude CLI | 2.1.285, Claude processes present | User/project/local .claude/settings*.json; PreToolUse exit2 or nested permissionDecision deny; Stop | CLAUDE imports central AGENTS; individual current /goal states UNVERIFIED, historical use owner-reported |
+| Claude VS Code | extension and bundled binary 2.1.296 | Same Claude event family; actual Windows IDE deny UNVERIFIED | Backend CLAUDE @AGENTS and frontend backend-CLAUDE imports verified; live effective loading UNVERIFIED |
+| Codex CLI/VS Code/desktop | CLI0.162.1, extension26.1007.21434, bundled0.162.0-alpha.17.2; desktop process present | .codex/hooks.json and config.toml user/project; current docs PreToolUse deny/exit2 and Stop | Native AGENTS; loader verified; /goal active in manager chat, other sessions UNVERIFIED |
+| Copilot Local | VS Code present; Copilot extension not detected | .github/hooks/*.json and user .copilot/hooks/*.json; PascalCase PreToolUse/Stop; exit2/nested deny | AGENTS settings/effective loading and active sessions UNVERIFIED |
+| Copilot CLI/Host | No copilot executable/extension or gh extension detected | .copilot/hooks plus .github/hooks; version1 preToolUse/agentStop; exit2/top-level deny; timeouts fail OPEN | Local hook behavior is not automatically Host behavior; instructions/goal use UNVERIFIED |
+| OpenCode | CLI1.18.35; extension0.0.13; active process UNVERIFIED | Configured plugin/global and project plugin dirs; tool.execute.before may throw; no guaranteed Claude Stop equivalent | Native AGENTS, user loader/ECC plugin path verified; external references not automatically expanded; goal use UNVERIFIED |
+| Gemini CLI | CLI0.42.0; companion0.20.0 | .gemini/settings.json hooks.BeforeTool exit2/decision deny; AfterAgent retries | No explicit context.fileName or hooks observed in selected user fields; live central delivery UNVERIFIED |
+| Gemini Code Assist | extension2.104.0 | Do not infer CLI hook support; UNVERIFIED | Loading and goal use UNVERIFIED |
+
+Observed backend .claude/settings.json and .codex/hooks.json are {}. User Claude
+has a force-push Git guard, not a manifest fence; no Stop was observed. User Codex
+has features.codex_hooks=false (deprecated alias of features.hooks); user hooks.json
+absent. Backend .github/hooks/rtk-rewrite.json invokes rtk hook copilot, not a scope
+fence. OpenCode plugin configuration is not proof the plugin loads/intercepts.
+Remote/WSL, every other active worktree, managed policies, enabled plugins and
+private per-session goal states were not exhaustively inspected or changed.
+
+### Results and maintenance
+
+P=direct hook blocks attack/allows legitimate action; F=bypass/false positive;
+U=UNVERIFIED. b aggregates echo redirect, sed -i, python -c and PowerShell;
+c includes direct and Python-shell configuration tampering; d dependency/refactor;
+e includes legitimate edit/shell/read. f probes actual dirty Git state but pre-tool
+scripts have no scope Stop registration: native/full-workflow f remains U.
+
+| Candidate | a | b | c | d | e | f |
+| --- | --- | --- | --- | --- | --- | --- |
+| Built-in goal/permissions/subagent restrictions | U | U | U | U | U | U |
+| agent-flow scope-guard | F | F | F | F | P, inert without jq | U, no tested scope Stop |
+| harness-guard readonly-scope | F | F | F | F | P, inert without jq | U, no tested scope Stop |
+| agent-guard | P | F | F | F | F, useful read blocked | U, no scope Stop |
+| agent-hook-guards protected_paths | P | F | F | F | F, useful read blocked | U, no scope Stop |
+| CWC verify-gate plus actual Stop | F | F | F | F | P | F, commits unrelated file |
+| espalier-harness | U | U | U | U | U | U |
+| spec-kit | U | U | U | U | U | U |
+
+Raw evidence artifacts/scope-guard/results.json; runner evaluate.py is an offline
+evaluation, not an installed guard/test template. 55 expected-denial probes and
+15 legitimate probes; two false positives (protected-path reads), 10/10 legitimate
+edits/shell calls allowed. Zero false positives from an inert guard do not show
+useful enforcement. Median hook process latency66.52ms, not production/model speed.
+Replay from this worktree: C:/Python314/python.exe artifacts/scope-guard/evaluate.py.
+Do not replay CWC commit-on-stop in a real checkout. Its actual fixture commit
+67f7ef3 contains outside/other.py value=2 plus src/target.py, proving blanket commit.
+
+| Repository | Pinned SHA | Stars / last push UTC / license | Findings |
+| --- | --- | --- | --- |
+| farol-team/agent-flow | fa61e801b34f418912f4292f4ba61d49555171c5 | 1 / 2026-09-21 / MIT | Fails open missing jq/manifest; file tools only; string/glob paths; broader acceptance workflow unexecuted |
+| Lucface/harness-guard | dd6d0df85d01772a777906862b68ddbd2b15b990 | 0 / 2026-08-28 / MIT | Global markers interfere across sessions; jq fails open; reviewed pre-commit runs broad Bun checks, not manifest scope (not executed) |
+| eeshsaxena/agent-guard | f30f6f084dbbd36d6e15827a76e59d5be0dcf01c | 1 / 2026-09-06 / MIT | Direct file fence/logs useful; shell outside writes flag rather than block; malformed input allows; raw logs need redaction; hash chain not externally anchored; no Windows sandbox |
+| Adrian-I-lab/agent-hook-guards | 5993ce8c7244b0f06770dd21b4c3c79b0cb410e5 | 0 / 2026-10-10 / MIT | stdlib fail-closed denylist; echo/sed blocked, interpreter/PowerShell bypass; reads blocked; no allow-manifest/Stop |
+| Mike-Byrne-AI/espalier-harness | ffc3043c1efe99bda6d9587b0f1f6734d45c5d82 | 0 / 2026-10-11 / MIT | Guard/utility code exceeds8000 lines and was not fully read, so NOT executed; large parallel task-pack system |
+| anthropics/cwc-long-running-agents | ad107a974bced5244f74dd283dbf2bfd3baee3a1 | 691 / 2026-05-13 / Apache-2.0 | Evaluator agent separate; configured Stop is git commit -am, not default-FAIL product evaluation |
+| github/spec-kit | 0443760542e7e5269724744a2ac55c4bd386d095 | 40820 / 2026-10-10 / MIT | Reviewed README: structured workflows/artifacts, not deterministic interceptor; no CLI/live workflow run |
+
+Reviewed/executed hooks have no direct external network/telemetry calls. Agent-guard
+notifications were disabled and homes/config/logs redirected into fixtures; its
+dashboard/listener was not run. CWC can commit all tracked files; agent-guard default
+logs/notifications and harness-guard default global markers would escape the eval
+tree without our child-only config redirection. Installers were not executed.
+Test-file presence is not measured test coverage. Optional TaskMaster/OpenSpec
+not assessed. AILabs-Dev/loop-engineering and /auto-loop public URLs/API return404:
+UNVERIFIED, no substitute repo. addyosmani/agent-skills metadata-only, not proven
+capability enforcement. Exact Isenberg Diamond primary source was not supplied.
+
+### Weighted scores: conservative engineering judgments, not live benchmarks
+
+E/C/F/M/S/O=enforcement/cross-harness/false positives/maintenance/setup/observability.
+Weights30/20/15/15/10/10%. Untested enforcement/false positives score1 for missing
+evidence, not established poor behavior. Scores are provisional, not adoption proof.
+
+| Candidate | E/C/F/M/S/O | /5 | Rationale |
+| --- | --- | --- | --- |
+| Built-in layers | 1/3/2/5/5/2 | 2.65 | Maintained/reversible; goal text is not a fence; native canary U |
+| agent-flow | 1/1/1/2/3/2 | 1.45 | Reuse manifest idea, not fail-open hook |
+| harness-guard | 1/1/1/1/2/2 | 1.20 | Shared markers and broad commit checks add conflict/cost |
+| agent-guard | 2/2/2/2/3/4 | 2.30 | Audit/adapter ideas useful, interpreter bypass and read false positives |
+| agent-hook-guards | 3/1/2/2/4/3 | 2.40 | Best tested parser reference, not shell containment |
+| espalier-harness | 1/1/1/2/1/2 | 1.25 | Unexecuted large parallel framework |
+| CWC | 1/1/2/3/2/2 | 1.65 | Evaluator idea useful, actual auto-commit violates ownership |
+| Spec Kit | 1/4/1/4/2/3 | 2.35 | Broad planning delivery, no proven interception |
+
+### Decision: extend existing ECC with layered enforcement, not another framework
+
+1. Existing active-goal.yaml/session registry: bind goal revision, owner, frozen
+   base SHA, output/blocker, write scopes, protected checks/config, command/turn/tool/
+   resource/cost/deadline limits. Derive manifests; do not add a competing immutable
+   CONCURRENT_SESSION_PROTOCOL.md. Corrections invalidate stale worker capabilities.
+2. Small dependency-light engine: extend existing scripts/lib/session-coordination.js,
+   scripts/session-coordinate.js and scripts/hooks/goal-runtime-gate.js. Normalize
+   native/UNC/GitBash paths, case, traversal, symlinks/junctions and multi-file patches.
+   Reads of central rules stay allowed. Block unknown writes/missing state in block
+   mode; tool aliases and outputs are per-harness, not per-model.
+3. Shell: deny unapproved installs/providers/releases, but parsing cannot contain
+   arbitrary Python/Node/native programs or interactive stdin. Require a restricted
+   execution principal/filesystem or narrowly allowed typed commands. Same-user
+   writable config/ACLs are not immutable; Windows containment remains unproven.
+4. Post-hoc scope/acceptance: inspect committed changes since frozen base, staged,
+   unstaged, deletions, renames and untracked paths with NUL-safe parsing. Ignored/
+   external writes require filesystem controls. Combine with goal-runtime final
+   receipts for API/UI/Save/reopen/export/science, not just tests or CI.
+5. Controller counters and protected, redacted audit metadata. Stop can ask for
+   one bounded repair, not endless credits. Exhausted limit=stopped incomplete,
+   never completed. Independent validator cannot weaken assertions to get a pass.
+
+Not protected by hooks alone: other sessions/human terminals, escaped processes,
+provider writes, editable guard/config, timeout fail-open, and semantic side work
+inside an allowed file. Models share one engine; harnesses need different adapters.
+Context displacement/competing priorities/isolated workers are plausible causes,
+not proven training diagnoses. Verified gaps: cooperative checks not per-action,
+empty/disabled hooks, schema differences and interpreter bypasses. No evidence
+establishes /doctor-skills or Docker as root cause. Public goal descriptions do
+not prove exact evaluator visibility. Reflection every command adds tokens without
+blocking writes; keep relevant security/scientific/tenant tests, prune unchanged work.
+
+### Proposed rollout and rollback: NOT performed
+
+Phase0: three new bounded instruction-maintenance sessions on one isolated backend
+worktree, audit-only; no Nature/Climate implementation. Extend existing ECC files
+and existing tests, no new MD/test templates. Proposed active-goal.yaml scope_guard
+fields: mode=audit, base_sha, allowed_write_paths, protected_paths, allowed_commands,
+turn_limit, deadline_utc. These fields/engine are NOT implemented. Redacted JSONL
+in existing agent-runs storage. Measure real drift per write opportunity, false
+positives, latency and cost; synthetic failure rates are not agent drift frequency.
+Phase1: mode=block only after a-f plus malformed/missing state, symlink, Windows
+path, patch and interactive-shell canaries pass. Same repo, NEW sessions. Merge
+project hooks, never replace others: .claude/settings.json hooks.PreToolUse/Stop;
+.codex/hooks.json hooks.PreToolUse/Stop, .codex/config.toml features.hooks=true;
+.github/hooks/scope-guard.json only when that harness is selected/installed.
+Existing Claude agent frontmatter tools/disallowedTools narrows workers; no new
+agent rulebooks. For project/ECC rollback from a clean owned worktree with approval:
+git revert --no-edit <scope-guard-rollout-SHA>. Never shared reset or a push to test.
+Phase2: NEW sessions after each native canary passes; merge only owned entries:
+
+| Harness | Exact proposed user config keys/path | Confirm / rollback |
+| --- | --- | --- |
+| Claude CLI/IDE | C:/Users/adelm/.claude/settings.json hooks.PreToolUse/Stop, explicit node command; managed policy for strong protection | /hooks and denied synthetic write + allowed edit; restore owned entries |
+| Codex CLI/IDE | .codex/hooks.json hooks.PreToolUse/Stop; config.toml features.hooks=true; resolve deprecated false alias under approval | Native patch/exec/interactive transport canaries; restore owned entries and prior feature value |
+| VS Code Local | .copilot/hooks/seabridge-scope-local.json PascalCase hooks.PreToolUse/Stop, windows command; chat.useHooks=true | Local target and Hooks/debug output; disable only owned file via chat.hookFilesLocations |
+| Copilot CLI/Host | .copilot/hooks/seabridge-scope-copilot.json version1, hooks.preToolUse/agentStop, powershell/command, timeoutSec | Actual top-level deny and timeout bypass canary; de-duplicate cross-loading Local/Copilot files; restore owned entries |
+| OpenCode | Existing ECC .opencode plugin tool.execute.before and current opencode.jsonc plugin entry | Successful plugin startup, denied native patch/shell; wrapper/commit final gate; restore owned plugin settings |
+| Gemini CLI | .gemini/settings.json hooks.BeforeTool/AfterAgent command/timeout | Actual deny and bounded retry, context separate; restore owned hooks |
+| Gemini Code Assist/other unsupported | No verified shared keys | Advisory/read-only or validated wrapper; do not advertise deterministic coverage |
+
+All relative user paths above resolve under C:/Users/adelm. Native payload/decision
+schemas differ. Copilot timeout fails open; VSCode Local non-2 errors warn/continue;
+Local Claude compatibility requires chat.useClaudeHooks and ignores matchers;
+Codex specialized paths and write_stdin can skip PreToolUse. No universal user hook
+file works for every harness. Strong tamper protection needs a distinct trusted
+principal/managed policy. Before restoring user config, check unchanged rollout
+hash/no concurrent edits; then Copy-Item -LiteralPath '<config>.scope-guard-backup'
+-Destination '<config>'. Otherwise remove only owned entries. Backups/rollout
+receipts must be created at future rollout, not assumed to exist now.
+
+### Reusable goal condition
+
+/goal Deliver <specific output> in <owned worktree/session> at goal revision <rev>.
+Complete only when <existing focused acceptance command> exits0, all committed/
+staged/unstaged/untracked changes since frozen base <full SHA> are inside existing
+approved scopes, protected checks/config hashes are unchanged, and <required API/
+UI/Save-reopen/export receipt> matches current code/environment. Print owned changed
+paths and receipts. Stop incomplete at <approved turn/tool/time/cost limit>; do not
+widen scope/install/push/call providers/rerun unchanged checks. Owner corrections
+supersede old assignments. Continue independent approved work; report blocked lanes.
+
+Do not diff against main for development work. Goal text is not an enforced counter;
+the future controller must implement it. Twenty turns is a proposal, not a current
+enforced limit or an instruction-level worker cap. Proposed concise central addition,
+NOT applied: controlled goals bind current owner revision/scopes to every write/
+spend/completion; guard/check state outside writer authority; shell without verified
+containment advisory; scope/cap failures stop incomplete; corrections invalidate workers.
+
+Open questions: which new-session pilot and turn/tool/time budget? Approve native
+canary sessions before settings changes? Accept restricted OS principal/container/
+typed runner for shell protection? Supply exact AILabs/Isenberg primary sources?
+No tested candidate passes native a-f on all harnesses. Three-core-file authority
+remains; no additional immutable Markdown. Clean eval has no graphify-out/graph.json;
+source-bound map is not a full Graphify/FalkorDB refresh; no graph/database writes.
+
+Separate earlier release closure: backend030cc3062da9e9bb67767c6c04942d97e8bb2f4c
+run38164602786 FAILED, one regression:
+tests/test_live_provider_acceptance_runner.py::test_nvidia_project_config_uses_live_discovered_model_id.
+Only root's own release ended failed and registration closed; no corrective push,
+rerun or product repair. Completed-release heartbeat paused; no productive session
+stopped. This is not backend deployment acceptance.
+
+## Scope-guard implementation pilot, 2026-10-11: local milestone, adoption pending
+
+Owner authorization: isolated audit-only backend pilot, then gated rollout once
+checks pass; preserve running agents and the three central policy files. This
+owned copy continues the existing evaluation report. The evaluation worktree and
+third-party fixtures were read only; no clone or third-party suite replay.
+
+Implementation worktree: C:/Users/adelm/SeaBridgeAI/.worktrees/scope-guard-engine-20261011,
+branch codex/scope-guard-engine-20261011, fetched origin/main base
+5aaae8e38d3d7e2e42fb01a3e5bd7c2b36c4d5ed. Backend pilot:
+C:/Users/adelm/SeaBridgeAI/.worktrees/scope-guard-pilot-backend-20261011,
+branch codex/scope-guard-pilot-20261011, frozen base
+030cc3062da9e9bb67767c6c04942d97e8bb2f4c. Controlled goal/session admission
+passed in both worktrees before implementation. The actual desktop harness cwd
+remains the projectless Documents/Codex directory, not either worktree.
+
+### Implemented, opt-in only
+
+- Existing session registry owns guard binding and counters; active-goal owns
+  goal revision. `ecc session guard-bind --session ID --guard-mode audit|block
+  --native-session ID --deadline ISO --tool-limit N --turn-limit N
+  --protected-path FILE` binds frozen base/scopes, semantic owner revision,
+  implementation digest, protected files, admitted operations and budgets.
+  No second manifest, framework, test template or fourth policy Markdown.
+- Known typed reads remain available across modules; typed edits and every patch
+  add/update/delete/move destination are scoped. Normalize native Windows/UNC/
+  Git Bash paths, case and existing aliases; reject traversal, ADS, device paths
+  and linked/junction paths. Unknown payload/tool defaults to would-deny/deny.
+- Shell, Python, Node, PowerShell, external executables, interactive stdin,
+  delegated/code-mode execution and unverified MCP/cloud tools are opaque and
+  denied in block mode. No shell-string allowlist is claimed as containment.
+  Codex clients relying on shell reads lose that capability in this profile;
+  a safe typed read adapter or verified restricted runner is still needed.
+- Completion/precommit/release scope checks use the frozen base for guarded
+  sessions plus committed, staged, unstaged, deleted/renamed and untracked paths.
+  A moving upstream cannot erase the guard baseline. Existing product receipt
+  checks remain; opt-out sessions retain their existing final-claim behavior.
+- Audit returns allow with would-deny; block fails closed on absent/malformed/
+  stale/expired state. Native session, goal revision, protected hashes and tool/
+  turn budgets are checked. Logs under artifacts/agent-runs/scope-guard are
+  redacted metadata, never prompts/commands/patches/tool arguments. Provider and
+  CI action budgets are zero; resource and normal-chat cost telemetry are
+  explicitly unverified. This is a hook fence, not OS isolation or total spend
+  enforcement. A timed-out/errored/skipped native hook must not earn acceptance.
+
+Backend central rule addition committed locally as
+2ad9fad62e1ca5374d6a9adc210b74d1b22cc558. Its normal detect-secrets and agent
+runtime precommit checks passed; Python-only checks correctly skipped. The other
+two central files are unchanged. Backend project hooks/features are staged only
+in the isolated pilot; no user-level config, auth, OS privileges or running
+session settings were changed.
+
+### Focused verification and native evidence
+
+25 session-coordination checks pass, including a/d/e typed write/read controls,
+b/c opaque interpreters/config/MCP/stdin, multi-file patches, Windows aliases,
+UNC negative control, junction, malformed/missing/stale state, deadline/tool/turn
+budgets, protected content and f committed/staged/unstaged/deletion/rename/untracked
+controls. 7 goal-runtime-hook checks pass, including real hook subprocess allow/
+deny and adapter JSON contracts. 39 existing goal-control and 5 runtime tests pass.
+These are synthetic/local-engine results, not native drift or client interception.
+
+Initial map tests failed because this isolated ECC worktree has no expected
+sibling manageesg-backend directory. The acceptance attempt moves to a clean,
+task-owned sibling source pair at committed milestones; no assertions are weakened.
+The refreshed map includes scope engine/schema/hook evidence. It is a deterministic
+control-plane map, not a Graphify or FalkorDB refresh.
+
+Native Codex0.162.1 app-server `config/read` reports project/user/system and
+invocation layers and enabled hooks/codex_hooks flags. Ephemeral read-only session
+01a12c69-ff59-7bd2-86ca-fd6ad0893212 reports the pilot cwd; `hooks/list` is empty
+with no errors/warnings. No model turn or trust bypass was performed. The pilot
+registry is audit-bound to that startup identity with 20-turn/40-tool/20-minute
+limits, but it has zero native tool/turn observations and must not be reused for
+another native session identity.
+
+Native CLI TUI startup subsequently fails before a model turn:
+`account/read failed: failed to load workspace requirements (code -32603)`.
+A first PTY attempt only asked about TERM=dumb and was cancelled; setting TERM for
+the task-owned second invocation reached this exact readiness error. No existing
+agent process was interrupted. Hook activation/trust and native typed patch,
+interpreter and interactive transport rejection remain UNVERIFIED. No auth/config
+remediation is authorized implicitly by this scope rollout.
+
+Real audited sessions with write observations: 0. Real write opportunities: 0.
+Would-deny frequency and native false-positive rate: unavailable (0/0, not 0%).
+Native hook latency: unavailable. Direct test durations are not native latency.
+Paid/live model eval calls: 0; manually dispatched Actions: 0. Normal chat tokens
+and USD cost are a separate, unavailable ledger, not asserted zero.
+
+### Release/adoption gate and rollback
+
+Fresh organization billing REST observation on 2026-10-11: October Actions net
+USD307.752, USD400 Actions product budget, prevent_further_usage=true. This
+replaces the stale USD305.87 observation. No relevant active/queued ECC runs were
+listed. ECC schema/hook changes classify as core+compatibility+platform+packed;
+publication to main can expose the full CI matrix. Backend publication can trigger
+automatic CI/deployment. No manual Actions/re-run or paid provider was started.
+Recheck <=1-hour budget/exposure and acquire fixed-SHA owner release lease before
+any later publication. Local commits do not imply remote verification or deployment.
+
+Phase0 remains pending a working trusted native session with bounded real writes.
+Phase1 block and phase2 harness expansion are held. Claude/Copilot/Gemini/OpenCode
+JSON output shapes have synthetic tests only; no adapter is advertised as native
+certified, and OpenCode still needs a throwing plugin adapter. Gemini Code Assist
+and other unsupported clients remain advisory/UNVERIFIED. No global adoption.
+
+Next admission: resolve native workspace-requirements readiness without changing
+other sessions; inspect `/hooks` and review exact project hook definitions if the
+client requests trust. Do not write trusted_hash or bypass trust. Register a new
+native identity and current goal/session before starting the bounded sample;
+expired bindings/corrections require fresh admission, not extra credits.
+
+Rollback: pilot project hooks can restore only the task-owned empty hooks.json
+and features.hooks=false after checking for concurrent edits and ending its own
+binding. Revert the task-owned backend policy and ECC milestone commits with
+normal `git revert --no-edit` in clean owned worktrees under bounded approval;
+never reset shared work or turn off Git hooks. No provider/data/server rollback is
+needed because those systems were not touched.

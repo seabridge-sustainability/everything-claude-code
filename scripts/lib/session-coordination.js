@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
 const { writeFileAtomic } = require('./atomic-write');
+const crypto = require('node:crypto');
 
 function git(cwd, args) {
   const output = execFileSync('git', args, { cwd, encoding: 'utf8', windowsHide: true,
@@ -187,6 +188,7 @@ function checkSession({ cwd, sessionId, now = Date.now() }) {
   const session = current(state, repo, sessionId, now);
   conflicts(state, repo, session.scopes, session.id, now);
   verifyLoop(repo, session);
+  if (session.guard) verifyGuard(repo, session, session.guard.mode, now);
   return session;
 }
 function changedPaths(repo, base, upstream) {
@@ -199,9 +201,199 @@ function changedPaths(repo, base, upstream) {
   // Both names of renames are checked (no rename detection); include unstaged/untracked files.
   const outputs = [
     ['diff', '--name-only', '--no-renames', '-z', base, '--'],
+    ['diff', '--cached', '--name-only', '--no-renames', '-z', base, '--'],
+    ['diff', '--name-only', '--no-renames', '-z', '--'],
     ['ls-files', '--others', '--exclude-standard', '-z'],
   ].map(args => git(repo.root, args));
   return [...new Set(outputs.flatMap(output => output.split('\0').filter(Boolean)))];
+}
+
+// This is a typed-tool fence, not a shell parser or OS sandbox. The session
+// registry owns the contract/counters; active-goal owns the owner revision.
+function goalRevision(repo) {
+  const { readStructuredFile, assertDocument, validateGoalSemantics } = require('./goal-control');
+  const file = path.join(repo.root, '.ecc/goal/active-goal.yaml');
+  safePath(repo, '.ecc/goal/active-goal.yaml');
+  const goal = readStructuredFile(file);
+  assertDocument('goal', goal, 'scope guard goal');
+  validateGoalSemantics(goal);
+  const revision = { goal_id: goal.goal_id, objective: goal.objective,
+    current_priority: goal.current_priority, non_goals: goal.non_goals,
+    owner_corrections: goal.owner_corrections, user_visible_proofs: goal.user_visible_proofs };
+  return { id: goal.goal_id, revision: crypto.createHash('sha256').update(JSON.stringify(revision)).digest('hex') };
+}
+function normalizeToolPath(repo, value, cwd = repo.root) {
+  if (typeof value !== 'string' || !value || /[\x00-\x1f]/.test(value)) throw new Error('invalid tool path');
+  let input = value.replace(/\\/g, '/');
+  if (process.platform === 'win32') input = input.replace(/^\/([a-z])\//i, '$1:/');
+  // Reject ambiguous Win32 device/extended paths, ADS, dot/space aliases and
+  // traversal even when a lexical resolve would bring them back into scope.
+  if (/^\/\/[?.]\//.test(input) || input.split('/').some(p => p === '..' || (p && /[. ]$/.test(p)))) throw new Error('ambiguous tool path');
+  const absolute = path.resolve(cwd, input);
+  const relative = path.relative(repo.root, absolute).replace(/\\/g, '/');
+  safePath(repo, relative); // Reject links before resolving an existing alias.
+  let parent = absolute;
+  const missing = [];
+  while (!fs.existsSync(parent)) {
+    missing.unshift(path.basename(parent));
+    parent = path.dirname(parent);
+  }
+  // Expand existing Win32 short-name aliases before protected-path comparisons.
+  const resolved = path.join(fs.realpathSync.native(parent), ...missing);
+  return safePath(repo, path.relative(repo.root, resolved).replace(/\\/g, '/'));
+}
+function patchPaths(input) {
+  if (typeof input !== 'string' || input.length > 1024 * 1024) throw new Error('invalid patch');
+  const lines = input.replace(/\r\n/g, '\n').trimEnd().split('\n');
+  if (lines.shift() !== '*** Begin Patch' || lines.pop() !== '*** End Patch') throw new Error('invalid patch');
+  const paths = [];
+  let inFile = false;
+  for (const line of lines) {
+    const header = /^\*\*\* (?:Add|Update|Delete) File: (.+)$/.exec(line);
+    const move = /^\*\*\* Move to: (.+)$/.exec(line);
+    if (header) { paths.push(header[1]); inFile = true; }
+    else if (move && inFile) paths.push(move[1]);
+    else if (line.startsWith('*** ') && line !== '*** End of File') throw new Error('invalid patch');
+    else if (!inFile) throw new Error('invalid patch');
+  }
+  if (!paths.length) throw new Error('empty patch');
+  return paths;
+}
+function typedAction(payload) {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) throw new Error('invalid event');
+  const tool = String(payload.tool_name || payload.toolName || '').replace(/^functions\./, '');
+  const input = payload.tool_input ?? payload.toolInput;
+  if (['Read', 'Glob', 'Grep', 'read_file'].includes(tool)) return { operation: 'read', paths: [] };
+  if (['apply_patch', 'ApplyPatch'].includes(tool)) {
+    return { operation: 'patch', paths: patchPaths(typeof input === 'string' ? input : input?.patch ?? input?.input) };
+  }
+  if (['Write', 'Edit', 'write_file', 'edit_file'].includes(tool)) {
+    if (!input || typeof input !== 'object' || typeof input.file_path !== 'string') throw new Error('unknown write payload');
+    return { operation: 'write', paths: [input.file_path] };
+  }
+  if (tool === 'MultiEdit') {
+    if (!Array.isArray(input?.edits) || !input.edits.length) throw new Error('unknown write payload');
+    return { operation: 'write', paths: input.edits.map(item => item.file_path) };
+  }
+  // Interpreters, external executables, MCP/cloud, transport and delegated
+  // execution are opaque. A command allowlist would not contain their effects.
+  throw new Error('opaque tool requires a verified restricted execution boundary');
+}
+let guardValidator;
+function implementationDigest() {
+  const root = path.resolve(__dirname, '../..');
+  const files = ['scripts/lib/session-coordination.js', 'scripts/hooks/goal-runtime-gate.js',
+    'scripts/goal-runtime-bridge.js', 'schemas/goal-control.schema.json'];
+  return crypto.createHash('sha256').update(files.map(file =>
+    crypto.createHash('sha256').update(fs.readFileSync(path.join(root, file))).digest('hex')).join('\n')).digest('hex');
+}
+function validateGuard(guard) {
+  const Ajv = require('ajv');
+  const schema = require('../../schemas/goal-control.schema.json');
+  if (!guardValidator) {
+    const ajv = new Ajv({ strict: false });
+    ajv.addSchema(schema);
+    guardValidator = ajv.compile({ $ref: 'ecc.goal-control.v1#/$defs/scopeGuard' });
+  }
+  if (!guardValidator(guard) || !Number.isFinite(guard.deadline)) throw new Error('invalid scope guard state');
+  guard.scopes.forEach(scope);
+  for (const check of guard.protected) {
+    if (!check || typeof check.path !== 'string' || !/^[a-f0-9]{64}$/.test(check.sha256)) throw new Error('invalid protected state');
+    scope(check.path);
+  }
+}
+function bindGuard(repo, session, options, now) {
+  if (session.guard) throw new Error('guard already bound; use a new session after a correction or mode change');
+  if (!['audit', 'block'].includes(options.guardMode)) throw new Error('guard-mode must be audit or block');
+  const goal = goalRevision(repo);
+  const deadline = Date.parse(options.deadline);
+  const guard = { mode: options.guardMode, goalId: goal.id, goalRevision: goal.revision,
+    implementationSha256: implementationDigest(),
+    nativeSessionId: options.nativeSessionId || session.id,
+    base: session.base, scopes: [...session.scopes], deadline,
+    protected: [...new Set(options.protectedPaths || [])].map(file => ({ path: safePath(repo, file), sha256: checkDigest(repo, file) })),
+    allowedOperations: options.allowedOperations || ['read', 'write', 'patch'],
+    toolLimit: Number(options.toolLimit), turnLimit: Number(options.turnLimit), tools: 0, turnIds: [],
+    budgets: { providerUsd: 0, ciRuns: 0, resourceTelemetry: 'unverified' } };
+  validateGuard(guard);
+  if (deadline <= now || deadline > session.expiresAt) throw new Error('guard deadline must be within the active lease');
+  session.guard = guard;
+  return guard;
+}
+function verifyGuard(repo, session, mode, now) {
+  const guard = session.guard;
+  validateGuard(guard);
+  if (guard.implementationSha256 !== implementationDigest()) throw new Error('protected guard/check configuration changed');
+  if (guard.mode !== mode || guard.base !== session.base || JSON.stringify(guard.scopes) !== JSON.stringify(session.scopes)) throw new Error('scope guard binding mismatch');
+  const goal = goalRevision(repo);
+  if (goal.id !== guard.goalId || goal.revision !== guard.goalRevision) throw new Error('stale owner goal revision');
+  if (now >= guard.deadline || guard.tools > guard.toolLimit || guard.turnIds.length > guard.turnLimit) throw new Error('scope guard budget exhausted');
+  verifyLoop(repo, session);
+  for (const check of guard.protected) if (checkDigest(repo, check.path) !== check.sha256) throw new Error('protected guard/check configuration changed');
+  return guard;
+}
+function guardEvent(repo, state, options, now) {
+  const mode = options.guardMode;
+  if (!['audit', 'block'].includes(mode)) throw new Error('trusted guard mode required');
+  const started = performance.now();
+  let session, action, reason = null;
+  try {
+    session = current(state, repo, options.sessionId, now);
+    conflicts(state, repo, session.scopes, session.id, now);
+    const guard = verifyGuard(repo, session, mode, now);
+    const nativeId = options.payload?.session_id || options.payload?.conversation_id;
+    if (nativeId !== guard.nativeSessionId) throw new Error('native session identity mismatch');
+    if (options.event === 'turn') {
+      const turn = options.payload?.turn_id;
+      if (typeof turn !== 'string' || !turn || turn.length > 100) throw new Error('missing native turn identity');
+      if (!guard.turnIds.includes(turn)) guard.turnIds.push(turn);
+      if (guard.turnIds.length > guard.turnLimit) throw new Error('scope guard budget exhausted');
+      action = { operation: 'turn' };
+    } else if (options.event === 'final') {
+      const paths = changedPaths(repo, guard.base);
+      if (paths.length) ownedPaths(repo, session, paths);
+      action = { operation: 'final' };
+    } else if (options.event === 'pre') {
+      guard.tools += 1;
+      if (guard.tools > guard.toolLimit) throw new Error('scope guard budget exhausted');
+      const cwd = options.payload?.cwd || repo.root;
+      if (canonical(cwd) !== repo.root) throw new Error('native cwd differs from owned worktree');
+      action = typedAction(options.payload);
+      if (!guard.allowedOperations.includes(action.operation)) throw new Error('operation not admitted');
+      const toolCwd = options.payload?.tool_input?.workdir || options.payload?.tool_input?.cwd || cwd;
+      for (const value of action.paths) {
+        const relative = normalizeToolPath(repo, value, toolCwd);
+        if (/^(?:\.git|\.ecc|\.codex|\.claude|\.gemini|\.copilot)(?:\/|$)|^\.github\/hooks(?:\/|$)/i.test(relative)
+            || guard.protected.some(check => overlaps(relative, check.path))) throw new Error('protected guard/check configuration write');
+        ownedPaths(repo, session, [relative]);
+      }
+    } else throw new Error('unknown guard event');
+  } catch (error) {
+    // Never echo parser errors, which can contain source snippets or secrets.
+    reason = ['invalid scope guard state', 'invalid protected state', 'scope guard binding mismatch',
+      'stale owner goal revision', 'scope guard budget exhausted', 'protected guard/check configuration changed',
+      'native session identity mismatch', 'missing native turn identity', 'native cwd differs from owned worktree',
+      'operation not admitted', 'protected guard/check configuration write', 'unknown guard event',
+      'invalid event', 'invalid patch', 'empty patch', 'unknown write payload',
+      'opaque tool requires a verified restricted execution boundary', 'invalid tool path', 'ambiguous tool path',
+      'outside owned write scope', 'linked path is not an owned scope',
+      'session missing, closed, or expired', 'session belongs to another worktree']
+      .find(code => error.message.startsWith(code)) || 'scope guard state/input unavailable or malformed';
+  }
+  const decision = { allowed: mode === 'audit' || reason === null, wouldDeny: reason !== null,
+    mode, event: options.event, operation: action?.operation || 'unknown', reason,
+    elapsedMs: Math.round((performance.now() - started) * 100) / 100 };
+  // Redacted metadata only. No tool arguments, command text, patch content,
+  // paths, prompts or credential-bearing transport are recorded.
+  const logDir = 'artifacts/agent-runs/scope-guard';
+  safePath(repo, logDir);
+  fs.mkdirSync(path.join(repo.root, logDir), { recursive: true });
+  const logPath = `${logDir}/${id(options.sessionId)}.jsonl`;
+  safePath(repo, logPath);
+  fs.appendFileSync(path.join(repo.root, logPath), JSON.stringify({ at: new Date(now).toISOString(), session: options.sessionId,
+    mode, event: decision.event, operation: decision.operation, wouldDeny: decision.wouldDeny,
+    reasonCode: reason ? reason.split(':')[0].replace(/[^a-zA-Z -]/g, '').slice(0,80) : null, elapsedMs: decision.elapsedMs }) + '\n');
+  return decision;
 }
 function ownedPaths(repo, session, paths) {
   if (!paths.length) throw new Error('at least one --path required');
@@ -217,6 +409,7 @@ function execute(command, options = {}) {
     limitation: 'same Git clone and cooperating wrappers only; no permission grant or proof of CI/deployment' };
   const sessionId = id(options.sessionId);
   return transaction(repo, state => {
+    if (command === 'guard-event') return guardEvent(repo, state, options, now);
     if (command === 'register') {
       if (state.sessions.some(s => s.id === sessionId)) throw new Error('session ID already exists; renew or use a new ID');
       const scopes = (options.scopes || []).map(item => safePath(repo, item));
@@ -241,14 +434,16 @@ function execute(command, options = {}) {
     const session = current(state, repo, sessionId, now);
     conflicts(state, repo, session.scopes, sessionId, now);
     if (command !== 'close' && command !== 'release-end') verifyLoop(repo, session);
+    if (command === 'guard-bind') return bindGuard(repo, session, options, now);
     if (command === 'check-write') {
       ownedPaths(repo, session, options.paths || []);
       return { allowed: true, session: sessionId, paths: options.paths };
     }
     if (command === 'check-changes') {
+      if (session.guard) verifyGuard(repo, session, session.guard.mode, now);
       // A moving remote tip must not erase an experiment's original scope fence.
       const paths = changedPaths(repo, session.loop ? session.loop.baseline : session.base,
-        session.loop ? undefined : options.upstream);
+        session.loop || session.guard ? undefined : options.upstream);
       if (paths.length) ownedPaths(repo, session, paths);
       return { allowed: true, session: sessionId, paths };
     }
@@ -273,6 +468,7 @@ function execute(command, options = {}) {
       return session;
     }
     if (command === 'release-acquire') {
+      if (session.guard) verifyGuard(repo, session, session.guard.mode, now);
       if (state.release) throw new Error(`release owned by ${state.release.owner}; expiry never proves CI/deploy stopped`);
       const branch = requireText(options.branch, 'branch');
       git(repo.root, ['check-ref-format', `refs/heads/${branch}`]);
@@ -280,7 +476,7 @@ function execute(command, options = {}) {
       if (options.candidate !== candidate) throw new Error('candidate must equal the current full HEAD SHA');
       if (options.upstream && options.upstream !== `refs/remotes/origin/${branch}`) throw new Error('upstream must match the release target branch');
       const paths = changedPaths(repo, session.loop ? session.loop.baseline : session.base,
-        session.loop ? undefined : options.upstream);
+        session.loop || session.guard ? undefined : options.upstream);
       if (paths.length) ownedPaths(repo, session, paths);
       if (git(repo.root, ['status', '--porcelain'])) throw new Error('release requires a clean worktree');
       const actionsBudget = actionsBudgetReceipt(options, now);
@@ -310,4 +506,4 @@ function execute(command, options = {}) {
     throw new Error(`unknown session command: ${command}`);
   });
 }
-module.exports = { execute, checkSession, repository, overlaps, scope };
+module.exports = { execute, checkSession, repository, overlaps, scope, normalizeToolPath, patchPaths, typedAction, validateGuard };

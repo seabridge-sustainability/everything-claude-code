@@ -22,6 +22,24 @@ function invoke(runtime, phase, payload, cwd) {
 
 const workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-goal-hook-'));
 const tests = [
+  ['block adapters reject malformed and missing guard state; audit is explicitly advisory', () => {
+    for (const runtime of ['claude','codex','copilot-local','copilot-cli','gemini','opencode']) {
+      const blocked = spawnSync(process.execPath, [hook, runtime, 'guard', 'block', 'pre'], { cwd: workspace, input: '{malformed secret-example-never-log', encoding: 'utf8' });
+      assert.strictEqual(blocked.status, 2, runtime);
+      assert.doesNotMatch(blocked.stdout + blocked.stderr, /secret-example/);
+      const missing = spawnSync(process.execPath, [hook, runtime, 'guard', 'block', 'pre'], { cwd: workspace, input: JSON.stringify({ session_id: 'missing', tool_name: 'Write', tool_input: { file_path: 'outside' } }), encoding: 'utf8' });
+      assert.strictEqual(missing.status, 2, runtime);
+      const output = JSON.parse(missing.stdout);
+      if (runtime === 'copilot-cli') assert.strictEqual(output.permissionDecision, 'deny');
+      else if (runtime === 'gemini') assert.strictEqual(output.decision, 'deny');
+      else assert.strictEqual(output.hookSpecificOutput.permissionDecision, 'deny');
+    }
+    const audit = spawnSync(process.execPath, [hook, 'codex', 'guard', 'audit', 'pre'], { cwd: workspace, input: '{}', encoding: 'utf8' });
+    assert.strictEqual(audit.status, 0);
+    assert.match(audit.stderr, /audit would-deny/);
+    const invalidMode = spawnSync(process.execPath, [hook, 'codex', 'guard', 'unknown', 'pre'], { cwd: workspace, input: '{}', encoding: 'utf8' });
+    assert.strictEqual(invalidMode.status, 2);
+  }],
   ['ordinary prompt passes without goal state', () => {
     const result = invoke('claude', 'admit', { prompt: 'Explain this file.' }, workspace);
     assert.strictEqual(result.status, 0, result.stderr);

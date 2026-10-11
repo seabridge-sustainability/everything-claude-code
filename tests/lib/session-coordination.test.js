@@ -46,6 +46,146 @@ function budgetArgs(now = Date.now()) {
 
 after(() => fs.rmSync(workspace, { recursive: true, force: true }));
 
+function guardFixture(mode = 'block', overrides = {}) {
+  const f = fixture();
+  const now = Date.now();
+  const goal = { schema: 'ecc.active-goal.v1', goal_id: 'fence', mode: 'controlled', proof_profile: 'security', objective: 'Typed write fence', current_priority: 'Run negative controls', non_goals: [],
+    user_visible_proofs: [{ id: 'fence', description: 'Fence behavior', lane_id: 'guard', required_stage: 'authentic_input_processed', required_evidence_kinds: ['test','runtime'], required_repositories: ['fixture'], allowed_result_classes: ['other'], acceptance_predicate: 'Negative controls fail closed', requires_authentic: false, requires_user_visible: false, subject_scope: null, required: true }],
+    lanes: [{ id: 'guard', description: 'Guard', status: 'active', blocker: null, next_action: 'Probe' }], owner_corrections: [],
+    forecast: { state: 'not_set', confidence: 'none', basis: null, critical_path: [], likely_hours: null, next_checkpoint_at: null, checkpoint_started_at: null, checkpoint_proof_id: null, updated_at: new Date(now).toISOString() }, status: 'active', updated_at: new Date(now).toISOString() };
+  fs.mkdirSync(path.join(f.root, '.ecc/goal'), { recursive: true });
+  fs.writeFileSync(path.join(f.root, '.ecc/goal/active-goal.yaml'), JSON.stringify(goal));
+  register(f.root, 'fence', ['README.md', 'owned', '.ecc/goal', 'artifacts/agent-runs/scope-guard']);
+  execute('guard-bind', { cwd: f.root, sessionId: 'fence', guardMode: mode, deadline: new Date(now + 600000).toISOString(), toolLimit: 40, turnLimit: 20, protectedPaths: ['README.md'], ...overrides });
+  function event(tool, input, eventName = 'pre', extra = {}) {
+    return execute('guard-event', { cwd: f.root, sessionId: 'fence', guardMode: mode, event: eventName,
+      payload: { session_id: 'fence', cwd: f.root, tool_name: tool, tool_input: input, ...extra } });
+  }
+  return { ...f, goal, event };
+}
+
+test('guard a/d/e: direct fence, protected checks and useful cross-module reads', () => {
+  const { event } = guardFixture();
+  assert.equal(event('Write', { file_path: 'owned/new.js', content: 'safe' }).allowed, true);
+  assert.equal(event('Read', { file_path: 'outside/module.js' }).allowed, true);
+  assert.equal(event('Write', { file_path: 'outside/module.js' }).allowed, false);
+  assert.equal(event('Edit', { file_path: 'package.json' }).allowed, false);
+  assert.equal(event('Edit', { file_path: 'README.md' }).allowed, false);
+  assert.equal(event('Write', { path: 'owned/unknown.js' }).allowed, false);
+  assert.equal(event('MultiEdit', { edits: [{ file_path: 'owned/a.js' }, { file_path: 'outside/b.js' }] }).allowed, false);
+});
+
+test('guard b/c: interpreters, stdin, MCP/cloud and configuration mutation are opaque', () => {
+  const { event } = guardFixture();
+  for (const tool of ['Bash', 'exec_command', 'write_stdin', 'mcp__cloud__write', 'functions.exec', 'unknown_write']) {
+    const decision = event(tool, { command: 'python -c "mutate()"', chars: 'secret-example-never-log' });
+    assert.equal(decision.allowed, false, tool);
+  }
+  for (const file of ['.codex/hooks.json', '.ecc/goal/active-goal.yaml', '.claude/settings.json', '.github/hooks/check.json']) {
+    assert.equal(event('Write', { file_path: file }).allowed, false, file);
+  }
+});
+
+test('guard paths: absolute, Windows/Git Bash aliases, traversal, ADS, symlink and every patch destination', () => {
+  const { root, event } = guardFixture();
+  assert.equal(event('Write', { file_path: path.join(root, 'owned/new.js') }).allowed, true);
+  for (const file of ['owned/../outside.js', 'owned/alias. ', 'owned/file:stream', '../outside.js']) {
+    assert.equal(event('Write', { file_path: file }).allowed, false, file);
+  }
+  fs.mkdirSync(path.join(root, 'outside'));
+  fs.mkdirSync(path.join(root, 'owned'));
+  fs.symlinkSync(path.join(root, 'outside'), path.join(root, 'owned/link'), process.platform === 'win32' ? 'junction' : 'dir');
+  assert.equal(event('Write', { file_path: 'owned/link/file.js' }).allowed, false);
+  if (process.platform === 'win32') {
+    const absolute = path.join(root, 'owned/new.js');
+    assert.equal(event('Write', { file_path: absolute.toUpperCase() }).allowed, true);
+    assert.equal(event('Write', { file_path: absolute.replace(/^([A-Z]):\\/i, (_, d) => '/' + d.toLowerCase() + '/').replace(/\\/g,'/') }).allowed, true);
+    assert.equal(event('Write', { file_path: '\\\\server\\share\\outside.js' }).allowed, false);
+    assert.equal(event('Write', { file_path: '\\\\?\\' + absolute }).allowed, false);
+  }
+  const patch = '*** Begin Patch\n*** Add File: owned/a.js\n+safe\n*** Update File: owned/b.js\n*** Move to: outside/c.js\n@@\n-old\n+new\n*** End Patch';
+  assert.equal(event('apply_patch', { input: patch }).allowed, false);
+  assert.equal(event('apply_patch', { input: patch.replace('outside/c.js', 'owned/c.js') }).allowed, true);
+  assert.equal(event('apply_patch', { input: 'garbage\n' + patch }).allowed, false);
+});
+
+test('guard f: committed, staged, unstaged, deleted, renamed and untracked changes since frozen base', () => {
+  const { root, event } = guardFixture();
+  fs.writeFileSync(path.join(root, 'outside.js'), 'foreign');
+  assert.equal(event(null, null, 'final').allowed, false);
+  git(root, 'add', 'outside.js');
+  git(root, '-c', 'core.hooksPath=', 'commit', '-m', 'foreign fixture');
+  git(root, 'update-ref', 'refs/remotes/origin/development', 'HEAD');
+  assert.equal(event(null, null, 'final').allowed, false);
+  assert.throws(() => execute('check-changes', { cwd: root, sessionId: 'fence', upstream: 'refs/remotes/origin/development' }), /outside owned/);
+});
+
+test('completion detects staged content restored in working tree, deletes and both rename paths', () => {
+  const { root } = fixture();
+  fs.writeFileSync(path.join(root, 'outside.js'), 'baseline');
+  git(root, 'add', 'outside.js');
+  git(root, '-c', 'core.hooksPath=', 'commit', '-m', 'outside baseline');
+  register(root, 'scoped', ['README.md', 'owned']);
+  fs.writeFileSync(path.join(root, 'outside.js'), 'staged change');
+  git(root, 'add', 'outside.js');
+  fs.writeFileSync(path.join(root, 'outside.js'), 'baseline');
+  assert.throws(() => execute('check-changes', { cwd: root, sessionId: 'scoped' }), /outside owned/);
+  fs.unlinkSync(path.join(root, 'outside.js'));
+  assert.throws(() => execute('check-changes', { cwd: root, sessionId: 'scoped' }), /outside owned/);
+  fs.mkdirSync(path.join(root, 'owned'));
+  fs.writeFileSync(path.join(root, 'owned/moved.js'), 'baseline');
+  git(root, 'add', '--', 'outside.js', 'owned/moved.js');
+  assert.throws(() => execute('check-changes', { cwd: root, sessionId: 'scoped' }), /outside owned/);
+});
+
+test('audit records would-deny without payloads; block rejects stale/corrupt/missing state and exhausted budgets', () => {
+  const audit = guardFixture('audit');
+  const decision = audit.event('Write', { file_path: 'outside.js', content: 'secret-example-never-log' });
+  assert.equal(decision.allowed, true);
+  assert.equal(decision.wouldDeny, true);
+  const log = fs.readFileSync(path.join(audit.root, 'artifacts/agent-runs/scope-guard/fence.jsonl'), 'utf8');
+  assert.doesNotMatch(log, /secret-example|outside.js|content|file_path/);
+  const blocked = guardFixture('block', { toolLimit: 1, turnLimit: 1 });
+  assert.equal(blocked.event('Write', { file_path: 'owned/a' }).allowed, true);
+  assert.equal(blocked.event('Write', { file_path: 'owned/b' }).allowed, false);
+  const turn = guardFixture('block', { turnLimit: 1 });
+  assert.equal(turn.event(null, null, 'turn', { turn_id: 'one' }).allowed, true);
+  assert.equal(turn.event(null, null, 'turn', { turn_id: 'one' }).allowed, true);
+  assert.equal(turn.event(null, null, 'turn', { turn_id: 'two' }).allowed, false);
+  const stale = guardFixture();
+  stale.goal.current_priority = 'Owner corrected the requirement';
+  fs.writeFileSync(path.join(stale.root, '.ecc/goal/active-goal.yaml'), JSON.stringify(stale.goal));
+  assert.equal(stale.event('Read', {}).allowed, false);
+  const corrupt = guardFixture();
+  const registry = path.join(repository(corrupt.root).directory, 'registry.json');
+  const state = JSON.parse(fs.readFileSync(registry));
+  state.sessions[0].guard.allowedOperations = ['anything'];
+  fs.writeFileSync(registry, JSON.stringify(state));
+  assert.equal(corrupt.event('Write', { file_path: 'owned/a' }).allowed, false);
+  const missing = guardFixture();
+  fs.unlinkSync(path.join(missing.root, '.ecc/goal/active-goal.yaml'));
+  assert.equal(missing.event('Read', {}).allowed, false);
+});
+
+test('trusted hook process allows owned write, denies protected tampering, wrong native identity, deadline and final drift', () => {
+  const f = guardFixture();
+  const hook = path.resolve(__dirname, '../../scripts/hooks/goal-runtime-gate.js');
+  const run = (tool, input, event = 'pre') => spawnSync(process.execPath, [hook, 'codex', 'guard', 'block', event], {
+    cwd: f.root, encoding: 'utf8', env: { ...process.env, ECC_SESSION_ID: 'fence' },
+    input: JSON.stringify({ session_id: 'fence', cwd: f.root, tool_name: tool, tool_input: input }), windowsHide: true });
+  assert.equal(run('Write', { file_path: 'owned/new.js' }).status, 0);
+  assert.equal(run('Write', { file_path: 'outside.js' }).status, 2);
+  assert.equal(f.event('Read', {}, 'pre', { session_id: 'other' }).allowed, false);
+  const expired = execute('guard-event', { cwd: f.root, sessionId: 'fence', guardMode: 'block', event: 'pre', now: Date.now() + 700000,
+    payload: { session_id: 'fence', cwd: f.root, tool_name: 'Read', tool_input: {} } });
+  assert.equal(expired.allowed, false);
+  fs.writeFileSync(path.join(f.root, 'README.md'), 'weakened protected configuration');
+  assert.equal(f.event('Read', {}).allowed, false);
+  fs.writeFileSync(path.join(f.root, 'README.md'), 'fixture\n');
+  fs.writeFileSync(path.join(f.root, 'foreign.js'), 'outside');
+  assert.equal(run(null, null, 'final').status, 2);
+});
+
 test('owner CLI can hand off one file without closing product scopes or release lease', () => {
   const { root, other, sha } = fixture();
   register(root, 'owner', ['README.md', 'app/product']);

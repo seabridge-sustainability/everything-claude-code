@@ -15,7 +15,7 @@ const {
 } = require('./lib/goal-runtime');
 
 const GOAL_CLI = path.join(__dirname, 'goal-control.js');
-const { checkSession } = require('./lib/session-coordination');
+const { checkSession, execute } = require('./lib/session-coordination');
 
 function optionValue(args, name, fallback = null) {
   const index = args.indexOf(name);
@@ -110,7 +110,10 @@ function main(args = process.argv.slice(2)) {
       process.stderr.write(`goal runtime: ${claim} claim requires ${goalPath}\n`);
       return 2;
     }
-    try { checkSession({ sessionId }); }
+    try {
+      const session = checkSession({ sessionId });
+      if (session.guard) execute('check-changes', { sessionId });
+    }
     catch (error) {
       process.stderr.write(`session coordination: ${error.message}\n`);
       return 2;

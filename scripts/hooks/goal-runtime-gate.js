@@ -28,6 +28,7 @@ function payloadModel(raw) {
 function main(args = process.argv.slice(2), raw = readInput()) {
   const runtime = args[0];
   const phase = args[1];
+  if (phase === 'guard') return guardMain(runtime, args[2], args[3], raw);
   if (!runtime || !['admit', 'prepare', 'final'].includes(phase)) {
     process.stderr.write('goal runtime hook requires <runtime> <admit|prepare|final>\n');
     return 2;
@@ -84,6 +85,44 @@ function main(args = process.argv.slice(2), raw = readInput()) {
   return 2;
 }
 
+function guardMain(runtime, mode, event, raw) {
+  // Mode/event come from the reviewed hook definition, never tool arguments.
+  if (!['claude', 'codex', 'copilot-local', 'copilot-cli', 'gemini', 'opencode'].includes(runtime)
+      || !['audit', 'block'].includes(mode) || !['pre', 'turn', 'final'].includes(event)) {
+    process.stderr.write('invalid scope guard adapter invocation\n');
+    return 2;
+  }
+  let decision;
+  try {
+    if (Buffer.byteLength(raw) >= MAX_INPUT_BYTES) throw new Error('oversized hook input');
+    const payload = JSON.parse(raw);
+    if (!payload || typeof payload !== 'object' || Array.isArray(payload)) throw new Error('invalid hook input');
+    const sessionId = process.env.ECC_SESSION_ID || payload.session_id || payload.conversation_id;
+    decision = require('../lib/session-coordination').execute('guard-event', {
+      sessionId, guardMode: mode, event, payload, cwd: process.cwd(),
+    });
+  } catch {
+    decision = { allowed: mode === 'audit', wouldDeny: true, reason: 'scope guard state/input unavailable or malformed' };
+  }
+  if (!decision.wouldDeny) return event === 'final' && mode === 'block' ? main([runtime, 'final'], raw) : 0;
+  const reason = `ECC scope guard: ${decision.reason}`;
+  if (mode === 'audit') {
+    process.stderr.write(`audit would-deny: ${reason}\n`);
+    return 0;
+  }
+  if (event === 'pre' && runtime === 'copilot-cli') {
+    process.stdout.write(JSON.stringify({ permissionDecision: 'deny', permissionDecisionReason: reason }) + '\n');
+  } else if (event === 'pre' && runtime === 'gemini') {
+    process.stdout.write(JSON.stringify({ decision: 'deny', reason }) + '\n');
+  } else if (event === 'pre') {
+    process.stdout.write(JSON.stringify({ hookSpecificOutput: { hookEventName: 'PreToolUse', permissionDecision: 'deny', permissionDecisionReason: reason } }) + '\n');
+  } else if (event === 'final') {
+    process.stdout.write(JSON.stringify({ decision: 'block', reason }) + '\n');
+  }
+  process.stderr.write(reason + '\n');
+  return 2;
+}
+
 function run(raw, context = {}) {
   const hookId = String(context.hookId || process.env.ECC_HOOK_ID || '');
   const phase = hookId === 'stop:goal-runtime-final' ? 'final' : 'admit';
@@ -92,4 +131,4 @@ function run(raw, context = {}) {
 
 if (require.main === module) process.exitCode = main();
 
-module.exports = { MAX_INPUT_BYTES, main, payloadModel, readInput, run };
+module.exports = { MAX_INPUT_BYTES, main, guardMain, payloadModel, readInput, run };

@@ -4,7 +4,8 @@
 const { execute } = require('./lib/session-coordination');
 function main(args = process.argv.slice(2)) {
   if (!args.length || args.includes('--help')) {
-    console.log('ecc session <register|status|renew|check-write|check-changes|handoff-file|close|release-acquire|check-release|release-renew|release-end>');
+    console.log('ecc session <register|status|renew|check-write|check-changes|guard-bind|handoff-file|close|release-acquire|check-release|release-renew|release-end>');
+    console.log('Guard binding: --guard-mode audit|block --native-session ID --deadline ISO_UTC --tool-limit N --turn-limit N --protected-path FILE (repeatable) --allowed-operation read|write|patch (repeatable). New session required for rebinding; opaque execution denied, resource telemetry unverified, provider/CI budget zero.');
     console.log('Options: --session ID --scope relative/path (repeatable) --objective TEXT --done-when TEXT --ttl-minutes 120');
     console.log('Checks: --path relative/path (repeatable), --upstream refs/remotes/origin/BRANCH after integration.');
     console.log('Experiment registration: --loop-target exact-file --check-file committed-check (repeatable); exactly one owned target, pinned read-only-to-maker checks.');
@@ -13,18 +14,21 @@ function main(args = process.argv.slice(2)) {
     console.log('Handoff: owner invokes --path exact-file --evidence TEXT; releases only that reservation, never a product session or release lease.');
     return 0;
   }
-  const options = { sessionId: process.env.ECC_SESSION_ID, scopes: [], paths: [], checkFiles: [] };
+  const options = { sessionId: process.env.ECC_SESSION_ID, scopes: [], paths: [], checkFiles: [], protectedPaths: [] };
   const fields = { '--session': 'sessionId', '--objective': 'objective', '--done-when': 'doneWhen',
     '--ttl-minutes': 'ttl', '--branch': 'branch', '--candidate': 'candidate', '--outcome': 'outcome', '--evidence': 'evidence', '--upstream': 'upstream', '--loop-target': 'loopTarget',
     '--actions-budget-status': 'actionsBudgetStatus', '--actions-budget-used': 'actionsBudgetUsed',
     '--actions-budget-limit': 'actionsBudgetLimit', '--actions-budget-checked-at': 'actionsBudgetCheckedAt',
     '--actions-budget-source': 'actionsBudgetSource', '--actions-stop-usage': 'actionsStopUsage',
     '--expected-actions-usd': 'expectedActionsUsd', '--expected-workflows': 'expectedWorkflows',
-    '--owner-cost-approval': 'ownerCostApproval' };
+    '--owner-cost-approval': 'ownerCostApproval', '--guard-mode': 'guardMode', '--deadline': 'deadline',
+    '--tool-limit': 'toolLimit', '--turn-limit': 'turnLimit', '--native-session': 'nativeSessionId' };
   for (let i = 1; i < args.length; i += 2) {
     const key = args[i], value = args[i + 1];
     if (!value || value.startsWith('--')) throw new Error(`value required for ${key}`);
     if (key === '--scope') options.scopes.push(value);
+    else if (key === '--protected-path') options.protectedPaths.push(value);
+    else if (key === '--allowed-operation') (options.allowedOperations ||= []).push(value);
     else if (key === '--check-file') options.checkFiles.push(value);
     else if (key === '--path') options.paths.push(value);
     else if (fields[key]) options[fields[key]] = value;

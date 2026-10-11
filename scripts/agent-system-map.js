@@ -22,6 +22,8 @@ const SOURCES = Object.freeze([
   'protocols/GOAL_PROTOCOL_SHORT.md',
   'protocols/CONCURRENT_SESSION_PROTOCOL.md', 'scripts/session-coordinate.js',
   'scripts/lib/session-coordination.js',
+  'scripts/hooks/goal-runtime-gate.js', 'schemas/goal-control.schema.json',
+  'tests/lib/goal-runtime-hook.test.js', 'tests/lib/goal-runtime.test.js',
   'manifests/instruction-adapters.json', 'manifests/goal-runtime-capabilities.json',
   'manifests/goal-proof-profiles.json',
   'scripts/check-instruction-stack.js', 'scripts/eval-instruction-scenarios.js',
@@ -104,6 +106,9 @@ function buildMap(root = ROOT, sources = SOURCES) {
   // Verify the memory control path rather than leaving its new source nodes as
   // disconnected inventory. These edges are only emitted while the imports exist.
   for (const [from, to, importText] of [
+    ['scripts/hooks/goal-runtime-gate.js', 'scripts/lib/session-coordination.js', "require('../lib/session-coordination')"],
+    ['scripts/lib/session-coordination.js', 'schemas/goal-control.schema.json', "require('../../schemas/goal-control.schema.json')"],
+    ['scripts/goal-runtime-bridge.js', 'scripts/lib/session-coordination.js', "require('./lib/session-coordination')"],
     ['scripts/memory.js', 'scripts/lib/memory-vault.js', "require('./lib/memory-vault')"],
     ['scripts/memory-mcp.mjs', 'scripts/lib/memory-vault.js', "require('./lib/memory-vault.js')"],
     ['scripts/lib/memory-vault.js', 'scripts/lib/memory-vault-format.js', "require('./memory-vault-format')"],
@@ -114,7 +119,7 @@ function buildMap(root = ROOT, sources = SOURCES) {
     ['tests/scripts/memory-mcp.test.js', 'scripts/lib/memory-vault.js', "require('../../scripts/lib/memory-vault')"],
   ]) {
     if (!fs.readFileSync(file(root, from), 'utf8').includes(importText)) {
-      throw new Error(`declared memory import missing from ${from}: ${importText}`);
+        throw new Error(`declared memory import missing from ${from}: ${importText}`);
     }
     edge(`file:${from}`, to, 'verified-code-import', from);
   }
@@ -133,7 +138,7 @@ function buildMap(root = ROOT, sources = SOURCES) {
     schema: 'seabridge.agent-system-map.v1',
     scope: 'Three backend policy sources and ECC loading adapters, outcome control, evaluation, and CI; no product or tenant data',
     extractor: 'scripts/agent-system-map.js (deterministic, no LLM)',
-    generatorVersion: 4,
+    generatorVersion: 5,
     // Generated verification artifact, not a fourth policy source. CI can
     // reproduce the three reviewed, pinned files without a private-repo token.
     policySnapshot: rows.filter(row => row.path.startsWith('../manageesg-backend/'))

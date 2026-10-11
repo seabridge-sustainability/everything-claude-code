@@ -3,6 +3,34 @@
   "$id": "ecc.goal-control.v1",
   "title": "ECC Outcome Control Schema",
   "$defs": {
+    "scopeGuard": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "goalId", "goalRevision", "implementationSha256", "nativeSessionId", "base", "scopes", "deadline", "protected", "allowedOperations", "toolLimit", "turnLimit", "tools", "turnIds", "budgets"],
+      "properties": {
+        "mode": { "enum": ["audit", "block"] },
+        "goalId": { "$ref": "#/$defs/nonEmptyString" },
+        "goalRevision": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "implementationSha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "nativeSessionId": { "$ref": "#/$defs/nonEmptyString" },
+        "base": { "type": "string", "pattern": "^[a-f0-9]{40,64}$" },
+        "scopes": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/nonEmptyString" } },
+        "deadline": { "type": "number" },
+        "protected": { "type": "array", "items": {
+          "type": "object", "additionalProperties": false, "required": ["path", "sha256"],
+          "properties": { "path": { "$ref": "#/$defs/nonEmptyString" }, "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" } }
+        } },
+        "allowedOperations": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["read", "write", "patch"] } },
+        "toolLimit": { "type": "integer", "minimum": 1 },
+        "turnLimit": { "type": "integer", "minimum": 1 },
+        "tools": { "type": "integer", "minimum": 0 },
+        "turnIds": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 100 } },
+        "budgets": {
+          "type": "object", "additionalProperties": false, "required": ["providerUsd", "ciRuns", "resourceTelemetry"],
+          "properties": { "providerUsd": { "const": 0 }, "ciRuns": { "const": 0 }, "resourceTelemetry": { "const": "unverified" } }
+        }
+      }
+    },
     "nonEmptyString": {
       "type": "string",
       "minLength": 1
