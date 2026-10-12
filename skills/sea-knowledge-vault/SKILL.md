@@ -32,7 +32,7 @@ transforms dry-run unless the named `--apply --backup` operation is approved.
 
 ## Private operator wiki
 
-The local `SeaBridgeAI/SeaBridgeAI` vault is not a product runtime or public ECC
+The local `SeaBridgeAI/knowledge-base` vault is not a product runtime or public ECC
 repository. Obsidian is a viewer. Its sources, not synthesized pages, are truth.
 Do not modify source code, governed documents, dated reports or `raw/` inputs as
 part of note ingestion. Product behavior must be verified in its owning repo.

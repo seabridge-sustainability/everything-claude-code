@@ -15,9 +15,10 @@ and its system import. Do not grant new permissions or change the owner goal.
 ## Independent delivery lanes
 
 Use existing goal assignments: required output/observed blocker, acceptance,
-disjoint files/worktrees, current goal revision, lease and realistic budget with
-closure/integration reserve. Reuse suitable owned worktrees and completed workers;
-isolate occupied write surfaces, not every micro-task. Measure aggregate RAM/disk
+disjoint files in approved primary checkouts, current goal revision, lease and realistic budget with
+closure/integration reserve. Reuse completed workers; no new branches/worktrees
+without explicit owner approval. One integration writer per repository; occupied
+scopes wait or hand off, never trigger a new checkout. Measure aggregate RAM/disk
 headroom and honor storage holds. Never stop another session or remove its artifacts.
 
 Select available configured models/effort for task difficulty and measured quality/
