@@ -1,0 +1,17 @@
+# WeKnora for SeaBridgeAI development
+
+Pinned Tencent WeKnora0.8.2 source is in source/. MIT license plus its bundled third-party notices remain intact. ParadeDB also has AGPL-3.0 components; review its license before adapting or hosting customer-facing functionality. Prebuilt app/UI image digests are pinned in compose.yaml. This independent knowledge service does not replace SeaBridgeAI document RAG or read existing company databases.
+
+Start with Docker Desktop running: node service.mjs start. Stop without deleting data: node service.mjs stop. Status: node service.mjs status. UI: http://127.0.0.1:3182; API: http://127.0.0.1:8182. Both bind loopback only. Combined hard memory caps832MiB, 1.75CPUs. Dedicated PostgreSQL/ParadeDB state persists in state/postgres and uploaded files in state/pg-files. The earlier failed SQLite fixture remains preserved in state/data. Do not delete that directory or Docker volumes.
+
+Task-local login credentials are stored in ignored state/account.json. Signing/encryption secrets are in ignored .env.local. Native MCP endpoint bearer credential is stored in ignored state/mcp-connection.json; do not print or copy its value. The read-only endpoint exposes list_knowledge_bases, search_knowledge, grep_chunks, list_documents and read_document. No write/delete/chat tools are enabled. Source ingestion must be an explicit owner task with approved documents and workspace scope. It currently sees only the synthetic verification knowledge base.
+
+Any stdio MCP client can invoke node with the absolute mcp-bridge.mjs path; no credential belongs in agent configuration or command-line arguments. The bridge loads the local credential file, restricts its target to loopback8182 and forwards native WeKnora MCP. Parent installer registers this transport for compatible agents. Local nomic-embed-text embeddings (Apache-2.0, 274MB, pinned in embedding-lock.json) support retrieval. No generative/paid provider is configured.
+
+Docker sandbox/browser execution, graph processing and telemetry are disabled. Existing Ollama is the only local inference endpoint; no cloud keys are inherited. This is a local development service, not an Internet deployment. Health/MCP verification receipts are under state/.
+
+The prebuilt app image lacks sqlite_fts5, so genuine indexed search uses the upstream-recommended ParadeDB/PostgreSQL deployment. The failure is retained in state/sqlite-failure-receipt.json. To initialize a fresh isolated database, node bootstrap.mjs creates a local owner account, embedding configuration, synthetic KB and read-only endpoint. It is intentionally a one-time bootstrap, not a migration or reset tool. node verify.mjs checks authentic indexed retrieval and source equality, and verifies the destructive MCP tool is denied.
+
+Resource discipline: services are on-demand, not auto-restarting. verify.mjs unloads only the task-created nomic embedding model after verification. Existing coding models are never unloaded or changed. Keep private/company documents out until their source, workspace and ingestion task are approved.
+
+Verified native MCP semantic and stdio keyword searches both returned the synthetic lighthouse passage; read_document matched its full chunk/source, and delete_document was rejected. UI HTTP200 and APIhealthok were observed. Containers used288.81MiB during the final sample, against832MiB combined caps. Services are stopped after verification to protect concurrent development; start before live client calls. All private company data and existing indexes remain untouched.

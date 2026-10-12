@@ -1,0 +1,37 @@
+name: ecc-openshell
+services:
+  init:
+    image: ghcr.io/nvidia/openshell/gateway@sha256:ea14aa4db0980fab4769fb6b5509ac42ae3dc8495e645b1ba1fe1ada49892fa6
+    user: "0"
+    command: ["generate-certs", "--output-dir", "/var/lib/ecc-openshell/tls"]
+    environment:
+      OPENSHELL_TELEMETRY_ENABLED: "false"
+    volumes:
+      - state:/var/lib/ecc-openshell
+    mem_limit: 256m
+    cpus: 0.5
+    restart: "no"
+  gateway:
+    image: ghcr.io/nvidia/openshell/gateway@sha256:ea14aa4db0980fab4769fb6b5509ac42ae3dc8495e645b1ba1fe1ada49892fa6
+    user: "0"
+    command: ["--port", "17770", "--bind-address", "0.0.0.0"]
+    ports:
+      - "127.0.0.1:17770:17770"
+      - "127.0.0.1:17771:17771"
+    depends_on:
+      init:
+        condition: service_completed_successfully
+    environment:
+      OPENSHELL_GATEWAY_CONFIG: /etc/openshell/gateway.toml
+      OPENSHELL_DB_URL: sqlite:/var/lib/ecc-openshell/gateway.db?mode=rwc
+      OPENSHELL_TELEMETRY_ENABLED: "false"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - state:/var/lib/ecc-openshell
+      - ./gateway.toml:/etc/openshell/gateway.toml:ro
+    mem_limit: 512m
+    cpus: 1
+    restart: "no"
+volumes:
+  state:
+    name: ecc-openshell-state

@@ -1,0 +1,218 @@
+{
+  "name": "seabridge-company-tools",
+  "owner": {
+    "name": "SeaBridgeAI"
+  },
+  "plugins": [
+    {
+      "name": "work-productivity",
+      "source": "./plugins/work-productivity",
+      "description": "Manage tasks, plan your day, and build up memory of important context about your work. Syncs with your calendar, email, and chat to keep everything organized and on track."
+    },
+    {
+      "name": "work-enterprise-search",
+      "source": "./plugins/work-enterprise-search",
+      "description": "Search across all of your company's tools in one place. Find anything across email, chat, documents, and wikis without switching between apps."
+    },
+    {
+      "name": "work-cowork-plugin-management",
+      "source": "./plugins/work-cowork-plugin-management",
+      "description": "Create, customize, and manage plugins tailored to your organization's tools and workflows. Configure MCP servers, adjust plugin behavior, and adapt templates to match how your team works."
+    },
+    {
+      "name": "work-sales",
+      "source": "./plugins/work-sales",
+      "description": "Prep calls, summarize and follow up, research accounts, review deals and pipeline, and write the forecast, using the CRM, email, calendar and chat tools your team already uses, or uploaded files. Updates records, drafts or sends email, posts to chat and books meetings when you ask."
+    },
+    {
+      "name": "work-finance",
+      "source": "./plugins/work-finance",
+      "description": "Streamline finance and accounting workflows, from journal entries and reconciliation to financial statements and variance analysis. Speed up audit prep, month-end close, and keeping your books clean."
+    },
+    {
+      "name": "work-data",
+      "source": "./plugins/work-data",
+      "description": "Write SQL, explore datasets, and generate insights faster. Build visualizations and dashboards, and turn raw data into clear stories for stakeholders."
+    },
+    {
+      "name": "work-legal",
+      "source": "./plugins/work-legal",
+      "description": "Speed up contract review, NDA triage, and compliance workflows for in-house legal teams. Draft legal briefs, organize precedent research, and manage institutional knowledge."
+    },
+    {
+      "name": "work-marketing",
+      "source": "./plugins/work-marketing",
+      "description": "Create content, plan campaigns, and analyze performance across marketing channels. Maintain brand voice consistency, track competitors, and report on what's working."
+    },
+    {
+      "name": "work-customer-support",
+      "source": "./plugins/work-customer-support",
+      "description": "Triage tickets, draft responses, escalate issues, and build your knowledge base. Research customer context and turn resolved issues into self-service content."
+    },
+    {
+      "name": "work-product-management",
+      "source": "./plugins/work-product-management",
+      "description": "Write feature specs, plan roadmaps, and synthesize user research faster. Keep stakeholders updated and stay ahead of the competitive landscape."
+    },
+    {
+      "name": "work-bio-research",
+      "source": "./plugins/work-bio-research",
+      "description": "Connect to preclinical research tools and databases (literature search, genomics analysis, target prioritization) to accelerate early-stage life sciences R&D"
+    },
+    {
+      "name": "work-slack-by-salesforce",
+      "source": "./plugins/work-slack-by-salesforce",
+      "description": "Slack integration for searching messages, sending communications, managing canvases, and more"
+    },
+    {
+      "name": "work-apollo",
+      "source": "./plugins/work-apollo",
+      "description": "Prospect, enrich leads, and load outreach sequences with Apollo.io — one-click MCP server integration for Claude Code and Cowork."
+    },
+    {
+      "name": "work-common-room",
+      "source": "./plugins/work-common-room",
+      "description": "Turn Common Room into your GTM copilot. Research accounts and contacts, prep for calls with attendee profiles and talking points, and draft personalized outreach across email, LinkedIn, and phone."
+    },
+    {
+      "name": "work-engineering",
+      "source": "./plugins/work-engineering",
+      "description": "Streamline engineering workflows — standups, code review, architecture decisions, incident response, and technical documentation. Works with your existing tools or standalone."
+    },
+    {
+      "name": "work-human-resources",
+      "source": "./plugins/work-human-resources",
+      "description": "Streamline people operations — recruiting, onboarding, performance reviews, compensation analysis, and policy guidance. Maintain compliance and keep your team running smoothly."
+    },
+    {
+      "name": "work-design",
+      "source": "./plugins/work-design",
+      "description": "Accelerate design workflows — critique, design system management, UX writing, accessibility audits, research synthesis, and dev handoff. From exploration to pixel-perfect specs."
+    },
+    {
+      "name": "work-operations",
+      "source": "./plugins/work-operations",
+      "description": "Optimize business operations — vendor management, process documentation, change management, capacity planning, and compliance tracking. Keep your organization running efficiently."
+    },
+    {
+      "name": "work-small-business",
+      "source": "./plugins/work-small-business",
+      "description": "Pre-built small business workflows to help you run and grow your business. Supports a majority of the tools you already use. You approve every step that touches money or customers. Install and then ask Claude to help you get onboarded."
+    },
+    {
+      "name": "work-brand-voice",
+      "source": "./plugins/work-brand-voice",
+      "description": "Discover your brand voice from existing documents and conversations, generate enforceable guidelines, and validate AI-generated content against your established tone and positioning."
+    },
+    {
+      "name": "work-zoom-plugin",
+      "source": "./plugins/work-zoom-plugin",
+      "description": "Plan, build, and debug Zoom integrations across REST APIs, Meeting SDK, Video SDK, webhooks, bots, and MCP workflows. Search meetings, retrieve recordings, access transcripts, and design AI-powered Zoom experiences."
+    },
+    {
+      "name": "work-pdf-viewer",
+      "source": "./plugins/work-pdf-viewer",
+      "description": "View, annotate, and sign PDFs in a live interactive viewer. Mark up contracts, fill forms with visual feedback, stamp approvals, and place signatures — then download the annotated copy."
+    },
+    {
+      "name": "fsi-financial-analysis",
+      "source": "./plugins/fsi-financial-analysis",
+      "description": "Core financial modeling and analysis tools: DCF, comps, LBO, 3-statement models, competitive analysis, and deck QC"
+    },
+    {
+      "name": "fsi-investment-banking",
+      "source": "./plugins/fsi-investment-banking",
+      "description": "Investment banking productivity tools - client and market insights, deck creation, financial analysis, and transaction management"
+    },
+    {
+      "name": "fsi-equity-research",
+      "source": "./plugins/fsi-equity-research",
+      "description": "Equity research tools: earnings analysis, initiating coverage reports, and research workflows"
+    },
+    {
+      "name": "fsi-private-equity",
+      "source": "./plugins/fsi-private-equity",
+      "description": "Private equity deal sourcing and workflow tools: company discovery, CRM integration, and founder outreach"
+    },
+    {
+      "name": "fsi-fund-admin",
+      "source": "./plugins/fsi-fund-admin",
+      "description": "Fund administration and finance ops: GL reconciliation, break tracing, accruals, roll-forwards, variance commentary, NAV tie-out"
+    },
+    {
+      "name": "fsi-operations",
+      "source": "./plugins/fsi-operations",
+      "description": "Operational workflows: KYC document parsing and rules-grid evaluation"
+    },
+    {
+      "name": "fsi-pitch-agent",
+      "source": "./plugins/fsi-pitch-agent",
+      "description": "Comps, precedents, LBO to a branded pitch deck, end to end"
+    },
+    {
+      "name": "fsi-market-researcher",
+      "source": "./plugins/fsi-market-researcher",
+      "description": "Sector or theme to industry overview, competitive landscape, peer comps, and ideas shortlist"
+    },
+    {
+      "name": "fsi-earnings-reviewer",
+      "source": "./plugins/fsi-earnings-reviewer",
+      "description": "Earnings call and filings to model update to note draft"
+    },
+    {
+      "name": "fsi-meeting-prep-agent",
+      "source": "./plugins/fsi-meeting-prep-agent",
+      "description": "Briefing pack before every client meeting"
+    },
+    {
+      "name": "fsi-model-builder",
+      "source": "./plugins/fsi-model-builder",
+      "description": "DCF, LBO, 3-statement, comps - live in Excel"
+    },
+    {
+      "name": "fsi-gl-reconciler",
+      "source": "./plugins/fsi-gl-reconciler",
+      "description": "Finds breaks, traces root cause, routes for sign-off"
+    },
+    {
+      "name": "fsi-kyc-screener",
+      "source": "./plugins/fsi-kyc-screener",
+      "description": "Parses onboarding docs, runs the rules engine, flags gaps"
+    },
+    {
+      "name": "fsi-valuation-reviewer",
+      "source": "./plugins/fsi-valuation-reviewer",
+      "description": "Ingests GP packages, runs valuation template, stages LP reporting"
+    },
+    {
+      "name": "fsi-month-end-closer",
+      "source": "./plugins/fsi-month-end-closer",
+      "description": "Accruals, roll-forwards, variance commentary"
+    },
+    {
+      "name": "fsi-statement-auditor",
+      "source": "./plugins/fsi-statement-auditor",
+      "description": "Audits pre-generated LP statements before distribution"
+    },
+    {
+      "name": "fsi-lseg",
+      "source": "./plugins/fsi-lseg",
+      "description": "Price bonds, analyze yield curves, evaluate FX carry trades, value options, and build macro dashboards using LSEG financial data and analytics."
+    },
+    {
+      "name": "fsi-sp-global",
+      "source": "./plugins/fsi-sp-global",
+      "description": "S&P Global - Financial data and analytics skills including company tearsheets, earnings previews, and transaction summaries"
+    },
+    {
+      "name": "fsi-claude-for-msft-365-install",
+      "source": "./plugins/fsi-claude-for-msft-365-install",
+      "description": "Provision direct cloud access (Vertex AI, Bedrock, or LLM gateway) for the Claude Microsoft 365 add-in. Generates the customized manifest, walks through Azure admin consent, and writes per-user config via Graph extension attributes."
+    },
+    {
+      "name": "sea-engineering",
+      "source": "./plugins/sea-engineering",
+      "description": "Selected engineering disciplines"
+    }
+  ]
+}

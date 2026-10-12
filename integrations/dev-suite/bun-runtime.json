@@ -1,0 +1,8 @@
+{
+  "source": "C:/Users/adelm/AppData/Roaming/npm/node_modules/bun/bin/bun.exe",
+  "destination": "C:/Users/adelm/.bun/bin/bun.exe",
+  "version": "1.3.11",
+  "sha256": "a8e83a6ff04ddc8e66b9262e6d49052cfae3a8a29276627c3d530af4af238c45",
+  "reason": "Initial ENOENT diagnosis was wrong: actual test project cwd was missing. Removed only the matching task-created Bun copy; existing npm Bun unchanged.",
+  "destinationRemoved": true
+}

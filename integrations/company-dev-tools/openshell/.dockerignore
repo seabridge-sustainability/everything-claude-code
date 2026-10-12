@@ -1,0 +1,8 @@
+source/
+*.json
+*.md
+*.py
+*.ps1
+compose.yaml
+gateway.toml
+policy*.yaml

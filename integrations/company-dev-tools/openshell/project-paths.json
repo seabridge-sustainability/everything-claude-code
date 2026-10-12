@@ -1,0 +1,14 @@
+{
+  "priority": [
+    "C:/Users/adelm/SeaBridgeAI/manageesg-backend",
+    "C:/Users/adelm/SeaBridgeAI/manageesg-frontend"
+  ],
+  "default_access": "read-only selected source snapshots",
+  "sandbox_destination": "/sandbox/references",
+  "host_bind_mounts": false,
+  "whole_repository_upload": false,
+  "exclude": [".env*", "*.pem", "*.key", "credentials*", ".git", "node_modules", ".venv", "private tenant documents"],
+  "writes": "only /sandbox/output and /tmp; manually review outputs before applying to a project",
+  "network": "denied unless an explicit endpoint and binary policy is approved",
+  "credentials": "none configured"
+}

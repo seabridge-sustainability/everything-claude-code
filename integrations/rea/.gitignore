@@ -1,0 +1,8 @@
+vendor/
+.venv/
+state/
+workspace.local.json
+mcp.local.json
+codex.local.toml
+opencode.local.json
+requirements.lock.txt

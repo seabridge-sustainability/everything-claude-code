@@ -1,0 +1,88 @@
+{
+  "checkedAt": "2026-10-12T03:05:39.084Z",
+  "scope": "user across all projects",
+  "clients": [
+    {
+      "name": "Claude",
+      "file": "C:\\Users\\adelm\\.claude.json",
+      "servers": [
+        "seabridge-dev-suite",
+        "context-mode",
+        "weknora"
+      ],
+      "preservedPriorServers": [
+        "aws-mcp",
+        "rea",
+        "rea-reference",
+        "rea-native",
+        "seabridge_memory",
+        "seabridge-dev-suite",
+        "context-mode",
+        "weknora"
+      ],
+      "weknora": "start before connecting"
+    },
+    {
+      "name": "Gemini",
+      "file": "C:\\Users\\adelm\\.gemini\\settings.json",
+      "servers": [
+        "seabridge-dev-suite",
+        "context-mode",
+        "weknora"
+      ],
+      "preservedPriorServers": [
+        "aws-mcp",
+        "rea",
+        "rea-reference",
+        "rea-native",
+        "seabridge_memory",
+        "seabridge-dev-suite",
+        "context-mode",
+        "weknora"
+      ],
+      "weknora": "registered disabled until started"
+    },
+    {
+      "name": "OpenCode",
+      "file": "C:\\Users\\adelm\\.config\\opencode\\opencode.json",
+      "servers": [
+        "seabridge-dev-suite",
+        "context-mode",
+        "weknora"
+      ],
+      "preservedPriorServers": [
+        "aws-mcp",
+        "rea",
+        "rea-reference",
+        "rea-native",
+        "seabridge_memory",
+        "seabridge-dev-suite",
+        "context-mode",
+        "weknora"
+      ],
+      "weknora": "registered disabled until started"
+    },
+    {
+      "name": "Codex",
+      "file": "C:\\Users\\adelm\\.codex\\config.toml",
+      "servers": [
+        "seabridge-dev-suite",
+        "context-mode",
+        "weknora"
+      ],
+      "weknora": "registered disabled until started"
+    },
+    {
+      "name": "VS Code MCP host",
+      "file": "C:\\Users\\adelm\\AppData\\Roaming\\Code\\User\\mcp.json",
+      "servers": [
+        "seabridge-dev-suite",
+        "context-mode",
+        "weknora"
+      ],
+      "weknora": "start before connecting"
+    }
+  ],
+  "preservedExisting": true,
+  "backupDirectory": "C:\\Users\\adelm\\.codex\\state\\dev-suite-config-backups\\2026-10-12T03-05-39.056Z"
+}

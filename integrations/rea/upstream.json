@@ -1,0 +1,9 @@
+{
+  "repository": "https://github.com/morluto/rea.git",
+  "revision": "a95795c6ed3cb149e03460f4c818ad12e0c670d9",
+  "version": "6.4.0",
+  "license": "MIT",
+  "windowsArtifactSha256": "c4fd9f377e567bcf15ba3fec3e0b0ed965d82b765a2adcdac49e46f14524b6d5",
+  "releaseIntegrity": "sha512-Vj1zWfSlna5bphGoaoI/TcVBuYvze9u+OyPC3Shz8YkBqaCTqB4COnnRoX7XDwMpwI24ZlFEel2yEj0k8LTWEQ==",
+  "whisperRevision": "d90ca5fe260221311c53c58e660288d3deb8d356"
+}

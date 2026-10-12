@@ -1,0 +1,9 @@
+FROM ubuntu:24.04
+RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates iproute2 && \
+    mkdir -p /sandbox/references /sandbox/output /sandbox/private && \
+    printf 'REFERENCE_ALLOW_MARKER\n' > /sandbox/references/allowed.txt && \
+    printf 'PRIVATE_DENY_MARKER\n' > /sandbox/private/denied.txt && \
+    chown -R ubuntu:ubuntu /sandbox
+USER ubuntu
+WORKDIR /sandbox
+CMD ["sleep", "infinity"]

@@ -1,0 +1,62 @@
+{
+  "checkedAt": "2026-10-12T03:10:07.332Z",
+  "results": [
+    {
+      "client": "Claude",
+      "server": "seabridge-dev-suite",
+      "protocolConnected": true,
+      "tools": 5
+    },
+    {
+      "client": "Claude",
+      "server": "context-mode",
+      "protocolConnected": true,
+      "tools": 11
+    },
+    {
+      "client": "Gemini",
+      "server": "seabridge-dev-suite",
+      "protocolConnected": true,
+      "tools": 5
+    },
+    {
+      "client": "Gemini",
+      "server": "context-mode",
+      "protocolConnected": true,
+      "tools": 11
+    },
+    {
+      "client": "OpenCode",
+      "server": "seabridge-dev-suite",
+      "protocolConnected": true,
+      "tools": 5
+    },
+    {
+      "client": "OpenCode",
+      "server": "context-mode",
+      "protocolConnected": true,
+      "tools": 11
+    },
+    {
+      "client": "Codex",
+      "server": "seabridge-dev-suite",
+      "protocolConnected": true,
+      "tools": 5
+    },
+    {
+      "client": "Codex",
+      "server": "context-mode",
+      "protocolConnected": true,
+      "tools": 11
+    }
+  ],
+  "nativeGeminiCliObserved": {
+    "project": "manageesg-backend",
+    "suite": "Connected",
+    "context": "Connected",
+    "weknora": "Disconnected before exclusion while stopped"
+  },
+  "vsCodeJsoncValidated": true,
+  "editorReloadPerformed": false,
+  "limitation": "Protocol tests use actual configured launch vectors, not authenticated agent/model execution or existing editor-panel reload"
+}

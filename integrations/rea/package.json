@@ -1,0 +1,9 @@
+{
+  "name": "ecc-rea-bridge",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "bin": { "ecc-rea": "cli.mjs" },
+  "scripts": { "test": "node --test test/*.test.mjs", "doctor": "node cli.mjs doctor" },
+  "engines": { "node": "^22.19.0 || ^24.11.0 || >=26" }
+}
