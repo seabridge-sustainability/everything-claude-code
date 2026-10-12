@@ -25,6 +25,8 @@ const SOURCES = Object.freeze([
   'skills/parallel-execution-optimizer/SKILL.md',
   'protocols/CONCURRENT_SESSION_PROTOCOL.md', 'scripts/session-coordinate.js',
   'scripts/lib/session-coordination.js',
+  'scripts/orchestrate-worktrees.js', 'scripts/lib/tmux-worktree-orchestrator.js',
+  'tests/lib/tmux-worktree-orchestrator.test.js',
   'scripts/hooks/goal-runtime-gate.js', 'schemas/goal-control.schema.json',
   'scripts/lib/scope-guard-adapters.js', 'scripts/scope-guard-adapters.js',
   '.opencode/plugins/ecc-scope-guard.ts', 'tests/lib/scope-guard-adapters.test.js',

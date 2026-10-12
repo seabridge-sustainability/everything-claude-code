@@ -178,7 +178,7 @@ function conflicts(state, repo, scopes, sessionId, now) {
   for (const other of state.sessions) {
     if (other.id === sessionId || other.state !== 'active'
         || (other.expiresAt <= now && state.release?.owner !== other.id)) continue;
-    if (other.worktree === repo.root) throw new Error(`worktree already owned by ${other.id}; use an isolated worktree`);
+    if (other.worktree === repo.root) throw new Error(`worktree already owned by ${other.id}; serialize or explicitly hand off this checkout; do not automatically create another worktree`);
     if (scopes.some(a => other.scopes.some(b => overlaps(a, b)))) throw new Error(`write scope overlaps session ${other.id}; no automatic takeover`);
   }
 }

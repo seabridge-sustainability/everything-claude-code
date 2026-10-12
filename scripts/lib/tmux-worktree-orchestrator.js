@@ -4,6 +4,21 @@ const fs = require('fs');
 const path = require('path');
 const { spawnSync } = require('child_process');
 
+function assertGenericWorkspace(repoRoot) {
+  const root = path.resolve(repoRoot);
+  const candidates = [String(repoRoot), root, canonicalizePath(root)];
+  const marker = path.join(root, '.git');
+  if (fs.existsSync(marker) && fs.lstatSync(marker).isFile()) {
+    const value = fs.readFileSync(marker, 'utf8').trim();
+    if (value.startsWith('gitdir: ')) candidates.push(path.resolve(root, value.slice(8)));
+  }
+  if (candidates.some(value => /^(?:c:\/users\/adelm\/seabridgeai|e:\/seabridgeai)(?:\/|$)/.test(
+    value.toLowerCase().replace(/\\/g, '/')
+  ))) {
+    throw new Error('Automatic worktree orchestration is disabled for SeaBridgeAI. Use its primary checkout and serialize ownership; a worktree exception requires Alejandro to approve the exact path, branch and reason through the controlled workflow.');
+  }
+}
+
 function slugify(value, fallback = 'worker') {
   const normalized = String(value || '')
     .trim()
@@ -84,6 +99,7 @@ function normalizeSeedPaths(seedPaths, repoRoot) {
 }
 
 function overlaySeedPaths({ repoRoot, seedPaths, worktreePath }) {
+  assertGenericWorkspace(repoRoot);
   const normalizedSeedPaths = normalizeSeedPaths(seedPaths, repoRoot);
 
   for (const seedPath of normalizedSeedPaths) {
@@ -173,6 +189,7 @@ function buildWorkerArtifacts(workerPlan) {
 }
 
 function buildOrchestrationPlan(config = {}) {
+  assertGenericWorkspace(config.repoRoot || process.cwd());
   const repoRoot = path.resolve(config.repoRoot || process.cwd());
   const repoName = path.basename(repoRoot);
   const workers = Array.isArray(config.workers) ? config.workers : [];
@@ -312,6 +329,7 @@ function buildOrchestrationPlan(config = {}) {
 }
 
 function materializePlan(plan) {
+  assertGenericWorkspace(plan.repoRoot);
   for (const workerPlan of plan.workerPlans) {
     const artifacts = buildWorkerArtifacts(workerPlan);
     fs.mkdirSync(artifacts.dir, { recursive: true });
@@ -388,6 +406,7 @@ function listWorktrees(repoRoot) {
 }
 
 function cleanupExisting(plan) {
+  assertGenericWorkspace(plan.repoRoot);
   runCommand('git', ['worktree', 'prune', '--expire', 'now'], { cwd: plan.repoRoot });
 
   const hasSession = spawnSync('tmux', ['has-session', '-t', plan.sessionName], {
@@ -424,6 +443,7 @@ function cleanupExisting(plan) {
 }
 
 function rollbackCreatedResources(plan, createdState, runtime = {}) {
+  assertGenericWorkspace(plan.repoRoot);
   const runCommandImpl = runtime.runCommand || runCommand;
   const listWorktreesImpl = runtime.listWorktrees || listWorktrees;
   const branchExistsImpl = runtime.branchExists || branchExists;
@@ -480,6 +500,7 @@ function rollbackCreatedResources(plan, createdState, runtime = {}) {
 }
 
 function executePlan(plan, runtime = {}) {
+  assertGenericWorkspace(plan.repoRoot);
   const spawnSyncImpl = runtime.spawnSync || spawnSync;
   const runCommandImpl = runtime.runCommand || runCommand;
   const materializePlanImpl = runtime.materializePlan || materializePlan;
