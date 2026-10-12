@@ -8,6 +8,10 @@ triggers:
   - "research stack status"
 ---
 
+> RETIREMENT: Strix was retired by Alejandro on 2026-10-09. Do not launch, pull or reinstall it. Agent Shield/static checks remain available but do not provide active application pentesting; selecting a replacement requires a separate owner decision. Historical Strix examples below are disabled and must not be executed.
+
+
+
 # Skill: co-scientist-orchestrator — Research Stack Dispatcher
 
 ## What this skill covers

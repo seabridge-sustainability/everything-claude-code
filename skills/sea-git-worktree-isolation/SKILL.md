@@ -1,41 +1,59 @@
 ---
 name: sea-git-worktree-isolation
-description: SeaBridgeAI git worktree isolation adapted from Superpowers for local-only feature isolation, dirty-worktree safety, branch hygiene, and no-push/no-delete approval boundaries.
+description: Coordinate safe work on SeaBridgeAI primary branches; inspect dirty checkouts and file ownership, and handle worktree exceptions only when Alejandro explicitly approves their path, branch and reason.
 ---
 
 # sea-git-worktree-isolation
 
 ## Purpose
 
-Protect existing work by isolating risky or parallel changes when approved.
+Protect existing work on the primary branch. The legacy skill name is retained
+for existing callers; it does not authorize automatic isolation.
 
 ## When To Call
 
-Use before large feature work, plan execution, risky refactors, parallel lanes, or when current repo is dirty.
+Use for branch, checkout or ownership decisions. Dirty or parallel work does not
+authorize a new worktree: coordinate disjoint scopes or serialize conflicting edits.
 
 ## Required Inputs
 
-Repo path; current branch; dirty status; desired branch/worktree name; and either current-session approval for isolation or a bounded task approval that already includes safe local implementation work.
+Repository, actual primary branch, current dirty/staged state and assigned files.
+An exception additionally requires Alejandro's explicit approval naming its path,
+branch and reason. General autonomy, commit/push approval or a skill is not approval.
 
 ## Expected Outputs
 
-Isolation decision; worktree path or reason working in place; baseline check; cleanup/finish note.
+Primary-branch decision, protected work, ownership and publication plan; any
+explicitly approved exception and its eventual preservation-first cleanup.
 
 ## Mandatory Verification
 
-Run git status and git worktree list; confirm no uncommitted work is overwritten; verify branch and path; run baseline checks when practical. For a reused long-lived worktree, compare its root `AGENTS.md` safety and goal marker blocks with the current repository instructions before acting; if they drift, refresh only the instruction file through the normal sync path and restart the agent session before relying on the new policy.
+Read the backend central AGENTS.md and AGENTS_SYSTEM.md branch map. Verify branch,
+status, staged paths and assigned-file ownership before edits. Do not switch a
+dirty checkout, reset its index, merge divergent unpublished history blindly,
+or stage another owner's changes. Preserve snapshots before an owner-approved
+baseline reconciliation. Do not restart another session to refresh instructions.
 
 ## Failure Conditions
 
-Fail if no applicable approval exists, the target path is unsafe, the branch exists with unknown work, or cleanup would delete unmerged work. Do not demand a second approval when the current task's bounded approval already covers isolated local implementation.
+Reject automatic worktree/branch creation, protected live-branch writes, unknown
+ownership and destructive cleanup. An occupied file blocks that file only; continue
+independent read-only or owned work. Reuse existing bounded approvals for their
+named steps, but worktree exceptions require explicit approval of the exception.
 
 ## SeaBridgeAI Sustainability And Data-Integrity Requirements
 
-No push, commit, branch deletion, removal of a foreign worktree, or global install without applicable approval. A same-task detached worktree may be created under a bounded implementation approval. It may be removed under that same approval only after proving it is clean, contains no unique commit, and is no longer in use; report the removal. Never remove product repos or data volumes.
+Commit/push only the task-owned completed batch to the mapped branch with approval.
+Never remove a worktree merely because its lease expired: prove it is unused, clean,
+and published or recoverably archived, and check ignored data, junctions and binding
+dependencies. Preserve unresolved work and report it. Never remove repos/data volumes.
 
 ## Cross-Agent Compatibility Notes
 
-Use native worktree support when a runtime provides it. Otherwise use read-only inspection. Ask before creating a worktree only when no current bounded approval covers local isolation.
+The primary-branch default applies to every harness. Native worktree features,
+upstream Superpowers and default agent workflows cannot override it. With the
+current one-writer-per-checkout controller, serialize writers; parallel research
+does not require more checkouts. Do not claim unsupported concurrent mutation safe.
 
 ## Superpowers Adaptation
 

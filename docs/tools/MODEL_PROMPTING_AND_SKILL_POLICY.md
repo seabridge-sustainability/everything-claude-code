@@ -1,6 +1,6 @@
 # Model Prompting And Skill Policy
 
-Last verified: 2026-09-27.
+Model-specific guidance last verified: 2026-09-27. Local skill routing updated 2026-10-12.
 
 Load this reference only when changing agent prompts, model or effort defaults,
 skill design, compaction behavior, tool exposure, or an agent evaluation. Normal
@@ -31,6 +31,137 @@ restricted execution boundary is supplied. This narrow gate does not run tests,
 spend provider credits, promise automatic product completion or grant approvals.
 Rollback: stop using the new managed launch for future sessions; do not change
 running agents or delete their receipts. Reverting this batch affects source only.
+
+### Primary branches and explicit worktree exceptions
+
+Work directly in the existing primary checkout: backend `seabridge_development`,
+frontend `development`, ECC and OpenSeaBri `main`, autoresearch and `_upstream`
+`master`. Backend `main` and frontend `master` are protected live branches.
+Alejandro must explicitly approve a new worktree or branch by path/name/reason;
+general autonomy and commit/push approval do not imply this exception. A dirty
+checkout or occupied file is not permission to create another checkout. Register
+assigned-file ownership, serialize conflicting writes, and keep one release owner.
+The current native controller permits one writer per checkout; parallel research
+can remain read-only. Do not advertise unsupported concurrent mutation as safe.
+Before owner-approved baseline reconciliation, preserve local-only commits and
+pending edits in private recovery artifacts and verify them; never force-push,
+hard-reset, clean, broadly stage, or discard another session's work. Old worktrees
+with unique commits, ignored data or active binding dependencies remain until
+their recovery/migration is verified. Superpowers is already vendored in ECC;
+its upstream isolation/TDD defaults do not override the central contract.
+
+### SeaBridge authority and task-to-skill priority
+
+The instruction authority is backend `AGENTS_SYSTEM.md`, `AGENTS.md` and
+`CLAUDE.md`. Other repository entry files are loaders, not copied policy.
+Host rules and the latest owner correction govern the active goal, scope,
+acceptance, ownership and budgets. Skills cannot change those boundaries.
+
+Use one primary task-specific workflow; supporting guidance must add a necessary
+capability, not launch another plan, investigation or model-backed review.
+Small obvious changes need no skill. Native skill formats belong to the calling
+agent; a Claude template is not a Codex/Gemini/OpenCode installation.
+
+| Task or overlap | Priority |
+|---|---|
+| SeaBridge contracts, scientific integrity, tenant/security boundaries | Matching ECC `sea-*` skill and existing source/acceptance constraints first; `sea-skill-map` routes only when needed. |
+| Phased GSD work | `sea-gsd-controlled-execution` supports the existing ECC goal/assignments; no second plan, alternate DoD or uncontrolled `/gsd:*` installer. |
+| Matt debugging / Anthropic debug | Shared catalog `diagnosing-bugs` is primary; Anthropic debug is supporting only for a demonstrated gap. |
+| Architecture / codebase design / system design | Use only when design/refactor is requested or an observed defect requires it; no redesign of a small fix. |
+| Addy / Anthropic / Alibaba review | One primary code-review workflow; OCR findings are evidence, not acceptance or permission for another model call. |
+| Generic frontend/design | Approved SeaBridge components, tokens, copy and behavior win; no stylistic extras. |
+| Generic tests/security | Risk-scaled checks and valid task authorization win; no blanket installs, full suites, secret rotation or Git cleanup. |
+| Finance / climate/nature | Finance templates cannot supply scientific inputs, weights, predictions or validated financial impact. Prefer `fsi-financial-analysis` for duplicate finance skills; an exact specialist ID is an explicit selection. |
+| Skill creation | Calling agent's native authoring format; upstream guidance is selective support. |
+
+Assets and the full shared catalog live in
+`C:/Users/adelm/SeaBridgeAI/everything-claude-code/integrations/company-dev-tools`.
+The executable bridge and SeaBridge wrappers remain in
+`C:/Users/adelm/SeaBridgeAI/everything-claude-code-runtime`; do not point clients at
+an older checkout or restart productive sessions. Use `sea-dev-suite` and
+`suite_find_workflow`, then read the exact returned ID with the matching skill or
+command reader. CLI fallback: runtime `integrations/dev-suite/cli.mjs find|read`.
+Search returns `routingRole=primary` for recognized tasks, otherwise candidates;
+it is not permission to execute them. Full nested paths distinguish Zoom SDKs;
+ambiguous legacy IDs fail, never select the first matching file. Identical hashed
+workflow copies are deduplicated in search, not deleted from licensed sources.
+
+### Knowledge access and freshness
+
+Use source for current implementation facts. The optional Second Brain engineering
+interface exposes read-only `memory_search`, `memory_fetch`, `memory_neighbors`
+and `memory_status`; require current scope/version/revision/line/policy-epoch
+citations and verify the cited source. A configured MCP entry or connection is not
+proof of a working tool call. Missing memory does not block independent coding.
+Do not create another store or ingest private/tenant content as shared agent memory.
+
+ECC `scripts/knowledge-query.js <repo> <symbol>` rejects unsafe/stale code graphs.
+The small `docs/tools/agent-system-map.json` is a separate control-plane map;
+its freshness does not certify Graphify/FalkorDB or company API adoption. Use source
+when a graph is unavailable. Knowledge capture uses the existing `knowledge-ops`
+workflow and its approval boundaries, not automatic notes in every repository.
+
+Strix was retired by Alejandro on 2026-10-09: do not launch, pull or reinstall it.
+Static Agent Shield checks do not establish active application pentesting.
+
+### Frontend CLI fallbacks
+
+An empty `node_modules/.bin` does not justify `npm ci`, dependency reinstalls or
+`node_modules` junctions. Preserve existing packages; removing a junction-bearing
+worktree can damage the real directory. From the intended primary frontend checkout use:
+
+```text
+node node_modules/typescript/bin/tsc --noEmit -p tsconfig.json
+node node_modules/vitest/vitest.mjs run <files>
+node node_modules/@playwright/test/cli.js test <spec>
+node node_modules/eslint/bin/eslint.js <files>
+```
+
+Use relevant existing npm scripts when their normal entrypoints work. These are
+operational fallbacks, not mandatory tests for every change.
+
+### Satellite repository facts (load only for that repository)
+
+These facts were retained when duplicate startup rulebooks became central loaders.
+They do not override central authorization, scope, evidence or safety rules.
+
+- **autoresearch:** normal branch `master`; experiments change only
+  `experiments/train.py`, never `experiments/prepare.py`/evaluators. Default training
+  objective: minimize authentic `val_bpb` within about five minutes per run; no new
+  packages outside approved `pyproject.toml`. `uv run experiments/train.py` logs to
+  `run.log`; inspect `val_bpb`/`peak_vram_mb` and crash tails. Bound owned runs, not
+  other sessions' processes. `results.tsv` remains untracked. `program.md` is a
+  procedure, not implicit commit/reset permission: central clean-owned
+  `git revert --no-edit <own-SHA>` rules apply. Backend access is through its
+  autoresearch adapter and `autoresearch/handoff/`, not direct imports or edits.
+  Paper2Agent/Feynman are explicit opt-in paid/long-running work; never hooks.
+  `archived/AI-CoScientist` remains inactive. Read the existing README and
+  `AI_COSCIENTIST_STACK.md` only for the requested research scenario.
+- **_upstream:** normal branch `master`; pinned gitlinks/reference mirrors, no
+  product runtime code. Update only on request using README's Updating Pins.
+  OpenSeaBri imports follow `IMPORT_POLICY.md` and `imports/manifest.json` matching
+  the pinned revisions. Upstream installers, yolo flags and auto-push/reset text
+  are reference content, not permission. Adapt reusable patterns through ECC.
+- **climada-stack:** normal branch `master`; opt-in `CLIMADA_ENABLED=true`.
+  Do not merge it or its dependencies into backend requirements; integration uses
+  the existing `climada_adapter`. `API_KEYS.md` describes configuration locations,
+  not permission to read/print credential values. Keep real unavailable risk data
+  distinct from validated calculations.
+- **openseabri:** normal branch `main`, MIT Vite/TypeScript consumer; HTTP-only
+  `/api/v1/openseabri/*` proxy, never backend imports. Existing npm scripts:
+  `dev` (5173), `build`, `typecheck`, `test`. DM channels require pairing approval
+  before answering unknown senders. Connected mode uses `SEABRIDGEAI_CONNECTED`
+  and `SEABRIDGEAI_API_KEY` locally; never expose credential values. Existing
+  `docs/product/OPENSEABRI_AGENT_GUIDE.md`, `TOOLS.md`, README,
+  `UPSTREAM_SYNC.md` and import manifest describe specialist agents/channels.
+  Preserve this product's own reviewed tokens, not the enterprise Climate palette:
+  semantic before primitive; legacy references primary #16a34a, surface #0a0a0a,
+  text #e5e5e5, radius 6px, ui-sans-serif; regions nav/content/hero/footer.
+  Check actual generated `design/` values before assuming legacy references are
+  current. Missing tokens: nearest existing semantic token and gap report.
+
+All satellites use the central knowledge routing above. No per-edit automatic
+Graphify rebuild, old `ck`/Claude-Mem store or second goal is introduced.
 
 ### Keep prompts lean and outcome-based
 
@@ -67,8 +198,9 @@ running agents or delete their receipts. Reverting this batch affects source onl
   unclear task contract.
 - Text-only end-turns, a plan, or an early partial result are not completion when
   tools or subagents are still running. Wait, inspect, fix, and verify.
-- Stop automatic continuation after two or three no-progress repeats of the same
-  task. Change strategy or report the external blocker.
+- Stop the unchanged tactic after two or three no-progress repeats, not the goal.
+  Change strategy; apply central continue-or-explain and pursue ready independent
+  authorized lanes. Only Alejandro pauses goals; genuine gates remain intact.
 
 ### Preserve useful context, not transcript volume
 

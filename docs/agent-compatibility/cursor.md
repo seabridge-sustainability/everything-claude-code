@@ -42,10 +42,7 @@ Cursor rules must load or point to the centralized `AGENTS_SYSTEM.md` / `SEABRID
 - Backend public-route exemptions:
   `manifests\harness\backend-public-routes.json`.
 - Agent Shield is the advisory agent/MCP/config governance scanner.
-- Strix is the active app-security scanner.
-- When the user explicitly asks for a full vulnerability scan, run the approved
-  ECC combined wrapper so Agent Shield and Strix execute together on approved
-  local/staging scope only.
+- Strix was retired by Alejandro on 2026-10-09. Do not launch, pull or reinstall it. Agent Shield/static checks remain available but do not provide active application pentesting; selecting a replacement requires a separate owner decision.
 
 ## Required Loop
 

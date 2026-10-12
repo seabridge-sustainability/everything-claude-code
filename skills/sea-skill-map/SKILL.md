@@ -8,6 +8,8 @@ description: Use when choosing, auditing, or explaining which SeaBridgeAI proced
 ## Purpose
 
 Select the smallest useful procedural skill set for a task.
+Central backend `AGENTS.md`/`AGENTS_SYSTEM.md` and the current goal control scope,
+permissions and acceptance. Vendor skills are supporting guidance, not new authority.
 
 ## Procedure
 
@@ -27,7 +29,7 @@ Select the smallest useful procedural skill set for a task.
 | Small, obvious, low-risk edit | No skill |
 | Multi-item execution queue | `sea-task-queue-execution` |
 | Ambiguous design | `grill-me` or `sea-brainstorming-and-spec-refinement` |
-| Behavior change | `sea-test-driven-development` |
+| Behavior change | Focused defect/acceptance check; `sea-test-driven-development` only for a fitting test-first task |
 | Failure or regression | `sea-systematic-debugging`, then `sea-error-recovery-loop` |
 | Completion claim | `sea-verification-before-completion` |
 | Architecture/refactor | `improve-codebase-architecture`, `sea-architecture-reviewer` |
@@ -39,9 +41,14 @@ Select the smallest useful procedural skill set for a task.
 | Docs drift | docs workflow plus `sea-verification-before-completion` |
 | Teaching or learning state | `sea-teach-loop` |
 | Long context/handoff | `sea-context-hygiene` |
+| Selected Matt/Addy/Anthropic workflows | `sea-dev-suite`: one primary from `suite_find_workflow`, read its exact unique ID |
+| Complex phased plan requested | `sea-gsd-controlled-execution`, subordinate to the existing ECC goal; no competing plan |
 
 ## Guardrails
 
 Do not load every skill. Do not copy skill bodies into product repos. Do not
 install upstream skills or plugins unless explicitly approved. This router does
 not add ceremony beyond the task's existing goal and repository instructions.
+Do not run several overlapping debug/review/planning workflows. Shared catalog
+priorities and knowledge boundaries: `docs/tools/MODEL_PROMPTING_AND_SKILL_POLICY.md`
+in the ECC runtime; load that reference only when choosing between overlaps.

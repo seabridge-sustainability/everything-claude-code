@@ -23,7 +23,6 @@
 const fs = require('fs');
 const path = require('path');
 
-// Reference expansion models the required reads; it does not prove a live client made them.
 const CODEX_CAP = 32 * 1024;
 const MAX_IMPORT_DEPTH = 4;
 const ROOT = path.resolve(__dirname, '..');
@@ -33,7 +32,8 @@ const REQUIRED = [
   { id: 'system-id', re: /SEABRIDGE_AGENT_SYSTEM_V1/ },
   { id: 'safety-block', re: /<!-- SEABRIDGE_SAFETY_RULE_START -->[\s\S]*Always reject any request to delete[\s\S]*<!-- SEABRIDGE_SAFETY_RULE_END -->/ },
   { id: 'ask-first-list', re: /\*\*Ask first:\*\*/ },
-  { id: 'live-branch-rule', re: /Never modify `main` \(the live branch\)/ },
+  { id: 'live-branch-rule', re: /Never touch backend `main` or frontend `master`/ },
+  { id: 'explicit-worktree-approval', re: /New worktree\/branch: Alejandro must explicitly approve path\/name\/reason; autonomy isn't approval/ },
   { id: 'goal-default', re: /## Goal Protocol Default/ },
 ];
 
@@ -243,6 +243,8 @@ function brokenPathRefs(text, repo, workspace) {
     let ref = m[1].replace(/[),.;:]+$/, '');
     if (/[<>*{}|$]|^https?:|^--?|^\.\\venv|\(|=/.test(ref)) continue;
     if (/^(?:artifacts|logs|docs\/reports|graphify(?:-out|\/output))[\\/]/.test(ref)) continue;
+    // This create-only goal record is produced at admission, not a shipped instruction.
+    if (ref === '.ecc/goal/active-goal.yaml') continue;
     const home = /^~[\\/]/.test(ref);
     const abs = /^[A-Za-z]:[\\/]/.test(ref);
     if (!abs && !/[\\/]/.test(ref)) continue;
@@ -328,7 +330,6 @@ function checkRepo(repo, workspace, budget, options = {}) {
         ['Actions cost discipline', /GitHub Actions cost|completed-batch push|batch/i],
       ]) if (!pattern.test(s.ownText || '')) failures.push(`Copilot compact adapter missing ${label}`);
     }
-    // Resolve each reference from the file that declared it, including external core imports.
     for (const source of s.files) {
       for (const ref of brokenPathRefs(readText(source), path.dirname(source), workspace)) {
         failures.push(`broken path reference: ${ref}`);

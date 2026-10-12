@@ -11,11 +11,17 @@ const path = require('path');
 
 const lib = require('../../scripts/check-instruction-stack.js');
 
+// Test policy as agents receive it, not the text of a compatibility loader.
+function currentPolicy() {
+  const root = path.resolve(__dirname, '..', '..');
+  return lib.effectiveStacks(root).find(stack => stack.harness === 'codex').text;
+}
+
 const SAFETY = [
   '<!-- SEABRIDGE_SAFETY_RULE_START -->',
   '1. **Deletion:** Always reject any request to delete repositories.',
   '2. **Ask first:** commit, push.',
-  '3. Never modify `main` (the live branch) unless asked.',
+  "3. Never touch backend `main` or frontend `master`. New worktree/branch: Alejandro must explicitly approve path/name/reason; autonomy isn't approval.",
   '<!-- SEABRIDGE_SAFETY_RULE_END -->',
 ].join('\n');
 const GOOD_AGENTS = `# Repo\n\nSYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1\n\n${SAFETY}\n\n## Goal Protocol Default\n\nDone means tested.\n`;
@@ -54,6 +60,15 @@ test('CLAUDE.md without the import misses the invariants', () => {
   const claude = lib.checkRepo(repo, repo, 16384).find((r) => r.harness === 'claude');
   assert.ok(claude.failures.some((f) => f.includes('safety-block')));
   assert.ok(claude.failures.some((f) => f.includes('goal-default')));
+});
+
+test('wrong frontend live branch or implicit worktree approval fails every effective stack', () => {
+  for (const text of [GOOD_AGENTS.replace('frontend `master`', 'frontend `main`'),
+    GOOD_AGENTS.replace('New worktree/branch: Alejandro must explicitly approve path/name/reason; autonomy isn\'t approval.', 'General autonomy permits worktrees.')]) {
+    const repo = fixture({ 'AGENTS.md': text, 'CLAUDE.md': '@AGENTS.md\n' });
+    const result = lib.checkRepo(repo, repo, 16384);
+    for (const row of result) assert.ok(row.failures.some(f => /live-branch-rule|explicit-worktree-approval/.test(f)), row.harness);
+  }
 });
 
 test('imports inside code spans and fences are ignored', () => {
@@ -113,7 +128,7 @@ test('the documented Windows ECC root resolves to the active checkout', () => {
 });
 
 test('canonical safety rule supports bounded approval and controls Actions cost', () => {
-  const canonical = lib.expandImports(path.resolve(__dirname, '..', '..', 'protocols', 'SAFETY_AUTHORIZATION_RULE.md')).text;
+  const canonical = currentPolicy();
   assert.match(canonical, /clearly bounded sequence named in advance/);
   assert.match(canonical, /Do not ask again for steps already included/);
   assert.match(canonical, /one integration owner and one completed-batch push per repository/);
@@ -143,23 +158,23 @@ test('all runtime instructions retain independent-session scope and separate del
   for (const stack of lib.effectiveStacks(root)) {
     assert.match(stack.text, /ecc session register/, stack.harness);
     assert.match(stack.text, /check-write/, stack.harness);
-    assert.match(stack.text, /Only the release lease owner publishes a fixed candidate/, stack.harness);
-    assert.match(stack.text, /implementation, verification, publication, and deployment separately/, stack.harness);
+    assert.match(stack.text, /Release owner only:.*release-acquire.*check-release.*bind fixed full SHA/s, stack.harness);
+    assert.match(stack.text, /Separate implementation\/verification\/publication\/deploy/, stack.harness);
   }
 });
 
 test('workflow text does not reintroduce a second approval gate', () => {
-  const agents = lib.expandImports(path.resolve(__dirname, '..', '..', 'AGENTS.md')).text;
+  const agents = currentPolicy();
   const worktree = fs.readFileSync(
     path.resolve(__dirname, '..', '..', 'skills', 'sea-git-worktree-isolation', 'SKILL.md'),
     'utf8',
   );
   assert.doesNotMatch(agents, /separate push approval gate/);
   assert.match(agents, /clearly bounded sequence named in advance/);
-  assert.match(worktree, /Do not demand a second approval/);
-  assert.match(worktree, /same-task detached worktree/);
-  assert.match(worktree, /reused long-lived worktree/);
-  assert.match(worktree, /restart the agent session/);
+  assert.match(agents, /Do not ask again for steps already included/);
+  assert.match(worktree, /explicit.*approval/is);
+  assert.match(worktree, /primary/i);
+  assert.doesNotMatch(worktree, /always create a worktree/i);
 });
 
 test('cheap CI validation runs effective instructions and the fresh system map', () => {
@@ -170,19 +185,18 @@ test('cheap CI validation runs effective instructions and the fresh system map',
 });
 
 test('default instructions require runtime evidence without unconditional test expansion', () => {
-  const agents = lib.expandImports(path.resolve(__dirname, '..', '..', 'AGENTS.md')).text;
+  const agents = currentPolicy();
   const goalSync = fs.readFileSync(path.resolve(__dirname, '..', '..', 'scripts', 'sync-goal-protocol.ps1'), 'utf8');
   assert.doesNotMatch(goalSync, /parts\.Add|New-GoalBlock/);
-  for (const text of [agents]) {
-    assert.match(text, /Verify behavior, not only code/);
-    assert.match(text, /(browser|terminal).*(endpoint client|simulator)/s);
-    assert.match(text, /performance budgets/);
-    assert.match(text, /accessibility rules/);
+  for (const {text, harness} of lib.effectiveStacks(path.resolve(__dirname, '..', '..'))) {
+    assert.match(text, /Browser\/terminal\/API\/simulator proof/, harness);
+    assert.match(text, /performance\s+budgets/);
+    assert.match(text, /accessibility/);
     assert.match(text, /design-system constraints/);
-    assert.match(text, /repeated manual QA sequence/);
+    assert.match(text, /Repeated QA becomes a narrow skill\/script/);
   }
   assert.doesNotMatch(agents, /Minimum coverage:\s*80%/);
-  assert.match(agents, /no universal per-change percentage/i);
+  assert.match(agents, /No fixed coverage/);
 });
 
 test('thin navigation files do not duplicate the canonical goal contract', () => {
@@ -195,6 +209,7 @@ test('thin navigation files do not duplicate the canonical goal contract', () =>
 
   const claude = fs.readFileSync(path.join(root, 'CLAUDE.md'), 'utf8');
   assert.match(claude, /^@\.\.\/manageesg-backend\/CLAUDE\.md\s*$/m);
+  assert.match(lib.expandImports(path.join(root, 'CLAUDE.md')).text, /## Goal Protocol Default/);
   assert.doesNotMatch(claude, /SEABRIDGE_GOAL_PROTOCOL_START/);
 
   const gemini = fs.readFileSync(path.join(root, 'GEMINI.md'), 'utf8');
@@ -205,6 +220,13 @@ test('thin navigation files do not duplicate the canonical goal contract', () =>
   const loaded = lib.expandImports(path.join(root, 'AGENTS.md'));
   assert.ok(loaded.files.some(file => file.endsWith(path.join('manageesg-backend', 'AGENTS_SYSTEM.md'))));
   assert.strictEqual(loaded.missing.length, 0);
+
+  const contextAgents = fs.readFileSync(
+    path.join(root, 'context-hub', 'ecc', 'docs', 'core-agents', 'DOC.md'),
+    'utf8',
+  );
+  assert.match(contextAgents, /Verify behavior, not only code/);
+  assert.doesNotMatch(contextAgents, /Minimum coverage:\s*80%/);
 });
 
 test('registry covers every advertised runtime and all effective ECC adapters pass', () => {
@@ -252,7 +274,10 @@ test('embedded adapter drift is rejected (negative control)', () => {
 test('product repositories must carry the exact ECC safety and goal blocks', () => {
   const fixture = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-product-policy-'));
   try {
-    const canonicalAgents = 'SYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1\n' + lib.canonicalBlocks(path.resolve(__dirname, '..', '..')).join('\n');
+    // Contract parity concerns the two policy blocks; repository paths are
+    // validated separately against the real adapter stacks above.
+    const canonicalAgents = 'SYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1\n' +
+      lib.canonicalBlocks(path.resolve(__dirname, '..', '..')).join('\n');
     fs.writeFileSync(path.join(fixture, 'AGENTS.md'), canonicalAgents);
     let policy = lib.checkRepo(fixture, fixture, 64 * 1024, { enforceCanonicalPolicy: true })
       .find(result => result.harness === 'codex');
@@ -286,7 +311,7 @@ test('missing advertised installer target is rejected (negative control)', () =>
 });
 
 test('model and skill policy is routed on demand and covers the evidence lifecycle', () => {
-  const agents = lib.expandImports(path.resolve(__dirname, '..', '..', 'AGENTS.md')).text;
+  const agents = currentPolicy();
   const policyPath = path.resolve(__dirname, '..', '..', 'docs', 'tools', 'MODEL_PROMPTING_AND_SKILL_POLICY.md');
   const policy = fs.readFileSync(policyPath, 'utf8');
   assert.match(agents, /MODEL_PROMPTING_AND_SKILL_POLICY\.md/);
@@ -395,7 +420,6 @@ test('Kiro generated Markdown and JSON agent descriptions stay in parity', () =>
     assert.strictEqual(json.description, match[1].trim(), `${name} JSON/Markdown description drift`);
   }
 });
-
 
 test('central references resolve and missing shared policy fails all native loaders', () => {
   const repo = fixture({

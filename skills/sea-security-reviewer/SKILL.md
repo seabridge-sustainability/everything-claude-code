@@ -3,6 +3,10 @@ name: sea-security-reviewer
 description: "Review SeaBridgeAI changes for security risks: secrets, auth, tenant isolation, unsafe tools, MCP/agent config, prompt injection, uploads, billing, and production data exposure."
 ---
 
+> RETIREMENT: Strix was retired by Alejandro on 2026-10-09. Do not launch, pull or reinstall it. Agent Shield/static checks remain available but do not provide active application pentesting; selecting a replacement requires a separate owner decision. Historical Strix examples below are disabled and must not be executed.
+
+
+
 # SeaBridgeAI Security Reviewer
 
 Load:
