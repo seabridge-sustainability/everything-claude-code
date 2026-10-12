@@ -5,8 +5,7 @@ const path = require('node:path');
 const crypto = require('node:crypto');
 const { spawn } = require('node:child_process');
 const { pathToFileURL } = require('node:url');
-const { checkSession, execute, repository } = require('./lib/session-coordination');
-const { SUPPORTED, policyFiles } = require('./lib/fresh-session-guard');
+const { checkSession, execute, repository, SUPPORTED, policyFiles } = require('./lib/fresh-session-guard');
 const root = path.resolve(__dirname, '..');
 function toml(value) {
   if (Array.isArray(value)) return '[' + value.map(toml).join(', ') + ']';

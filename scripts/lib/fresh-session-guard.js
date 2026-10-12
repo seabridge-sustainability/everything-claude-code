@@ -4,15 +4,31 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
-const { execute, checkSession, repository } = require('./session-coordination');
-const { normalizePayload } = require('./scope-guard-adapters');
-const { normalize: normalizeAntigravity } = require('../hooks/antigravity-scope-guard');
-const { writeFileAtomic } = require('./atomic-write');
 const root = path.resolve(__dirname, '../..');
 const SUPPORTED = ['codex', 'claude', 'gemini', 'opencode', 'antigravity'];
 const sha = data => crypto.createHash('sha256').update(data).digest('hex');
 const hash = file => sha(fs.readFileSync(file));
 const canonical = file => { const p = fs.realpathSync(file); return process.platform === 'win32' ? p.toLowerCase() : p; };
+// Older installed runtimes keep a reviewed controller engine separately. Never
+// replace their libraries or search arbitrary paths for a convenient fallback.
+let engineRoot = root;
+const engineBinding = path.join(root, 'manifests/fresh-session-engine.json');
+if (fs.existsSync(engineBinding)) {
+  const binding = JSON.parse(fs.readFileSync(engineBinding, 'utf8'));
+  if (binding.version !== 1 || !path.isAbsolute(binding.root) || !binding.pins
+      || !Object.hasOwn(binding.pins, 'scripts/lib/session-coordination.js')
+      || !Object.hasOwn(binding.pins, 'scripts/lib/scope-guard-adapters.js')
+      || !Object.hasOwn(binding.pins, 'scripts/hooks/antigravity-scope-guard.js')) throw Error('Reviewed controller engine pins required');
+  for (const [file, digest] of Object.entries(binding.pins)) {
+    if (!/^[a-f0-9]{64}$/.test(digest) || path.isAbsolute(file) || file.split(/[\\/]/).includes('..')
+        || hash(path.join(binding.root, file)) !== digest) throw Error('Pinned controller engine changed');
+  }
+  engineRoot = binding.root;
+}
+const { execute, checkSession, repository } = require(path.join(engineRoot, 'scripts/lib/session-coordination.js'));
+const { normalizePayload, denialOutput } = require(path.join(engineRoot, 'scripts/lib/scope-guard-adapters.js'));
+const { normalize: normalizeAntigravity } = require(path.join(engineRoot, 'scripts/hooks/antigravity-scope-guard.js'));
+const { writeFileAtomic } = require(path.join(engineRoot, 'scripts/lib/atomic-write.js'));
 
 function normalize(runtime, payload, cwd) {
   if (!SUPPORTED.includes(runtime)) throw Error('native preflight adapter unsupported; no protected launch');
@@ -107,4 +123,5 @@ function guard(options, event) {
   return execute('guard-event', { cwd: options.cwd, sessionId: options.sessionId,
     guardMode: 'block', event, payload: ctx.native });
 }
-module.exports = { SUPPORTED, normalize, policyFiles, context, preflight, guard };
+module.exports = { SUPPORTED, normalize, policyFiles, context, preflight, guard,
+  execute, checkSession, repository, denialOutput, engineRoot };

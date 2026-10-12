@@ -6,10 +6,10 @@ const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 const { pathToFileURL } = require('node:url');
 const { test, after } = require('node:test');
-const { execute, repository } = require('../../scripts/lib/session-coordination');
-const { prepare, configuration, launch } = require('../../scripts/fresh-agent-session');
-const { run } = require('../../scripts/hooks/fresh-session-guard');
-const { preflight, SUPPORTED } = require('../../scripts/lib/fresh-session-guard');
+const testedRoot = process.env.ECC_PREFLIGHT_TEST_ROOT || path.resolve(__dirname,'../..');
+const { prepare, configuration, launch } = require(path.join(testedRoot,'scripts/fresh-agent-session.js'));
+const { run } = require(path.join(testedRoot,'scripts/hooks/fresh-session-guard.js'));
+const { preflight, SUPPORTED, execute, repository } = require(path.join(testedRoot,'scripts/lib/fresh-session-guard.js'));
 const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-fresh-preflight-'));
 let count = 0;
 after(() => fs.rmSync(temp, { recursive: true, force: true }));
@@ -90,7 +90,7 @@ test('prepared launch refuses reuse, trust/permission bypass, changed argv and u
   assert.throws(()=>prepare(f.plan.manifest),/existing bindings/);
 });
 test('OpenCode actual plugin callback automatically preflights and throws before outside execution; unmanaged processes unchanged', async () => {
-  const plugin=await import(pathToFileURL(path.resolve(__dirname,'../../.opencode/plugins/ecc-fresh-session-guard.mjs')).href);
+  const plugin=await import(pathToFileURL(path.join(testedRoot,'.opencode/plugins/ecc-fresh-session-guard.mjs')).href);
   const keys=['ECC_FRESH_SESSION_REQUIRED','ECC_FRESH_GUARD_ROOT','ECC_CORE_POLICY_ROOT','ECC_FRESH_SESSION_CONFIG','ECC_SESSION_ID','ECC_OWNED_WORKTREE'];
   const saved=Object.fromEntries(keys.map(k=>[k,process.env[k]]));
   try {
@@ -108,7 +108,7 @@ test('OpenCode actual plugin callback automatically preflights and throws before
 });
 test('a real hook subprocess preserves native JSON denial and auto-starts without a model call', () => {
   const f=fixture('claude');
-  const hook=path.resolve(__dirname,'../../scripts/hooks/fresh-session-guard.js');
+  const hook=path.join(testedRoot,'scripts/hooks/fresh-session-guard.js');
   const invoke=file=>spawnSync(process.execPath,[hook,'claude','pre'],{cwd:f.cwd,env:{...process.env,...f.plan.environment},
     input:JSON.stringify(payload('claude',f.cwd,file)),encoding:'utf8',windowsHide:true});
   const good=invoke('owned/ok.txt');assert.equal(good.status,0,good.stderr);assert.equal(good.stdout,'');

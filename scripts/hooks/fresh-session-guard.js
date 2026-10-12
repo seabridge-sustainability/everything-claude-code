@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 const fs = require('node:fs');
-const { guard } = require('../lib/fresh-session-guard');
-const { denialOutput } = require('../lib/scope-guard-adapters');
+const { guard, denialOutput } = require('../lib/fresh-session-guard');
 function run(runtime, event, payload, options = {}) {
   let result;
   try {
