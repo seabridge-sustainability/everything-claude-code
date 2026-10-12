@@ -11,6 +11,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const crypto = require('crypto');
+const vm = require('vm');
 const { execFileSync } = require('child_process');
 
 const {
@@ -77,8 +78,54 @@ banner('knowledge-freshness');
 try {
   section('graphs:');
 
+  run('large Git inventories retain their final source in the fingerprint', () => {
+    const repo = makeRepo('large-manifest');
+    const source = path.join(repo, 'src', 'last.py');
+    fs.mkdirSync(path.dirname(source));
+    fs.writeFileSync(source, 'version = 1\n');
+    const inventory = Array.from({ length: 12000 }, (_, i) =>
+      `artifacts/retained-${i}-${'x'.repeat(100)}.json`).join('\0') + '\0src/last.py\0';
+    assert(Buffer.byteLength(inventory) > 1024 * 1024);
+    const script = require.resolve('../../scripts/knowledge-freshness');
+    const sandbox = {
+      module: { exports: {} }, __dirname: path.dirname(script), process, console,
+      require: name => name === 'child_process' ? {
+        execFileSync: (bin, args, options) => {
+          assert.strictEqual(bin, 'git');
+          assert(args.includes('ls-files'));
+          if (Buffer.byteLength(inventory) > (options.maxBuffer || 1024 * 1024)) {
+            throw Object.assign(new Error('inventory buffer exhausted'), { code: 'ENOBUFS' });
+          }
+          return inventory;
+        },
+      } : require(name),
+    };
+    vm.runInNewContext(fs.readFileSync(script, 'utf8'), sandbox, { filename: script });
+    const fingerprint = sandbox.module.exports.sourceFingerprint;
+    const first = fingerprint(repo);
+    fs.writeFileSync(source, 'version = 2\n');
+    assert.notStrictEqual(fingerprint(repo), first);
+  });
+
   run('ECC checkout keeps the required graph boundary', () => {
     assert.strictEqual(graphBoundaryStatus(path.resolve(__dirname,'../..')).safe,true);
+  });
+
+  run('tracked ECC artifacts are excluded before extraction, not only after it', () => {
+    const isolated = makeRepo('ecc-boundary');
+    const ignore = path.join(isolated, '.graphifyignore');
+    fs.writeFileSync(ignore, fs.readFileSync(ignore, 'utf8').replace('.ecc/\n', ''));
+    assert.strictEqual(graphBoundaryStatus(isolated).safe, false);
+    assert.match(graphBoundaryStatus(isolated).problems.join(' '), /\.ecc\//);
+    assert.throws(() => captureSnapshot(isolated), /Unsafe Graphify boundary/);
+    fs.appendFileSync(ignore, '.ecc/\n');
+    assert.strictEqual(graphBoundaryStatus(isolated).safe, true);
+    fs.mkdirSync(path.join(isolated, 'graphify-out'));
+    fs.writeFileSync(path.join(isolated, 'graphify-out/graph.json'), JSON.stringify({
+      nodes: [{id: 'private-artifact', _origin: 'ast', file_type: 'code', source_file: '.ecc/run/replay.py'}],
+      links: [],
+    }));
+    assert.strictEqual(graphArtifactBoundary(isolated).safe, false);
   });
 
   run('reads built_at_commit from the end of a large graph.json', () => {
