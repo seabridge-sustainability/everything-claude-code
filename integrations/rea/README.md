@@ -257,7 +257,7 @@ same tool. This optional inference runs locally without provider API credentials
 For OpenCode, launch a reference session from the frontend/backend/ECC with:
 
 ```powershell
-& C:/Users/adelm/SeaBridgeAI/everything-claude-code-runtime/integrations/rea/opencode-vision.ps1
+& C:/Users/adelm/SeaBridgeAI/everything-claude-code/integrations/rea/opencode-vision.ps1
 ```
 
 For an image reference, choose the **rea-reference** OpenCode agent or run:

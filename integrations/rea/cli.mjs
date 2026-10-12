@@ -17,10 +17,11 @@ try {
     const invocation = useWsl ? await nativeInvocation(args) : { executable: process.execPath, args: [REA, ...args] };
     const proxy = useWsl && args.includes('--mcp');
     const child = spawn(invocation.executable, invocation.args, { stdio: proxy ? ['pipe', 'pipe', 'pipe'] : 'inherit', windowsHide: true, shell: false, env: await providerEnvironment() });
+    let lines;
     if (proxy) {
       // Translate only target/snapshot coordinates. Preserve upstream evidence
       // verbatim, including the Linux host and actual imported path identity.
-      const lines = readline.createInterface({ input: process.stdin });
+      lines = readline.createInterface({ input: process.stdin });
       lines.on('line', line => {
         let request;
         try {
@@ -39,8 +40,9 @@ try {
       child.stdin.on('error', () => { lines.close(); process.stdin.pause(); });
       child.stdout.pipe(process.stdout); child.stderr.pipe(process.stderr);
     }
-    child.once('error', error => { process.stderr.write(error.message + '\n'); process.exitCode = 1; });
-    child.once('close', code => { process.exitCode = code ?? 1; });
+    const closeProxy = () => { if (proxy) { lines?.close(); process.stdin.destroy(); } };
+    child.once('error', error => { process.stderr.write(error.message + '\n'); process.exitCode = 1; closeProxy(); });
+    child.once('close', code => { process.exitCode = code !== null && code >= 0 ? code : 1; closeProxy(); });
   } else if (['analyze', 'video', 'blueprint', 'read', 'inspect-image'].includes(command)) {
     if (args.length !== 1) throw new Error(`${command} takes one JSON request file, or '-' for stdin`);
     let request;

@@ -18,7 +18,10 @@ export async function providerEnvironment() {
   let native;
   try { native = (await config()).native; }
   catch (error) { if (error.code !== 'ENOENT') throw error; }
-  const environment = { ...process.env };
+  return nativeEnvironment(process.env, native);
+}
+export function nativeEnvironment(parent, native, platform = process.platform) {
+  const environment = { ...parent };
   if (native) {
     if (native.provider !== 'ghidra') throw new Error('Configured native provider must be ghidra');
     for (const [key, field] of [['GHIDRA_INSTALL_DIR', 'ghidraInstallDir'], ['JAVA_HOME', 'javaHome']]) {
@@ -26,7 +29,14 @@ export async function providerEnvironment() {
       environment[key] = native[field];
     }
     environment.REA_ANALYSIS_PROVIDER = 'ghidra';
-    environment.PATH = path.join(native.javaHome, 'bin') + path.delimiter + (environment.PATH || '');
+    const pathKeys = platform === 'win32'
+      ? Object.keys(environment).filter(key => key.toLowerCase() === 'path').sort()
+      : ['PATH'];
+    // Windows spawn chooses one lexically first case variant. Keep that value,
+    // then emit only one key so Java cannot hide System32/wsl.exe.
+    const inherited = environment[pathKeys[0] || 'PATH'] || '';
+    if (platform === 'win32') for (const key of pathKeys) delete environment[key];
+    environment.PATH = path.join(native.javaHome, 'bin') + (platform === 'win32' ? ';' : ':') + inherited;
   }
   return environment;
 }

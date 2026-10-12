@@ -3,7 +3,58 @@ import assert from 'node:assert/strict';
 import path from 'node:path';
 import fs from 'node:fs/promises';
 import { createServer } from 'node:http';
-import { ROOT, STATE, config, providerEnvironment, run } from '../runtime.mjs';
+import { ROOT, STATE, config, providerEnvironment, nativeEnvironment, run } from '../runtime.mjs';
+import { spawn } from 'node:child_process';
+
+test('Windows provider environment preserves inherited Path without duplicate case variants', () => {
+  const native = { provider: 'ghidra', ghidraInstallDir: path.resolve('fixture-ghidra'), javaHome: path.resolve('fixture-java') };
+  const parent = { Path: 'C:\\Windows\\System32;C:\\Program Files\\nodejs', PRESERVED: 'fixture-value' };
+  const before = structuredClone(parent);
+  const result = nativeEnvironment(parent, native, 'win32');
+  assert.deepEqual(parent, before);
+  assert.deepEqual(Object.keys(result).filter(key => key.toLowerCase() === 'path'), ['PATH']);
+  assert.equal(result.PATH, path.join(native.javaHome, 'bin') + ';' + parent.Path);
+  assert.equal(result.PRESERVED, before.PRESERVED);
+  const duplicate = nativeEnvironment({ Path: 'secondary', PATH: 'primary' }, native, 'win32');
+  assert.equal(duplicate.PATH, path.join(native.javaHome, 'bin') + ';primary');
+  assert.equal(duplicate.Path, undefined);
+  const unix = nativeEnvironment({ PATH: '/usr/bin', Path: 'unrelated-value' }, native, 'linux');
+  assert.equal(unix.PATH, path.join(native.javaHome, 'bin') + ':/usr/bin');
+  assert.equal(unix.Path, 'unrelated-value');
+});
+
+test('native proxy exits after child spawn failure even while client stdin stays open', { skip: process.platform !== 'win32', timeout: 8000 }, async () => {
+  const fixtures = path.join(STATE, 'fixtures');
+  await fs.mkdir(fixtures, { recursive: true });
+  const root = await fs.mkdtemp(path.join(fixtures, 'spawn-exit-'));
+  let child;
+  try {
+    for (const file of ['cli.mjs', 'runtime.mjs', 'reference.mjs', 'video.mjs', 'vision.mjs', 'mcp.mjs', 'wsl-native.mjs']) {
+      await fs.copyFile(path.join(ROOT, file), path.join(root, file), 1);
+    }
+    await fs.writeFile(path.join(root, 'workspace.local.json'), JSON.stringify({ repositories: { frontend: root, backend: root }, whisperModel: '.', native: { provider: 'ghidra', ghidraInstallDir: path.join(root, 'absent-ghidra'), javaHome: path.join(root, 'absent-java'), wsl: { distribution: 'fixture', node: '/fixture/node', javaHome: '/fixture/java', ghidraInstallDir: '/fixture/ghidra' } } }));
+    const env = { ...process.env };
+    for (const key of Object.keys(env)) if (key.toLowerCase() === 'path') delete env[key];
+    env.PATH = ''; // No wsl.exe is resolvable; the test never starts WSL.
+    child = spawn(process.execPath, [path.join(root, 'cli.mjs'), 'native', '--mcp'], { env, cwd: root, windowsHide: true, stdio: ['pipe', 'pipe', 'pipe'] });
+    child.stdout.resume();
+    let error = '';
+    child.stderr.on('data', data => { error += data; });
+    const code = await new Promise((resolve, reject) => {
+      const timer = setTimeout(() => { child.kill(); reject(new Error('Spawn failure left proxy waiting for client stdin')); }, 4000);
+      child.once('error', failure => { clearTimeout(timer); reject(failure); });
+      child.once('close', exit => { clearTimeout(timer); resolve(exit); });
+    });
+    assert.equal(code, 1);
+    assert.match(error, /spawn wsl\.exe ENOENT/);
+  } finally {
+    if (child && child.exitCode === null) child.kill();
+    assert.equal(path.dirname(root), fixtures);
+    assert.equal((await fs.lstat(root)).isSymbolicLink(), false);
+    assert.equal(path.dirname(await fs.realpath(root)), await fs.realpath(fixtures));
+    await fs.rm(root, { recursive: true, force: false });
+  }
+});
 import { referenceAnalyze } from '../reference.mjs';
 import { inspectImage, visionStatus } from '../vision.mjs';
 import { visionConfig } from '../opencode-config.mjs';
