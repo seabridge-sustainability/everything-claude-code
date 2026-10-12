@@ -24,6 +24,11 @@ if (fs.existsSync(engineBinding)) {
         || hash(path.join(binding.root, file)) !== digest) throw Error('Pinned controller engine changed');
   }
   engineRoot = binding.root;
+  const modules = path.join(root, 'node_modules');
+  const localRequire = require('node:module').createRequire(path.join(root, 'package.json'));
+  for (const dependency of ['ajv', 'js-yaml']) localRequire.resolve(dependency);
+  process.env.NODE_PATH = modules + (process.env.NODE_PATH ? path.delimiter + process.env.NODE_PATH : '');
+  require('node:module').Module._initPaths();
 }
 const { execute, checkSession, repository } = require(path.join(engineRoot, 'scripts/lib/session-coordination.js'));
 const { normalizePayload, denialOutput } = require(path.join(engineRoot, 'scripts/lib/scope-guard-adapters.js'));

@@ -115,3 +115,17 @@ test('a real hook subprocess preserves native JSON denial and auto-starts withou
   const bad=invoke('outside.txt');assert.equal(bad.status,0,bad.stderr);
   assert.equal(JSON.parse(bad.stdout).hookSpecificOutput.permissionDecision,'deny');
 });
+test('missing or invalid engine dependencies emit native denials, never a fail-open exit 1', () => {
+  const broken=path.join(temp,'broken-engine');
+  fs.mkdirSync(path.join(broken,'scripts/hooks'),{recursive:true});
+  fs.mkdirSync(path.join(broken,'scripts/lib'),{recursive:true});
+  const hook=path.join(broken,'scripts/hooks/fresh-session-guard.js');
+  fs.copyFileSync(path.join(testedRoot,'scripts/hooks/fresh-session-guard.js'),hook);
+  fs.writeFileSync(path.join(broken,'scripts/lib/fresh-session-guard.js'),"throw Error('unavailable verified engine');\n");
+  for(const runtime of ['claude','codex','gemini','antigravity','opencode','unsupported']) {
+    const r=spawnSync(process.execPath,[hook,runtime,'pre'],{input:'{}',encoding:'utf8',windowsHide:true});
+    assert.notEqual(r.status,1,runtime);
+    if(['opencode','unsupported'].includes(runtime)) assert.equal(r.status,2);
+    else {assert.equal(r.status,0);const d=JSON.parse(r.stdout);assert.equal(runtime==='claude'||runtime==='codex'?d.hookSpecificOutput.permissionDecision:d.decision,'deny');}
+  }
+});

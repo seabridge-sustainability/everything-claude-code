@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 'use strict';
 const fs = require('node:fs');
-const { guard, denialOutput } = require('../lib/fresh-session-guard');
 function run(runtime, event, payload, options = {}) {
   let result;
   try {
+    const { guard } = require('../lib/fresh-session-guard');
     result = guard({ cwd: options.cwd || process.env.ECC_OWNED_WORKTREE || process.cwd(),
       sessionId: options.sessionId || process.env.ECC_SESSION_ID,
       policyRoot: options.policyRoot || process.env.ECC_CORE_POLICY_ROOT,
@@ -17,7 +17,14 @@ function run(runtime, event, payload, options = {}) {
   }
   const reason = 'ECC: ' + result.reason;
   if (runtime === 'antigravity') return { output: { decision: 'deny', reason }, exit: 0 };
-  return { output: event === 'startup' ? { systemMessage: reason } : denialOutput(runtime, event, reason), exit: event === 'startup' || runtime === 'opencode' ? 2 : 0 };
+  // Keep native denials dependency-free: module-load failure must not become
+  // exit 1 (warning/fail-open in several clients).
+  if (event === 'startup') return { output: { systemMessage: reason }, exit: 2 };
+  if (runtime === 'gemini') return { output: { decision: 'deny', reason }, exit: 0 };
+  if (['claude','codex'].includes(runtime)) return { output: event === 'pre'
+    ? { hookSpecificOutput: { hookEventName: 'PreToolUse', permissionDecision: 'deny', permissionDecisionReason: reason } }
+    : { decision: 'block', reason }, exit: 0 };
+  return { output: null, exit: 2 };
 }
 function main(args = process.argv.slice(2)) {
   let payload;
