@@ -3218,8 +3218,8 @@
     }
   ],
   "build": {
-    "generatedAt": "2026-10-12T20:43:53.835Z",
-    "sourceCommit": "f444287404bbd474eceee70a17ecf6ff8b8d1050",
+    "generatedAt": "2026-10-12T22:27:37.109Z",
+    "sourceCommit": "18bc11593dfe7ed7957fbc85d8897e6a14050672",
     "sourceDirty": false,
     "policyCommit": "559f58858a6a1884dcb724bb737d58779ddc6434",
     "policyDirty": false
