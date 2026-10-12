@@ -30,7 +30,7 @@
     ],
     "semanticIndex": "not-run"
   },
-  "sourceFingerprint": "113d5219656dad2337bb9b9461fc7d5330bc7b379b80cfe6b37d6b4125b23562",
+  "sourceFingerprint": "89bb1457dbb65526d82248478d41293ba905f3198696ef34ab50b3ff908a0bfe",
   "sources": [
     {
       "path": "../manageesg-backend/AGENTS.md",
@@ -166,7 +166,7 @@
     },
     {
       "path": "schemas/goal-control.schema.json",
-      "sha256": "9204321280297b03de381d54120057eb6ce2faf9ea6176778b6260117318b4c0"
+      "sha256": "82f4523db19bcf9b8c6f46b7214f78ff5ce627829875c87d59cb1d0a6bcb26fb"
     },
     {
       "path": "schemas/memory.schema.json",
@@ -222,7 +222,7 @@
     },
     {
       "path": "scripts/goal-control.js",
-      "sha256": "50c5403601b1c79272503322f0e77bd10f89efe392790302f0a65e3e3a912d7f"
+      "sha256": "67caeb7d8256c0d7c84881ee62d770b73b5a8c0850923421ef368236e422d9dd"
     },
     {
       "path": "scripts/goal-runtime-bridge.js",
@@ -270,7 +270,7 @@
     },
     {
       "path": "scripts/lib/goal-control.js",
-      "sha256": "65773a0b6ec8ceac5fc4985f5ea4b56f4d4d7622f5f6e2f9a1d522c6d8fb157f"
+      "sha256": "d3ccf7f5fd35fa7e092b447f1bd09cb7f15cbbc2964a5a0e071ae12abdf2f9be"
     },
     {
       "path": "scripts/lib/memory-vault-format.js",
@@ -286,7 +286,7 @@
     },
     {
       "path": "scripts/lib/session-coordination.js",
-      "sha256": "b67cf150324099c050e3dc28d8f05bb2f0e070e93028b444c6cfd85d3601376a"
+      "sha256": "d921854d59543757b955b72d7bd0beec15c35590a1f35e89a32f1d6269de290c"
     },
     {
       "path": "scripts/memory-mcp.mjs",
@@ -306,7 +306,7 @@
     },
     {
       "path": "scripts/session-coordinate.js",
-      "sha256": "f4fea041aba3e0487b6201db7cd06ab38557e6f153770ef07d1529503afd17b4"
+      "sha256": "c48e8be5dae6fbfdc0861957d3d619ed77064c2b3610503b0688bbcb9d2e9206"
     },
     {
       "path": "scripts/sync-instruction-adapters.js",
@@ -350,19 +350,19 @@
     },
     {
       "path": "tests/lib/coding-execution.test.js",
-      "sha256": "04c39fd1a2b5606bf54346a2befa65fd0f3436f600e4a5a73e85742d7a044a8f"
+      "sha256": "12acf5f9d0f0ae3ea2cba89241b9b0a23c4731d2bdd6eea0bc4d042f73d194fd"
     },
     {
       "path": "tests/lib/goal-control.test.js",
-      "sha256": "c43b84829844add9d29fc046872394ec5921f7df20abb93007080de90bf2cbe3"
+      "sha256": "c16edf885131a786fda3d92fe70fce1d21580524932401a8239547b7b4fd5409"
     },
     {
       "path": "tests/lib/goal-runtime-hook.test.js",
-      "sha256": "910851cd3d612b286905602c0e804c41a7ee7ce819353594214818396486433b"
+      "sha256": "2dcf75fcb204864f8bbb4be07c5a8c309bb6564b4a3721ad57f23d3b95781b44"
     },
     {
       "path": "tests/lib/goal-runtime.test.js",
-      "sha256": "56410686938f2fb247b996734a3998c2bcd0fc91bdb742c57fe6573379fc4728"
+      "sha256": "2ee306a2605464cf3e430044777b8e2b7a990aa56df4e36edae251e690c64f2d"
     },
     {
       "path": "tests/lib/memory-schema.test.js",
@@ -386,7 +386,7 @@
     },
     {
       "path": "tests/lib/session-coordination.test.js",
-      "sha256": "8595369f27be9bdc048608686df48072081e14e9362d437659240f0c659de128"
+      "sha256": "0149491dbea9b82edb5c00eaaca2fa104cd2ef52e38a0b55c424ed9e526b058c"
     },
     {
       "path": "tests/scripts/knowledge-freshness.test.js",
@@ -608,7 +608,7 @@
       "id": "file:schemas/goal-control.schema.json",
       "type": "source",
       "path": "schemas/goal-control.schema.json",
-      "sha256": "9204321280297b03de381d54120057eb6ce2faf9ea6176778b6260117318b4c0"
+      "sha256": "82f4523db19bcf9b8c6f46b7214f78ff5ce627829875c87d59cb1d0a6bcb26fb"
     },
     {
       "id": "file:schemas/memory.schema.json",
@@ -692,7 +692,7 @@
       "id": "file:scripts/goal-control.js",
       "type": "source",
       "path": "scripts/goal-control.js",
-      "sha256": "50c5403601b1c79272503322f0e77bd10f89efe392790302f0a65e3e3a912d7f"
+      "sha256": "67caeb7d8256c0d7c84881ee62d770b73b5a8c0850923421ef368236e422d9dd"
     },
     {
       "id": "file:scripts/goal-runtime-bridge.js",
@@ -764,7 +764,7 @@
       "id": "file:scripts/lib/goal-control.js",
       "type": "source",
       "path": "scripts/lib/goal-control.js",
-      "sha256": "65773a0b6ec8ceac5fc4985f5ea4b56f4d4d7622f5f6e2f9a1d522c6d8fb157f"
+      "sha256": "d3ccf7f5fd35fa7e092b447f1bd09cb7f15cbbc2964a5a0e071ae12abdf2f9be"
     },
     {
       "id": "file:scripts/lib/memory-vault-format.js",
@@ -788,7 +788,7 @@
       "id": "file:scripts/lib/session-coordination.js",
       "type": "source",
       "path": "scripts/lib/session-coordination.js",
-      "sha256": "b67cf150324099c050e3dc28d8f05bb2f0e070e93028b444c6cfd85d3601376a"
+      "sha256": "d921854d59543757b955b72d7bd0beec15c35590a1f35e89a32f1d6269de290c"
     },
     {
       "id": "file:scripts/memory-mcp.mjs",
@@ -818,7 +818,7 @@
       "id": "file:scripts/session-coordinate.js",
       "type": "source",
       "path": "scripts/session-coordinate.js",
-      "sha256": "f4fea041aba3e0487b6201db7cd06ab38557e6f153770ef07d1529503afd17b4"
+      "sha256": "c48e8be5dae6fbfdc0861957d3d619ed77064c2b3610503b0688bbcb9d2e9206"
     },
     {
       "id": "file:scripts/sync-instruction-adapters.js",
@@ -884,25 +884,25 @@
       "id": "file:tests/lib/coding-execution.test.js",
       "type": "source",
       "path": "tests/lib/coding-execution.test.js",
-      "sha256": "04c39fd1a2b5606bf54346a2befa65fd0f3436f600e4a5a73e85742d7a044a8f"
+      "sha256": "12acf5f9d0f0ae3ea2cba89241b9b0a23c4731d2bdd6eea0bc4d042f73d194fd"
     },
     {
       "id": "file:tests/lib/goal-control.test.js",
       "type": "source",
       "path": "tests/lib/goal-control.test.js",
-      "sha256": "c43b84829844add9d29fc046872394ec5921f7df20abb93007080de90bf2cbe3"
+      "sha256": "c16edf885131a786fda3d92fe70fce1d21580524932401a8239547b7b4fd5409"
     },
     {
       "id": "file:tests/lib/goal-runtime-hook.test.js",
       "type": "source",
       "path": "tests/lib/goal-runtime-hook.test.js",
-      "sha256": "910851cd3d612b286905602c0e804c41a7ee7ce819353594214818396486433b"
+      "sha256": "2dcf75fcb204864f8bbb4be07c5a8c309bb6564b4a3721ad57f23d3b95781b44"
     },
     {
       "id": "file:tests/lib/goal-runtime.test.js",
       "type": "source",
       "path": "tests/lib/goal-runtime.test.js",
-      "sha256": "56410686938f2fb247b996734a3998c2bcd0fc91bdb742c57fe6573379fc4728"
+      "sha256": "2ee306a2605464cf3e430044777b8e2b7a990aa56df4e36edae251e690c64f2d"
     },
     {
       "id": "file:tests/lib/memory-schema.test.js",
@@ -938,7 +938,7 @@
       "id": "file:tests/lib/session-coordination.test.js",
       "type": "source",
       "path": "tests/lib/session-coordination.test.js",
-      "sha256": "8595369f27be9bdc048608686df48072081e14e9362d437659240f0c659de128"
+      "sha256": "0149491dbea9b82edb5c00eaaca2fa104cd2ef52e38a0b55c424ed9e526b058c"
     },
     {
       "id": "file:tests/scripts/knowledge-freshness.test.js",
@@ -3158,8 +3158,8 @@
     }
   ],
   "build": {
-    "generatedAt": "2026-10-12T06:59:04.271Z",
-    "sourceCommit": "f7abadb35546a2fa5c67342e19dd7636850b115e",
+    "generatedAt": "2026-10-12T07:57:49.938Z",
+    "sourceCommit": "8de411ea48a85eff29da57a87f14a2f01ff5d1e2",
     "sourceDirty": false,
     "policyCommit": "9fef3bfece4d17c8c918d708975779760869117b",
     "policyDirty": false
