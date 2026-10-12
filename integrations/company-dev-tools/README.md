@@ -1,8 +1,8 @@
 # Shared company and development tools
 
-Installed for this Windows workstation on 2026-10-11. Sources and localized Anthropic plugins are in this requested ECC checkout. The active cross-agent bridge lives in the separate canonical ECC runtime checkout:
+Installed for this Windows workstation on 2026-10-11. Sources, localized Anthropic plugins and the active cross-agent bridge now live together in the primary ECC checkout:
 
-`C:/Users/adelm/SeaBridgeAI/everything-claude-code-runtime/integrations/dev-suite`
+`C:/Users/adelm/SeaBridgeAI/everything-claude-code/integrations/dev-suite`
 
 User-level MCP registrations and the `sea-dev-suite` skill expose the tools across projects to Claude, Codex, Gemini and OpenCode. VS Code's MCP host also has registrations. These clients have different plugin formats; the shared MCP library supplies the same pinned workflow text through standard tool calls. A new/reconnected client session is required to load registrations. No running editor session was forcibly restarted.
 
@@ -34,13 +34,15 @@ Review an explicitly selected commit with `suite_review_prepare` using `reposito
 CLI fallback, from any project:
 
 ```powershell
-node C:/Users/adelm/SeaBridgeAI/everything-claude-code-runtime/integrations/dev-suite/cli.mjs status
-node C:/Users/adelm/SeaBridgeAI/everything-claude-code-runtime/integrations/dev-suite/cli.mjs review --help
+node C:/Users/adelm/SeaBridgeAI/everything-claude-code/integrations/dev-suite/cli.mjs status
+node C:/Users/adelm/SeaBridgeAI/everything-claude-code/integrations/dev-suite/cli.mjs review --help
 ```
 
-For other MCP clients, use `command: "C:/Program Files/nodejs/node.exe"`, `args: ["C:/Users/adelm/SeaBridgeAI/everything-claude-code-runtime/integrations/dev-suite/cli.mjs", "mcp"]`. Register a second server with the final argument `context` for context-mode. Run from the intended project; the bridge inherits that working directory. Do not set a universal backend cwd for unrelated projects.
+For other MCP clients, use `command: "C:/Program Files/nodejs/node.exe"`, `args: ["C:/Users/adelm/SeaBridgeAI/everything-claude-code/integrations/dev-suite/cli.mjs", "mcp"]`. Register a second server with the final argument `context` for context-mode. Run from the intended project; the bridge inherits that working directory. Do not set a universal backend cwd for unrelated projects.
 
 Context-mode supports explicit indexing/search/execution across these clients. Automatic routing enforcement, session capture and compaction hooks were not added: they differ by client and can override existing workflows. Its executor is a local tool, not the OpenShell isolation boundary. Do not invoke `ctx_upgrade` or `ctx_purge` without an explicit request; upgrading can alter plugin configuration. Its self-healing postinstall was skipped. Preserve cited source text when using compressed retrieval.
+
+Context-mode startup includes stale-session database cleanup; it is not a read-only readiness probe. Preserve existing session storage and use isolated task-owned storage for acceptance probes. Installed registrations and a stdio handshake do not prove live agent guard activation.
 
 ## On-demand services
 
