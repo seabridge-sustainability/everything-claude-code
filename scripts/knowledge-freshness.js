@@ -23,6 +23,7 @@ const BUILD_INFO_SCHEMA = 'seabridge.graph-build.v3';
 const TAIL_BYTES = 4096;
 const KNOWLEDGE_BOUNDARY_MARKER = 'SeaBridgeAI knowledge boundary';
 const REQUIRED_GRAPHIFY_IGNORES = Object.freeze([
+  '.ecc/',
   'docs/reports/',
   'reports/',
   'artifacts/',
@@ -38,7 +39,11 @@ const REQUIRED_GRAPHIFY_IGNORES = Object.freeze([
 ]);
 
 function git(repo, args) {
-  return execFileSync('git', ['-C', repo, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).replace(/\r?\n$/, '');
+  // Full inventories exceed Node's 1 MiB default in SeaBridge. Keep output
+  // bounded and fail on overflow; never fingerprint a truncated file list.
+  return execFileSync('git', ['-C', repo, ...args], {
+    encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], maxBuffer: 32 * 1024 * 1024,
+  }).replace(/\r?\n$/, '');
 }
 
 function tryGit(repo, args) {
