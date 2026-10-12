@@ -2,7 +2,7 @@
   "schema": "seabridge.agent-system-map.v1",
   "scope": "Three backend policy sources and ECC loading adapters, outcome control, evaluation, and CI; no product or tenant data",
   "extractor": "scripts/agent-system-map.js (deterministic, no LLM)",
-  "generatorVersion": 6,
+  "generatorVersion": 7,
   "policySnapshot": [
     {
       "path": "../manageesg-backend/AGENTS.md",
@@ -30,7 +30,7 @@
     ],
     "semanticIndex": "not-run"
   },
-  "sourceFingerprint": "4146e11e5e49b9a1e1a9ac0ffe1995ccc6278ccfe53cfa5877d9ac5c8a4d5a21",
+  "sourceFingerprint": "4c86e7db5d71cae877892eae2264ddb2d16e1e68835f66a1a8b1eb554e283f31",
   "sources": [
     {
       "path": "../manageesg-backend/AGENTS.md",
@@ -182,7 +182,7 @@
     },
     {
       "path": "scripts/agent-system-map.js",
-      "sha256": "d2f6908af5e55e7ec38ab7c4e3866df009a99424fedf9f9652adc31cbe030220"
+      "sha256": "d848c1bf37d2d6b90935f261a2f41346ef29cdc37ce6eca8ce422c783276d48e"
     },
     {
       "path": "scripts/check-instruction-stack.js",
@@ -273,6 +273,10 @@
       "sha256": "c5266a07230d5917c84665fff55c4f17a50a6f74bc55bf403d3d4a6b9cc2620c"
     },
     {
+      "path": "scripts/native-adoption-pilot.js",
+      "sha256": "05e2f862a8c9f4b4440420c02ea4e99fb93c8c6e601b11697d9cb8eefba6cc00"
+    },
+    {
       "path": "scripts/scope-guard-adapters.js",
       "sha256": "c4b41ed0756f39d14d5f1b13e7f439c9ce98f52fb237e2bbec6abe61383a3bfe"
     },
@@ -343,6 +347,10 @@
     {
       "path": "tests/lib/memory-vault.test.js",
       "sha256": "087b9100802e46d15754e5ae7d9c785685ee197913f5c59226bce27470603f5a"
+    },
+    {
+      "path": "tests/lib/native-adoption-pilot.test.js",
+      "sha256": "b8c7cd706f949d7d7365d4f233352259243c5511b7cf22c48d0703a8d53afb29"
     },
     {
       "path": "tests/lib/scope-guard-adapters.test.js",
@@ -596,7 +604,7 @@
       "id": "file:scripts/agent-system-map.js",
       "type": "source",
       "path": "scripts/agent-system-map.js",
-      "sha256": "d2f6908af5e55e7ec38ab7c4e3866df009a99424fedf9f9652adc31cbe030220"
+      "sha256": "d848c1bf37d2d6b90935f261a2f41346ef29cdc37ce6eca8ce422c783276d48e"
     },
     {
       "id": "file:scripts/check-instruction-stack.js",
@@ -731,6 +739,12 @@
       "sha256": "c5266a07230d5917c84665fff55c4f17a50a6f74bc55bf403d3d4a6b9cc2620c"
     },
     {
+      "id": "file:scripts/native-adoption-pilot.js",
+      "type": "source",
+      "path": "scripts/native-adoption-pilot.js",
+      "sha256": "05e2f862a8c9f4b4440420c02ea4e99fb93c8c6e601b11697d9cb8eefba6cc00"
+    },
+    {
       "id": "file:scripts/scope-guard-adapters.js",
       "type": "source",
       "path": "scripts/scope-guard-adapters.js",
@@ -837,6 +851,12 @@
       "type": "source",
       "path": "tests/lib/memory-vault.test.js",
       "sha256": "087b9100802e46d15754e5ae7d9c785685ee197913f5c59226bce27470603f5a"
+    },
+    {
+      "id": "file:tests/lib/native-adoption-pilot.test.js",
+      "type": "source",
+      "path": "tests/lib/native-adoption-pilot.test.js",
+      "sha256": "b8c7cd706f949d7d7365d4f233352259243c5511b7cf22c48d0703a8d53afb29"
     },
     {
       "id": "file:tests/lib/scope-guard-adapters.test.js",
@@ -1838,6 +1858,12 @@
     },
     {
       "from": "file:scripts/agent-system-map.js",
+      "to": "file:scripts/native-adoption-pilot.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
       "to": "file:scripts/scope-guard-adapters.js",
       "type": "mentions-path",
       "evidence": "scripts/agent-system-map.js"
@@ -1941,6 +1967,12 @@
     {
       "from": "file:scripts/agent-system-map.js",
       "to": "file:tests/lib/memory-vault.test.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:tests/lib/native-adoption-pilot.test.js",
       "type": "mentions-path",
       "evidence": "scripts/agent-system-map.js"
     },
@@ -2135,6 +2167,114 @@
       "to": "file:scripts/lib/memory-vault.js",
       "type": "verified-code-import",
       "evidence": "scripts/memory.js"
+    },
+    {
+      "from": "file:scripts/native-adoption-pilot.js",
+      "to": "file:.gemini/settings.json",
+      "type": "mentions-path",
+      "evidence": "scripts/native-adoption-pilot.js"
+    },
+    {
+      "from": "file:scripts/native-adoption-pilot.js",
+      "to": "file:.opencode/plugins/ecc-scope-guard.ts",
+      "type": "mentions-path",
+      "evidence": "scripts/native-adoption-pilot.js"
+    },
+    {
+      "from": "file:scripts/native-adoption-pilot.js",
+      "to": "file:AGENTS.md",
+      "type": "mentions-path",
+      "evidence": "scripts/native-adoption-pilot.js"
+    },
+    {
+      "from": "file:scripts/native-adoption-pilot.js",
+      "to": "file:manifests/goal-proof-profiles.json",
+      "type": "mentions-path",
+      "evidence": "scripts/native-adoption-pilot.js"
+    },
+    {
+      "from": "file:scripts/native-adoption-pilot.js",
+      "to": "file:manifests/goal-runtime-capabilities.json",
+      "type": "mentions-path",
+      "evidence": "scripts/native-adoption-pilot.js"
+    },
+    {
+      "from": "file:scripts/native-adoption-pilot.js",
+      "to": "file:manifests/instruction-adapters.json",
+      "type": "mentions-path",
+      "evidence": "scripts/native-adoption-pilot.js"
+    },
+    {
+      "from": "file:scripts/native-adoption-pilot.js",
+      "to": "file:package.json",
+      "type": "mentions-path",
+      "evidence": "scripts/native-adoption-pilot.js"
+    },
+    {
+      "from": "file:scripts/native-adoption-pilot.js",
+      "to": "file:schemas/coding-execution.schema.json",
+      "type": "mentions-path",
+      "evidence": "scripts/native-adoption-pilot.js"
+    },
+    {
+      "from": "file:scripts/native-adoption-pilot.js",
+      "to": "file:schemas/goal-control.schema.json",
+      "type": "mentions-path",
+      "evidence": "scripts/native-adoption-pilot.js"
+    },
+    {
+      "from": "file:scripts/native-adoption-pilot.js",
+      "to": "file:scripts/coding-execution.js",
+      "type": "mentions-path",
+      "evidence": "scripts/native-adoption-pilot.js"
+    },
+    {
+      "from": "file:scripts/native-adoption-pilot.js",
+      "to": "file:scripts/goal-runtime-bridge.js",
+      "type": "mentions-path",
+      "evidence": "scripts/native-adoption-pilot.js"
+    },
+    {
+      "from": "file:scripts/native-adoption-pilot.js",
+      "to": "file:scripts/hooks/goal-runtime-gate.js",
+      "type": "mentions-path",
+      "evidence": "scripts/native-adoption-pilot.js"
+    },
+    {
+      "from": "file:scripts/native-adoption-pilot.js",
+      "to": "file:scripts/lib/coding-execution.js",
+      "type": "mentions-path",
+      "evidence": "scripts/native-adoption-pilot.js"
+    },
+    {
+      "from": "file:scripts/native-adoption-pilot.js",
+      "to": "file:scripts/lib/goal-control.js",
+      "type": "mentions-path",
+      "evidence": "scripts/native-adoption-pilot.js"
+    },
+    {
+      "from": "file:scripts/native-adoption-pilot.js",
+      "to": "file:scripts/lib/scope-guard-adapters.js",
+      "type": "mentions-path",
+      "evidence": "scripts/native-adoption-pilot.js"
+    },
+    {
+      "from": "file:scripts/native-adoption-pilot.js",
+      "to": "file:scripts/lib/session-coordination.js",
+      "type": "mentions-path",
+      "evidence": "scripts/native-adoption-pilot.js"
+    },
+    {
+      "from": "file:scripts/native-adoption-pilot.js",
+      "to": "file:scripts/lib/session-coordination.js",
+      "type": "verified-code-import",
+      "evidence": "scripts/native-adoption-pilot.js"
+    },
+    {
+      "from": "file:scripts/native-adoption-pilot.js",
+      "to": "file:scripts/scope-guard-adapters.js",
+      "type": "verified-code-import",
+      "evidence": "scripts/native-adoption-pilot.js"
     },
     {
       "from": "file:scripts/scope-guard-adapters.js",
@@ -2417,6 +2557,30 @@
       "to": "file:scripts/lib/memory-vault.js",
       "type": "verified-code-import",
       "evidence": "tests/lib/memory-vault.test.js"
+    },
+    {
+      "from": "file:tests/lib/native-adoption-pilot.test.js",
+      "to": "file:.opencode/plugins/ecc-scope-guard.ts",
+      "type": "mentions-path",
+      "evidence": "tests/lib/native-adoption-pilot.test.js"
+    },
+    {
+      "from": "file:tests/lib/native-adoption-pilot.test.js",
+      "to": "file:schemas/goal-control.schema.json",
+      "type": "mentions-path",
+      "evidence": "tests/lib/native-adoption-pilot.test.js"
+    },
+    {
+      "from": "file:tests/lib/native-adoption-pilot.test.js",
+      "to": "file:scripts/lib/coding-execution.js",
+      "type": "mentions-path",
+      "evidence": "tests/lib/native-adoption-pilot.test.js"
+    },
+    {
+      "from": "file:tests/lib/native-adoption-pilot.test.js",
+      "to": "file:scripts/native-adoption-pilot.js",
+      "type": "verified-code-import",
+      "evidence": "tests/lib/native-adoption-pilot.test.js"
     },
     {
       "from": "file:tests/lib/scope-guard-adapters.test.js",
@@ -2810,8 +2974,8 @@
     }
   ],
   "build": {
-    "generatedAt": "2026-10-11T23:33:00.502Z",
-    "sourceCommit": "c546a8cb62ac6914957ab63279807e67a6699dc5",
+    "generatedAt": "2026-10-12T00:07:29.115Z",
+    "sourceCommit": "3f72f7bdb8a516d2fea469eb0b15a684695c013e",
     "sourceDirty": false,
     "policyCommit": "998aa246ea2d26d23aeadadda47e8a84212dc5e7",
     "policyDirty": false
