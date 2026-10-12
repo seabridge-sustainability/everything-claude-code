@@ -23,6 +23,7 @@
 const fs = require('fs');
 const path = require('path');
 
+// Reference expansion models the required reads; it does not prove a live client made them.
 const CODEX_CAP = 32 * 1024;
 const MAX_IMPORT_DEPTH = 4;
 const ROOT = path.resolve(__dirname, '..');
@@ -76,11 +77,11 @@ function expandImports(file, depth = 0, seen = new Set()) {
   out.text = raw;
   if (depth >= MAX_IMPORT_DEPTH) return out;
   const scan = stripCode(raw);
-  const re = /(^|\s)@([^\s`]+\.md)\b/g;
+  const re = /(^|\s)@([^\s`]+\.md)\b|<!--\s*SEABRIDGE_CORE_ENTRY:\s*([^\s]+\.md)\s*-->/g;
   let m;
   while ((m = re.exec(scan)) !== null) {
-    const target = path.resolve(path.dirname(abs), m[2].replace(/^~(?=[\\/])/, process.env.USERPROFILE || '~'));
-    if (!fs.existsSync(target)) { out.missing.push(m[2]); continue; }
+    const target = path.resolve(path.dirname(abs), (m[2] || m[3]).replace(/^~(?=[\\/])/, process.env.USERPROFILE || '~'));
+    if (!fs.existsSync(target)) { out.missing.push(m[2] || m[3]); continue; }
     const sub = expandImports(target, depth + 1, seen);
     out.text += '\n' + sub.text;
     out.files.push(...sub.files);
@@ -129,11 +130,12 @@ function legacyEffectiveStacks(repo) {
   const stacks = [];
   const agents = path.join(repo, 'AGENTS.md');
   const claude = path.join(repo, 'CLAUDE.md');
-  const agentsText = fs.existsSync(agents) ? readText(agents) : '';
+  const agentsStack = fs.existsSync(agents) ? expandImports(agents) : { text: '', files: [], missing: [] };
+  const agentsText = agentsStack.text;
   // These runtimes natively discover root AGENTS.md. Keep separate harness
   // results so a product adapter cannot silently disappear from reports.
   for (const harness of ['codex', 'opencode', 'cursor', 'qwen', 'kiro', 'windsurf']) {
-    if (fs.existsSync(agents)) stacks.push({ harness, mode: 'canonical', files: [agents], missing: [], text: agentsText });
+    if (fs.existsSync(agents)) stacks.push({ harness, mode: agentsStack.files.length > 1 ? 'declared' : 'canonical', files: [...agentsStack.files], missing: [...agentsStack.missing], text: agentsText });
   }
   const claudeEntry = fs.existsSync(claude) ? claude : (fs.existsSync(agents) ? agents : null);
   if (claudeEntry) {
@@ -158,7 +160,7 @@ function legacyEffectiveStacks(repo) {
     const ownText = exp.text;
     // Compact product adapters may explicitly delegate to the root contract.
     // Model that declared load without requiring another embedded copy.
-    if (agentsText && /AGENTS\.md/i.test(ownText) && /read|follow|canonical|authoritative/i.test(ownText)) {
+    if (!/SEABRIDGE_CORE_ENTRY/.test(ownText) && agentsText && /AGENTS\.md/i.test(ownText) && /read|follow|canonical|authoritative/i.test(ownText)) {
       exp.files.push(agents); exp.text += '\n' + agentsText;
     }
     stacks.push({ harness, mode: 'declared', files: exp.files, missing: exp.missing, text: exp.text, ownText });
@@ -213,7 +215,8 @@ function effectiveStacks(repo) {
       const exp = expandImports(entry);
       return { harness: adapter.id, mode: adapter.mode, files: exp.files, missing: exp.missing, text: exp.text };
     }
-    return { harness: adapter.id, mode: adapter.mode, files: [entry], missing: [], text: readText(entry), config: adapter.config, installEntry: adapter.installEntry };
+    const exp = expandImports(entry);
+    return { harness: adapter.id, mode: adapter.mode, files: exp.files, missing: exp.missing, text: exp.text, config: adapter.config, installEntry: adapter.installEntry };
   });
 }
 
@@ -224,7 +227,7 @@ function markerBlock(text, start, end) {
 }
 
 function canonicalBlocks(repo) {
-  const text = readText(path.join(repo, 'AGENTS.md'));
+  const text = expandImports(path.join(repo, 'AGENTS.md')).text;
   return [
     ['<!-- SEABRIDGE_SAFETY_RULE_START -->', '<!-- SEABRIDGE_SAFETY_RULE_END -->'],
     ['<!-- SEABRIDGE_GOAL_PROTOCOL_START -->', '<!-- SEABRIDGE_GOAL_PROTOCOL_END -->'],
@@ -241,18 +244,18 @@ function brokenPathRefs(text, repo, workspace) {
     if (/[<>*{}|$]|^https?:|^--?|^\.\\venv|\(|=/.test(ref)) continue;
     if (/^(?:artifacts|logs|docs\/reports|graphify(?:-out|\/output))[\\/]/.test(ref)) continue;
     const home = /^~[\\/]/.test(ref);
-    const abs = /^[A-Za-z]:\\/.test(ref);
+    const abs = /^[A-Za-z]:[\\/]/.test(ref);
     if (!abs && !/[\\/]/.test(ref)) continue;
     // Output directories may be created on demand and need not exist in a
     // detached validation checkout. Validate concrete file references only.
     if (!abs && !/\.(md|json|jsonc|toml|ps1|js|mjs|py|ts|tsx|yaml|yml|txt)$/.test(ref)) continue;
     const portableWindowsRef = abs
-      ? ref.match(/\\everything-claude-code(?:\\(.*))?$/i)
+      ? ref.match(/[\\/]everything-claude-code(?:-runtime)?(?:[\\/](.*))?$/i)
       : null;
     const candidates = home ? [path.join(process.env.USERPROFILE || process.env.HOME || '~', ref.slice(2))]
       : portableWindowsRef
         ? [portableWindowsRef[1]
-          ? path.join(repo, ...portableWindowsRef[1].split('\\'))
+          ? path.join(repo, ...portableWindowsRef[1].split(/[\\/]/))
           : repo]
         : abs ? [ref] : [path.join(repo, ref), path.join(workspace, ref), path.join(workspace, 'everything-claude-code', ref), path.join(ROOT, ref)];
     if (!candidates.some((c) => fs.existsSync(c))) broken.push(ref);
@@ -308,7 +311,7 @@ function checkRepo(repo, workspace, budget, options = {}) {
     if (s.config) {
       const configPath = path.join(repo, s.config);
       if (!fs.existsSync(configPath)) failures.push(`missing adapter config: ${s.config}`);
-      else if (!/"instructions"\s*:\s*\[[\s\S]*?"AGENTS\.md"/.test(readText(configPath))) {
+      else if (!/"instructions"\s*:\s*\[[\s\S]*?"[^"]*AGENTS\.md"/.test(readText(configPath))) {
         failures.push(`${s.config} does not load AGENTS.md`);
       }
     }
@@ -317,7 +320,7 @@ function checkRepo(repo, workspace, budget, options = {}) {
       if (!fs.existsSync(installPath)) failures.push(`missing install entry: ${s.installEntry}`);
       else if (!/@\.\/AGENTS\.md/.test(readText(installPath))) failures.push(`${s.installEntry} does not import its installed AGENTS.md`);
     }
-    if (s.harness === 'copilot' && s.mode === 'declared') {
+    if (s.harness === 'copilot' && s.mode === 'declared' && !/SEABRIDGE_CORE_ENTRY/.test(s.ownText || '')) {
       for (const [label, pattern] of [
         ['approval boundary', /(?:ask before|approval)/i],
         ['prohibited git operations', /force-push|reset --hard|git clean/i],
@@ -325,7 +328,12 @@ function checkRepo(repo, workspace, budget, options = {}) {
         ['Actions cost discipline', /GitHub Actions cost|completed-batch push|batch/i],
       ]) if (!pattern.test(s.ownText || '')) failures.push(`Copilot compact adapter missing ${label}`);
     }
-    for (const ref of brokenPathRefs(s.text, repo, workspace)) failures.push(`broken path reference: ${ref}`);
+    // Resolve each reference from the file that declared it, including external core imports.
+    for (const source of s.files) {
+      for (const ref of brokenPathRefs(readText(source), path.dirname(source), workspace)) {
+        failures.push(`broken path reference: ${ref}`);
+      }
+    }
     if (s.harness === 'claude') for (const d of duplicatedLines(repo)) failures.push(`CLAUDE.md duplicates AGENTS.md: "${d.slice(0, 70)}…"`);
     results.push({ repo: path.basename(repo), harness: s.harness, bytes, files: s.files.map((f) => path.relative(repo, f) || f), failures });
   }

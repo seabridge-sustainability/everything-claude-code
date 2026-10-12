@@ -1,62 +1,31 @@
 #!/usr/bin/env node
 'use strict';
-
 const fs = require('fs');
 const path = require('path');
-
+const { expandImports } = require('./check-instruction-stack');
 const ROOT = path.resolve(__dirname, '..');
 const WRITE = process.argv.includes('--write');
-const STARTS = [
-  ['<!-- SEABRIDGE_SAFETY_RULE_START -->', '<!-- SEABRIDGE_SAFETY_RULE_END -->'],
-  ['<!-- SEABRIDGE_GOAL_PROTOCOL_START -->', '<!-- SEABRIDGE_GOAL_PROTOCOL_END -->'],
-];
-
-function read(relativePath) {
-  return fs.readFileSync(path.join(ROOT, relativePath), 'utf8').replace(/\r\n/g, '\n');
+// Compatibility adapters carry only a reference. Never generate policy copies.
+const outputs = {};
+for (const relative of ['.github/copilot-instructions.md', '.agents/rules/seabridge-agent-baseline.md', '.clinerules']) {
+  const target = path.relative(path.dirname(path.join(ROOT, relative)), path.join(ROOT, '..', 'manageesg-backend', 'AGENTS.md')).replace(/\\/g, '/');
+  outputs[relative] = `# SeaBridgeAI core instruction loader\n\nSYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1\n\n<!-- SEABRIDGE_CORE_ENTRY: ${target} -->\n\nRead and follow \`${target}\` and its shared system import before working.\nThis existing file is a loading adapter only. It defines no independent policy.\n`;
 }
-
-function block(text, start, end) {
-  const from = text.indexOf(start);
-  const to = text.indexOf(end, from);
-  if (from < 0 || to < 0) throw new Error(`Missing canonical block ${start}`);
-  return text.slice(from, to + end.length);
-}
-
-const canonical = read('AGENTS.md');
-const contract = STARTS.map(([start, end]) => block(canonical, start, end)).join('\n\n');
-const costControl = canonical.match(/^## GitHub Actions Budget Tripwire[\s\S]*?(?=^## |^<!-- SEABRIDGE_GOAL_PROTOCOL_START -->)/m)?.[0]?.trim();
-if (!costControl) throw new Error('Missing canonical Actions budget tripwire');
-const compact = [
-  costControl,
-  '',
-  'Load task-specific skills and large references only when their trigger fits.',
-  'No skill is needed for small or single-file work unless a task-specific trigger applies.',
-  'Use focused local checks first and broaden validation only for changed contracts, failures, or material risk.',
-  'Repository rules and configured thresholds override generic examples.',
-].join('\n');
-
-const outputs = {
-  '.github/copilot-instructions.md': `# SeaBridgeAI GitHub Copilot Instructions\n\nSYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1\n\n${contract}\n\n${compact}\n`,
-  '.agents/rules/seabridge-agent-baseline.md': `---\ndescription: SeaBridgeAI canonical safety, goal, and verification contract\n---\n# SeaBridgeAI Agent Baseline\n\nSYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1\n\n${contract}\n\n${compact}\n`,
-  '.clinerules': `# SeaBridgeAI Agent Baseline\n\nSYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1\n\n${contract}\n\n${compact}\n`,
-};
-
+const resolved = expandImports(path.join(ROOT, 'AGENTS.md'));
+if (resolved.missing.length) throw new Error('Central policy unavailable: ' + resolved.missing.join(', '));
+const contract = resolved.text;
 let drift = false;
-for (const [relativePath, expected] of Object.entries(outputs)) {
-  const absolutePath = path.join(ROOT, relativePath);
-  const actual = fs.existsSync(absolutePath) ? read(relativePath) : null;
+for (const [relative, expected] of Object.entries(outputs)) {
+  const file = path.join(ROOT, relative);
+  const actual = fs.existsSync(file) ? fs.readFileSync(file, 'utf8').replace(/\r\n/g, '\n') : null;
   if (actual === expected) continue;
   drift = true;
   if (WRITE) {
-    fs.mkdirSync(path.dirname(absolutePath), { recursive: true });
-    fs.writeFileSync(absolutePath, expected, 'utf8');
-    console.log(`WRITE ${relativePath}`);
-  } else {
-    console.error(`DRIFT ${relativePath}`);
-  }
+    if (!fs.existsSync(file)) throw new Error('Refusing to create another instruction file: ' + relative);
+    fs.writeFileSync(file, expected, 'utf8');
+    console.log('WRITE loader ' + relative);
+  } else console.error('DRIFT loader ' + relative);
 }
-
-if (!WRITE && drift) process.exit(1);
-if (!drift) console.log('instruction adapters: synchronized');
-
+if (!WRITE && drift) process.exitCode = 1;
+if (!drift) console.log('instruction adapters: central references synchronized');
 module.exports = { outputs, contract };

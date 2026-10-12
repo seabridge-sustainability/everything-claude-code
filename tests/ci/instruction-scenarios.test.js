@@ -12,6 +12,13 @@ const script = path.join(root, 'scripts', 'eval-instruction-scenarios.js');
 const adapters = JSON.parse(fs.readFileSync(path.join(root, 'manifests', 'instruction-adapters.json'), 'utf8')).adapters;
 const scenarios = JSON.parse(fs.readFileSync(path.join(root, 'evals', 'agent-instructions', 'scenarios.json'), 'utf8')).scenarios;
 
+const { assertHistoricalLocality } = require('../../scripts/eval-instruction-scenarios');
+assert.doesNotThrow(() => assertHistoricalLocality(() => '@AGENTS.md'));
+for (const external of ['@../manageesg-backend/CLAUDE.md', '<!-- SEABRIDGE_CORE_ENTRY: ../manageesg-backend/AGENTS.md -->']) {
+  assert.throws(() => assertHistoricalLocality(() => external), /bound peer revisions/);
+}
+console.log('  ok  historical checks cannot borrow unbound live sibling policy');
+
 function evaluate(env = {}) {
   const result = spawnSync(process.execPath, [script, '--repo', 'everything-claude-code', '--json'], {
     cwd: root,

@@ -1,0 +1,67 @@
+#!/usr/bin/env node
+'use strict';
+// Supplementary Claude guard, NOT an approval issuer or a general shell sandbox.
+const { execFileSync } = require('node:child_process');
+const path = require('node:path');
+const READ = new Set(['status', 'diff', 'log', 'show', 'rev-parse', 'rev-list', 'ls-files', 'ls-tree', 'ls-remote', 'check-ref-format', 'help', 'version', '--version']);
+const MUTATE = /\b(commit|push|merge|cherry-pick|revert|reset|clean|checkout|switch|branch|tag|update-ref|symbolic-ref|read-tree|config|rebase|stash|fetch|pull|worktree|add|restore|rm|mv|apply)\b/;
+
+function inspect(dir) {
+  const git = args => execFileSync('git', ['-C', dir, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 5000 }).trim();
+  const common = path.resolve(dir, git(['rev-parse', '--git-common-dir'])).replace(/\\/g, '/');
+  let remote = '';
+  try { remote = git(['remote', 'get-url', 'origin']); } catch (_) { /* common directory remains authoritative */ }
+  const product = /(?:^|[/:])manageesg-(backend|frontend)(?:\.git)?\/?$/i.test(remote) || /\/manageesg-(backend|frontend)\/\.git$/i.test(common);
+  const ecc = /(?:^|[/:])everything-claude-code(?:\.git)?\/?$/i.test(remote) || /\/everything-claude-code(?:-runtime)?\/\.git$/i.test(common);
+  let branch = '';
+  try { branch = git(['symbolic-ref', '--short', 'HEAD']); } catch (_) { /* detached HEAD */ }
+  return { product, ecc, branch };
+}
+
+function decide(command, cwd, inspector = inspect) {
+  if (typeof command !== 'string' || !command.trim() || typeof cwd !== 'string') return ['deny', 'Git guard: malformed tool payload; no execution authorized.'];
+  if (!/\bgit(?:\.exe)?\b/i.test(command)) return null;
+  if (/--no-verify\b|(?:core\.hooksPath|HUSKY\s*=\s*0|SKIP\s*=)/i.test(command)) return ['deny', 'Never bypass Git hooks.'];
+  if (/\bpush\b[^\n;&|]*(?:\s--force\S*|\s-[a-z]*f\b|\s\+\S)/i.test(command)) return ['deny', 'Never force-push.'];
+  // Only a direct invocation is resolved. Do not pretend to interpret cd, scripts,
+  // aliases, shell expansion, alternate Git dirs, or compound mutations safely.
+  if (!/^\s*git(?:\.exe)?\s/i.test(command) || /[;&|\r\n`$><]/.test(command)) {
+    return MUTATE.test(command) ? ['ask', 'Git mutation target is ambiguous; use a direct git -C invocation and existing bounded authorization.'] : null;
+  }
+  const tokens = command.match(/"[^"\r\n]*"|'[^'\r\n]*'|[^\s]+/g).map(t => /^['"]/.test(t) ? t.slice(1, -1) : t);
+  let dir = cwd, i = 1;
+  while (tokens[i] === '-C') { if (!tokens[i + 1]) return ['deny', 'Missing git -C directory.']; dir = path.resolve(dir, tokens[i + 1]); i += 2; }
+  const op = tokens[i], args = tokens.slice(i + 1);
+  if (READ.has(op)) return null;
+  if (!op || op.startsWith('-') || !MUTATE.test(op)) return ['ask', 'Unresolved Git options/alias; guard cannot verify its target.'];
+  let repo;
+  try { repo = inspector(dir); } catch (_) { return ['ask', 'Cannot verify Git repository/branch; no silent approval.']; }
+  if ((op === 'reset' && args.includes('--hard')) || (op === 'clean' && args.some(a => /^-[a-z]*f/.test(a)))) {
+    return [repo.product ? 'deny' : 'ask', 'Destructive reset/clean is prohibited on shared product work; preserve concurrent changes.'];
+  }
+  const mutatesCurrent = ['commit', 'merge', 'cherry-pick', 'revert', 'rebase', 'reset', 'add', 'restore', 'rm', 'mv', 'apply', 'read-tree'].includes(op);
+  // ECC main is its ordinary release branch, not backend/frontend production.
+  // Return no extra opinion, NEVER "allow": normal permissions still apply.
+  if (op === 'push') {
+    const refs = args.filter(a => !a.startsWith('-'));
+    const destinationMain = refs.some(a => /(?:^|:)refs\/heads\/main$|(?:^|:)main$/.test(a));
+    const implicitMain = args.includes('--all') || args.includes('--mirror') || (repo.branch === 'main' && (refs.length <= 1 || refs.slice(1).some(a => ['HEAD', 'main', 'refs/heads/main'].includes(a))));
+    if ((destinationMain || implicitMain) && (repo.product || !repo.ecc)) return ['ask', 'Push to main requires explicit bounded owner authorization for this repository; reuse it if already granted.'];
+  }
+  if (mutatesCurrent && repo.branch === 'main' && (repo.product || !repo.ecc)) return ['ask', 'Main-branch mutation requires explicit bounded owner authorization; reuse it if already granted.'];
+  return null;
+}
+
+function run(raw) {
+  let input, decision;
+  try { input = JSON.parse(raw); } catch (_) { decision = ['deny', 'Git guard: malformed hook JSON; execution refused.']; }
+  if (!decision) decision = decide(input?.tool_input?.command, input?.cwd);
+  return decision ? { hookSpecificOutput: { hookEventName: 'PreToolUse', permissionDecision: decision[0], permissionDecisionReason: decision[1] } } : null;
+}
+if (require.main === module) {
+  let raw = '';
+  process.stdin.setEncoding('utf8');
+  process.stdin.on('data', chunk => { raw += chunk; });
+  process.stdin.on('end', () => { const result = run(raw); if (result) process.stdout.write(JSON.stringify(result)); });
+}
+module.exports = { decide, run, inspect };

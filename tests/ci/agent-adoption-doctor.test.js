@@ -15,7 +15,14 @@ assert.equal(baseline.ready, true, JSON.stringify(baseline.runtimes.filter(row =
 assert.ok(baseline.runtimes.every(row => row.liveEnforcementProven === false));
 assert.equal(baseline.runtimes.find(row => row.id === 'copilot').status, 'instruction-only');
 
-const project = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-adoption-'));
+const container = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-adoption-'));
+const project = path.join(container, 'ecc');
+const core = path.join(container, 'manageesg-backend');
+fs.mkdirSync(project);
+fs.mkdirSync(core);
+for (const name of ['AGENTS.md', 'AGENTS_SYSTEM.md', 'CLAUDE.md']) {
+  fs.copyFileSync(path.join(root, '..', 'manageesg-backend', name), path.join(core, name));
+}
 try {
   for (const relative of ['AGENTS.md', 'CLAUDE.md', 'GEMINI.md', '.clinerules']) {
     const target = path.join(project, relative);
@@ -23,6 +30,12 @@ try {
     fs.copyFileSync(path.join(root, relative), target);
   }
   assert.equal(inspect({ projectRoot: project, runtime: 'claude' }).ready, true);
+  fs.renameSync(path.join(core, 'AGENTS_SYSTEM.md'), path.join(core, 'held.md'));
+  assert.equal(inspect({ projectRoot: project, runtime: 'claude' }).ready, false);
+  fs.renameSync(path.join(core, 'held.md'), path.join(core, 'AGENTS_SYSTEM.md'));
+  fs.writeFileSync(path.join(project, 'CLAUDE.md'), '@../outside.md\n');
+  assert.ok(inspect({ projectRoot: project, runtime: 'claude' }).runtimes[0].issues
+    .some(issue => issue.includes('untrusted instruction import')));
   fs.writeFileSync(path.join(project, 'CLAUDE.md'), '# no import\n');
   const brokenImport = inspect({ projectRoot: project, runtime: 'claude' });
   assert.equal(brokenImport.ready, false);
@@ -58,7 +71,11 @@ try {
   const inactive = inspectInstallation({ adapterRoot, projectRoot: project, homeDir: home, probe });
   assert.equal(inactive.status, 'incomplete');
   assert.equal(inactive.runtimes.find(row => row.id === 'claude').gateConfigured, false);
-  assert.equal(inactive.runtimes.find(row => row.id === 'opencode').status, 'plugin-configured-not-observed');
+  assert.equal(inactive.runtimes.find(row => row.id === 'opencode').status, 'plugin-dependency-missing');
+  assert.equal(inactive.runtimes.find(row => row.id === 'opencode').gateConfigured, false);
+  const peer = path.join(adapterRoot, '.opencode', 'node_modules', '@opencode-ai', 'plugin', 'package.json');
+  fs.mkdirSync(path.dirname(peer), { recursive: true });
+  fs.writeFileSync(peer, '{}\n');
   fs.mkdirSync(path.join(project, '.claude'), { recursive: true });
   fs.writeFileSync(path.join(project, '.claude', 'settings.json'), JSON.stringify({ hooks: {
     UserPromptSubmit: [{ hooks: [{ command: 'node scripts/hooks/goal-runtime-gate.js claude admit' }] }],
@@ -86,7 +103,7 @@ try {
   fs.writeFileSync(path.join(home, '.codex', 'AGENTS.md'), 'old shared checkout\n');
   assert.equal(inspectInstallation({ adapterRoot, projectRoot: project, homeDir: home, probe }).status, 'incomplete');
 } finally {
-  fs.rmSync(project, { recursive: true, force: true });
+  fs.rmSync(container, { recursive: true, force: true });
 }
 
 console.log('agent adoption doctor: file and installation checks passed');

@@ -1,0 +1,66 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$defs": {
+    "state": {
+      "type":"object","additionalProperties":false,
+      "required":["version","plan","plan_sha256","sequence","phase","dispatches","repairs","spent_usd","history","nodes","join_sha256","critique","synthesis","effects","audit"],
+      "properties": {
+        "version":{"const":3}, "plan":{"$ref":"#/$defs/plan"}, "plan_sha256":{"$ref":"#/$defs/hash"},
+        "sequence":{"type":"integer","minimum":0}, "phase":{"enum":["planned","workers","critic","repair","synthesis","approval","effect","completed","reconciliation","budget-exhausted"]},
+        "dispatches":{"type":"integer","minimum":0},"repairs":{"type":"integer","minimum":0},"spent_usd":{"type":"number","minimum":0},
+        "history":{"type":"array","items":{"anyOf":[{"type":"object","additionalProperties":false,"required":["join_sha256","critique","results"],"properties":{"join_sha256":{"$ref":"#/$defs/hash"},"critique":{"$ref":"#/$defs/critique"},"results":{"type":"array","items":{"$ref":"#/$defs/result"}}}},{"type":"object","additionalProperties":false,"required":["error","worker","attempt"],"properties":{"error":{"const":"worker-launch-or-execution-failed"},"worker":{"$ref":"#/$defs/id"},"attempt":{"type":"integer","minimum":1}}}]}},
+        "nodes":{"type":"object","minProperties":1,"additionalProperties":{"type":"object","additionalProperties":false,"required":["status","attempts","token","lease_until","result","usage"],"properties":{"status":{"enum":["pending","running","done"]},"attempts":{"type":"integer","minimum":0},"token":{"anyOf":[{"type":"null"},{"$ref":"#/$defs/hash"}]},"lease_until":{"type":["integer","null"]},"result":{"anyOf":[{"type":"null"},{"$ref":"#/$defs/result"}]},"usage":{"$ref":"#/$defs/usage"}}}},
+        "join_sha256":{"anyOf":[{"type":"null"},{"$ref":"#/$defs/hash"}]},"critique":{"anyOf":[{"type":"null"},{"$ref":"#/$defs/critique"}]},"synthesis":{"anyOf":[{"type":"null"},{"$ref":"#/$defs/synthesis"}]},
+        "effects":{"type":"object","additionalProperties":{"type":"object","additionalProperties":false,"required":["proposal","binding","status","approval","receipt"],"properties":{"proposal":{"$ref":"#/$defs/effect"},"binding":{"$ref":"#/$defs/hash"},"status":{"enum":["pending","approved","running","completed"]},"approval":{"type":["object","null"]},"receipt":{}}}},
+        "audit":{"type":"array","items":{"type":"object","additionalProperties":false,"required":["sequence","type","actor","at","phase"],"properties":{"sequence":{"type":"integer","minimum":1},"type":{"$ref":"#/$defs/text"},"actor":{"$ref":"#/$defs/id"},"at":{"$ref":"#/$defs/text"},"phase":{"$ref":"#/$defs/text"}}}}
+      }
+    },
+    "id": {"type":"string","pattern":"^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"},
+    "hash": {"type":"string","pattern":"^[a-f0-9]{64}$"},
+    "text": {"type":"string","minLength":1,"maxLength":2000},
+    "worker": {
+      "type":"object","additionalProperties":false,
+      "required":["id","runtime","agent","repo","session","scopes","requirement","acceptance","expires_at","max_attempts","assignment_id","assignment_sha256"],
+      "properties":{"id":{"$ref":"#/$defs/id"},"runtime":{"$ref":"#/$defs/text"},"agent":{"$ref":"#/$defs/id"},"repo":{"$ref":"#/$defs/text"},"session":{"$ref":"#/$defs/id"},"scopes":{"type":"array","minItems":1,"uniqueItems":true,"items":{"$ref":"#/$defs/text"}},"requirement":{"$ref":"#/$defs/text"},"acceptance":{"$ref":"#/$defs/text"},"expires_at":{"$ref":"#/$defs/text"},"max_attempts":{"type":"integer","minimum":1,"maximum":20},"assignment_id":{"$ref":"#/$defs/id"},"assignment_sha256":{"$ref":"#/$defs/hash"}}
+    },
+    "plan": {
+      "type":"object","additionalProperties":false,
+      "required":["version","id","parent","session","repo","goal_file","goal_sha256","assignments_file","revision","environment","critic","workers","limits"],
+      "properties":{"version":{"const":3},"id":{"$ref":"#/$defs/id"},"parent":{"$ref":"#/$defs/id"},"session":{"$ref":"#/$defs/id"},"repo":{"$ref":"#/$defs/text"},"goal_file":{"$ref":"#/$defs/text"},"goal_sha256":{"$ref":"#/$defs/hash"},"assignments_file":{"$ref":"#/$defs/text"},"revision":{"$ref":"#/$defs/hash"},"environment":{"$ref":"#/$defs/text"},"critic":{"$ref":"#/$defs/id"},"workers":{"type":"array","minItems":1,"items":{"$ref":"#/$defs/worker"}},"limits":{"type":"object","additionalProperties":false,"required":["dispatches","repairs","lease_ms","usd"],"properties":{"dispatches":{"type":"integer","minimum":1},"repairs":{"type":"integer","minimum":0,"maximum":20},"lease_ms":{"type":"integer","minimum":1,"maximum":3600000},"usd":{"type":"number","minimum":0}}}}
+    },
+    "citation": {
+      "type":"object","additionalProperties":false,
+      "required":["source_id","version","citation","source_revision","line_start","line_end","chunk_id","policy_epoch","scope"],
+      "properties":{"source_id":{"$ref":"#/$defs/text"},"version":{"$ref":"#/$defs/text"},"citation":{"$ref":"#/$defs/text"},"source_revision":{"$ref":"#/$defs/text"},"line_start":{"type":"integer","minimum":1},"line_end":{"type":"integer","minimum":1},"chunk_id":{"$ref":"#/$defs/hash"},"policy_epoch":{"type":"integer","minimum":1},"scope":{"const":"engineering:seabridge-code"}}
+    },
+    "evidence": {
+      "type":"object","additionalProperties":false,"required":["path","sha256","kind"],
+      "properties":{"path":{"$ref":"#/$defs/text"},"sha256":{"$ref":"#/$defs/hash"},"kind":{"enum":["local-check","api","browser","save-reopen","attachment","export","scientific-validation"]}}
+    },
+    "result": {
+      "type":"object","additionalProperties":false,
+      "required":["version","worker","agent","runtime","token","revision","environment","status","head","tree_fingerprint","changed_paths","evidence","citations","usd","usage"],
+      "properties":{"version":{"const":1},"worker":{"$ref":"#/$defs/id"},"agent":{"$ref":"#/$defs/id"},"runtime":{"$ref":"#/$defs/text"},"token":{"$ref":"#/$defs/hash"},"revision":{"$ref":"#/$defs/hash"},"environment":{"$ref":"#/$defs/text"},"status":{"enum":["pass","fail"]},"head":{"type":"string","pattern":"^[a-f0-9]{40,64}$"},"tree_fingerprint":{"$ref":"#/$defs/hash"},"changed_paths":{"type":"array","uniqueItems":true,"items":{"$ref":"#/$defs/text"}},"evidence":{"type":"array","minItems":1,"items":{"$ref":"#/$defs/evidence"}},"citations":{"type":"array","items":{"$ref":"#/$defs/citation"}},"usd":{"type":"number","minimum":0},"usage":{"$ref":"#/$defs/usage"},"preservation":{"$ref":"#/$defs/preservation"}}
+    },
+    "preservation": {
+      "type":"object","additionalProperties":false,"required":["contract_sha256","checks"],
+      "properties":{"contract_sha256":{"$ref":"#/$defs/hash"},"checks":{"type":"array","minItems":1,"items":{"type":"object","additionalProperties":false,"required":["id","evidence"],"properties":{"id":{"$ref":"#/$defs/id"},"evidence":{"$ref":"#/$defs/evidence"}}}}}
+    },
+    "usage": {
+      "type":"object","additionalProperties":false,"required":["tool_calls","retries","ci_runs","cost_usd"],
+      "properties":{"tool_calls":{"type":"integer","minimum":0},"retries":{"type":"integer","minimum":0},"ci_runs":{"type":"integer","minimum":0},"cost_usd":{"type":"number","minimum":0}}
+    },
+    "critique": {
+      "type":"object","additionalProperties":false,"required":["agent","join_sha256","accepted","rejections"],
+      "properties":{"agent":{"$ref":"#/$defs/id"},"join_sha256":{"$ref":"#/$defs/hash"},"accepted":{"type":"boolean"},"rejections":{"type":"array","items":{"type":"object","additionalProperties":false,"required":["worker","reason"],"properties":{"worker":{"$ref":"#/$defs/id"},"reason":{"enum":["missing-required-output","scope-violation","stale-evidence","failed-acceptance","unsupported-quantification","tenant-or-license-violation","unrequested-semantic-change"]}}}}}
+    },
+    "synthesis": {
+      "type":"object","additionalProperties":false,"required":["version","join_sha256","claim","outputs"],
+      "properties":{"version":{"const":1},"join_sha256":{"$ref":"#/$defs/hash"},"claim":{"const":"locally-verified"},"outputs":{"type":"array","minItems":1,"uniqueItems":true,"items":{"$ref":"#/$defs/id"}}}
+    },
+    "effect": {
+      "type":"object","additionalProperties":false,"required":["id","kind","target","payload_sha256","candidate","environment","expected_usd"],
+      "properties":{"id":{"$ref":"#/$defs/id"},"kind":{"enum":["push","deploy","provider-call","shared-write"]},"target":{"$ref":"#/$defs/text"},"payload_sha256":{"$ref":"#/$defs/hash"},"candidate":{"type":"string","pattern":"^[a-f0-9]{40,64}$"},"environment":{"$ref":"#/$defs/text"},"expected_usd":{"type":"number","minimum":0}}
+    }
+  }
+}

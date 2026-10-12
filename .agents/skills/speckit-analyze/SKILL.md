@@ -6,6 +6,6 @@ description: Callable wrapper for SeaBridgeAI curated Spec Kit read-only analysi
 # speckit-analyze
 
 Canonical skill:
-`C:\Users\adelm\SeaBridgeAI\everything-claude-code\skills\spec-kit\analyze\SKILL.md`
+`C:\Users\adelm\SeaBridgeAI\everything-claude-code-runtime\skills\spec-kit\analyze\SKILL.md`
 
 Load and follow the canonical skill body. Do not fork behavior here.

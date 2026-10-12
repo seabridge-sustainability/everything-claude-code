@@ -1,0 +1,405 @@
+'use strict';
+
+// Runtime-neutral cooperative controller. No model calls, shell executor,
+// authorization issuer, sandbox or memory implementation lives in this module.
+const fs = require('node:fs');
+const path = require('node:path');
+const crypto = require('node:crypto');
+const os = require('node:os');
+const Ajv = require('ajv');
+const { canonicalJson, sha256Buffer, sha256File, captureRepositoryState } = require('./goal-store');
+const { writeFileAtomic } = require('./atomic-write');
+const coordination = require('./session-coordination');
+const goals = require('./goal-control');
+const schema = JSON.parse(fs.readFileSync(path.join(__dirname, '../../schemas/coding-execution.schema.json'), 'utf8'));
+const validators = new Map();
+function assert(kind, value) {
+  if (!validators.has(kind)) validators.set(kind, new Ajv({ allErrors: true, strict: false }).compile({ ...schema, $ref: `#/$defs/${kind}` }));
+  const validate = validators.get(kind);
+  if (!validate(value)) throw new Error(`${kind}: ${JSON.stringify(validate.errors)}`);
+}
+const digest = value => sha256Buffer(canonicalJson(value));
+function demand(test, message) { if (!test) throw new Error(message); }
+function inside(root, file) {
+  const relative = path.relative(fs.realpathSync(root), path.resolve(root, file)).split(path.sep).join('/');
+  coordination.scope(relative);
+  let current = fs.realpathSync(root);
+  for (const part of relative.split('/')) {
+    current = path.join(current, part);
+    try { demand(!fs.lstatSync(current).isSymbolicLink(), 'linked execution path'); }
+    catch (error) { if (error.code !== 'ENOENT') throw error; }
+  }
+  return coordination.scope(relative);
+}
+function owner(plan, now) {
+  return coordination.checkSession({ cwd: plan.repo, sessionId: plan.session, now });
+}
+function workerAuthority(worker, now) {
+  const active = coordination.checkSession({ cwd: worker.repo, sessionId: worker.session, now });
+  for (const value of worker.scopes) {
+    const clean = inside(worker.repo, value);
+    demand(active.scopes.some(owned => clean === owned || clean.startsWith(`${owned}/`)), 'worker scope not owned');
+  }
+}
+function checkPlan(plan, now) {
+  assert('plan', plan); owner(plan, now);
+  demand(path.isAbsolute(plan.repo) && path.isAbsolute(plan.goal_file), 'absolute repository and goal paths required');
+  inside(plan.repo, plan.goal_file);
+  demand(sha256File(plan.goal_file) === plan.goal_sha256, 'owner goal changed; replan and reissue assignments');
+  demand(path.isAbsolute(plan.assignments_file), 'absolute goal assignment path required');
+  inside(plan.repo, plan.assignments_file);
+  const goal = goals.readStructuredFile(plan.goal_file);
+  const assignments = goals.readJsonLines(plan.assignments_file);
+  goals.validateBundle({ goal, assignments });
+  demand(['active', 'off_track'].includes(goal.status), 'goal is not executable');
+  const correction = goals.latestExecutableCorrection(goal);
+  const ids = new Set(), agents = new Set([plan.parent, plan.critic]);
+  const repositories = new Map(plan.workers.map(worker => [worker.id, coordination.repository(worker.repo).common]));
+  demand(plan.parent !== plan.critic, 'critic must be independent of planner');
+  for (const worker of plan.workers) {
+    const assignment = assignments.find(item => item.assignment_id === worker.assignment_id);
+    demand(assignment && digest(assignment) === worker.assignment_sha256, 'missing or changed goal assignment');
+    demand(assignment.owner_agent === worker.agent && assignment.owner_runtime === worker.runtime, 'assignment owner/runtime mismatch');
+    demand(assignment.scope_paths.map(coordination.scope).sort().join() === worker.scopes.map(coordination.scope).sort().join(), 'assignment scope mismatch');
+    demand(assignment.description === worker.requirement, 'task differs from approved goal assignment');
+    demand(assignment.change_contract, 'missing requested-change/preservation contract; reissue assignment for v3');
+    demand(assignment.change_contract.requested_delta === assignment.description, 'requested delta differs from goal assignment');
+    const invariantIds = new Set();
+    for (const invariant of assignment.change_contract.preserved_invariants) {
+      demand(!invariantIds.has(invariant.id), 'duplicate preserved invariant'); invariantIds.add(invariant.id);
+      const relative = inside(worker.repo, invariant.baseline.path);
+      demand(!worker.scopes.some(value => coordination.overlaps(coordination.scope(value), relative)), 'preservation baseline must be outside worker write scope');
+      demand(sha256File(path.join(worker.repo, relative)) === invariant.baseline.sha256, 'preservation baseline changed');
+      demand(invariant.category !== 'design' || invariant.baseline.kind === 'browser', 'design preservation needs browser baseline, not private tests');
+    }
+    const proofs = assignment.acceptance_ids.map(id => goal.user_visible_proofs.find(proof => proof.id === id));
+    demand(proofs.every(proof => {
+      const lane=goal.lanes.find(item=>item.id===proof.lane_id);
+      return proof.required && (lane?.status==='active' || (lane?.status==='blocked' && lane.blocker && lane.next_action));
+    }), 'worker must advance an active required outcome or its recorded blocker, not optional or deferred work');
+    demand(worker.acceptance === proofs.map(proof => proof.acceptance_predicate).join('\n'), 'acceptance differs from required goal output');
+    demand(Date.parse(assignment.issued_at) <= now && Date.parse(assignment.lease_expires_at) === Date.parse(worker.expires_at), 'assignment lease mismatch or not yet issued');
+    demand(!correction || Date.parse(assignment.issued_at) >= Date.parse(correction.recorded_at), 'assignment predates current owner correction; reissue it');
+    demand(worker.max_attempts <= assignment.budget.max_retries + 1, 'worker retries exceed goal assignment budget');
+    demand(!ids.has(worker.id) && !agents.has(worker.agent), 'duplicate worker or non-independent critic/worker');
+    ids.add(worker.id); agents.add(worker.agent);
+    demand(path.isAbsolute(worker.repo), 'worker repository must be absolute');
+    demand(Number.isFinite(Date.parse(worker.expires_at)), 'invalid worker expiry');
+    worker.scopes.forEach(value => inside(worker.repo, value));
+    for (const other of plan.workers) {
+      if (other.id === worker.id) continue;
+      // Registry reservations are repository-wide even in separate worktrees.
+      const sameRepo = repositories.get(other.id) === repositories.get(worker.id);
+      demand(!sameRepo || !worker.scopes.some(a => other.scopes.some(b => coordination.overlaps(coordination.scope(a), coordination.scope(b)))), 'overlapping worker scopes');
+    }
+  }
+}
+function initialize(plan, now = Date.now()) {
+  checkPlan(plan, now);
+  return { version: 3, plan, plan_sha256: digest(plan), sequence: 0, phase: 'planned',
+    dispatches: 0, repairs: 0, spent_usd: 0, history: [], nodes: Object.fromEntries(plan.workers.map(worker => [worker.id,
+      { status: 'pending', attempts: 0, token: null, lease_until: null, result: null, usage: {tool_calls:0,retries:0,ci_runs:0,cost_usd:0} }])),
+    join_sha256: null, critique: null, synthesis: null, effects: {}, audit: [] };
+}
+function validateState(state) {
+  assert('state', state);
+  demand(state?.version === 3 && digest(state.plan) === state.plan_sha256, 'invalid execution state/plan fingerprint');
+  assert('plan', state.plan);
+  demand(Object.keys(state.nodes).sort().join() === state.plan.workers.map(w => w.id).sort().join(), 'invalid execution node set');
+  demand(['planned','workers','critic','repair','synthesis','approval','effect','completed','reconciliation','budget-exhausted'].includes(state.phase), 'invalid execution phase');
+  demand(Number.isInteger(state.sequence) && state.sequence >= 0 && Array.isArray(state.audit), 'invalid execution sequence');
+  demand(['dispatches','repairs'].every(key => Number.isInteger(state[key]) && state[key] >= 0), 'invalid execution counters');
+  demand(Number.isFinite(state.spent_usd) && state.spent_usd >= 0 && Array.isArray(state.history), 'invalid execution budget/history');
+  demand(state.effects && typeof state.effects === 'object' && !Array.isArray(state.effects), 'invalid execution effects');
+  for (const [id, effect] of Object.entries(state.effects)) {
+    assert('effect', effect.proposal);
+    demand(effect.proposal.id === id && ['pending','approved','running','completed'].includes(effect.status), 'invalid effect state');
+    demand(effect.binding === digest({ effect: effect.proposal, synthesis: state.synthesis, revision: state.plan.revision }), 'stale effect binding');
+    if (effect.status !== 'pending') demand(effect.approval?.binding === effect.binding && typeof effect.approval.receipt === 'string' && effect.approval.receipt.length > 0, 'missing effect approval');
+    if (effect.status === 'completed') demand(effect.receipt !== null && effect.receipt !== undefined, 'missing completed effect receipt');
+  }
+  if (state.phase === 'completed') demand(Object.keys(state.effects).length > 0 && Object.values(state.effects).every(e => e.status === 'completed'), 'incomplete effect barrier');
+  for (const node of Object.values(state.nodes)) {
+    demand(['pending','running','done'].includes(node.status) && Number.isInteger(node.attempts) && node.attempts >= 0, 'invalid execution node');
+    if (node.result) assert('result', node.result);
+    if (node.status === 'running') demand(node.token !== null && Number.isInteger(node.lease_until), 'running node lacks lease/token');
+    if (node.status === 'done') demand(node.result !== null, 'done node lacks result');
+  }
+  if (['critic','synthesis','approval','effect','completed','reconciliation'].includes(state.phase)) {
+    demand(Object.values(state.nodes).every(node => node.status === 'done'), 'join barrier state mismatch');
+    demand(state.join_sha256 === digest({ revision: state.plan.revision, results: Object.values(state.nodes).map(node => node.result) }), 'join fingerprint mismatch');
+  }
+  if (['synthesis','approval','effect','completed','reconciliation'].includes(state.phase)) demand(state.critique?.accepted === true && state.critique.join_sha256 === state.join_sha256, 'accepted critic state required');
+  if (['approval','effect','completed','reconciliation'].includes(state.phase)) demand(state.synthesis?.join_sha256 === state.join_sha256, 'typed synthesis state required');
+}
+function currentEvidence(state, authorizeCitation, verifyPreservation, requireReview = false) {
+  for (const worker of state.plan.workers) {
+    const result = state.nodes[worker.id].result;
+    if (!result) continue;
+    const captured = captureRepositoryState(worker.repo, { excludePaths: [path.join(worker.repo, '.ecc/goal')] });
+    demand(captured.head === result.head && captured.tree_fingerprint === result.tree_fingerprint, 'stale worker repository evidence');
+    const contract = assignmentFor(state.plan, worker).change_contract;
+    if (result.status === 'pass') {
+      demand(result.preservation?.contract_sha256 === digest(contract), 'missing or stale preservation receipt');
+      const checks = result.preservation.checks;
+      demand(checks.length === contract.preserved_invariants.length && new Set(checks.map(check => check.id)).size === checks.length, 'preservation checks must cover each invariant exactly once');
+      for (const invariant of contract.preserved_invariants) {
+        const check = checks.find(item => item.id === invariant.id);
+        demand(check && check.evidence.kind === invariant.baseline.kind, 'missing invariant or wrong preservation evidence kind');
+        demand(inside(worker.repo, check.evidence.path) !== inside(worker.repo, invariant.baseline.path), 'baseline is not post-change preservation evidence');
+      }
+      if (requireReview) {
+        // Hashes establish identity/freshness, not semantic equality. The caller
+        // must supply a trusted, independent comparison of outcome + invariants.
+        demand(typeof verifyPreservation === 'function' && verifyPreservation({
+          worker, assignment: assignmentFor(state.plan, worker), contract, result,
+          revision: state.plan.revision, environment: state.plan.environment,
+          join_sha256: state.join_sha256,
+        }) === true, 'requested outcome and semantic preservation not independently verified');
+      }
+    }
+    for (const ref of [...result.evidence, ...(result.preservation?.checks || []).map(check => check.evidence)]) {
+      const relative = inside(worker.repo, ref.path);
+      demand(sha256File(path.join(worker.repo, relative)) === ref.sha256, 'stale evidence artifact');
+    }
+    for (const ref of result.citations) {
+      demand(ref.line_end >= ref.line_start, 'invalid citation line range');
+      demand(typeof authorizeCitation === 'function' && authorizeCitation(ref) === true, 'current scoped memory authorizer required');
+    }
+  }
+}
+function maybeJoin(state) {
+  if (!Object.values(state.nodes).every(node => node.status === 'done')) return;
+  state.join_sha256 = digest({ revision: state.plan.revision, results: Object.values(state.nodes).map(node => node.result) });
+  state.phase = 'critic';
+}
+function assignmentFor(plan, worker) {
+  return goals.readJsonLines(plan.assignments_file).find(item => item.assignment_id === worker.assignment_id);
+}
+function accountUsage(state, node, worker, usage) {
+  assert('usage', usage);
+  for (const key of Object.keys(node.usage)) node.usage[key] += usage[key];
+  state.spent_usd += usage.cost_usd;
+  const budget = assignmentFor(state.plan, worker).budget;
+  if (state.spent_usd > state.plan.limits.usd || Object.entries(node.usage).some(([key,value]) => value > budget[`max_${key}`])) state.phase = 'budget-exhausted';
+}
+function apply(state, event, options = {}) {
+  validateState(state);
+  const now = options.now ?? Date.now();
+  checkPlan(state.plan, now);
+  demand(event && typeof event.type === 'string', 'typed execution event required');
+  const next = structuredClone(state), plan = next.plan;
+  const parent = () => demand(event.actor === plan.parent, 'parent/root actor required');
+  const live = worker => { workerAuthority(worker, now); demand(Date.parse(worker.expires_at) > now, 'expired assignment'); };
+  const evidence = (requireReview = next.critique?.accepted === true) => currentEvidence(next, options.authorizeCitation, options.verifyPreservation, requireReview);
+  switch (event.type) {
+    case 'dispatch': {
+      parent(); demand(['planned','repair'].includes(next.phase), 'dispatch requires planned/repair phase');
+      const pending = plan.workers.filter(worker => next.nodes[worker.id].status === 'pending');
+      demand(pending.length > 0, 'no pending nodes'); pending.forEach(live);
+      if (next.spent_usd > plan.limits.usd || next.dispatches + pending.length > plan.limits.dispatches || pending.some(w => {
+        const node=next.nodes[w.id],budget=assignmentFor(plan,w).budget;
+        return node.attempts >= w.max_attempts || node.usage.tool_calls >= budget.max_tool_calls
+          || node.usage.retries > budget.max_retries || node.usage.ci_runs > budget.max_ci_runs
+          || (budget.max_cost_usd > 0 && node.usage.cost_usd >= budget.max_cost_usd);
+      })) {
+        next.phase = 'budget-exhausted'; break;
+      }
+      for (const worker of pending) {
+        const node = next.nodes[worker.id]; node.status = 'running'; node.attempts++;
+        node.token = crypto.randomBytes(32).toString('hex');
+        node.lease_until = Math.min(now + plan.limits.lease_ms, Date.parse(worker.expires_at));
+      }
+      next.dispatches += pending.length; next.phase = 'workers'; break;
+    }
+    case 'result': {
+      assert('result', event.result);
+      const result = event.result, worker = plan.workers.find(w => w.id === result.worker);
+      demand(worker, 'unknown worker'); live(worker);
+      const node = next.nodes[worker.id];
+      demand(event.actor === worker.agent && result.agent === worker.agent && result.runtime === worker.runtime, 'worker identity/runtime mismatch');
+      demand(node.status === 'running' && node.token === result.token && now < node.lease_until, 'stale or duplicate worker result');
+      demand(result.revision === plan.revision && result.environment === plan.environment, 'stale goal revision or environment');
+      demand(result.changed_paths.every(file => worker.scopes.some(scope => {
+        const clean = inside(worker.repo, file), normalized = coordination.scope(scope); return clean === normalized || clean.startsWith(`${normalized}/`);
+      })), 'unauthorized mutation reported');
+      const mutations = coordination.execute('check-changes', { cwd: worker.repo, sessionId: worker.session, now }).paths;
+      demand(mutations.every(file => result.changed_paths.map(p => inside(worker.repo, p)).includes(coordination.scope(file))), 'unreported worker mutations');
+      const stateNow = captureRepositoryState(worker.repo, { excludePaths: [path.join(worker.repo, '.ecc/goal')] });
+      demand([...stateNow.dirty_paths].every(file => result.changed_paths.includes(file)), 'unreported worker mutations');
+      demand(result.usage.cost_usd === result.usd, 'inconsistent reported worker cost');
+      accountUsage(next,node,worker,result.usage);
+      if (next.phase === 'budget-exhausted') break;
+      node.result = result; node.status = 'done'; evidence(); maybeJoin(next); break;
+    }
+    case 'worker-error': {
+      const worker = plan.workers.find(w => w.id === event.worker); demand(worker, 'unknown worker');
+      demand(event.actor === worker.agent, 'worker identity mismatch');
+      const node = next.nodes[worker.id]; demand(node.status === 'running' && node.token === event.token, 'stale worker error');
+      next.history.push({ error: 'worker-launch-or-execution-failed', worker: worker.id, attempt: node.attempts });
+      node.status = 'pending'; node.token = null;
+      // Unknown failed-attempt spending must not buy another attempt.
+      if (!event.usage) { next.phase = 'budget-exhausted'; break; }
+      accountUsage(next,node,worker,event.usage);
+      if (next.phase !== 'budget-exhausted') next.phase = 'repair'; break;
+    }
+    case 'critic': {
+      demand(next.phase === 'critic', 'join barrier not satisfied'); assert('critique', event.report); evidence();
+      demand(event.actor === plan.critic && event.report.agent === plan.critic, 'independent critic required');
+      demand(event.report.join_sha256 === next.join_sha256, 'stale critic result');
+      const failures = Object.values(next.nodes).filter(n => n.result.status !== 'pass').map(n => n.result.worker);
+      demand(event.report.rejections.every(r => Object.hasOwn(next.nodes, r.worker)), 'unknown rejected worker');
+      demand(event.report.accepted ? !event.report.rejections.length && !failures.length : event.report.rejections.length > 0, 'critic decision contradicts outputs');
+      demand(failures.every(id => event.report.rejections.some(r => r.worker === id)), 'critic omitted failed output');
+      demand(typeof options.verifyCritic === 'function' && options.verifyCritic(event, plan) === true, 'trusted independent critic identity verifier required');
+      if (event.report.accepted) evidence(true);
+      next.critique = event.report;
+      next.history.push({ join_sha256: next.join_sha256, critique: event.report, results: Object.values(next.nodes).map(n => n.result) });
+      if (event.report.accepted) next.phase = 'synthesis';
+      else if (next.repairs >= plan.limits.repairs) next.phase = 'budget-exhausted';
+      else {
+        next.repairs++;
+        for (const rejection of event.report.rejections) {
+          const node = next.nodes[rejection.worker]; node.status = 'pending'; node.result = null; node.token = null;
+        }
+        next.join_sha256 = null; next.phase = 'repair';
+      }
+      break;
+    }
+    case 'synthesis': {
+      parent(); demand(next.phase === 'synthesis', 'accepted critic required'); assert('synthesis', event.output); evidence();
+      demand(event.output.join_sha256 === next.join_sha256, 'stale synthesis');
+      demand(event.output.outputs.slice().sort().join() === plan.workers.map(w => w.id).sort().join(), 'synthesis must cover every required output');
+      next.synthesis = event.output; next.phase = 'approval'; break;
+    }
+    case 'propose-effect': {
+      parent(); demand(next.phase === 'approval', 'typed synthesis required'); assert('effect', event.effect); evidence();
+      demand(!Object.hasOwn(next.effects, event.effect.id), 'effect ID is immutable; completed effects cannot replay');
+      const operationKey = proposal => digest(Object.fromEntries(Object.entries(proposal).filter(([key]) => !['id','expected_usd'].includes(key))));
+      demand(!Object.values(next.effects).some(item => operationKey(item.proposal) === operationKey(event.effect)), 'duplicate exact side effect');
+      demand(event.effect.environment === plan.environment, 'effect environment mismatch');
+      demand(next.spent_usd + event.effect.expected_usd <= plan.limits.usd, 'effect budget exhausted');
+      next.effects[event.effect.id] = { proposal: event.effect, binding: digest({ effect: event.effect, synthesis: next.synthesis, revision: plan.revision }), status: 'pending', approval: null, receipt: null }; break;
+    }
+    case 'approve-effect': {
+      parent(); demand(next.phase === 'approval', 'not at approval pause'); evidence();
+      const effect = next.effects[event.id]; demand(effect?.status === 'pending', 'effect not pending');
+      demand(event.binding === effect.binding, 'approval does not bind exact side effect');
+      demand(typeof options.authorizeApproval === 'function' && options.authorizeApproval({ ...event, proposal: effect.proposal }) === true, 'external owner approval verifier required');
+      demand(typeof event.receipt === 'string' && event.receipt.trim().length > 0, 'owner approval receipt required');
+      demand(Number.isFinite(Date.parse(event.expires_at)) && Date.parse(event.expires_at) > now, 'approval expired');
+      effect.approval = { receipt: event.receipt, expires_at: event.expires_at, binding: event.binding }; effect.status = 'approved'; break;
+    }
+    case 'begin-effect': {
+      parent(); evidence(); const effect = next.effects[event.id];
+      demand(next.phase === 'approval' && effect?.status === 'approved', 'effect not approved or already started');
+      demand(Date.parse(effect.approval.expires_at) > now && event.binding === effect.binding, 'stale effect approval');
+      demand(next.spent_usd + effect.proposal.expected_usd <= plan.limits.usd, 'effect budget exhausted');
+      effect.status = 'running'; next.spent_usd += effect.proposal.expected_usd; next.phase = 'effect'; break;
+    }
+    case 'finish-effect': {
+      parent(); const effect = next.effects[event.id];
+      demand(next.phase === 'effect' && effect?.status === 'running', 'effect not running');
+      demand(typeof options.verifyEffect === 'function' && options.verifyEffect(effect.proposal, event.receipt) === true, 'independent side-effect receipt verifier required');
+      effect.status = 'completed'; effect.receipt = event.receipt;
+      next.phase = Object.values(next.effects).every(item => item.status === 'completed') ? 'completed' : 'approval'; break;
+    }
+    case 'recover': {
+      parent();
+      if (['budget-exhausted','completed'].includes(next.phase)) break;
+      if (Object.values(next.effects).some(effect => effect.status === 'running')) { next.phase = 'reconciliation'; break; }
+      let interrupted = false;
+      for (const node of Object.values(next.nodes)) {
+        if (node.status === 'running' && node.lease_until <= now) { node.status = 'pending'; node.token = null; interrupted = true; }
+      }
+      if (interrupted) next.phase = 'repair'; break;
+    }
+    case 'reconcile-effect': {
+      parent(); demand(next.phase === 'reconciliation', 'effect not ambiguous'); const effect = next.effects[event.id];
+      demand(effect?.status === 'running', 'effect not ambiguous');
+      // Completion is the only automated reconciliation. A negative/unknown
+      // external result requires a new owner decision, never automatic replay.
+      demand(typeof options.verifyEffect === 'function' && options.verifyEffect(effect.proposal, event.receipt) === true, 'verified completed side effect required; do not replay');
+      effect.status = 'completed'; effect.receipt = event.receipt;
+      next.phase = Object.values(next.effects).every(item => item.status === 'completed') ? 'completed' : 'approval'; break;
+    }
+    default: throw new Error('unknown execution transition');
+  }
+  next.sequence++; next.audit.push({ sequence: next.sequence, type: event.type, actor: event.actor, at: new Date(now).toISOString(), phase: next.phase });
+  validateState(next); return next;
+}
+function authorizeStatePath(file, plan) {
+  checkPlan(plan, Date.now());
+  const relative = inside(plan.repo, file);
+  demand(relative.startsWith('.ecc/'), 'execution state must be task-local .ecc data');
+  coordination.execute('check-write', { cwd: plan.repo, sessionId: plan.session, paths: [relative, `${relative}.lock`] });
+}
+function save(file, state) {
+  validateState(state); authorizeStatePath(file, state.plan);
+  const relative = inside(state.plan.repo, file);
+  demand(relative.startsWith('.ecc/'), 'execution state must be task-local .ecc data');
+  coordination.execute('check-write', { cwd: state.plan.repo, sessionId: state.plan.session, paths: [relative] });
+  writeFileAtomic(file, JSON.stringify({ state, sha256: digest(state) }, null, 2) + '\n');
+}
+function load(file) {
+  const envelope = JSON.parse(fs.readFileSync(file, 'utf8'));
+  demand(digest(envelope.state) === envelope.sha256, 'execution checkpoint integrity mismatch');
+  validateState(envelope.state); return envelope.state;
+}
+function executionLock(file, plan, action) {
+  const lock = `${file}.lock`;
+  const descriptor = fs.openSync(lock, 'wx', 0o600);
+  const marker = { pid: process.pid, host: os.hostname(), session: plan.session, plan_sha256: digest(plan), nonce: crypto.randomBytes(16).toString('hex') };
+  try { fs.writeFileSync(descriptor, JSON.stringify(marker)); fs.fsyncSync(descriptor); return action(); }
+  finally {
+    fs.closeSync(descriptor);
+    if (JSON.parse(fs.readFileSync(lock,'utf8')).nonce === marker.nonce) fs.unlinkSync(lock);
+  }
+}
+function recoverLock(file, initialPlan = null) {
+  const plan = fs.existsSync(file) ? load(file).plan : initialPlan;
+  authorizeStatePath(file, plan);
+  inside(plan.repo, `${file}.lock`);
+  const lock = `${file}.lock`, raw = fs.readFileSync(lock,'utf8'), marker = JSON.parse(raw);
+  demand(marker.host === os.hostname() && marker.session === plan.session && marker.plan_sha256 === digest(plan)
+    && Number.isInteger(marker.pid) && marker.pid > 0, 'lock recovery requires exact own session/host/plan');
+  let dead = false;
+  try { process.kill(marker.pid, 0); } catch (error) { dead = error.code === 'ESRCH'; }
+  demand(dead, 'lock owner still alive or inaccessible; never steal it');
+  demand(fs.readFileSync(lock,'utf8') === raw, 'lock changed during recovery');
+  fs.unlinkSync(lock);
+  return { recovered: true, session: plan.session, dead_pid: marker.pid, limitation: 'same-user cooperative lock; no permission bypass' };
+}
+function transaction(file, action) {
+  const plan = load(file).plan; authorizeStatePath(file, plan);
+  return executionLock(file, plan, () => { const next = action(load(file)); save(file, next); return next; });
+}
+function create(file, plan) {
+  authorizeStatePath(file, plan);
+  demand(!fs.existsSync(file), 'execution checkpoint already exists');
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  return executionLock(file, plan, () => { demand(!fs.existsSync(file), 'execution checkpoint already exists'); const state = initialize(plan); save(file, state); return state; });
+}
+async function dispatchParallel(file, launch, options = {}) {
+  demand(typeof launch === 'function', 'explicit admitted worker launcher required');
+  const before = load(file);
+  const state = transaction(file, current => apply(current, { type: 'dispatch', actor: current.plan.parent }, options));
+  if (state.phase === 'budget-exhausted') return state;
+  const running = state.plan.workers.filter(w => state.nodes[w.id].status === 'running' && state.nodes[w.id].token !== before.nodes[w.id].token);
+  // Launchers must provide their own native sandbox/tool restrictions. Persist
+  // dispatch tokens BEFORE calling them. No shell or provider is inferred here.
+  await Promise.all(running.map(async worker => {
+    let result;
+    try {
+      const assignment = assignmentFor(state.plan,worker), usage=state.nodes[worker.id].usage;
+      const remaining_budget=Object.fromEntries(Object.entries(usage).map(([key,value])=>[key,Math.max(0,assignment.budget[`max_${key}`]-value)]));
+      result = await launch({ ...worker, assignment, remaining_budget, goal_sha256:state.plan.goal_sha256, token: state.nodes[worker.id].token, revision: state.plan.revision, environment: state.plan.environment });
+    }
+    catch (_error) {
+      transaction(file, current => apply(current, { type: 'worker-error', actor: worker.agent, worker: worker.id, token: state.nodes[worker.id].token, usage:_error?.usage }, options)); return;
+    }
+    transaction(file, current => apply(current, { type: 'result', actor: worker.agent, result }, options));
+  }));
+  return load(file);
+}
+module.exports = { assert, digest, initialize, apply, create, load, transaction, dispatchParallel, currentEvidence, recoverLock };

@@ -59,12 +59,16 @@ jobs:
         run: npm ci --ignore-scripts
       - name: Run full test suite
         if: github.event_name != 'pull_request'
-        run: node tests/run-all.js
+        run: |
+          node scripts/agent-system-map.js materialize
+          node tests/run-all.js
         env:
           CLAUDE_CODE_PACKAGE_MANAGER: npm
       - name: Run full test suite with coverage
         if: github.event_name == 'pull_request'
-        run: npm run coverage
+        run: |
+          node scripts/agent-system-map.js materialize
+          npm run coverage
         env:
           CLAUDE_CODE_PACKAGE_MANAGER: npm
       - name: Upload coverage report
@@ -270,7 +274,9 @@ jobs:
         continue-on-error: false
 
       - name: Validate effective ECC agent instructions
-        run: node scripts/check-instruction-stack.js --workspace "$RUNNER_TEMP"
+        run: |
+          node scripts/agent-system-map.js materialize
+          node scripts/check-instruction-stack.js --workspace "$RUNNER_TEMP"
 
       - name: Evaluate all advertised agent instruction adapters
         run: node tests/ci/instruction-scenarios.test.js

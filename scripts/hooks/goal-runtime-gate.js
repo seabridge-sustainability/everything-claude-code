@@ -4,6 +4,7 @@
 const fs = require('fs');
 const path = require('path');
 const { spawnSync } = require('child_process');
+const { normalizePayload, denialOutput } = require('../lib/scope-guard-adapters');
 
 const MAX_INPUT_BYTES = 1024 * 1024;
 
@@ -28,6 +29,7 @@ function payloadModel(raw) {
 function main(args = process.argv.slice(2), raw = readInput()) {
   const runtime = args[0];
   const phase = args[1];
+  if (phase === 'guard') return guardMain(runtime, args[2], args[3], raw);
   if (!runtime || !['admit', 'prepare', 'final'].includes(phase)) {
     process.stderr.write('goal runtime hook requires <runtime> <admit|prepare|final>\n');
     return 2;
@@ -81,6 +83,52 @@ function main(args = process.argv.slice(2), raw = readInput()) {
     .filter(value => typeof value === 'string' && value.trim())
     .join('\n');
   process.stderr.write(`${diagnostic || 'goal runtime gate could not verify this action'}\n`);
+  if (['claude', 'codex', 'gemini'].includes(runtime) && phase === 'final') {
+    // Preserve Stop control through PowerShell's native exit-code conversion.
+    process.stdout.write(JSON.stringify(denialOutput(runtime, 'final', 'ECC controlled-goal final claim was not admitted. Review the goal evidence before claiming completion.')) + '\n');
+    return 0;
+  }
+  return 2;
+}
+
+function guardMain(runtime, mode, event, raw) {
+  // Mode/event come from the reviewed hook definition, never tool arguments.
+  if (!['claude', 'codex', 'copilot-local', 'copilot-cli', 'gemini', 'opencode'].includes(runtime)
+      || !['audit', 'block'].includes(mode) || !['pre', 'turn', 'final'].includes(event)) {
+    process.stderr.write('invalid scope guard adapter invocation\n');
+    return 2;
+  }
+  let decision;
+  try {
+    if (Buffer.byteLength(raw) >= MAX_INPUT_BYTES) throw new Error('oversized hook input');
+    const payload = normalizePayload(runtime, JSON.parse(raw));
+    if (!payload || typeof payload !== 'object' || Array.isArray(payload)) throw new Error('invalid hook input');
+    const sessionId = process.env.ECC_SESSION_ID || payload.session_id || payload.conversation_id;
+    decision = require('../lib/session-coordination').execute('guard-event', {
+      sessionId, guardMode: mode, event, payload, cwd: process.cwd(),
+    });
+  } catch {
+    decision = { allowed: mode === 'audit', wouldDeny: true, reason: 'scope guard state/input unavailable or malformed' };
+  }
+  if (!decision.wouldDeny) return event === 'final' && mode === 'block' ? main([runtime, 'final'], raw) : 0;
+  const reason = `ECC scope guard: ${decision.reason}`;
+  if (mode === 'audit') {
+    process.stderr.write(`audit would-deny: ${reason}\n`);
+    return 0;
+  }
+  const nativeOutput = denialOutput(runtime, event, reason);
+  if (nativeOutput) {
+    process.stdout.write(JSON.stringify(nativeOutput) + '\n');
+    process.stderr.write(reason + '\n');
+    return 0;
+  }
+  if (event === 'pre') {
+    process.stdout.write(JSON.stringify({ hookSpecificOutput: { hookEventName: 'PreToolUse', permissionDecision: 'deny', permissionDecisionReason: reason } }) + '\n');
+  } else if (event === 'final' || (event === 'turn' && runtime === 'codex')) {
+    process.stdout.write(JSON.stringify({ decision: 'block', reason }) + '\n');
+  }
+  process.stderr.write(reason + '\n');
+  // Clients without a verified JSON contract require a preserving wrapper.
   return 2;
 }
 
@@ -92,4 +140,4 @@ function run(raw, context = {}) {
 
 if (require.main === module) process.exitCode = main();
 
-module.exports = { MAX_INPUT_BYTES, main, payloadModel, readInput, run };
+module.exports = { MAX_INPUT_BYTES, main, guardMain, payloadModel, readInput, run };

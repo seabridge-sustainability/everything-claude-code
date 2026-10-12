@@ -12,18 +12,37 @@ const { expandImports } = require('./check-instruction-stack');
 const ROOT = path.resolve(__dirname, '..');
 const OUTPUT = 'docs/tools/agent-system-map.json';
 const SOURCES = Object.freeze([
+  '../manageesg-backend/AGENTS_SYSTEM.md',
+  '../manageesg-backend/AGENTS.md',
+  '../manageesg-backend/CLAUDE.md',
   'AGENTS.md', 'CLAUDE.md', 'GEMINI.md', 'CODEX.md', 'OPENCODE.md',
   '.github/copilot-instructions.md', '.agents/rules/seabridge-agent-baseline.md',
   '.clinerules', '.cursor/rules/common-agents.md',
   'protocols/SAFETY_AUTHORIZATION_RULE.md', 'protocols/GOAL_PROTOCOL.md',
   'protocols/GOAL_PROTOCOL_SHORT.md',
+  'commands/goal.md', 'skills/goal-default/SKILL.md',
+  'skills/persistent-goal-execution/SKILL.md',
+  'skills/parallel-execution-optimizer/SKILL.md',
   'protocols/CONCURRENT_SESSION_PROTOCOL.md', 'scripts/session-coordinate.js',
   'scripts/lib/session-coordination.js',
+  'scripts/hooks/goal-runtime-gate.js', 'schemas/goal-control.schema.json',
+  'scripts/lib/scope-guard-adapters.js', 'scripts/scope-guard-adapters.js',
+  '.opencode/plugins/ecc-scope-guard.ts', 'tests/lib/scope-guard-adapters.test.js',
+  'tests/lib/goal-runtime-hook.test.js', 'tests/lib/goal-runtime.test.js',
   'manifests/instruction-adapters.json', 'manifests/goal-runtime-capabilities.json',
   'manifests/goal-proof-profiles.json',
   'scripts/check-instruction-stack.js', 'scripts/eval-instruction-scenarios.js',
   'scripts/sync-instruction-adapters.js', 'scripts/goal-control.js',
   'scripts/goal-runtime-bridge.js', 'scripts/eval-goal-runtime-offline.js',
+  'scripts/ecc.js', 'package.json', 'scripts/coding-execution.js',
+  'scripts/lib/coding-execution.js', 'schemas/coding-execution.schema.json',
+  'scripts/lib/goal-control.js',
+  'tests/lib/coding-execution.test.js',
+  'scripts/native-adoption-pilot.js', 'tests/lib/native-adoption-pilot.test.js',
+  'scripts/coding-execution-run.js', 'scripts/lib/coding-execution-runner.js',
+  'scripts/lib/coding-execution-host.js', 'scripts/coding-execution-memory-check.js',
+  'scripts/hooks/antigravity-scope-guard.js', 'scripts/hooks/seabridge-git-guard.js',
+  'tests/lib/seabridge-git-guard.test.js',
   'scripts/agent-system-map.js', 'scripts/agent-adoption-doctor.js',
   'scripts/agent-behavior-report.js', 'scripts/eval-agent-behavior.js',
   'scripts/ci/detect-ci-scope.js', 'scripts/knowledge-adoption.js',
@@ -101,6 +120,21 @@ function buildMap(root = ROOT, sources = SOURCES) {
   // Verify the memory control path rather than leaving its new source nodes as
   // disconnected inventory. These edges are only emitted while the imports exist.
   for (const [from, to, importText] of [
+    ['scripts/hooks/goal-runtime-gate.js', 'scripts/lib/session-coordination.js', "require('../lib/session-coordination')"],
+    ['scripts/lib/session-coordination.js', 'schemas/goal-control.schema.json', "require('../../schemas/goal-control.schema.json')"],
+    ['scripts/goal-runtime-bridge.js', 'scripts/lib/session-coordination.js', "require('./lib/session-coordination')"],
+    ['scripts/coding-execution.js', 'scripts/lib/coding-execution.js', "require('./lib/coding-execution')"],
+    ['scripts/lib/coding-execution.js', 'scripts/lib/session-coordination.js', "require('./session-coordination')"],
+    ['scripts/lib/coding-execution.js', 'scripts/lib/goal-control.js', "require('./goal-control')"],
+    ['tests/lib/coding-execution.test.js', 'scripts/lib/coding-execution.js', "require('../../scripts/lib/coding-execution')"],
+    ['scripts/native-adoption-pilot.js', 'scripts/scope-guard-adapters.js', "require('./scope-guard-adapters')"],
+    ['scripts/native-adoption-pilot.js', 'scripts/lib/session-coordination.js', "require('./lib/session-coordination')"],
+    ['scripts/coding-execution-run.js', 'scripts/lib/coding-execution-runner.js', "require('./lib/coding-execution-runner')"],
+    ['scripts/lib/coding-execution-runner.js', 'scripts/lib/coding-execution.js', "require('./coding-execution')"],
+    ['scripts/lib/coding-execution-host.js', 'scripts/lib/coding-execution.js', "require('./coding-execution')"],
+    ['scripts/coding-execution-memory-check.js', 'scripts/lib/coding-execution-host.js', "require('./lib/coding-execution-host')"],
+    ['scripts/hooks/antigravity-scope-guard.js', 'scripts/lib/session-coordination.js', "require('../lib/session-coordination')"],
+    ['tests/lib/native-adoption-pilot.test.js', 'scripts/native-adoption-pilot.js', "require('../../scripts/native-adoption-pilot')"],
     ['scripts/memory.js', 'scripts/lib/memory-vault.js', "require('./lib/memory-vault')"],
     ['scripts/memory-mcp.mjs', 'scripts/lib/memory-vault.js', "require('./lib/memory-vault.js')"],
     ['scripts/lib/memory-vault.js', 'scripts/lib/memory-vault-format.js', "require('./memory-vault-format')"],
@@ -111,7 +145,7 @@ function buildMap(root = ROOT, sources = SOURCES) {
     ['tests/scripts/memory-mcp.test.js', 'scripts/lib/memory-vault.js', "require('../../scripts/lib/memory-vault')"],
   ]) {
     if (!fs.readFileSync(file(root, from), 'utf8').includes(importText)) {
-      throw new Error(`declared memory import missing from ${from}: ${importText}`);
+        throw new Error(`declared memory import missing from ${from}: ${importText}`);
     }
     edge(`file:${from}`, to, 'verified-code-import', from);
   }
@@ -128,9 +162,13 @@ function buildMap(root = ROOT, sources = SOURCES) {
   edges.sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b)));
   return {
     schema: 'seabridge.agent-system-map.v1',
-    scope: 'ECC agent instructions, runtime adapters, outcome control, evaluation, and CI; no product or tenant data',
+    scope: 'Three backend policy sources and ECC loading adapters, outcome control, evaluation, and CI; no product or tenant data',
     extractor: 'scripts/agent-system-map.js (deterministic, no LLM)',
-    generatorVersion: 2,
+    generatorVersion: 7,
+    // Generated verification artifact, not a fourth policy source. CI can
+    // reproduce the three reviewed, pinned files without a private-repo token.
+    policySnapshot: rows.filter(row => row.path.startsWith('../manageesg-backend/'))
+      .map(row => ({ ...row, text: fs.readFileSync(file(root, row.path), 'utf8').replace(/\r\n/g, '\n') })),
     coverage: {
       excludedRoots: ['artifacts/', 'data/', 'graphify-out/', 'logs/', 'vendor/'],
       semanticIndex: 'not-run',
@@ -143,12 +181,21 @@ function buildMap(root = ROOT, sources = SOURCES) {
 function buildMetadata(root = ROOT) {
   let sourceCommit = null;
   let sourceDirty = null;
+  let policyCommit = null;
+  let policyDirty = null;
   try {
     sourceCommit = execFileSync('git', ['-C', root, 'rev-parse', 'HEAD'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
-    sourceDirty = Boolean(execFileSync('git', ['-C', root, 'status', '--porcelain=v1', '--', ...SOURCES],
+    sourceDirty = Boolean(execFileSync('git', ['-C', root, 'status', '--porcelain=v1', '--', ...SOURCES.filter(source => !source.startsWith('../'))],
       { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim());
   } catch { /* Fixture or exported corpus outside Git: content hash remains authoritative. */ }
-  return { generatedAt: new Date().toISOString(), sourceCommit, sourceDirty };
+  try {
+    const policyRoot = path.resolve(root, '..', 'manageesg-backend');
+    policyCommit = execFileSync('git', ['-C', policyRoot, 'rev-parse', 'HEAD'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+    policyDirty = Boolean(execFileSync('git', ['-C', policyRoot, 'status', '--porcelain=v1', '--', 'AGENTS_SYSTEM.md', 'AGENTS.md', 'CLAUDE.md'],
+      { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim());
+  } catch { /* Exported fixtures retain content-bound fingerprints. */ }
+  if (policyDirty === true) sourceDirty = true;
+  return { generatedAt: new Date().toISOString(), sourceCommit, sourceDirty, policyCommit, policyDirty };
 }
 
 function check(root = ROOT, destination = OUTPUT) {
@@ -159,7 +206,7 @@ function check(root = ROOT, destination = OUTPUT) {
     if (!stored.build || !stored.build.generatedAt || !('sourceCommit' in stored.build)) {
       return { fresh: false, reason: 'map lacks build provenance' };
     }
-    if (stored.build.sourceDirty === true) {
+    if (stored.build.sourceDirty === true || stored.build.policyDirty === true) {
       return { fresh: false, reason: 'map was built from dirty source files' };
     }
     const current = buildMap(root);
@@ -172,9 +219,49 @@ function check(root = ROOT, destination = OUTPUT) {
   }
 }
 
+function materialize(root = ROOT) {
+  const stored = JSON.parse(fs.readFileSync(file(root, OUTPUT), 'utf8'));
+  if (stored.build?.sourceDirty !== false || stored.build?.policyDirty !== false
+      || !/^[a-f0-9]{40}$/.test(stored.build?.policyCommit || '')) {
+    throw new Error('policy snapshot requires clean, committed source provenance');
+  }
+  const expected = ['AGENTS.md', 'AGENTS_SYSTEM.md', 'CLAUDE.md']
+    .map(name => `../manageesg-backend/${name}`).sort();
+  const snapshot = stored.policySnapshot;
+  if (!Array.isArray(snapshot) || JSON.stringify(snapshot.map(row => row.path).sort()) !== JSON.stringify(expected)) {
+    throw new Error('policy snapshot must contain exactly the three central files');
+  }
+  const destination = path.resolve(root, '..', 'manageesg-backend');
+  if (fs.existsSync(destination) && (!fs.lstatSync(destination).isDirectory() || fs.lstatSync(destination).isSymbolicLink())) {
+    throw new Error('unsafe policy snapshot destination');
+  }
+  // Preflight every row before any write. Never replace a live checkout's policy.
+  for (const row of snapshot) {
+    const source = stored.sources.find(item => item.path === row.path);
+    if (typeof row.text !== 'string' || hash(row.text) !== row.sha256 || source?.sha256 !== row.sha256) {
+      throw new Error('policy snapshot digest mismatch');
+    }
+    const target = file(root, row.path);
+    if (fs.existsSync(target) && (!fs.lstatSync(target).isFile() || hash(fs.readFileSync(target, 'utf8').replace(/\r\n/g, '\n')) !== row.sha256)) {
+      throw new Error('refusing to overwrite existing central policy');
+    }
+  }
+  fs.mkdirSync(destination, { recursive: true });
+  for (const row of snapshot) {
+    const target = file(root, row.path);
+    if (!fs.existsSync(target)) fs.writeFileSync(target, row.text, { flag: 'wx' });
+  }
+  return { policyCommit: stored.build.policyCommit, files: snapshot.length };
+}
+
 function main(args = process.argv.slice(2), root = ROOT) {
-  if (args.length !== 1 || !['build', 'check'].includes(args[0])) {
-    throw new Error('usage: node scripts/agent-system-map.js <build|check>');
+  if (args.length !== 1 || !['build', 'check', 'materialize'].includes(args[0])) {
+    throw new Error('usage: node scripts/agent-system-map.js <build|check|materialize>');
+  }
+  if (args[0] === 'materialize') {
+    const result = materialize(root);
+    process.stdout.write(`Verification snapshot: ${result.files} central files at backend ${result.policyCommit}; not a live freshness or installation claim.\n`);
+    return 0;
   }
   if (args[0] === 'build') {
     const map = buildMap(root);
@@ -197,4 +284,4 @@ if (require.main === module) {
   try { process.exitCode = main(); }
   catch (error) { process.stderr.write(`${error.message}\n`); process.exitCode = 1; }
 }
-module.exports = { SOURCES, OUTPUT, sourceRows, buildMap, buildMetadata, check, main };
+module.exports = { SOURCES, OUTPUT, sourceRows, buildMap, buildMetadata, check, materialize, main };

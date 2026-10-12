@@ -26,7 +26,8 @@
     }
   },
   "instructions": [
-    "AGENTS.md",
+    "../manageesg-backend/AGENTS.md",
+    "../manageesg-backend/AGENTS_SYSTEM.md",
     "CONTRIBUTING.md"
   ],
   "plugin": [
