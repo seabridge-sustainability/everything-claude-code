@@ -30,7 +30,7 @@
     ],
     "semanticIndex": "not-run"
   },
-  "sourceFingerprint": "d99f19b1518d0f176c337574a518dafc9071facf575ce69d3ab227721c0b5623",
+  "sourceFingerprint": "a4567e4b853910b570f089a658cae9f17caa3e1864e757fb2527a1437e92378a",
   "sources": [
     {
       "path": "../manageesg-backend/AGENTS.md",
@@ -182,7 +182,7 @@
     },
     {
       "path": "scripts/agent-system-map.js",
-      "sha256": "f3ae866d73fc55f439182cca517235c0dc6b39a552b849ae03e451ab7dffe992"
+      "sha256": "4b4805a0f744070c52273c46bd85f1eb331aaf8db61f608d832c83d6cd7a4c54"
     },
     {
       "path": "scripts/check-instruction-stack.js",
@@ -286,7 +286,11 @@
     },
     {
       "path": "scripts/lib/session-coordination.js",
-      "sha256": "d921854d59543757b955b72d7bd0beec15c35590a1f35e89a32f1d6269de290c"
+      "sha256": "6c5275fbc542a314538275d57785c72d1d694c056bfbc2a78e2a22b7365bb364"
+    },
+    {
+      "path": "scripts/lib/tmux-worktree-orchestrator.js",
+      "sha256": "f9378ae0f78d831edb3ca151a2fa588bc456327e6a5ab4ced7ade78f42b504e5"
     },
     {
       "path": "scripts/memory-mcp.mjs",
@@ -299,6 +303,10 @@
     {
       "path": "scripts/native-adoption-pilot.js",
       "sha256": "57ac0a690163cc37053c389edfea2d4648f6aeed5ef28d3d063bd854a8f5f307"
+    },
+    {
+      "path": "scripts/orchestrate-worktrees.js",
+      "sha256": "a510d697ffd52c9588ad5a6739d697df3424f00571c39fd0249a3916d867fc97"
     },
     {
       "path": "scripts/scope-guard-adapters.js",
@@ -387,6 +395,10 @@
     {
       "path": "tests/lib/session-coordination.test.js",
       "sha256": "0149491dbea9b82edb5c00eaaca2fa104cd2ef52e38a0b55c424ed9e526b058c"
+    },
+    {
+      "path": "tests/lib/tmux-worktree-orchestrator.test.js",
+      "sha256": "bc5ac8a3a080dc0ce4527fff64eca655524744c5710b3ee7d0e23c356ffc1947"
     },
     {
       "path": "tests/scripts/knowledge-freshness.test.js",
@@ -632,7 +644,7 @@
       "id": "file:scripts/agent-system-map.js",
       "type": "source",
       "path": "scripts/agent-system-map.js",
-      "sha256": "f3ae866d73fc55f439182cca517235c0dc6b39a552b849ae03e451ab7dffe992"
+      "sha256": "4b4805a0f744070c52273c46bd85f1eb331aaf8db61f608d832c83d6cd7a4c54"
     },
     {
       "id": "file:scripts/check-instruction-stack.js",
@@ -788,7 +800,13 @@
       "id": "file:scripts/lib/session-coordination.js",
       "type": "source",
       "path": "scripts/lib/session-coordination.js",
-      "sha256": "d921854d59543757b955b72d7bd0beec15c35590a1f35e89a32f1d6269de290c"
+      "sha256": "6c5275fbc542a314538275d57785c72d1d694c056bfbc2a78e2a22b7365bb364"
+    },
+    {
+      "id": "file:scripts/lib/tmux-worktree-orchestrator.js",
+      "type": "source",
+      "path": "scripts/lib/tmux-worktree-orchestrator.js",
+      "sha256": "f9378ae0f78d831edb3ca151a2fa588bc456327e6a5ab4ced7ade78f42b504e5"
     },
     {
       "id": "file:scripts/memory-mcp.mjs",
@@ -807,6 +825,12 @@
       "type": "source",
       "path": "scripts/native-adoption-pilot.js",
       "sha256": "57ac0a690163cc37053c389edfea2d4648f6aeed5ef28d3d063bd854a8f5f307"
+    },
+    {
+      "id": "file:scripts/orchestrate-worktrees.js",
+      "type": "source",
+      "path": "scripts/orchestrate-worktrees.js",
+      "sha256": "a510d697ffd52c9588ad5a6739d697df3424f00571c39fd0249a3916d867fc97"
     },
     {
       "id": "file:scripts/scope-guard-adapters.js",
@@ -939,6 +963,12 @@
       "type": "source",
       "path": "tests/lib/session-coordination.test.js",
       "sha256": "0149491dbea9b82edb5c00eaaca2fa104cd2ef52e38a0b55c424ed9e526b058c"
+    },
+    {
+      "id": "file:tests/lib/tmux-worktree-orchestrator.test.js",
+      "type": "source",
+      "path": "tests/lib/tmux-worktree-orchestrator.test.js",
+      "sha256": "bc5ac8a3a080dc0ce4527fff64eca655524744c5710b3ee7d0e23c356ffc1947"
     },
     {
       "id": "file:tests/scripts/knowledge-freshness.test.js",
@@ -1484,6 +1514,12 @@
     },
     {
       "from": "file:package.json",
+      "to": "file:scripts/orchestrate-worktrees.js",
+      "type": "mentions-path",
+      "evidence": "package.json"
+    },
+    {
+      "from": "file:package.json",
       "to": "file:scripts/session-coordinate.js",
       "type": "mentions-path",
       "evidence": "package.json"
@@ -1952,6 +1988,12 @@
     },
     {
       "from": "file:scripts/agent-system-map.js",
+      "to": "file:scripts/lib/tmux-worktree-orchestrator.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
       "to": "file:scripts/memory-mcp.mjs",
       "type": "mentions-path",
       "evidence": "scripts/agent-system-map.js"
@@ -1965,6 +2007,12 @@
     {
       "from": "file:scripts/agent-system-map.js",
       "to": "file:scripts/native-adoption-pilot.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:scripts/orchestrate-worktrees.js",
       "type": "mentions-path",
       "evidence": "scripts/agent-system-map.js"
     },
@@ -2097,6 +2145,12 @@
     {
       "from": "file:scripts/agent-system-map.js",
       "to": "file:tests/lib/session-coordination.test.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:tests/lib/tmux-worktree-orchestrator.test.js",
       "type": "mentions-path",
       "evidence": "scripts/agent-system-map.js"
     },
@@ -2809,6 +2863,12 @@
       "evidence": "tests/lib/session-coordination.test.js"
     },
     {
+      "from": "file:tests/lib/tmux-worktree-orchestrator.test.js",
+      "to": "file:scripts/orchestrate-worktrees.js",
+      "type": "mentions-path",
+      "evidence": "tests/lib/tmux-worktree-orchestrator.test.js"
+    },
+    {
       "from": "file:tests/scripts/knowledge-freshness.test.js",
       "to": "file:scripts/knowledge-freshness.js",
       "type": "mentions-path",
@@ -3158,10 +3218,10 @@
     }
   ],
   "build": {
-    "generatedAt": "2026-10-12T12:04:15.473Z",
-    "sourceCommit": "05984032149394ddfdd45bdba1790532a6f8d0c9",
+    "generatedAt": "2026-10-12T17:44:49.321Z",
+    "sourceCommit": "ff0808a954e296080ffe53e719bbbd05efb76f94",
     "sourceDirty": false,
-    "policyCommit": "cf8b45012d884b36bc17e1ec80a984f5426748e8",
+    "policyCommit": "cb7963329729846c44ced75d9a90adf895d57d4d",
     "policyDirty": false
   }
 }
