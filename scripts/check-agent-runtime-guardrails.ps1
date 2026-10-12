@@ -14,7 +14,7 @@ if ($RepoPaths.Count -eq 0) {
     (Join-Path $workspace "manageesg-backend"),
     (Join-Path $workspace "manageesg-frontend"),
     (Join-Path $workspace "openseabri"),
-    (Join-Path $workspace "climada-stack"),
+    (Join-Path $workspace "_upstream/climada-stack"),
     (Join-Path $workspace "autoresearch"),
     (Join-Path $workspace ".falkordb-data"),
     (Join-Path $workspace "_upstream"),

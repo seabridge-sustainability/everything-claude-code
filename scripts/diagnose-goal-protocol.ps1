@@ -18,7 +18,7 @@ $TopLevelRepos = @(
     "seabridge-dev",
     "_upstream",
     "autoresearch",
-    "climada-stack"
+    "_upstream/climada-stack"
 )
 
 $SkipDirNames = @(

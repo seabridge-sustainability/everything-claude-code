@@ -11,7 +11,7 @@ $expectedActiveRepos = @(
   "manageesg-backend",
   "manageesg-frontend",
   "openseabri",
-  "climada-stack",
+  "_upstream/climada-stack",
   "everything-claude-code",
   "autoresearch",
   ".falkordb-data",

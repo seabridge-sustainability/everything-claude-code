@@ -363,7 +363,7 @@ const REPOS = [
   { name: 'manageesg-frontend', budget: 16 * 1024 },
   { name: 'autoresearch', budget: 16 * 1024 },
   { name: 'openseabri', budget: 16 * 1024 },
-  { name: 'climada-stack', budget: 16 * 1024 },
+  { name: 'climada-stack', relativePath: '_upstream/climada-stack', budget: 16 * 1024 },
   { name: '_upstream', budget: 16 * 1024 },
   // ECC itself: always the checkout this script runs from (works in a worktree).
   // Larger budget: the plugin's own dev repo also loads its language rules.
@@ -396,7 +396,7 @@ function main(argv) {
   const workspace = wsIdx >= 0 ? argv[wsIdx + 1] : defaultWorkspace();
   const all = [];
   for (const r of REPOS) {
-    const repo = r.self ? path.resolve(__dirname, '..') : path.join(workspace, r.name);
+    const repo = r.self ? path.resolve(__dirname, '..') : path.join(workspace, r.relativePath || r.name);
     if (fs.existsSync(repo)) all.push(...checkRepo(repo, workspace, r.budget, { enforceCanonicalPolicy: !r.self }));
   }
   if (argv.includes('--json')) {
