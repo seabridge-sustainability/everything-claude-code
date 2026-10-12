@@ -8,6 +8,30 @@ coding tasks use the short Goal Protocol and the matching repository skill.
 
 ## Shared Policy
 
+### Fresh-session guard preflight
+
+Use ECC `scripts/fresh-agent-session.js prepare <host-manifest.json>` and
+`launch <prepared-plan.json>` for new managed clients. The host registers the
+current goal and disjoint scope first, including `.ecc/fresh-session` for private
+binding records. Antigravity also requires owned, absent `.agents/hooks.json`.
+The first native startup/tool callback automatically tests an owned write decision
+and rejects outside, policy/config, opaque-shell and wrong-identity actions. It
+stores one receipt outside the agent write scope; unchanged probes are not repeated.
+Current ownership, goal, policy and native-config hashes remain checked before tools.
+No running process, global auth/model config or permission trust store is changed.
+
+Managed adapters: Codex, Claude, Gemini CLI, Antigravity and OpenCode. Codex needs
+operator `/hooks` review/trust; never bypass it. Gemini hook timeouts are milliseconds.
+OpenCode uses its actual `event` callback and throwing `tool.execute.before` gate.
+Other advertised agents fail protected-launch admission until a native adapter is
+verified. Direct IDE starts are not certified; `/goal` and Markdown alone do not
+activate a guard. Adapter probes are not full native-client proof or OS containment.
+Opaque shell/MCP/cloud execution stays denied until an independently verified
+restricted execution boundary is supplied. This narrow gate does not run tests,
+spend provider credits, promise automatic product completion or grant approvals.
+Rollback: stop using the new managed launch for future sessions; do not change
+running agents or delete their receipts. Reverting this batch affects source only.
+
 ### Keep prompts lean and outcome-based
 
 - State each instruction once, at the highest scope that needs it.
