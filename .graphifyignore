@@ -36,6 +36,7 @@ agentic-stack/.agent/memory/episodic/
 # structure only. No reports, run artifacts, logs, local data, vendored or
 # upstream code; reports and artifacts can quote customer data.
 docs/reports/
+.ecc/
 reports/
 artifacts/
 logs/
