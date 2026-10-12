@@ -5,7 +5,7 @@ const path = require('node:path');
 const crypto = require('node:crypto');
 const { spawn } = require('node:child_process');
 const { pathToFileURL } = require('node:url');
-const { checkSession, execute, repository, SUPPORTED, policyFiles } = require('./lib/fresh-session-guard');
+const { checkSession, execute, repository, SUPPORTED, policyFiles, workspaceBoundary } = require('./lib/fresh-session-guard');
 const root = path.resolve(__dirname, '..');
 function toml(value) {
   if (Array.isArray(value)) return '[' + value.map(toml).join(', ') + ']';
@@ -29,6 +29,7 @@ function configuration(runtime) {
 function prepare(manifest) {
   const { runtime, session, cwd, policyRoot, executable, args = [], toolLimit = 200, turnLimit = 40 } = manifest;
   configuration(runtime); policyFiles(policyRoot);
+  workspaceBoundary(cwd, policyRoot);
   const repo = repository(cwd);
   const owner = checkSession({ cwd, sessionId: session });
   if (owner.guard) throw Error('Use a new registered session; existing bindings/running agents are never changed');
@@ -76,6 +77,7 @@ function prepare(manifest) {
 }
 function launch(plan) {
   if (plan.status !== 'prepared-not-native-proof') throw Error('Prepared launch plan required');
+  workspaceBoundary(plan.cwd, plan.manifest?.policyRoot);
   checkSession({ cwd: plan.cwd, sessionId: plan.session });
   // Refuse caller-supplied rewrites of the prepared native hooks or environment.
   const m = plan.manifest;

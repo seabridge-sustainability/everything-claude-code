@@ -9,13 +9,14 @@ const { test, after } = require('node:test');
 const testedRoot = process.env.ECC_PREFLIGHT_TEST_ROOT || path.resolve(__dirname,'../..');
 const { prepare, configuration, launch } = require(path.join(testedRoot,'scripts/fresh-agent-session.js'));
 const { run } = require(path.join(testedRoot,'scripts/hooks/fresh-session-guard.js'));
-const { preflight, SUPPORTED, execute, repository } = require(path.join(testedRoot,'scripts/lib/fresh-session-guard.js'));
+const { preflight, SUPPORTED, execute, repository, workspaceBoundary } = require(path.join(testedRoot,'scripts/lib/fresh-session-guard.js'));
 const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-fresh-preflight-'));
 let count = 0;
 after(() => fs.rmSync(temp, { recursive: true, force: true }));
-function fixture(runtime) {
-  const cwd = path.join(temp, String(count++)); fs.mkdirSync(cwd);
-  for (const args of [['init','--initial-branch=fixture'],['config','user.name','ECC Test'],['config','user.email','test@example.invalid']]) {
+function fixture(runtime, centralLayout = false) {
+  const box = path.join(temp, String(count++));
+  const cwd = centralLayout ? path.join(box,'manageesg-backend') : box; fs.mkdirSync(cwd,{recursive:true});
+  for (const args of [['init','--initial-branch='+(centralLayout?'seabridge_development':'fixture')],['config','user.name','ECC Test'],['config','user.email','test@example.invalid']]) {
     const r = spawnSync('git', args, { cwd, encoding: 'utf8', windowsHide: true }); assert.equal(r.status, 0, r.stderr);
   }
   fs.writeFileSync(path.join(cwd, 'check.json'), '{"protected":true}\n');
@@ -30,6 +31,7 @@ function fixture(runtime) {
   fs.writeFileSync(path.join(cwd,'.ecc/goal/active-goal.yaml'),JSON.stringify(goal));
   const policyRoot = path.join(cwd,'policy'); fs.mkdirSync(policyRoot);
   for (const name of ['AGENTS.md','AGENTS_SYSTEM.md','CLAUDE.md']) fs.writeFileSync(path.join(policyRoot,name),'SYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1\n');
+  if(centralLayout) fs.appendFileSync(path.join(policyRoot,'AGENTS_SYSTEM.md'),`Code: ${box} only; one active checkout/repo. E: Docker only.\n`);
   const session = 'fresh-' + count;
   execute('register',{cwd,sessionId:session,scopes:['owned','.ecc/fresh-session','.agents/hooks.json'],objective:'Preflight',doneWhen:'Checked',ttl:30});
   const plan = prepare({runtime,session,cwd,policyRoot,executable:process.execPath,args:['--help'],toolLimit:40,turnLimit:10});
@@ -128,4 +130,24 @@ test('missing or invalid engine dependencies emit native denials, never a fail-o
     if(['opencode','unsupported'].includes(runtime)) assert.equal(r.status,2);
     else {assert.equal(r.status,0);const d=JSON.parse(r.stdout);assert.equal(runtime==='claude'||runtime==='codex'?d.hookSpecificOutput.permissionDecision:d.decision,'deny');}
   }
+});
+
+for(const runtime of SUPPORTED) test(runtime+': central primary layout accepted; later wrong branch denied before tool execution',()=>{
+  const f=fixture(runtime,true),p=payload(runtime,f.cwd);
+  assert.equal(workspaceBoundary(f.cwd,f.policyRoot).branch,'seabridge_development');
+  assert.equal(allowed(run(runtime,'pre',p,f.options),runtime),true);
+  const changed=spawnSync('git',['branch','-m','unapproved-fixture'],{cwd:f.cwd,encoding:'utf8',windowsHide:true});
+  assert.equal(changed.status,0,changed.stderr);
+  assert.throws(()=>workspaceBoundary(f.cwd,f.policyRoot),/approved primary branch/);
+  assert.equal(allowed(run(runtime,'pre',p,f.options),runtime),false);
+  assert.equal(fs.existsSync(path.join(f.cwd,'owned/ok.txt')),false);
+});
+
+test('central workspace declaration rejects outside or extra checkouts and malformed declarations without moving files',()=>{
+  const f=fixture('claude',true),outside=fixture('claude');
+  assert.throws(()=>workspaceBoundary(outside.cwd,f.policyRoot),/approved primary checkout/);
+  fs.writeFileSync(path.join(f.policyRoot,'AGENTS_SYSTEM.md'),'SYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1\nCode: relative only; one active checkout/repo.\n');
+  assert.throws(()=>workspaceBoundary(f.cwd,f.policyRoot),/Absolute central code workspace/);
+  fs.writeFileSync(path.join(f.policyRoot,'AGENTS_SYSTEM.md'),'SYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1\nCode: invalid declaration\n');
+  assert.throws(()=>workspaceBoundary(f.cwd,f.policyRoot),/Malformed central workspace/);
 });

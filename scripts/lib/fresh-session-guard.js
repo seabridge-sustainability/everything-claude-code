@@ -4,6 +4,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
+const { execFileSync } = require('node:child_process');
 const root = path.resolve(__dirname, '../..');
 const SUPPORTED = ['codex', 'claude', 'gemini', 'opencode', 'antigravity'];
 const sha = data => crypto.createHash('sha256').update(data).digest('hex');
@@ -53,8 +54,37 @@ function policyFiles(policyRoot) {
     return file;
   });
 }
+function workspaceBoundary(cwd, policyRoot) {
+  const system = policyFiles(policyRoot).find(file => path.basename(file) === 'AGENTS_SYSTEM.md');
+  const text = fs.readFileSync(system, 'utf8');
+  const declaration = /^Code: (.+?) only; one active checkout\/repo\./m.exec(text);
+  // Non-SeaBridge policy fixtures or other projects have no declared layout.
+  // Never invent a workspace policy for them; the scope guard still applies.
+  if (!declaration) {
+    if (/^Code:/m.test(text)) throw Error('Malformed central workspace declaration');
+    return null;
+  }
+  if (!path.isAbsolute(declaration[1])) throw Error('Absolute central code workspace required');
+  const workspace = canonical(declaration[1]);
+  const repo = repository(cwd);
+  const relative = path.relative(workspace, repo.root).replace(/\\/g, '/');
+  const branches = {
+    'manageesg-backend': 'seabridge_development', 'manageesg-frontend': 'development',
+    'everything-claude-code': 'main', 'autoresearch': 'master', 'openseabri': 'main',
+    '_upstream': 'master', 'seabridge-ai-oss': 'master', 'seabri-tidekeepers': 'main',
+    '_upstream/climada-stack': 'master',
+  };
+  if (!Object.hasOwn(branches, relative)) throw Error('Workspace is not an approved primary checkout; explicit layout approval required');
+  const git = args => execFileSync('git', args, { cwd: repo.root, encoding: 'utf8',
+    windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] }).trim();
+  if (canonical(git(['rev-parse', '--absolute-git-dir'])) !== repo.common) throw Error('Secondary worktree refused by central workspace policy');
+  const branch = git(['symbolic-ref', '--quiet', '--short', 'HEAD']);
+  if (branch !== branches[relative]) throw Error('Branch differs from approved primary branch; no automatic switching or takeover');
+  return { workspace, repository: relative, branch };
+}
 function context({ cwd, runtime, sessionId, payload, policyRoot, configFile }) {
   const native = normalize(runtime, payload, cwd);
+  workspaceBoundary(cwd, policyRoot);
   const repo = repository(cwd);
   const session = checkSession({ cwd, sessionId });
   if (!configFile || !path.isAbsolute(configFile)) throw Error('reviewed fresh launch config required');
@@ -128,5 +158,5 @@ function guard(options, event) {
   return execute('guard-event', { cwd: options.cwd, sessionId: options.sessionId,
     guardMode: 'block', event, payload: ctx.native });
 }
-module.exports = { SUPPORTED, normalize, policyFiles, context, preflight, guard,
+module.exports = { SUPPORTED, normalize, policyFiles, workspaceBoundary, context, preflight, guard,
   execute, checkSession, repository, denialOutput, engineRoot };
