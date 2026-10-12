@@ -30,7 +30,7 @@
     ],
     "semanticIndex": "not-run"
   },
-  "sourceFingerprint": "f4710f60aa54ceddeda60ddcb3a3fde7f47c18a9e3ede9451b064a08768d2d17",
+  "sourceFingerprint": "d99f19b1518d0f176c337574a518dafc9071facf575ce69d3ab227721c0b5623",
   "sources": [
     {
       "path": "../manageesg-backend/AGENTS.md",
@@ -186,7 +186,7 @@
     },
     {
       "path": "scripts/check-instruction-stack.js",
-      "sha256": "9210b24aeb62f3e215248649a87a2c05e5fc5642fc34c3587f08eb28103b156b"
+      "sha256": "1d821fc905ac0625993c958490cd1d7a97042f40a3b4ec5a951bd71e1ac34efb"
     },
     {
       "path": "scripts/ci/detect-ci-scope.js",
@@ -638,7 +638,7 @@
       "id": "file:scripts/check-instruction-stack.js",
       "type": "source",
       "path": "scripts/check-instruction-stack.js",
-      "sha256": "9210b24aeb62f3e215248649a87a2c05e5fc5642fc34c3587f08eb28103b156b"
+      "sha256": "1d821fc905ac0625993c958490cd1d7a97042f40a3b4ec5a951bd71e1ac34efb"
     },
     {
       "id": "file:scripts/ci/detect-ci-scope.js",
@@ -3158,8 +3158,8 @@
     }
   ],
   "build": {
-    "generatedAt": "2026-10-12T10:49:44.314Z",
-    "sourceCommit": "03351f95fb8a86b6cdfa358b1a2a6604d2cf168f",
+    "generatedAt": "2026-10-12T12:04:15.473Z",
+    "sourceCommit": "05984032149394ddfdd45bdba1790532a6f8d0c9",
     "sourceDirty": false,
     "policyCommit": "cf8b45012d884b36bc17e1ec80a984f5426748e8",
     "policyDirty": false
