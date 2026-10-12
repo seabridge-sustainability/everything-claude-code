@@ -1,0 +1,54 @@
+{
+  "project": "WeKnora",
+  "status": "verified-on-demand",
+  "root": "C:/Users/adelm/SeaBridgeAI/everything-claude-code/integrations/company-dev-tools/weknora",
+  "transport": {
+    "command": "node",
+    "args": [
+      "C:/Users/adelm/SeaBridgeAI/everything-claude-code/integrations/company-dev-tools/weknora/mcp-bridge.mjs"
+    ]
+  },
+  "ui": "http://127.0.0.1:3182",
+  "api": "http://127.0.0.1:8182",
+  "start": [
+    "node",
+    "service.mjs",
+    "start"
+  ],
+  "stop": [
+    "node",
+    "service.mjs",
+    "stop"
+  ],
+  "memory_cap_mib": 832,
+  "credential_paths": [
+    ".env.local",
+    "state/account.json",
+    "state/mcp-connection.json"
+  ],
+  "scope": "synthetic task knowledge only; no automatic project ingestion",
+  "previous_failure": "state/sqlite-failure-receipt.json",
+  "configured_tools": [
+    "list_knowledge_bases",
+    "search_knowledge",
+    "grep_chunks",
+    "list_documents",
+    "read_document"
+  ],
+  "remaining_proof": null,
+  "runtime_default": "stopped to preserve host memory; node service.mjs start before live calls",
+  "proofs": {
+    "http": "state/http-verification.json",
+    "native_mcp": "state/mcp-verification.json",
+    "stdio": "state/stdio-verification.json",
+    "fixture": "state/fixture-import.json",
+    "initial_failure": "state/sqlite-failure-receipt.json"
+  },
+  "observed_memory_mib": {
+    "app": 183.8,
+    "postgres": 80.51,
+    "ui": 24.5,
+    "total": 288.81
+  },
+  "verified_at": "2026-10-12T02:54:08.149Z"
+}

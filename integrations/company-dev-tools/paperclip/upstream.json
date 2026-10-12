@@ -1,0 +1,8 @@
+{
+  "repository": "https://github.com/paperclipai/paperclip",
+  "revision": "f331d386dc3c2e2d4914d794a9a5e2d4b8fd58e5",
+  "license": "MIT",
+  "package": "paperclipai",
+  "version": "2026.1005.0",
+  "integrity": "sha512-+2JQad9cnLm5K/x4ecFTV7/qIzqADinH4BKg7OA4/fppODgUX9HZ+aaeStyNUvcPtgaT7eFmLMd4suJSLSzBSA=="
+}

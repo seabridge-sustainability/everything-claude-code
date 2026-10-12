@@ -1,0 +1,30 @@
+[openshell]
+version = 2
+
+[openshell.gateway]
+name = "ecc-dev-suite"
+bind_address = "0.0.0.0:17770"
+health_bind_address = "0.0.0.0:17771"
+compute_driver = "docker"
+disable_tls = true
+
+[openshell.gateway.auth]
+allow_unauthenticated_users = true
+
+[openshell.gateway.gateway_jwt]
+signing_key_path = "/var/lib/ecc-openshell/tls/jwt/signing.pem"
+public_key_path = "/var/lib/ecc-openshell/tls/jwt/public.pem"
+kid_path = "/var/lib/ecc-openshell/tls/jwt/kid"
+gateway_id = "ecc-dev-suite"
+
+[openshell.drivers.docker]
+socket_path = "/var/run/docker.sock"
+default_image = "ecc-openshell-fixture:0.1.3"
+sandbox_runtime_image = "ghcr.io/nvidia/openshell/sandbox@sha256:2658534bfb3f1ebba4bb7792e9e875a0972edbe7ae5f58d807ae22c46844a2ac"
+supervisor_image = "ghcr.io/nvidia/openshell/supervisor@sha256:4ab2b970cdb02c7518ba4ccbbadb4861ae9a8d0b8770e5b160697f0453b0a8e4"
+image_pull_policy = "if_not_present"
+sandbox_label = "ecc-dev-suite"
+grpc_endpoint = "http://127.0.0.1:17770"
+app_armor_profile = "Unconfined"
+allow_driver_config = false
+enable_bind_mounts = false

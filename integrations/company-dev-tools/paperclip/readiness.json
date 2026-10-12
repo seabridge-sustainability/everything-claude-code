@@ -1,0 +1,145 @@
+{
+  "tool": "paperclip",
+  "checkedAt": "2026-10-12T02:44:28.893Z",
+  "installed": true,
+  "runtimeVersion": "2026.1005.0",
+  "runtimePackage": "paperclipai@2026.1005.0",
+  "source": {
+    "repository": "https://github.com/paperclipai/paperclip",
+    "revision": "f331d386dc3c2e2d4914d794a9a5e2d4b8fd58e5",
+    "license": "MIT",
+    "package": "paperclipai",
+    "version": "2026.1005.0",
+    "integrity": "sha512-+2JQad9cnLm5K/x4ecFTV7/qIzqADinH4BKg7OA4/fppODgUX9HZ+aaeStyNUvcPtgaT7eFmLMd4suJSLSzBSA=="
+  },
+  "endpoint": "http://127.0.0.1:3183",
+  "health": {
+    "status": "ok",
+    "authReady": true,
+    "startupRecovery": "ready",
+    "deploymentMode": "local_trusted"
+  },
+  "dashboard": {
+    "httpStatus": 200,
+    "browserVerified": true,
+    "browserUrl": "http://127.0.0.1:3183/SEA/dashboard",
+    "visibleBanner": "All agents in this organization are paused — nothing will run.",
+    "visibleCounts": {
+      "agents": 4,
+      "running": 0,
+      "paused": 4,
+      "tasks": 0
+    },
+    "spendUSD": 0,
+    "browserObservedAt": "2026-10-12T02:39:00Z",
+    "browserProofFile": "state/ui-receipt.json"
+  },
+  "agents": [
+    {
+      "name": "Claude",
+      "adapterType": "claude_local",
+      "status": "paused",
+      "model": "sonnet",
+      "executionVerified": false,
+      "executionBlocker": null
+    },
+    {
+      "name": "Codex",
+      "adapterType": "codex_local",
+      "status": "paused",
+      "model": "gpt-6.1-sol",
+      "executionVerified": false,
+      "executionBlocker": null
+    },
+    {
+      "name": "Gemini",
+      "adapterType": "process",
+      "status": "paused",
+      "model": "auto",
+      "executionVerified": false,
+      "executionBlocker": "Supply explicit owner-approved prompt before manual dispatch. Generic process wrapper preserves approval-mode default; no automatic assigned-task prompt injection."
+    },
+    {
+      "name": "OpenCode",
+      "adapterType": "opencode_local",
+      "status": "paused",
+      "model": "ollama/qwen3.5-opencode:32k",
+      "executionVerified": false,
+      "executionBlocker": null
+    }
+  ],
+  "projects": [
+    {
+      "name": "manageesg-backend",
+      "path": "C:/Users/adelm/SeaBridgeAI/manageesg-backend",
+      "projectId": "7be0f19b-f2bd-461f-9dd4-8b9bff9d475d",
+      "executionWorkspacePolicyEnabled": false
+    },
+    {
+      "name": "manageesg-frontend",
+      "path": "C:/Users/adelm/SeaBridgeAI/manageesg-frontend",
+      "projectId": "56622f64-d763-4ccd-9a3e-7c134b0daf51",
+      "executionWorkspacePolicyEnabled": false
+    }
+  ],
+  "dispatchEnabled": false,
+  "schedulerEnabled": false,
+  "telemetryEnabled": false,
+  "inferenceCallsDuringSetup": 0,
+  "start": {
+    "command": "powershell.exe",
+    "args": [
+      "-NoProfile",
+      "-File",
+      "C:\\Users\\adelm\\SeaBridgeAI\\everything-claude-code\\integrations\\company-dev-tools\\paperclip\\start.ps1"
+    ]
+  },
+  "stop": {
+    "command": "C:\\Program Files\\nodejs\\node.exe",
+    "args": [
+      "C:\\Users\\adelm\\SeaBridgeAI\\everything-claude-code\\integrations\\company-dev-tools\\paperclip\\stop.mjs"
+    ]
+  },
+  "cli": {
+    "command": "C:\\Program Files\\nodejs\\node.exe",
+    "args": [
+      "C:\\Users\\adelm\\SeaBridgeAI\\everything-claude-code\\integrations\\company-dev-tools\\paperclip\\cli.mjs"
+    ]
+  },
+  "state": "C:\\Users\\adelm\\SeaBridgeAI\\everything-claude-code\\integrations\\company-dev-tools\\paperclip\\state",
+  "databasePort": 54339,
+  "limitations": [
+    "Agent execution and authentication are not verified; no paid inference probe ran.",
+    "Gemini uses approval-preserving generic process wrapper; explicit approved prompt is required and automatic assigned-task prompt injection is not implemented.",
+    "Native Windows upstream background service unsupported; hidden owned launcher is used.",
+    "npm transitive jsdom package requests newer Node; installed dashboard/API passed with Node24.12.",
+    "Monthly budget0 means unlimited metadata, not an enforced spending cap.",
+    "Upstream health git.commit identifies surrounding ECC checkout; upstream.json/npm lock are installation provenance.",
+    "Upstream Windows embedded PostgreSQL shutdown leaves a stale postmaster lock file; both listener and recorded process exited. Restart recovery was verified; the database was retained."
+  ],
+  "serverRunning": false,
+  "shutdown": {
+    "pid": 17316,
+    "graceful": true,
+    "stoppedAt": "2026-10-12T02:45:37.887Z",
+    "listenersClosed": [
+      3183,
+      54339
+    ],
+    "ownedServerAndPostgresProcessesExited": true,
+    "databasePreserved": true
+  },
+  "resources": {
+    "peakWorkingSetBytes": 478535680,
+    "workingSetBytes": 472592384,
+    "pid": 17316,
+    "checkedAt": "2026-10-12T02:45:31.9320866Z",
+    "scope": "Paperclip Node server only; not aggregate host or PostgreSQL peak."
+  },
+  "safetyChecks": {
+    "geminiArgTransform": "2 tests passed; no inference",
+    "claudePermissionBypass": false,
+    "codexApprovalsSandboxBypass": false,
+    "geminiSafeGenericProcess": true
+  }
+}

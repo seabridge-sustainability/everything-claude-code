@@ -1,0 +1,15 @@
+{
+  "checkedAt": "2026-10-12T03:06:37.072Z",
+  "catalogDigestsVerified": 439,
+  "gisDigestsVerified": 22,
+  "openshellActualDenyChecks": true,
+  "weknoraSourceEquality": true,
+  "paperclipPausedAndApprovalsPreserved": true,
+  "serviceState": "stopped on demand",
+  "limitations": [
+    "No provider inference or external business accounts tested",
+    "No forced editor reload",
+    "OpenShell current agents not automatically sandboxed",
+    "Gemini Paperclip manual prompt workflow"
+  ]
+}

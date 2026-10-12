@@ -1,0 +1,2 @@
+import {spawnSync} from 'node:child_process';import {fileURLToPath} from 'node:url';
+const action=process.argv[2]??'status';const commands={start:['up','-d'],stop:['stop'],status:['ps'],validate:['config','--quiet']};if(!commands[action])throw new Error('Use start, stop, status or validate');const result=spawnSync('docker',['compose','--env-file','.env.local','-f','compose.yaml',...commands[action]],{cwd:fileURLToPath(new URL('./',import.meta.url)),stdio:'inherit'});process.exitCode=result.status??1;

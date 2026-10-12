@@ -1,0 +1,14 @@
+sources/
+runtime/*
+!runtime/package.json
+!runtime/package-lock.json
+state/
+**/node_modules/
+**/upstream/
+**/source/
+**/state/
+**/.env
+**/.env.*
+**/*.secret
+**/secrets.json
+**/config.local.json

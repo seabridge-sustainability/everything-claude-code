@@ -1,0 +1,98 @@
+{
+  "checkedAt": "2026-10-12T05:09:47.872Z",
+  "tests": [
+    "catalog search and digest-checked read",
+    "unknown/traversal ID denied",
+    "Alibaba explicit commit review planning no inference",
+    "context JavaScript runtime execution",
+    "context indexed source retrieval"
+  ],
+  "suiteTools": [
+    "suite_status",
+    "suite_find_workflow",
+    "suite_read_skill",
+    "suite_read_command",
+    "suite_review_prepare"
+  ],
+  "review": {
+    "repository": "C:/Users/adelm/SeaBridgeAI/everything-claude-code",
+    "commit": "5d583b00ed8534c4862aa06343d6d2bd0fe0cde1",
+    "preview": {
+      "schema_version": "1",
+      "mode": "commit",
+      "repository": "C:/Users/adelm/SeaBridgeAI/everything-claude-code",
+      "commit": "5d583b00ed8534c4862aa06343d6d2bd0fe0cde1",
+      "background": "fix(goal-protocol): point the full-protocol path at the runtime checkout\n\nThe stamped goal block linked C:\\...\\everything-claude-code, the shared\ncheckout that drifts behind origin; agents should read the clean published\neverything-claude-code-runtime checkout. Updated the generator and every\ncommitted copy (AGENTS.md, Cline, Copilot, Antigravity, context-hub doc).\n\nAlso adds the \"No project-wide worker count\" bullet to sync-goal-protocol.ps1:\nAGENTS.md already carried it, so re-running the script silently dropped a\npublished rule. The script is now a content no-op on AGENTS.md.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>",
+      "total_files": 6,
+      "reviewable_count": 2,
+      "excluded_count": 4,
+      "total_insertions": 7,
+      "total_deletions": 6,
+      "reviewable_files": [
+        {
+          "path": ".clinerules",
+          "status": "modified",
+          "insertions": 1,
+          "deletions": 1
+        },
+        {
+          "path": "scripts/sync-goal-protocol.ps1",
+          "status": "modified",
+          "insertions": 2,
+          "deletions": 1
+        }
+      ],
+      "excluded_files": [
+        {
+          "path": ".agents/rules/seabridge-agent-baseline.md",
+          "status": "modified",
+          "insertions": 1,
+          "deletions": 1,
+          "exclude_reason": "unsupported_ext"
+        },
+        {
+          "path": ".github/copilot-instructions.md",
+          "status": "modified",
+          "insertions": 1,
+          "deletions": 1,
+          "exclude_reason": "unsupported_ext"
+        },
+        {
+          "path": "AGENTS.md",
+          "status": "modified",
+          "insertions": 1,
+          "deletions": 1,
+          "exclude_reason": "unsupported_ext"
+        },
+        {
+          "path": "context-hub/ecc/docs/core-agents/DOC.md",
+          "status": "modified",
+          "insertions": 1,
+          "deletions": 1,
+          "exclude_reason": "unsupported_ext"
+        }
+      ]
+    }
+  },
+  "contextTools": [
+    "ctx_execute",
+    "ctx_execute_file",
+    "ctx_index",
+    "ctx_search",
+    "ctx_fetch_and_index",
+    "ctx_batch_execute",
+    "ctx_stats",
+    "ctx_doctor",
+    "ctx_upgrade",
+    "ctx_purge",
+    "ctx_insight"
+  ],
+  "contextRetrieval": {
+    "content": [
+      {
+        "type": "text",
+        "text": "## permitted status amber\n\n--- [current-session | 2026-10-12 05:09 | ecc-install-fixture] ---\n### SeaBridge local fixture\n\n# SeaBridge local fixture\nThe permitted status code is amber. Reference source: synthetic fixture.\n\n> Throttle: call #1/8 in this window. 2 call(s) before soft cap. Prefer ctx_search(queries: [...]) array form for multi-query workloads — it counts as a single call."
+      }
+    ]
+  }
+}

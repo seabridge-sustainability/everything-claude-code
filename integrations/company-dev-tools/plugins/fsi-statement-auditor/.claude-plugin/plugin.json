@@ -1,0 +1,8 @@
+{
+  "name": "fsi-statement-auditor",
+  "version": "0.1.0",
+  "description": "Audits pre-generated LP statements before distribution",
+  "author": {
+    "name": "Anthropic FSI"
+  }
+}

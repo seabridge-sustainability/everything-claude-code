@@ -1,0 +1,37 @@
+{
+  "fixture": "ecc-policy-20261011",
+  "captured_after_behavior_run": true,
+  "policy_log_observations": [
+    "Isolation boundary enforcement confirmed backend=openshell-sandbox",
+    "HTTP:GET ALLOWED GET api.github.com:443/zen policy:github_readonly engine:l7",
+    "NET:REFUSE DENIED example.com reason:policy_dns_ineligible",
+    "NET:OPEN DENIED /usr/bin/curl -> example.com:443 reason:transparent_tcp_policy_denied",
+    "HTTP:POST DENIED POST api.github.com:443/zen policy:github_readonly engine:l7 reason:POST /zen not permitted by policy"
+  ],
+  "callback": "Supervisor fetched sandbox policy from http://127.0.0.1:17770 and acknowledged revision1 as loaded",
+  "observed_memory_mib": {
+    "gateway": 64.42,
+    "workload": 17.65,
+    "supervisor": 24.44,
+    "total_sample": 106.51,
+    "measurement_is_peak": false
+  },
+  "host_free_ram_gib_samples": [3.72, 2.50, 2.19],
+  "caps_bytes_final": {
+    "gateway": 536870912,
+    "workload": 268435456,
+    "supervisor": 268435456
+  },
+  "supervisor_cap_note": "Upstream Docker driver launches supervisor without a configured memory cap; only this owned supervisor was capped with docker update before stop. Future verification runner caps its owned supervisor immediately after creation.",
+  "network_modes": {
+    "gateway": "ecc-openshell_default private bridge, published host loopback17770/17771",
+    "workload": "none",
+    "supervisor": "host in Docker Desktop Linux VM"
+  },
+  "owned_sandbox_stopped": true,
+  "owned_gateway_stopped": true,
+  "other_services_preserved": ["falkordb", "redis-seabridge"],
+  "state_volumes_preserved": true,
+  "policy_widened": false,
+  "global_docker_settings_changed": false
+}

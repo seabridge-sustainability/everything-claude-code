@@ -1,0 +1,80 @@
+{
+  "version": "0.1.3",
+  "fixture": "ecc-policy-20261011",
+  "strict_landlock": true,
+  "providers": [],
+  "project_host_mounts": [],
+  "passed": true,
+  "results": [
+    {
+      "label": "gateway_status",
+      "exit_code": 0,
+      "stdout": "Server Status\n\n  Gateway: http://127.0.0.1:17770\n  Server: http://127.0.0.1:17770\n  Status: Connected\n  Authentication: Not required (gateway)\n  Version: 0.1.3\n",
+      "stderr": "",
+      "seconds": 0.01
+    },
+    {
+      "label": "create_strict_sandbox",
+      "exit_code": 0,
+      "stdout": "\nCreated sandbox: ecc-policy-20261011\n\n  [0.0s] Requesting compute...\n[0.0s] Sandbox allocated\n[0.0s] Pulling image ecc-openshell-fixture:0.1.3\n[0.0s] Image already present\n[0.3s] Starting sandbox Container created\n",
+      "stderr": "",
+      "seconds": 1.898
+    },
+    {
+      "label": "reference_read_allowed",
+      "exit_code": 0,
+      "stdout": "REFERENCE_ALLOW_MARKER\n",
+      "stderr": "",
+      "seconds": 0.144
+    },
+    {
+      "label": "private_read_denied",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "cat: /sandbox/private/denied.txt: Permission denied\n",
+      "seconds": 0.026
+    },
+    {
+      "label": "reference_write_denied",
+      "exit_code": 2,
+      "stdout": "",
+      "stderr": "sh: 1: cannot create /sandbox/references/allowed.txt: Permission denied\n",
+      "seconds": 0.028
+    },
+    {
+      "label": "output_write_allowed",
+      "exit_code": 0,
+      "stdout": "OUTPUT_ALLOWED\n",
+      "stderr": "",
+      "seconds": 0.027
+    },
+    {
+      "label": "github_get_allowed",
+      "exit_code": 0,
+      "stdout": "It's not fully shipped until it's fast.",
+      "stderr": "",
+      "seconds": 0.221
+    },
+    {
+      "label": "unlisted_network_denied",
+      "exit_code": 7,
+      "stdout": "",
+      "stderr": "curl: (7) Failed to connect to example.com port 443 after 2 ms: Couldn't connect to server\n",
+      "seconds": 0.033
+    },
+    {
+      "label": "github_post_denied",
+      "exit_code": 22,
+      "stdout": "",
+      "stderr": "curl: (22) The requested URL returned error: 403\n",
+      "seconds": 0.108
+    },
+    {
+      "label": "policy_decision_logs",
+      "exit_code": 0,
+      "stdout": "[1791773329.279] [sandbox] [INFO ] [openshell_supervisor] Starting sandbox supervision command=[\"sleep\", \"infinity\"]\n[1791773329.383] [sandbox] [INFO ] [openshell_supervisor] Fetching sandbox policy via gRPC endpoint=http://127.0.0.1:17770 sandbox=ecc-policy-20261011 sandbox_id=228a436c-9402-4399-83ec-19e12465a934\n[1791773329.424] [sandbox] [INFO ] [openshell_supervisor_network::opa] Configured OPA runtime binary identity mode require_binary_identity=true source=proto\n[1791773329.425] [sandbox] [OCSF ] [ocsf] CONFIG:CONFIGURED [INFO] OPA runtime binary identity mode configured [source:proto require_binary_identity:true] [source:proto]\n[1791773329.459] [sandbox] [INFO ] [openshell_supervisor] Isolation boundary attached backend=openshell-sandbox\n[1791773329.461] [sandbox] [INFO ] [openshell_supervisor] Isolation boundary enforcement confirmed backend=openshell-sandbox\n[1791773329.466] [sandbox] [OCSF ] [ocsf] CONFIG:ENABLED [INFO] TLS termination enabled: ephemeral CA generated\n[1791773329.467] [sandbox] [OCSF ] [ocsf] CONFIG:READY [INFO] Policy DNS connected to isolation boundary\n[1791773329.467] [sandbox] [OCSF ] [ocsf] NET:LISTEN [INFO] 127.0.0.1:3128\n[1791773329.468] [sandbox] [WARN ] [openshell_supervisor_network::proxy] host.openshell.internal maps to a non-link-local IP; trusted-gateway SSRF exemption disabled ip=127.0.0.1\n[1791773329.494] [sandbox] [INFO ] [openshell_supervisor] Isolation boundary agent started backend=openshell-sandbox\n[1791773329.497] [sandbox] [OCSF ] [ocsf] SSH:LISTEN [INFO]\n[1791773329.497] [sandbox] [INFO ] [openshell_supervisor] Control-mode access plane started backend=openshell-sandbox\n[1791773329.529] [sandbox] [OCSF ] [ocsf] CONFIG:LOADED [INFO] Acknowledged initial policy revision as loaded [version:1] [hash:e70f2aad5530b474537a5829230730bbea66b978f44b81d6f37848294b54fde9]\n[1791773329.534] [sandbox] [OCSF ] [ocsf] NET:OPEN [INFO] 127.0.0.1:17770\n[1791773329.655] [sandbox] [OCSF ] [ocsf] EVENT [INFO] ssh relay open (channel_id=71eb67db-e952-462b-a7a9-e8ab89b697c7, target=unix:/run/openshell/ssh.sock)\n[1791773329.655] [sandbox] [OCSF ] [ocsf] SSH:OPEN [INFO] ALLOWED\n[1791773329.685] [sandbox] [OCSF ] [ocsf] EVENT [INFO] ssh relay closed (channel_id=71eb67db-e952-462b-a7a9-e8ab89b697c7, target=unix:/run/openshell/ssh.sock)\n[1791773329.705] [sandbox] [OCSF ] [ocsf] EVENT [INFO] ssh relay open (channel_id=153c8fa6-1f06-4aeb-a607-e8a4ac5a36d3, target=unix:/run/openshell/ssh.sock)\n[1791773329.705] [sandbox] [OCSF ] [ocsf] SSH:OPEN [INFO] ALLOWED\n[1791773329.718] [sandbox] [OCSF ] [ocsf] EVENT [INFO] ssh relay closed (channel_id=153c8fa6-1f06-4aeb-a607-e8a4ac5a36d3, target=unix:/run/openshell/ssh.sock)\n[1791773329.734] [sandbox] [OCSF ] [ocsf] EVENT [INFO] ssh relay open (channel_id=8528016b-8c8a-4f1c-b12b-31269fc7fe7e, target=unix:/run/openshell/ssh.sock)\n[1791773329.734] [sandbox] [OCSF ] [ocsf] SSH:OPEN [INFO] ALLOWED\n[1791773329.750] [sandbox] [OCSF ] [ocsf] EVENT [INFO] ssh relay closed (channel_id=8528016b-8c8a-4f1c-b12b-31269fc7fe7e, target=unix:/run/openshell/ssh.sock)\n[1791773329.768] [sandbox] [OCSF ] [ocsf] EVENT [INFO] ssh relay open (channel_id=ffbbf688-861e-492c-9104-6d60b05d5c6a, target=unix:/run/openshell/ssh.sock)\n[1791773329.769] [sandbox] [OCSF ] [ocsf] SSH:OPEN [INFO] ALLOWED\n",
+      "stderr": "Warning: log buffer contains only the last 50 lines; --since results may be incomplete.\n",
+      "seconds": 0.02
+    }
+  ]
+}

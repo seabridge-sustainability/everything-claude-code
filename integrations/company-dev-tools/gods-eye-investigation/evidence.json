@@ -1,0 +1,496 @@
+{
+  "schema_version": 1,
+  "investigated_at": "2026-10-12T02:35:30.154Z",
+  "scope": "read-only upstream and local source investigation; no app/provider execution",
+  "upstream": {
+    "repository": "https://github.com/bilawalsidhu/gods-eye-view",
+    "revision": "591f299d11f38a612629a274463196d57ae3862e",
+    "package_version": "0.2.1",
+    "selected_files": [
+      {
+        "path": "DATA_SOURCES.md",
+        "sha256": "62f22a37ade67ba7cb022a2dea72f648b89e6456bb71764e024731fc09665b0c",
+        "bytes": 75478
+      },
+      {
+        "path": "docs/MCP_SETUP.md",
+        "sha256": "6d8699e2e9e2271cbb60b10c4abe634d62320fd036b4a98337f4e7b6a8b759ab",
+        "bytes": 2798
+      },
+      {
+        "path": "LICENSE",
+        "sha256": "b231bb38e2d4eab741643126087cbe9df2b58e2f2e5abf27ad613d05f52b01ca",
+        "bytes": 3281
+      },
+      {
+        "path": "package.json",
+        "sha256": "51236ae43839ca1d2285395e4b19cbc639985d086b0ff2389bf4281b2834797c",
+        "bytes": 12207
+      },
+      {
+        "path": "README.md",
+        "sha256": "1f10279b1b74981d3625216e2489c11e3b725f7ac554668bc577647e288b9c9f",
+        "bytes": 59392
+      },
+      {
+        "path": "server/mcp/services.js",
+        "sha256": "629a6abb03306539a08ed6c0c07803163ea9b10e34487ec83885e5035cb9174f",
+        "bytes": 2075
+      },
+      {
+        "path": "server/providers/cyclones.js",
+        "sha256": "81a4ca66a4c03e494625a115359ffe3eb862b918a56113d40faeeff848c57b87",
+        "bytes": 13199
+      },
+      {
+        "path": "server/providers/firms.js",
+        "sha256": "63a270d8c05ed000c65aaf5f1af410075e5c382c724d88a35d02d0c46a81b7b5",
+        "bytes": 9318
+      },
+      {
+        "path": "server/providers/weather.js",
+        "sha256": "315d150f75f487143de54e982dd0f0e4ca403f2a37e45d6de8f6c80042d62743",
+        "bytes": 21774
+      },
+      {
+        "path": "server/providers/wind/gfs.js",
+        "sha256": "18690d9a0d5e372184e6f92b1d9e51c2037744b15a83a0ebce0a4c3b6fb7e80f",
+        "bytes": 6736
+      },
+      {
+        "path": "server/providers/wind/grid.js",
+        "sha256": "d2bc7718525f3f12bc87253a3d23e1662c5a29326ca8110a175e80a0fa8c7a61",
+        "bytes": 5165
+      },
+      {
+        "path": "server/providers/wind/ifs.js",
+        "sha256": "ee363db9a06ad627d50a262c2ffd1201809336df631e81a47e008106112e1286",
+        "bytes": 5674
+      },
+      {
+        "path": "server/providers/wind.js",
+        "sha256": "7c375a33ba862ad598595dc76da9fafad531b5522af0c2bf5f96b5e4782647b2",
+        "bytes": 8022
+      },
+      {
+        "path": "src/data/dataCredits.js",
+        "sha256": "06806895f065eef33d7ab2daa4995168dcb5848e3c637eb9e137655ae43abbe7",
+        "bytes": 20048
+      },
+      {
+        "path": "src/data/earthquakes.js",
+        "sha256": "632c982429fbb12c0d47c602826031dbdd92d0dad598ba3da6482fd3a9817200",
+        "bytes": 478
+      },
+      {
+        "path": "src/data/firmsCsv.js",
+        "sha256": "d3a6b6394362ac1b1ffbc336551b398e5a32dd27576e4cb991818b1a65d2e6e3",
+        "bytes": 7524
+      },
+      {
+        "path": "src/layers/earthquakes/records.js",
+        "sha256": "a35859b1cef9b6a5353aad1a62335444781ae7cb7191a1c975a05490e338aa56",
+        "bytes": 1635
+      },
+      {
+        "path": "src/layers/earthquakes/source.js",
+        "sha256": "fd04c42b6d7386bc262054b78611b87bf7c3a3e3c7a7fe815a22e4642080f2d3",
+        "bytes": 803
+      },
+      {
+        "path": "src/layers/firms/policy.js",
+        "sha256": "0b041d0ac883396197407758fc890e4c6efd451b6f11389084038c099c8cbb85",
+        "bytes": 2870
+      },
+      {
+        "path": "src/layers/firms/queries.js",
+        "sha256": "ec5e49172e5e579d4eed9d9f564bd9cc5a0a5df2aad1487696c212d5d87b9830",
+        "bytes": 6979
+      },
+      {
+        "path": "src/layers/weather/source.js",
+        "sha256": "289efdfa249f1fda2f00206406390b81b047e3d3239d205bb75ff2b9936a3561",
+        "bytes": 5551
+      },
+      {
+        "path": "src/tools/services.js",
+        "sha256": "b53dcb9e308d8e80abe375440e6e89db27cb89b6ad021b6c375c4448b5c36c5b",
+        "bytes": 5173
+      }
+    ]
+  },
+  "observations": [
+    {
+      "claim": "MIT source only; bundled and runtime data carve-out",
+      "file": "LICENSE",
+      "lines": [
+        21,
+        55
+      ],
+      "url": "https://github.com/bilawalsidhu/gods-eye-view/blob/591f299d11f38a612629a274463196d57ae3862e/LICENSE#L21-L55",
+      "sha256": "b231bb38e2d4eab741643126087cbe9df2b58e2f2e5abf27ad613d05f52b01ca"
+    },
+    {
+      "claim": "TeleGeography, ODbL and Vantor/GeoPera restrictions including derived JS coordinates",
+      "file": "DATA_SOURCES.md",
+      "lines": [
+        146,
+        184
+      ],
+      "url": "https://github.com/bilawalsidhu/gods-eye-view/blob/591f299d11f38a612629a274463196d57ae3862e/DATA_SOURCES.md#L146-L184",
+      "sha256": "62f22a37ade67ba7cb022a2dea72f648b89e6456bb71764e024731fc09665b0c"
+    },
+    {
+      "claim": "NASA FIRMS trailing-day multi-source feed needs MAP_KEY",
+      "file": "server/providers/firms.js",
+      "lines": [
+        1,
+        35
+      ],
+      "url": "https://github.com/bilawalsidhu/gods-eye-view/blob/591f299d11f38a612629a274463196d57ae3862e/server/providers/firms.js#L1-L35",
+      "sha256": "63a270d8c05ed000c65aaf5f1af410075e5c382c724d88a35d02d0c46a81b7b5"
+    },
+    {
+      "claim": "FIRMS parser substitutes zero for missing quantitative values; do not directly adopt",
+      "file": "src/data/firmsCsv.js",
+      "lines": [
+        106,
+        123
+      ],
+      "url": "https://github.com/bilawalsidhu/gods-eye-view/blob/591f299d11f38a612629a274463196d57ae3862e/src/data/firmsCsv.js#L106-L123",
+      "sha256": "d3a6b6394362ac1b1ffbc336551b398e5a32dd27576e4cb991818b1a65d2e6e3"
+    },
+    {
+      "claim": "Source native FIRMS confidence categorical versus numeric",
+      "file": "src/data/firmsCsv.js",
+      "lines": [
+        6,
+        18
+      ],
+      "url": "https://github.com/bilawalsidhu/gods-eye-view/blob/591f299d11f38a612629a274463196d57ae3862e/src/data/firmsCsv.js#L6-L18",
+      "sha256": "d3a6b6394362ac1b1ffbc336551b398e5a32dd27576e4cb991818b1a65d2e6e3"
+    },
+    {
+      "claim": "FIRMS FRP shown in MW",
+      "file": "src/layers/firms/queries.js",
+      "lines": [
+        18,
+        29
+      ],
+      "url": "https://github.com/bilawalsidhu/gods-eye-view/blob/591f299d11f38a612629a274463196d57ae3862e/src/layers/firms/queries.js#L18-L29",
+      "sha256": "ec5e49172e5e579d4eed9d9f564bd9cc5a0a5df2aad1487696c212d5d87b9830"
+    },
+    {
+      "claim": "Weather product source, units, resolution and geographic coverage",
+      "file": "server/providers/weather.js",
+      "lines": [
+        4,
+        58
+      ],
+      "url": "https://github.com/bilawalsidhu/gods-eye-view/blob/591f299d11f38a612629a274463196d57ae3862e/server/providers/weather.js#L4-L58",
+      "sha256": "315d150f75f487143de54e982dd0f0e4ca403f2a37e45d6de8f6c80042d62743"
+    },
+    {
+      "claim": "WMS geographical grid, bounded request and shared queue differ from Mapbox mercator",
+      "file": "server/providers/weather.js",
+      "lines": [
+        209,
+        275
+      ],
+      "url": "https://github.com/bilawalsidhu/gods-eye-view/blob/591f299d11f38a612629a274463196d57ae3862e/server/providers/weather.js#L209-L275",
+      "sha256": "315d150f75f487143de54e982dd0f0e4ca403f2a37e45d6de8f6c80042d62743"
+    },
+    {
+      "claim": "Wind manifest separates cycle metadata, fetched time, native level/units and state",
+      "file": "server/providers/wind.js",
+      "lines": [
+        99,
+        146
+      ],
+      "url": "https://github.com/bilawalsidhu/gods-eye-view/blob/591f299d11f38a612629a274463196d57ae3862e/server/providers/wind.js#L99-L146",
+      "sha256": "7c375a33ba862ad598595dc76da9fafad531b5522af0c2bf5f96b5e4782647b2"
+    },
+    {
+      "claim": "GFS issue/valid time and 10m m/s wind field",
+      "file": "server/providers/wind/gfs.js",
+      "lines": [
+        164,
+        221
+      ],
+      "url": "https://github.com/bilawalsidhu/gods-eye-view/blob/591f299d11f38a612629a274463196d57ae3862e/server/providers/wind/gfs.js#L164-L221",
+      "sha256": "18690d9a0d5e372184e6f92b1d9e51c2037744b15a83a0ebce0a4c3b6fb7e80f"
+    },
+    {
+      "claim": "ECMWF open-data source selected field and issue/valid time",
+      "file": "server/providers/wind/ifs.js",
+      "lines": [
+        104,
+        165
+      ],
+      "url": "https://github.com/bilawalsidhu/gods-eye-view/blob/591f299d11f38a612629a274463196d57ae3862e/server/providers/wind/ifs.js#L104-L165",
+      "sha256": "ee363db9a06ad627d50a262c2ffd1201809336df631e81a47e008106112e1286"
+    },
+    {
+      "claim": "Explicit K to Celsius and Pa to hPa transformation",
+      "file": "server/providers/wind/grid.js",
+      "lines": [
+        101,
+        149
+      ],
+      "url": "https://github.com/bilawalsidhu/gods-eye-view/blob/591f299d11f38a612629a274463196d57ae3862e/server/providers/wind/grid.js#L101-L149",
+      "sha256": "d2bc7718525f3f12bc87253a3d23e1662c5a29326ca8110a175e80a0fa8c7a61"
+    },
+    {
+      "claim": "Cyclone status/GIS allowlisted URLs and regional coverage",
+      "file": "server/providers/cyclones.js",
+      "lines": [
+        1,
+        14
+      ],
+      "url": "https://github.com/bilawalsidhu/gods-eye-view/blob/591f299d11f38a612629a274463196d57ae3862e/server/providers/cyclones.js#L1-L14",
+      "sha256": "81a4ca66a4c03e494625a115359ffe3eb862b918a56113d40faeeff848c57b87"
+    },
+    {
+      "claim": "USGS keyless event feed validation",
+      "file": "src/layers/earthquakes/source.js",
+      "lines": [
+        1,
+        20
+      ],
+      "url": "https://github.com/bilawalsidhu/gods-eye-view/blob/591f299d11f38a612629a274463196d57ae3862e/src/layers/earthquakes/source.js#L1-L20",
+      "sha256": "fd04c42b6d7386bc262054b78611b87bf7c3a3e3c7a7fe815a22e4642080f2d3"
+    },
+    {
+      "claim": "USGS magnitude/depth/timestamp missing-state validation",
+      "file": "src/layers/earthquakes/records.js",
+      "lines": [
+        1,
+        47
+      ],
+      "url": "https://github.com/bilawalsidhu/gods-eye-view/blob/591f299d11f38a612629a274463196d57ae3862e/src/layers/earthquakes/records.js#L1-L47",
+      "sha256": "a35859b1cef9b6a5353aad1a62335444781ae7cb7191a1c975a05490e338aa56"
+    },
+    {
+      "claim": "Upstream MCP requires running local globe app, not standalone climate dataset API",
+      "file": "docs/MCP_SETUP.md",
+      "lines": [
+        1,
+        47
+      ],
+      "url": "https://github.com/bilawalsidhu/gods-eye-view/blob/591f299d11f38a612629a274463196d57ae3862e/docs/MCP_SETUP.md#L1-L47",
+      "sha256": "6d8699e2e9e2271cbb60b10c4abe634d62320fd036b4a98337f4e7b6a8b759ab"
+    },
+    {
+      "claim": "Node runtime engine >=24.14 or >=26; no runtime installed for this investigation",
+      "file": "package.json",
+      "lines": [
+        1,
+        20
+      ],
+      "url": "https://github.com/bilawalsidhu/gods-eye-view/blob/591f299d11f38a612629a274463196d57ae3862e/package.json#L1-L20",
+      "sha256": "51236ae43839ca1d2285395e4b19cbc639985d086b0ff2389bf4281b2834797c"
+    }
+  ],
+  "local_source": {
+    "backend_head_observed": "937084936b2e4d17200850cd9b1c5b8d4532a740",
+    "frontend_head_observed": "a5d05671c64a1a39bd0eb846b5c07fe97015d509",
+    "graph_freshness": "UNSAFE boundary/exclusions; direct source used",
+    "frontend_origin_development_header_checked": true,
+    "files": [
+      {
+        "repo": "backend",
+        "file": "app/api/v1/api.py",
+        "lines": [
+          467,
+          470
+        ],
+        "sha256": "f0d2042ef1f7c112bc9df0eae33e61ad8bd238e4fdd8a2b5d3c05c777e5836ea",
+        "binding": "observed working tree, may include concurrent uncommitted work; no live or remote-tip equivalence claim"
+      },
+      {
+        "repo": "backend",
+        "file": "app/api/v1/endpoints/gis_toolkit.py",
+        "lines": [
+          433,
+          448
+        ],
+        "sha256": "3cf95516dfb8de8782b9c1e9a16c6b7ff46dbfb2cc793813ab5b47b59fb73c8e",
+        "binding": "observed working tree, may include concurrent uncommitted work; no live or remote-tip equivalence claim"
+      },
+      {
+        "repo": "backend",
+        "file": "app/api/v1/endpoints/gis_toolkit.py",
+        "lines": [
+          2640,
+          2691
+        ],
+        "sha256": "3cf95516dfb8de8782b9c1e9a16c6b7ff46dbfb2cc793813ab5b47b59fb73c8e",
+        "binding": "observed working tree, may include concurrent uncommitted work; no live or remote-tip equivalence claim"
+      },
+      {
+        "repo": "backend",
+        "file": "app/services/climate_data/mrms.py",
+        "lines": [
+          1,
+          95
+        ],
+        "sha256": "6b787bbbfe92dd37d56e858c2ad6ac00e3ce0a48cf3304feeb4a11d9f66195c2",
+        "binding": "observed working tree, may include concurrent uncommitted work; no live or remote-tip equivalence claim"
+      },
+      {
+        "repo": "backend",
+        "file": "seabridge_ai/src/sustainability_ai/gis/adapters/land_cover/arcgis_adapter.py",
+        "lines": [
+          135,
+          202
+        ],
+        "sha256": "ea4383a0ae4dcb2eec60ec829d8d016d36b6be78bdf3c3feededdfd9e3c25495",
+        "binding": "observed working tree, may include concurrent uncommitted work; no live or remote-tip equivalence claim"
+      },
+      {
+        "repo": "backend",
+        "file": "app/services/physical_twin/context_layers.py",
+        "lines": [
+          1,
+          6
+        ],
+        "sha256": "ba928db5f17e7833a3c0d3ee84fe1d8e93a2879e8ec127e16d772e80555ba32f",
+        "binding": "observed working tree, may include concurrent uncommitted work; no live or remote-tip equivalence claim"
+      },
+      {
+        "repo": "backend",
+        "file": "app/schemas/nature_saved_source.py",
+        "lines": [
+          1,
+          20
+        ],
+        "sha256": "32deaea31b14f431bf092cac812c160b812728994f26067fed56d0bfc049ff13",
+        "binding": "observed working tree, may include concurrent uncommitted work; no live or remote-tip equivalence claim"
+      },
+      {
+        "repo": "backend",
+        "file": "app/schemas/climate_saved_source.py",
+        "lines": [
+          1,
+          17
+        ],
+        "sha256": "124db09d4d5be41e1b1c1ba6fcfd8c458b845df831685d07be6642d0fa85c0e3",
+        "binding": "observed working tree, may include concurrent uncommitted work; no live or remote-tip equivalence claim"
+      },
+      {
+        "repo": "frontend",
+        "file": "src/components/views/risk-management/climate-risk/PropertyRiskMap.tsx",
+        "lines": [
+          1,
+          58
+        ],
+        "sha256": "ad6827a39a973695fe20f5bd5c2978323eda29c389447b48681a6044c9e482db",
+        "binding": "observed working tree, may include concurrent uncommitted work; no live or remote-tip equivalence claim"
+      },
+      {
+        "repo": "frontend",
+        "file": "src/components/map/EsriLayerPanel.tsx",
+        "lines": [
+          1,
+          45
+        ],
+        "sha256": "1044a4d6cea3f758eaee3b9b4718bc0ed018d7e159eb4920af6f451fdb334a4f",
+        "binding": "observed working tree, may include concurrent uncommitted work; no live or remote-tip equivalence claim"
+      },
+      {
+        "repo": "frontend",
+        "file": "src/hooks/useEsriLayers.ts",
+        "lines": [
+          1,
+          50
+        ],
+        "sha256": "20dde68cfe43654769fb92f636f292fed17b13c522f55323d0a1ef6f22c63aa8",
+        "binding": "observed working tree, may include concurrent uncommitted work; no live or remote-tip equivalence claim"
+      },
+      {
+        "repo": "frontend",
+        "file": "src/components/views/nature-risk/MapBox.tsx",
+        "lines": [
+          288,
+          300
+        ],
+        "sha256": "5f1cdbdc07701bcdd4d318d2336ad7ffb6198a9020deb3c8c5b3a64f6b9eee76",
+        "binding": "observed working tree, may include concurrent uncommitted work; no live or remote-tip equivalence claim"
+      },
+      {
+        "repo": "frontend",
+        "file": "src/components/views/nature-risk/AOIMap.tsx",
+        "lines": [
+          1,
+          70
+        ],
+        "sha256": "72bf054bcbf0290f1f3516ae4876248d1145273de61a781440a14a9dbbf74b75",
+        "binding": "observed working tree, may include concurrent uncommitted work; no live or remote-tip equivalence claim"
+      },
+      {
+        "repo": "frontend",
+        "file": "src/components/views/nature-risk/useNatureLocationContext.ts",
+        "lines": [
+          48,
+          68
+        ],
+        "sha256": "521b2f1407c207dc8bca2c99c28f58a0d774c195e2247f49660442e469d67fdf",
+        "binding": "observed working tree, may include concurrent uncommitted work; no live or remote-tip equivalence claim"
+      }
+    ]
+  },
+  "ecological_tree_search": {
+    "revision": "591f299d11f38a612629a274463196d57ae3862e",
+    "truncated": false,
+    "pattern": "land.?cover|biodiversity|habitat|protected.?area|species",
+    "matching_paths": [],
+    "limitation": "filename/tree plus selected documents review; not a complete semantic proof about every line of upstream"
+  },
+  "rights_sources": [
+    {
+      "url": "https://www.naturalearthdata.com/about/terms-of-use/",
+      "status": "official document read; public-domain commercial use stated"
+    },
+    {
+      "url": "https://www.ecmwf.int/en/forecasts/datasets/open-data",
+      "status": "official document read; CC BY 4.0 plus terms, commercial use stated"
+    },
+    {
+      "url": "https://www.weather.gov/disclaimer",
+      "status": "official document read; product-specific third-party exceptions and non-endorsement apply"
+    },
+    {
+      "url": "https://www.usgs.gov/information-policies-and-instructions/copyrights-and-credits",
+      "status": "official document accessible; exact event-product receipt still required"
+    },
+    {
+      "url": "https://www.earthdata.nasa.gov/data/earthdata-data-policy",
+      "status": "browser inaccessible; upstream rights statement not independently admitted"
+    }
+  ],
+  "gaps": [
+    "No live feed, key, runtime, browser or scientific-model verification",
+    "No matching nature-location-context route found in current backend source despite frontend hook",
+    "No whole-repository ecological semantic scan",
+    "No product-specific NASA rights receipt",
+    "Mapbox/WebMercator and Cesium geographic tile adaptation requires tests",
+    "Climate calculation implementation remains paused"
+  ],
+  "proposed_outcome": "one property-linked environmental context feed in existing GIS/Mapbox, with source/time/units/coverage; no risk score or finance mutation",
+  "actions_performed": {
+    "dataset_downloads": 0,
+    "provider_calls": 0,
+    "app_source_edits": 0,
+    "runtimes_installed": 0,
+    "mcp_registrations": 0,
+    "commits": 0,
+    "pushes": 0
+  },
+  "validation": {
+    "validated_at": "2026-10-12T02:35:49.728Z",
+    "selected_source_digests": "22/22 match pinned downloaded source",
+    "line_ranges": "all within retained source or inspected current local files",
+    "dataset_assets_retained": false,
+    "total_selected_source_bytes": 276180
+  }
+}

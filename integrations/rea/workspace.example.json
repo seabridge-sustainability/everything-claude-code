@@ -1,0 +1,10 @@
+{
+  "repositories": { "frontend": "../../../manageesg-frontend", "backend": "../../../manageesg-backend" },
+  "browserExecutable": null,
+  "cdpEndpoint": "http://127.0.0.1:9222",
+  "whisperModel": "state/models/tiny",
+  "maxVideoSeconds": 600,
+  "maxFrames": 60,
+  "native": null,
+  "vision": { "endpoint": "http://127.0.0.1:11434", "model": "qwen3.5-opencode:32k" }
+}

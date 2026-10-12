@@ -1,0 +1,75 @@
+name: ecc-weknora
+services:
+  app:
+    image: wechatopenai/weknora-app@sha256:bc8a534799fcb54045100daf4bc5db86270b38ae45c5f761c410c50b4dcd6cdc
+    ports: ["127.0.0.1:8182:8080"]
+    env_file: [.env.local]
+    environment:
+      GIN_MODE: release
+      LOG_LEVEL: warn
+      DB_DRIVER: postgres
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_USER: ecc_weknora
+      DB_NAME: ecc_weknora
+      RETRIEVE_DRIVER: postgres
+      STORAGE_TYPE: local
+      LOCAL_STORAGE_BASE_DIR: /data/files/documents
+      STREAM_MANAGER_TYPE: memory
+      OLLAMA_BASE_URL: http://host.docker.internal:11434
+      WEKNORA_SANDBOX_MODE: disabled
+      WEKNORA_SANDBOX_DOCKER_ENABLED: "false"
+      NEO4J_ENABLE: "false"
+      ENABLE_GRAPH_RAG: "false"
+      CONCURRENCY_POOL_SIZE: "1"
+      AUTO_MIGRATE: "true"
+      DISABLE_REGISTRATION: "false"
+      LLM_DEBUG_LOG: "false"
+      LANGFUSE_ENABLED: "false"
+      WEKNORA_LANGUAGE: en-US
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes: ["./state/pg-files:/data/files"]
+    mem_limit: 512m
+    cpus: 1.0
+    pids_limit: 128
+    restart: "no"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 12
+  ui:
+    image: wechatopenai/weknora-ui@sha256:83cfd9272e1219b5b5729f89d9c3f8d15a16e1b8cc17cacf638153cc0417290f
+    ports: ["127.0.0.1:3182:80"]
+    environment:
+      APP_HOST: app
+      APP_PORT: "8080"
+      APP_SCHEME: http
+      DEFAULT_LOCALE: en-US
+    mem_limit: 64m
+    cpus: 0.25
+    pids_limit: 32
+    restart: "no"
+    depends_on:
+      app:
+        condition: service_healthy
+
+  postgres:
+    image: paradedb/paradedb@sha256:58bf87d2a6f1e72f56590b0f0ae1467e82c3f99ca203dde646672c8ac13148b2
+    environment:
+      POSTGRES_USER: ecc_weknora
+      POSTGRES_DB: ecc_weknora
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    command: ["postgres", "-c", "shared_buffers=32MB", "-c", "work_mem=2MB", "-c", "max_connections=30"]
+    volumes: ["./state/postgres:/var/lib/postgresql/data"]
+    mem_limit: 256m
+    cpus: 0.5
+    pids_limit: 64
+    restart: "no"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U ecc_weknora -d ecc_weknora"]
+      interval: 5s
+      timeout: 3s
+      retries: 15

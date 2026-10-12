@@ -1,0 +1,12 @@
+{
+  "repository": "https://github.com/Tencent/WeKnora",
+  "commit": "00474f734d6c7c0911d7485465d7c7286d0047cb",
+  "version": "0.8.2",
+  "license": "MIT with THIRD_PARTY_NOTICES.md and licenses/",
+  "images": {
+    "app": "wechatopenai/weknora-app@sha256:bc8a534799fcb54045100daf4bc5db86270b38ae45c5f761c410c50b4dcd6cdc",
+    "ui": "wechatopenai/weknora-ui@sha256:83cfd9272e1219b5b5729f89d9c3f8d15a16e1b8cc17cacf638153cc0417290f",
+    "postgres": "paradedb/paradedb@sha256:58bf87d2a6f1e72f56590b0f0ae1467e82c3f99ca203dde646672c8ac13148b2"
+  },
+  "paradedb_license": "AGPL-3.0 https://github.com/paradedb/paradedb/blob/main/LICENSE"
+}
