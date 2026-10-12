@@ -38,6 +38,7 @@ const SOURCES = Object.freeze([
   'scripts/lib/coding-execution.js', 'schemas/coding-execution.schema.json',
   'scripts/lib/goal-control.js',
   'tests/lib/coding-execution.test.js',
+  'scripts/native-adoption-pilot.js', 'tests/lib/native-adoption-pilot.test.js',
   'scripts/agent-system-map.js', 'scripts/agent-adoption-doctor.js',
   'scripts/agent-behavior-report.js', 'scripts/eval-agent-behavior.js',
   'scripts/ci/detect-ci-scope.js', 'scripts/knowledge-adoption.js',
@@ -122,6 +123,9 @@ function buildMap(root = ROOT, sources = SOURCES) {
     ['scripts/lib/coding-execution.js', 'scripts/lib/session-coordination.js', "require('./session-coordination')"],
     ['scripts/lib/coding-execution.js', 'scripts/lib/goal-control.js', "require('./goal-control')"],
     ['tests/lib/coding-execution.test.js', 'scripts/lib/coding-execution.js', "require('../../scripts/lib/coding-execution')"],
+    ['scripts/native-adoption-pilot.js', 'scripts/scope-guard-adapters.js', "require('./scope-guard-adapters')"],
+    ['scripts/native-adoption-pilot.js', 'scripts/lib/session-coordination.js', "require('./lib/session-coordination')"],
+    ['tests/lib/native-adoption-pilot.test.js', 'scripts/native-adoption-pilot.js', "require('../../scripts/native-adoption-pilot')"],
     ['scripts/memory.js', 'scripts/lib/memory-vault.js', "require('./lib/memory-vault')"],
     ['scripts/memory-mcp.mjs', 'scripts/lib/memory-vault.js', "require('./lib/memory-vault.js')"],
     ['scripts/lib/memory-vault.js', 'scripts/lib/memory-vault-format.js', "require('./memory-vault-format')"],
@@ -151,7 +155,7 @@ function buildMap(root = ROOT, sources = SOURCES) {
     schema: 'seabridge.agent-system-map.v1',
     scope: 'Three backend policy sources and ECC loading adapters, outcome control, evaluation, and CI; no product or tenant data',
     extractor: 'scripts/agent-system-map.js (deterministic, no LLM)',
-    generatorVersion: 6,
+    generatorVersion: 7,
     // Generated verification artifact, not a fourth policy source. CI can
     // reproduce the three reviewed, pinned files without a private-repo token.
     policySnapshot: rows.filter(row => row.path.startsWith('../manageesg-backend/'))
