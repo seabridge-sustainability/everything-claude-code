@@ -66,6 +66,15 @@ test('final claim inference avoids explicit negative claims', () => {
   assert.strictEqual(inferClaim('The goal is blocked as a whole.'), 'blocked');
   assert.strictEqual(inferClaim('The work remains on track.'), 'on-track');
   assert.strictEqual(inferClaim('This is not complete; two proofs remain.'), null);
+  assert.strictEqual(inferClaim('Two bounded source-only reviews completed: Astra 32/35 operations. They produced review receipts, not new features.'), null);
+  assert.strictEqual(inferClaim('Handoff complete; whole-building MVP remains incomplete.'), null);
+  assert.strictEqual(inferClaim('The whole-building MVP is complete and accepted.'), 'complete');
+  assert.strictEqual(inferClaim('My work is finished.'), 'complete');
+  assert.strictEqual(inferClaim('I have completed the task.'), 'complete');
+  assert.strictEqual(inferClaim('The work is not on track.'), null);
+  assert.strictEqual(inferClaim('The goal is not blocked as a whole.'), null);
+  assert.strictEqual(inferClaim('The old prototype is not complete; the goal is complete.'), 'complete');
+  assert.strictEqual(inferClaim('Done.'), 'complete');
 });
 
 (async () => {

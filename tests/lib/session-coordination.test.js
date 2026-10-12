@@ -329,7 +329,18 @@ test('release expiry is not proof a remote job stopped; it prevents takeover', (
   assert.throws(() => execute('release-acquire', { cwd: other, sessionId: 'worker', branch: 'development', candidate: sha, now: 60200, ...budget(60200) }), /release owned/);
   assert.throws(() => execute('close', { cwd: root, sessionId: 'release', now: 60200 }), /terminal status/);
   execute('release-end', { cwd: root, sessionId: 'release', outcome: 'failed', evidence: 'fixture run terminal failure', now: 60200 });
-  execute('release-acquire', { cwd: other, sessionId: 'worker', branch: 'development', candidate: sha, now: 60201, ...budget(60201) });
+  assert.throws(() => execute('release-acquire', { cwd: other, sessionId: 'worker', branch: 'development', candidate: sha, now: 60201, ...budget(60201) }), /retry-evidence/);
+  execute('release-acquire', { cwd: other, sessionId: 'worker', branch: 'development', candidate: sha,
+    retryEvidence: 'Runner outage repaired; one justified retry of unchanged source', now: 60201, ...budget(60201) });
+});
+
+test('completed candidate cannot be released twice even with retry prose', () => {
+  const { root, sha } = fixture();
+  register(root, 'release', ['README.md']);
+  execute('release-acquire', { cwd: root, sessionId: 'release', branch: 'development', candidate: sha, ...budget() });
+  execute('release-end', { cwd: root, sessionId: 'release', outcome: 'completed', evidence: 'fixture completed' });
+  assert.throws(() => execute('release-acquire', { cwd: root, sessionId: 'release', branch: 'development', candidate: sha,
+    retryEvidence: 'no new code', ...budget() }), /candidate already released/);
 });
 
 test('changed HEAD never silently retargets an acquired candidate', () => {

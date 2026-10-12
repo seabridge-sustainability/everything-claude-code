@@ -433,6 +433,15 @@
         "max_cost_usd": { "type": "number", "minimum": 0 }
       }
     },
+    "assignmentCapacity": {
+      "type": "object", "additionalProperties": false,
+      "required": ["ram_gib", "disk_gib", "volume"],
+      "properties": {
+        "ram_gib": { "type": "number", "exclusiveMinimum": 0 },
+        "disk_gib": { "type": "number", "minimum": 0 },
+        "volume": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
     "assignmentUsage": {
       "type": "object",
       "additionalProperties": false,
@@ -525,6 +534,10 @@
           "type": "array", "minItems": 1, "uniqueItems": true,
           "items": { "$ref": "#/$defs/nonEmptyString" }
         },
+        "work_kind": { "type": "string", "enum": ["output", "blocker"] },
+        "defect_evidence": { "$ref": "#/$defs/nonEmptyString" },
+        "defect_evidence_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "capacity": { "$ref": "#/$defs/assignmentCapacity" },
         "owner_runtime": { "$ref": "#/$defs/nonEmptyString" },
         "owner_agent": { "$ref": "#/$defs/nonEmptyString" },
         "scope_paths": {
@@ -562,7 +575,7 @@
           "items": { "$ref": "#/$defs/evidence" }
         },
         "usage": { "$ref": "#/$defs/assignmentUsage" },
-        "outcome": { "type": "string", "enum": ["pass", "fail"] },
+        "outcome": { "type": "string", "enum": ["pass", "fail", "superseded", "not_adopted"] },
         "limitations": {
           "type": "array", "uniqueItems": true,
           "items": { "$ref": "#/$defs/nonEmptyString" }

@@ -4,6 +4,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 const {
   assertDocument,
   buildParallelStatus,
@@ -94,6 +95,8 @@ function loadBundle(args) {
 }
 
 function help() {
+  process.stdout.write('New assignments require --work-kind output|blocker, --ram-gib N, --disk-gib N, and --disk-path DIR; blockers also require --defect-evidence FILE.\n');
+  process.stdout.write('Terminal integration outcomes superseded/not_adopted require --limitation REASON; failed or over-budget receipts remain history, never passing proof.\n');
   process.stdout.write('Controlled execution v3: assign --change-contract FILE (requested_delta and hash-bound preserved_invariants). Historical records are not silently upgraded.\n');
   process.stdout.write(`ECC outcome control\n\nUsage:\n  ecc goal profiles\n  ecc goal init --from FILE [--dir DIR]\n  ecc goal checkpoint --proof ID --at ISO --started-at ISO --basis TEXT --hours N [--confidence LEVEL]\n  ecc goal correct --instruction TEXT --priority TEXT --proof ID --next-action TEXT --at ISO --started-at ISO --basis TEXT --hours N\n  ecc goal record --acceptance ID --stage STAGE --environment NAME --evidence KIND=FILE [options]\n    options: --result-class CLASS --authenticity CLASS --user-visible true|false --subject-scope SCOPE\n  ecc goal assign --description TEXT --acceptance ID --owner-runtime NAME --owner-agent ID --scope PATH --lease-until ISO [budgets]\n  ecc goal integrate --assignment ID --integrator ID --evidence KIND=FILE --repo ID=DIR --tool-calls N --retries N --ci-runs N --cost-usd N\n  ecc goal watch-config --window-hours N --max-activity N --max-retries N --max-ci-runs N --max-cost-usd N\n  ecc goal activity --kind KIND --tactic ID [--count N] [--cost-usd N]\n  ecc goal watch [--json] [--now ISO]\n  ecc goal resume --next-action TEXT [--repo DIR ...] [--last-result TEXT] [options]\n  ecc goal handoff --next-action TEXT [resume options]\n  ecc goal validate [--goal FILE] [--outcomes FILE] [--resume FILE]\n  ecc goal status [--goal FILE] [--outcomes FILE] [--json] [--now ISO]\n  ecc goal claim <complete|blocked|on-track> [--goal FILE] [--outcomes FILE] [--resume FILE] [--json] [--now ISO]\n\nDefaults:\n  directory:    .ecc/goal\n  goal:         active-goal.yaml\n  outcomes:     outcomes.jsonl\n  assignments:  assignments.jsonl\n  integrations: integrations.jsonl\n  resume:       resume-receipt.yaml (loaded when present)\n\nWrites are local, atomic, and lock-protected. The command never calls a model, provider, CI service, or deployment API.\n`);
 }
@@ -223,7 +226,31 @@ function commandActivity(args) {
   return { recorded: true, ...write, event, paths };
 }
 
+function checkAssignmentCapacity(goalId, assignments, integrations, capacity, telemetry, now = Date.now()) {
+  if (![telemetry.freeRamGib, telemetry.freeDiskGib].every(value => Number.isFinite(value) && value >= 0)) throw new Error('capacity telemetry must be known and non-negative');
+  const latest = new Map();
+  for (const receipt of integrations.filter(item => item.goal_id === goalId && Date.parse(item.observed_at) <= now)) {
+    const previous = latest.get(receipt.assignment_id);
+    if (!previous || Date.parse(receipt.observed_at) > Date.parse(previous.observed_at)) latest.set(receipt.assignment_id, receipt);
+  }
+  // Lease expiry proves neither process cessation nor released capacity.
+  const active = assignments.filter(item => item.goal_id === goalId && Date.parse(item.issued_at) <= now
+    && !['pass', 'superseded', 'not_adopted'].includes(latest.get(item.assignment_id)?.outcome));
+  if (active.some(item => !item.capacity)) throw new Error('active legacy assignment has unknown capacity; reconcile it before adding parallel work');
+  const reservedRam = active.reduce((sum, item) => sum + item.capacity.ram_gib, 0);
+  const reservedDisk = active.filter(item => item.capacity.volume === capacity.volume)
+    .reduce((sum, item) => sum + item.capacity.disk_gib, 0);
+  if (telemetry.freeRamGib - reservedRam - capacity.ram_gib < 2
+      || telemetry.freeDiskGib - reservedDisk - capacity.disk_gib < 5) throw new Error('insufficient aggregate capacity: preserve 2 GiB RAM and 5 GiB disk headroom');
+  return { reservedRam, reservedDisk, limitation: 'current-goal reservations plus live machine headroom; other goals need their own coordinated capacity admission' };
+}
+
 function commandAssign(args) {
+  const paths = pathsFrom(args);
+  return withFileLock(`${paths.assignments}.admission.lock`, () => commandAssignLocked(args));
+}
+
+function commandAssignLocked(args) {
   const paths = pathsFrom(args);
   const goal = readStructuredFile(paths.goal);
   const description = optionValue(args, '--description');
@@ -232,16 +259,34 @@ function commandAssign(args) {
   const ownerAgent = optionValue(args, '--owner-agent');
   const scopePaths = optionValues(args, '--scope');
   const leaseExpiresAt = optionValue(args, '--lease-until');
-  if (!description || !acceptanceIds.length || !ownerRuntime || !ownerAgent || !scopePaths.length || !leaseExpiresAt) {
-    throw new Error('assign requires --description, --acceptance, --owner-runtime, --owner-agent, --scope, and --lease-until');
+  const workKind = optionValue(args, '--work-kind');
+  const defectEvidence = optionValue(args, '--defect-evidence');
+  if (!description || !acceptanceIds.length || !ownerRuntime || !ownerAgent || !scopePaths.length || !leaseExpiresAt || !workKind) {
+    throw new Error('assign requires --description, --acceptance, --work-kind output|blocker, --owner-runtime, --owner-agent, --scope, and --lease-until');
   }
+  if (!['output', 'blocker'].includes(workKind)) throw new Error('assign --work-kind must be output or blocker');
+  if (workKind === 'blocker' && !defectEvidence) throw new Error('blocker assignment requires --defect-evidence identifying the observed defect');
+  if (defectEvidence && (!fs.existsSync(path.resolve(defectEvidence)) || !fs.statSync(path.resolve(defectEvidence)).isFile())) throw new Error('assignment --defect-evidence must identify an existing local evidence file');
+  const requiredProofs = new Set(goal.user_visible_proofs.filter(proof => proof.required).map(proof => proof.id));
+  if (acceptanceIds.some(id => !requiredProofs.has(id))) throw new Error('assignment acceptance must reference only required product proofs');
   const issuedAt = optionValue(args, '--issued-at', new Date().toISOString());
+  const correction = latestExecutableCorrection(goal);
+  if (correction && Date.parse(issuedAt) < Date.parse(correction.recorded_at)) throw new Error('assignment predates latest owner correction; refresh the plan and reissue relevant work');
+  const ramPeak = optionValue(args, '--ram-gib'), diskPeak = optionValue(args, '--disk-gib'), diskPath = optionValue(args, '--disk-path');
+  if (ramPeak === null || diskPeak === null || !diskPath) throw new Error('assign requires --ram-gib, --disk-gib, and --disk-path to reserve aggregate capacity');
+  const ramGib = parseNumber(ramPeak, '--ram-gib'), diskGib = parseNumber(diskPeak, '--disk-gib');
+  if (ramGib <= 0 || diskGib < 0) throw new Error('assignment peak RAM must be positive and disk cannot be negative');
+  const resolvedDiskPath = fs.realpathSync(path.resolve(diskPath));
+  const capacity = { ram_gib: ramGib, disk_gib: diskGib, volume: path.parse(resolvedDiskPath).root.toLowerCase() };
   const assignment = {
     schema: 'ecc.assignment.v1',
     assignment_id: optionValue(args, '--assignment-id', makeReceiptId('assignment', issuedAt)),
     goal_id: goal.goal_id,
     description,
     acceptance_ids: acceptanceIds,
+    work_kind: workKind,
+    ...(defectEvidence ? { defect_evidence: defectEvidence, defect_evidence_sha256: sha256File(path.resolve(defectEvidence)) } : {}),
+    capacity,
     owner_runtime: ownerRuntime,
     owner_agent: ownerAgent,
     scope_paths: scopePaths,
@@ -263,14 +308,19 @@ function commandAssign(args) {
   }
   assertDocument('assignment', assignment, `assignment ${assignment.assignment_id}`);
   const assignments = readJsonLines(paths.assignments);
+  const integrations = readJsonLines(paths.integrations);
   validateBundle({
     goal,
     outcomes: readJsonLines(paths.outcomes),
     resume: null,
     assignments: [...assignments, assignment],
-    integrations: readJsonLines(paths.integrations),
+    integrations,
     watchdog: fs.existsSync(path.resolve(paths.watchdog)) ? readStructuredFile(paths.watchdog) : null,
     activity: readJsonLines(paths.activity),
+  });
+  const stats = fs.statfsSync(resolvedDiskPath), gib = 1024 ** 3;
+  checkAssignmentCapacity(goal.goal_id, assignments, integrations, capacity, {
+    freeRamGib: os.freemem() / gib, freeDiskGib: stats.bavail * stats.bsize / gib,
   });
   const write = appendJsonLine(paths.assignments, assignment, 'assignment_id');
   return { assigned: true, ...write, assignment, paths };
@@ -308,6 +358,7 @@ function commandIntegrate(args) {
     source_harness: optionValue(args, '--source-harness', process.env.ECC_SOURCE_HARNESS || 'unknown'),
   };
   assertDocument('integration', receipt, `integration receipt ${receipt.receipt_id}`);
+  if (['superseded', 'not_adopted'].includes(receipt.outcome) && !receipt.limitations.length) throw new Error('terminal assignment outcome requires --limitation REASON');
   const integrations = readJsonLines(paths.integrations);
   validateBundle({
     goal,
@@ -404,8 +455,15 @@ function commandCorrect(args) {
     goal.updated_at = recordedAt;
     assertDocument('goal', goal, 'active goal');
     validateGoalSemantics(goal);
+    const integrations = readJsonLines(paths.integrations);
+    const supersededAssignments = readJsonLines(paths.assignments)
+      .filter(item => item.goal_id === goal.goal_id && Date.parse(item.issued_at) < Date.parse(recordedAt)
+        && !integrations.some(receipt => receipt.goal_id === goal.goal_id && receipt.assignment_id === item.assignment_id
+          && ['pass', 'superseded', 'not_adopted'].includes(receipt.outcome)
+          && Date.parse(receipt.observed_at) <= Date.parse(recordedAt)))
+      .map(item => item.assignment_id);
     writeYaml(paths.goal, goal);
-    return { corrected: true, goal_id: goal.goal_id, correction, paths };
+    return { corrected: true, goal_id: goal.goal_id, correction, superseded_assignment_ids: supersededAssignments, paths };
   });
 }
 
@@ -517,7 +575,7 @@ function renderStatus(status) {
     `User-visible proofs: ${status.completed_proofs}/${status.required_proofs}`,
     `Forecast: ${status.forecast.state} (${status.forecast.confidence})`,
   ];
-  if (status.parallel) rows.push(`Delegated assignments: ${status.parallel.integrated}/${status.parallel.total} integrated`);
+  if (status.parallel) rows.push(`Delegated assignments: ${status.parallel.integrated}/${status.parallel.total} integrated, ${status.parallel.retired} retired, ${status.parallel.pending} pending`);
   if (status.forecast.checkpoint_overdue) rows.push('Checkpoint: OVERDUE');
   for (const proof of status.proofs) {
     rows.push(`  ${proof.met ? 'PASS' : 'OPEN'} ${proof.id}: ${proof.achieved_stage || 'no receipt'} / ${proof.required_stage}`);
@@ -648,6 +706,7 @@ if (require.main === module) {
 }
 
 module.exports = {
+  checkAssignmentCapacity,
   commandCheckpoint,
   commandCorrect,
   commandAssign,

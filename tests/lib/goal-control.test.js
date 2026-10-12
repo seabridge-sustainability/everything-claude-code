@@ -15,6 +15,7 @@ const {
   validateBundle,
 } = require('../../scripts/lib/goal-control');
 const { captureRepositoryState } = require('../../scripts/lib/goal-store');
+const { checkAssignmentCapacity } = require('../../scripts/goal-control');
 const yaml = require('js-yaml');
 
 const CLI = path.join(__dirname, '..', '..', 'scripts', 'goal-control.js');
@@ -343,6 +344,49 @@ test('assignment integration enforces owner separation, lease, and budgets', () 
   assert.throws(() => validateBundle({
     goal: goal(), assignments: [assignment()], integrations: [integration({ usage: { tool_calls: 26, retries: 1, ci_runs: 0, cost_usd: 0 } })],
   }), /exceeds assignment.*max_tool_calls/);
+});
+
+test('new assignments need required outputs and observed blocker evidence', () => {
+  const optionalGoal = goal({ user_visible_proofs: goal().user_visible_proofs.map(proof =>
+    proof.id === 'flood-validation' ? { ...proof, required: false } : proof) });
+  assert.throws(() => validateBundle({ goal: optionalGoal,
+    assignments: [assignment({ acceptance_ids: ['flood-validation'], work_kind: 'output' })] }), /optional-only proofs/);
+  assert.throws(() => validateBundle({ goal: goal(),
+    assignments: [assignment({ work_kind: 'blocker' })] }), /observed defect evidence/);
+});
+
+test('failed over-budget history is auditable, retired work is not passing product proof', () => {
+  const overrun = integration({ outcome: 'fail', observed_at: '2026-09-29T19:00:00Z',
+    usage: { tool_calls: 54, retries: 5, ci_runs: 0, cost_usd: 0 },
+    limitations: ['Failed over-budget work; not adopted.'] });
+  assert.doesNotThrow(() => validateBundle({ goal: goal(), assignments: [assignment()], integrations: [overrun] }));
+  const retired = integration({ receipt_id: 'retired-heat', outcome: 'not_adopted',
+    observed_at: '2026-09-29T19:05:00Z', usage: overrun.usage, limitations: ['Owner superseded this review.'] });
+  const result = evaluateClaim('complete', { goal: goal({ status: 'complete' }), assignments: [assignment()],
+    integrations: [overrun, retired] }, { now: new Date('2026-09-29T19:10:00Z') });
+  assert.strictEqual(result.status.parallel.retired, 1);
+  assert.strictEqual(result.status.parallel.pending, 0);
+  assert.strictEqual(result.allowed, false);
+  assert.match(result.reasons.join(' '), /required user-visible proof/);
+  assert.throws(() => validateBundle({ goal: goal(), assignments: [assignment()],
+    integrations: [integration({ outcome: 'superseded', limitations: [] })] }), /requires a reason/);
+});
+
+test('capacity holds survive expiry, ignore cross-goal receipts and honor only the latest terminal receipt', () => {
+  const capacity = { ram_gib: 1, disk_gib: 1, volume: 'c:' };
+  const reserved = assignment({ capacity });
+  const now = Date.parse('2026-09-30T12:00:00Z');
+  const request = { ram_gib: 1, disk_gib: 1, volume: 'c:' };
+  const telemetry = { freeRamGib: 3.5, freeDiskGib: 8 };
+  assert.throws(() => checkAssignmentCapacity(reserved.goal_id, [reserved], [], request, { ...telemetry, freeRamGib: NaN }, now), /telemetry must be known/);
+  const foreign = integration({ goal_id: 'other-goal', outcome: 'pass' });
+  assert.throws(() => checkAssignmentCapacity(reserved.goal_id, [reserved], [foreign], request, telemetry, now), /insufficient aggregate/);
+  const passed = integration({ outcome: 'pass' });
+  assert.doesNotThrow(() => checkAssignmentCapacity(reserved.goal_id, [reserved], [passed], request, telemetry, now));
+  const failed = integration({ receipt_id: 'later-fail', outcome: 'fail', observed_at: '2026-09-29T19:00:00Z' });
+  assert.throws(() => checkAssignmentCapacity(reserved.goal_id, [reserved], [passed, failed], request, telemetry, now), /insufficient aggregate/);
+  const retired = integration({ receipt_id: 'retired', outcome: 'not_adopted', observed_at: '2026-09-29T20:00:00Z' });
+  assert.doesNotThrow(() => checkAssignmentCapacity(reserved.goal_id, [reserved], [passed, failed, retired], request, telemetry, now));
 });
 
 test('completion rejects an integration receipt bound to stale repository state', () => {
@@ -999,13 +1043,22 @@ test('real CLI assigns bounded work and requires parent integration before compl
     fs.writeFileSync(browserEvidence, '{"visible":true}');
     fs.writeFileSync(integrationEvidence, 'parent verified integration');
     assert.strictEqual(run(CLI, ['init', '--from', seed], dir).status, 0);
-    assert.strictEqual(run(CLI, [
+    const unlinked = run(CLI, ['assign', '--description', 'Unrequested research', '--acceptance', 'parallel-proof',
+      '--owner-runtime', 'claude', '--owner-agent', 'worker-one', '--scope', 'README.md', '--lease-until', '2026-09-29T18:00:00Z'], dir);
+    assert.strictEqual(unlinked.status, 1); assert.match(unlinked.stderr, /--work-kind output\|blocker/);
+    const unobserved = run(CLI, ['assign', '--description', 'Speculative blocker', '--work-kind', 'blocker', '--acceptance', 'parallel-proof',
+      '--owner-runtime', 'claude', '--owner-agent', 'worker-one', '--scope', 'README.md', '--lease-until', '2026-09-29T18:00:00Z'], dir);
+    assert.strictEqual(unobserved.status, 1); assert.match(unobserved.stderr, /observed defect/);
+    const memoryShim = path.join(dir, 'fixture-memory.js');
+    fs.writeFileSync(memoryShim, "require('os').freemem = () => 8 * 1024 ** 3;\n");
+    assert.strictEqual(spawnSync('node', ['--require', memoryShim, CLI,
       'assign', '--assignment-id', 'parallel-assignment',
-      '--description', 'Deliver the visible parallel proof.', '--acceptance', 'parallel-proof',
+      '--description', 'Deliver the visible parallel proof.', '--acceptance', 'parallel-proof', '--work-kind', 'output',
       '--owner-runtime', 'claude', '--owner-agent', 'worker-one', '--scope', 'README.md',
       '--issued-at', '2026-09-29T12:00:00Z', '--lease-until', '2026-09-29T18:00:00Z',
       '--max-tool-calls', '10', '--max-retries', '1', '--max-ci-runs', '0', '--max-cost-usd', '0',
-    ], dir).status, 0);
+      '--ram-gib', '0.1', '--disk-gib', '0', '--disk-path', dir,
+    ], { cwd: dir, encoding: 'utf8' }).status, 0);
     assert.strictEqual(run(CLI, [
       'record', '--acceptance', 'parallel-proof', '--stage', 'ui_displayed',
       '--environment', 'local', '--evidence', `browser=${browserEvidence}`,

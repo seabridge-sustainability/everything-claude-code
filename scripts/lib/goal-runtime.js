@@ -130,11 +130,13 @@ function admissionDecision({ runtimeId, mode, goalExists, goalValid = false, mod
 
 function inferClaim(text) {
   const source = String(text || '');
-  if (!/\b(not|isn't|is not)\s+(done|complete|completed|finished)\b/i.test(source)
-      && /\b(done|complete|completed|finished|goal achieved|fully functional)\b/i.test(source)) return 'complete';
-  if (!/\bnot\s+blocked\b/i.test(source)
-      && /\b(goal|task|work)\b.{0,30}\bblocked\b|\bblocked as a whole\b/i.test(source)) return 'blocked';
-  if (/\bon[ -]track\b/i.test(source)) return 'on-track';
+  // Activity completion is not goal completion. A negated clause must not hide
+  // a separate affirmative goal claim elsewhere in the same response.
+  if (/\b(?:everything|(?:the|this|our|my)\s+(?:whole[- ]building\s+)?(?:goal|task|mvp|product|project|implementation|requested work|work))\s+(?:is|was|has been|is now)\s+(?:fully\s+)?(?:complete|completed|done|finished|functional)\b|\b(?:i(?:'m| am)|we(?:'re| are))\s+(?:now\s+)?(?:done|finished)\b|\b(?:i|we)\s+have\s+(?:fully\s+)?(?:completed|finished)\s+(?:the|this|our)\s+(?:goal|task|work|mvp|project)\b|\bgoal achieved\b/i.test(source)
+      || /^\s*(?:done|finished|complete|fully functional)[.!\s]*$/i.test(source)) return 'complete';
+  const positive = source.replace(/\b(?:not|isn't|is not)\s+(?:blocked(?: as a whole)?|on[ -]track)\b/gi, '');
+  if (/\b(?:the|this|our)\s+(?:goal|task|work)\s+(?:is|remains)\s+blocked\b|\bblocked as a whole\b/i.test(positive)) return 'blocked';
+  if (/\b(?:the|this|our)\s+(?:goal|task|work)\s+(?:is|remains)\s+on[ -]track\b/i.test(positive)) return 'on-track';
   return null;
 }
 

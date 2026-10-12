@@ -22,6 +22,17 @@ function invoke(runtime, phase, payload, cwd) {
 
 const workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-goal-hook-'));
 const tests = [
+  ['neutral completed handoff is not a product completion claim', () => {
+    const result = invoke('cursor', 'final', { response: 'Handoff complete; whole-building MVP remains incomplete. Two source-only reviews completed, not product acceptance.' }, workspace);
+    assert.strictEqual(result.status, 0, result.stderr);
+  }],
+  ['explicit whole-building completion and mixed negative/positive clauses still require proof', () => {
+    for (const response of ['The whole-building MVP is complete and accepted.', 'This old prototype is not complete; the goal is complete.']) {
+      const result = invoke('cursor', 'final', { response }, workspace);
+      assert.strictEqual(result.status, 2);
+      assert.match(result.stderr, /complete claim requires/);
+    }
+  }],
   ['block adapters reject malformed and missing guard state; audit is explicitly advisory', () => {
     for (const runtime of ['claude','codex','copilot-local','copilot-cli','gemini','opencode']) {
       const blocked = spawnSync(process.execPath, [hook, runtime, 'guard', 'block', 'pre'], { cwd: workspace, input: '{malformed secret-example-never-log', encoding: 'utf8' });

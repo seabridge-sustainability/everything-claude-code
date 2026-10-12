@@ -244,6 +244,8 @@ function validateBundle({
     if (missingProofs.length) {
       throw new Error(`assignment ${assignment.assignment_id} references missing proofs: ${missingProofs.join(', ')}`);
     }
+    if (assignment.work_kind && assignment.acceptance_ids.some(id => !proofById.get(id).required)) throw new Error(`assignment ${assignment.assignment_id} cannot use optional-only proofs`);
+    if (assignment.work_kind === 'blocker' && (!assignment.defect_evidence || !assignment.defect_evidence_sha256)) throw new Error(`assignment ${assignment.assignment_id} needs observed defect evidence`);
     const issuedAt = parseIso(assignment.issued_at, `assignment ${assignment.assignment_id}.issued_at`);
     const expiresAt = parseIso(assignment.lease_expires_at, `assignment ${assignment.assignment_id}.lease_expires_at`);
     if (expiresAt <= issuedAt) throw new Error(`assignment ${assignment.assignment_id} lease must expire after it is issued`);
@@ -262,10 +264,10 @@ function validateBundle({
       throw new Error(`integration receipt ${receipt.receipt_id} must be recorded by the parent/integrator, not assignment owner ${assignment.owner_agent}`);
     }
     const observedAt = parseIso(receipt.observed_at, `integration receipt ${receipt.receipt_id}.observed_at`);
-    if (observedAt < Date.parse(assignment.issued_at) || observedAt > Date.parse(assignment.lease_expires_at)) {
+    if (observedAt < Date.parse(assignment.issued_at) || (receipt.outcome === 'pass' && observedAt > Date.parse(assignment.lease_expires_at))) {
       throw new Error(`integration receipt ${receipt.receipt_id} falls outside assignment ${assignment.assignment_id} lease`);
     }
-    if (currentCorrection
+    if (receipt.outcome === 'pass' && currentCorrection
         && Date.parse(assignment.issued_at) < Date.parse(currentCorrection.recorded_at)
         && observedAt > Date.parse(currentCorrection.recorded_at)) {
       throw new Error(`integration receipt ${receipt.receipt_id} uses assignment ${assignment.assignment_id} from a superseded owner plan`);
@@ -279,10 +281,11 @@ function validateBundle({
       ['ci_runs', 'max_ci_runs'],
       ['cost_usd', 'max_cost_usd'],
     ]) {
-      if (usage[used] > limits[limit]) {
+      if (receipt.outcome === 'pass' && usage[used] > limits[limit]) {
         throw new Error(`integration receipt ${receipt.receipt_id} exceeds assignment ${assignment.assignment_id} ${limit}`);
       }
     }
+    if (['superseded', 'not_adopted'].includes(receipt.outcome) && !receipt.limitations.length) throw new Error(`terminal assignment receipt ${receipt.receipt_id} requires a reason`);
     const key = `${receipt.assignment_id}\u0000${receipt.observed_at}`;
     const prior = integrationsByAssignmentAndTime.get(key);
     if (prior && prior.outcome !== receipt.outcome) {
@@ -471,8 +474,10 @@ function buildParallelStatus(assignments = [], integrations = [], now = new Date
   const items = assignments.map(assignment => {
     const integration = latestByAssignment.get(assignment.assignment_id) || null;
     const integrated = integration?.outcome === 'pass';
+    const terminal = ['superseded', 'not_adopted'].includes(integration?.outcome);
     const stale = Boolean(
       correction
+      && !terminal
       && Date.parse(assignment.issued_at) < Date.parse(correction.recorded_at)
       && (!integration || Date.parse(integration.observed_at) > Date.parse(correction.recorded_at)),
     );
@@ -481,9 +486,10 @@ function buildParallelStatus(assignments = [], integrations = [], now = new Date
       owner_runtime: assignment.owner_runtime,
       owner_agent: assignment.owner_agent,
       lease_expires_at: assignment.lease_expires_at,
-      lease_expired: !integrated && now.getTime() > Date.parse(assignment.lease_expires_at),
+      lease_expired: !integrated && !terminal && now.getTime() > Date.parse(assignment.lease_expires_at),
       stale_owner_plan: stale,
       integrated,
+      terminal,
       integration_receipt_id: integration?.receipt_id || null,
       integration_outcome: integration?.outcome || null,
       repository_fingerprints: integration?.repository_fingerprints || [],
@@ -493,7 +499,8 @@ function buildParallelStatus(assignments = [], integrations = [], now = new Date
     assignments: items,
     total: items.length,
     integrated: items.filter(item => item.integrated).length,
-    pending: items.filter(item => !item.integrated).length,
+    pending: items.filter(item => !item.integrated && !item.terminal).length,
+    retired: items.filter(item => item.terminal).length,
     expired: items.filter(item => item.lease_expired).length,
     stale: items.filter(item => item.stale_owner_plan).length,
   };

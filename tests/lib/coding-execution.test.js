@@ -371,11 +371,14 @@ test('in-scope redesign or data changes are rejected across runtime labels; requ
 
 test('actual assignment CLI persists the canonical contract and rejects a widened request', t => {
   const f=fixture(t,['gemini']),cli=path.resolve(__dirname,'../../scripts/goal-control.js');
+  f.assignments[0].capacity={ram_gib:0.1,disk_gib:0,volume:path.parse(f.plan.repo).root.toLowerCase()};f.writeAssignments();
   const contractFile=path.join(f.plan.repo,'.ecc/goal/change-contract.json');
   const contract=f.assignments[0].change_contract;fs.writeFileSync(contractFile,JSON.stringify(contract));
-  const args=[cli,'assign','--dir',path.dirname(f.plan.goal_file),'--goal',f.plan.goal_file,'--assignment-id','cli-contract',
+  const memoryShim=path.join(f.plan.repo,'.ecc/goal/fixture-memory.js');fs.writeFileSync(memoryShim,"require('os').freemem = () => 8 * 1024 ** 3;\n");
+  const args=['--require',memoryShim,cli,'assign','--dir',path.dirname(f.plan.goal_file),'--goal',f.plan.goal_file,'--assignment-id','cli-contract',
     '--description',contract.requested_delta,'--acceptance','required-output','--owner-runtime','gemini','--owner-agent','cli-worker',
-    '--scope','code.txt','--lease-until',f.plan.workers[0].expires_at,'--change-contract',contractFile];
+    '--scope','code.txt','--lease-until',f.plan.workers[0].expires_at,'--change-contract',contractFile,
+    '--work-kind','output','--ram-gib','0.1','--disk-gib','0','--disk-path',f.plan.repo];
   const run=()=>spawnSync(process.execPath,args,{encoding:'utf8',windowsHide:true,cwd:f.plan.repo});
   const good=run();assert.equal(good.status,0,good.stderr);
   const stored=JSON.parse(good.stdout).assignment;assert.deepEqual(stored.change_contract,contract);

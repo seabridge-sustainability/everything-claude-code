@@ -476,12 +476,21 @@ function execute(command, options = {}) {
       const candidate = git(repo.root, ['rev-parse', 'HEAD']);
       if (options.candidate !== candidate) throw new Error('candidate must equal the current full HEAD SHA');
       if (options.upstream && options.upstream !== `refs/remotes/origin/${branch}`) throw new Error('upstream must match the release target branch');
+      const candidateHistory = state.releases.filter(item => item.branch === branch && item.candidate === candidate);
+      if (candidateHistory.some(item => item.outcome === 'completed')) throw new Error('candidate already released; do not duplicate CI for the same SHA');
+      const previous = candidateHistory.filter(item => item.outcome !== 'aborted-before-push').at(-1);
+      if (previous) {
+        if (previous.outcome !== 'failed') throw new Error('candidate already released; do not duplicate CI for the same SHA');
+        requireText(options.retryEvidence, 'retry-evidence for unchanged failed candidate');
+      }
       const paths = changedPaths(repo, session.loop ? session.loop.baseline : session.base,
         session.loop || session.guard ? undefined : options.upstream);
       if (paths.length) ownedPaths(repo, session, paths);
       if (git(repo.root, ['status', '--porcelain'])) throw new Error('release requires a clean worktree');
       const actionsBudget = actionsBudgetReceipt(options, now);
-      state.release = { owner: sessionId, branch, candidate, actionsBudget, expiresAt: expiry(options.ttl, now) };
+      state.release = { owner: sessionId, branch, candidate, actionsBudget,
+        retryEvidence: previous?.outcome === 'failed' ? options.retryEvidence : null,
+        expiresAt: expiry(options.ttl, now) };
       return state.release;
     }
     const release = state.release;

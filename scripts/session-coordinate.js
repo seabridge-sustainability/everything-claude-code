@@ -11,6 +11,7 @@ function main(args = process.argv.slice(2)) {
     console.log('Experiment registration: --loop-target exact-file --check-file committed-check (repeatable); exactly one owned target, pinned read-only-to-maker checks.');
     console.log('Release: --branch NAME --candidate FULL_SHA --actions-budget-status known|unknown --actions-budget-used USD --actions-budget-limit USD --actions-budget-checked-at ISO_UTC --actions-budget-source github-org-budget-ui|owner-screenshot|github-org-billing-export --actions-stop-usage yes|no|unknown --expected-actions-usd USD --expected-workflows NAMES [--owner-cost-approval TEXT].');
     console.log('End: --outcome completed|failed|superseded|aborted-before-push --evidence TEXT');
+    console.log('Unchanged failed release: --retry-evidence TEXT describing the external change; completed candidates cannot be released again.');
     console.log('Handoff: owner invokes --path exact-file --evidence TEXT; releases only that reservation, never a product session or release lease.');
     return 0;
   }
@@ -21,7 +22,7 @@ function main(args = process.argv.slice(2)) {
     '--actions-budget-limit': 'actionsBudgetLimit', '--actions-budget-checked-at': 'actionsBudgetCheckedAt',
     '--actions-budget-source': 'actionsBudgetSource', '--actions-stop-usage': 'actionsStopUsage',
     '--expected-actions-usd': 'expectedActionsUsd', '--expected-workflows': 'expectedWorkflows',
-    '--owner-cost-approval': 'ownerCostApproval', '--guard-mode': 'guardMode', '--deadline': 'deadline',
+    '--owner-cost-approval': 'ownerCostApproval', '--retry-evidence': 'retryEvidence', '--guard-mode': 'guardMode', '--deadline': 'deadline',
     '--tool-limit': 'toolLimit', '--turn-limit': 'turnLimit', '--native-session': 'nativeSessionId' };
   for (let i = 1; i < args.length; i += 2) {
     const key = args[i], value = args[i + 1];
