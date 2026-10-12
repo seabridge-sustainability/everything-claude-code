@@ -15,6 +15,8 @@ const c = { ...engine, apply:(state,event,options={}) => engine.apply(state,even
 }) };
 const coord = require('../../scripts/lib/session-coordination');
 const store = require('../../scripts/lib/goal-store');
+const operational = require('../../scripts/lib/coding-execution-runner');
+const concrete = require('../../scripts/lib/coding-execution-host');
 function fixture(t, runtimes = ['claude','gemini']) {
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-execution-'));
   t.after(() => fs.rmSync(directory, { recursive: true, force: true })); // Own synthetic fixtures only.
@@ -84,6 +86,42 @@ function fixture(t, runtimes = ['claude','gemini']) {
   const effect = {id:'publish',kind:'push',target:'origin/seabridge_development',payload_sha256:c.digest('exact proposed payload'),candidate:'a'.repeat(40),environment:plan.environment,expected_usd:0};
   return { plan,file,result,joined,approvedCritic,synthesized,effect,goalDocument,assignments,writeAssignments };
 }
+test('concrete reviewed processes reject, repair and pause for externally signed exact approval', async t => {
+  const f=fixture(t,['opencode']);
+  f.plan.limits.usd=1; // synthetic reserve required by release contract; actual bare-Git cost is zero
+  const crypto=require('node:crypto'),trust=path.join(f.plan.repo,'.ecc/goal/trust');fs.mkdirSync(trust);
+  const script=(name,text)=>{const file=path.join(trust,name+'.js');fs.writeFileSync(file,text);return {path:file,sha256:store.sha256File(file)};};
+  const launch=script('launch',`const fs=require('node:fs');const w=JSON.parse(fs.readFileSync(0,'utf8'));const file='.ecc/goal/attempt';const n=fs.existsSync(file)?2:1;fs.writeFileSync(file,String(n));fs.writeFileSync('code.txt',JSON.stringify({design:'approved',data:42,delta:n===2?'delivered':'missing'}));console.log(JSON.stringify({agent:w.agent,runtime:w.runtime,token:w.token,native_protection:true,usage:{tool_calls:1,retries:0,ci_runs:0,cost_usd:0}}));`);
+  const check=script('check',`const fs=require('node:fs'),crypto=require('node:crypto');const v=JSON.parse(fs.readFileSync('code.txt'));const h=crypto.createHash('sha256').update(fs.readFileSync('code.txt')).digest('hex');const evidence={path:'code.txt',sha256:h,kind:'local-check'};console.log(JSON.stringify({passed:v.design==='approved'&&v.data===42&&v.delta==='delivered',evidence:[evidence],preservation:[{id:'preserve',evidence}],citations:[]}));`);
+  const critic=script('critic',`const fs=require('node:fs');const {state:s}=JSON.parse(fs.readFileSync(0,'utf8'));const rejected=Object.values(s.nodes).filter(n=>n.result.status!=='pass').map(n=>({worker:n.result.worker,reason:'failed-acceptance'}));console.log(JSON.stringify({agent:s.plan.critic,join_sha256:s.join_sha256,accepted:!rejected.length,rejections:rejected}));`);
+  const keys=crypto.generateKeyPairSync('ed25519'),key=path.join(trust,'owner.pub');fs.writeFileSync(key,keys.publicKey.export({type:'spki',format:'pem'}));
+  const approval=path.join(trust,'owner-approval.json');fs.writeFileSync(approval,'{}');
+  const effect={...f.effect,expected_usd:1,candidate:execFileSync('git',['rev-parse','HEAD'],{cwd:f.plan.repo,encoding:'utf8'}).trim(),target:'origin/approved-batch'};
+  const spec={version:1,plan_sha256:engine.digest(f.plan),timeout_ms:10000,receipts:path.join(f.plan.repo,'.ecc/goal/processes'),
+    workers:{'worker-0':{launch,check}},critic,approval_key:{path:key,sha256:store.sha256File(key)},approval_file:approval,effects:[{proposal:effect,remote:'origin',branch:'approved-batch'}]};
+  c.create(f.file,f.plan);
+  const host=concrete.createBoundHost(spec,{stateFile:f.file,plan:f.plan});
+  const paused=await operational.run(f.file,host);
+  assert.equal(paused.stopped,'owner-approval-required');assert.equal(paused.state.repairs,1);assert.equal(paused.state.dispatches,2);
+  const entry=paused.state.effects.publish,payload={binding:entry.binding,proposal_sha256:engine.digest(entry.proposal),plan_sha256:engine.digest(f.plan),expires_at:new Date(Date.now()+60000).toISOString()};
+  fs.writeFileSync(approval,JSON.stringify({payload,signature:crypto.sign(null,Buffer.from(store.canonicalJson(payload)),keys.privateKey).toString('base64')}));
+  const event=host.readApproval(entry);assert.equal(host.authorizeApproval({...event,proposal:entry.proposal}),true);
+  assert.equal(host.authorizeApproval({...event,binding:'0'.repeat(64),proposal:entry.proposal}),false);
+  assert.equal(host.authorizeCitation({chunk_id:'0'.repeat(64)}),false);
+  // Exercise the actual Git effect against our own bare fixture, never GitHub.
+  const bare=path.join(trust,'remote.git');execFileSync('git',['init','--bare','-q',bare],{stdio:'pipe'});
+  execFileSync('git',['remote','add','origin',bare],{cwd:f.plan.repo,stdio:'pipe'});
+  coord.execute('release-acquire',{cwd:f.plan.repo,sessionId:f.plan.session,branch:'approved-batch',candidate:effect.candidate,
+    actionsBudgetStatus:'known',actionsBudgetUsed:0,actionsBudgetLimit:400,actionsBudgetCheckedAt:new Date().toISOString(),actionsBudgetSource:'owner-screenshot',actionsStopUsage:'yes',expectedActionsUsd:1,expectedWorkflows:'Local bare fixture'});
+  const done=await operational.run(f.file,host);assert.equal(done.state.phase,'completed');
+  assert.equal(host.verifyEffect(effect,done.state.effects.publish.receipt),true);
+  assert.equal((await operational.run(f.file,host)).state.sequence,done.state.sequence+1); // recovery checkpoint only, no second push
+  coord.execute('release-end',{cwd:f.plan.repo,sessionId:f.plan.session,outcome:'completed',evidence:'exact local bare remote SHA verified'});
+  const impostor=crypto.generateKeyPairSync('ed25519');fs.writeFileSync(approval,JSON.stringify({payload,signature:crypto.sign(null,Buffer.from(store.canonicalJson(payload)),impostor.privateKey).toString('base64')}));
+  assert.equal(host.readApproval(entry),null);
+  fs.appendFileSync(check.path,'\n// unapproved edit');assert.throws(()=>concrete.createBoundHost(spec,{stateFile:f.file,plan:f.plan}),/source changed/);
+});
+
 test('same contract supports parallel Codex/Claude/Gemini/OpenCode workers and a durable join', async t => {
   const f=fixture(t,['codex','claude','gemini','opencode']); c.create(f.file,f.plan); let active=0, peak=0;
   const state=await c.dispatchParallel(f.file,async w=>{
@@ -344,4 +382,62 @@ test('actual assignment CLI persists the canonical contract and rejects a widene
   contract.requested_delta='also change the design';fs.writeFileSync(contractFile,JSON.stringify(contract));
   // goal-control CLI uses exit 1; coding-execution CLI uses exit 2.
   const bad=run();assert.equal(bad.status,1,bad.stdout);assert.match(bad.stderr,/requested delta differs/);
+});
+
+test('operational runner joins, rejects once, repairs, pauses and resumes exact effects without replay', async t => {
+  const f=fixture(t,['codex','claude','gemini','opencode']); c.create(f.file,f.plan);
+  let reviews=0, launches=0, executed=0, grant=false;
+  const effectFile=path.join(f.plan.repo,'.ecc/goal/effect.txt');
+  const host={
+    launchWorker: async worker => { launches++; return f.result(c.load(f.file),worker.id); },
+    inspectWorker: async () => ({status:'unknown'}),
+    confirmStopped: async call => call.method==='executeEffect' && fs.existsSync(effectFile),
+    review: async state => ({agent:f.plan.critic,join_sha256:state.join_sha256,accepted:++reviews>1,
+      rejections:reviews===1?[{worker:'worker-0',reason:'failed-acceptance'}]:[]}),
+    verifyCritic: (event,plan) => event.actor===plan.critic && event.report.agent===plan.critic && event.report.join_sha256===c.load(f.file).join_sha256,
+    verifyPreservation: ({worker,result}) => fs.readFileSync(path.join(worker.repo,'code.txt'),'utf8')==='baseline\n' && result.evidence[0].sha256===store.sha256File(path.join(worker.repo,'code.txt')),
+    authorizeCitation: () => false, // No memory claims fabricated for this offline fixture.
+    proposeEffects: async () => [{...f.effect,kind:'shared-write',target:effectFile,payload_sha256:store.sha256Buffer('EXACT_EFFECT')}],
+    readApproval: async entry => grant?{binding:entry.binding,receipt:'fixture-external-owner',expires_at:new Date(Date.now()+60000).toISOString()}:null,
+    authorizeApproval: event => grant && event.receipt==='fixture-external-owner' && event.proposal.target===effectFile,
+    executeEffect: async proposal => { executed++; fs.writeFileSync(effectFile,'EXACT_EFFECT',{flag:'wx'}); throw Error('fixture interruption after exact side effect'); },
+    inspectEffect: async () => fs.existsSync(effectFile)?{path:effectFile,sha256:store.sha256File(effectFile)}:null,
+    verifyEffect: (proposal,receipt) => receipt?.path===effectFile && receipt.sha256===proposal.payload_sha256 && store.sha256File(effectFile)===receipt.sha256,
+  };
+  const paused=await operational.run(f.file,host);
+  assert.equal(paused.stopped,'owner-approval-required'); assert.equal(reviews,2); assert.equal(launches,5); assert.equal(executed,0);
+  grant=true; await assert.rejects(operational.run(f.file,host),/fixture interruption/);
+  assert.equal(c.load(f.file).phase,'effect');
+  const done=await operational.run(f.file,host); assert.equal(done.state.phase,'completed'); assert.equal(executed,1);
+  await operational.run(f.file,host); assert.equal(executed,1);
+});
+
+test('operational recovery never duplicates a live or unmetered expired worker', async t => {
+  const f=fixture(t,['claude']); c.create(f.file,f.plan);
+  c.transaction(f.file,s=>{s=c.apply(s,{type:'dispatch',actor:'parent'});s.nodes['worker-0'].lease_until=Date.now()-1;return s;});
+  let launches=0;
+  const host=Object.fromEntries(operational.REQUIRED.map(key=>[key,()=>false]));
+  host.launchWorker=()=>{launches++;throw Error('must not launch');};host.inspectWorker=()=>({status:'running'});
+  const held=await operational.run(f.file,host); assert.equal(held.stopped,'worker-reconciliation-required'); assert.equal(launches,0);
+  host.inspectWorker=()=>({status:'failed'});assert.equal((await operational.run(f.file,host)).stopped,'worker-reconciliation-required');assert.equal(launches,0);
+});
+
+test('operational CLI requires exact trusted host pin and all verifiers', t => {
+  const f=fixture(t,['opencode']); c.create(f.file,f.plan);
+  const hostFile=path.join(f.plan.repo,'.ecc/goal/host.js'); fs.writeFileSync(hostFile,'module.exports={createHost:()=>({})};');
+  const cli=path.resolve(__dirname,'../../scripts/coding-execution-run.js');
+  const bad=spawnSync(process.execPath,[cli,f.file,hostFile,'0'.repeat(64)],{encoding:'utf8',windowsHide:true});
+  assert.equal(bad.status,2);assert.match(bad.stderr,/host source changed/);
+  const incomplete=spawnSync(process.execPath,[cli,f.file,hostFile,store.sha256File(hostFile)],{encoding:'utf8',windowsHide:true});
+  assert.equal(incomplete.status,2);assert.match(incomplete.stderr,/missing trusted host capability/);
+});
+
+test('operational timeouts journal all parallel calls and retain supervision until cessation is proven', async t => {
+  const f=fixture(t,['claude','opencode']);c.create(f.file,f.plan);
+  const host=Object.fromEntries(operational.REQUIRED.map(key=>[key,()=>false]));
+  host.launchWorker=()=>new Promise(()=>{});
+  await operational.run(f.file,host,{maxMilliseconds:30000});
+  const marker=JSON.parse(fs.readFileSync(f.file+'.runner-lock','utf8'));
+  assert.equal(marker.pendingCalls.length,2); assert.equal(new Set(marker.pendingCalls.map(call=>call.callId)).size,2);
+  await assert.rejects(operational.run(f.file,host),/supervisor is still alive/);
 });
