@@ -113,6 +113,44 @@ function evidenceRoots(bundle, options = {}) {
   return uniqueRoots(roots);
 }
 
+const TERMINAL_INTEGRATION_OUTCOMES = new Set(['superseded', 'not_adopted']);
+
+// A receipt is historical only when a STRICTLY LATER receipt for the same assignment
+// is an explicit terminal state (superseded/not_adopted, which validateBundle already
+// requires to carry a reason) that itself pins at least one evidence item. A later
+// 'pass' or 'fail' is not an explicit retirement, so earlier receipts stay strict.
+// The latest receipt, equal-timestamp receipts and every other ledger are never
+// historical. Pure and deterministic: ties on observed_at resolve by ledger order.
+function classifyHistoricalIntegrations(integrations = []) {
+  const byAssignment = new Map();
+  (integrations || []).forEach((receipt, index) => {
+    const time = Date.parse(receipt.observed_at);
+    const list = byAssignment.get(receipt.assignment_id) || [];
+    list.push({ receipt, index, time });
+    byAssignment.set(receipt.assignment_id, list);
+  });
+  const historical = [];
+  for (const [assignmentId, entries] of byAssignment) {
+    const latest = entries.reduce((best, entry) => (
+      entry.time > best.time || (entry.time === best.time && entry.index > best.index) ? entry : best
+    ));
+    if (!TERMINAL_INTEGRATION_OUTCOMES.has(latest.receipt.outcome)) continue;
+    if (!Array.isArray(latest.receipt.evidence) || !latest.receipt.evidence.length) continue;
+    if (!Number.isFinite(latest.time)) continue;
+    for (const entry of entries) {
+      if (entry.receipt !== latest.receipt && Number.isFinite(entry.time) && entry.time < latest.time) {
+        historical.push({
+          receipt_id: entry.receipt.receipt_id,
+          assignment_id: assignmentId,
+          superseded_by: latest.receipt.receipt_id,
+          outcome: latest.receipt.outcome,
+        });
+      }
+    }
+  }
+  return historical;
+}
+
 function verifyBundleEvidence(bundle, options = {}) {
   const roots = evidenceRoots(bundle, options);
   const verified = [];
@@ -132,7 +170,11 @@ function verifyBundleEvidence(bundle, options = {}) {
       }
     }
   }
+  const historical = new Set(classifyHistoricalIntegrations(bundle.integrations).map(item => item.receipt_id));
   for (const receipt of bundle.integrations || []) {
+    // Retired history stays in the ledger and schema-validated, but its pinned live
+    // files are not re-hashed once a later terminal receipt re-pins the current state.
+    if (historical.has(receipt.receipt_id)) continue;
     for (const item of receipt.evidence || []) {
       try {
         verified.push({
@@ -148,6 +190,7 @@ function verifyBundleEvidence(bundle, options = {}) {
 }
 
 module.exports = {
+  classifyHistoricalIntegrations,
   evidenceRoots,
   isUri,
   loadEvidenceMaps,

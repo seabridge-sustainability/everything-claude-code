@@ -1341,6 +1341,142 @@ test('goal CLI and runtime bridge forward pinned maps and explicit historical ro
   }
 });
 
+test('a later terminal receipt retires stale pinned history without weakening current evidence checks', () => {
+  const { classifyHistoricalIntegrations, verifyBundleEvidence } = require('../../scripts/lib/goal-evidence');
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-historical-receipts-'));
+  try {
+    const live = path.join(dir, 'live-source.py');
+    const sha = text => crypto.createHash('sha256').update(text).digest('hex');
+    const stale = sha('version one');
+    fs.writeFileSync(live, 'version two (legitimately evolved)');
+    const current = sha('version two (legitimately evolved)');
+    const pinned = hash => [{ kind: 'source', ref: live, sha256: hash }];
+    const older = integration({ receipt_id: 'integration-old', observed_at: '2026-09-29T13:00:00Z', evidence: pinned(stale) });
+    const terminal = integration({
+      receipt_id: 'integration-retired', observed_at: '2026-09-29T15:00:00Z', outcome: 'superseded',
+      limitations: ['Reference method evolved; current file re-pinned.'], evidence: pinned(current),
+    });
+    const bundle = integrations => ({ outcomes: [], integrations, resume: null });
+    const roots = { roots: [dir] };
+
+    // (1) stale older receipt + later superseded receipt with the current hash: valid and listed.
+    assert.doesNotThrow(() => validateBundle({ goal: goal(), assignments: [assignment()], integrations: [older, terminal] }));
+    const verified = verifyBundleEvidence(bundle([older, terminal]), roots);
+    assert.deepStrictEqual(verified.map(item => item.receipt_id), ['integration-retired']);
+    assert.deepStrictEqual(classifyHistoricalIntegrations([older, terminal]), [{
+      receipt_id: 'integration-old', assignment_id: 'assign-heat', superseded_by: 'integration-retired', outcome: 'superseded',
+    }]);
+    const notAdopted = { ...terminal, outcome: 'not_adopted' };
+    assert.strictEqual(classifyHistoricalIntegrations([older, notAdopted])[0].outcome, 'not_adopted');
+    // Ledger order does not matter; observed_at does.
+    assert.strictEqual(classifyHistoricalIntegrations([terminal, older]).length, 1);
+
+    // (2) stale older receipt with NO later terminal receipt still fails closed.
+    assert.throws(() => verifyBundleEvidence(bundle([older]), roots), /integration receipt integration-old: evidence hash mismatch/);
+    // A later pass or fail is not an explicit retirement: older history stays strict.
+    for (const outcome of ['pass', 'fail']) {
+      const later = { ...terminal, outcome, limitations: [] };
+      assert.deepStrictEqual(classifyHistoricalIntegrations([older, later]), []);
+      assert.throws(() => verifyBundleEvidence(bundle([older, later]), roots), /integration-old: evidence hash mismatch/);
+    }
+    // A terminal receipt that is OLDER than the stale one retires nothing.
+    const early = { ...terminal, receipt_id: 'integration-early', observed_at: '2026-09-29T12:30:00Z' };
+    assert.deepStrictEqual(classifyHistoricalIntegrations([early, older]), []);
+    assert.throws(() => verifyBundleEvidence(bundle([early, older]), roots), /integration-old: evidence hash mismatch/);
+    // Equal timestamps are not "older"; both stay verified.
+    const tied = { ...older, receipt_id: 'integration-tied', observed_at: terminal.observed_at };
+    assert.deepStrictEqual(classifyHistoricalIntegrations([tied, terminal]), []);
+    // Another assignment's terminal receipt never retires this assignment's history.
+    const other = { ...terminal, receipt_id: 'integration-other', assignment_id: 'assign-other' };
+    assert.deepStrictEqual(classifyHistoricalIntegrations([older, other]), []);
+
+    // (3) the latest (terminal) receipt itself is verified fully: wrong hash and missing file fail.
+    const wrong = { ...terminal, evidence: pinned('f'.repeat(64)) };
+    assert.throws(() => verifyBundleEvidence(bundle([older, wrong]), roots), /integration receipt integration-retired: evidence hash mismatch/);
+    const missing = { ...terminal, evidence: [{ kind: 'source', ref: path.join(dir, 'gone.py'), sha256: current }] };
+    assert.throws(() => verifyBundleEvidence(bundle([older, missing]), roots), /integration-retired: evidence file not found/);
+
+    // Historical receipts remain schema-validated and tied to an existing assignment.
+    assert.throws(() => validateBundle({ goal: goal(), assignments: [assignment()], integrations: [{ ...older, outcome: 'maybe' }, terminal] }), /integration receipt integration-old/);
+    assert.throws(() => validateBundle({ goal: goal(), assignments: [assignment()], integrations: [{ ...older, assignment_id: 'assign-missing' }, terminal] }), /missing assignment assign-missing/);
+    // Outcome receipts are never historical.
+    const outcomeBundle = { outcomes: [{ receipt_id: 'outcome-one', status: 'accepted', supersedes: [], evidence: pinned(stale) }], integrations: [older, terminal] };
+    assert.throws(() => verifyBundleEvidence(outcomeBundle, roots), /outcome receipt outcome-one: evidence hash mismatch/);
+
+    // Status semantics are unchanged: a superseded assignment is retired, not integrated.
+    const { buildParallelStatus } = require('../../scripts/lib/goal-control');
+    const status = buildParallelStatus([assignment()], [older, terminal], new Date('2026-09-30T00:00:00Z'));
+    assert.strictEqual(status.integrated, 0);
+    assert.strictEqual(status.retired, 1);
+    assert.strictEqual(status.pending, 0);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('real CLI validate lists historical receipts after an explicit superseded integration', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-historical-cli-'));
+  const evidenceDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-historical-cli-evidence-'));
+  try {
+    runGit(['init', '--initial-branch=development'], dir);
+    runGit(['config', 'user.email', 'goal-control@example.invalid'], dir);
+    runGit(['config', 'user.name', 'ECC Goal Test'], dir);
+    fs.writeFileSync(path.join(dir, 'README.md'), '# Historical receipts\n');
+    runGit(['add', 'README.md'], dir);
+    runGit(['commit', '-m', 'test: initialize historical receipts repository'], dir);
+    const evolving = path.join(evidenceDir, 'evolving-source.txt');
+    fs.writeFileSync(evolving, 'first version');
+    const seed = path.join(dir, 'goal.yaml');
+    fs.writeFileSync(seed, yaml.dump(goal({ goal_id: 'historical-goal' }), { noRefs: true }));
+    assert.strictEqual(run(CLI, ['init', '--from', seed], dir).status, 0);
+    const memoryShim = path.join(dir, 'fixture-memory.js');
+    fs.writeFileSync(memoryShim, "require('os').freemem = () => 8 * 1024 ** 3;\n");
+    assert.strictEqual(spawnSync('node', ['--require', memoryShim, CLI,
+      'assign', '--assignment-id', 'historical-assignment', '--description', 'Pin a live source.',
+      '--acceptance', 'heat-browser', '--work-kind', 'output', '--owner-runtime', 'claude', '--owner-agent', 'worker-one',
+      '--scope', 'README.md', '--issued-at', '2026-09-29T12:00:00Z', '--lease-until', '2026-09-29T18:00:00Z',
+      '--max-tool-calls', '10', '--max-retries', '1', '--max-ci-runs', '0', '--max-cost-usd', '0',
+      '--ram-gib', '0.1', '--disk-gib', '0', '--disk-path', dir,
+    ], { cwd: dir, encoding: 'utf8' }).status, 0);
+    const integrate = (receiptId, observedAt, extra = []) => run(CLI, [
+      'integrate', '--assignment', 'historical-assignment', '--integrator', 'parent-agent',
+      '--evidence', `source=${evolving}`, '--repo', `backend=${dir}`,
+      '--tool-calls', '5', '--retries', '0', '--ci-runs', '0', '--cost-usd', '0',
+      '--receipt-id', receiptId, '--observed-at', observedAt, ...extra,
+    ], dir);
+    assert.strictEqual(integrate('historical-first', '2026-09-29T14:00:00Z').status, 0);
+    assert.strictEqual(run(CLI, ['validate'], dir).status, 0);
+    fs.writeFileSync(evolving, 'second version after legitimate evolution');
+    const broken = run(CLI, ['validate'], dir);
+    assert.strictEqual(broken.status, 1);
+    assert.match(broken.stderr, /integration receipt historical-first: evidence hash mismatch/);
+    const retired = integrate('historical-retired', '2026-09-29T15:00:00Z',
+      ['--outcome', 'superseded', '--limitation', 'Source evolved; current file re-pinned.']);
+    assert.strictEqual(retired.status, 0, retired.stderr);
+    const fixed = run(CLI, ['validate'], dir);
+    assert.strictEqual(fixed.status, 0, fixed.stderr);
+    const report = JSON.parse(fixed.stdout);
+    assert.strictEqual(report.valid, true);
+    assert.strictEqual(report.integrations, 2);
+    assert.strictEqual(report.evidence_artifacts, 1);
+    assert.deepStrictEqual(report.historical_receipts, [{
+      receipt_id: 'historical-first', assignment_id: 'historical-assignment',
+      superseded_by: 'historical-retired', outcome: 'superseded',
+    }]);
+    // The retired assignment is not integrated progress.
+    const claim = run(CLI, ['claim', 'complete', '--json', '--now', '2026-09-29T15:30:00Z'], dir);
+    assert.strictEqual(claim.status, 2);
+    // A later wrong pin on the latest receipt still fails closed.
+    fs.writeFileSync(evolving, 'third version');
+    const latestBroken = run(CLI, ['validate'], dir);
+    assert.strictEqual(latestBroken.status, 1);
+    assert.match(latestBroken.stderr, /integration receipt historical-retired: evidence hash mismatch/);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+    fs.rmSync(evidenceDir, { recursive: true, force: true });
+  }
+});
+
 (async () => {
   let passed = 0;
   let failed = 0;

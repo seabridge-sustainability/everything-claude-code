@@ -30,7 +30,7 @@ const {
   withFileLock,
   writeYaml,
 } = require('./lib/goal-store');
-const { loadEvidenceMaps, verifyBundleEvidence } = require('./lib/goal-evidence');
+const { classifyHistoricalIntegrations, loadEvidenceMaps, verifyBundleEvidence } = require('./lib/goal-evidence');
 
 const DEFAULT_DIR = path.join('.ecc', 'goal');
 
@@ -659,6 +659,7 @@ function main(args = process.argv.slice(2)) {
       activity_events: bundle.activity.length,
       watchdog_configured: Boolean(bundle.watchdog),
       evidence_artifacts: verification.length,
+      historical_receipts: classifyHistoricalIntegrations(bundle.integrations),
       resume_receipt: Boolean(bundle.resume),
       paths,
     };
