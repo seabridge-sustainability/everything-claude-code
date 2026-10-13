@@ -29,7 +29,8 @@ test('git -C is resolved; inspection failure and opaque writes are not allowed s
   assert.equal(decide('git -C "../ecc space" commit -m fix', cwd, dir => { received = dir; return ecc(); }), null);
   assert.equal(received, path.resolve(cwd, '../ecc space'));
   assert.equal(decide('git commit -m fix', cwd, () => { throw Error('missing'); })[0], 'ask');
-  for (const command of ['cd other; git commit -m fix', 'git -c alias.publish=push publish', 'git --git-dir elsewhere commit', 'git commit -m fix && git push', 'git -C $TARGET push']) assert.equal(decide(command, cwd, ecc)[0], 'ask', command);
+  for (const command of ['cd $OTHER; git commit -m fix', 'cd a; cd b; git commit -m fix', 'git -c alias.publish=push publish', 'git --git-dir elsewhere commit', 'GIT_DIR=x git commit -m fix', 'git -C $TARGET push']) assert.equal(decide(command, cwd, ecc)[0], 'ask', command);
+  assert.equal(decide('git commit -m fix && git push', cwd, product)[0], 'ask');
 });
 test('read-only and unrelated tools remain unaffected; malformed events deny', () => {
   assert.equal(decide('git status --short', cwd, product), null);
@@ -46,13 +47,26 @@ test('read-only compound and inspection commands do not ask', () => {
     '$b = git branch --show-current; Write-Output $b', 'git -C repo log -1 2>&1',
   ]) assert.equal(decide(command, cwd, product), null, command);
 });
-test('mutating compound and listing-shaped writes still ask', () => {
+test('mutating compound commands on protected or unresolved targets still ask', () => {
   for (const command of [
-    'cd x; git add .', 'git status && git commit -m fix', 'git log -1; git branch new-feature', 'cd x; git tag v1',
-    'cd x; git config user.name y', 'cd x; git stash', 'cd x; git apply fix.patch', 'git -C $T --no-pager push',
-    'cd x; git -c core.pager=x commit', 'cd x; git branch -D old', 'cd x; git remote add up url', 'cd x; git worktree add ../w',
-    'op=commit; git $op -m fix', '$c = "push"; git $c origin', 'git `echo commit` -m fix',
-  ]) assert.equal(decide(command, cwd, ecc)[0], 'ask', command);
+    'cd x; git add .', 'git status && git commit -m fix', 'cd x; git apply fix.patch', 'git -C $T --no-pager push',
+    'cd x; git -c core.pager=x commit', 'cd x; git remote add up url', 'git log -1 && git push origin main',
+    'op=commit; git $op -m fix', '$c = "push"; git $c origin', 'git `echo commit` -m fix', 'git push origin $BRANCH; echo ok',
+  ]) assert.equal(decide(command, cwd, product)[0], 'ask', command);
+  for (const command of ['git checkout main && git commit -m fix', 'git fetch; git reset $MODE', 'echo x; cd ../fe && git commit -m x'])
+    assert.equal(decide(command, cwd, development)[0], 'ask', command);
+  assert.equal(decide('cd x; git reset --hard HEAD', cwd, product)[0], 'deny');
+});
+test('compound mutations with a literal target resolve like direct invocations', () => {
+  const heredoc = "A=src/x; git add -- $A/a.test.tsx && git diff --cached --name-only && timeout 500 git commit -m \"$(cat <<'EOF'\nfix: msg\n\nbody\nEOF\n)\"";
+  for (const command of [heredoc, "gh run view 1; git fetch origin development 2>&1 | tail -1; git log --oneline HEAD..origin/development | head",
+    'node ecc.js session register --scope a; git apply a.patch b.patch && echo APPLIED; git status --short | grep -v x',
+    'git add -A && git commit -m fix && git push origin development', 'git log -1; git branch new-feature', 'cd x; git stash', 'cd x; git tag v1'])
+    assert.equal(decide(command, cwd, development), null, command);
+  let received;
+  assert.equal(decide('cd ../fe && git add . && git -C sub commit -m x', cwd, dir => { received = dir; return { ecc: false, product: true, branch: 'development' }; }), null);
+  assert.equal(received, path.resolve(cwd, '../fe', 'sub'));
+  assert.equal(decide('cd ../ecc; git commit -m fix && git push origin main', cwd, ecc), null, 'ECC main stays its normal release branch');
   assert.equal(decide('git --no-pager commit -m fix', cwd, product)[0], 'ask');
 });
 test('actual stdin runner emits native denial protocol', () => {

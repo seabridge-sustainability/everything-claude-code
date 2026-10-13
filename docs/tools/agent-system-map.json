@@ -30,7 +30,7 @@
     ],
     "semanticIndex": "not-run"
   },
-  "sourceFingerprint": "13df2d335a004dfefd7465842da8c551b568988e93e5ef48d2386f823a4aff70",
+  "sourceFingerprint": "e01bb047b79dd86394263e4a846fe48488c8eeb2bb2c4b15994f82f409b969b9",
   "sources": [
     {
       "path": "../manageesg-backend/AGENTS.md",
@@ -222,11 +222,11 @@
     },
     {
       "path": "scripts/goal-control.js",
-      "sha256": "67caeb7d8256c0d7c84881ee62d770b73b5a8c0850923421ef368236e422d9dd"
+      "sha256": "82c9d451eb2833f7ad9859e1381fba4ed5d02e9d662295d1d345ece0679bdd8c"
     },
     {
       "path": "scripts/goal-runtime-bridge.js",
-      "sha256": "08039ddb74981bda422ea69e8abcc8fca915ec9627d61b6c69d04239a1d84440"
+      "sha256": "67d28284fbba6a882caeadb16416c9346d6c42a81a26425dd44e8d48d109bd95"
     },
     {
       "path": "scripts/hooks/antigravity-scope-guard.js",
@@ -238,7 +238,7 @@
     },
     {
       "path": "scripts/hooks/seabridge-git-guard.js",
-      "sha256": "0ae0105d2244c20e927d82cb7b5682be8af588725fbd44560ef6214b21254f72"
+      "sha256": "e05d895327491a329efe3d54abffcdeca0d185ede4dbb312db17ad462d9e2fcd"
     },
     {
       "path": "scripts/knowledge-adoption.js",
@@ -286,7 +286,7 @@
     },
     {
       "path": "scripts/lib/session-coordination.js",
-      "sha256": "6c5275fbc542a314538275d57785c72d1d694c056bfbc2a78e2a22b7365bb364"
+      "sha256": "a565a754f77cd6bc5674afe0bb47eacd7373f24235ae45f446afe09991abd859"
     },
     {
       "path": "scripts/lib/tmux-worktree-orchestrator.js",
@@ -362,7 +362,7 @@
     },
     {
       "path": "tests/lib/goal-control.test.js",
-      "sha256": "c16edf885131a786fda3d92fe70fce1d21580524932401a8239547b7b4fd5409"
+      "sha256": "b34a9b2a4e36a139dac26946169d837462c227caae3c0acca3bf8a2c1b6aa2bf"
     },
     {
       "path": "tests/lib/goal-runtime-hook.test.js",
@@ -390,11 +390,11 @@
     },
     {
       "path": "tests/lib/seabridge-git-guard.test.js",
-      "sha256": "80d2f330881033fde210dea930c26ccca63d77d9c7620f3469ee1dd289a25109"
+      "sha256": "08a017d5fdeeee0a71a6c1ea662e246d24ff602d52171c5a536182b5f0a85634"
     },
     {
       "path": "tests/lib/session-coordination.test.js",
-      "sha256": "0149491dbea9b82edb5c00eaaca2fa104cd2ef52e38a0b55c424ed9e526b058c"
+      "sha256": "3d8db900c7b8e711dd7cd2684f3dad494d54c7724bc65519c5e5b2167887f25c"
     },
     {
       "path": "tests/lib/tmux-worktree-orchestrator.test.js",
@@ -704,13 +704,13 @@
       "id": "file:scripts/goal-control.js",
       "type": "source",
       "path": "scripts/goal-control.js",
-      "sha256": "67caeb7d8256c0d7c84881ee62d770b73b5a8c0850923421ef368236e422d9dd"
+      "sha256": "82c9d451eb2833f7ad9859e1381fba4ed5d02e9d662295d1d345ece0679bdd8c"
     },
     {
       "id": "file:scripts/goal-runtime-bridge.js",
       "type": "source",
       "path": "scripts/goal-runtime-bridge.js",
-      "sha256": "08039ddb74981bda422ea69e8abcc8fca915ec9627d61b6c69d04239a1d84440"
+      "sha256": "67d28284fbba6a882caeadb16416c9346d6c42a81a26425dd44e8d48d109bd95"
     },
     {
       "id": "file:scripts/hooks/antigravity-scope-guard.js",
@@ -728,7 +728,7 @@
       "id": "file:scripts/hooks/seabridge-git-guard.js",
       "type": "source",
       "path": "scripts/hooks/seabridge-git-guard.js",
-      "sha256": "0ae0105d2244c20e927d82cb7b5682be8af588725fbd44560ef6214b21254f72"
+      "sha256": "e05d895327491a329efe3d54abffcdeca0d185ede4dbb312db17ad462d9e2fcd"
     },
     {
       "id": "file:scripts/knowledge-adoption.js",
@@ -800,7 +800,7 @@
       "id": "file:scripts/lib/session-coordination.js",
       "type": "source",
       "path": "scripts/lib/session-coordination.js",
-      "sha256": "6c5275fbc542a314538275d57785c72d1d694c056bfbc2a78e2a22b7365bb364"
+      "sha256": "a565a754f77cd6bc5674afe0bb47eacd7373f24235ae45f446afe09991abd859"
     },
     {
       "id": "file:scripts/lib/tmux-worktree-orchestrator.js",
@@ -914,7 +914,7 @@
       "id": "file:tests/lib/goal-control.test.js",
       "type": "source",
       "path": "tests/lib/goal-control.test.js",
-      "sha256": "c16edf885131a786fda3d92fe70fce1d21580524932401a8239547b7b4fd5409"
+      "sha256": "b34a9b2a4e36a139dac26946169d837462c227caae3c0acca3bf8a2c1b6aa2bf"
     },
     {
       "id": "file:tests/lib/goal-runtime-hook.test.js",
@@ -956,13 +956,13 @@
       "id": "file:tests/lib/seabridge-git-guard.test.js",
       "type": "source",
       "path": "tests/lib/seabridge-git-guard.test.js",
-      "sha256": "80d2f330881033fde210dea930c26ccca63d77d9c7620f3469ee1dd289a25109"
+      "sha256": "08a017d5fdeeee0a71a6c1ea662e246d24ff602d52171c5a536182b5f0a85634"
     },
     {
       "id": "file:tests/lib/session-coordination.test.js",
       "type": "source",
       "path": "tests/lib/session-coordination.test.js",
-      "sha256": "0149491dbea9b82edb5c00eaaca2fa104cd2ef52e38a0b55c424ed9e526b058c"
+      "sha256": "3d8db900c7b8e711dd7cd2684f3dad494d54c7724bc65519c5e5b2167887f25c"
     },
     {
       "id": "file:tests/lib/tmux-worktree-orchestrator.test.js",
@@ -3218,8 +3218,8 @@
     }
   ],
   "build": {
-    "generatedAt": "2026-10-13T00:33:30.005Z",
-    "sourceCommit": "5f59ea3e6bbf38467f540a8c56915219907f951e",
+    "generatedAt": "2026-10-13T05:01:15.551Z",
+    "sourceCommit": "c724cae0613e51282a56d2d414792171457ca1c5",
     "sourceDirty": false,
     "policyCommit": "9e9779171815a74e3e54adf225d1c6a2c773e75e",
     "policyDirty": false

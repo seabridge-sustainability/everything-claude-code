@@ -33,21 +33,51 @@ function subcommand(tokens, i) {
   return i;
 }
 
+const AMBIGUOUS = ['ask', 'Git mutation target is ambiguous; use a direct git -C invocation and existing bounded authorization.'];
+const INVOCATION = /(?:^|[\s;&|(){}`'"/\\])git(?:\.exe)?["']?(?=\s)([^;&|\r\n)]*)/gi;
+const DIR_CHANGE = /(?:^|[;&|\r\n(])\s*(?:cd|pushd|chdir|Set-Location|sl)\s+("[^"\r\n]*"|'[^'\r\n]*'|[^\s;&|)]+)/gi;
+const tokenize = text => (text.match(/"[^"\r\n]*"|'[^'\r\n]*'|[^\s]+/g) || []).map(t => /^['"]/.test(t) ? t.slice(1, -1) : t);
+
+function literalDir(base, value) {
+  if (!value || value.startsWith('-') || /[$`%~]/.test(value)) return null;
+  return path.resolve(base, process.platform === 'win32' ? value.replace(/^\/([a-z])(?=\/|$)/i, '$1:') : value);
+}
+
 // Compound commands: classify each visible git invocation instead of matching mutation words anywhere
-// (paths like app/core/config.py or a cd prefix are not mutations). Targets stay unresolved, so any
-// invocation that may mutate still asks.
-function compoundMutates(command) {
-  const invocation = /(?:^|[\s;&|(){}`'"/\\])git(?:\.exe)?["']?(?=\s)([^;&|\r\n)]*)/gi;
-  for (const [, rest] of command.matchAll(invocation)) {
-    const tokens = (rest.match(/"[^"\r\n]*"|'[^'\r\n]*'|[^\s]+/g) || []).map(t => /^['"]/.test(t) ? t.slice(1, -1) : t);
+// (paths like app/core/config.py or a cd prefix are not mutations). A mutation is resolved like a direct
+// invocation only when its target is literal: no directory change or one leading literal cd, literal -C,
+// no alternate git dir, no branch switch alongside other mutations, and no expanded push/reset/clean args.
+function decideCompound(command, cwd, inspector) {
+  const mutations = [];
+  for (const [, rest] of command.matchAll(INVOCATION)) {
+    const tokens = tokenize(rest);
     let i = subcommand(tokens, 0);
-    while (tokens[i] === '-C') i = subcommand(tokens, i + 2);
-    const op = tokens[i];
+    const dirs = [];
+    while (tokens[i] === '-C') { dirs.push(tokens[i + 1]); i = subcommand(tokens, i + 2); }
+    const op = tokens[i], args = tokens.slice(i + 1);
     if (!op) continue;
     // A subcommand hidden in a variable or substitution cannot be classified; fall back to the whole command.
-    if (/[$`]/.test(op) ? MUTATE.test(command) : !readOnly(op, tokens.slice(i + 1)) && MUTATE.test(rest)) return true;
+    if (/[$`]/.test(op) || op.startsWith('-')) { if (MUTATE.test(/[$`]/.test(op) ? command : rest)) return AMBIGUOUS; continue; }
+    if (readOnly(op, args) || !MUTATE.test(rest)) continue;
+    mutations.push({ op, args, dirs });
   }
-  return false;
+  if (!mutations.length) return null;
+  if (/--git-dir|--work-tree|\bGIT_(?:DIR|WORK_TREE)\b/i.test(command)) return AMBIGUOUS;
+  if (mutations.length > 1 && mutations.some(m => m.op === 'checkout' || m.op === 'switch')) return AMBIGUOUS;
+  const changes = [...command.matchAll(DIR_CHANGE)];
+  if (changes.length > 1 || (changes.length === 1 && command.slice(0, changes[0].index).trim())) return AMBIGUOUS;
+  const base = changes.length ? literalDir(cwd, changes[0][1].replace(/^(['"])(.*)\1$/, '$2')) : cwd;
+  if (!base) return AMBIGUOUS;
+  let result = null;
+  for (const { op, args, dirs } of mutations) {
+    let dir = base;
+    for (const value of dirs) { dir = literalDir(dir, value); if (!dir) return AMBIGUOUS; }
+    if (['push', 'reset', 'clean'].includes(op) && args.some(a => /[$`]/.test(a))) return AMBIGUOUS;
+    const decision = decideOperation(op, args, dir, inspector);
+    if (decision?.[0] === 'deny') return decision;
+    result = result || decision;
+  }
+  return result;
 }
 
 function inspect(dir) {
@@ -67,15 +97,15 @@ function decide(command, cwd, inspector = inspect) {
   if (!/\bgit(?:\.exe)?\b/i.test(command)) return null;
   if (/--no-verify\b|(?:core\.hooksPath|HUSKY\s*=\s*0|SKIP\s*=)/i.test(command)) return ['deny', 'Never bypass Git hooks.'];
   if (/\bpush\b[^\n;&|]*(?:\s--force\S*|\s-[a-z]*f\b|\s\+\S)/i.test(command)) return ['deny', 'Never force-push.'];
-  // Only a direct invocation is resolved. Do not pretend to interpret cd, scripts,
-  // aliases, shell expansion, alternate Git dirs, or compound mutations safely.
-  if (!/^\s*git(?:\.exe)?\s/i.test(command) || /[;&|\r\n`$><]/.test(command)) {
-    return compoundMutates(command) ? ['ask', 'Git mutation target is ambiguous; use a direct git -C invocation and existing bounded authorization.'] : null;
-  }
-  const tokens = command.match(/"[^"\r\n]*"|'[^'\r\n]*'|[^\s]+/g).map(t => /^['"]/.test(t) ? t.slice(1, -1) : t);
+  // Scripts, aliases and opaque shell expansion are never interpreted; see decideCompound.
+  if (!/^\s*git(?:\.exe)?\s/i.test(command) || /[;&|\r\n`$><]/.test(command)) return decideCompound(command, cwd, inspector);
+  const tokens = tokenize(command);
   let dir = cwd, i = subcommand(tokens, 1);
   while (tokens[i] === '-C') { if (!tokens[i + 1]) return ['deny', 'Missing git -C directory.']; dir = path.resolve(dir, tokens[i + 1]); i = subcommand(tokens, i + 2); }
-  const op = tokens[i], args = tokens.slice(i + 1);
+  return decideOperation(tokens[i], tokens.slice(i + 1), dir, inspector);
+}
+
+function decideOperation(op, args, dir, inspector) {
   if (op && readOnly(op, args)) return null;
   if (!op || op.startsWith('-') || !MUTATE.test(op)) return ['ask', 'Unresolved Git options/alias; guard cannot verify its target.'];
   let repo;
