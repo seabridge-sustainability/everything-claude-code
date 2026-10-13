@@ -14,6 +14,6 @@ Alibaba: suite_review_prepare takes an absolute repository and explicit commit S
 Start WeKnora before connecting its registered read-only MCP server. Paperclip's optional dashboard has paused agents; approve a concrete task before dispatch. OpenShell has verified strict policies and a local CLI. Current agent sessions are not automatically sandboxed.
 
 Install and lifecycle guide: C:/Users/adelm/SeaBridgeAI/everything-claude-code/integrations/company-dev-tools/README.md
-Bridge guide: C:/Users/adelm/SeaBridgeAI/everything-claude-code-runtime/integrations/dev-suite/README.md
+Bridge guide: C:/Users/adelm/SeaBridgeAI/everything-claude-code/integrations/dev-suite/README.md
 
 Backend/frontend are initial links. User-level registrations expose tools across projects; follow each project's own policy. No automatic private repository/document ingestion.
