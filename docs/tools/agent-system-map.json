@@ -30,7 +30,7 @@
     ],
     "semanticIndex": "not-run"
   },
-  "sourceFingerprint": "17c1f89b491945d11e41189f5aac53cda39a102004cb97357d4f935e2aa026de",
+  "sourceFingerprint": "7b0190bed729fc4a2a4ba6bc08465151c6f46efc187f34672c49306adf886752",
   "sources": [
     {
       "path": "../manageesg-backend/AGENTS.md",
@@ -122,7 +122,7 @@
     },
     {
       "path": "docs/tools/MODEL_PROMPTING_AND_SKILL_POLICY.md",
-      "sha256": "4afb7ad275368c9ee4a332b57b770d28d1e8eca4364ed89d1345ac01813cc90d"
+      "sha256": "f02d84c01c9dcf27bb038faedee8ca67157e44a55aeb7e7c64ce00412474f15d"
     },
     {
       "path": "docs/tools/PONYTAIL_ECC_GUIDE.md",
@@ -142,7 +142,23 @@
     },
     {
       "path": "integrations/dev-suite/runtime.mjs",
-      "sha256": "989cb5206e7f94ac2bd9d038f67f99a2653d484b1c2dd760c17be73b9d0586b5"
+      "sha256": "1127297dd5c050e58aa66df2d6021458b6e8a448e8f1f4f576faa429c2c0f6ba"
+    },
+    {
+      "path": "integrations/engineering-skills/adaptation.json",
+      "sha256": "cd5cd913126ad5559a1b65fa36d76687da2482f39e64da14b1ebf2fa91235204"
+    },
+    {
+      "path": "integrations/engineering-skills/catalog.mjs",
+      "sha256": "ea121774c535d7065d57b3eee1139401fb645ecc66b7ebac17b38a29aa11eaee"
+    },
+    {
+      "path": "integrations/engineering-skills/configure.mjs",
+      "sha256": "d7f04da1ca2185362d4a7b5fa502604692ec252c716a5ce847a56f99df998f10"
+    },
+    {
+      "path": "integrations/engineering-skills/verify-clients.mjs",
+      "sha256": "39a17aec36c16d7ac0c3180d7baa137d728112fe645c1d5c865b276d6a58bf5e"
     },
     {
       "path": "integrations/ponytail/cli.mjs",
@@ -162,11 +178,11 @@
     },
     {
       "path": "integrations/pstack/mcp.mjs",
-      "sha256": "37f83a1fcdfeda186738a204af3a864bff7a67d1b6036a9e0cf8919c45964320"
+      "sha256": "4072af6cb42b6adab9a3dc3d6875e46c535d4de018637f92ce7f77aa22a2c7bf"
     },
     {
       "path": "integrations/pstack/runtime.mjs",
-      "sha256": "fcb5b803da979917a4c3c1effbea3453e47b19b6e4a972413578edf1ba307c94"
+      "sha256": "b4c2ed6b976b1ae95c1ed9b1d3754b270460a4f93ccf4b2599a752994f743281"
     },
     {
       "path": "manifests/goal-proof-profiles.json",
@@ -179,6 +195,10 @@
     {
       "path": "manifests/instruction-adapters.json",
       "sha256": "e3bb2ee039fb12e0992a2da98fef4900c8a82cb1e39481c7b0d5392227cf77cc"
+    },
+    {
+      "path": "manifests/task-skill-routing.json",
+      "sha256": "cab17c47c84bf53a11b7a7cb6568819b9317407f4045e5b94bc581e3dfc113d0"
     },
     {
       "path": "package.json",
@@ -222,7 +242,7 @@
     },
     {
       "path": "scripts/agent-system-map.js",
-      "sha256": "6deb91512497d4db4ff0e7926ba49946017cc1eaf7f10b7845be0c2782bab397"
+      "sha256": "aa5dd67cf5b4a3862c03ac4ae47d55f752bd55e976a9a05537a471131d9a5ac8"
     },
     {
       "path": "scripts/check-instruction-stack.js",
@@ -261,6 +281,10 @@
       "sha256": "c02f800ad248ef19aa3530f124ca627ac6ade4bcae85145f454e34852b9b81bf"
     },
     {
+      "path": "scripts/fresh-agent-session.js",
+      "sha256": "977266c7a7cd7d589277d12f94f0d6a50f4c2f6ea80a768facf9292b24f17d0a"
+    },
+    {
       "path": "scripts/goal-control.js",
       "sha256": "82c9d451eb2833f7ad9859e1381fba4ed5d02e9d662295d1d345ece0679bdd8c"
     },
@@ -271,6 +295,10 @@
     {
       "path": "scripts/hooks/antigravity-scope-guard.js",
       "sha256": "397e0c47fc6df927d2dfaec2494d49ef89408fa3470037a57a4f09c26f7d29a5"
+    },
+    {
+      "path": "scripts/hooks/fresh-session-guard.js",
+      "sha256": "f715dd2fe830c3339087fe1a09a7035180e7d6b800fae772193246ac31f518fa"
     },
     {
       "path": "scripts/hooks/goal-runtime-gate.js",
@@ -309,6 +337,10 @@
       "sha256": "abc6dc3bf8a5944ecd359eb1ff9004e930149bbc35eafadfb98f1233e26991de"
     },
     {
+      "path": "scripts/lib/fresh-session-guard.js",
+      "sha256": "973e715b5c69cf9a3384e33f265c6bfd04666d992ab3864bd30a5c46717813a8"
+    },
+    {
       "path": "scripts/lib/goal-control.js",
       "sha256": "d3ccf7f5fd35fa7e092b447f1bd09cb7f15cbbc2964a5a0e071ae12abdf2f9be"
     },
@@ -327,6 +359,10 @@
     {
       "path": "scripts/lib/session-coordination.js",
       "sha256": "a565a754f77cd6bc5674afe0bb47eacd7373f24235ae45f446afe09991abd859"
+    },
+    {
+      "path": "scripts/lib/skill-routing.js",
+      "sha256": "529587d20dd19cf147fc77e3a63bedebd33a510196fdb31871b9766ac9cc89e5"
     },
     {
       "path": "scripts/lib/tmux-worktree-orchestrator.js",
@@ -357,6 +393,10 @@
       "sha256": "c48e8be5dae6fbfdc0861957d3d619ed77064c2b3610503b0688bbcb9d2e9206"
     },
     {
+      "path": "scripts/skill-route.js",
+      "sha256": "c511b05f65f7eebc5ebd424e4dbafeecf76f90193510d06cb2d320129a46641b"
+    },
+    {
       "path": "scripts/sync-instruction-adapters.js",
       "sha256": "2de1e0e12e629a080f90e09b7031540389cc4421638c9e238ba334e006d8899a"
     },
@@ -373,6 +413,10 @@
       "sha256": "c8cc096cbee536289230ea44e73250044918c2c51df431aaa784f655eb8b685f"
     },
     {
+      "path": "skills/sea-adversarial-review/SKILL.md",
+      "sha256": "5b1795e3f0e8d28a88e044e72d6199ed02ac5d926653dd898e54c558627d7a44"
+    },
+    {
       "path": "skills/sea-multi-model-planning/SKILL.md",
       "sha256": "636e6d21ec6355cd4f4b4d48a364cb6651adc27404d60df5bc1c377a72ca545c"
     },
@@ -381,12 +425,24 @@
       "sha256": "ac916101f4f71a7edf9c18f57a97dd9d249a1c5128ba3eca2ab8cffdc44fb14d"
     },
     {
+      "path": "skills/sea-quality-contract/SKILL.md",
+      "sha256": "5c647a6e289a0f52987f2b7a3a7388560d89534709a1791c7eefa6663971dbb1"
+    },
+    {
+      "path": "skills/sea-requirements-discovery/SKILL.md",
+      "sha256": "e008a0dcd388ba911065b8da4f0fdd16fd12b73e3eeca215fee06b7d245421d1"
+    },
+    {
       "path": "skills/sea-skill-map/SKILL.md",
-      "sha256": "680e2a3c45de54a7162396426aa100f24c4c151cac3f14acabbd60b239b260e4"
+      "sha256": "4bf2ba59851ddc8c90145333b768666f434651963e37d28aa9eb310e2f798333"
     },
     {
       "path": "skills/sea-verify-seabridge/SKILL.md",
       "sha256": "acfae800e0411a3bb77e330461960737eb7ae33346514287ae4c50b42bb29b55"
+    },
+    {
+      "path": "skills/sea-verify-seabridge/features/README.md",
+      "sha256": "21658318a7b84ec335b65ce30e036698f970de698742bb44f5beb1066251d944"
     },
     {
       "path": "tests/ci/agent-adoption-doctor.test.js",
@@ -415,6 +471,10 @@
     {
       "path": "tests/lib/coding-execution.test.js",
       "sha256": "12acf5f9d0f0ae3ea2cba89241b9b0a23c4731d2bdd6eea0bc4d042f73d194fd"
+    },
+    {
+      "path": "tests/lib/fresh-session-guard.test.js",
+      "sha256": "bb91b02b5813f45d3c730ce29f8c5e50515dd8d895ed2f2494212dcea3765fb4"
     },
     {
       "path": "tests/lib/goal-control.test.js",
@@ -453,6 +513,10 @@
       "sha256": "3d8db900c7b8e711dd7cd2684f3dad494d54c7724bc65519c5e5b2167887f25c"
     },
     {
+      "path": "tests/lib/skill-routing.test.js",
+      "sha256": "76c560243d2c9aea40279d5bae18a3ad7b7f8a2dfe07b0e6c7d0522a111552f2"
+    },
+    {
       "path": "tests/lib/tmux-worktree-orchestrator.test.js",
       "sha256": "bc5ac8a3a080dc0ce4527fff64eca655524744c5710b3ee7d0e23c356ffc1947"
     },
@@ -474,11 +538,15 @@
     },
     {
       "path": "tests/scripts/ponytail-integration.test.mjs",
-      "sha256": "c3ed9a1d0657aecaa3e4d7aab76767874a8392bd1ed745dd70ef10d0674ebabb"
+      "sha256": "47df98840ad30bae73e0ba39cde7ebbc45b8aaa5f0509eccf5b27e088aff3492"
+    },
+    {
+      "path": "tests/scripts/pstack-feature-recipes.test.mjs",
+      "sha256": "dbb16831eafe456021157514d10655baf52e722503bcd4059d23d6d13aa874e1"
     },
     {
       "path": "tests/scripts/pstack-integration.test.mjs",
-      "sha256": "5d22fa71221a8f7d1782d020ad37825a630826e69fd6e86f1c9b2a0e83849f97"
+      "sha256": "07a529d3bfaa2906d8db071e05bb2265c6abd35a32eaad9a30b14f65054acd53"
     }
   ],
   "nodes": [
@@ -606,7 +674,7 @@
       "id": "file:docs/tools/MODEL_PROMPTING_AND_SKILL_POLICY.md",
       "type": "source",
       "path": "docs/tools/MODEL_PROMPTING_AND_SKILL_POLICY.md",
-      "sha256": "4afb7ad275368c9ee4a332b57b770d28d1e8eca4364ed89d1345ac01813cc90d"
+      "sha256": "f02d84c01c9dcf27bb038faedee8ca67157e44a55aeb7e7c64ce00412474f15d"
     },
     {
       "id": "file:docs/tools/PONYTAIL_ECC_GUIDE.md",
@@ -642,7 +710,31 @@
       "id": "file:integrations/dev-suite/runtime.mjs",
       "type": "source",
       "path": "integrations/dev-suite/runtime.mjs",
-      "sha256": "989cb5206e7f94ac2bd9d038f67f99a2653d484b1c2dd760c17be73b9d0586b5"
+      "sha256": "1127297dd5c050e58aa66df2d6021458b6e8a448e8f1f4f576faa429c2c0f6ba"
+    },
+    {
+      "id": "file:integrations/engineering-skills/adaptation.json",
+      "type": "source",
+      "path": "integrations/engineering-skills/adaptation.json",
+      "sha256": "cd5cd913126ad5559a1b65fa36d76687da2482f39e64da14b1ebf2fa91235204"
+    },
+    {
+      "id": "file:integrations/engineering-skills/catalog.mjs",
+      "type": "source",
+      "path": "integrations/engineering-skills/catalog.mjs",
+      "sha256": "ea121774c535d7065d57b3eee1139401fb645ecc66b7ebac17b38a29aa11eaee"
+    },
+    {
+      "id": "file:integrations/engineering-skills/configure.mjs",
+      "type": "source",
+      "path": "integrations/engineering-skills/configure.mjs",
+      "sha256": "d7f04da1ca2185362d4a7b5fa502604692ec252c716a5ce847a56f99df998f10"
+    },
+    {
+      "id": "file:integrations/engineering-skills/verify-clients.mjs",
+      "type": "source",
+      "path": "integrations/engineering-skills/verify-clients.mjs",
+      "sha256": "39a17aec36c16d7ac0c3180d7baa137d728112fe645c1d5c865b276d6a58bf5e"
     },
     {
       "id": "file:integrations/ponytail/cli.mjs",
@@ -672,13 +764,13 @@
       "id": "file:integrations/pstack/mcp.mjs",
       "type": "source",
       "path": "integrations/pstack/mcp.mjs",
-      "sha256": "37f83a1fcdfeda186738a204af3a864bff7a67d1b6036a9e0cf8919c45964320"
+      "sha256": "4072af6cb42b6adab9a3dc3d6875e46c535d4de018637f92ce7f77aa22a2c7bf"
     },
     {
       "id": "file:integrations/pstack/runtime.mjs",
       "type": "source",
       "path": "integrations/pstack/runtime.mjs",
-      "sha256": "fcb5b803da979917a4c3c1effbea3453e47b19b6e4a972413578edf1ba307c94"
+      "sha256": "b4c2ed6b976b1ae95c1ed9b1d3754b270460a4f93ccf4b2599a752994f743281"
     },
     {
       "id": "file:manifests/goal-proof-profiles.json",
@@ -697,6 +789,12 @@
       "type": "source",
       "path": "manifests/instruction-adapters.json",
       "sha256": "e3bb2ee039fb12e0992a2da98fef4900c8a82cb1e39481c7b0d5392227cf77cc"
+    },
+    {
+      "id": "file:manifests/task-skill-routing.json",
+      "type": "source",
+      "path": "manifests/task-skill-routing.json",
+      "sha256": "cab17c47c84bf53a11b7a7cb6568819b9317407f4045e5b94bc581e3dfc113d0"
     },
     {
       "id": "file:OPENCODE.md",
@@ -768,7 +866,7 @@
       "id": "file:scripts/agent-system-map.js",
       "type": "source",
       "path": "scripts/agent-system-map.js",
-      "sha256": "6deb91512497d4db4ff0e7926ba49946017cc1eaf7f10b7845be0c2782bab397"
+      "sha256": "aa5dd67cf5b4a3862c03ac4ae47d55f752bd55e976a9a05537a471131d9a5ac8"
     },
     {
       "id": "file:scripts/check-instruction-stack.js",
@@ -825,6 +923,12 @@
       "sha256": "c02f800ad248ef19aa3530f124ca627ac6ade4bcae85145f454e34852b9b81bf"
     },
     {
+      "id": "file:scripts/fresh-agent-session.js",
+      "type": "source",
+      "path": "scripts/fresh-agent-session.js",
+      "sha256": "977266c7a7cd7d589277d12f94f0d6a50f4c2f6ea80a768facf9292b24f17d0a"
+    },
+    {
       "id": "file:scripts/goal-control.js",
       "type": "source",
       "path": "scripts/goal-control.js",
@@ -841,6 +945,12 @@
       "type": "source",
       "path": "scripts/hooks/antigravity-scope-guard.js",
       "sha256": "397e0c47fc6df927d2dfaec2494d49ef89408fa3470037a57a4f09c26f7d29a5"
+    },
+    {
+      "id": "file:scripts/hooks/fresh-session-guard.js",
+      "type": "source",
+      "path": "scripts/hooks/fresh-session-guard.js",
+      "sha256": "f715dd2fe830c3339087fe1a09a7035180e7d6b800fae772193246ac31f518fa"
     },
     {
       "id": "file:scripts/hooks/goal-runtime-gate.js",
@@ -897,6 +1007,12 @@
       "sha256": "abc6dc3bf8a5944ecd359eb1ff9004e930149bbc35eafadfb98f1233e26991de"
     },
     {
+      "id": "file:scripts/lib/fresh-session-guard.js",
+      "type": "source",
+      "path": "scripts/lib/fresh-session-guard.js",
+      "sha256": "973e715b5c69cf9a3384e33f265c6bfd04666d992ab3864bd30a5c46717813a8"
+    },
+    {
       "id": "file:scripts/lib/goal-control.js",
       "type": "source",
       "path": "scripts/lib/goal-control.js",
@@ -925,6 +1041,12 @@
       "type": "source",
       "path": "scripts/lib/session-coordination.js",
       "sha256": "a565a754f77cd6bc5674afe0bb47eacd7373f24235ae45f446afe09991abd859"
+    },
+    {
+      "id": "file:scripts/lib/skill-routing.js",
+      "type": "source",
+      "path": "scripts/lib/skill-routing.js",
+      "sha256": "529587d20dd19cf147fc77e3a63bedebd33a510196fdb31871b9766ac9cc89e5"
     },
     {
       "id": "file:scripts/lib/tmux-worktree-orchestrator.js",
@@ -969,6 +1091,12 @@
       "sha256": "c48e8be5dae6fbfdc0861957d3d619ed77064c2b3610503b0688bbcb9d2e9206"
     },
     {
+      "id": "file:scripts/skill-route.js",
+      "type": "source",
+      "path": "scripts/skill-route.js",
+      "sha256": "c511b05f65f7eebc5ebd424e4dbafeecf76f90193510d06cb2d320129a46641b"
+    },
+    {
       "id": "file:scripts/sync-instruction-adapters.js",
       "type": "source",
       "path": "scripts/sync-instruction-adapters.js",
@@ -993,6 +1121,12 @@
       "sha256": "c8cc096cbee536289230ea44e73250044918c2c51df431aaa784f655eb8b685f"
     },
     {
+      "id": "file:skills/sea-adversarial-review/SKILL.md",
+      "type": "source",
+      "path": "skills/sea-adversarial-review/SKILL.md",
+      "sha256": "5b1795e3f0e8d28a88e044e72d6199ed02ac5d926653dd898e54c558627d7a44"
+    },
+    {
       "id": "file:skills/sea-multi-model-planning/SKILL.md",
       "type": "source",
       "path": "skills/sea-multi-model-planning/SKILL.md",
@@ -1005,10 +1139,28 @@
       "sha256": "ac916101f4f71a7edf9c18f57a97dd9d249a1c5128ba3eca2ab8cffdc44fb14d"
     },
     {
+      "id": "file:skills/sea-quality-contract/SKILL.md",
+      "type": "source",
+      "path": "skills/sea-quality-contract/SKILL.md",
+      "sha256": "5c647a6e289a0f52987f2b7a3a7388560d89534709a1791c7eefa6663971dbb1"
+    },
+    {
+      "id": "file:skills/sea-requirements-discovery/SKILL.md",
+      "type": "source",
+      "path": "skills/sea-requirements-discovery/SKILL.md",
+      "sha256": "e008a0dcd388ba911065b8da4f0fdd16fd12b73e3eeca215fee06b7d245421d1"
+    },
+    {
       "id": "file:skills/sea-skill-map/SKILL.md",
       "type": "source",
       "path": "skills/sea-skill-map/SKILL.md",
-      "sha256": "680e2a3c45de54a7162396426aa100f24c4c151cac3f14acabbd60b239b260e4"
+      "sha256": "4bf2ba59851ddc8c90145333b768666f434651963e37d28aa9eb310e2f798333"
+    },
+    {
+      "id": "file:skills/sea-verify-seabridge/features/README.md",
+      "type": "source",
+      "path": "skills/sea-verify-seabridge/features/README.md",
+      "sha256": "21658318a7b84ec335b65ce30e036698f970de698742bb44f5beb1066251d944"
     },
     {
       "id": "file:skills/sea-verify-seabridge/SKILL.md",
@@ -1057,6 +1209,12 @@
       "type": "source",
       "path": "tests/lib/coding-execution.test.js",
       "sha256": "12acf5f9d0f0ae3ea2cba89241b9b0a23c4731d2bdd6eea0bc4d042f73d194fd"
+    },
+    {
+      "id": "file:tests/lib/fresh-session-guard.test.js",
+      "type": "source",
+      "path": "tests/lib/fresh-session-guard.test.js",
+      "sha256": "bb91b02b5813f45d3c730ce29f8c5e50515dd8d895ed2f2494212dcea3765fb4"
     },
     {
       "id": "file:tests/lib/goal-control.test.js",
@@ -1113,6 +1271,12 @@
       "sha256": "3d8db900c7b8e711dd7cd2684f3dad494d54c7724bc65519c5e5b2167887f25c"
     },
     {
+      "id": "file:tests/lib/skill-routing.test.js",
+      "type": "source",
+      "path": "tests/lib/skill-routing.test.js",
+      "sha256": "76c560243d2c9aea40279d5bae18a3ad7b7f8a2dfe07b0e6c7d0522a111552f2"
+    },
+    {
       "id": "file:tests/lib/tmux-worktree-orchestrator.test.js",
       "type": "source",
       "path": "tests/lib/tmux-worktree-orchestrator.test.js",
@@ -1146,13 +1310,19 @@
       "id": "file:tests/scripts/ponytail-integration.test.mjs",
       "type": "source",
       "path": "tests/scripts/ponytail-integration.test.mjs",
-      "sha256": "c3ed9a1d0657aecaa3e4d7aab76767874a8392bd1ed745dd70ef10d0674ebabb"
+      "sha256": "47df98840ad30bae73e0ba39cde7ebbc45b8aaa5f0509eccf5b27e088aff3492"
+    },
+    {
+      "id": "file:tests/scripts/pstack-feature-recipes.test.mjs",
+      "type": "source",
+      "path": "tests/scripts/pstack-feature-recipes.test.mjs",
+      "sha256": "dbb16831eafe456021157514d10655baf52e722503bcd4059d23d6d13aa874e1"
     },
     {
       "id": "file:tests/scripts/pstack-integration.test.mjs",
       "type": "source",
       "path": "tests/scripts/pstack-integration.test.mjs",
-      "sha256": "5d22fa71221a8f7d1782d020ad37825a630826e69fd6e86f1c9b2a0e83849f97"
+      "sha256": "07a529d3bfaa2906d8db071e05bb2265c6abd35a32eaad9a30b14f65054acd53"
     },
     {
       "id": "runtime:adal",
@@ -1255,6 +1425,12 @@
     {
       "from": "file:../manageesg-backend/AGENTS_SYSTEM.md",
       "to": "file:CLAUDE.md",
+      "type": "mentions-path",
+      "evidence": "../manageesg-backend/AGENTS_SYSTEM.md"
+    },
+    {
+      "from": "file:../manageesg-backend/AGENTS_SYSTEM.md",
+      "to": "file:scripts/fresh-agent-session.js",
       "type": "mentions-path",
       "evidence": "../manageesg-backend/AGENTS_SYSTEM.md"
     },
@@ -1650,7 +1826,31 @@
     },
     {
       "from": "file:docs/tools/MODEL_PROMPTING_AND_SKILL_POLICY.md",
+      "to": "file:manifests/task-skill-routing.json",
+      "type": "mentions-path",
+      "evidence": "docs/tools/MODEL_PROMPTING_AND_SKILL_POLICY.md"
+    },
+    {
+      "from": "file:docs/tools/MODEL_PROMPTING_AND_SKILL_POLICY.md",
+      "to": "file:scripts/fresh-agent-session.js",
+      "type": "mentions-path",
+      "evidence": "docs/tools/MODEL_PROMPTING_AND_SKILL_POLICY.md"
+    },
+    {
+      "from": "file:docs/tools/MODEL_PROMPTING_AND_SKILL_POLICY.md",
       "to": "file:scripts/knowledge-query.js",
+      "type": "mentions-path",
+      "evidence": "docs/tools/MODEL_PROMPTING_AND_SKILL_POLICY.md"
+    },
+    {
+      "from": "file:docs/tools/MODEL_PROMPTING_AND_SKILL_POLICY.md",
+      "to": "file:scripts/lib/skill-routing.js",
+      "type": "mentions-path",
+      "evidence": "docs/tools/MODEL_PROMPTING_AND_SKILL_POLICY.md"
+    },
+    {
+      "from": "file:docs/tools/MODEL_PROMPTING_AND_SKILL_POLICY.md",
+      "to": "file:scripts/skill-route.js",
       "type": "mentions-path",
       "evidence": "docs/tools/MODEL_PROMPTING_AND_SKILL_POLICY.md"
     },
@@ -1675,6 +1875,12 @@
     {
       "from": "file:docs/tools/PSTACK_ECC_GUIDE.md",
       "to": "file:integrations/pstack/runtime.mjs",
+      "type": "mentions-path",
+      "evidence": "docs/tools/PSTACK_ECC_GUIDE.md"
+    },
+    {
+      "from": "file:docs/tools/PSTACK_ECC_GUIDE.md",
+      "to": "file:skills/sea-verify-seabridge/features/README.md",
       "type": "mentions-path",
       "evidence": "docs/tools/PSTACK_ECC_GUIDE.md"
     },
@@ -1737,6 +1943,36 @@
       "to": "file:package.json",
       "type": "mentions-path",
       "evidence": "integrations/dev-suite/runtime.mjs"
+    },
+    {
+      "from": "file:integrations/dev-suite/runtime.mjs",
+      "to": "file:scripts/lib/skill-routing.js",
+      "type": "mentions-path",
+      "evidence": "integrations/dev-suite/runtime.mjs"
+    },
+    {
+      "from": "file:integrations/engineering-skills/catalog.mjs",
+      "to": "file:integrations/engineering-skills/adaptation.json",
+      "type": "mentions-path",
+      "evidence": "integrations/engineering-skills/catalog.mjs"
+    },
+    {
+      "from": "file:integrations/engineering-skills/configure.mjs",
+      "to": "file:AGENTS.md",
+      "type": "mentions-path",
+      "evidence": "integrations/engineering-skills/configure.mjs"
+    },
+    {
+      "from": "file:integrations/engineering-skills/verify-clients.mjs",
+      "to": "file:.gemini/settings.json",
+      "type": "mentions-path",
+      "evidence": "integrations/engineering-skills/verify-clients.mjs"
+    },
+    {
+      "from": "file:integrations/engineering-skills/verify-clients.mjs",
+      "to": "file:integrations/pstack/cli.mjs",
+      "type": "mentions-path",
+      "evidence": "integrations/engineering-skills/verify-clients.mjs"
     },
     {
       "from": "file:integrations/ponytail/cli.mjs",
@@ -2304,6 +2540,30 @@
     },
     {
       "from": "file:scripts/agent-system-map.js",
+      "to": "file:integrations/engineering-skills/adaptation.json",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:integrations/engineering-skills/catalog.mjs",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:integrations/engineering-skills/configure.mjs",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:integrations/engineering-skills/verify-clients.mjs",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
       "to": "file:integrations/ponytail/cli.mjs",
       "type": "mentions-path",
       "evidence": "scripts/agent-system-map.js"
@@ -2353,6 +2613,12 @@
     {
       "from": "file:scripts/agent-system-map.js",
       "to": "file:manifests/instruction-adapters.json",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:manifests/task-skill-routing.json",
       "type": "mentions-path",
       "evidence": "scripts/agent-system-map.js"
     },
@@ -2478,6 +2744,12 @@
     },
     {
       "from": "file:scripts/agent-system-map.js",
+      "to": "file:scripts/fresh-agent-session.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
       "to": "file:scripts/goal-control.js",
       "type": "mentions-path",
       "evidence": "scripts/agent-system-map.js"
@@ -2491,6 +2763,12 @@
     {
       "from": "file:scripts/agent-system-map.js",
       "to": "file:scripts/hooks/antigravity-scope-guard.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:scripts/hooks/fresh-session-guard.js",
       "type": "mentions-path",
       "evidence": "scripts/agent-system-map.js"
     },
@@ -2550,6 +2828,12 @@
     },
     {
       "from": "file:scripts/agent-system-map.js",
+      "to": "file:scripts/lib/fresh-session-guard.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
       "to": "file:scripts/lib/goal-control.js",
       "type": "mentions-path",
       "evidence": "scripts/agent-system-map.js"
@@ -2575,6 +2859,12 @@
     {
       "from": "file:scripts/agent-system-map.js",
       "to": "file:scripts/lib/session-coordination.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:scripts/lib/skill-routing.js",
       "type": "mentions-path",
       "evidence": "scripts/agent-system-map.js"
     },
@@ -2622,6 +2912,12 @@
     },
     {
       "from": "file:scripts/agent-system-map.js",
+      "to": "file:scripts/skill-route.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
       "to": "file:scripts/sync-instruction-adapters.js",
       "type": "mentions-path",
       "evidence": "scripts/agent-system-map.js"
@@ -2646,6 +2942,12 @@
     },
     {
       "from": "file:scripts/agent-system-map.js",
+      "to": "file:skills/sea-adversarial-review/SKILL.md",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
       "to": "file:skills/sea-multi-model-planning/SKILL.md",
       "type": "mentions-path",
       "evidence": "scripts/agent-system-map.js"
@@ -2658,7 +2960,25 @@
     },
     {
       "from": "file:scripts/agent-system-map.js",
+      "to": "file:skills/sea-quality-contract/SKILL.md",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:skills/sea-requirements-discovery/SKILL.md",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
       "to": "file:skills/sea-skill-map/SKILL.md",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:skills/sea-verify-seabridge/features/README.md",
       "type": "mentions-path",
       "evidence": "scripts/agent-system-map.js"
     },
@@ -2707,6 +3027,12 @@
     {
       "from": "file:scripts/agent-system-map.js",
       "to": "file:tests/lib/coding-execution.test.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:tests/lib/fresh-session-guard.test.js",
       "type": "mentions-path",
       "evidence": "scripts/agent-system-map.js"
     },
@@ -2766,6 +3092,12 @@
     },
     {
       "from": "file:scripts/agent-system-map.js",
+      "to": "file:tests/lib/skill-routing.test.js",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
       "to": "file:tests/lib/tmux-worktree-orchestrator.test.js",
       "type": "mentions-path",
       "evidence": "scripts/agent-system-map.js"
@@ -2797,6 +3129,12 @@
     {
       "from": "file:scripts/agent-system-map.js",
       "to": "file:tests/scripts/ponytail-integration.test.mjs",
+      "type": "mentions-path",
+      "evidence": "scripts/agent-system-map.js"
+    },
+    {
+      "from": "file:scripts/agent-system-map.js",
+      "to": "file:tests/scripts/pstack-feature-recipes.test.mjs",
       "type": "mentions-path",
       "evidence": "scripts/agent-system-map.js"
     },
@@ -2885,6 +3223,18 @@
       "evidence": "scripts/eval-instruction-scenarios.js"
     },
     {
+      "from": "file:scripts/fresh-agent-session.js",
+      "to": "file:manifests/instruction-adapters.json",
+      "type": "mentions-path",
+      "evidence": "scripts/fresh-agent-session.js"
+    },
+    {
+      "from": "file:scripts/fresh-agent-session.js",
+      "to": "file:scripts/hooks/fresh-session-guard.js",
+      "type": "mentions-path",
+      "evidence": "scripts/fresh-agent-session.js"
+    },
+    {
       "from": "file:scripts/goal-runtime-bridge.js",
       "to": "file:scripts/lib/session-coordination.js",
       "type": "verified-code-import",
@@ -2939,6 +3289,60 @@
       "evidence": "scripts/lib/coding-execution.js"
     },
     {
+      "from": "file:scripts/lib/fresh-session-guard.js",
+      "to": "file:AGENTS.md",
+      "type": "mentions-path",
+      "evidence": "scripts/lib/fresh-session-guard.js"
+    },
+    {
+      "from": "file:scripts/lib/fresh-session-guard.js",
+      "to": "file:CLAUDE.md",
+      "type": "mentions-path",
+      "evidence": "scripts/lib/fresh-session-guard.js"
+    },
+    {
+      "from": "file:scripts/lib/fresh-session-guard.js",
+      "to": "file:manifests/task-skill-routing.json",
+      "type": "mentions-path",
+      "evidence": "scripts/lib/fresh-session-guard.js"
+    },
+    {
+      "from": "file:scripts/lib/fresh-session-guard.js",
+      "to": "file:package.json",
+      "type": "mentions-path",
+      "evidence": "scripts/lib/fresh-session-guard.js"
+    },
+    {
+      "from": "file:scripts/lib/fresh-session-guard.js",
+      "to": "file:scripts/hooks/antigravity-scope-guard.js",
+      "type": "mentions-path",
+      "evidence": "scripts/lib/fresh-session-guard.js"
+    },
+    {
+      "from": "file:scripts/lib/fresh-session-guard.js",
+      "to": "file:scripts/hooks/fresh-session-guard.js",
+      "type": "mentions-path",
+      "evidence": "scripts/lib/fresh-session-guard.js"
+    },
+    {
+      "from": "file:scripts/lib/fresh-session-guard.js",
+      "to": "file:scripts/lib/scope-guard-adapters.js",
+      "type": "mentions-path",
+      "evidence": "scripts/lib/fresh-session-guard.js"
+    },
+    {
+      "from": "file:scripts/lib/fresh-session-guard.js",
+      "to": "file:scripts/lib/session-coordination.js",
+      "type": "mentions-path",
+      "evidence": "scripts/lib/fresh-session-guard.js"
+    },
+    {
+      "from": "file:scripts/lib/fresh-session-guard.js",
+      "to": "file:scripts/lib/skill-routing.js",
+      "type": "mentions-path",
+      "evidence": "scripts/lib/fresh-session-guard.js"
+    },
+    {
       "from": "file:scripts/lib/memory-vault.js",
       "to": "file:scripts/lib/memory-vault-format.js",
       "type": "verified-code-import",
@@ -2979,6 +3383,12 @@
       "to": "file:scripts/lib/scope-guard-adapters.js",
       "type": "mentions-path",
       "evidence": "scripts/lib/session-coordination.js"
+    },
+    {
+      "from": "file:scripts/lib/skill-routing.js",
+      "to": "file:manifests/task-skill-routing.json",
+      "type": "mentions-path",
+      "evidence": "scripts/lib/skill-routing.js"
     },
     {
       "from": "file:scripts/memory-mcp.mjs",
@@ -3228,15 +3638,33 @@
     },
     {
       "from": "file:skills/sea-skill-map/SKILL.md",
-      "to": "file:AGENTS.md",
+      "to": "file:docs/tools/MODEL_PROMPTING_AND_SKILL_POLICY.md",
       "type": "mentions-path",
       "evidence": "skills/sea-skill-map/SKILL.md"
     },
     {
       "from": "file:skills/sea-skill-map/SKILL.md",
-      "to": "file:docs/tools/MODEL_PROMPTING_AND_SKILL_POLICY.md",
+      "to": "file:manifests/task-skill-routing.json",
       "type": "mentions-path",
       "evidence": "skills/sea-skill-map/SKILL.md"
+    },
+    {
+      "from": "file:skills/sea-skill-map/SKILL.md",
+      "to": "file:scripts/skill-route.js",
+      "type": "mentions-path",
+      "evidence": "skills/sea-skill-map/SKILL.md"
+    },
+    {
+      "from": "file:skills/sea-verify-seabridge/features/README.md",
+      "to": "file:integrations/pstack/cli.mjs",
+      "type": "mentions-path",
+      "evidence": "skills/sea-verify-seabridge/features/README.md"
+    },
+    {
+      "from": "file:skills/sea-verify-seabridge/features/README.md",
+      "to": "file:integrations/pstack/runtime.mjs",
+      "type": "mentions-path",
+      "evidence": "skills/sea-verify-seabridge/features/README.md"
     },
     {
       "from": "file:skills/sea-verify-seabridge/SKILL.md",
@@ -3437,6 +3865,42 @@
       "evidence": "tests/lib/coding-execution.test.js"
     },
     {
+      "from": "file:tests/lib/fresh-session-guard.test.js",
+      "to": "file:AGENTS.md",
+      "type": "mentions-path",
+      "evidence": "tests/lib/fresh-session-guard.test.js"
+    },
+    {
+      "from": "file:tests/lib/fresh-session-guard.test.js",
+      "to": "file:CLAUDE.md",
+      "type": "mentions-path",
+      "evidence": "tests/lib/fresh-session-guard.test.js"
+    },
+    {
+      "from": "file:tests/lib/fresh-session-guard.test.js",
+      "to": "file:manifests/instruction-adapters.json",
+      "type": "mentions-path",
+      "evidence": "tests/lib/fresh-session-guard.test.js"
+    },
+    {
+      "from": "file:tests/lib/fresh-session-guard.test.js",
+      "to": "file:scripts/fresh-agent-session.js",
+      "type": "mentions-path",
+      "evidence": "tests/lib/fresh-session-guard.test.js"
+    },
+    {
+      "from": "file:tests/lib/fresh-session-guard.test.js",
+      "to": "file:scripts/hooks/fresh-session-guard.js",
+      "type": "mentions-path",
+      "evidence": "tests/lib/fresh-session-guard.test.js"
+    },
+    {
+      "from": "file:tests/lib/fresh-session-guard.test.js",
+      "to": "file:scripts/lib/fresh-session-guard.js",
+      "type": "mentions-path",
+      "evidence": "tests/lib/fresh-session-guard.test.js"
+    },
+    {
       "from": "file:tests/lib/goal-runtime.test.js",
       "to": "file:hooks/hooks.json",
       "type": "mentions-path",
@@ -3615,6 +4079,12 @@
       "to": "file:OPENCODE.md",
       "type": "mentions-path",
       "evidence": "tests/scripts/ponytail-integration.test.mjs"
+    },
+    {
+      "from": "file:tests/scripts/pstack-feature-recipes.test.mjs",
+      "to": "file:integrations/pstack/runtime.mjs",
+      "type": "mentions-path",
+      "evidence": "tests/scripts/pstack-feature-recipes.test.mjs"
     },
     {
       "from": "file:tests/scripts/pstack-integration.test.mjs",
@@ -4026,10 +4496,10 @@
     }
   ],
   "build": {
-    "generatedAt": "2026-10-13T05:48:48.950Z",
-    "sourceCommit": "ed59e73f4b2fcc8c8592e77f5755508c4fb00e09",
+    "generatedAt": "2026-10-13T16:47:27.176Z",
+    "sourceCommit": "cbbc969ea36c994dabe72486857951e529211960",
     "sourceDirty": false,
-    "policyCommit": "58a4242991a33d272b0940b053e4f27cff32b775",
+    "policyCommit": "7db11dbdf5af1cfeeb38be1af17bac6540e0719f",
     "policyDirty": false
   }
 }
