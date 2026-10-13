@@ -3,8 +3,52 @@
 // Supplementary Claude guard, NOT an approval issuer or a general shell sandbox.
 const { execFileSync } = require('node:child_process');
 const path = require('node:path');
-const READ = new Set(['status', 'diff', 'log', 'show', 'rev-parse', 'rev-list', 'ls-files', 'ls-tree', 'ls-remote', 'check-ref-format', 'help', 'version', '--version']);
+const READ = new Set(['status', 'diff', 'log', 'show', 'rev-parse', 'rev-list', 'ls-files', 'ls-tree', 'ls-remote', 'check-ref-format', 'help', 'version', '--version',
+  'grep', 'blame', 'annotate', 'cat-file', 'describe', 'shortlog', 'for-each-ref', 'show-ref', 'show-branch', 'name-rev', 'merge-base', 'diff-tree', 'diff-index',
+  'diff-files', 'range-diff', 'cherry', 'check-ignore', 'check-attr', 'count-objects', 'whatchanged', 'var']);
 const MUTATE = /\b(commit|push|merge|cherry-pick|revert|reset|clean|checkout|switch|branch|tag|update-ref|symbolic-ref|read-tree|config|rebase|stash|fetch|pull|worktree|add|restore|rm|mv|apply)\b/;
+const BRANCH_LIST = /^(?:--show-current|--list|-l|-a|--all|-r|--remotes|-v|-vv|--verbose|--contains|--no-contains|--merged|--no-merged|--points-at|--color|--no-color|--column|--no-column|--abbrev(?:=\d+)?|--no-abbrev|--omit-empty|--sort=.*|--format=.*)$/;
+
+// Listing/inspection forms of otherwise-mutating subcommands. Anything unlisted keeps its mutation handling.
+function readOnly(op, args) {
+  if (READ.has(op)) return true;
+  const flags = args.filter(a => a.startsWith('-')), plain = args.filter(a => !a.startsWith('-'));
+  switch (op) {
+    case 'branch': return flags.every(f => BRANCH_LIST.test(f)) && (!plain.length || flags.some(f => /^(?:--list|-l|--contains|--no-contains|--merged|--no-merged|--points-at)$/.test(f)));
+    case 'tag': return flags.every(f => /^(?:-l|--list|-n\d*|--contains|--no-contains|--merged|--no-merged|--points-at|--sort=.*|--format=.*)$/.test(f)) && (!plain.length || flags.some(f => f === '-l' || f === '--list'));
+    case 'remote': return flags.every(f => f === '-v' || f === '--verbose') && (!plain.length || ['get-url', 'show'].includes(plain[0]));
+    case 'stash': return ['list', 'show'].includes(plain[0]);
+    case 'worktree': return plain[0] === 'list';
+    case 'reflog': return !plain.length || plain[0] === 'show';
+    case 'config': return (['get', 'list'].includes(plain[0]) || flags.some(f => /^(?:--get|--get-all|--get-regexp|--list|-l)$/.test(f)))
+      && !flags.some(f => /^(?:--add|--unset|--unset-all|--replace-all|--rename-section|--remove-section|--edit|-e)$/.test(f));
+    case 'apply': return flags.some(f => /^(?:--check|--stat|--numstat|--summary)$/.test(f)) && !flags.includes('--apply');
+    default: return false;
+  }
+}
+
+// Skip pager-only global options; any other global option stays unresolved.
+function subcommand(tokens, i) {
+  while (tokens[i] === '--no-pager' || tokens[i] === '-P') i += 1;
+  return i;
+}
+
+// Compound commands: classify each visible git invocation instead of matching mutation words anywhere
+// (paths like app/core/config.py or a cd prefix are not mutations). Targets stay unresolved, so any
+// invocation that may mutate still asks.
+function compoundMutates(command) {
+  const invocation = /(?:^|[\s;&|(){}`'"/\\])git(?:\.exe)?["']?(?=\s)([^;&|\r\n)]*)/gi;
+  for (const [, rest] of command.matchAll(invocation)) {
+    const tokens = (rest.match(/"[^"\r\n]*"|'[^'\r\n]*'|[^\s]+/g) || []).map(t => /^['"]/.test(t) ? t.slice(1, -1) : t);
+    let i = subcommand(tokens, 0);
+    while (tokens[i] === '-C') i = subcommand(tokens, i + 2);
+    const op = tokens[i];
+    if (!op) continue;
+    // A subcommand hidden in a variable or substitution cannot be classified; fall back to the whole command.
+    if (/[$`]/.test(op) ? MUTATE.test(command) : !readOnly(op, tokens.slice(i + 1)) && MUTATE.test(rest)) return true;
+  }
+  return false;
+}
 
 function inspect(dir) {
   const git = args => execFileSync('git', ['-C', dir, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 5000 }).trim();
@@ -26,13 +70,13 @@ function decide(command, cwd, inspector = inspect) {
   // Only a direct invocation is resolved. Do not pretend to interpret cd, scripts,
   // aliases, shell expansion, alternate Git dirs, or compound mutations safely.
   if (!/^\s*git(?:\.exe)?\s/i.test(command) || /[;&|\r\n`$><]/.test(command)) {
-    return MUTATE.test(command) ? ['ask', 'Git mutation target is ambiguous; use a direct git -C invocation and existing bounded authorization.'] : null;
+    return compoundMutates(command) ? ['ask', 'Git mutation target is ambiguous; use a direct git -C invocation and existing bounded authorization.'] : null;
   }
   const tokens = command.match(/"[^"\r\n]*"|'[^'\r\n]*'|[^\s]+/g).map(t => /^['"]/.test(t) ? t.slice(1, -1) : t);
-  let dir = cwd, i = 1;
-  while (tokens[i] === '-C') { if (!tokens[i + 1]) return ['deny', 'Missing git -C directory.']; dir = path.resolve(dir, tokens[i + 1]); i += 2; }
+  let dir = cwd, i = subcommand(tokens, 1);
+  while (tokens[i] === '-C') { if (!tokens[i + 1]) return ['deny', 'Missing git -C directory.']; dir = path.resolve(dir, tokens[i + 1]); i = subcommand(tokens, i + 2); }
   const op = tokens[i], args = tokens.slice(i + 1);
-  if (READ.has(op)) return null;
+  if (op && readOnly(op, args)) return null;
   if (!op || op.startsWith('-') || !MUTATE.test(op)) return ['ask', 'Unresolved Git options/alias; guard cannot verify its target.'];
   let repo;
   try { repo = inspector(dir); } catch (_) { return ['ask', 'Cannot verify Git repository/branch; no silent approval.']; }

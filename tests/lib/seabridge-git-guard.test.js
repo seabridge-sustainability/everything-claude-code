@@ -37,6 +37,24 @@ test('read-only and unrelated tools remain unaffected; malformed events deny', (
   assert.equal(run('{bad').hookSpecificOutput.permissionDecision, 'deny');
   assert.equal(run('{}').hookSpecificOutput.permissionDecision, 'deny');
 });
+test('read-only compound and inspection commands do not ask', () => {
+  for (const command of [
+    'cd /c/repo; git branch --show-current', 'git -C repo log --oneline -3; git -C repo status --short | head -20',
+    'git diff -- app/core/config.py | head', 'git --no-pager log -1', 'git -C repo --no-pager show HEAD', 'git grep -n add',
+    'git remote -v', 'git stash list', 'git worktree list', 'git tag --list', 'git config --get user.name', 'git branch -a',
+    'git apply --check --stat fix.patch', 'cd x; git apply --check --stat fix.patch', 'node "C:/x/git-guard.js" && echo config',
+    '$b = git branch --show-current; Write-Output $b', 'git -C repo log -1 2>&1',
+  ]) assert.equal(decide(command, cwd, product), null, command);
+});
+test('mutating compound and listing-shaped writes still ask', () => {
+  for (const command of [
+    'cd x; git add .', 'git status && git commit -m fix', 'git log -1; git branch new-feature', 'cd x; git tag v1',
+    'cd x; git config user.name y', 'cd x; git stash', 'cd x; git apply fix.patch', 'git -C $T --no-pager push',
+    'cd x; git -c core.pager=x commit', 'cd x; git branch -D old', 'cd x; git remote add up url', 'cd x; git worktree add ../w',
+    'op=commit; git $op -m fix', '$c = "push"; git $c origin', 'git `echo commit` -m fix',
+  ]) assert.equal(decide(command, cwd, ecc)[0], 'ask', command);
+  assert.equal(decide('git --no-pager commit -m fix', cwd, product)[0], 'ask');
+});
 test('actual stdin runner emits native denial protocol', () => {
   const file = path.resolve(__dirname, '../../scripts/hooks/seabridge-git-guard.js');
   const result = spawnSync(process.execPath, [file], { input: JSON.stringify({ cwd, tool_input: { command: 'git push --force' } }), encoding: 'utf8' });

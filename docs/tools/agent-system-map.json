@@ -30,7 +30,7 @@
     ],
     "semanticIndex": "not-run"
   },
-  "sourceFingerprint": "4de6345805920ec90963f23c3292d193ffd06e2d855ef1507ff3212696f849e7",
+  "sourceFingerprint": "13df2d335a004dfefd7465842da8c551b568988e93e5ef48d2386f823a4aff70",
   "sources": [
     {
       "path": "../manageesg-backend/AGENTS.md",
@@ -238,7 +238,7 @@
     },
     {
       "path": "scripts/hooks/seabridge-git-guard.js",
-      "sha256": "99ec82e3798464ef26b517569a0e445fa8f86a749516ac14b9e15a2a797dd266"
+      "sha256": "0ae0105d2244c20e927d82cb7b5682be8af588725fbd44560ef6214b21254f72"
     },
     {
       "path": "scripts/knowledge-adoption.js",
@@ -390,7 +390,7 @@
     },
     {
       "path": "tests/lib/seabridge-git-guard.test.js",
-      "sha256": "045846c252f4f5c71824e939b0e260daefe623ec19add89921912070fe677d25"
+      "sha256": "80d2f330881033fde210dea930c26ccca63d77d9c7620f3469ee1dd289a25109"
     },
     {
       "path": "tests/lib/session-coordination.test.js",
@@ -728,7 +728,7 @@
       "id": "file:scripts/hooks/seabridge-git-guard.js",
       "type": "source",
       "path": "scripts/hooks/seabridge-git-guard.js",
-      "sha256": "99ec82e3798464ef26b517569a0e445fa8f86a749516ac14b9e15a2a797dd266"
+      "sha256": "0ae0105d2244c20e927d82cb7b5682be8af588725fbd44560ef6214b21254f72"
     },
     {
       "id": "file:scripts/knowledge-adoption.js",
@@ -956,7 +956,7 @@
       "id": "file:tests/lib/seabridge-git-guard.test.js",
       "type": "source",
       "path": "tests/lib/seabridge-git-guard.test.js",
-      "sha256": "045846c252f4f5c71824e939b0e260daefe623ec19add89921912070fe677d25"
+      "sha256": "80d2f330881033fde210dea930c26ccca63d77d9c7620f3469ee1dd289a25109"
     },
     {
       "id": "file:tests/lib/session-coordination.test.js",
