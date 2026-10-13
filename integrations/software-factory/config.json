@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "feedback": {
+    "enabled": true,
+    "mode": "read-only-intake",
+    "sources": ["seabridge-sustainability/manageesg-backend", "seabridge-sustainability/manageesg-frontend"],
+    "pageLimit": 30,
+    "maxRecords": 1000,
+    "storeBodies": false,
+    "automaticMessages": false,
+    "automaticModelDispatch": false
+  },
+  "verification": {
+    "gateway": "http://127.0.0.1:17770",
+    "image": "ecc-factory-verifier:20261013",
+    "sandbox": "ecc-factory-1013",
+    "minimumFreeGiB": 1.5,
+    "memoryMiB": 256,
+    "cpu": "500m",
+    "seed": 20261013,
+    "cases": 500,
+    "source": "manageesg-frontend/src/lib/utils/auth-return-path.ts"
+  }
+}

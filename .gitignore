@@ -153,3 +153,4 @@ graphify-out/
 # Local Pstack/Ponytail execution evidence and machine-specific proof inputs.
 artifacts/agent-runs/pstack/
 artifacts/agent-runs/ponytail/
+artifacts/agent-runs/software-factory/

@@ -17,6 +17,7 @@ const configs = [
   ['Codex', '.codex/config.toml', 'mcp_servers']
 ];
 const results = [];
+const factoryOperations=['status','contract','queue',...(process.argv.includes('--factory-runtime')?['verify']:[])];
 for (const [host, rel, section] of configs) {
   const raw = await fs.readFile(path.join(os.homedir(), rel), 'utf8');
   const errors = [], config = rel.endsWith('.toml') ? toml.parse(raw) : jsonc.parse(raw.replace(/^\uFEFF/, ''), errors, { allowTrailingComma: true });
@@ -33,7 +34,17 @@ for (const [host, rel, section] of configs) {
   const client = new Client({ name: 'ecc-engineering-config-proof', version: '1.0.0' });
   try {
     await client.connect(new StdioClientTransport({ command, args, env: { ...process.env, ...(server.env || {}) }, stderr: 'pipe' }), { timeout: 20000 });
-    assert.equal((await client.listTools({}, { timeout: 15000 })).tools.length, 5);
+    assert.equal((await client.listTools({}, { timeout: 15000 })).tools.length, 6);
+    const factory=key==='seabridge-dev-suite'?'suite_factory':'pstack_factory';
+    for(const operation of factoryOperations) {
+      const proof=await client.callTool({name:factory,arguments:{operation}},undefined,{timeout:20000});
+      assert.ok(!proof.isError,host+' actual factory '+operation+': '+proof.content?.[0]?.text);
+      if(operation==='contract')assert.equal(JSON.parse(proof.content[0].text).verdict,'PASS');
+      if(operation==='verify') {
+        const body=JSON.parse(proof.content[0].text);
+        assert.equal(body.verdict,'PASS');assert.equal(body.cases,2008);assert.equal(body.policyNetworkDenialProved,true);
+      }
+    }
     const coding = await client.callTool({ name: key === 'seabridge-dev-suite' ? 'suite_find_workflow' : 'pstack_find_workflow',
       arguments: { query: 'debug backend regression', profile: 'coding' } }, undefined, { timeout: 15000 });
     assert.ok(!coding.isError, host + ' coding profile');
@@ -56,11 +67,11 @@ for (const [host, rel, section] of configs) {
     const bad = await client.callTool({ name: key === 'seabridge-dev-suite' ? 'suite_read_skill' : 'pstack_read_skill', arguments: { id: '../../.env' } }, undefined, { timeout: 15000 });
     assert.equal(bad.isError, true);
     results.push({ host, server: key, savedConfigurationSha256: crypto.createHash('sha256').update(raw).digest('hex'), sdkStdioProof: true, routingVersion: routes[0].routingVersion,
-      routingPolicySha256: routes[0].routingPolicySha256, nativeAgentInvocationProved: false, calls: 8 });
+      routingPolicySha256: routes[0].routingPolicySha256, factoryOperations,nativeAgentInvocationProved: false, calls: 8+factoryOperations.length });
   } finally { await client.close(); }
 }
 const receipt = { checkedAt: new Date().toISOString(), results, providerCalls: 0, newServices: 0, restartedSessions: 0, limitation: 'Actual saved registrations exercised by MCP SDK, not native UI/agent adoption. Native Codex tool calls are recorded separately.' };
-const target = path.join(ROOT, 'artifacts/agent-runs/pstack/engineering-skills/client-proof.json');
+const target = path.join(ROOT, 'artifacts/agent-runs/pstack/engineering-skills',`client-proof-${Date.now()}-${crypto.randomUUID()}.json`);
 await fs.mkdir(path.dirname(target), { recursive: true });
 await fs.writeFile(target, JSON.stringify(receipt, null, 2) + '\n');
-console.log(JSON.stringify({ clients: results.length, calls: results.reduce((n,x)=>n+x.calls,0), providerCalls: 0, nativeAgentInvocationProved: false }));
+console.log(JSON.stringify({ clients: results.length, calls: results.reduce((n,x)=>n+x.calls,0), providerCalls: 0, nativeAgentInvocationProved: false,artifact:target }));

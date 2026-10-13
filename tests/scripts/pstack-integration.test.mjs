@@ -130,7 +130,7 @@ test('each saved client configuration starts the real MCP server and invokes pla
     await client.connect(transport);
     try {
       const tools = (await client.listTools()).tools.map(t => t.name);
-      assert.deepEqual(tools.sort(), ['pstack_find_workflow','pstack_read_skill','pstack_prepare_plan','pstack_validate_review','pstack_verify_feature'].sort());
+      assert.deepEqual(tools.sort(), ['pstack_find_workflow','pstack_read_skill','pstack_prepare_plan','pstack_validate_review','pstack_verify_feature','pstack_factory'].sort());
       const found = await client.callTool({ name: 'pstack_find_workflow', arguments: { query: 'multi-model planning' } });
       assert.ok(!found.isError, found.content[0].text);
       const selected = JSON.parse(found.content[0].text)[0]; assert.equal(selected.id, 'cursor-pstack/ecc/arena');

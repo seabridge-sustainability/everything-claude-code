@@ -1,5 +1,6 @@
 import { require, findWorkflow, readEntry } from '../dev-suite/runtime.mjs';
 import { preparePlan, validateReview, verifyFeature, features } from './runtime.mjs';
+import { registerFactoryTool } from '../software-factory/mcp.mjs';
 const { McpServer } = require('@modelcontextprotocol/sdk/server/mcp.js');
 const { StdioServerTransport } = require('@modelcontextprotocol/sdk/server/stdio.js');
 const { z } = require('zod');
@@ -14,5 +15,6 @@ export async function startMcp() {
   tool('pstack_verify_feature', 'Execute an allowlisted local check and retain a bounded receipt; readiness and missing auth never prove product completion', { feature: z.enum(Object.keys(features)) }, ({ feature }) => verifyFeature(feature));
   tool('pstack_find_workflow', 'Select the same canonical ECC task workflow as the shared suite; optional coding/company profile, no actions executed', { query: z.string().min(1).max(200), limit: z.number().int().min(1).max(30).optional(), profile: z.enum(['auto','coding','company','all']).optional() }, findWorkflow);
   tool('pstack_read_skill', 'Read an exact catalog skill ID with source digest and project-policy boundary', { id: z.string() }, readEntry);
+  registerFactoryTool(server,z,'pstack_factory');
   await server.connect(new StdioServerTransport());
 }

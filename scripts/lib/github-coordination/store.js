@@ -1,6 +1,9 @@
 'use strict';
 
 const os = require('os');
+const path = require('path');
+const crypto = require('crypto');
+const { withFileLock } = require('../goal-store');
 
 const { createStateStore } = require('../state-store');
 const { DEFAULT_SCHEMA_VERSION, DEFAULT_POLICY } = require('./policy');
@@ -58,8 +61,15 @@ async function openStore(options = {}) {
   });
 }
 
+function withClaimLock(repo, issueNumber, action) {
+  const key = crypto.createHash('sha256').update(repo.toLowerCase() + '#' + issueNumber).digest('hex');
+  const directory = path.resolve(__dirname, '../../../artifacts/agent-runs/software-factory/github-claim-locks');
+  return withFileLock(path.join(directory, key + '.lock'), action);
+}
+
 module.exports = {
   epicWorkItemId,
   openStore,
   upsertCoordinationWorkItem,
+  withClaimLock,
 };

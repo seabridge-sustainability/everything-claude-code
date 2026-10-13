@@ -13,7 +13,7 @@ const {
   syncIssueLabels,
   verifyDependenciesClosed,
 } = require('./state');
-const { upsertCoordinationWorkItem } = require('./store');
+const { upsertCoordinationWorkItem, withClaimLock } = require('./store');
 const { extractIssueReferences, extractTasks } = require('./parsing');
 
 function assertValidRepo(repo) {
@@ -35,17 +35,16 @@ function staleCoordinationLabels(issue, nextLabels, policy) {
   );
 }
 
-// applyClaim performs a read (getIssue) → check (assertIssueClaimable) → write
-// (editIssue) sequence that is NOT atomic. Two concurrent callers can both read
-// an unclaimed issue, pass the check, and both succeed — resulting in a
-// double-claim. A code-review finding suggested fixing this via
-// context.store.acquireLock(repo, issueNumber), but that API does not exist in
-// store.js; adding a call to it would throw at runtime. Left as-is until a
-// locking primitive is available — callers should prevent races via external
-// serialization (e.g. a serialized job queue or GitHub branch-protection rule).
 function applyClaim(repo, issueNumber, options = {}, context = {}) {
   assertValidRepo(repo);
   assertValidIssueNumber(issueNumber);
+  if (options.dryRun) return claimUnderLock(repo, issueNumber, options, context);
+  // Canonical local callers serialize the complete read/check/write sequence.
+  // This does not provide remote multi-host exclusivity: those need one consumer.
+  return withClaimLock(repo, issueNumber, () => claimUnderLock(repo, issueNumber, options, context));
+}
+
+function claimUnderLock(repo, issueNumber, options, context) {
   const policy = context.policy || loadPolicy(context.rootDir || process.cwd(), options.configPath);
   const store = context.store || null;
   const issue = getIssue(repo, issueNumber, options);

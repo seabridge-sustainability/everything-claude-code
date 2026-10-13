@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "backendModel": "app/models/energy_findings.py",
+  "backendSchema": "app/schemas/energy_findings.py",
+  "backendClass": "EnergyFindingOut",
+  "frontend": "src/lib/api/energy-findings-api.ts",
+  "frontendType": "EnergyFinding",
+  "enums": {"FindingStatus":"FindingStatus","FindingKind":"EnergyFindingKind","RecoveryOutcome":"RecoveryOutcome","DismissalReason":"DismissalReasonCode"},
+  "fields": {"id":"string","company_id":"string","property_id":"string","baseline_id":"string","actual_kwh":"number","expected_kwh":"number","deviation_kwh":"number","abs_deviation_kwh":"number","state_version":"number","cost_currency":"string | null","abs_cost_amount":"number | null","unit":"\"kWh\""}
+}

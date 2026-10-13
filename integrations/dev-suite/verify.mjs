@@ -48,7 +48,7 @@ await fs.mkdir('integrations/dev-suite/verification-context',{recursive:true});
 const receipt={checkedAt:new Date().toISOString(),tests:[]};
 async function connect(args,env){const c=new Client({name:'ecc-install-verifier',version:'1.0.0'});await c.connect(new StdioClientTransport({command:process.execPath,args,env:{...process.env,...env},stderr:'pipe'}));return c;}
 const c=await connect([path.resolve('integrations/dev-suite/cli.mjs'),'mcp']);
-try {const t=await c.listTools();assert.equal(t.tools.length,5);receipt.suiteTools=t.tools.map(t=>t.name);
+try {const t=await c.listTools();assert.equal(t.tools.length,6);receipt.suiteTools=t.tools.map(t=>t.name);
 const found=await c.callTool({name:'suite_find_workflow',arguments:{query:'api interface design'}});const list=JSON.parse(found.content[0].text);assert.ok(list.length);const item=list.find(x=>x.source==='addyosmani-agent-skills')||list[0];const read=await c.callTool({name:'suite_read_skill',arguments:{id:item.id}});assert.ok(JSON.parse(read.content[0].text).content.includes('---'));receipt.tests.push('catalog search and digest-checked read');
 const bad=await c.callTool({name:'suite_read_skill',arguments:{id:'../../.env'}});assert.equal(bad.isError,true);receipt.tests.push('unknown/traversal ID denied');
 const repo='C:/Users/adelm/SeaBridgeAI/everything-claude-code';const commit=execFileSync('git',['-C',repo,'rev-parse','HEAD'],{encoding:'utf8'}).trim();const preview=await c.callTool({name:'suite_review_prepare',arguments:{repository:repo,commit}});assert.ok(!preview.isError,preview.content[0].text);const p=JSON.parse(preview.content[0].text);receipt.review={repository:repo,commit,preview:p};receipt.tests.push('Alibaba explicit commit review planning no inference');

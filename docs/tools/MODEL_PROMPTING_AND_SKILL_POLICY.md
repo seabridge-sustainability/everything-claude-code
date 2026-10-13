@@ -143,6 +143,19 @@ bounded output and working source identities for existing contract commands;
 fixtures cannot complete product journeys. Explicit Climate resumption remains a
 prerequisite for Open Access calculation acceptance.
 
+For affected interface or URL behavior, use the executable factory documented in
+`PSTACK_ECC_GUIDE.md`: `suite_factory`/`pstack_factory` or
+`node integrations/software-factory/cli.mjs contract|verify|intake`. Contract checks
+and seeded restricted-snapshot tests are deterministic; their receipts state the
+specific scope and unavailable product proof. Empty test discovery cannot pass.
+Feedback intake is metadata-only and on demand; version-bound local claims prevent
+duplicate assignment on this machine. A sanitized reproduction becomes a proposal
+for the same current goal, never another plan or automatic implementation grant.
+No scheduled model execution, customer-data ingestion or automatic communications.
+Native managed hooks retain opaque-execution restrictions; the portable tool alone
+does not authorize bypassing a harness gate. Missing admission blocks that
+invocation, while allowed reads and other independent work continue.
+
 Keep constraints, resolved terminology and decision rationale in the existing ECC
 goal/task record; reuse an existing product glossary/ADR/quality contract where one
 already applies. A structured quality artifact can live at ECC

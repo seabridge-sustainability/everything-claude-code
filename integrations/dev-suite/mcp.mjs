@@ -1,4 +1,5 @@
 import { require, findWorkflow, readEntry, prepareReview, status } from './runtime.mjs';
+import { registerFactoryTool } from '../software-factory/mcp.mjs';
 const { McpServer } = require('@modelcontextprotocol/sdk/server/mcp.js');
 const { StdioServerTransport } = require('@modelcontextprotocol/sdk/server/stdio.js');
 const { z } = require('zod');
@@ -13,6 +14,7 @@ export async function startMcp() {
   tool('suite_read_skill', 'Read a selected installed skill with source digest and policy boundary', { id: z.string() }, readEntry);
   tool('suite_read_command', 'Read a selected company command template; does not execute its external actions', { id: z.string() }, args => readEntry({ ...args, kind: 'command' }));
   tool('suite_review_prepare', 'Prepare Alibaba review rules/file scope for an explicit selected commit without a model call', { repository: z.string(), commit: z.string() }, prepareReview);
+  registerFactoryTool(server,z,'suite_factory');
   server.prompt('company_workflow', 'Prepare a task using the shared company workflow library', { task: z.string() }, ({ task }) => ({ messages: [{ role: 'user', content: { type: 'text', text: `For this requested task: ${task}\nFind the relevant installed company workflow using suite_find_workflow, read it, and produce evidence-based drafts under project policy. Use already-authorized tools or provided files; missing provider accounts remain unavailable. No automatic external writes or communications.` } }] }));
   await server.connect(new StdioServerTransport());
 }

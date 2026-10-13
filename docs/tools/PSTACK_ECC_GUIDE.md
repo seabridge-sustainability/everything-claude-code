@@ -7,7 +7,7 @@ Pstack is pinned reference material, not another instruction authority or autono
 - Ask for `sea-multi-model-planning` when a substantial change needs competing plans and independent judgment. Ordinary small edits use the existing task workflow.
 - Ask for `sea-verify-seabridge` to run or maintain a feature journey. It extends `verification-loop`, not a second verification framework.
 - Shared catalog: `pstack_find_workflow` with `multi-model planning`, `verification skill` or `maintain verification`, then `pstack_read_skill` with the exact returned `cursor-pstack/ecc/...` ID. These aliases use the existing ECC catalog, so a client does not need a second MCP server to discover the skills. Existing `suite_find_workflow`/`suite_read_skill` remain available where registered.
-- Five tools on `seabridge-pstack`: `pstack_find_workflow`, `pstack_read_skill`, `pstack_prepare_plan`, `pstack_validate_review`, `pstack_verify_feature`.
+- Six tools on `seabridge-pstack`: `pstack_find_workflow`, `pstack_read_skill`, `pstack_prepare_plan`, `pstack_validate_review`, `pstack_verify_feature`, `pstack_factory`. The existing shared suite exposes the same factory through `suite_factory`; both use one implementation.
 - CLI from `C:/Users/adelm/SeaBridgeAI/everything-claude-code`:
 
 ```powershell
@@ -53,6 +53,78 @@ The maintained feature map is `skills/sea-verify-seabridge/features/README.md`; 
 For a changed feature, resolve its source entry points and responsible task owner. Update the affected feature recipe and useful regression check in the same change. Capture redacted action/result evidence, source/runtime revisions, auth/tenant context without credentials, prerequisites, verdict and cleanup. Use the existing knowledge-ops workflow for durable documentation; no new shared memory store or automatic private-data ingestion. Do not scan unrelated transcripts or automatically edit personal memory.
 
 Reuse primary frontend :3000 and backend :8000; serialize shared UI and data checks. Readiness, fixture tests, signed-in UI, persistence, scientific validation and deployment are separate proof stages. Missing prerequisites remain BLOCKED; no alternate ports, automatic seeding or provider calls. Provider execution, shared-data writes and external communications require their appropriate existing authorization.
+
+## Executable verification and feedback loop
+
+Use the existing primary skill and goal. From ECC, any local coding agent can run:
+
+```powershell
+node integrations/software-factory/cli.mjs status
+node integrations/software-factory/cli.mjs contract
+node integrations/software-factory/cli.mjs intake
+node integrations/software-factory/cli.mjs queue
+node integrations/software-factory/cli.mjs verify
+node integrations/software-factory/cli.mjs journey
+'{"operation":"contract"}' | node integrations/pstack/cli.mjs factory -
+```
+
+MCP equivalents: `pstack_factory` or `suite_factory` with `{operation:"contract"}`,
+`status`, `intake`, `queue`, `verify` or `fuzz`. Productive sessions keep their
+existing server; fresh clients discover new metadata. Use the CLI while the
+current MCP process has older tools. Saved-registration SDK proof establishes
+transport compatibility, not native agent enforcement or model judgment.
+
+`contract` parses selected real Energy Findings Python/TypeScript schemas without
+importing the backend app: enums, required fields and nullability. It installs no
+dependencies and never mutates product files. Extend the reviewed mapping only
+for demonstrated recurring interface drift; this is not whole-API coverage.
+
+`prepare` is explicit local verifier installation, not a routine skill trigger.
+It needs the existing OpenShell gateway on loopback :17770, Docker, WSL Ubuntu,
+the installed TypeScript compiler and at least 1.5 GiB available RAM. It builds
+only the existing approved base plus a hashed snapshot of the production
+return-path helper. No host source mounts, credentials, providers or app servers.
+`verify`/`fuzz` reuse that prepared image with mandatory Landlock, a read-only
+reference, no permitted egress and bounded 256 MiB/500m workload. Source, engine,
+policy or image drift blocks execution until explicit re-preparation. A seeded
+500-case corpus gives 2,008 actual assertions plus filesystem/network denial
+probes and a policy-log denial receipt. Replay seed and corpus digest are retained.
+This proves the named pure helper and isolation, not a signed-in product journey.
+Missing capacity or infrastructure is BLOCKED; never stop another service to pass.
+
+`intake` reads metadata from the two admitted SeaBridge GitHub repositories, at
+most one 30-record page per source. A full page is explicitly potentially
+truncated; it is not complete historical intake. Raw titles, bodies, comments and
+tenant material are not stored. Records retain source/revision, duplicate identity
+and history. Six concurrent workers must yield one local claim winner. Existing
+GitHub claim actions also share a machine-local lock before their remote writes;
+this is not an atomic multi-host GitHub lock.
+
+For an admitted sanitized reproduction, use `claim` with `{id,version,owner}`;
+then `propose` with `{id,version,token,reproduction,acceptance:[...]}`. JSON can be
+supplied through a bounded file or `-`. These return a current-revision task packet
+for the existing goal and ownership checks, not implementation permission. Do not
+paste private customer data or tracker instructions into it. Re-fetch metadata
+before accepting a packet; a newer revision invalidates old claims and proposals.
+`release` requires the exact live claim token and revision. Claims expire after
+15 minutes and confer no repository ownership. The agent reproduces, implements
+and verifies under the current authorized goal; no extra coordinator persona or
+second plan is introduced.
+
+Private queue, snapshots, installation history and immutable verification receipts
+live in ignored `artifacts/agent-runs/software-factory`. No scheduler, autonomous
+model dispatch, external posting or auto-merge is enabled. Invoke intake at the
+existing task's feedback checkpoint; scheduling is a separate owner decision.
+Tests now require nonzero passing test counts; exit zero with no tests fails.
+
+`journey` checks the existing backend browser-QA state against the primary
+validate-user endpoint, then observes `/dashboard` in a separate private context
+of the installed Chrome browser. Missing/expired auth or missing browser blocks
+that lane; it does not install browsers, refresh tokens, save session state or
+restart an app. Only GET/HEAD to the primary local origins is allowed. External
+requests and data mutations are blocked. No credentials or response bodies are
+retained. A dashboard/session PASS is narrower than the selected property and
+negative tenant acceptance; these remain separate required product receipts.
 
 ## Upstream boundary and maintenance
 

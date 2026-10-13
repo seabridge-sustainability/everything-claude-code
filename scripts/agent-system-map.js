@@ -86,6 +86,16 @@ const SOURCES = Object.freeze([
   'skills/sea-quality-contract/SKILL.md', 'skills/sea-adversarial-review/SKILL.md',
   'skills/sea-verify-seabridge/features/README.md',
   'tests/scripts/pstack-feature-recipes.test.mjs',
+  'integrations/software-factory/config.json', 'integrations/software-factory/runtime.mjs',
+  'integrations/software-factory/cli.mjs', 'integrations/software-factory/mcp.mjs',
+  'integrations/software-factory/verifier.mjs', 'integrations/software-factory/worker.cjs',
+  'integrations/software-factory/policy.yaml', 'integrations/software-factory/Dockerfile',
+  'integrations/software-factory/contracts.mjs', 'integrations/software-factory/contract-map.json',
+  'integrations/software-factory/schema-reader.py', 'tests/scripts/software-factory.test.mjs',
+  'integrations/software-factory/journey.mjs',
+  'tests/scripts/software-factory.test.js',
+  'integrations/dev-suite/mcp.mjs', 'scripts/lib/github-coordination/actions.js',
+  'scripts/lib/github-coordination/store.js',
 ]);
 
 function hash(value) { return crypto.createHash('sha256').update(value).digest('hex'); }

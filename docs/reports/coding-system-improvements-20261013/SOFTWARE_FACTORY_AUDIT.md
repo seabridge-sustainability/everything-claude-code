@@ -1,5 +1,16 @@
 # Software Factory / Michelin Kitchen audit and improvement plan
 
+Implementation checkpoint, 2026-10-13: the existing ECC factory now runs restricted
+production-helper tests/fuzzing, scoped DTO conformance, read-only GitHub intake,
+serialized local claims and sanitized proposals. All 81 actual instruction stacks
+pass after the authorized central compaction. Six saved MCP registrations execute
+the new verifier; the existing authenticated primary dashboard was observed
+read-only. Detailed current proof and limits are in this report's README. The audit
+below records the earlier assessment; its pending/disabled observations are
+historical. Native model evaluation remains deferred; periodic dispatch and
+unattended merging are not activated. Property/tenant/persistence/science proof and
+hosted publication remain separate stages.
+
 Assessment date: 2026-10-13. Input: the supplied Matt Pocock / Lauren Tan transcript
 for [the video](https://www.youtube.com/watch?v=MN9dGgmLyso&t=1847s). The transcript's
 reported PR volume and other companies' practices are context, not SeaBridge

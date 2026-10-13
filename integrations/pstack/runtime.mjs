@@ -3,6 +3,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { execFileSync, spawn } from 'node:child_process';
+import { stripVTControlCharacters } from 'node:util';
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 export const revision = '7845807642f9ef234a0ec5b4067fa3f11fd92a85'; // pragma: allowlist secret -- public upstream Git commit
@@ -161,6 +162,14 @@ export async function boundedRun(executable, args, options = {}) {
   });
 }
 
+export function testAdmission(output,runner) {
+  const clean=stripVTControlCharacters(output);
+  if(/no tests? (?:found|collected)|0 tests|no test files found/i.test(clean))return {passed:0,admitted:false};
+  const match=runner==='pytest'?clean.match(/\b(\d+) passed\b/):clean.match(/Tests\s+(\d+) passed\b/);
+  const passed=match?Number(match[1]):0;
+  return {passed,admitted:passed>0&&!/\b[1-9]\d* (?:failed|errors?)\b/.test(clean)};
+}
+
 export async function verifyFeature(feature, { persist = true } = {}) {
   if (!Object.hasOwn(features, feature)) fail('Select an allowlisted feature');
   const head = execFileSync('git', ['-C', ROOT, 'rev-parse', 'HEAD'], { encoding: 'utf8', windowsHide: true }).trim();
@@ -190,8 +199,9 @@ export async function verifyFeature(feature, { persist = true } = {}) {
       const result = await boundedRun(executable, definition.args, { cwd, timeout: 120000 });
       receipt.sourceAfter = await source();
       receipt.result = { exitCode: result.exitCode, outputSha256: result.outputSha256, outputBytes: result.outputBytes };
-      receipt.verdict = result.exitCode === 0 && !result.problem && digest(receipt.sourceBefore) === digest(receipt.sourceAfter) ? 'PASS' : 'FAIL';
-      receipt.reason = result.problem || (digest(receipt.sourceBefore) !== digest(receipt.sourceAfter) ? 'Source changed during verification; rerun against a stable revision.' : definition.limitation);
+      receipt.result.testAdmission=testAdmission(result.output,definition.executable==='node'?'vitest':'pytest');
+      receipt.verdict = result.exitCode === 0 && !result.problem && receipt.result.testAdmission.admitted && digest(receipt.sourceBefore) === digest(receipt.sourceAfter) ? 'PASS' : 'FAIL';
+      receipt.reason = result.problem || (!receipt.result.testAdmission.admitted?'No non-empty passing test proof; exit zero alone is insufficient.':digest(receipt.sourceBefore) !== digest(receipt.sourceAfter) ? 'Source changed during verification; rerun against a stable revision.' : definition.limitation);
     }
     }
   } else if (feature.endsWith('-readiness')) {

@@ -12,7 +12,7 @@ const script = path.join(root, 'scripts', 'eval-instruction-scenarios.js');
 const adapters = JSON.parse(fs.readFileSync(path.join(root, 'manifests', 'instruction-adapters.json'), 'utf8')).adapters;
 const scenarios = JSON.parse(fs.readFileSync(path.join(root, 'evals', 'agent-instructions', 'scenarios.json'), 'utf8')).scenarios;
 
-const { assertHistoricalLocality } = require('../../scripts/eval-instruction-scenarios');
+const { assertHistoricalLocality,scoreScenario } = require('../../scripts/eval-instruction-scenarios');
 assert.doesNotThrow(() => assertHistoricalLocality(() => '@AGENTS.md'));
 for (const external of ['@../manageesg-backend/CLAUDE.md', '<!-- SEABRIDGE_CORE_ENTRY: ../manageesg-backend/AGENTS.md -->']) {
   assert.throws(() => assertHistoricalLocality(() => external), /bound peer revisions/);
@@ -36,6 +36,18 @@ assert.strictEqual(baseline.output.rows.length, adapters.length * scenarios.filt
 assert.deepStrictEqual(new Set(baseline.output.rows.map((r) => r.harness)), new Set(adapters.map((a) => a.id)));
 assert.ok(baseline.output.rows.every((r) => r.pass));
 console.log(`  ok  ${adapters.length} ECC adapters pass their applicable scenarios`);
+
+const declared='Long task: read ECC `skills/goal-default/SKILL.md`';
+const taskReference={must:['reject activity-only progress'],onDemandReferences:['skills/goal-default/SKILL.md']};
+assert.equal(scoreScenario(declared,taskReference,()=>null).pass,false);
+assert.equal(scoreScenario('No declared skill',taskReference,()=> 'Reject activity-only progress').pass,false);
+assert.equal(scoreScenario(declared,taskReference,()=> 'Reject activity-only progress').pass,true);
+assert.deepEqual(scoreScenario(declared,taskReference,()=> 'Reject activity-only progress').loadedReferences,['skills/goal-default/SKILL.md']);
+for(const id of ['S11-outcome-not-activity','S12-lane-not-goal-blocker','S13-handoff-admission','S14-forecast-correction','S15-all-null-not-on-track']) {
+  assert.equal(scoreScenario(declared,scenarios.find(row=>row.id===id),()=> 'All done; CI passed').pass,false);
+}
+assert.throws(()=>scoreScenario(declared,{onDemandReferences:['../../private.md']}),/Unknown task-specific/);
+console.log('  ok  missing or unrelated task guidance cannot satisfy outcome scenarios');
 
 const workerCap = scenarios.find((s) => s.id === 'S16-no-instruction-worker-cap');
 assert.ok(workerCap, 'worker-cap regression scenario must exist');

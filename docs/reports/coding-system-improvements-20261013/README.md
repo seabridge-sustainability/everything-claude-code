@@ -2,7 +2,9 @@
 
 This batch selectively reuses Matt/Addy/Pstack under the existing central
 AGENTS.md / AGENTS_SYSTEM.md / CLAUDE.md authority. It adds no backend/frontend
-rulebook, MCP server, worktree, live model call or product/service change.
+rulebook, MCP server, worktree, live model call or product-code change. The approved
+existing OpenShell gateway and task-owned restricted verifier helpers are running;
+the primary app services and productive agents were preserved.
 
 ## Implemented
 
@@ -52,22 +54,62 @@ No live planner/judge or new native agent session was run. Existing productive
 clients were not reconnected. The shared catalog/CLI is portable; that does not
 prove every coding agent has consumed or enforced every instruction.
 
-## Central owner checkpoint still required
+## Central integration completed locally
 
-Actual instruction-stack check remains 75 pass / 6 over-budget frontend stacks.
-The existing Next-generated block is preserved. `central-policy.patch` changes
-only the existing backend AGENTS_SYSTEM.md; `central-policy-proposal.json` binds
-the unchanged source and candidate. It saves 680 normalized bytes and preserves
-the Safety And Authorization block byte-for-byte. Apply-check passes and the
-projected worst frontend stack is 16,318 bytes, below the unchanged 16,384 cap.
-Projected size is not owner integration or an actual 81-stack pass.
+After the owner closed its metadata checkpoint, the registry had no active backend
+writer/release and the checkout was clean. A short documentation reservation
+applied only AGENTS_SYSTEM.md, then closed. Commit `f477aeb64` passed normal hooks.
+The applied file matches the prepared candidate; the Safety And Authorization
+block is byte-identical. All **81 actual instruction stacks pass**; worst frontend
+is **16,318 bytes**, below the unchanged 16,384 cap. Existing AGENTS.md/CLAUDE.md
+references and other harness loaders resolve this same policy. No product
+instruction file was added.
 
-The authorized system owner has the exact patch and must obtain the legitimate
-backend documentation checkpoint, apply it and run `scripts/check-instruction-stack.js`.
-This task did not take over the active Second Brain backend reservation. Refresh
-the clean-source map again after that policy commit. Full central acceptance is
-pending; do not claim universal activation, scientific completion, hosted CI or
-deployment from these local proofs.
+Backend publication is handed to the system manager: the branch includes eight
+other owners' unpublished commits, so this task did not silently publish that
+product batch. Local central integration and hosted publication are separate.
+
+## Executable Software Factory implementation
+
+One implementation at `integrations/software-factory` uses the existing Pstack
+and shared-suite MCP bridges and Node CLI:
+
+- Selected Energy Findings Python/TypeScript conformance: **16 actual checks** for
+  enums, required fields and nullability; no backend app imports.
+- Restricted execution of the real frontend return-path helper: **500 generated
+  inputs / 2,008 assertions**, source/image/engine identities, mandatory Landlock,
+  denied private reads/reference writes and per-run network-policy denial logs.
+  Unique probe identities avoid Windows/WSL clock ambiguity. Failures retain
+  source/seed diagnostics; empty tests cannot pass.
+- Bounded read-only GitHub intake for backend/frontend with metadata-only storage,
+  version/token-bound local claims, sanitized task proposals and release. Both
+  sources currently have zero issues: connection is proved, customer-bug
+  reproduction is not. Six concurrent workers yield one claim winner. Existing
+  remote claim actions share a machine-local lock, not global GitHub atomicity.
+- Read-only authenticated session validation and dashboard observation on primary
+  :8000/:3000 using existing local browser state and installed Chrome: both HTTP
+  observations 200, dashboard observed, no page error. No login/token refresh,
+  state overwrite or requested product mutation. This does not establish a
+  selected property, negative tenant case, Save/reopen, export or scientific proof.
+
+The final regression batch passes **40 tests**, plus **20** existing GitHub
+coordination tests. Six saved configurations (Claude, Codex, Gemini, OpenCode,
+Cursor, VS Code) execute **72 MCP SDK calls**, including restricted verification
+through each registration. Replays retain the same seed/corpus digest. A narrow
+entry adds these regressions to the existing CI test runner; missing paired local
+repositories explicitly skip only their dependent source checks.
+
+Guidance stays in the existing Pstack guide, model/skill policy and verification
+skills. Karpathy remains universal, Grill Me resolves material ambiguity, and one
+primary skill/goal controls work. No new skill pack or product rulebook. Private
+queues, auth-readiness receipts and immutable proofs remain ignored in ECC.
+
+Native model-session behavior for every harness remains unverified; live planning
+and behavioral calls remain deferred as requested. Productive sessions were not
+reconnected. A protected native opaque-execution gate still needs actual admission;
+an MCP tool name alone grants no bypass. Scheduler/model dispatch, external
+replies and auto-merge remain disabled. Hosted CI is evaluated against the eventual
+exact ECC source SHA and is not inferred from local tests.
 
 ## Agent invocation
 
@@ -77,6 +119,10 @@ boolean impact flags. Discover/read exact bodies through existing
 verification with `node integrations/pstack/cli.mjs verify FEATURE` or
 `pstack_verify_feature`. Existing model/skill policy contains the managed-launch
 and independent-review details; no product-side Markdown needs to be added.
+Use `suite_factory` / `pstack_factory` or
+`node integrations/software-factory/cli.mjs status|contract|verify|intake|journey`;
+the existing [Pstack guide](../../tools/PSTACK_ECC_GUIDE.md) defines every bounded
+operation, prerequisite and proof boundary.
 
 [Colibri parallel evaluation](COLIBRI_EVALUATION.md): optional future OpenCode
 provider pilot, deferred under current RAM/storage constraints; no installation

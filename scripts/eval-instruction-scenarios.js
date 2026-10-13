@@ -144,6 +144,22 @@ function stacks(repoName, ref) {
   return out;
 }
 
+function scoreScenario(text,scenario,readReference=reader(ECC_REPO,null)) {
+  const loadedReferences=[];
+  for(const reference of scenario.onDemandReferences||[]) {
+    if(reference!=='skills/goal-default/SKILL.md')throw Error('Unknown task-specific scenario reference');
+    const position=text.indexOf(reference);
+    // Only expand an actually declared required task reference, never all skills.
+    if(position<0||!/(?:read ECC|read the existing)/i.test(text.slice(Math.max(0,position-100),position)))continue;
+    const body=readReference(reference);
+    if(body){text+='\n'+body;loadedReferences.push(reference);}
+  }
+  const normalized=text.replace(/\r\n/g,'\n');
+  const missing=(scenario.must||[]).filter(pattern=>!new RegExp(pattern,'i').test(normalized));
+  const harmful=(scenario.must_not||[]).filter(pattern=>new RegExp(pattern,'i').test(normalized));
+  return {pass:!missing.length&&!harmful.length,missing,harmful,loadedReferences};
+}
+
 function main(argv) {
   const ref = optionValue(argv, '--ref');
   const requestedRepo = optionValue(argv, '--repo');
@@ -164,9 +180,8 @@ function main(argv) {
     for (const [harness, text] of Object.entries(repoStacks)) {
       for (const s of scenarios) {
         if (s.repos && !s.repos.includes(repo)) continue;
-        const missing = (s.must || []).filter((p) => !new RegExp(p, 'i').test(text));
-        const harmful = (s.must_not || []).filter((p) => new RegExp(p, 'i').test(text));
-        rows.push({ repo, harness, scenario: s.id, pass: !missing.length && !harmful.length, missing, harmful });
+        if(ref&&repo!=='everything-claude-code'&&s.onDemandReferences?.length)throw Error('Historical task-reference evaluation requires bound ECC peer revisions');
+        rows.push({repo,harness,scenario:s.id,...scoreScenario(text,s,reader(ECC_REPO,ref))});
       }
     }
   }
@@ -193,6 +208,6 @@ function main(argv) {
   return exitCode;
 }
 
-module.exports = { defaultWorkspace, main, assertHistoricalLocality };
+module.exports = { defaultWorkspace, main, assertHistoricalLocality,scoreScenario };
 
 if (require.main === module) process.exit(main(process.argv.slice(2)));
