@@ -35,7 +35,7 @@ function subcommand(tokens, i) {
 
 const AMBIGUOUS = ['ask', 'Git mutation target is ambiguous; use a direct git -C invocation and existing bounded authorization.'];
 const INVOCATION = /(?:^|[\s;&|(){}`'"/\\])git(?:\.exe)?["']?(?=\s)([^;&|\r\n)]*)/gi;
-const DIR_CHANGE = /(?:^|[;&|\r\n(])\s*(?:cd|pushd|chdir|Set-Location|sl)\s+("[^"\r\n]*"|'[^'\r\n]*'|[^\s;&|)]+)/gi;
+const DIR_CHANGE = /(?:^|[;&|\r\n({])\s*(?:cd|pushd|chdir|Set-Location|Push-Location|sl)\s+("[^"\r\n]*"|'[^'\r\n]*'|[^\s;&|)}]+)/gi;
 const tokenize = text => (text.match(/"[^"\r\n]*"|'[^'\r\n]*'|[^\s]+/g) || []).map(t => /^['"]/.test(t) ? t.slice(1, -1) : t);
 
 function literalDir(base, value) {
@@ -45,12 +45,13 @@ function literalDir(base, value) {
 
 // Compound commands: classify each visible git invocation instead of matching mutation words anywhere
 // (paths like app/core/config.py or a cd prefix are not mutations). A mutation is resolved like a direct
-// invocation only when its target is literal: no directory change or one leading literal cd, literal -C,
-// no alternate git dir, no branch switch alongside other mutations, and no expanded push/reset/clean args.
+// invocation only when its target is literal: literal cd steps before it (none inside a subshell or undone
+// by popd), literal -C, no alternate git dir, no branch switch alongside other mutations, and no expanded
+// push/reset/clean args.
 function decideCompound(command, cwd, inspector) {
   const mutations = [];
-  for (const [, rest] of command.matchAll(INVOCATION)) {
-    const tokens = tokenize(rest);
+  for (const match of command.matchAll(INVOCATION)) {
+    const rest = match[1], tokens = tokenize(rest);
     let i = subcommand(tokens, 0);
     const dirs = [];
     while (tokens[i] === '-C') { dirs.push(tokens[i + 1]); i = subcommand(tokens, i + 2); }
@@ -59,18 +60,21 @@ function decideCompound(command, cwd, inspector) {
     // A subcommand hidden in a variable or substitution cannot be classified; fall back to the whole command.
     if (/[$`]/.test(op) || op.startsWith('-')) { if (MUTATE.test(/[$`]/.test(op) ? command : rest)) return AMBIGUOUS; continue; }
     if (readOnly(op, args) || !MUTATE.test(rest)) continue;
-    mutations.push({ op, args, dirs });
+    mutations.push({ op, args, dirs, at: match.index });
   }
   if (!mutations.length) return null;
   if (/--git-dir|--work-tree|\bGIT_(?:DIR|WORK_TREE)\b/i.test(command)) return AMBIGUOUS;
   if (mutations.length > 1 && mutations.some(m => m.op === 'checkout' || m.op === 'switch')) return AMBIGUOUS;
   const changes = [...command.matchAll(DIR_CHANGE)];
-  if (changes.length > 1 || (changes.length === 1 && command.slice(0, changes[0].index).trim())) return AMBIGUOUS;
-  const base = changes.length ? literalDir(cwd, changes[0][1].replace(/^(['"])(.*)\1$/, '$2')) : cwd;
-  if (!base) return AMBIGUOUS;
+  if (/\b(?:popd|Pop-Location)\b/i.test(command) || changes.some(c => /^[({]/.test(c[0].trimStart()))) return AMBIGUOUS;
   let result = null;
-  for (const { op, args, dirs } of mutations) {
-    let dir = base;
+  for (const { op, args, dirs, at } of mutations) {
+    let dir = cwd;
+    for (const change of changes) {
+      if (change.index >= at) break;
+      dir = literalDir(dir, change[1].replace(/^(['"])(.*)\1$/, '$2'));
+      if (!dir) return AMBIGUOUS;
+    }
     for (const value of dirs) { dir = literalDir(dir, value); if (!dir) return AMBIGUOUS; }
     if (['push', 'reset', 'clean'].includes(op) && args.some(a => /[$`]/.test(a))) return AMBIGUOUS;
     const decision = decideOperation(op, args, dir, inspector);
