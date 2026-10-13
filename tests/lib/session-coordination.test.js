@@ -277,6 +277,160 @@ test('check-changes catches untracked and committed foreign work, not just stage
   assert.equal(invoke(root, ['check-changes', '--session', 'climate']).status, 2);
 });
 
+test('standard sessions preserve inherited foreign bytes without owning or staging them', () => {
+  const { root } = fixture();
+  fs.appendFileSync(path.join(root, 'README.md'), 'another owner draft\n');
+  fs.writeFileSync(path.join(root, 'foreign.txt'), 'private draft\n');
+  const before = fs.readFileSync(path.join(root, 'README.md'));
+  const session = register(root, 'writer', ['owned.txt']);
+  assert.equal(session.preservedForeign.files.length, 2);
+  fs.writeFileSync(path.join(root, 'owned.txt'), 'own change\n');
+  git(root, 'add', 'owned.txt');
+  const result = execute('check-changes', { cwd: root, sessionId: 'writer' });
+  assert.deepEqual(result.paths, ['owned.txt']);
+  assert.deepEqual(result.preservedForeign.sort(), ['README.md', 'foreign.txt'].sort());
+  assert.equal(result.foreignOwnershipGranted, false);
+  assert.deepEqual(fs.readFileSync(path.join(root, 'README.md')), before);
+  assert.equal(git(root, 'diff', '--cached', '--name-only'), 'owned.txt');
+});
+
+test('foreign staging at registration is never inherited', () => {
+  const { root } = fixture();
+  fs.appendFileSync(path.join(root, 'README.md'), 'foreign\n');
+  git(root, 'add', 'README.md');
+  assert.throws(() => register(root, 'writer', ['owned.txt']), /foreign staging/);
+});
+
+test('foreign committed history cannot be hidden by restoring the index or reverting', () => {
+  for (const revert of [false, true]) {
+    const { root, sha } = fixture();
+    const file = path.join(root, 'README.md');
+    fs.appendFileSync(file, 'foreign draft\n');
+    const draft = fs.readFileSync(file);
+    register(root, 'writer', ['owned.txt']);
+    git(root, 'add', 'README.md');
+    git(root, '-c', 'core.hooksPath=', 'commit', '-m', 'foreign fixture');
+    if (revert) {
+      git(root, '-c', 'core.hooksPath=', 'revert', '--no-edit', 'HEAD');
+      fs.writeFileSync(file, draft);
+    } else git(root, 'read-tree', sha);
+    assert.throws(() => execute('check-changes', { cwd: root, sessionId: 'writer' }), /foreign baseline entered committed history/);
+  }
+});
+
+test('changed foreign file size rejects before its payload is opened for hashing', () => {
+  const { root } = fixture();
+  const file = path.join(root, 'foreign.txt');
+  fs.writeFileSync(file, 'draft\n');
+  register(root, 'writer', ['owned.txt']);
+  fs.appendFileSync(file, 'growth\n');
+  const open = fs.openSync;
+  let foreignOpens = 0;
+  fs.openSync = function(target, ...args) {
+    if (String(target).toLowerCase() === file.toLowerCase()) foreignOpens += 1;
+    return open.call(this, target, ...args);
+  };
+  try { assert.throws(() => execute('check-changes', { cwd: root, sessionId: 'writer' }), /foreign baseline changed/); }
+  finally { fs.openSync = open; }
+  assert.equal(foreignOpens, 0);
+});
+
+test('foreign growth during hashing cannot exceed the admitted read size', () => {
+  const { root } = fixture();
+  const file = path.join(root, 'foreign.txt');
+  fs.writeFileSync(file, 'draft\n');
+  const original = fs.statSync(file), read = fs.readSync;
+  let changed = false, bytesRead = 0;
+  fs.readSync = function(fd, ...args) {
+    if (fs.fstatSync(fd).ino === original.ino) {
+      if (!changed) { fs.appendFileSync(file, 'concurrent growth\n'); changed = true; }
+      const bytes = read.call(this, fd, ...args); bytesRead += bytes; return bytes;
+    }
+    return read.call(this, fd, ...args);
+  };
+  try { assert.throws(() => register(root, 'writer', ['owned.txt']), /foreign baseline changed/); }
+  finally { fs.readSync = read; }
+  assert.equal(changed, true);
+  assert.equal(bytesRead, original.size);
+});
+
+test('foreign byte changes, new files, deletion and index changes reject after registration', () => {
+  const mutations = [
+    root => fs.appendFileSync(path.join(root, 'README.md'), 'changed\n'),
+    root => fs.writeFileSync(path.join(root, 'new-foreign.txt'), 'new\n'),
+    root => fs.unlinkSync(path.join(root, 'README.md')),
+    root => git(root, 'add', 'README.md'),
+  ];
+  for (const mutate of mutations) {
+    const { root } = fixture();
+    fs.appendFileSync(path.join(root, 'README.md'), 'inherited foreign\n');
+    register(root, 'writer', ['owned.txt']);
+    mutate(root);
+    assert.throws(() => execute('check-changes', { cwd: root, sessionId: 'writer' }),
+      /foreign baseline changed|outside owned/);
+  }
+});
+
+test('staging an inherited untracked draft is denied even when its bytes do not change', () => {
+  const { root } = fixture();
+  fs.writeFileSync(path.join(root, 'foreign.txt'), 'draft\n');
+  register(root, 'writer', ['owned.txt']);
+  git(root, 'add', 'foreign.txt');
+  assert.throws(() => execute('check-changes', { cwd: root, sessionId: 'writer' }), /foreign baseline changed/);
+});
+
+test('inherited deletions remain absent and cannot be silently restored', () => {
+  const { root } = fixture();
+  fs.unlinkSync(path.join(root, 'README.md'));
+  register(root, 'writer', ['owned.txt']);
+  assert.deepEqual(execute('check-changes', { cwd: root, sessionId: 'writer' }).preservedForeign, ['README.md']);
+  fs.writeFileSync(path.join(root, 'README.md'), 'fixture\n');
+  assert.throws(() => execute('check-changes', { cwd: root, sessionId: 'writer' }), /foreign baseline changed/);
+});
+
+test('linked inherited paths and native guard conversion do not gain a preservation exception', () => {
+  const { root, other } = fixture();
+  fs.writeFileSync(path.join(root, 'foreign.txt'), 'draft\n');
+  register(root, 'writer', ['owned.txt']);
+  assert.throws(() => execute('guard-bind', { cwd: root, sessionId: 'writer', guardMode: 'block' }), /no inherited foreign/);
+  const linked = path.join(root, 'linked');
+  fs.symlinkSync(other, linked, process.platform === 'win32' ? 'junction' : 'dir');
+  assert.throws(() => register(other, 'linked-writer', ['owned.txt']), /already owned|overlaps/);
+  assert.throws(() => execute('check-write', { cwd: root, sessionId: 'writer', paths: ['linked/README.md'] }), /linked path/);
+});
+
+test('experiment loops never exempt inherited foreign drafts', () => {
+  const { root } = fixture();
+  fs.writeFileSync(path.join(root, 'owned.txt'), 'target\n');
+  fs.writeFileSync(path.join(root, 'check.txt'), 'immutable check\n');
+  git(root, 'add', 'owned.txt', 'check.txt');
+  git(root, '-c', 'core.hooksPath=', 'commit', '-m', 'loop target fixture');
+  fs.writeFileSync(path.join(root, 'foreign.txt'), 'other draft\n');
+  execute('register', { cwd: root, sessionId: 'loop', scopes: ['owned.txt'], objective: 'atomic experiment',
+    doneWhen: 'protected checks', loopTarget: 'owned.txt', checkFiles: ['check.txt'] });
+  assert.throws(() => execute('check-changes', { cwd: root, sessionId: 'loop' }), /outside owned/);
+});
+
+test('publication remains strict even when standard checks preserve foreign drafts', () => {
+  const { root, sha } = fixture();
+  fs.writeFileSync(path.join(root, 'foreign.txt'), 'draft\n');
+  register(root, 'writer', ['README.md']);
+  assert.equal(execute('check-changes', { cwd: root, sessionId: 'writer' }).allowed, true);
+  assert.throws(() => execute('release-acquire', { cwd: root, sessionId: 'writer', branch: 'development', candidate: sha, ...budget() }),
+    /outside owned|clean worktree/);
+});
+
+test('legacy records remain strict and cannot retroactively inherit foreign changes', () => {
+  const { root } = fixture();
+  register(root, 'writer', ['README.md']);
+  const file = path.join(repository(root).directory, 'registry.json');
+  const state = JSON.parse(fs.readFileSync(file, 'utf8'));
+  delete state.sessions[0].preservedForeign;
+  fs.writeFileSync(file, JSON.stringify(state));
+  fs.writeFileSync(path.join(root, 'foreign.txt'), 'draft\n');
+  assert.throws(() => execute('check-changes', { cwd: root, sessionId: 'writer' }), /outside owned/);
+});
+
 test('already published upstream changes are not claimed as owned edits after integration', () => {
   const { root } = fixture();
   register(root, 'climate', ['README.md']);

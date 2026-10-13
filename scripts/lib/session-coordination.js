@@ -208,6 +208,115 @@ function changedPaths(repo, base, upstream) {
   return [...new Set(outputs.flatMap(output => output.split('\0').filter(Boolean)))];
 }
 
+// Standard shared-checkout sessions can inherit other owners' UNSTAGED drafts.
+// Freeze bytes and index entries, never ownership. Loops, native fences and
+// publication retain their stricter whole-checkout requirements.
+function owns(session, relative) {
+  const clean = scope(relative);
+  return session.scopes.some(s => clean === s || clean.startsWith(`${s}/`));
+}
+function foreignSnapshot(repo, relative, expected, declaredBytes) {
+  safePath(repo, relative);
+  const index = git(repo.root, ['ls-files', '--stage', '-z', '--', relative]);
+  if (expected && index !== expected.index) throw new Error(`foreign baseline changed or staged: ${relative}`);
+  if (git(repo.root, ['ls-files', '--unmerged', '-z', '--', relative])) {
+    throw new Error('foreign baseline has unresolved index entries');
+  }
+  const file = path.join(repo.root, relative);
+  let stat;
+  try { stat = fs.lstatSync(file); } catch (error) { if (error.code !== 'ENOENT') throw error; }
+  if (!stat) {
+    if ((expected && !expected.absent) || (declaredBytes !== undefined && declaredBytes !== null)) {
+      throw new Error(`foreign baseline changed: ${relative}`);
+    }
+    return { path: relative, index, absent: true };
+  }
+  if (declaredBytes !== undefined && declaredBytes !== stat.size) throw new Error('foreign baseline changed after size admission');
+  if (expected && (expected.absent || expected.bytes !== stat.size || expected.mode !== stat.mode
+      || expected.inode !== stat.ino || expected.device !== stat.dev)) {
+    throw new Error(`foreign baseline changed: ${relative}`);
+  }
+  if (!stat.isFile() || stat.isSymbolicLink() || stat.size > 1024 * 1024 * 1024) {
+    throw new Error('foreign baseline requires bounded regular files');
+  }
+  const hash = crypto.createHash('sha256'), buffer = Buffer.alloc(1024 * 1024);
+  const fd = fs.openSync(file, 'r');
+  try {
+    const opened = fs.fstatSync(fd);
+    if (opened.size !== stat.size || opened.ino !== stat.ino || opened.dev !== stat.dev) {
+      throw new Error('foreign baseline changed before read');
+    }
+    let readBytes = 0;
+    while (readBytes < stat.size) {
+      const n = fs.readSync(fd, buffer, 0, Math.min(buffer.length, stat.size - readBytes), null);
+      if (!n) throw new Error('foreign baseline truncated during read');
+      readBytes += n; hash.update(buffer.subarray(0, n));
+    }
+    if (fs.fstatSync(fd).size !== stat.size) throw new Error('foreign baseline changed during bounded read');
+  } finally { fs.closeSync(fd); }
+  const after = fs.lstatSync(file);
+  if (after.size !== stat.size || after.mtimeMs !== stat.mtimeMs || after.ino !== stat.ino) {
+    throw new Error('foreign baseline changed during capture');
+  }
+  return { path: relative, index, absent: false, bytes: stat.size,
+    sha256: hash.digest('hex'), mode: stat.mode, inode: stat.ino, device: stat.dev };
+}
+function captureForeign(repo, session) {
+  const paths = changedPaths(repo, session.base).filter(file => !owns(session, file));
+  if (paths.length > 2000) throw new Error('foreign baseline exceeds bounded file count');
+  const staged = git(repo.root, ['diff', '--cached', '--name-only', '--no-renames', '-z', '--'])
+    .split('\0').filter(Boolean);
+  if (staged.some(file => !owns(session, file))) throw new Error('foreign staging cannot be inherited');
+  // Bound total reads BEFORE hashing, rather than discover an oversized cache
+  // only after consuming it. Missing tracked files are preserved deletions.
+  let totalBytes = 0;
+  const declared = new Map();
+  for (const relative of paths) {
+    safePath(repo, relative);
+    try { const size = fs.lstatSync(path.join(repo.root, relative)).size; declared.set(relative, size); totalBytes += size; }
+    catch (error) { if (error.code !== 'ENOENT') throw error; declared.set(relative, null); }
+    if (totalBytes > 1024 * 1024 * 1024) throw new Error('foreign baseline exceeds bounded byte count');
+  }
+  const files = paths.map(file => foreignSnapshot(repo, file, undefined, declared.get(file)));
+  const finalStaged = git(repo.root, ['diff', '--cached', '--name-only', '--no-renames', '-z', '--'])
+    .split('\0').filter(Boolean);
+  if (finalStaged.some(file => !owns(session, file))) throw new Error('foreign staging cannot be inherited');
+  return { version: 1, files };
+}
+function preservedForeign(repo, session) {
+  if (!session.preservedForeign || session.loop || session.guard) return new Set();
+  const baseline = session.preservedForeign;
+  if (baseline.version !== 1 || !Array.isArray(baseline.files) || baseline.files.length > 2000) {
+    throw new Error('invalid foreign preservation baseline');
+  }
+  let totalBytes = 0;
+  for (const file of baseline.files) {
+    if (!file || typeof file.absent !== 'boolean' || (!file.absent
+        && (!Number.isSafeInteger(file.bytes) || file.bytes < 0))) throw new Error('invalid foreign byte bound');
+    totalBytes += file.bytes || 0;
+    if (totalBytes > 1024 * 1024 * 1024) throw new Error('foreign baseline exceeds bounded byte count');
+  }
+  // A matching current index is insufficient: foreign content must not enter
+  // any unpublished commit, even if later reverted or the index is restored.
+  if (baseline.files.length) git(repo.root, ['merge-base', '--is-ancestor', session.base, 'HEAD']);
+  const committed = baseline.files.length ? new Set(git(repo.root, ['log', '--format=', '--name-only',
+    '--no-renames', '--diff-merges=first-parent', '-z', `${session.base}..HEAD`, '--'])
+    .split('\0').map(file => file.replace(/^\n+|\n+$/g, '')).filter(Boolean).map(scope)) : new Set();
+  const preserved = new Set();
+  for (const file of baseline.files) {
+    if (!file || typeof file.path !== 'string' || owns(session, file.path)
+        || preserved.has(file.path) || (!file.absent && !/^[a-f0-9]{64}$/.test(file.sha256))) {
+      throw new Error('invalid foreign preservation entry');
+    }
+    if (committed.has(scope(file.path))) throw new Error(`foreign baseline entered committed history: ${file.path}`);
+    if (JSON.stringify(foreignSnapshot(repo, file.path, file)) !== JSON.stringify(file)) {
+      throw new Error(`foreign baseline changed or staged: ${file.path}; preserve its owner and re-register after handoff`);
+    }
+    preserved.add(file.path);
+  }
+  return preserved;
+}
+
 // This is a typed-tool fence, not a shell parser or OS sandbox. The session
 // registry owns the contract/counters; active-goal owns the owner revision.
 function goalRevision(repo) {
@@ -305,6 +414,7 @@ function validateGuard(guard) {
 }
 function bindGuard(repo, session, options, now) {
   if (session.guard) throw new Error('guard already bound; use a new session after a correction or mode change');
+  if (session.preservedForeign?.files.length) throw new Error('native guard requires no inherited foreign changes');
   if (!['audit', 'block'].includes(options.guardMode)) throw new Error('guard-mode must be audit or block');
   const goal = goalRevision(repo);
   const deadline = Date.parse(options.deadline);
@@ -421,6 +531,7 @@ function execute(command, options = {}) {
         base: git(repo.root, ['rev-parse', 'HEAD']), updatedAt: now, expiresAt: expiry(options.ttl, now) };
       const loop = pinLoop(repo, options, scopes);
       if (loop) session.loop = loop;
+      else session.preservedForeign = captureForeign(repo, session);
       state.sessions.push(session);
       return session;
     }
@@ -445,8 +556,11 @@ function execute(command, options = {}) {
       // A moving remote tip must not erase an experiment's original scope fence.
       const paths = changedPaths(repo, session.loop ? session.loop.baseline : session.base,
         session.loop || session.guard ? undefined : options.upstream);
-      if (paths.length) ownedPaths(repo, session, paths);
-      return { allowed: true, session: sessionId, paths };
+      const preserved = preservedForeign(repo, session);
+      const ownPaths = paths.filter(file => !preserved.has(file));
+      if (ownPaths.length) ownedPaths(repo, session, ownPaths);
+      return { allowed: true, session: sessionId, paths: ownPaths,
+        preservedForeign: [...preserved], foreignOwnershipGranted: false };
     }
     if (command === 'handoff-file') {
       if (options.paths?.length !== 1) throw new Error('handoff requires exactly one file');
