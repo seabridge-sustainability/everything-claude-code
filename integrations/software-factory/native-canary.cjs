@@ -6,7 +6,12 @@ const {spawn,execFileSync}=require('node:child_process');
 const ROOT=path.resolve(__dirname,'../..');
 const DIR=path.join(ROOT,'artifacts/agent-runs/pstack/engineering-skills/ui-workflow-audit-20261013');
 const APPROVAL=path.join(DIR,'native-canary-batch.json'),LEDGER=path.join(DIR,'native-canary-ledger.json');
-const prompt='Read the existing central policy. This is a fresh read-only native MCP canary under the existing ECC improvement goal, with no source/data writes or new plan. Use only seabridge-pstack: find the frontend UI verification workflow, read its exact returned id, call pstack_factory ui-features, then pstack_factory ui-admit with contract {} and ui-image with file C:/ecc-canary-not-a-real-image.png. The last two must fail. Do not run shell, authenticate, install, write, create tasks, start services, delegate or call other providers. Report the observed tools and refusals, and state that this does not prove visual review, native write guards, authenticated product behavior or all other clients. Keep your response under 250 words.';
+const policyFiles=['AGENTS.md','AGENTS_SYSTEM.md','CLAUDE.md'].map(name=>'C:/Users/adelm/SeaBridgeAI/manageesg-backend/'+name);
+// Claude normalizes Windows absolute paths to /c/...; // anchors permission
+// patterns at the filesystem root. Exact files only, no broad Read approval.
+// https://code.claude.com/docs/en/permissions#read-and-edit
+const policyReadRules=policyFiles.map(file=>'Read(//'+file[0].toLowerCase()+file.slice(2)+')');
+const prompt='Read these existing central policy files first: '+policyFiles.join(', ')+'. This is a fresh read-only native MCP canary under the existing ECC improvement goal, with no source/data writes or new plan. Use only seabridge-pstack after those reads: find the frontend UI verification workflow, read its exact returned id, call pstack_factory ui-features, then pstack_factory ui-admit with contract {} and ui-image with file C:/ecc-canary-not-a-real-image.png. The last two must fail. Do not run shell, authenticate, install, write, create tasks, start services, delegate or call other providers. Report whether all three central policy reads succeeded, the observed tools and refusals, and state that this does not prove visual review, native write guards, authenticated product behavior or all other clients. Keep your response under 250 words.';
 const server={command:process.execPath,args:[path.join(ROOT,'integrations/pstack/cli.mjs'),'mcp']};
 function regular(file){const s=fs.lstatSync(file);if(!s.isFile()||s.isSymbolicLink()||s.size>1000000)throw Error('Bounded regular metadata required');}
 function read(file){regular(file);return JSON.parse(fs.readFileSync(file,'utf8').replace(/^\uFEFF/,''));}
@@ -19,7 +24,7 @@ function prepare(){
 }
 function spec(host){
   const p=prepare(),npm=path.join(process.env.APPDATA,'npm/node_modules');
-  if(host==='claude')return {exe:path.join(os.homedir(),'.local/bin/claude.exe'),args:['-p',prompt,'--output-format','json','--max-turns','6','--max-budget-usd','0.625','--tools','Read','--strict-mcp-config','--mcp-config',p.config,'--allowedTools','mcp__seabridge-pstack__pstack_find_workflow,mcp__seabridge-pstack__pstack_read_skill,mcp__seabridge-pstack__pstack_factory'],env:{}};
+  if(host==='claude')return {exe:path.join(os.homedir(),'.local/bin/claude.exe'),args:['-p',prompt,'--output-format','json','--max-turns','6','--max-budget-usd','0.625','--tools','Read','--strict-mcp-config','--mcp-config',p.config,'--allowedTools',[...policyReadRules,'mcp__seabridge-pstack__pstack_find_workflow','mcp__seabridge-pstack__pstack_read_skill','mcp__seabridge-pstack__pstack_factory'].join(',')],env:{}};
   if(host==='gemini')return {exe:process.execPath,entry:path.join(npm,'@google/gemini-cli/dist/index.js'),args:[path.join(npm,'@google/gemini-cli/dist/index.js'),'-p',prompt,'--approval-mode','plan','--allowed-mcp-server-names','seabridge-pstack','--output-format','stream-json'],env:{GEMINI_CLI_SYSTEM_SETTINGS_PATH:p.gemini}};
   if(host==='codex'){
     const toml=require('@iarna/toml').parse(fs.readFileSync(path.join(os.homedir(),'.codex/config.toml'),'utf8'));
