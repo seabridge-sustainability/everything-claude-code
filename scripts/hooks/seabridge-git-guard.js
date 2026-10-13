@@ -27,20 +27,53 @@ function readOnly(op, args) {
   }
 }
 
-// Skip pager-only global options; any other global option stays unresolved.
+// Skip pager options and identity/display -c settings; any other global option stays unresolved.
+const SAFE_CONFIG = /^(?:user\.(?:name|email)|core\.(?:autocrlf|safecrlf|quotepath)|color\.[\w.]+|advice\.\w+|init\.defaultBranch)=/i;
 function subcommand(tokens, i) {
-  while (tokens[i] === '--no-pager' || tokens[i] === '-P') i += 1;
-  return i;
+  for (;;) {
+    if (tokens[i] === '--no-pager' || tokens[i] === '-P') i += 1;
+    else if (tokens[i] === '-c' && SAFE_CONFIG.test(tokens[i + 1] || '')) i += 2;
+    else return i;
+  }
 }
 
 const AMBIGUOUS = ['ask', 'Git mutation target is ambiguous; use a direct git -C invocation and existing bounded authorization.'];
 const INVOCATION = /(?:^|[\s;&|(){}`'"/\\])git(?:\.exe)?["']?(?=\s)([^;&|\r\n)]*)/gi;
-const DIR_CHANGE = /(?:^|[;&|\r\n({])\s*(?:cd|pushd|chdir|Set-Location|Push-Location|sl)\s+("[^"\r\n]*"|'[^'\r\n]*'|[^\s;&|)}]+)/gi;
+const DIR_CHANGE = /(?:^|[;&|\r\n({])\s*(cd|pushd|chdir|Set-Location|Push-Location|sl)\s+("[^"\r\n]*"|'[^'\r\n]*'|[^\s;&|)}]+)/gi;
+const DIR_POP = /(?:^|[;&|\r\n({])\s*(?:popd|Pop-Location)\b/gi;
+const ASSIGN = /(?:^|[;&|\r\n({])\s*\$?([A-Za-z_]\w*)\s*=\s*("[^"\r\n]*"|'[^'\r\n]*'|[^\s;&|)}]*)/g;
+const LITERAL_PUSH_REF = /^[^:\s]*:[\w./-]+$/;
 const tokenize = text => (text.match(/"[^"\r\n]*"|'[^'\r\n]*'|[^\s]+/g) || []).map(t => /^['"]/.test(t) ? t.slice(1, -1) : t);
+
+// Variables assigned exactly once in this command to a literal (or to earlier literals) are expanded;
+// substitutions, loop variables, environment variables and reassigned names stay unresolved.
+function literalVars(command) {
+  const vars = new Map();
+  for (const m of command.matchAll(ASSIGN)) {
+    const quoted = m[2].match(/^(['"])(.*)\1$/);
+    const value = quoted?.[1] === "'" ? quoted[2] : expand(quoted ? quoted[2] : m[2], vars, m.index);
+    vars.set(m[1], vars.has(m[1]) ? { value: null, at: m.index } : { value, at: m.index });
+  }
+  return vars;
+}
+
+function expand(text, vars, at) {
+  if (typeof text !== 'string') return null;
+  let ok = true;
+  const out = text.replace(/\$\{(\w+)\}|\$(\w+)(?!:)/g, (_, braced, bare) => {
+    const v = vars.get(braced || bare);
+    if (!v || v.value == null || v.at >= at) ok = false;
+    return ok ? v.value : '';
+  });
+  return ok && !/[$`]/.test(out) ? out : null;
+}
+
+// Git Bash spells C:/x as /c/x; path.resolve would read it as <drive>:/c/x and fail inspection.
+const shellPath = (base, value) => path.resolve(base, process.platform === 'win32' ? value.replace(/^\/([a-z])(?=\/|$)/i, (_, d) => `${d.toUpperCase()}:`) : value);
 
 function literalDir(base, value) {
   if (!value || value.startsWith('-') || /[$`%~]/.test(value)) return null;
-  return path.resolve(base, process.platform === 'win32' ? value.replace(/^\/([a-z])(?=\/|$)/i, '$1:') : value);
+  return shellPath(base, value);
 }
 
 // Compound commands: classify each visible git invocation instead of matching mutation words anywhere
@@ -64,19 +97,26 @@ function decideCompound(command, cwd, inspector) {
   }
   if (!mutations.length) return null;
   if (/--git-dir|--work-tree|\bGIT_(?:DIR|WORK_TREE)\b/i.test(command)) return AMBIGUOUS;
-  if (mutations.length > 1 && mutations.some(m => m.op === 'checkout' || m.op === 'switch')) return AMBIGUOUS;
-  const changes = [...command.matchAll(DIR_CHANGE)];
-  if (/\b(?:popd|Pop-Location)\b/i.test(command) || changes.some(c => /^[({]/.test(c[0].trimStart()))) return AMBIGUOUS;
+  if (mutations.length > 1 && mutations.some(m => (m.op === 'checkout' || m.op === 'switch') && !m.args.includes('--detach'))) return AMBIGUOUS;
+  const vars = literalVars(command);
+  const steps = [...command.matchAll(DIR_CHANGE), ...command.matchAll(DIR_POP)].sort((a, b) => a.index - b.index);
+  if (steps.some(s => /^[({]/.test(s[0].trimStart()))) return AMBIGUOUS;
   let result = null;
   for (const { op, args, dirs, at } of mutations) {
     let dir = cwd;
-    for (const change of changes) {
-      if (change.index >= at) break;
-      dir = literalDir(dir, change[1].replace(/^(['"])(.*)\1$/, '$2'));
-      if (!dir) return AMBIGUOUS;
+    const stack = [];
+    for (const step of steps) {
+      if (step.index >= at) break;
+      if (!step[1]) { if (!stack.length) return AMBIGUOUS; dir = stack.pop(); continue; }
+      const target = literalDir(dir, expand(step[2].replace(/^(['"])(.*)\1$/, '$2'), vars, step.index));
+      if (!target) return AMBIGUOUS;
+      if (/^(?:pushd|Push-Location)$/i.test(step[1])) stack.push(dir);
+      dir = target;
     }
-    for (const value of dirs) { dir = literalDir(dir, value); if (!dir) return AMBIGUOUS; }
-    if (['push', 'reset', 'clean'].includes(op) && args.some(a => /[$`]/.test(a))) return AMBIGUOUS;
+    for (const value of dirs) { dir = literalDir(dir, expand(value, vars, at)); if (!dir) return AMBIGUOUS; }
+    if (['reset', 'clean'].includes(op) && args.some(a => /[$`]/.test(a))) return AMBIGUOUS;
+    // A push may name its source through a variable only when the destination branch is literal.
+    if (op === 'push' && args.some(a => /[$`]/.test(a) && !LITERAL_PUSH_REF.test(a))) return AMBIGUOUS;
     const decision = decideOperation(op, args, dir, inspector);
     if (decision?.[0] === 'deny') return decision;
     result = result || decision;
@@ -85,8 +125,14 @@ function decideCompound(command, cwd, inspector) {
 }
 
 function inspect(dir) {
-  const git = args => execFileSync('git', ['-C', dir, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 5000 }).trim();
-  const common = path.resolve(dir, git(['rev-parse', '--git-common-dir'])).replace(/\\/g, '/');
+  const git = args => execFileSync('git', ['-C', dir, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 5000 }).trim();
+  let commonDir;
+  try { commonDir = git(['rev-parse', '--git-common-dir']); } catch (error) {
+    // An existing directory outside any repository has no branch to protect (git apply works as a plain patch tool).
+    if (/not a git repository/i.test(String(error.stderr || ''))) return { repo: false };
+    throw error;
+  }
+  const common = path.resolve(dir, commonDir).replace(/\\/g, '/');
   let remote = '';
   try { remote = git(['remote', 'get-url', 'origin']); } catch (_) { /* common directory remains authoritative */ }
   const product = /(?:^|[/:])manageesg-(backend|frontend)(?:\.git)?\/?$/i.test(remote) || /\/manageesg-(backend|frontend)\/\.git$/i.test(common);
@@ -105,7 +151,7 @@ function decide(command, cwd, inspector = inspect) {
   if (!/^\s*git(?:\.exe)?\s/i.test(command) || /[;&|\r\n`$><]/.test(command)) return decideCompound(command, cwd, inspector);
   const tokens = tokenize(command);
   let dir = cwd, i = subcommand(tokens, 1);
-  while (tokens[i] === '-C') { if (!tokens[i + 1]) return ['deny', 'Missing git -C directory.']; dir = path.resolve(dir, tokens[i + 1]); i = subcommand(tokens, i + 2); }
+  while (tokens[i] === '-C') { if (!tokens[i + 1]) return ['deny', 'Missing git -C directory.']; dir = shellPath(dir, tokens[i + 1]); i = subcommand(tokens, i + 2); }
   return decideOperation(tokens[i], tokens.slice(i + 1), dir, inspector);
 }
 
@@ -114,6 +160,7 @@ function decideOperation(op, args, dir, inspector) {
   if (!op || op.startsWith('-') || !MUTATE.test(op)) return ['ask', 'Unresolved Git options/alias; guard cannot verify its target.'];
   let repo;
   try { repo = inspector(dir); } catch (_) { return ['ask', 'Cannot verify Git repository/branch; no silent approval.']; }
+  if (repo.repo === false) return null;
   if ((op === 'reset' && args.includes('--hard')) || (op === 'clean' && args.some(a => /^-[a-z]*f/.test(a)))) {
     return [repo.product ? 'deny' : 'ask', 'Destructive reset/clean is prohibited on shared product work; preserve concurrent changes.'];
   }

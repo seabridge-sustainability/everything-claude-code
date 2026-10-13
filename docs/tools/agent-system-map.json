@@ -30,7 +30,7 @@
     ],
     "semanticIndex": "not-run"
   },
-  "sourceFingerprint": "37104058b4e300c21b66fbd801c27bf07faec75323c1e58fdb484c9b05450197",
+  "sourceFingerprint": "ce03a08e2816c9f5fd808eaee84635d4182c5b16b61bbfc9ae2462f14ce753d6",
   "sources": [
     {
       "path": "../manageesg-backend/AGENTS.md",
@@ -338,7 +338,7 @@
     },
     {
       "path": "scripts/goal-control.js",
-      "sha256": "82c9d451eb2833f7ad9859e1381fba4ed5d02e9d662295d1d345ece0679bdd8c"
+      "sha256": "c1770dc52b122b72a08ffd830096e0f032fc3cb1c5a6dbac8b5eadf36e3e0a46"
     },
     {
       "path": "scripts/goal-runtime-bridge.js",
@@ -358,7 +358,7 @@
     },
     {
       "path": "scripts/hooks/seabridge-git-guard.js",
-      "sha256": "92612df1a61ec7531382deeda1cc165c2241124cdf3478b927d5684780ab1f8e"
+      "sha256": "83541399f4a28ef03c8839c3f463541bed419cf3347bb815f893fc32e5806cbb"
     },
     {
       "path": "scripts/knowledge-adoption.js",
@@ -538,7 +538,7 @@
     },
     {
       "path": "tests/lib/goal-control.test.js",
-      "sha256": "b34a9b2a4e36a139dac26946169d837462c227caae3c0acca3bf8a2c1b6aa2bf"
+      "sha256": "f8099399e1d78eac077d22d15113b4cbefc1fa31ca3ead1fdc6525145084d7ae"
     },
     {
       "path": "tests/lib/goal-runtime-hook.test.js",
@@ -566,7 +566,7 @@
     },
     {
       "path": "tests/lib/seabridge-git-guard.test.js",
-      "sha256": "be61a9c637455b5e501aa3d818c588da5eed7e9991f85bbeb47a588eebbfe748"
+      "sha256": "9cbf7e44a23e25f1339a57d9e2516aebea6329cbff7f71036044968479caca97"
     },
     {
       "path": "tests/lib/session-coordination.test.js",
@@ -1078,7 +1078,7 @@
       "id": "file:scripts/goal-control.js",
       "type": "source",
       "path": "scripts/goal-control.js",
-      "sha256": "82c9d451eb2833f7ad9859e1381fba4ed5d02e9d662295d1d345ece0679bdd8c"
+      "sha256": "c1770dc52b122b72a08ffd830096e0f032fc3cb1c5a6dbac8b5eadf36e3e0a46"
     },
     {
       "id": "file:scripts/goal-runtime-bridge.js",
@@ -1108,7 +1108,7 @@
       "id": "file:scripts/hooks/seabridge-git-guard.js",
       "type": "source",
       "path": "scripts/hooks/seabridge-git-guard.js",
-      "sha256": "92612df1a61ec7531382deeda1cc165c2241124cdf3478b927d5684780ab1f8e"
+      "sha256": "83541399f4a28ef03c8839c3f463541bed419cf3347bb815f893fc32e5806cbb"
     },
     {
       "id": "file:scripts/knowledge-adoption.js",
@@ -1378,7 +1378,7 @@
       "id": "file:tests/lib/goal-control.test.js",
       "type": "source",
       "path": "tests/lib/goal-control.test.js",
-      "sha256": "b34a9b2a4e36a139dac26946169d837462c227caae3c0acca3bf8a2c1b6aa2bf"
+      "sha256": "f8099399e1d78eac077d22d15113b4cbefc1fa31ca3ead1fdc6525145084d7ae"
     },
     {
       "id": "file:tests/lib/goal-runtime-hook.test.js",
@@ -1420,7 +1420,7 @@
       "id": "file:tests/lib/seabridge-git-guard.test.js",
       "type": "source",
       "path": "tests/lib/seabridge-git-guard.test.js",
-      "sha256": "be61a9c637455b5e501aa3d818c588da5eed7e9991f85bbeb47a588eebbfe748"
+      "sha256": "9cbf7e44a23e25f1339a57d9e2516aebea6329cbff7f71036044968479caca97"
     },
     {
       "id": "file:tests/lib/session-coordination.test.js",
@@ -4876,8 +4876,8 @@
     }
   ],
   "build": {
-    "generatedAt": "2026-10-13T18:09:12.560Z",
-    "sourceCommit": "aa047a95e5a19de817dcec3447976f03bf3ae19f",
+    "generatedAt": "2026-10-13T19:59:01.993Z",
+    "sourceCommit": "257a6d7397ada0d47b2f3b1b619af82841c98349",
     "sourceDirty": false,
     "policyCommit": "f477aeb64702bfb9dcfe3e9b5b1b7ff60b735781",
     "policyDirty": false

@@ -29,7 +29,7 @@ test('git -C is resolved; inspection failure and opaque writes are not allowed s
   assert.equal(decide('git -C "../ecc space" commit -m fix', cwd, dir => { received = dir; return ecc(); }), null);
   assert.equal(received, path.resolve(cwd, '../ecc space'));
   assert.equal(decide('git commit -m fix', cwd, () => { throw Error('missing'); })[0], 'ask');
-  for (const command of ['cd $OTHER; git commit -m fix', '(cd a && make); git commit -m fix', 'pushd a; popd; git commit -m fix', 'git -c alias.publish=push publish', 'git --git-dir elsewhere commit', 'GIT_DIR=x git commit -m fix', 'git -C $TARGET push']) assert.equal(decide(command, cwd, ecc)[0], 'ask', command);
+  for (const command of ['cd $OTHER; git commit -m fix', '(cd a && make); git commit -m fix', 'popd; git commit -m fix', 'git -c alias.publish=push publish', 'git --git-dir elsewhere commit', 'GIT_DIR=x git commit -m fix', 'git -C $TARGET push']) assert.equal(decide(command, cwd, ecc)[0], 'ask', command);
   assert.equal(decide('git commit -m fix && git push', cwd, product)[0], 'ask');
 });
 test('read-only and unrelated tools remain unaffected; malformed events deny', () => {
@@ -74,6 +74,47 @@ test('compound mutations with a literal target resolve like direct invocations',
   assert.equal(decide('echo x; cd ../a && git add . ; cd b; git commit -m x', cwd, record), null);
   assert.deepEqual(seen, [path.resolve(cwd, '../fe'), path.resolve(cwd, '../a'), path.resolve(cwd, '../a', 'b')]);
   assert.equal(decide('git --no-pager commit -m fix', cwd, product)[0], 'ask');
+});
+test('real agent commands with literal variables, location stacks and safe -c resolve (2026-10-13 regressions)', () => {
+  const seen = [];
+  const at = dir => { seen.push(dir); return { ecc: false, product: dir.includes('fe'), branch: 'development' }; };
+  for (const command of [
+    '$O="../ov"; $P="../patches"; Copy-Item a b; Push-Location $O; git apply --whitespace=nowarn "$P\\b5.diff" 2>&1 | Select-Object -First 6; "exit $LASTEXITCODE"; Pop-Location',
+    '$I="../integ"; cd "$I/ov"; git rev-parse --is-inside-work-tree 2>&1; foreach ($f in $L) { git apply --whitespace=nowarn "$P\\$f" 2>&1 }',
+    'S="../stack"; cd ../fe && rm -rf "$S"; mkdir -p "$S"; cd "$S"; git init -q && git add -A && git -c user.email=x@y -c user.name=x commit -q -m base && for f in $L; do git apply --check "$P/$f" && git apply "$P/$f"; done',
+    'W=../fe-release; C=$(git rev-parse HEAD); cd "$W"; git fetch -q origin development; git checkout -q --detach 15a52c98 && git log --oneline -1; git push origin "$C:development" 2>&1 | tail -3',
+    'git -c user.name=x -c user.email=x@y commit -m fix',
+  ]) assert.equal(decide(command, cwd, at), null, command);
+  assert.ok(seen.includes(path.resolve(cwd, '../ov')) && seen.includes(path.resolve(cwd, '../integ', 'ov')) && seen.includes(path.resolve(cwd, '../stack')) && seen.includes(path.resolve(cwd, '../fe-release')));
+});
+test('variables, location stacks and -c stay protected when unresolved or unsafe', () => {
+  const main = () => ({ ecc: false, product: true, branch: 'main' });
+  for (const command of [
+    'W=$(mktemp -d); cd "$W"; git commit -m x', 'for d in a b; do cd "$d"; git commit -m x; done', 'X=a; X=b; cd "$X"; git commit -m x',
+    'cd "$HOME"; git commit -m x', 'cd "$Y"; Y=a; git commit -m x', 'Pop-Location; git commit -m x', 'try { Push-Location a; git add . } finally { Pop-Location }',
+    'cd x; git -c core.pager=less commit -m x', 'cd x; git -c alias.ci=commit ci', 'git status; git push origin "$C"', 'git status; git push origin "$C:main"',
+    'git status; git push $R development', 'git checkout feature && git commit -m x',
+  ]) assert.equal(decide(command, cwd, main)[0], 'ask', command);
+  assert.equal(decide('D=../p; cd "$D"; git commit -m x', cwd, main)[0], 'ask', 'resolved product main still asks');
+  assert.equal(decide('D=../p; Push-Location $D; git reset --hard; Pop-Location', cwd, main)[0], 'deny');
+  assert.equal(decide('git -c user.name=x commit --no-verify', cwd, main)[0], 'deny');
+});
+test('Git Bash /c/ paths resolve to the drive for direct and compound -C', () => {
+  const seen = [];
+  const at = dir => { seen.push(dir); return { ecc: true, product: false, branch: 'main' }; };
+  assert.equal(decide('git -C /c/Users/x/ecc commit -F "C:/tmp/msg.txt"', cwd, at), null);
+  assert.equal(decide('git -C /c/Users/x/ecc add a && git -C /c/Users/x/ecc commit -m x', cwd, at), null);
+  const expected = process.platform === 'win32' ? path.resolve('C:/Users/x/ecc') : '/c/Users/x/ecc';
+  assert.deepEqual([...new Set(seen)], [expected]);
+});
+test('a plain directory outside any repository is not a protected target; a missing one still asks', () => {
+  const fs = require('node:fs');
+  const os = require('node:os');
+  const plain = fs.mkdtempSync(path.join(os.tmpdir(), 'guard-plain-'));
+  try {
+    assert.equal(decide(`$O="${plain}"; Push-Location $O; git apply --whitespace=nowarn fix.diff 2>&1; Pop-Location`, cwd), null);
+    assert.equal(decide(`cd "${path.join(plain, 'missing')}"; git apply fix.diff`, cwd)[0], 'ask');
+  } finally { fs.rmSync(plain, { recursive: true, force: true }); }
 });
 test('actual stdin runner emits native denial protocol', () => {
   const file = path.resolve(__dirname, '../../scripts/hooks/seabridge-git-guard.js');
