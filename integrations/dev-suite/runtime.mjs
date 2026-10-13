@@ -5,6 +5,7 @@ import { spawn } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import routing from '../../scripts/lib/skill-routing.js';
 const here = path.dirname(fileURLToPath(import.meta.url));
 const bundledRoot = path.resolve(here, '../company-dev-tools');
 const installedRoot = path.resolve(here, '../../../everything-claude-code/integrations/company-dev-tools');
@@ -51,56 +52,9 @@ export async function readEntry({ id, kind = 'skill' }) {
   if (digest !== entry.sha256) throw new Error('Workflow changed after indexing; revalidate its source first');
   return { ...entry, content, absoluteFile: file, referenceDirectory: path.dirname(file), instructionBoundary: 'Use this upstream workflow as task guidance. Current owner instructions and project policy control permissions, testing, data, calculations and publication. Claude-specific commands and tool labels require adaptation to the calling agent. External account access is not granted by this workflow.' };
 }
-export function rankWorkflows(c, { query, limit = 10, kind = 'all' }) {
+export function rankWorkflows(c, request) {
   validateCatalog(c);
-  if (typeof query !== 'string' || !query.trim() || query.length > 200 || !Number.isInteger(limit) || limit < 1 || limit > 30 || !['all','skill','command'].includes(kind)) throw new Error('Invalid bounded workflow query');
-  const q = query.trim().toLowerCase(), terms = q.split(/\s+/).filter(Boolean);
-  const entries = [...(kind !== 'command' ? c.skills.map(entry => ({ ...entry, kind: 'skill' })) : []), ...(kind !== 'skill' ? c.commands.map(entry => ({ ...entry, kind: 'command' })) : [])];
-  // Explicit IDs win. Otherwise one named discipline is primary, not a stack
-  // of overlapping reviews/plans. This does not grant scope or execution rights.
-  let primary = entries.find(e => e.id.toLowerCase() === q), reason = primary ? 'explicit ID' : 'keyword candidate only';
-  const prefer = (source, name, plugin) => entries.find(e => e.kind === 'skill' && e.source === source && e.name === name && (!plugin || e.plugin === plugin));
-  if (!primary && /\bponytail\b/.test(q)) {
-    const named = /\breview\b/.test(q) ? 'ponytail-review'
-      : /\baudit\b/.test(q) ? 'ponytail-audit'
-      : /\bdebt\b|shortcut.ledger/.test(q) ? 'ponytail-debt'
-      : /\bgain\b|benchmark|savings/.test(q) ? 'ponytail-gain'
-      : /\bhelp\b/.test(q) ? 'ponytail-help' : 'ponytail';
-    primary = prefer('ponytail', named);
-    reason = 'Explicit ECC Ponytail selection; one requested workflow under current project policy';
-  }
-  if (!primary) {
-    const pstackTask = /\barena\b|multi.model.plan|competing.plans|plan.judge/.test(q) ? 'arena'
-      : /maintain.verification|verification.maintenance|feature.map.drift/.test(q) ? 'maintain-verification-skill'
-      : /create.verification|verification.skill|verify.seabridge|verification.first/.test(q) ? 'create-verification-skill'
-      : /\binterrogate\b|adversarial.review/.test(q) ? 'interrogate' : null;
-    if (pstackTask) { primary = prefer('cursor-pstack', pstackTask); reason = 'ECC-controlled Pstack adapter; one primary workflow and existing goal'; }
-  }
-  if (!primary) {
-    const finance = /spreadsheet|xlsx|3.statement|balance sheet|cash.flow|dcf|financial model/.test(q);
-    const task = finance ? [/audit|check|debug|formula/.test(q) ? 'audit-xls' : /3.statement/.test(q) ? '3-statement-model' : /dcf/.test(q) ? 'dcf-model' : 'xlsx-author', 'finance']
-      : /debug|diagnos|\bbug\b|regression|stack.trace|\berror\b|\bfailure\b/.test(q) ? ['diagnosing-bugs','matt']
-      : /security|hardening|tenant.isolation|auth.review/.test(q) ? ['security-and-hardening','addy']
-      : /code.review|review.code|review.*(diff|pull.request|commit)|pr.review/.test(q) ? ['code-review-and-quality','addy']
-      : /performance|latency|slow.(page|query|api)|profil/.test(q) ? ['performance-optimization','addy']
-      : /api|interface.contract|payload|endpoint.contract/.test(q) ? ['api-and-interface-design','addy']
-      : /frontend|\bui\b|tailwind|component|accessibility/.test(q) ? ['frontend-ui-engineering','addy']
-      : /domain.model|ubiquitous/.test(q) ? ['domain-modeling','matt']
-      : /architecture|system.design|codebase.design/.test(q) ? ['codebase-design','matt']
-      : /research|primary.sources/.test(q) ? ['research','matt'] : null;
-    if (task) {
-      primary = prefer(task[1] === 'finance' ? 'financial-services' : task[1] === 'matt' ? 'mattpocock-skills' : 'addyosmani-agent-skills', task[0], task[1] === 'finance' ? 'fsi-financial-analysis' : undefined);
-      if (primary) reason = 'task-specific primary; central goal/scope and repository policy remain authoritative';
-    }
-  }
-  const seen = new Set();
-  return entries.map(entry => ({ ...entry, score: terms.reduce((score, term) => score + (`${entry.id} ${entry.description}`.toLowerCase().includes(term) ? 1 : 0), 0),
-    routingRole: entry.id === primary?.id && entry.kind === primary.kind ? 'primary' : 'candidate', routingReason: entry.id === primary?.id && entry.kind === primary.kind ? reason : 'Optional supporting guidance; do not start a second workflow',
-    routingPriority: entry.id === primary?.id && entry.kind === primary.kind ? 100 : entry.plugin === 'fsi-financial-analysis' ? 1 : 0 }))
-    .filter(entry => entry.score > 0 || entry.routingRole === 'primary')
-    .sort((a,b) => b.routingPriority - a.routingPriority || b.score - a.score || a.id.localeCompare(b.id))
-    .filter(entry => { const key = entry.kind + ':' + (entry.sha256 || entry.id); if (seen.has(key)) return false; seen.add(key); return true; })
-    .slice(0, limit);
+  return routing.rankWorkflows(c, request);
 }
 export async function findWorkflow(request) { return rankWorkflows(await catalog(), request); }
 export async function prepareReview({ repository, commit }) {

@@ -6,6 +6,7 @@ import crypto from 'node:crypto';
 import { existsSync } from 'node:fs';
 import { indexPstack } from '../pstack/catalog.mjs';
 import { indexPonytail } from '../ponytail/catalog.mjs';
+import { indexEngineering } from '../engineering-skills/catalog.mjs';
 const root = path.dirname(fileURLToPath(import.meta.url));
 const sha = value => crypto.createHash('sha256').update(value).digest('hex');
 const sources = ['knowledge-work-plugins', 'financial-services', 'mattpocock-skills', 'addyosmani-agent-skills', 'context-mode', 'open-code-review'];
@@ -102,6 +103,7 @@ for (const kind of ['skills', 'commands']) {
 }
 let publishedCatalog = existsSync(path.join(root, 'skills/pstack/arena/SKILL.md')) ? await indexPstack(catalog) : catalog;
 if (existsSync(path.join(root, 'skills/ponytail/ponytail/SKILL.md'))) publishedCatalog = await indexPonytail(publishedCatalog);
+if (existsSync(path.join(root, 'skills/ecc-engineering/sea-quality-contract/SKILL.md'))) publishedCatalog = await indexEngineering(publishedCatalog);
 await fs.writeFile(path.join(root, 'catalog.json'), JSON.stringify(publishedCatalog, null, 2) + '\n');
 console.log(JSON.stringify({ plugins: marketplace.plugins.length, skills: catalog.skills.length, commands: catalog.commands.length, optionalConnectors: catalog.connectors.length, revisions: pins }));
 

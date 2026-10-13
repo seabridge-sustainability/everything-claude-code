@@ -13,7 +13,8 @@ function run(runtime, event, payload, options = {}) {
   } catch { result = { allowed: false, wouldDeny: true, reason: 'fresh-session preflight not admitted; check current goal, ownership, config and identity' }; }
   if (result.allowed && !result.wouldDeny) {
     if (runtime === 'antigravity') return { output: event === 'pre' ? { decision: 'allow' } : {}, exit: 0 };
-    return { output: event === 'startup' ? { systemMessage: 'ECC fresh-session allowed/blocked preflight passed; opaque shell/cloud tools remain denied.' } : null, exit: 0 };
+    return { output: event === 'startup' ? { systemMessage: 'ECC fresh-session allowed/blocked preflight passed; opaque shell/cloud tools remain denied.',
+      ...(['codex','claude'].includes(runtime)?{hookSpecificOutput:{hookEventName:'SessionStart',additionalContext:result.additionalContext}}:{}) } : null, exit: 0 };
   }
   const reason = 'ECC: ' + result.reason;
   if (runtime === 'antigravity') return { output: { decision: 'deny', reason }, exit: 0 };

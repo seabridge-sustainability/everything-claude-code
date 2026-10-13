@@ -6,6 +6,7 @@ const path = require('node:path');
 const crypto = require('node:crypto');
 const { execFileSync } = require('node:child_process');
 const root = path.resolve(__dirname, '../..');
+const routing = require('./skill-routing');
 const SUPPORTED = ['codex', 'claude', 'gemini', 'opencode', 'antigravity'];
 const sha = data => crypto.createHash('sha256').update(data).digest('hex');
 const hash = file => sha(fs.readFileSync(file));
@@ -95,9 +96,22 @@ function context({ cwd, runtime, sessionId, payload, policyRoot, configFile }) {
   const nativeConfig = path.resolve(repo.root, binding.nativeConfig || '');
   if (!binding.nativeConfig || path.relative(repo.root, nativeConfig).startsWith('..')
       || fs.lstatSync(nativeConfig).isSymbolicLink() || hash(nativeConfig) !== binding.nativeConfigSha256) throw Error('native config changed or outside worktree');
+  const catalogFile = path.join(root,'integrations/company-dev-tools/catalog.json');
+  if (!binding.taskRoute || binding.taskRoute.policySha256 !== routing.policy().sha256
+      || binding.catalogSha256 !== hash(catalogFile)) throw Error('Task routing or catalog changed; fresh reviewed binding required');
+  const expectedRoute=routing.taskRoute(JSON.parse(fs.readFileSync(catalogFile,'utf8')),
+    {query:binding.taskRoute.query,profile:binding.taskRoute.profile,impact:binding.taskRoute.impact});
+  if(JSON.stringify(expectedRoute)!==JSON.stringify(binding.taskRoute)) throw Error('Task selection was modified');
+  const expectedWorkflow=expectedRoute.primary ? {id:expectedRoute.primary.id,file:path.join(root,'integrations/company-dev-tools',expectedRoute.primary.file),sha256:expectedRoute.primary.sha256}:null;
+  if(JSON.stringify(binding.workflow)!==JSON.stringify(expectedWorkflow)) throw Error('Selected workflow binding was modified');
+  if (binding.workflow) {
+    const relative = path.relative(path.join(root,'integrations/company-dev-tools'),binding.workflow.file);
+    if (relative.startsWith('..') || path.isAbsolute(relative) || fs.lstatSync(binding.workflow.file).isSymbolicLink()
+        || sha(fs.readFileSync(binding.workflow.file,'utf8').replace(/\r\n/g,'\n')) !== binding.workflow.sha256) throw Error('Selected workflow changed or outside ECC');
+  }
   const fingerprint = sha(JSON.stringify({ runtime, sessionId, cwd: repo.root,
     nativeId: native.session_id, config: hash(configFile),
-    policies: files.map(hash), implementation: [__filename, path.join(root, 'scripts/hooks/fresh-session-guard.js'),
+    policies: files.map(hash), implementation: [__filename, path.join(root,'scripts/lib/skill-routing.js'),path.join(root,'manifests/task-skill-routing.json'), path.join(root, 'scripts/hooks/fresh-session-guard.js'),
       path.join(root, '.opencode/plugins/ecc-fresh-session-guard.mjs')].map(hash) }));
   const receipt = path.join(repo.directory, 'fresh-preflight', sha(sessionId + ':' + native.session_id) + '.json');
   return { native, repo, session, relative, fingerprint, receipt, binding };
@@ -145,7 +159,8 @@ function preflight(options) {
   });
   const receipt = { version: 1, status: 'passed', runtime: options.runtime, session: options.sessionId,
     fingerprint: ctx.fingerprint, at: new Date().toISOString(), results,
-    proof: 'Actual guard decisions; synthetic probes execute no product writes. Native client interception requires native evidence.' };
+    taskRoute:ctx.binding.taskRoute, workflow:ctx.binding.workflow,
+    proof: 'Actual guard decisions and pinned task selection; synthetic probes execute no product writes. Native client interception and model compliance require native evidence.' };
   fs.mkdirSync(path.dirname(ctx.receipt), { recursive: true, mode: 0o700 });
   writeFileAtomic(ctx.receipt, JSON.stringify(receipt) + '\n');
   return receipt;
@@ -153,7 +168,8 @@ function preflight(options) {
 function guard(options, event) {
   const receipt = preflight(options);
   const ctx = context(options);
-  if (event === 'startup') return { allowed: true, wouldDeny: false, preflight: receipt.status };
+  if (event === 'startup') return { allowed: true, wouldDeny: false, preflight: receipt.status,
+    additionalContext: 'ECC task routing: '+JSON.stringify({risk:ctx.binding.taskRoute.risk,primary:ctx.binding.workflow,always:ctx.binding.taskRoute.always,checks:ctx.binding.taskRoute.checks,evaluatorMode:ctx.binding.taskRoute.evaluatorMode})+'. Read the selected workflow; current project authority and existing goal control all actions.' };
   if (!['pre', 'turn', 'final'].includes(event)) throw Error('unknown fresh guard event');
   return execute('guard-event', { cwd: options.cwd, sessionId: options.sessionId,
     guardMode: 'block', event, payload: ctx.native });

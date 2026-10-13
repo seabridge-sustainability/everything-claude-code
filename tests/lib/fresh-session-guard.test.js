@@ -9,7 +9,7 @@ const { test, after } = require('node:test');
 const testedRoot = process.env.ECC_PREFLIGHT_TEST_ROOT || path.resolve(__dirname,'../..');
 const { prepare, configuration, launch } = require(path.join(testedRoot,'scripts/fresh-agent-session.js'));
 const { run } = require(path.join(testedRoot,'scripts/hooks/fresh-session-guard.js'));
-const { preflight, SUPPORTED, execute, repository, workspaceBoundary } = require(path.join(testedRoot,'scripts/lib/fresh-session-guard.js'));
+const { preflight, SUPPORTED, execute, workspaceBoundary } = require(path.join(testedRoot,'scripts/lib/fresh-session-guard.js'));
 const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-fresh-preflight-'));
 let count = 0;
 after(() => fs.rmSync(temp, { recursive: true, force: true }));
@@ -32,6 +32,9 @@ function fixture(runtime, centralLayout = false) {
   const policyRoot = path.join(cwd,'policy'); fs.mkdirSync(policyRoot);
   for (const name of ['AGENTS.md','AGENTS_SYSTEM.md','CLAUDE.md']) fs.writeFileSync(path.join(policyRoot,name),'SYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1\n');
   if(centralLayout) fs.appendFileSync(path.join(policyRoot,'AGENTS_SYSTEM.md'),`Code: ${box} only; one active checkout/repo. E: Docker only.\n`);
+  fs.writeFileSync(path.join(cwd,'.gitignore'),'.ecc/\n');
+  const addPolicy=spawnSync('git',['add','.gitignore','policy'],{cwd,encoding:'utf8',windowsHide:true});assert.equal(addPolicy.status,0,addPolicy.stderr);
+  const commitPolicy=spawnSync('git',['commit','-m','fixture policy baseline'],{cwd,encoding:'utf8',windowsHide:true});assert.equal(commitPolicy.status,0,commitPolicy.stderr);
   const session = 'fresh-' + count;
   execute('register',{cwd,sessionId:session,scopes:['owned','.ecc/fresh-session','.agents/hooks.json'],objective:'Preflight',doneWhen:'Checked',ttl:30});
   const plan = prepare({runtime,session,cwd,policyRoot,executable:process.execPath,args:['--help'],toolLimit:40,turnLimit:10});
@@ -47,7 +50,9 @@ function allowed(result,runtime) {
 }
 for (const runtime of SUPPORTED) test(runtime + ': automatic once-only preflight and actual allowed/blocked callback decisions', () => {
   const f=fixture(runtime), p=payload(runtime,f.cwd);
-  const first=run(runtime,'pre',p,f.options); assert.equal(allowed(first,runtime),true);
+  const first=run(runtime,'pre',p,f.options);
+  if(!allowed(first,runtime)) preflight({...f.options,runtime,payload:p}); // Surface the refused prerequisite without weakening the allow assertion.
+  assert.equal(allowed(first,runtime),true);
   fs.mkdirSync(path.join(f.cwd,'owned')); fs.writeFileSync(path.join(f.cwd,'owned/ok.txt'),'LOCAL_ALLOWED');
   assert.equal(fs.readFileSync(path.join(f.cwd,'owned/ok.txt'),'utf8'),'LOCAL_ALLOWED');
   for(const file of ['outside.txt','.ecc/goal/active-goal.yaml',path.relative(f.cwd,f.options.configFile)]) {
@@ -61,6 +66,14 @@ for (const runtime of SUPPORTED) test(runtime + ': automatic once-only preflight
   assert.equal(entries.filter(e=>e.reasonCode==='opaque tool requires a verified restricted execution boundary').length,1);
   assert.equal(allowed(run(runtime,'pre',p,f.options),runtime),true);
   assert.equal(fs.readFileSync(log,'utf8').trim().split('\n').length,entries.length+1,'cached preflight must not repeat probes');
+});
+test('managed admission retains the inherited foreign-change refusal',()=>{
+  const f=fixture('claude');execute('close',{cwd:f.cwd,sessionId:f.session});
+  fs.writeFileSync(path.join(f.cwd,'foreign.txt'),'OTHER_OWNER_DRAFT');
+  const session=f.session+'-foreign';execute('register',{cwd:f.cwd,sessionId:session,scopes:['owned','.ecc/fresh-session'],objective:'Guard inherited draft',doneWhen:'Refused',ttl:30});
+  const plan=prepare({...f.plan.manifest,session});const options={...f.options,sessionId:session,configFile:plan.environment.ECC_FRESH_SESSION_CONFIG};
+  assert.throws(()=>preflight({...options,runtime:'claude',payload:payload('claude',f.cwd)}),/inherited foreign/);
+  assert.equal(fs.readFileSync(path.join(f.cwd,'foreign.txt'),'utf8'),'OTHER_OWNER_DRAFT');
 });
 test('changed central policy, native config, expired ownership and owner correction invalidate admission', () => {
   for(const mutation of ['policy','config','close','goal']) {
@@ -81,6 +94,18 @@ test('unknown/missing bindings and malformed input fail closed without changing 
   for(const id of ids.filter(x=>!SUPPORTED.includes(x))) assert.throws(()=>configuration(id),/No verified native/);
   assert.equal(configuration('gemini').hooks.BeforeTool[0].hooks[0].timeout,10000);
   assert.match(JSON.stringify(configuration('codex')),/SessionStart/);
+});
+test('new managed sessions pin the selected workflow and expose actual task context; Codex enables hooks per launch only',()=>{
+  const f=fixture('codex'),binding=JSON.parse(fs.readFileSync(f.options.configFile));
+  assert.ok(f.plan.args.includes('features.hooks=true'));assert.ok(binding.taskRoute.policySha256);assert.ok(binding.catalogSha256);
+  const r=run('codex','startup',{session_id:'fresh-native',cwd:f.cwd},f.options);assert.equal(r.exit,0);assert.match(r.output.hookSpecificOutput.additionalContext,/ECC task routing/);
+  binding.taskRoute.risk='low';fs.writeFileSync(f.options.configFile,JSON.stringify(binding));
+  assert.equal(allowed(run('codex','pre',payload('codex',f.cwd),f.options),'codex'),false);
+});
+for(const runtime of SUPPORTED) test(runtime+': real hook subprocess denies outside execution without native model inference',()=>{
+  const f=fixture(runtime),hook=path.join(testedRoot,'scripts/hooks/fresh-session-guard.js');
+  const r=spawnSync(process.execPath,[hook,runtime,'pre'],{cwd:f.cwd,env:{...process.env,...f.plan.environment},input:JSON.stringify(payload(runtime,f.cwd,'outside.txt')),encoding:'utf8',windowsHide:true});
+  assert.notEqual(r.status,1);assert.equal(allowed({exit:r.status,output:r.stdout?JSON.parse(r.stdout):null},runtime),false);assert.equal(fs.existsSync(path.join(f.cwd,'outside.txt')),false);
 });
 test('prepared launch refuses reuse, trust/permission bypass, changed argv and unowned config writes', () => {
   const f=fixture('claude');

@@ -1,6 +1,6 @@
 # Model Prompting And Skill Policy
 
-Model-specific guidance last verified: 2026-09-27. Local skill routing updated 2026-10-12.
+Model-specific guidance last verified: 2026-09-27. Local skill routing updated 2026-10-13.
 
 Load this reference only when changing agent prompts, model or effort defaults,
 skill design, compaction behavior, tool exposure, or an agent evaluation. Normal
@@ -19,6 +19,22 @@ and rejects outside, policy/config, opaque-shell and wrong-identity actions. It
 stores one receipt outside the agent write scope; unchanged probes are not repeated.
 Current ownership, goal, policy and native-config hashes remain checked before tools.
 No running process, global auth/model config or permission trust store is changed.
+
+Supply `task: {query, profile: "coding", impact: {...}}` in the fresh-session host
+manifest. Supported boolean impact flags are presentationOnly, behavior, ambiguous,
+auth, tenant, secrets, irreversible, scientific and productionData. Inspect actual
+effects before setting these flags; an omitted flag is not proof of low impact.
+The managed binding records the canonical route, routing policy/catalog hashes
+and exact selected workflow body. Changed routing, body, identity or ownership
+fails closed and needs a new legitimate session. Without task selection, only the
+existing goal objective is searched; an unresolved route stays explicitly unresolved.
+Claude and Codex receive bounded startup context; other adapter contracts check
+the binding without claiming that their model consumed the context.
+
+New Codex launches enable `features.hooks=true` only in that process. Current CLI
+0.162.1 accepts it; existing global settings and sessions remain untouched. Exact
+hook review/trust is still required. Callback/subprocess tests prove adapter
+behavior, not model compliance, native IDE enforcement or OS containment.
 
 Managed adapters: Codex, Claude, Gemini CLI, Antigravity and OpenCode. Codex needs
 operator `/hooks` review/trust; never bypass it. Gemini hook timeouts are milliseconds.
@@ -62,23 +78,28 @@ capability, not launch another plan, investigation or model-backed review.
 Small obvious changes need no skill. Native skill formats belong to the calling
 agent; a Claude template is not a Codex/Gemini/OpenCode installation.
 
-| Task or overlap | Priority |
-|---|---|
-| SeaBridge contracts, scientific integrity, tenant/security boundaries | Matching ECC `sea-*` skill and existing source/acceptance constraints first; `sea-skill-map` routes only when needed. |
-| Phased GSD work | `sea-gsd-controlled-execution` supports the existing ECC goal/assignments; no second plan, alternate DoD or uncontrolled `/gsd:*` installer. |
-| Competing plans / Pstack arena or architect | `sea-multi-model-planning` is primary for a requested substantial multi-model design; arena/architect are supporting adapters under the same ECC goal. No raw Cursor Task/model defaults, automatic worktrees or implementation before owner plan approval. |
-| Pstack verification creation / maintenance | `sea-verify-seabridge` coordinates affected feature recipes; `verification-loop` and backend/API checks provide the existing proof ladder. No competing harness, blanket full suite, mocked persistence claim or replacement server. |
-| Pstack interrogate / Addy / Alibaba review | Select one primary review workflow. An additional model critique requires a demonstrated need and existing provider authorization; findings remain evidence, not permission to edit or ship. |
-| Pstack reflect / correct / knowledge | Update an affected existing check or feature guide for recurring lessons. Existing knowledge-ops boundaries apply; no unrelated history scan, new memory store or automatic personal-memory edit. |
-| Explicit Ponytail implementation / review / audit | `sea-ponytail` is one requested lens under current policy. Generic Matt/Addy/SeaBridge routing stays primary otherwise; Pstack/GSD continue the same goal. No upstream global hooks, code-removal mandate or blanket test policy. |
-| Ponytail debt / gain | Read-only bounded source-comment candidates; benchmark provenance is upstream evidence, not measured SeaBridge savings. |
-| Matt debugging / Anthropic debug | Shared catalog `diagnosing-bugs` is primary; Anthropic debug is supporting only for a demonstrated gap. |
-| Architecture / codebase design / system design | Use only when design/refactor is requested or an observed defect requires it; no redesign of a small fix. |
-| Addy / Anthropic / Alibaba review | One primary code-review workflow; OCR findings are evidence, not acceptance or permission for another model call. |
-| Generic frontend/design | Approved SeaBridge components, tokens, copy and behavior win; no stylistic extras. |
-| Generic tests/security | Risk-scaled checks and valid task authorization win; no blanket installs, full suites, secret rotation or Git cleanup. |
-| Finance / climate/nature | Finance templates cannot supply scientific inputs, weights, predictions or validated financial impact. Prefer `fsi-financial-analysis` for duplicate finance skills; an exact specialist ID is an explicit selection. |
-| Skill creation | Calling agent's native authoring format; upstream guidance is selective support. |
+The executable routing authority is `manifests/task-skill-routing.json`, consumed
+by `scripts/lib/skill-routing.js`, both MCP bridges and `sea-skill-map`. Do not
+maintain a competing Markdown routing table. Exact IDs win; recognized tasks
+select one primary workflow. `profile: "coding"` omits unrelated company templates;
+`company` and `all` retain deliberate business discovery. Results expose
+`routingVersion`, `routingPolicySha256`, `routingProfile` and the canonical local
+skill entry. A stale MCP process can use exact IDs or the fresh local CLI without
+restarting productive agents:
+
+```powershell
+'{"query":"debug backend regression","profile":"coding","impact":{"behavior":true}}' | node scripts/skill-route.js -
+'{"query":"define constraints","profile":"coding"}' | node integrations/dev-suite/cli.mjs find -
+```
+
+Karpathy's assumptions, simplicity, surgical changes and observable success remain
+applicable to every task. Check material ambiguity every time; an actual Grill Me
+interview is needed only for unresolved material uncertainty or an explicit request.
+Existing goal/acceptance, auth/tenant and scientific rules prevail over every
+template. GSD, Pstack, Ponytail and legacy orchestration support that same goal.
+Approved frontend tokens/behavior remain protected. Finance templates cannot
+provide scientific inputs or validated financial impact. Upstream hooks,
+worktrees, mandatory test ceremonies and provider defaults are not imported.
 
 Assets and the full shared catalog live in
 `C:/Users/adelm/SeaBridgeAI/everything-claude-code/integrations/company-dev-tools`.
@@ -98,6 +119,53 @@ so clients can use it without a second server. If the running host has not loade
 its new tool metadata, use the Node CLI fallback; do not restart productive agents.
 Duplicate native thin-loader names resolve to the same canonical ECC skill body,
 not separate implementations. Raw Pstack skills remain pinned reference content.
+
+### Selective engineering risk and verification
+
+Small reversible presentation changes need the existing focused check, not a lifecycle
+ceremony. Feature/API behavior changes need affected contract and journey evidence;
+resolve only material ambiguity. Tenant/auth, irreversible or scientific changes
+need protected invariants and appropriate independent evidence. Impact governs risk,
+not file count. Choose one primary discipline and retain the same ECC goal; GSD,
+Pstack and supporting review guidance do not start another plan.
+
+For authorized parallel evaluation, functional/integration and affected
+security/scientific reviewers inspect the same completed source and evidence,
+read-only. Their findings can disagree; the lead resolves them against acceptance
+and actual receipts. No imaginary judge, automatic provider call or second writer.
+Without authorized capacity, label sequential/self-review limits. Live multi-model
+proof remains deferred until separately authorized. Pstack plan review is still
+an owner decision checkpoint, never implementation permission by itself.
+
+The existing `sea-verify-seabridge/features/README.md` maps tooling, readiness,
+pytest/Vitest contracts and real authenticated journeys. The Pstack runner records
+bounded output and working source identities for existing contract commands;
+fixtures cannot complete product journeys. Explicit Climate resumption remains a
+prerequisite for Open Access calculation acceptance.
+
+Keep constraints, resolved terminology and decision rationale in the existing ECC
+goal/task record; reuse an existing product glossary/ADR/quality contract where one
+already applies. A structured quality artifact can live at ECC
+`artifacts/agent-runs/pstack/quality/<task-id>/contract.json`. Do not automatically
+add CONSTRAINTS.md, constraints.mmd, GLOSSARY.md or more agent rulebooks to product
+repositories. Written guidance alone is not enforcement; identify the actual
+checker and evidence before claiming a gate runs.
+
+For web performance, use the existing Addy performance/browser discipline with
+approved primary-runtime URLs and available DevTools traces or Lighthouse JSON.
+Reuse installed tools; missing Lighthouse/DevTools is BLOCKED for measured audits,
+not permission to install, launch a replacement browser/server or invent scores.
+Source-only findings are potential impact. Record target/source revision, auth
+context without credentials, tool/version, run conditions and actual measurements.
+Backend latency/query profiling uses existing backend tools; Lighthouse is not a
+server-only profiler. Scientific validation remains a separate requirement.
+
+Shared discovery uses `ecc-engineering/ecc/sea-requirements-discovery`,
+`ecc-engineering/ecc/sea-quality-contract` and
+`ecc-engineering/ecc/sea-adversarial-review` through `suite_find_workflow` and
+`suite_read_skill`, or the existing dev-suite Node CLI. Exact IDs work without
+new tool schemas. Fresh MCP processes load updated keyword routing; preserve
+productive sessions and use exact IDs/CLI if an old process retains earlier code.
 
 ### Knowledge access and freshness
 

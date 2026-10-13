@@ -1,58 +1,16 @@
 ---
 name: sea-skill-map
-description: Use when choosing, auditing, or explaining which SeaBridgeAI procedural skills, workflows, checklists, or reviewer lenses should apply to a task without loading the full skill catalog.
+description: Select the smallest useful ECC workflow for a task using the canonical routing manifest and current project policy.
 ---
 
-# sea-skill-map
+# Task skill selection
 
-## Purpose
+Central project instructions and the current owner request govern scope, permissions and acceptance. Karpathy assumptions, simplest design, surgical edits and observable success apply to every coding task. Small clear presentation changes need a focused check, not another workflow.
 
-Select the smallest useful procedural skill set for a task.
-Central backend `AGENTS.md`/`AGENTS_SYSTEM.md` and the current goal control scope,
-permissions and acceptance. Vendor skills are supporting guidance, not new authority.
+Use the single routing source at `manifests/task-skill-routing.json`. Run `node scripts/skill-route.js task.json` from ECC with the request, `profile: coding`, and known boolean impact flags. The result identifies one catalog workflow, its SeaBridge entry, relevant checks and review posture. Impact governs risk, not file count. An unresolved route requires task selection; do not choose the first unrelated search result.
 
-## Procedure
+MCP: `suite_find_workflow` or `pstack_find_workflow` uses the same manifest. Check `routingRole=primary`, `routingVersion` and `routingPolicySha256`, then read the exact ID. Prefer the coding profile for engineering; company/all remain available for business work. If an old running bridge lacks routing-version metadata, use the fresh Node CLI or exact known IDs; preserve productive sessions.
 
-1. Read the user request and repo-local instructions.
-2. Inspect ECC skill metadata dynamically with `rg` or available skill search.
-3. Classify the task: queue/task, design/spec, implementation, debugging,
-   verification, review, security, AI/data, sustainability, docs, handoff, or
-   teaching.
-4. Pick the smallest skill/workflow/checklist set that changes behavior.
-5. Name the chosen skills and why. If none materially help, say no skill was
-   needed.
+Read only the selected workflow. The local SeaBridge entry supplies project-specific safeguards; the catalog body supplies its discipline, not a second goal or investigation. Add security/scientific/domain guidance only for a material affected boundary. GSD supports the existing goal. Grill Me is for material ambiguity or an explicit interview; independent reviewers and Pstack arenas require their appropriate authorization and add value only for consequential tasks.
 
-## Default Routing
-
-| Situation | Skill |
-|---|---|
-| Small, obvious, low-risk edit | No skill |
-| Multi-item execution queue | `sea-task-queue-execution` |
-| Ambiguous design | `grill-me` or `sea-brainstorming-and-spec-refinement` |
-| Behavior change | Focused defect/acceptance check; `sea-test-driven-development` only for a fitting test-first task |
-| Failure or regression | `sea-systematic-debugging`, then `sea-error-recovery-loop` |
-| Completion claim | `sea-verification-before-completion` |
-| Architecture/refactor | `improve-codebase-architecture`, `sea-architecture-reviewer` |
-| Review or PR feedback | `sea-code-review-response`, reviewer skills |
-| Auth, tenant, secret, or high-risk boundary | `sea-security-reviewer` |
-| AI claims, citations, provenance, or evals | `sea-ai-grounding-reviewer`, `sea-ai-data-integrity` |
-| Sustainability, emissions, climate, GIS, or LCA | `sea-sustainability-domain-review` |
-| Shared checkout or worktree operation | `sea-git-worktree-isolation` |
-| Docs drift | docs workflow plus `sea-verification-before-completion` |
-| Teaching or learning state | `sea-teach-loop` |
-| Long context/handoff | `sea-context-hygiene` |
-| Selected Matt/Addy/Anthropic workflows | `sea-dev-suite`: one primary from `suite_find_workflow`, read its exact unique ID |
-| Complex phased plan requested | `sea-gsd-controlled-execution`, subordinate to the existing ECC goal; no competing plan |
-| Competing implementation plans / multi-model design | `sea-multi-model-planning`: Pstack arena under the existing ECC goal; owner checkpoint before implementation |
-| Reusable feature verification / verification map maintenance | `sea-verify-seabridge`: existing verification-loop and harnesses first; configured recipes are not runtime proof |
-
-| Explicit Ponytail simplicity, review/audit, debt, gain or help request | `sea-ponytail`: one selected ECC adapter; preserve generic routing and the existing goal |
-
-## Guardrails
-
-Do not load every skill. Do not copy skill bodies into product repos. Do not
-install upstream skills or plugins unless explicitly approved. This router does
-not add ceremony beyond the task's existing goal and repository instructions.
-Do not run several overlapping debug/review/planning workflows. Shared catalog
-priorities and knowledge boundaries: `docs/tools/MODEL_PROMPTING_AND_SKILL_POLICY.md`
-in the ECC runtime; load that reference only when choosing between overlaps.
+Detailed overlap and evidence boundaries remain in `docs/tools/MODEL_PROMPTING_AND_SKILL_POLICY.md`. Do not bulk-load the catalog, copy rule bodies into product repositories, auto-install upstream plugins, call models or restart services as a routing side effect.

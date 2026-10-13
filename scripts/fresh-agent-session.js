@@ -5,6 +5,7 @@ const path = require('node:path');
 const crypto = require('node:crypto');
 const { spawn } = require('node:child_process');
 const { pathToFileURL } = require('node:url');
+const { taskRoute } = require('./lib/skill-routing');
 const { checkSession, execute, repository, SUPPORTED, policyFiles, workspaceBoundary } = require('./lib/fresh-session-guard');
 const root = path.resolve(__dirname, '..');
 function toml(value) {
@@ -55,8 +56,20 @@ function prepare(manifest) {
   // Binding pins the actual native config, not merely a generated template.
   const configText = JSON.stringify(cfg, null, 2) + '\n';
   const nativeConfigSha256 = crypto.createHash('sha256').update(configText).digest('hex');
+  const goal = require('js-yaml').load(fs.readFileSync(path.join(repo.root,'.ecc/goal/active-goal.yaml'),'utf8'));
+  const catalogFile = path.join(root,'integrations/company-dev-tools/catalog.json');
+  const catalog = JSON.parse(fs.readFileSync(catalogFile,'utf8'));
+  const route = taskRoute(catalog, manifest.task || { query: goal.objective.slice(0,200), profile:'coding' });
+  let workflow = null;
+  if (route.primary) {
+    const file = path.join(root,'integrations/company-dev-tools',route.primary.file);
+    const content = fs.readFileSync(file,'utf8').replace(/\r\n/g,'\n');
+    if (crypto.createHash('sha256').update(content).digest('hex') !== route.primary.sha256) throw Error('Selected workflow digest changed');
+    workflow = { id:route.primary.id, file, sha256:route.primary.sha256 };
+  }
   const bindingText = JSON.stringify({ version: 1, runtime, session, cwd: repo.root, toolLimit, turnLimit,
-    nativeConfig: config, nativeConfigSha256 }, null, 2) + '\n';
+    nativeConfig: config, nativeConfigSha256, taskRoute:route, workflow,
+    catalogSha256:crypto.createHash('sha256').update(fs.readFileSync(catalogFile)).digest('hex') }, null, 2) + '\n';
   for (const [rel, text] of [[config, configText], [binding, bindingText]]) {
     fs.mkdirSync(path.dirname(path.join(repo.root, rel)), { recursive: true });
     fs.writeFileSync(path.join(repo.root, rel), text, { flag: 'wx', mode: 0o600 });
@@ -68,9 +81,12 @@ function prepare(manifest) {
   if (runtime === 'claude') argv.unshift('--settings', fullConfig);
   if (runtime === 'gemini') environment.GEMINI_CLI_SYSTEM_SETTINGS_PATH = fullConfig;
   if (runtime === 'opencode') environment.OPENCODE_CONFIG = fullConfig;
-  if (runtime === 'codex') for (const [name, value] of Object.entries(cfg.hooks)) argv.unshift('-c', 'hooks.' + name + '=' + toml(value));
+  if (runtime === 'codex') {
+    argv.unshift('-c','features.hooks=true');
+    for (const [name, value] of Object.entries(cfg.hooks)) argv.unshift('-c', 'hooks.' + name + '=' + toml(value));
+  }
   return { version: 1, runtime, cwd: repo.root, session, executable, args: argv, environment,
-    manifest: { runtime, session, cwd: repo.root, policyRoot, executable, args, toolLimit, turnLimit },
+    manifest: { runtime, session, cwd: repo.root, policyRoot, executable, args, toolLimit, turnLimit, ...(manifest.task?{task:manifest.task}:{}) },
     fresh_only: true, no_provider_or_model_override: true, status: 'prepared-not-native-proof',
     limitation: runtime === 'codex' ? 'Codex requires operator /hooks review/trust of the exact new hook definition; no trust bypass supplied.'
       : 'Use this managed launch; direct IDE starts or unsupported clients are not certified protected.' };
@@ -92,7 +108,10 @@ function launch(plan) {
   const config = path.join(plan.cwd, binding.nativeConfig);
   let expectedArgs = [...m.args];
   if (plan.runtime === 'claude') expectedArgs.unshift('--settings', config);
-  if (plan.runtime === 'codex') for (const [name, value] of Object.entries(expected.hooks)) expectedArgs.unshift('-c', 'hooks.' + name + '=' + toml(value));
+  if (plan.runtime === 'codex') {
+    expectedArgs.unshift('-c','features.hooks=true');
+    for (const [name, value] of Object.entries(expected.hooks)) expectedArgs.unshift('-c', 'hooks.' + name + '=' + toml(value));
+  }
   if (JSON.stringify(plan.args) !== JSON.stringify(expectedArgs)
       || (plan.runtime === 'gemini' && plan.environment.GEMINI_CLI_SYSTEM_SETTINGS_PATH !== config)
       || (plan.runtime === 'opencode' && plan.environment.OPENCODE_CONFIG !== config)) throw Error('Prepared launch arguments changed');

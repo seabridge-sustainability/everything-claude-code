@@ -9,7 +9,7 @@ export async function startMcp() {
     catch (error) { return { isError: true, content: [{ type: 'text', text: error.message }] }; }
   });
   tool('suite_status', 'Inspect installed workflow catalog and tool/service readiness receipt locations', {}, status);
-  tool('suite_find_workflow', 'Find relevant Anthropic, Matt Pocock, Addy Osmani, Pstack or ECC Ponytail skills or commands', { query: z.string().min(1).max(200), limit: z.number().int().min(1).max(30).optional(), kind: z.enum(['all', 'skill', 'command']).optional() }, findWorkflow);
+  tool('suite_find_workflow', 'Select one canonical task workflow. Coding profiles exclude unrelated company templates; exact IDs preserve explicit choices.', { query: z.string().min(1).max(200), limit: z.number().int().min(1).max(30).optional(), kind: z.enum(['all', 'skill', 'command']).optional(), profile: z.enum(['auto','coding','company','all']).optional() }, findWorkflow);
   tool('suite_read_skill', 'Read a selected installed skill with source digest and policy boundary', { id: z.string() }, readEntry);
   tool('suite_read_command', 'Read a selected company command template; does not execute its external actions', { id: z.string() }, args => readEntry({ ...args, kind: 'command' }));
   tool('suite_review_prepare', 'Prepare Alibaba review rules/file scope for an explicit selected commit without a model call', { repository: z.string(), commit: z.string() }, prepareReview);

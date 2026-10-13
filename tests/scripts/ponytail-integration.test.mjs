@@ -31,7 +31,7 @@ test('Ponytail requests choose one primary; generic workflows and Pstack keep ex
   for(const [query,name] of [['code review','code-review-and-quality'],['debug backend regression','diagnosing-bugs'],['multi-model planning','arena'],['verification skill','create-verification-skill']])assert.equal((await findWorkflow({query}))[0].name,name);
 });
 test('Ponytail indexing preserves every preexisting entry and is idempotent',async()=>{
-  const current=await catalog();assert.deepEqual(await indexPonytail(current),current);assert.deepEqual(await indexPonytail(await indexPstack(current)),current);assert.equal(current.skills.filter(e=>e.source==='ponytail').length,6);assert.equal(current.skills.filter(e=>!['ponytail','cursor-pstack'].includes(e.source)).length,374);assert.equal(current.commands.length,65);
+  const current=await catalog();assert.deepEqual(await indexPonytail(current),current);assert.deepEqual(await indexPonytail(await indexPstack(current)),current);assert.equal(current.skills.filter(e=>e.source==='ponytail').length,6);assert.equal(current.skills.filter(e=>!['ponytail','cursor-pstack','ecc-engineering'].includes(e.source)).length,374);assert.equal(current.commands.length,65);
 });
 test('debt collection excludes ignored and sensitive files, retains trigger gaps and performs no writes',async()=>{
   const root=await fixture();try{

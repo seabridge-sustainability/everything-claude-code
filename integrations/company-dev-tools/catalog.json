@@ -29,6 +29,14 @@
       "revision": "2961b52fc1fe6a5a87c7a959a79512e5c2f3ffe5",
       "repository": "https://github.com/DietrichGebert/ponytail",
       "execution": "ECC adapters only; no upstream hooks"
+    },
+    "ecc-engineering": {
+      "execution": "ECC adapters only",
+      "upstream": [
+        "mattpocock-skills",
+        "addyosmani-agent-skills"
+      ],
+      "manifest": "../engineering-skills/adaptation.json"
     }
   },
   "skills": [
@@ -3397,6 +3405,36 @@
       "description": "Hardens code against vulnerabilities. Use when auditing an input handler for vulnerabilities, when handling user input, authentication, data storage, or external integrations, or when checking a login flow is safe against the OWASP Top Ten. Use when building any feature that accepts untrusted data, manages user sessions, or interacts with third-party services. Use when auditing dependencies for known vulnerabilities, triaging package-manager audit findings, or assessing supply-chain risk in a new package. Use when personal data or privacy compliance (GDPR, CCPA) is involved.",
       "file": "skills/addy/security-and-hardening/SKILL.md",
       "sha256": "2e3fc60eed5aba97fe416f3f3c9317fdb014a682925ec70a733c3ff99e4b9858"
+    },
+    {
+      "id": "ecc-engineering/ecc/sea-requirements-discovery",
+      "name": "sea-requirements-discovery",
+      "source": "ecc-engineering",
+      "plugin": "ecc",
+      "description": "Resolve material ambiguity in a feature or design, or conduct an explicitly requested Grill Me interview, using existing source and acceptance criteria.",
+      "file": "skills/ecc-engineering/sea-requirements-discovery/SKILL.md",
+      "sha256": "10584241971e06ddf4a4362d689d0404a76589caa5bfc3867b17d493be449693",
+      "adapted": true
+    },
+    {
+      "id": "ecc-engineering/ecc/sea-quality-contract",
+      "name": "sea-quality-contract",
+      "source": "ecc-engineering",
+      "plugin": "ecc",
+      "description": "Define or review task quality constraints, protected behavior and existing executable checks when acceptance or quality requirements are missing or disputed.",
+      "file": "skills/ecc-engineering/sea-quality-contract/SKILL.md",
+      "sha256": "1b0334d5abdfad039bb233d831fe392d0abad374c71a7bd1d19c9bacd369ea63",
+      "adapted": true
+    },
+    {
+      "id": "ecc-engineering/ecc/sea-adversarial-review",
+      "name": "sea-adversarial-review",
+      "source": "ecc-engineering",
+      "plugin": "ecc",
+      "description": "Challenge a consequential design or implementation claim against protected invariants and evidence; use for requested doubt-driven review or high-impact uncertain decisions.",
+      "file": "skills/ecc-engineering/sea-adversarial-review/SKILL.md",
+      "sha256": "b1f87dbd1b5f0efbd3fa5b8a1aaa39e29f89d09db02541e7073fb02263f8adb4",
+      "adapted": true
     },
     {
       "id": "cursor-pstack/ecc/arena",

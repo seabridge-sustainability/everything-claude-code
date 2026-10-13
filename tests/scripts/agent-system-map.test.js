@@ -43,6 +43,9 @@ run('map covers canonical policy, all adapters, outcome gate, and CI with bounde
     'file:integrations/pstack/cli.mjs', 'file:integrations/pstack/mcp.mjs',
     'file:integrations/ponytail/cli.mjs', 'file:integrations/ponytail/mcp.mjs',
     'file:skills/sea-ponytail/SKILL.md',
+    'file:manifests/task-skill-routing.json', 'file:scripts/lib/skill-routing.js',
+    'file:scripts/fresh-agent-session.js', 'file:scripts/lib/fresh-session-guard.js',
+    'file:integrations/engineering-skills/catalog.mjs',
     'file:skills/sea-multi-model-planning/SKILL.md', 'file:skills/sea-verify-seabridge/SKILL.md',
     'runtime:codex', 'runtime:claude', 'runtime:gemini', 'runtime:opencode']) {
     assert.ok(ids.has(required), required);

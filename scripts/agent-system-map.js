@@ -74,6 +74,18 @@ const SOURCES = Object.freeze([
   'integrations/ponytail/cli.mjs', 'integrations/ponytail/runtime.mjs',
   'integrations/ponytail/mcp.mjs', 'skills/sea-ponytail/SKILL.md',
   'docs/tools/PONYTAIL_ECC_GUIDE.md', 'tests/scripts/ponytail-integration.test.mjs',
+  'manifests/task-skill-routing.json', 'scripts/lib/skill-routing.js',
+  'scripts/skill-route.js', 'tests/lib/skill-routing.test.js',
+  'scripts/fresh-agent-session.js', 'scripts/lib/fresh-session-guard.js',
+  'scripts/hooks/fresh-session-guard.js', 'tests/lib/fresh-session-guard.test.js',
+  'integrations/engineering-skills/catalog.mjs',
+  'integrations/engineering-skills/adaptation.json',
+  'integrations/engineering-skills/configure.mjs',
+  'integrations/engineering-skills/verify-clients.mjs',
+  'skills/sea-requirements-discovery/SKILL.md',
+  'skills/sea-quality-contract/SKILL.md', 'skills/sea-adversarial-review/SKILL.md',
+  'skills/sea-verify-seabridge/features/README.md',
+  'tests/scripts/pstack-feature-recipes.test.mjs',
 ]);
 
 function hash(value) { return crypto.createHash('sha256').update(value).digest('hex'); }

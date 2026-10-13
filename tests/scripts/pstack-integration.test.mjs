@@ -58,7 +58,7 @@ test('Pstack catalog indexing is idempotent and preserves all existing workflows
   assert.deepEqual(byId(next), byId(current));
   assert.deepEqual(await indexPstack(next), next);
   assert.equal(next.skills.filter(s => s.source === 'cursor-pstack').length, 10);
-  assert.equal(next.skills.filter(s => !['cursor-pstack','ponytail'].includes(s.source)).length, 374);
+  assert.equal(next.skills.filter(s => !['cursor-pstack','ponytail','ecc-engineering'].includes(s.source)).length, 374);
   assert.equal(next.commands.length, 65);
 });
 test('offline two-planner/judge protocol is valid but never implementation permission', async () => {
@@ -99,7 +99,7 @@ test('judge rejection remains a replanning verdict', async () => {
 });
 test('unknown features and path traversal/Windows aliases are denied', async () => {
   await assert.rejects(verifyFeature('../../.env'), /allowlisted/);
-  for (const file of ['../AGENTS.md', 'C:/Windows/file', 'a\\b', 'file:stream', 'dir/file.', 'CON', 'dir/../file']) assert.throws(() => validateSpec({ ...spec, scopes: [{ repository: 'ecc', paths: [file] }] }), /bounded/);
+  for (const file of ['../AGENTS.md', 'C:/Windows/file', 'a\\b', 'file:stream', 'dir/file.', 'CON', 'dir/../file', 'dir/\u0000file', 'dir/\u001ffile']) assert.throws(() => validateSpec({ ...spec, scopes: [{ repository: 'ecc', paths: [file] }] }), /bounded/);
 });
 test('a timed-out task-owned child fails without killing unrelated processes', async () => {
   const result = await boundedRun(process.execPath, ['-e', 'setTimeout(()=>{},10000)'], { timeout: 100 });

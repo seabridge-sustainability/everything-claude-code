@@ -14,7 +14,7 @@ export const digest = value => sha(JSON.stringify(canonical(value)));
 const fail = message => { throw Error(message); };
 function text(value, label, max = 16000) { if (typeof value !== 'string' || !value.trim() || value.length > max) fail(`Invalid ${label}`); return value; }
 function id(value) { if (!/^[a-z][a-z0-9-]{0,79}$/.test(value || '')) fail('Invalid identifier'); return value; }
-function relative(file) { if (typeof file !== 'string' || path.isAbsolute(file) || /^[A-Za-z]:|[\\:\x00-\x1f]/.test(file) || file.split('/').some(x => !x || x === '.' || x === '..' || /[. ]$/.test(x) || /^(con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\.|$)/i.test(x))) fail('Use a bounded repository-relative path'); return file; }
+function relative(file) { if (typeof file !== 'string' || path.isAbsolute(file) || /^[A-Za-z]:|[\\:]/.test(file) || [...file].some(c => c.charCodeAt(0) < 32) || file.split('/').some(x => !x || x === '.' || x === '..' || /[. ]$/.test(x) || /^(con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\.|$)/i.test(x))) fail('Use a bounded repository-relative path'); return file; }
 async function hashFile(file) { try { return sha(await fs.readFile(file)); } catch (e) { if (e.code === 'ENOENT') return null; throw e; } }
 async function boundedFile(root, file) {
   const resolved = path.resolve(root, relative(file));
@@ -112,6 +112,26 @@ export const features = {
   'ecc-workflow-routing': { surface: 'CLI', required: 'catalog-routing-regression', command: 'node integrations/pstack/cli.mjs verify ecc-workflow-routing' },
   'backend-readiness': { surface: 'HTTP', required: 'readiness-only', url: 'http://127.0.0.1:8000/health', completionProof: false },
   'frontend-readiness': { surface: 'HTTP', required: 'readiness-only', url: 'http://127.0.0.1:3000/login', completionProof: false },
+  'backend-auth-contract': { surface: 'pytest fixture contract', required: 'validate-user-route-regression', completionProof: false,
+    repository: 'backend', files: ['tests/test_auth_route_contract.py'],
+    executable: 'venv/Scripts/python.exe', args: ['-m', 'pytest', '--no-cov', 'tests/test_auth_route_contract.py'],
+    limitation: 'Dependency-overridden users and TestClient; does not establish real login, Mongo readiness or tenant isolation.' },
+  'backend-openseabri-contract': { surface: 'pytest fixture contract', required: 'routes-and-api-key-fail-closed', completionProof: false,
+    repository: 'backend', files: ['tests/test_openseabri_route_contract.py'],
+    executable: 'venv/Scripts/python.exe', args: ['-m', 'pytest', '--no-cov', 'tests/test_openseabri_route_contract.py'],
+    limitation: 'Route registration and fixture API-key rejection; does not establish a connected OpenSeaBri journey.' },
+  'frontend-auth-return-path': { surface: 'Vitest unit regression', required: 'safe-property-return-url', completionProof: false,
+    repository: 'frontend', files: ['src/lib/utils/auth-return-path.test.ts', 'src/lib/utils/auth-return-path.ts'],
+    executable: 'node', args: ['node_modules/vitest/vitest.mjs', 'run', 'src/lib/utils/auth-return-path.test.ts', '--maxWorkers=1'],
+    limitation: 'URL preservation and rejection of external/unsafe returns; does not establish Cognito login or an authenticated page.' },
+  'authenticated-property-journey': { surface: 'signed-in intended UI/API', required: 'real-login-and-property-tenant-boundary', completionProof: false,
+    prerequisites: ['approved existing test tenant and property', 'authenticated primary frontend :3000 and backend :8000', 'authorized negative tenant test without exposing another tenant data'],
+    recipe: ['Sign in with existing test credentials without recording secrets', 'Open the agreed property through the intended page and real API', 'Verify missing/invalid session rejection and authorized tenant boundary case', 'Retain redacted UI/API receipts and source revision'],
+    limitation: 'Manual governed journey; unit auth contracts and login-page readiness do not complete it.' },
+  'openaccess-property-result': { surface: 'authenticated Model API/UI/export', required: 'property-linked-public-data-result', completionProof: false,
+    prerequisites: ['explicit resumption of the paused Climate goal', 'eligible acquired public inputs and justified methods', 'approved authenticated property and intended Model API/page/export'],
+    recipe: ['Inspect public-input provenance, units, timeframe and method eligibility', 'Observe the agreed property-linked values from the real API', 'Compare intended Model UI and CSV against those same values', 'Retain missing/unavailable fields and capture redacted evidence'],
+    limitation: 'Configured-unverified; no calculation, provider request or scientific-validation claim is performed by this recipe.' },
   'nature-actions': { surface: 'signed-in UI/API', required: 'durable-save-reopen-and-attachments', completionProof: false,
     prerequisites: ['approved test tenant/data and authenticated session', 'healthy primary frontend :3000 and backend :8000', 'existing Nature Actions journey with actual API calls; no mock-only acceptance'],
     recipe: ['Save Actions through intended UI', 'Fresh reopen and compare receipt/source values', 'Upload, download and compare attachment bytes', 'Capture redacted API/UI evidence and source revision'],
@@ -155,6 +175,25 @@ export async function verifyFeature(feature, { persist = true } = {}) {
     if (command.problem) receipt.reason = command.problem;
     if (command.exitCode === 0 && !command.problem) { receipt.result.summary = JSON.parse(command.output.trim()); receipt.verdict = 'PASS'; }
     else receipt.verdict = 'FAIL';
+  } else if (features[feature].executable) {
+    const definition = features[feature], cwd = repositories[definition.repository];
+    if (!(await fs.stat(cwd).catch(() => null))?.isDirectory()) receipt.reason = 'Existing project checkout missing; no installation or substitute repository attempted.';
+    else {
+    const source = async () => ({ head: execFileSync('git', ['-C', cwd, 'rev-parse', 'HEAD'], { encoding: 'utf8', windowsHide: true }).trim(),
+      files: await Promise.all(definition.files.map(async file => ({ path: file, sha256: await hashFile(await boundedFile(cwd, file)) }))) });
+    receipt.sourceBefore = await source();
+    const executable = definition.executable === 'node' ? process.execPath : await boundedFile(cwd, definition.executable);
+    receipt.command = [executable, ...definition.args];
+    receipt.cwd = cwd;
+    if (receipt.sourceBefore.files.some(file => !file.sha256) || !(await hashFile(executable))) receipt.reason = 'Existing executable or harness missing; no dependency installation or alternate runtime attempted.';
+    else {
+      const result = await boundedRun(executable, definition.args, { cwd, timeout: 120000 });
+      receipt.sourceAfter = await source();
+      receipt.result = { exitCode: result.exitCode, outputSha256: result.outputSha256, outputBytes: result.outputBytes };
+      receipt.verdict = result.exitCode === 0 && !result.problem && digest(receipt.sourceBefore) === digest(receipt.sourceAfter) ? 'PASS' : 'FAIL';
+      receipt.reason = result.problem || (digest(receipt.sourceBefore) !== digest(receipt.sourceAfter) ? 'Source changed during verification; rerun against a stable revision.' : definition.limitation);
+    }
+    }
   } else if (feature.endsWith('-readiness')) {
     try {
       const response = await fetch(features[feature].url, { signal: AbortSignal.timeout(5000), redirect: 'manual' });

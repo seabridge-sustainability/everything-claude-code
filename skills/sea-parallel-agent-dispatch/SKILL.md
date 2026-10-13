@@ -25,6 +25,15 @@ Agent task prompts; returned findings; integration decisions; conflict notes; ve
 
 Confirm disjoint write scopes, no duplicated work, no blocked critical path, and independent review of returned changes.
 
+For authorized independent evaluators, give each the same completed source
+revision and acceptance criteria. One checks functionality and integration;
+another checks the affected security, tenant or scientific invariants. Ask for
+evidence, concrete failures and limits, not agreement or a generic score. Keep
+evaluators read-only; the lead remains the single writer and reconciles conflicts
+against actual source and receipts. Changed source invalidates the review.
+Do not manufacture a second evaluator, provider identity or successful judgment
+from a fixture. Missing capacity means sequential review with an explicit limit.
+
 ## Failure Conditions
 
 Fail if subagents are not authorized, tasks share state, immediate work is blocked on a delegated result, or agents would touch the same files unsafely.
@@ -36,6 +45,11 @@ Every delegated task inherits local-only, no-push, no-global-install, no-fabrica
 ## Cross-Agent Compatibility Notes
 
 Codex spawn_agent only when the user explicitly asks for subagents. Other runtimes use their native agents or sequential local execution.
+
+Task authorization must cover delegation; a risk classification is no permission
+to spawn agents or make provider calls. Existing live-call deferrals and budgets
+remain in force. No extra worktree, running-session restart or parallel shared
+browser/Mongo write is implied. Use one active ECC goal and its proof record.
 
 ## Superpowers Adaptation
 
