@@ -18,6 +18,17 @@
     },
     "open-code-review": {
       "revision": "357c3f09a264563ab64d8f4fc3b25b186cd3c4a4"
+    },
+    "cursor-pstack": {
+      "revision": "7845807642f9ef234a0ec5b4067fa3f11fd92a85",
+      "repository": "https://github.com/cursor/plugins",
+      "path": "pstack",
+      "execution": "ECC adapters only"
+    },
+    "ponytail": {
+      "revision": "2961b52fc1fe6a5a87c7a959a79512e5c2f3ffe5",
+      "repository": "https://github.com/DietrichGebert/ponytail",
+      "execution": "ECC adapters only; no upstream hooks"
     }
   },
   "skills": [
@@ -3386,6 +3397,182 @@
       "description": "Hardens code against vulnerabilities. Use when auditing an input handler for vulnerabilities, when handling user input, authentication, data storage, or external integrations, or when checking a login flow is safe against the OWASP Top Ten. Use when building any feature that accepts untrusted data, manages user sessions, or interacts with third-party services. Use when auditing dependencies for known vulnerabilities, triaging package-manager audit findings, or assessing supply-chain risk in a new package. Use when personal data or privacy compliance (GDPR, CCPA) is involved.",
       "file": "skills/addy/security-and-hardening/SKILL.md",
       "sha256": "2e3fc60eed5aba97fe416f3f3c9317fdb014a682925ec70a733c3ff99e4b9858"
+    },
+    {
+      "id": "cursor-pstack/ecc/arena",
+      "name": "arena",
+      "source": "cursor-pstack",
+      "plugin": "ecc",
+      "description": "Compare independent implementation plans with an explicit judge before owner-approved implementation.",
+      "file": "skills/pstack/arena/SKILL.md",
+      "sha256": "bc9779864bea66885e760b395b2851e82fe26361ba3c1f0693c92f2fd6c614b5",
+      "upstreamSkill": "pstack/skills/arena/SKILL.md",
+      "adapted": true
+    },
+    {
+      "id": "cursor-pstack/ecc/architect",
+      "name": "architect",
+      "source": "cursor-pstack",
+      "plugin": "ecc",
+      "description": "Ground a substantial design in current contracts, compare interfaces and obtain plan approval.",
+      "file": "skills/pstack/architect/SKILL.md",
+      "sha256": "900e7292987d7a04893b58f641e6bf6e3ac447a010914d7efbe353955f484bdb",
+      "upstreamSkill": "pstack/skills/architect/SKILL.md",
+      "adapted": true
+    },
+    {
+      "id": "cursor-pstack/ecc/create-verification-skill",
+      "name": "create-verification-skill",
+      "source": "cursor-pstack",
+      "plugin": "ecc",
+      "description": "Turn a recurring user journey into an executable verification recipe with durable evidence.",
+      "file": "skills/pstack/create-verification-skill/SKILL.md",
+      "sha256": "d3ff9ad64ac683545a280705174536a01f0049f4145a23dab951100194816c12",
+      "upstreamSkill": "pstack/skills/create-verification-skill/SKILL.md",
+      "adapted": true
+    },
+    {
+      "id": "cursor-pstack/ecc/maintain-verification-skill",
+      "name": "maintain-verification-skill",
+      "source": "cursor-pstack",
+      "plugin": "ecc",
+      "description": "Keep affected feature journeys and verification prerequisites accurate as behavior changes.",
+      "file": "skills/pstack/maintain-verification-skill/SKILL.md",
+      "sha256": "87d9994cc50a5f3fbc66ba59fe16897aa37f985cadc42534a3aa314bc6a62126",
+      "upstreamSkill": "pstack/skills/maintain-verification-skill/SKILL.md",
+      "adapted": true
+    },
+    {
+      "id": "cursor-pstack/ecc/interrogate",
+      "name": "interrogate",
+      "source": "cursor-pstack",
+      "plugin": "ecc",
+      "description": "Obtain bounded independent critique for a consequential diff or design.",
+      "file": "skills/pstack/interrogate/SKILL.md",
+      "sha256": "d80bf6c761620d09c0de7f419b9365ea50f7ae013dd22578b40af44b17487511",
+      "upstreamSkill": "pstack/skills/interrogate/SKILL.md",
+      "adapted": true
+    },
+    {
+      "id": "cursor-pstack/ecc/reflect",
+      "name": "reflect",
+      "source": "cursor-pstack",
+      "plugin": "ecc",
+      "description": "Capture recurring engineering lessons in existing verification and feature guidance.",
+      "file": "skills/pstack/reflect/SKILL.md",
+      "sha256": "1d72359961ba8d3c64d7c96a931a8d74fbb40465574683ea4daae0846f8d17b7",
+      "upstreamSkill": "pstack/skills/reflect/SKILL.md",
+      "adapted": true
+    },
+    {
+      "id": "cursor-pstack/ecc/correct",
+      "name": "correct",
+      "source": "cursor-pstack",
+      "plugin": "ecc",
+      "description": "Prevent repeated defects with contracts, assertions and bounded regression checks.",
+      "file": "skills/pstack/correct/SKILL.md",
+      "sha256": "61024b05f502df2d826c60c15993720ea761a50a81ad54cbf1554827bbd66325",
+      "upstreamSkill": "pstack/skills/correct/SKILL.md",
+      "adapted": true
+    },
+    {
+      "id": "cursor-pstack/ecc/how",
+      "name": "how",
+      "source": "cursor-pstack",
+      "plugin": "ecc",
+      "description": "Explain an affected subsystem from current source and runtime evidence.",
+      "file": "skills/pstack/how/SKILL.md",
+      "sha256": "149504b096f3754f539d548c948a98fef16dac97b41bc7c8293486c0cf4db22e",
+      "upstreamSkill": "pstack/skills/how/SKILL.md",
+      "adapted": true
+    },
+    {
+      "id": "cursor-pstack/ecc/why",
+      "name": "why",
+      "source": "cursor-pstack",
+      "plugin": "ecc",
+      "description": "Recover design rationale and constraints using authorized evidence sources.",
+      "file": "skills/pstack/why/SKILL.md",
+      "sha256": "d1453fb061b8ca50f87e4035257c712a551ac6789577e64e56d5fbd7aa766278",
+      "upstreamSkill": "pstack/skills/why/SKILL.md",
+      "adapted": true
+    },
+    {
+      "id": "cursor-pstack/ecc/blast-radius",
+      "name": "blast-radius",
+      "source": "cursor-pstack",
+      "plugin": "ecc",
+      "description": "Identify affected callers and the smallest checks that can detect regressions.",
+      "file": "skills/pstack/blast-radius/SKILL.md",
+      "sha256": "e30216028224d23459851e70f240149cf4e793112782450f066d9c46b50c132a",
+      "upstreamSkill": "pstack/skills/blast-radius/SKILL.md",
+      "adapted": true
+    },
+    {
+      "id": "ponytail/ecc/ponytail",
+      "name": "ponytail",
+      "source": "ponytail",
+      "plugin": "ecc",
+      "description": "Apply requested Ponytail lite/full/ultra guidance to the smallest complete implementation.",
+      "file": "skills/ponytail/ponytail/SKILL.md",
+      "sha256": "11db8c2aa2160978c4203c69d8295b02ee04b035b0ed07e63f496a3773e689ce",
+      "revision": "2961b52fc1fe6a5a87c7a959a79512e5c2f3ffe5",
+      "adapted": true
+    },
+    {
+      "id": "ponytail/ecc/ponytail-review",
+      "name": "ponytail-review",
+      "source": "ponytail",
+      "plugin": "ecc",
+      "description": "Read-only scoped Ponytail review for correctness, safety, real load, useful tests, speed and unnecessary complexity.",
+      "file": "skills/ponytail/ponytail-review/SKILL.md",
+      "sha256": "b62fbda982bb278d8dbb2b3afcd7da6dd436cfd8d70454312a5be8e1bce8f4b2",
+      "revision": "2961b52fc1fe6a5a87c7a959a79512e5c2f3ffe5",
+      "adapted": true
+    },
+    {
+      "id": "ponytail/ecc/ponytail-audit",
+      "name": "ponytail-audit",
+      "source": "ponytail",
+      "plugin": "ecc",
+      "description": "Bounded read-only Ponytail audit of a requested repository or subsystem.",
+      "file": "skills/ponytail/ponytail-audit/SKILL.md",
+      "sha256": "58dba7008fe935c511f79d5aeb05d2154a5a3853384ef0c0cc84ef021cc7f0b8",
+      "revision": "2961b52fc1fe6a5a87c7a959a79512e5c2f3ffe5",
+      "adapted": true
+    },
+    {
+      "id": "ponytail/ecc/ponytail-debt",
+      "name": "ponytail-debt",
+      "source": "ponytail",
+      "plugin": "ecc",
+      "description": "Collect explicit shortcut/ponytail comment candidates into a read-only debt ledger.",
+      "file": "skills/ponytail/ponytail-debt/SKILL.md",
+      "sha256": "d76995645b696bb0cd9839bd639d383a9785b7ddb3aa6492ab76358cb2990405",
+      "revision": "2961b52fc1fe6a5a87c7a959a79512e5c2f3ffe5",
+      "adapted": true
+    },
+    {
+      "id": "ponytail/ecc/ponytail-gain",
+      "name": "ponytail-gain",
+      "source": "ponytail",
+      "plugin": "ecc",
+      "description": "Inspect pinned upstream benchmark methodology without inventing local savings.",
+      "file": "skills/ponytail/ponytail-gain/SKILL.md",
+      "sha256": "6d7b155d6883d8a9a6699fb7b72d996f0e65e334a3d3c35eeba6ce09d4f87a51",
+      "revision": "2961b52fc1fe6a5a87c7a959a79512e5c2f3ffe5",
+      "adapted": true
+    },
+    {
+      "id": "ponytail/ecc/ponytail-help",
+      "name": "ponytail-help",
+      "source": "ponytail",
+      "plugin": "ecc",
+      "description": "Explain available ECC Ponytail commands, conversational modes and CLI/MCP boundaries.",
+      "file": "skills/ponytail/ponytail-help/SKILL.md",
+      "sha256": "6f2039a06b0399ecf26d02ebadefaa7e7fbf4bfe62afe3cf2d56183d5aa96f13",
+      "revision": "2961b52fc1fe6a5a87c7a959a79512e5c2f3ffe5",
+      "adapted": true
     }
   ],
   "commands": [

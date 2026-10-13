@@ -1,0 +1,22 @@
+{
+  "revision": "7845807642f9ef234a0ec5b4067fa3f11fd92a85",
+  "selected": [
+    "arena",
+    "architect",
+    "create-verification-skill",
+    "maintain-verification-skill",
+    "interrogate",
+    "reflect",
+    "correct",
+    "how",
+    "why",
+    "blast-radius"
+  ],
+  "retainedUpstreamSkills": 52,
+  "upstreamScriptsExecuted": false,
+  "automaticShipping": false,
+  "automaticWorktrees": false,
+  "automaticCloudDispatch": false,
+  "primaryWorkflow": "ECC task routing",
+  "sourceManifest": "source-manifest.json"
+}

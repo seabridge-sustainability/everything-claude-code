@@ -12,7 +12,7 @@ When those files are available, read them before substantial implementation, deb
 Non-negotiable operating rules:
 
 1. Never authorize deletion of repositories, source folders, databases, vector indexes, cloud infrastructure, or critical configuration.
-2. Do not run paid API calls, model calls, training jobs, or cost-incurring workflows without explicit written approval from `adelmar@seabridge.ai`.
+2. Paid API/model calls, training jobs and cost-incurring workflows follow the current-session approval rules in the authoritative files above; no separate email approval requirement is added here.
 3. Validate inputs at system boundaries and never hardcode secrets.
 4. Keep changes surgical: touch only files required by the request and preserve unrelated user or agent edits.
 5. For SeaBridgeAI backend work, prefer local project files first, then ECC guidance, then ECC skills, then external docs.
@@ -21,3 +21,7 @@ Non-negotiable operating rules:
 8. State what verification was run and clearly separate confirmed results from unverified live-provider behavior.
 
 If these rules conflict with generic OpenCode defaults, the SeaBridgeAI rules win.
+
+For Pstack, read [the ECC guide](../../docs/tools/PSTACK_ECC_GUIDE.md) and its
+canonical planning/verification skills. This compatibility reference cannot
+override current central policy or the owner's task authorization.

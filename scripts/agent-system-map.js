@@ -65,6 +65,15 @@ const SOURCES = Object.freeze([
   'tests/lib/memory-schema.test.js', 'tests/scripts/memory.test.js',
   'tests/scripts/memory-mcp.test.js', 'tests/scripts/knowledge-freshness.test.js',
   'tests/scripts/knowledge-retrieval-eval.test.js',
+  'integrations/pstack/cli.mjs', 'integrations/pstack/runtime.mjs',
+  'integrations/pstack/mcp.mjs', 'integrations/dev-suite/runtime.mjs',
+  'skills/sea-multi-model-planning/SKILL.md',
+  'skills/sea-verify-seabridge/SKILL.md', 'skills/sea-skill-map/SKILL.md',
+  'docs/tools/PSTACK_ECC_GUIDE.md', 'docs/tools/MODEL_PROMPTING_AND_SKILL_POLICY.md',
+  'tests/scripts/pstack-integration.test.mjs',
+  'integrations/ponytail/cli.mjs', 'integrations/ponytail/runtime.mjs',
+  'integrations/ponytail/mcp.mjs', 'skills/sea-ponytail/SKILL.md',
+  'docs/tools/PONYTAIL_ECC_GUIDE.md', 'tests/scripts/ponytail-integration.test.mjs',
 ]);
 
 function hash(value) { return crypto.createHash('sha256').update(value).digest('hex'); }
@@ -145,6 +154,12 @@ function buildMap(root = ROOT, sources = SOURCES) {
     ['tests/lib/memory-schema.test.js', 'schemas/memory.schema.json', "require('../../schemas/memory.schema.json')"],
     ['tests/lib/memory-schema.test.js', 'scripts/lib/memory-vault.js', "require('../../scripts/lib/memory-vault')"],
     ['tests/scripts/memory-mcp.test.js', 'scripts/lib/memory-vault.js', "require('../../scripts/lib/memory-vault')"],
+    ['integrations/pstack/cli.mjs', 'integrations/pstack/runtime.mjs', "from './runtime.mjs'"],
+    ['integrations/pstack/mcp.mjs', 'integrations/pstack/runtime.mjs', "from './runtime.mjs'"],
+    ['integrations/pstack/mcp.mjs', 'integrations/dev-suite/runtime.mjs', "from '../dev-suite/runtime.mjs'"],
+    ['integrations/ponytail/cli.mjs', 'integrations/ponytail/runtime.mjs', "from './runtime.mjs'"],
+    ['integrations/ponytail/mcp.mjs', 'integrations/ponytail/runtime.mjs', "from './runtime.mjs'"],
+    ['integrations/ponytail/mcp.mjs', 'integrations/dev-suite/runtime.mjs', "from '../dev-suite/runtime.mjs'"],
   ]) {
     if (!fs.readFileSync(file(root, from), 'utf8').includes(importText)) {
         throw new Error(`declared memory import missing from ${from}: ${importText}`);
@@ -166,7 +181,7 @@ function buildMap(root = ROOT, sources = SOURCES) {
     schema: 'seabridge.agent-system-map.v1',
     scope: 'Three backend policy sources and ECC loading adapters, outcome control, evaluation, and CI; no product or tenant data',
     extractor: 'scripts/agent-system-map.js (deterministic, no LLM)',
-    generatorVersion: 7,
+    generatorVersion: 9,
     // Generated verification artifact, not a fourth policy source. CI can
     // reproduce the three reviewed, pinned files without a private-repo token.
     policySnapshot: rows.filter(row => row.path.startsWith('../manageesg-backend/'))

@@ -43,6 +43,10 @@ permissions and acceptance. Vendor skills are supporting guidance, not new autho
 | Long context/handoff | `sea-context-hygiene` |
 | Selected Matt/Addy/Anthropic workflows | `sea-dev-suite`: one primary from `suite_find_workflow`, read its exact unique ID |
 | Complex phased plan requested | `sea-gsd-controlled-execution`, subordinate to the existing ECC goal; no competing plan |
+| Competing implementation plans / multi-model design | `sea-multi-model-planning`: Pstack arena under the existing ECC goal; owner checkpoint before implementation |
+| Reusable feature verification / verification map maintenance | `sea-verify-seabridge`: existing verification-loop and harnesses first; configured recipes are not runtime proof |
+
+| Explicit Ponytail simplicity, review/audit, debt, gain or help request | `sea-ponytail`: one selected ECC adapter; preserve generic routing and the existing goal |
 
 ## Guardrails
 

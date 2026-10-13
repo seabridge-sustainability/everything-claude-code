@@ -66,6 +66,12 @@ agent; a Claude template is not a Codex/Gemini/OpenCode installation.
 |---|---|
 | SeaBridge contracts, scientific integrity, tenant/security boundaries | Matching ECC `sea-*` skill and existing source/acceptance constraints first; `sea-skill-map` routes only when needed. |
 | Phased GSD work | `sea-gsd-controlled-execution` supports the existing ECC goal/assignments; no second plan, alternate DoD or uncontrolled `/gsd:*` installer. |
+| Competing plans / Pstack arena or architect | `sea-multi-model-planning` is primary for a requested substantial multi-model design; arena/architect are supporting adapters under the same ECC goal. No raw Cursor Task/model defaults, automatic worktrees or implementation before owner plan approval. |
+| Pstack verification creation / maintenance | `sea-verify-seabridge` coordinates affected feature recipes; `verification-loop` and backend/API checks provide the existing proof ladder. No competing harness, blanket full suite, mocked persistence claim or replacement server. |
+| Pstack interrogate / Addy / Alibaba review | Select one primary review workflow. An additional model critique requires a demonstrated need and existing provider authorization; findings remain evidence, not permission to edit or ship. |
+| Pstack reflect / correct / knowledge | Update an affected existing check or feature guide for recurring lessons. Existing knowledge-ops boundaries apply; no unrelated history scan, new memory store or automatic personal-memory edit. |
+| Explicit Ponytail implementation / review / audit | `sea-ponytail` is one requested lens under current policy. Generic Matt/Addy/SeaBridge routing stays primary otherwise; Pstack/GSD continue the same goal. No upstream global hooks, code-removal mandate or blanket test policy. |
+| Ponytail debt / gain | Read-only bounded source-comment candidates; benchmark provenance is upstream evidence, not measured SeaBridge savings. |
 | Matt debugging / Anthropic debug | Shared catalog `diagnosing-bugs` is primary; Anthropic debug is supporting only for a demonstrated gap. |
 | Architecture / codebase design / system design | Use only when design/refactor is requested or an observed defect requires it; no redesign of a small fix. |
 | Addy / Anthropic / Alibaba review | One primary code-review workflow; OCR findings are evidence, not acceptance or permission for another model call. |
@@ -76,15 +82,22 @@ agent; a Claude template is not a Codex/Gemini/OpenCode installation.
 
 Assets and the full shared catalog live in
 `C:/Users/adelm/SeaBridgeAI/everything-claude-code/integrations/company-dev-tools`.
-The executable bridge and SeaBridge wrappers remain in
-`C:/Users/adelm/SeaBridgeAI/everything-claude-code-runtime`; do not point clients at
-an older checkout or restart productive sessions. Use `sea-dev-suite` and
+The canonical executable bridges and SeaBridge wrappers resolve from
+`C:/Users/adelm/SeaBridgeAI/everything-claude-code`. Preserve productive sessions
+and their existing bindings until an explicit handoff. Use `sea-dev-suite` and
 `suite_find_workflow`, then read the exact returned ID with the matching skill or
-command reader. CLI fallback: runtime `integrations/dev-suite/cli.mjs find|read`.
+command reader. CLI fallback: ECC `integrations/dev-suite/cli.mjs find|read`.
 Search returns `routingRole=primary` for recognized tasks, otherwise candidates;
 it is not permission to execute them. Full nested paths distinguish Zoom SDKs;
 ambiguous legacy IDs fail, never select the first matching file. Identical hashed
 workflow copies are deduplicated in search, not deleted from licensed sources.
+
+Pstack invocation: `docs/tools/PSTACK_ECC_GUIDE.md`. The `seabridge-pstack` server
+also exposes `pstack_find_workflow`/`pstack_read_skill` against this same catalog,
+so clients can use it without a second server. If the running host has not loaded
+its new tool metadata, use the Node CLI fallback; do not restart productive agents.
+Duplicate native thin-loader names resolve to the same canonical ECC skill body,
+not separate implementations. Raw Pstack skills remain pinned reference content.
 
 ### Knowledge access and freshness
 

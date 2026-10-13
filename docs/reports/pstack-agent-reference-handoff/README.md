@@ -1,0 +1,17 @@
+# Shared Pstack reference handoff
+
+Status: authorized handoff sent; central patch not yet applied. The original backend reservation `workspace-central-rule-release-20261013` has been replaced by `nature-mvp-root-be2-20261013`. The Codex task `CODING AGENT SYSTEM AND KNOWLEDGE SYSTEM` (thread `01a0d61b-bf15-7f72-a4c0-5bae287ce55e`) received the prepared patch and the request to coordinate a safe checkpoint with the current checkout owner. Do not take over the checkout or stop the Nature/Climate/product agents.
+
+Requested local integration: append the small Pstack references in `central-references.patch` to backend `AGENTS.md`, `AGENTS_SYSTEM.md` and `CLAUDE.md`. Compare each current file with the SHA-256 in `manifest.json`; the owner is changing these files, so rebase the append-only sections if any hash differs. Preserve all existing rules and concurrent changes. The patch is a proposal, not a fourth policy source. No commit/push authorization is added by this handoff.
+
+The frontend already imports backend AGENTS.md and AGENTS_SYSTEM.md, so integrating the central references exposes them there without editing the occupied frontend checkout. ECC native loaders now directly reference both canonical skills and `docs/tools/PSTACK_ECC_GUIDE.md`. The same guide documents single-primary routing, GSD/verification/review overlaps and a Node fallback for running hosts without fresh MCP metadata.
+
+Provider-free integration proof: ten adapters, six client configs, five callable tools per client, fourteen native thin loaders, sixteen integration tests, existing 96 routing checks and fourteen bounded system-map tests. Live model calls remain deferred by Alejandro. Application journeys remain unavailable until the approved primary runtime and authenticated data scope exist.
+
+After local integration, verify the three central references from current source and rerun the relevant instruction-stack check. The deterministic agent-system-map generator now includes Pstack. Its stored map is explicitly stale until clean, approved source publication permits rebuild; never bypass the dirty-source publication guard or claim an unchanged old map is fresh. The large Graphify graph is unrelated and must not be rebuilt as part of this handoff.
+
+Current audit receipt: `artifacts/agent-runs/pstack/reference-audit-proof.json`. The original integration receipts are retained unchanged; this continuation adds native instruction references and overlap routing. Handoff delivery succeeded; delivery does not prove central-file integration.
+
+2026-10-13 continuation: the combined Pstack/Ponytail proposal is `pstack-ponytail-central-references.patch` with `pstack-ponytail-manifest.json`. It supersedes the old pending Pstack-only patch for the same three central files. Read the current manifest and rebase on any drift; local owner integration only, no publication. The current ECC integration report is `../ponytail-integration-20261013/README.md`.
+
+RESOLVED LOCALLY 2026-10-13: Alejandro explicitly approved a documentation-only three-file exception while Claude continued. Compact references are now applied to backend AGENTS.md/AGENTS_SYSTEM.md/CLAUDE.md, preserving every original byte and passing all81 stack checks. Do not apply either historical long patch again; they duplicate references and exceed the16KiB budget. Exact evidence is in ../pstack-ponytail-publication-20261013/central-reference-proof.json. Normal commit/push release gates remain separate.

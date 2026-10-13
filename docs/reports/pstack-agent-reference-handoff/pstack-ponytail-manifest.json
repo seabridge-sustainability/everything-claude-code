@@ -1,0 +1,20 @@
+{
+  "status": "superseded-by-applied-compact-references",
+  "preparedAt": "2026-10-13T04:28:07.026Z",
+  "files": [
+    {
+      "file": "../manageesg-backend/AGENTS.md",
+      "sha256Before": "04c516b6bc91f87fa62122e7cb7221dab60993b2501f17ef183ec4253bf582c5"
+    },
+    {
+      "file": "../manageesg-backend/AGENTS_SYSTEM.md",
+      "sha256Before": "2607743a0a44db553c55847db5623c8f5d8daf761b14d9b96eed248f36d147d4"
+    },
+    {
+      "file": "../manageesg-backend/CLAUDE.md",
+      "sha256Before": "057ac44ca0aa593a73364fb79fd8e5f534edfacfacbf1cfce1537836d15cd8fa"
+    }
+  ],
+  "patchSha256": "45d4255cf49608b0f7ef12ef963813abdd8585da640a19db7a6b59d8df3bfa56",
+  "policy": "Current backend checkout owner applies locally at safe checkpoint; no publication or service changes authorized."
+}

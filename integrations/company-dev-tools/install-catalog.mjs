@@ -3,12 +3,15 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import crypto from 'node:crypto';
+import { existsSync } from 'node:fs';
+import { indexPstack } from '../pstack/catalog.mjs';
+import { indexPonytail } from '../ponytail/catalog.mjs';
 const root = path.dirname(fileURLToPath(import.meta.url));
 const sha = value => crypto.createHash('sha256').update(value).digest('hex');
 const sources = ['knowledge-work-plugins', 'financial-services', 'mattpocock-skills', 'addyosmani-agent-skills', 'context-mode', 'open-code-review'];
 const pins = Object.fromEntries(sources.map(name => [name, { revision: execFileSync('git', ['-C', path.join(root, 'sources', name), 'rev-parse', 'HEAD'], { encoding: 'utf8', windowsHide: true }).trim() }]));
 const marketplace = { name: 'seabridge-company-tools', owner: { name: 'SeaBridgeAI' }, plugins: [] };
-const catalog = { schema: 'seabridge.dev-suite.catalog.v1', sources: pins, skills: [], commands: [], connectors: [], plugins: [] };
+const catalog = { schema: 'seabridge.dev-suite.catalog.v1', contentDigest: 'sha256 of UTF-8 text with LF line endings', sources: pins, skills: [], commands: [], connectors: [], plugins: [] };
 const pluginRoot = path.join(root, 'plugins');
 await fs.mkdir(pluginRoot, { recursive: true });
 async function walk(directory) {
@@ -97,7 +100,9 @@ for (const kind of ['skills', 'commands']) {
   const ids = catalog[kind].map(entry => entry.id);
   if (new Set(ids).size !== ids.length) throw new Error('Duplicate workflow IDs; catalog publication refused');
 }
-await fs.writeFile(path.join(root, 'catalog.json'), JSON.stringify(catalog, null, 2) + '\n');
+let publishedCatalog = existsSync(path.join(root, 'skills/pstack/arena/SKILL.md')) ? await indexPstack(catalog) : catalog;
+if (existsSync(path.join(root, 'skills/ponytail/ponytail/SKILL.md'))) publishedCatalog = await indexPonytail(publishedCatalog);
+await fs.writeFile(path.join(root, 'catalog.json'), JSON.stringify(publishedCatalog, null, 2) + '\n');
 console.log(JSON.stringify({ plugins: marketplace.plugins.length, skills: catalog.skills.length, commands: catalog.commands.length, optionalConnectors: catalog.connectors.length, revisions: pins }));
 
 // Common Addy reference paths are relative to installed skills/addy/<name>.

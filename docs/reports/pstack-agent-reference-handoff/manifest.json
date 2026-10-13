@@ -1,0 +1,31 @@
+{
+  "status": "handoff-sent-awaiting-owner-integration",
+  "reservation": "workspace-central-rule-release-20261013",
+  "files": [
+    {
+      "file": "C:\\Users\\adelm\\SeaBridgeAI\\manageesg-backend\\AGENTS.md",
+      "sha256Before": "04c516b6bc91f87fa62122e7cb7221dab60993b2501f17ef183ec4253bf582c5",
+      "proposedNormalizedSha256": "f846fd7b7c6c3b281306559c9feb5916ec240a0f3fa66a14d6ff78f960eb4e74"
+    },
+    {
+      "file": "C:\\Users\\adelm\\SeaBridgeAI\\manageesg-backend\\AGENTS_SYSTEM.md",
+      "sha256Before": "2607743a0a44db553c55847db5623c8f5d8daf761b14d9b96eed248f36d147d4",
+      "proposedNormalizedSha256": "7dd8594d840334726a590770be6e5cd52a2eb3182d43f01ca0c8c06d00154437"
+    },
+    {
+      "file": "C:\\Users\\adelm\\SeaBridgeAI\\manageesg-backend\\CLAUDE.md",
+      "sha256Before": "057ac44ca0aa593a73364fb79fd8e5f534edfacfacbf1cfce1537836d15cd8fa",
+      "proposedNormalizedSha256": "4cd4209e5dcf7833e658a73ad7fe9337366aa5289f47850ccfc5c70af7693704"
+    }
+  ],
+  "instructions": "Current checkout owner must verify before hashes or rebase append-only hunks against current files. Preserve product agents/services and other changes. Local references only; no commit/push authorization is added.",
+  "reservationAtPreparation": "workspace-central-rule-release-20261013",
+  "currentReservationAtHandoff": "nature-mvp-root-be2-20261013",
+  "handoff": {
+    "threadId": "01a0d61b-bf15-7f72-a4c0-5bae287ce55e",
+    "title": "CODING AGENT SYSTEM AND KNOWLEDGE SYSTEM",
+    "sent": true,
+    "currentBackendReservation": "nature-mvp-root-be2-20261013"
+  },
+  "handoffRecordedAt": "2026-10-13T03:56:21.454Z"
+}

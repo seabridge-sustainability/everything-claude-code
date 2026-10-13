@@ -1,0 +1,2 @@
+# Machine-specific registration receipts are local, never user config copies.
+registrations.json

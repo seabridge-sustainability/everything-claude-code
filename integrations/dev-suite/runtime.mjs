@@ -60,6 +60,22 @@ export function rankWorkflows(c, { query, limit = 10, kind = 'all' }) {
   // of overlapping reviews/plans. This does not grant scope or execution rights.
   let primary = entries.find(e => e.id.toLowerCase() === q), reason = primary ? 'explicit ID' : 'keyword candidate only';
   const prefer = (source, name, plugin) => entries.find(e => e.kind === 'skill' && e.source === source && e.name === name && (!plugin || e.plugin === plugin));
+  if (!primary && /\bponytail\b/.test(q)) {
+    const named = /\breview\b/.test(q) ? 'ponytail-review'
+      : /\baudit\b/.test(q) ? 'ponytail-audit'
+      : /\bdebt\b|shortcut.ledger/.test(q) ? 'ponytail-debt'
+      : /\bgain\b|benchmark|savings/.test(q) ? 'ponytail-gain'
+      : /\bhelp\b/.test(q) ? 'ponytail-help' : 'ponytail';
+    primary = prefer('ponytail', named);
+    reason = 'Explicit ECC Ponytail selection; one requested workflow under current project policy';
+  }
+  if (!primary) {
+    const pstackTask = /\barena\b|multi.model.plan|competing.plans|plan.judge/.test(q) ? 'arena'
+      : /maintain.verification|verification.maintenance|feature.map.drift/.test(q) ? 'maintain-verification-skill'
+      : /create.verification|verification.skill|verify.seabridge|verification.first/.test(q) ? 'create-verification-skill'
+      : /\binterrogate\b|adversarial.review/.test(q) ? 'interrogate' : null;
+    if (pstackTask) { primary = prefer('cursor-pstack', pstackTask); reason = 'ECC-controlled Pstack adapter; one primary workflow and existing goal'; }
+  }
   if (!primary) {
     const finance = /spreadsheet|xlsx|3.statement|balance sheet|cash.flow|dcf|financial model/.test(q);
     const task = finance ? [/audit|check|debug|formula/.test(q) ? 'audit-xls' : /3.statement/.test(q) ? '3-statement-model' : /dcf/.test(q) ? 'dcf-model' : 'xlsx-author', 'finance']

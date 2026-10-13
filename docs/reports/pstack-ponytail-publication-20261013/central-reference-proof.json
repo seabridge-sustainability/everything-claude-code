@@ -1,0 +1,32 @@
+{
+  "checkedAt": "2026-10-13T04:59:05.153Z",
+  "authorization": "Explicit user-approved documentation-only three-file writer exception; reservations/services/guards untouched",
+  "files": [
+    {
+      "file": "AGENTS.md",
+      "beforeSha256": "04c516b6bc91f87fa62122e7cb7221dab60993b2501f17ef183ec4253bf582c5",
+      "afterSha256": "4d37d9bd03c05b4a8b8c93e0e21dd6d07637ef6f509bdff4c2e9ec142f691fe7",
+      "existingBytesPreserved": true,
+      "addedBytes": 156
+    },
+    {
+      "file": "AGENTS_SYSTEM.md",
+      "beforeSha256": "2607743a0a44db553c55847db5623c8f5d8daf761b14d9b96eed248f36d147d4",
+      "afterSha256": "b300a7df27015d3cf54f7711d56567ad077c6f00e36db541fe8677e342683b63",
+      "existingBytesPreserved": true,
+      "addedBytes": 97
+    },
+    {
+      "file": "CLAUDE.md",
+      "beforeSha256": "057ac44ca0aa593a73364fb79fd8e5f534edfacfacbf1cfce1537836d15cd8fa",
+      "afterSha256": "083eef1c81a22c039e1b5a5c126a060dc93dbf374cdf8e25af42a2dc45a51ff2",
+      "existingBytesPreserved": true,
+      "addedBytes": 56
+    }
+  ],
+  "backendRegistryChanged": false,
+  "productFilesChanged": false,
+  "servicesStopped": 0,
+  "agentsStopped": 0,
+  "contextBudgetPreserved": true
+}

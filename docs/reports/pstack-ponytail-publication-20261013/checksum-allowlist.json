@@ -1,0 +1,14 @@
+{
+  "reason": "Public upstream Git identities and source/evidence SHA256 digests; exact baseline entries only, no plugins/filters/hooks changed",
+  "falsePositiveEntries": 1166,
+  "files": {
+    "docs\\reports\\pstack-agent-reference-handoff\\manifest.json": 6,
+    "docs\\reports\\pstack-agent-reference-handoff\\pstack-ponytail-manifest.json": 5,
+    "docs\\reports\\pstack-ponytail-publication-20261013\\central-reference-proof.json": 6,
+    "integrations\\company-dev-tools\\catalog.json": 415,
+    "integrations\\ponytail\\adaptation.json": 1,
+    "integrations\\ponytail\\source-manifest.json": 397,
+    "integrations\\pstack\\adaptation.json": 1,
+    "integrations\\pstack\\source-manifest.json": 335
+  }
+}
