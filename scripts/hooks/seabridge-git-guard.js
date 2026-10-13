@@ -43,6 +43,12 @@ const DIR_CHANGE = /(?:^|[;&|\r\n({])\s*(cd|pushd|chdir|Set-Location|Push-Locati
 const DIR_POP = /(?:^|[;&|\r\n({])\s*(?:popd|Pop-Location)\b/gi;
 const ASSIGN = /(?:^|[;&|\r\n({])\s*\$?([A-Za-z_]\w*)\s*=\s*("[^"\r\n]*"|'[^'\r\n]*'|[^\s;&|)}]*)/g;
 const LITERAL_PUSH_REF = /^[^:\s]*:[\w./-]+$/;
+// Unquoted redirections (> out, 2>&1, < in) end the git arguments; their targets are not refs or flags.
+const gitArgs = text => {
+  const raw = text.match(/"[^"\r\n]*"|'[^'\r\n]*'|[^\s]+/g) || [];
+  const end = raw.findIndex(t => /^(?:\d*>|<)/.test(t));
+  return (end < 0 ? raw : raw.slice(0, end)).map(t => /^['"]/.test(t) ? t.slice(1, -1) : t);
+};
 const tokenize = text => (text.match(/"[^"\r\n]*"|'[^'\r\n]*'|[^\s]+/g) || []).map(t => /^['"]/.test(t) ? t.slice(1, -1) : t);
 
 // Variables assigned exactly once in this command to a literal (or to earlier literals) are expanded;
@@ -84,7 +90,7 @@ function literalDir(base, value) {
 function decideCompound(command, cwd, inspector) {
   const mutations = [];
   for (const match of command.matchAll(INVOCATION)) {
-    const rest = match[1], tokens = tokenize(rest);
+    const rest = match[1], tokens = gitArgs(rest);
     let i = subcommand(tokens, 0);
     const dirs = [];
     while (tokens[i] === '-C') { dirs.push(tokens[i + 1]); i = subcommand(tokens, i + 2); }

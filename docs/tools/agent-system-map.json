@@ -30,7 +30,7 @@
     ],
     "semanticIndex": "not-run"
   },
-  "sourceFingerprint": "ce03a08e2816c9f5fd808eaee84635d4182c5b16b61bbfc9ae2462f14ce753d6",
+  "sourceFingerprint": "ac7088cf83909715ae70a8dd9d13aaa08d41e8946a1abab1cf07dde6ec6d85c8",
   "sources": [
     {
       "path": "../manageesg-backend/AGENTS.md",
@@ -358,7 +358,7 @@
     },
     {
       "path": "scripts/hooks/seabridge-git-guard.js",
-      "sha256": "83541399f4a28ef03c8839c3f463541bed419cf3347bb815f893fc32e5806cbb"
+      "sha256": "399282f6ab12099de857381e7cdaa13627dd6411d3b388fcae40e1fc653842b0"
     },
     {
       "path": "scripts/knowledge-adoption.js",
@@ -566,7 +566,7 @@
     },
     {
       "path": "tests/lib/seabridge-git-guard.test.js",
-      "sha256": "9cbf7e44a23e25f1339a57d9e2516aebea6329cbff7f71036044968479caca97"
+      "sha256": "d25ab21d3fe004a57737e38c8977cf6402ea388152c545c8c8f7f0746b988f06"
     },
     {
       "path": "tests/lib/session-coordination.test.js",
@@ -1108,7 +1108,7 @@
       "id": "file:scripts/hooks/seabridge-git-guard.js",
       "type": "source",
       "path": "scripts/hooks/seabridge-git-guard.js",
-      "sha256": "83541399f4a28ef03c8839c3f463541bed419cf3347bb815f893fc32e5806cbb"
+      "sha256": "399282f6ab12099de857381e7cdaa13627dd6411d3b388fcae40e1fc653842b0"
     },
     {
       "id": "file:scripts/knowledge-adoption.js",
@@ -1420,7 +1420,7 @@
       "id": "file:tests/lib/seabridge-git-guard.test.js",
       "type": "source",
       "path": "tests/lib/seabridge-git-guard.test.js",
-      "sha256": "9cbf7e44a23e25f1339a57d9e2516aebea6329cbff7f71036044968479caca97"
+      "sha256": "d25ab21d3fe004a57737e38c8977cf6402ea388152c545c8c8f7f0746b988f06"
     },
     {
       "id": "file:tests/lib/session-coordination.test.js",
@@ -4876,10 +4876,10 @@
     }
   ],
   "build": {
-    "generatedAt": "2026-10-13T19:59:01.993Z",
-    "sourceCommit": "257a6d7397ada0d47b2f3b1b619af82841c98349",
+    "generatedAt": "2026-10-13T20:32:05.151Z",
+    "sourceCommit": "6eb77eff2d32d3d4510e9b7cc458071692096804",
     "sourceDirty": false,
-    "policyCommit": "f477aeb64702bfb9dcfe3e9b5b1b7ff60b735781",
+    "policyCommit": "d76a0c0e5b3c638d4d0e20f7c2d90c940f7dbf65",
     "policyDirty": false
   }
 }

@@ -116,6 +116,14 @@ test('a plain directory outside any repository is not a protected target; a miss
     assert.equal(decide(`cd "${path.join(plain, 'missing')}"; git apply fix.diff`, cwd)[0], 'ask');
   } finally { fs.rmSync(plain, { recursive: true, force: true }); }
 });
+test('redirections are not git arguments (2026-10-13 release push)', () => {
+  const dev = () => ({ ecc: false, product: true, branch: '' });
+  const push = 'cd ../be-release && S="../scratch"; timeout 900 git push origin 463ed18:refs/heads/seabridge_development > "$S/push.out" 2>&1; echo push=$?';
+  assert.equal(decide(push, cwd, dev), null);
+  assert.equal(decide('git status; git push origin "$C" > out.txt', cwd, dev)[0], 'ask', 'variable destination still asks');
+  assert.equal(decide('git status; git push origin 463ed18:main > "$S/o" 2>&1', cwd, dev)[0], 'ask', 'main destination still asks');
+  assert.equal(decide('cd x; git reset --hard HEAD > /dev/null', cwd, () => ({ ecc: false, product: true, branch: 'development' }))[0], 'deny');
+});
 test('actual stdin runner emits native denial protocol', () => {
   const file = path.resolve(__dirname, '../../scripts/hooks/seabridge-git-guard.js');
   const result = spawnSync(process.execPath, [file], { input: JSON.stringify({ cwd, tool_input: { command: 'git push --force' } }), encoding: 'utf8' });
