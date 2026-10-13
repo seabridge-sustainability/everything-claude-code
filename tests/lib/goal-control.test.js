@@ -1217,6 +1217,130 @@ test('real CLI invalidates a fresh claim after an uncommitted source change', ()
   }
 });
 
+test('pinned relocation indices and private-path ledgers recover exact evidence without rewriting receipts', () => {
+  const { loadEvidenceMaps, verifyEvidenceItem, verifyBundleEvidence } = require('../../scripts/lib/goal-evidence');
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-retained-evidence-'));
+  try {
+    const oldRoot = path.join(dir, 'retired-worker');
+    const archive = path.join(dir, 'archive');
+    fs.mkdirSync(archive);
+    const file = path.join(archive, 'proof.json');
+    fs.writeFileSync(file, '{"preserved":true}');
+    const digest = crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
+    const item = { kind: 'source', ref: path.join(oldRoot, 'proof.json'), sha256: digest };
+    const index = path.join(dir, 'index.json');
+    fs.writeFileSync(index, JSON.stringify({ relocated_roots: [{ source: oldRoot, destination: archive }] }));
+    const spec = crypto.createHash('sha256').update(fs.readFileSync(index)).digest('hex') + '=' + index;
+    const mappings = loadEvidenceMaps([spec]);
+    assert.strictEqual(verifyEvidenceItem(item, { mappings }).resolved, file);
+    assert.strictEqual(verifyEvidenceItem({ ...item, ref: 'proof.json' }, { roots: [oldRoot], mappings }).sha256, digest);
+    const history = { outcomes: [], integrations: [{ receipt_id: 'failed-review', outcome: 'fail', evidence: [item] }] };
+    const before = JSON.stringify(history);
+    assert.strictEqual(verifyBundleEvidence(history, { mappings }).length, 1);
+    assert.strictEqual(JSON.stringify(history), before); // Failed history is neither discarded nor promoted.
+    fs.writeFileSync(index, JSON.stringify({ rows: [{ source: oldRoot, preserved: [
+      { relative: 'proof.json', destination: file, identity_preserved: true },
+      { relative: 'unverified.json', destination: file, identity_preserved: false },
+    ] }] }));
+    const ledger = crypto.createHash('sha256').update(fs.readFileSync(index)).digest('hex') + '=' + index;
+    assert.strictEqual(loadEvidenceMaps([ledger]).length, 1);
+    assert.strictEqual(verifyEvidenceItem(item, { mappings: loadEvidenceMaps([ledger]) }).resolved, file);
+    assert.throws(() => loadEvidenceMaps([spec]), /map hash mismatch/);
+    assert.throws(() => loadEvidenceMaps([index]), /SHA256=FILE/);
+    for (const relative of ['../escape', path.join(dir, 'absolute')]) {
+      fs.writeFileSync(index, JSON.stringify({ rows: [{ source: oldRoot, preserved: [
+        { relative, destination: file, identity_preserved: true },
+      ] }] }));
+      const invalid = crypto.createHash('sha256').update(fs.readFileSync(index)).digest('hex') + '=' + index;
+      assert.throws(() => loadEvidenceMaps([invalid]), /escapes source root|contained relative path/);
+    }
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('relocation never hides a changed original, wrong preserved hash, missing file or ambiguous mapping', () => {
+  const { verifyEvidenceItem } = require('../../scripts/lib/goal-evidence');
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-relocation-denials-'));
+  try {
+    const original = path.join(dir, 'retired', 'proof');
+    const archive = path.join(dir, 'proof');
+    fs.writeFileSync(archive, 'original evidence');
+    const digest = crypto.createHash('sha256').update(fs.readFileSync(archive)).digest('hex');
+    const item = { kind: 'source', ref: original, sha256: digest };
+    const mappings = [{ source: original, destination: archive }];
+    assert.throws(() => verifyEvidenceItem(item), /not found/);
+    assert.throws(() => verifyEvidenceItem({ ...item, sha256: 'f'.repeat(64) }, { mappings }), /hash mismatch/);
+    fs.mkdirSync(path.dirname(original));
+    fs.writeFileSync(original, 'mutated original');
+    assert.throws(() => verifyEvidenceItem(item, { mappings }), /hash mismatch/);
+    fs.unlinkSync(original);
+    assert.throws(() => verifyEvidenceItem(item, { mappings: [...mappings, { source: original, destination: path.join(dir, 'other') }] }), /ambiguous/);
+    assert.throws(() => verifyEvidenceItem({ ...item, ref: path.join(dir, 'retired-extra', 'proof') }, { mappings: [{ source: path.dirname(original), destination: dir }] }), /not found/);
+    assert.throws(() => verifyEvidenceItem({ ...item, ref: path.join(dir, 'retired', '..', 'escape') }, { mappings }), /not found/);
+    assert.throws(() => verifyEvidenceItem({ ...item, ref: 'https://example.invalid/proof' }, { mappings }), /unverifiable URI/);
+    fs.unlinkSync(archive);
+    assert.throws(() => verifyEvidenceItem(item, { mappings }), /not found/);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('goal CLI and runtime bridge forward pinned maps and explicit historical roots, but keep live fingerprints strict', () => {
+  const { evidenceArgs } = require('../../scripts/goal-runtime-bridge');
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-relocation-cli-'));
+  try {
+    const archive = path.join(dir, 'archive');
+    fs.mkdirSync(archive);
+    const receipt = materializeEvidence(outcome('retained', 'heat-browser', 'ui_displayed'), archive);
+    const oldRoot = path.join(dir, 'retired');
+    const goalFile = path.join(dir, 'goal.json');
+    const outcomeFile = path.join(dir, 'outcomes.jsonl');
+    fs.writeFileSync(goalFile, JSON.stringify(goal()));
+    fs.writeFileSync(outcomeFile, JSON.stringify(receipt) + '\n');
+    const index = path.join(dir, 'index.json');
+    fs.writeFileSync(index, JSON.stringify({ relocated_roots: [{ source: oldRoot, destination: archive }] }));
+    const spec = crypto.createHash('sha256').update(fs.readFileSync(index)).digest('hex') + '=' + index;
+    const artifactArgs = ['--evidence-root', oldRoot, '--evidence-map', spec];
+    assert.deepStrictEqual(evidenceArgs(['admit', '--runtime', 'claude', ...artifactArgs]), artifactArgs);
+    assert.throws(() => evidenceArgs(['--evidence-map']), /requires a value/);
+    assert.throws(() => evidenceArgs(['--evidence-root', '--session']), /requires a value/);
+    const args = ['validate', '--goal', goalFile, '--outcomes', outcomeFile];
+    assert.strictEqual(run(CLI, args, dir).status, 1);
+    const verified = run(CLI, [...args, ...artifactArgs], dir);
+    assert.strictEqual(verified.status, 0, verified.stderr);
+    assert.strictEqual(JSON.parse(verified.stdout).evidence_artifacts, 1);
+    // Native bridge exercises the same validation; a missing session must still fail.
+    const goalDir = path.join(dir, '.ecc', 'goal');
+    fs.mkdirSync(goalDir, { recursive: true });
+    fs.copyFileSync(outcomeFile, path.join(goalDir, 'outcomes.jsonl'));
+    const bridge = run(path.join(__dirname, '..', '..', 'scripts', 'goal-runtime-bridge.js'), [
+      'admit', '--runtime', 'claude', '--mode', 'controlled', '--goal', goalFile,
+      '--dir', goalDir, '--session', 'unregistered', ...artifactArgs,
+    ], dir);
+    assert.strictEqual(bridge.status, 2);
+    const admission = JSON.parse(bridge.stdout);
+    assert.strictEqual(admission.validation_error, undefined, bridge.stdout);
+    assert.match(admission.reason, /session coordination/);
+    // File relocation is orthogonal to code state; it must not restamp a stale resume.
+    const source = path.join(dir, 'repo');
+    fs.mkdirSync(source);
+    runGit(['init', '-q'], source);
+    fs.writeFileSync(path.join(source, 'README.md'), '# Before\n');
+    runGit(['add', 'README.md'], source);
+    runGit(['-c', 'user.name=Test', '-c', 'user.email=test@example.invalid', 'commit', '-qm', 'initial'], source);
+    const state = captureRepositoryState(source, { repoId: 'backend' });
+    const resumeFile = path.join(dir, 'resume.json');
+    fs.writeFileSync(resumeFile, JSON.stringify(resume({ repository_state: state, repository_states: [state] })));
+    fs.writeFileSync(path.join(source, 'README.md'), '# Changed\n');
+    const stale = run(CLI, [...args, ...artifactArgs, '--resume', resumeFile], dir);
+    assert.strictEqual(stale.status, 1);
+    assert.match(stale.stderr, /is stale.*tree fingerprint/);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 (async () => {
   let passed = 0;
   let failed = 0;

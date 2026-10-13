@@ -52,6 +52,17 @@ function runGoal(args, cwd = process.cwd()) {
   return spawnSync(process.execPath, [GOAL_CLI, ...args], { cwd, encoding: 'utf8' });
 }
 
+function evidenceArgs(args) {
+  const result = [];
+  for (let index = 0; index < args.length; index += 1) {
+    if (!['--evidence-root', '--evidence-map'].includes(args[index])) continue;
+    if (!args[index + 1] || args[index + 1].startsWith('--')) throw new Error(`${args[index]} requires a value`);
+    result.push(args[index], args[index + 1]);
+    index += 1;
+  }
+  return result;
+}
+
 function main(args = process.argv.slice(2)) {
   const command = args[0] || 'capabilities';
   const capabilities = loadCapabilities();
@@ -69,6 +80,7 @@ function main(args = process.argv.slice(2)) {
   const goalPath = optionValue(args, '--goal', path.join(goalDir, 'active-goal.yaml'));
   const model = optionValue(args, '--model');
   const sessionId = optionValue(args, '--session', process.env.ECC_SESSION_ID);
+  const artifactArgs = evidenceArgs(args);
 
   if (command === 'admit') {
     const suppliedText = optionValue(args, '--text', hookText(readStdin()));
@@ -80,7 +92,7 @@ function main(args = process.argv.slice(2)) {
     let goalValid = false;
     let validationError = null;
     if (goalExists) {
-      const result = runGoal(['validate', '--goal', goalPath, '--dir', goalDir]);
+      const result = runGoal(['validate', '--goal', goalPath, '--dir', goalDir, ...artifactArgs]);
       goalValid = result.status === 0;
       validationError = goalValid ? null : (result.stderr || result.stdout).trim();
     }
@@ -91,7 +103,7 @@ function main(args = process.argv.slice(2)) {
       } catch (error) {
         decision.admitted = false;
         decision.reason = `session coordination: ${error.message}`;
-        decision.next_action = 'Register an isolated worktree and task write scopes with ecc session register, then pass --session or ECC_SESSION_ID.';
+        decision.next_action = 'Register task write scopes in the approved primary checkout with ecc session register, then pass --session or ECC_SESSION_ID. A new worktree requires explicit owner approval.';
       }
     }
     if (validationError) decision.validation_error = validationError;
@@ -118,7 +130,7 @@ function main(args = process.argv.slice(2)) {
       process.stderr.write(`session coordination: ${error.message}\n`);
       return 2;
     }
-    const result = runGoal(['claim', claim, '--goal', goalPath, '--dir', goalDir, '--json']);
+    const result = runGoal(['claim', claim, '--goal', goalPath, '--dir', goalDir, '--json', ...artifactArgs]);
     if (result.stdout) process.stdout.write(result.stdout);
     if (result.stderr) process.stderr.write(result.stderr);
     return result.status === null ? 1 : result.status;
@@ -136,4 +148,4 @@ if (require.main === module) {
   }
 }
 
-module.exports = { hookText, main, optionValue, readStdin, runGoal };
+module.exports = { evidenceArgs, hookText, main, optionValue, readStdin, runGoal };

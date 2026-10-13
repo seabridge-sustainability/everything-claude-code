@@ -30,7 +30,7 @@ const {
   withFileLock,
   writeYaml,
 } = require('./lib/goal-store');
-const { verifyBundleEvidence } = require('./lib/goal-evidence');
+const { loadEvidenceMaps, verifyBundleEvidence } = require('./lib/goal-evidence');
 
 const DEFAULT_DIR = path.join('.ecc', 'goal');
 
@@ -95,6 +95,7 @@ function loadBundle(args) {
 }
 
 function help() {
+  process.stdout.write('Retained artifact verification: --evidence-root DIR (repeatable), --evidence-map SHA256=FILE (repeatable, pinned relocation index/ledger). These do not refresh source fingerprints or authorize acceptance.\n');
   process.stdout.write('New assignments require --work-kind output|blocker, --ram-gib N, --disk-gib N, and --disk-path DIR; blockers also require --defect-evidence FILE.\n');
   process.stdout.write('Terminal integration outcomes superseded/not_adopted require --limitation REASON; failed or over-budget receipts remain history, never passing proof.\n');
   process.stdout.write('Controlled execution v3: assign --change-contract FILE (requested_delta and hash-bound preserved_invariants). Historical records are not silently upgraded.\n');
@@ -643,7 +644,10 @@ function main(args = process.argv.slice(2)) {
       }
     }
   }
-  const verification = verifyBundleEvidence(bundle, { roots: optionValues(args, '--evidence-root') });
+  const verification = verifyBundleEvidence(bundle, {
+    roots: optionValues(args, '--evidence-root'),
+    mappings: loadEvidenceMaps(optionValues(args, '--evidence-map')),
+  });
 
   if (command === 'validate') {
     const result = {
