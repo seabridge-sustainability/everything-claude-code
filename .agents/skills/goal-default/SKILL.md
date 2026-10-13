@@ -1,6 +1,6 @@
 ---
 name: goal-default
-description: "Defines the SeaBridgeAI goal protocol as the default execution wrapper for coding-agent tasks. Invoke this skill only by the exact name goal-default. Do not invoke Skill(goal); /goal is a user-facing Claude Code slash command, not a callable skill."
+description: "Execute or resume an explicit SeaBridgeAI goal using existing goal records, outcome checkpoints and bounded coordination. Small tasks need only a brief acceptance check; do not add a universal planning or review ritual."
 ---
 
 # goal-default

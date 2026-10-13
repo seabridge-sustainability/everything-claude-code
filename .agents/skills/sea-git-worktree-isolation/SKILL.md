@@ -1,6 +1,6 @@
 ---
 name: sea-git-worktree-isolation
-description: "SeaBridgeAI git worktree isolation adapted from Superpowers for local-only feature isolation, dirty-worktree safety, branch hygiene, and no-push/no-delete approval boundaries."
+description: "Coordinate safe work on SeaBridgeAI primary branches; inspect dirty checkouts and file ownership, and handle worktree exceptions only when Alejandro explicitly approves their path, branch and reason."
 ---
 
 # sea-git-worktree-isolation

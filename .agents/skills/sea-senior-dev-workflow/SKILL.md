@@ -1,6 +1,6 @@
 ---
 name: sea-senior-dev-workflow
-description: "SeaBridgeAI senior engineering workflow adapted from Superpowers for local-only planning, TDD, implementation, review, and verified completion across backend, frontend, AI, QA, security, sustainability, and cross-repo work."
+description: "Execute a non-trivial SeaBridge task through the existing goal, canonical task routing and evidence-based verification; no separate planning framework."
 ---
 
 # sea-senior-dev-workflow

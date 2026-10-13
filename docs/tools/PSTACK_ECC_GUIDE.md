@@ -4,6 +4,8 @@ Pstack is pinned reference material, not another instruction authority or autono
 
 ## Entry points
 
+For an affected SeaBridge module, load only its section in [the source-linked module guide](SEABRIDGE_MODULE_GUIDE.md). The [UI verification audit and integration plan](../reports/2026-10-13-ui-workflow-audit.md) distinguishes installed workflows from missing enforcement/native proof. The owner's browser-media location is D: only; the plan specifies the required capture/storage gates, which this reference does not activate.
+
 - Ask for `sea-multi-model-planning` when a substantial change needs competing plans and independent judgment. Ordinary small edits use the existing task workflow.
 - Ask for `sea-verify-seabridge` to run or maintain a feature journey. It extends `verification-loop`, not a second verification framework.
 - Shared catalog: `pstack_find_workflow` with `multi-model planning`, `verification skill` or `maintain verification`, then `pstack_read_skill` with the exact returned `cursor-pstack/ecc/...` ID. These aliases use the existing ECC catalog, so a client does not need a second MCP server to discover the skills. Existing `suite_find_workflow`/`suite_read_skill` remain available where registered.
@@ -125,6 +127,46 @@ restart an app. Only GET/HEAD to the primary local origins is allowed. External
 requests and data mutations are blocked. No credentials or response bodies are
 retained. A dashboard/session PASS is narrower than the selected property and
 negative tenant acceptance; these remain separate required product receipts.
+
+## D-only frontend exploration for any coding agent
+
+Use the existing CLI immediately; running agents and app services need no restart.
+New MCP operations appear when that specific bridge is next connected. From ECC:
+
+```text
+node scripts/browser-evidence.js doctor
+node scripts/browser-evidence.js features
+node scripts/browser-evidence.js admit request.json
+node scripts/browser-evidence.js capture capture-request.json
+node scripts/browser-evidence.js validate validation-request.json
+```
+
+The [existing browser workflow](../../agent-tooling/skills/seabridge-browser-autonomy/SKILL.md)
+defines the bounded request fields. Existing `pstack_factory`/`suite_factory`
+expose `ui-features` (optional `feature_ids` for one to five detailed modules),
+`ui-admit`, `ui-capture`, `ui-validate`, and `ui-image`. Image reads return standard
+MCP image content for a vision capable caller. Discovery defaults to concise
+module summaries, rather than injecting every route/component into context.
+
+Frontend's four existing Playwright configs share `scripts/playwright-evidence.cjs`
+and retain successful video, trace and screenshots. Media, browser profiles,
+temporary files and reports use the pinned D: evidence volume; missing/changed/full
+D or inadequate RAM blocks capture. C:/E: paths and cross-run media are rejected.
+The installed FFmpeg is reused through a scoped adapter for Playwright 1.64.0;
+package/encoder upgrades require review. No package file or running service is patched.
+
+The broker explores anonymous pages at localhost:3000, blocks API writes,
+external requests, service workers and application WebSockets (Next development
+HMR on its exact primary endpoint is allowed), and allows only existing local
+public assets through Next's image proxy. Desktop/mobile media and verifier/source
+hashes support review. This is not authenticated feature acceptance or baseline
+approval. Use the existing authorized feature journeys for signed-in data,
+Save/reopen, attachments and exports; Climate calculations remain paused.
+
+Fresh managed frontend write launches additionally require a reviewed
+`uiVerification` binding with an admission and complete before receipts. The
+existing native write guard checks exact component scope. Existing unmanaged
+clients and unsupported native adapters are not retroactively certified.
 
 ## Upstream boundary and maintenance
 

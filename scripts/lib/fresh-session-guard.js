@@ -58,11 +58,11 @@ function policyFiles(policyRoot) {
 function workspaceBoundary(cwd, policyRoot) {
   const system = policyFiles(policyRoot).find(file => path.basename(file) === 'AGENTS_SYSTEM.md');
   const text = fs.readFileSync(system, 'utf8');
-  const declaration = /^Code: (.+?) only; one active checkout\/repo\./m.exec(text);
+  const declaration = /^Code(?::|\s)\s*(.+?) only(?:;|,) one active checkout\/repo(?:\.|;)/m.exec(text);
   // Non-SeaBridge policy fixtures or other projects have no declared layout.
   // Never invent a workspace policy for them; the scope guard still applies.
   if (!declaration) {
-    if (/^Code:/m.test(text)) throw Error('Malformed central workspace declaration');
+    if (/^Code(?::|\s)/m.test(text)) throw Error('Malformed central workspace declaration');
     return null;
   }
   if (!path.isAbsolute(declaration[1])) throw Error('Absolute central code workspace required');
@@ -112,7 +112,7 @@ function context({ cwd, runtime, sessionId, payload, policyRoot, configFile }) {
   const fingerprint = sha(JSON.stringify({ runtime, sessionId, cwd: repo.root,
     nativeId: native.session_id, config: hash(configFile),
     policies: files.map(hash), implementation: [__filename, path.join(root,'scripts/lib/skill-routing.js'),path.join(root,'manifests/task-skill-routing.json'), path.join(root, 'scripts/hooks/fresh-session-guard.js'),
-      path.join(root, '.opencode/plugins/ecc-fresh-session-guard.mjs')].map(hash) }));
+      path.join(root, '.opencode/plugins/ecc-fresh-session-guard.mjs'),path.join(root,'integrations/software-factory/ui-write-gate.cjs'),path.join(root,'integrations/software-factory/ui-contract.cjs'),path.join(root,'integrations/software-factory/ui-browser.mjs'),path.join(root,'scripts/lib/browser-evidence.js')].map(hash) }));
   const receipt = path.join(repo.directory, 'fresh-preflight', sha(sessionId + ':' + native.session_id) + '.json');
   return { native, repo, session, relative, fingerprint, receipt, binding };
 }
@@ -171,6 +171,7 @@ function guard(options, event) {
   if (event === 'startup') return { allowed: true, wouldDeny: false, preflight: receipt.status,
     additionalContext: 'ECC task routing: '+JSON.stringify({risk:ctx.binding.taskRoute.risk,primary:ctx.binding.workflow,always:ctx.binding.taskRoute.always,checks:ctx.binding.taskRoute.checks,evaluatorMode:ctx.binding.taskRoute.evaluatorMode})+'. Read the selected workflow; current project authority and existing goal control all actions.' };
   if (!['pre', 'turn', 'final'].includes(event)) throw Error('unknown fresh guard event');
+  if(event==='pre')require('../../integrations/software-factory/ui-write-gate.cjs').checkUI(ctx.repo.root,ctx.native,ctx.binding.uiVerification);
   return execute('guard-event', { cwd: options.cwd, sessionId: options.sessionId,
     guardMode: 'block', event, payload: ctx.native });
 }

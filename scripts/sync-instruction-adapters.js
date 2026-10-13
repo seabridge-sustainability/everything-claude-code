@@ -10,6 +10,12 @@ const outputs = {};
 for (const relative of ['.github/copilot-instructions.md', '.agents/rules/seabridge-agent-baseline.md', '.clinerules']) {
   const target = path.relative(path.dirname(path.join(ROOT, relative)), path.join(ROOT, '..', 'manageesg-backend', 'AGENTS.md')).replace(/\\/g, '/');
   outputs[relative] = `# SeaBridgeAI core instruction loader\n\nSYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1\n\n<!-- SEABRIDGE_CORE_ENTRY: ${target} -->\n\nRead and follow \`${target}\` and its shared system import before working.\nThis existing file is a loading adapter only. It defines no independent policy.\n`;
+  if (relative !== '.clinerules') {
+    const docs = path.relative(path.dirname(path.join(ROOT, relative)), path.join(ROOT, 'docs/tools')).replace(/\\/g, '/');
+    const skills = path.relative(path.dirname(path.join(ROOT, relative)), path.join(ROOT, 'skills')).replace(/\\/g, '/');
+    const label = relative.startsWith('.github/') ? 'Copilot' : 'Shared-agent';
+    outputs[relative] += `\n${label} workflows: [Pstack ECC guide](${docs}/PSTACK_ECC_GUIDE.md),\n[planning](${skills}/sea-multi-model-planning/SKILL.md) and\n[verification](${skills}/sea-verify-seabridge/SKILL.md).\n\n${label} Ponytail entry: [sea-ponytail](${skills}/sea-ponytail/SKILL.md); [ECC invocation guide](${docs}/PONYTAIL_ECC_GUIDE.md).\n`;
+  }
 }
 const resolved = expandImports(path.join(ROOT, 'AGENTS.md'));
 if (resolved.missing.length) throw new Error('Central policy unavailable: ' + resolved.missing.join(', '));

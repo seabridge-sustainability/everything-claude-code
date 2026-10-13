@@ -34,6 +34,7 @@ function prepare(manifest) {
   const repo = repository(cwd);
   const owner = checkSession({ cwd, sessionId: session });
   if (owner.guard) throw Error('Use a new registered session; existing bindings/running agents are never changed');
+  const uiVerification = require('../integrations/software-factory/ui-write-gate.cjs').prepareUI(cwd, owner.scopes, manifest.uiVerification);
   if (!fs.existsSync(path.join(repo.root, '.ecc/goal/active-goal.yaml'))) throw Error('Current goal required before protected launch');
   if (!path.isAbsolute(executable) || !fs.statSync(executable).isFile() || !Array.isArray(args)
       || args.some(x => typeof x !== 'string') || args.some(x => /^--dangerously/.test(x)
@@ -69,7 +70,7 @@ function prepare(manifest) {
   }
   const bindingText = JSON.stringify({ version: 1, runtime, session, cwd: repo.root, toolLimit, turnLimit,
     nativeConfig: config, nativeConfigSha256, taskRoute:route, workflow,
-    catalogSha256:crypto.createHash('sha256').update(fs.readFileSync(catalogFile)).digest('hex') }, null, 2) + '\n';
+    catalogSha256:crypto.createHash('sha256').update(fs.readFileSync(catalogFile)).digest('hex'), uiVerification }, null, 2) + '\n';
   for (const [rel, text] of [[config, configText], [binding, bindingText]]) {
     fs.mkdirSync(path.dirname(path.join(repo.root, rel)), { recursive: true });
     fs.writeFileSync(path.join(repo.root, rel), text, { flag: 'wx', mode: 0o600 });
@@ -86,7 +87,7 @@ function prepare(manifest) {
     for (const [name, value] of Object.entries(cfg.hooks)) argv.unshift('-c', 'hooks.' + name + '=' + toml(value));
   }
   return { version: 1, runtime, cwd: repo.root, session, executable, args: argv, environment,
-    manifest: { runtime, session, cwd: repo.root, policyRoot, executable, args, toolLimit, turnLimit, ...(manifest.task?{task:manifest.task}:{}) },
+    manifest: { runtime, session, cwd: repo.root, policyRoot, executable, args, toolLimit, turnLimit, ...(manifest.task?{task:manifest.task}:{}), ...(uiVerification?{uiVerification}:{}) },
     fresh_only: true, no_provider_or_model_override: true, status: 'prepared-not-native-proof',
     limitation: runtime === 'codex' ? 'Codex requires operator /hooks review/trust of the exact new hook definition; no trust bypass supplied.'
       : 'Use this managed launch; direct IDE starts or unsupported clients are not certified protected.' };

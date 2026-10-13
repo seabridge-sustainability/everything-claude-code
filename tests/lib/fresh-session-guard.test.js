@@ -176,3 +176,12 @@ test('central workspace declaration rejects outside or extra checkouts and malfo
   fs.writeFileSync(path.join(f.policyRoot,'AGENTS_SYSTEM.md'),'SYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1\nCode: invalid declaration\n');
   assert.throws(()=>workspaceBoundary(f.cwd,f.policyRoot),/Malformed central workspace/);
 });
+
+test('compacted central workspace declaration keeps the primary checkout fence active',()=>{
+  const f=fixture('claude',true),system=path.join(f.policyRoot,'AGENTS_SYSTEM.md');
+  const workspace=path.dirname(f.cwd);
+  fs.writeFileSync(system,`SYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1\nCode ${workspace} only, one active checkout/repo; E: Docker only;\n`);
+  assert.equal(workspaceBoundary(f.cwd,f.policyRoot).branch,'seabridge_development');
+  fs.writeFileSync(system,'SYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1\nCode malformed compact declaration\n');
+  assert.throws(()=>workspaceBoundary(f.cwd,f.policyRoot),/Malformed central workspace/);
+});

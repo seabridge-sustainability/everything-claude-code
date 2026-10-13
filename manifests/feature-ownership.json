@@ -1,0 +1,1223 @@
+{
+  "version": 1,
+  "authority": "Existing central policy and current task/session; these descriptions grant no ownership",
+  "features": [
+    {
+      "id": "ai-manager",
+      "purpose": "Scoped AI chat, assistants, evidence and action proposals",
+      "owner_role": "Task-scoped feature lead; current goal/session grants scope",
+      "routes": [
+        "/dashboard/ai-manager"
+      ],
+      "allowed_paths": [
+        "src/app/dashboard/ai-manager/page.tsx",
+        "src/components/views/ai-manager/AIAgentPage.tsx"
+      ],
+      "source_files": [
+        "src/app/dashboard/ai-manager/page.tsx",
+        "src/components/views/ai-manager/AIAgentPage.tsx"
+      ],
+      "protected_behavior": [
+        "Preserve selected actor/company/property, approved layout/copy and source identity",
+        "Keep loading/error/empty/missing-data distinctions and hidden features",
+        "No unrelated redesign, invented calculations or unsupported capability promises"
+      ],
+      "recipe_ids": [
+        "feature-ai-manager"
+      ],
+      "verification_status": "configured-unverified"
+    },
+    {
+      "id": "carbon",
+      "purpose": "Carbon inventory, reductions, MRV and credits; hidden by default",
+      "owner_role": "Task-scoped feature lead; current goal/session grants scope",
+      "routes": [
+        "/dashboard/carbon",
+        "/dashboard/carbon/providers"
+      ],
+      "allowed_paths": [
+        "src/app/dashboard/carbon/page.tsx",
+        "src/components/common/MainCard.tsx",
+        "src/components/views/carbon/CarbonManagementWorkspace.tsx",
+        "src/app/dashboard/carbon/providers/page.tsx"
+      ],
+      "source_files": [
+        "src/app/dashboard/carbon/page.tsx",
+        "src/components/common/MainCard.tsx",
+        "src/components/views/carbon/CarbonManagementWorkspace.tsx",
+        "src/app/dashboard/carbon/providers/page.tsx"
+      ],
+      "protected_behavior": [
+        "Preserve selected actor/company/property, approved layout/copy and source identity",
+        "Keep loading/error/empty/missing-data distinctions and hidden features",
+        "No unrelated redesign, invented calculations or unsupported capability promises"
+      ],
+      "recipe_ids": [
+        "feature-carbon"
+      ],
+      "verification_status": "configured-unverified"
+    },
+    {
+      "id": "cloud-work",
+      "purpose": "Coding task/approval artifacts; runtime connection disabled pending review",
+      "owner_role": "Task-scoped feature lead; current goal/session grants scope",
+      "routes": [
+        "/dashboard/cloud-work",
+        "/dashboard/cloud-work/qa"
+      ],
+      "allowed_paths": [
+        "src/app/dashboard/cloud-work/page.tsx",
+        "src/components/views/cloud-work/CloudWorkPage.tsx",
+        "src/app/dashboard/cloud-work/qa/page.tsx",
+        "src/components/views/cloud-work/CloudWorkQAPage.tsx"
+      ],
+      "source_files": [
+        "src/app/dashboard/cloud-work/page.tsx",
+        "src/components/views/cloud-work/CloudWorkPage.tsx",
+        "src/app/dashboard/cloud-work/qa/page.tsx",
+        "src/components/views/cloud-work/CloudWorkQAPage.tsx"
+      ],
+      "protected_behavior": [
+        "Preserve selected actor/company/property, approved layout/copy and source identity",
+        "Keep loading/error/empty/missing-data distinctions and hidden features",
+        "No unrelated redesign, invented calculations or unsupported capability promises"
+      ],
+      "recipe_ids": [
+        "feature-cloud-work"
+      ],
+      "verification_status": "configured-unverified"
+    },
+    {
+      "id": "company-info",
+      "purpose": "Company details and selected-company context",
+      "owner_role": "Task-scoped feature lead; current goal/session grants scope",
+      "routes": [
+        "/dashboard/company-info/add",
+        "/dashboard/company-info/add-member",
+        "/dashboard/company-info/list/[companyId]/edit",
+        "/dashboard/company-info/list/[companyId]/materiality-assessments",
+        "/dashboard/company-info/list/[companyId]",
+        "/dashboard/company-info/list",
+        "/dashboard/company-info/members"
+      ],
+      "allowed_paths": [
+        "src/app/dashboard/company-info/add/page.tsx",
+        "src/app/dashboard/company-info/add-member/page.tsx",
+        "src/app/dashboard/company-info/list/[companyId]/edit/page.tsx",
+        "src/components/views/data-input/AddNewAssetTab.tsx",
+        "src/app/dashboard/company-info/list/[companyId]/materiality-assessments/page.tsx",
+        "src/components/views/data-input/AssetMaterialityAssessment.tsx",
+        "src/app/dashboard/company-info/list/[companyId]/page.tsx",
+        "src/components/views/company-info/companyDetailsPage.tsx",
+        "src/app/dashboard/company-info/list/page.tsx",
+        "src/components/views/company-info/CompanyListHeader.tsx",
+        "src/components/views/profile/TeamTableList.tsx",
+        "src/components/ui/badge.tsx",
+        "src/components/common/Button.tsx",
+        "src/lib/api/index.ts",
+        "src/components/ui/dialog.tsx",
+        "src/components/common/DialogHeaderWithClose.tsx",
+        "src/components/ui/input.tsx",
+        "src/store/index.ts",
+        "src/store/slice/companySlice.ts",
+        "src/components/ui/table.tsx",
+        "src/lib/utils/formatDate.ts",
+        "src/app/dashboard/company-info/members/page.tsx",
+        "src/components/common/InviteDialog.tsx"
+      ],
+      "source_files": [
+        "src/app/dashboard/company-info/add/page.tsx",
+        "src/app/dashboard/company-info/add-member/page.tsx",
+        "src/app/dashboard/company-info/list/[companyId]/edit/page.tsx",
+        "src/components/views/data-input/AddNewAssetTab.tsx",
+        "src/app/dashboard/company-info/list/[companyId]/materiality-assessments/page.tsx",
+        "src/components/views/data-input/AssetMaterialityAssessment.tsx",
+        "src/app/dashboard/company-info/list/[companyId]/page.tsx",
+        "src/components/views/company-info/companyDetailsPage.tsx",
+        "src/app/dashboard/company-info/list/page.tsx",
+        "src/components/views/company-info/CompanyListHeader.tsx",
+        "src/components/views/profile/TeamTableList.tsx",
+        "src/components/ui/badge.tsx",
+        "src/components/common/Button.tsx",
+        "src/lib/api/index.ts",
+        "src/components/ui/dialog.tsx",
+        "src/components/common/DialogHeaderWithClose.tsx",
+        "src/components/ui/input.tsx",
+        "src/store/index.ts",
+        "src/store/slice/companySlice.ts",
+        "src/components/ui/table.tsx",
+        "src/lib/utils/formatDate.ts",
+        "src/app/dashboard/company-info/members/page.tsx",
+        "src/components/common/InviteDialog.tsx"
+      ],
+      "protected_behavior": [
+        "Preserve selected actor/company/property, approved layout/copy and source identity",
+        "Keep loading/error/empty/missing-data distinctions and hidden features",
+        "No unrelated redesign, invented calculations or unsupported capability promises"
+      ],
+      "recipe_ids": [
+        "feature-company-info"
+      ],
+      "verification_status": "configured-unverified"
+    },
+    {
+      "id": "data-building",
+      "purpose": "Property operational data, utility usage/bills and source coverage",
+      "owner_role": "Task-scoped feature lead; current goal/session grants scope",
+      "routes": [
+        "/dashboard/data-building/air-pollution",
+        "/dashboard/data-building/biodiversity",
+        "/dashboard/data-building/energy-optimizer",
+        "/dashboard/data-building/greenhouse-emissions",
+        "/dashboard/data-building/health-safety",
+        "/dashboard/data-building/operational-data",
+        "/dashboard/data-building/property-insights",
+        "/dashboard/data-building/track-energy",
+        "/dashboard/data-building/track-waste",
+        "/dashboard/data-building/track-water",
+        "/dashboard/data-building/utility-coverage",
+        "/dashboard/data-building/view-usage"
+      ],
+      "allowed_paths": [
+        "src/app/dashboard/data-building/air-pollution/page.tsx",
+        "src/components/views/data-building/air-pollution/AirPollutionForm.tsx",
+        "src/app/dashboard/data-building/biodiversity/page.tsx",
+        "src/components/views/data-building/biodiversity/BiodiversityForm.tsx",
+        "src/app/dashboard/data-building/energy-optimizer/page.tsx",
+        "src/components/views/energy-optimizer/SavedEnergySourceEntry.tsx",
+        "src/app/dashboard/data-building/greenhouse-emissions/page.tsx",
+        "src/components/views/data-building/greenhouse-emissions/GreenHouseEmissionForm.tsx",
+        "src/components/views/ai-manager/AiInsightAssistant.tsx",
+        "src/components/views/ai-manager/ExpertAdvisor.tsx",
+        "src/components/common/AssistantPanelShell.tsx",
+        "src/store/index.ts",
+        "src/app/dashboard/data-building/health-safety/page.tsx",
+        "src/components/views/data-building/health-safety/HealthSafetyForm.tsx",
+        "src/app/dashboard/data-building/operational-data/page.tsx",
+        "src/app/dashboard/data-building/property-insights/page.tsx",
+        "src/app/dashboard/data-building/track-energy/page.tsx",
+        "src/components/common/Button.tsx",
+        "src/components/views/data-building/track-energy/trackEnergy.tsx",
+        "src/app/dashboard/data-building/track-waste/page.tsx",
+        "src/components/views/data-building/track-waste/trackWaste.tsx",
+        "src/app/dashboard/data-building/track-water/page.tsx",
+        "src/components/views/data-building/track-water/TrackWater.tsx",
+        "src/app/dashboard/data-building/utility-coverage/page.tsx",
+        "src/app/dashboard/data-building/view-usage/page.tsx",
+        "src/components/views/data-building/view-usage/viewUsage.tsx"
+      ],
+      "source_files": [
+        "src/app/dashboard/data-building/air-pollution/page.tsx",
+        "src/components/views/data-building/air-pollution/AirPollutionForm.tsx",
+        "src/app/dashboard/data-building/biodiversity/page.tsx",
+        "src/components/views/data-building/biodiversity/BiodiversityForm.tsx",
+        "src/app/dashboard/data-building/energy-optimizer/page.tsx",
+        "src/components/views/energy-optimizer/SavedEnergySourceEntry.tsx",
+        "src/app/dashboard/data-building/greenhouse-emissions/page.tsx",
+        "src/components/views/data-building/greenhouse-emissions/GreenHouseEmissionForm.tsx",
+        "src/components/views/ai-manager/AiInsightAssistant.tsx",
+        "src/components/views/ai-manager/ExpertAdvisor.tsx",
+        "src/components/common/AssistantPanelShell.tsx",
+        "src/store/index.ts",
+        "src/app/dashboard/data-building/health-safety/page.tsx",
+        "src/components/views/data-building/health-safety/HealthSafetyForm.tsx",
+        "src/app/dashboard/data-building/operational-data/page.tsx",
+        "src/app/dashboard/data-building/property-insights/page.tsx",
+        "src/app/dashboard/data-building/track-energy/page.tsx",
+        "src/components/common/Button.tsx",
+        "src/components/views/data-building/track-energy/trackEnergy.tsx",
+        "src/app/dashboard/data-building/track-waste/page.tsx",
+        "src/components/views/data-building/track-waste/trackWaste.tsx",
+        "src/app/dashboard/data-building/track-water/page.tsx",
+        "src/components/views/data-building/track-water/TrackWater.tsx",
+        "src/app/dashboard/data-building/utility-coverage/page.tsx",
+        "src/app/dashboard/data-building/view-usage/page.tsx",
+        "src/components/views/data-building/view-usage/viewUsage.tsx"
+      ],
+      "protected_behavior": [
+        "Preserve selected actor/company/property, approved layout/copy and source identity",
+        "Keep loading/error/empty/missing-data distinctions and hidden features",
+        "No unrelated redesign, invented calculations or unsupported capability promises"
+      ],
+      "recipe_ids": [
+        "feature-data-building"
+      ],
+      "verification_status": "configured-unverified"
+    },
+    {
+      "id": "data-input",
+      "purpose": "Assets, suppliers, initiatives, investors and controlled intake",
+      "owner_role": "Task-scoped feature lead; current goal/session grants scope",
+      "routes": [
+        "/dashboard/data-input/assets-companies",
+        "/dashboard/data-input/data-inputs-assets/add-new-asset",
+        "/dashboard/data-input/data-inputs-assets/asset-materiality-assessment",
+        "/dashboard/data-input/data-inputs-assets/update-asset/[companyId]",
+        "/dashboard/data-input/evidence-vault",
+        "/dashboard/data-input/investors",
+        "/dashboard/data-input",
+        "/dashboard/data-input/portfolio",
+        "/dashboard/data-input/procurement",
+        "/dashboard/data-input/production/goal-scope",
+        "/dashboard/data-input/production/interpretation",
+        "/dashboard/data-input/production/lci",
+        "/dashboard/data-input/production/lcia",
+        "/dashboard/data-input/production",
+        "/dashboard/data-input/production/workspace",
+        "/dashboard/data-input/profile",
+        "/dashboard/data-input/sites-properties",
+        "/dashboard/data-input/supply-chain",
+        "/dashboard/data-input/supply-chain/requests",
+        "/dashboard/data-input/supply-chain/scope-3",
+        "/dashboard/data-input/supply-chain/submissions/[id]/allocations",
+        "/dashboard/data-input/supply-chain/submissions/[id]",
+        "/dashboard/data-input/supply-chain/submissions",
+        "/dashboard/data-input/supply-chain/suppliers/[id]",
+        "/dashboard/data-input/supply-chain/suppliers",
+        "/dashboard/data-input/team",
+        "/dashboard/data-input/update-sites-properties"
+      ],
+      "allowed_paths": [
+        "src/app/dashboard/data-input/assets-companies/page.tsx",
+        "src/components/views/data-input/AddNewAssetTab.tsx",
+        "src/app/dashboard/data-input/data-inputs-assets/add-new-asset/page.tsx",
+        "src/components/common/ModuleAIRail.tsx",
+        "src/app/dashboard/data-input/data-inputs-assets/asset-materiality-assessment/page.tsx",
+        "src/app/dashboard/data-input/data-inputs-assets/update-asset/[companyId]/page.tsx",
+        "src/app/dashboard/data-input/evidence-vault/page.tsx",
+        "src/app/dashboard/data-input/investors/page.tsx",
+        "src/components/views/data-input/investors/InvestorsPage.tsx",
+        "src/app/dashboard/data-input/page.tsx",
+        "src/app/dashboard/data-input/portfolio/page.tsx",
+        "src/components/views/profile/TeamTableList.tsx",
+        "src/components/views/profile/TeamListHeader.tsx",
+        "src/app/dashboard/data-input/procurement/page.tsx",
+        "src/components/views/procurement/ProcurementPage.tsx",
+        "src/components/views/marketplace/MarketplaceOpportunityRail.tsx",
+        "src/app/dashboard/data-input/production/goal-scope/page.tsx",
+        "src/components/views/lca/GoalScopeView.tsx",
+        "src/app/dashboard/data-input/production/interpretation/page.tsx",
+        "src/components/views/lca/InterpretationView.tsx",
+        "src/app/dashboard/data-input/production/lci/page.tsx",
+        "src/components/views/lca/LCIView.tsx",
+        "src/app/dashboard/data-input/production/lcia/page.tsx",
+        "src/components/views/lca/LCIAView.tsx",
+        "src/app/dashboard/data-input/production/page.tsx",
+        "src/store/index.ts",
+        "src/components/common/Button.tsx",
+        "src/lib/api/index.ts",
+        "src/lib/utils/index.ts",
+        "src/app/dashboard/data-input/production/workspace/page.tsx",
+        "src/components/views/lca/LCAWorkspaceView.tsx",
+        "src/app/dashboard/data-input/profile/page.tsx",
+        "src/components/ui/select.tsx",
+        "src/components/ui/label.tsx",
+        "src/components/ui/badge.tsx",
+        "src/app/dashboard/data-input/sites-properties/page.tsx",
+        "src/components/views/add-sites-properties/SitesPropertiesList.tsx",
+        "src/app/dashboard/data-input/supply-chain/page.tsx",
+        "src/components/views/supply-chain/SupplyChainProgramDashboard.tsx",
+        "src/lib/api/supply-chain-api.ts",
+        "src/app/dashboard/data-input/supply-chain/requests/page.tsx",
+        "src/components/views/supply-chain/RequestForm.tsx",
+        "src/components/views/supply-chain/RequestQueue.tsx",
+        "src/app/dashboard/data-input/supply-chain/scope-3/page.tsx",
+        "src/components/views/supply-chain/Scope3Summary.tsx",
+        "src/app/dashboard/data-input/supply-chain/submissions/[id]/allocations/page.tsx",
+        "src/components/views/supply-chain/AllocationEditor.tsx",
+        "src/app/dashboard/data-input/supply-chain/submissions/[id]/page.tsx",
+        "src/components/views/supply-chain/AIReviewPanel.tsx",
+        "src/components/views/supply-chain/SubmissionDetail.tsx",
+        "src/components/views/supply-chain/SubmissionEvidencePanel.tsx",
+        "src/app/dashboard/data-input/supply-chain/submissions/page.tsx",
+        "src/components/views/supply-chain/StatusBadge.tsx",
+        "src/app/dashboard/data-input/supply-chain/suppliers/[id]/page.tsx",
+        "src/components/views/supply-chain/SupplierProgramProfile.tsx",
+        "src/components/views/supply-chain/SupplierEngagementHistory.tsx",
+        "src/components/views/supply-chain/SubmissionCreatePanel.tsx",
+        "src/app/dashboard/data-input/supply-chain/suppliers/page.tsx",
+        "src/components/views/supply-chain/SupplierTable.tsx",
+        "src/components/views/supply-chain/SupplierCreatePanel.tsx",
+        "src/components/views/supply-chain/EcoVadisPanel.tsx",
+        "src/app/dashboard/data-input/team/page.tsx",
+        "src/app/dashboard/data-input/update-sites-properties/page.tsx",
+        "src/components/views/add-sites-properties/AddSites.tsx"
+      ],
+      "source_files": [
+        "src/app/dashboard/data-input/assets-companies/page.tsx",
+        "src/components/views/data-input/AddNewAssetTab.tsx",
+        "src/app/dashboard/data-input/data-inputs-assets/add-new-asset/page.tsx",
+        "src/components/common/ModuleAIRail.tsx",
+        "src/app/dashboard/data-input/data-inputs-assets/asset-materiality-assessment/page.tsx",
+        "src/app/dashboard/data-input/data-inputs-assets/update-asset/[companyId]/page.tsx",
+        "src/app/dashboard/data-input/evidence-vault/page.tsx",
+        "src/app/dashboard/data-input/investors/page.tsx",
+        "src/components/views/data-input/investors/InvestorsPage.tsx",
+        "src/app/dashboard/data-input/page.tsx",
+        "src/app/dashboard/data-input/portfolio/page.tsx",
+        "src/components/views/profile/TeamTableList.tsx",
+        "src/components/views/profile/TeamListHeader.tsx",
+        "src/app/dashboard/data-input/procurement/page.tsx",
+        "src/components/views/procurement/ProcurementPage.tsx",
+        "src/components/views/marketplace/MarketplaceOpportunityRail.tsx",
+        "src/app/dashboard/data-input/production/goal-scope/page.tsx",
+        "src/components/views/lca/GoalScopeView.tsx",
+        "src/app/dashboard/data-input/production/interpretation/page.tsx",
+        "src/components/views/lca/InterpretationView.tsx",
+        "src/app/dashboard/data-input/production/lci/page.tsx",
+        "src/components/views/lca/LCIView.tsx",
+        "src/app/dashboard/data-input/production/lcia/page.tsx",
+        "src/components/views/lca/LCIAView.tsx",
+        "src/app/dashboard/data-input/production/page.tsx",
+        "src/store/index.ts",
+        "src/components/common/Button.tsx",
+        "src/lib/api/index.ts",
+        "src/lib/utils/index.ts",
+        "src/app/dashboard/data-input/production/workspace/page.tsx",
+        "src/components/views/lca/LCAWorkspaceView.tsx",
+        "src/app/dashboard/data-input/profile/page.tsx",
+        "src/components/ui/select.tsx",
+        "src/components/ui/label.tsx",
+        "src/components/ui/badge.tsx",
+        "src/app/dashboard/data-input/sites-properties/page.tsx",
+        "src/components/views/add-sites-properties/SitesPropertiesList.tsx",
+        "src/app/dashboard/data-input/supply-chain/page.tsx",
+        "src/components/views/supply-chain/SupplyChainProgramDashboard.tsx",
+        "src/lib/api/supply-chain-api.ts",
+        "src/app/dashboard/data-input/supply-chain/requests/page.tsx",
+        "src/components/views/supply-chain/RequestForm.tsx",
+        "src/components/views/supply-chain/RequestQueue.tsx",
+        "src/app/dashboard/data-input/supply-chain/scope-3/page.tsx",
+        "src/components/views/supply-chain/Scope3Summary.tsx",
+        "src/app/dashboard/data-input/supply-chain/submissions/[id]/allocations/page.tsx",
+        "src/components/views/supply-chain/AllocationEditor.tsx",
+        "src/app/dashboard/data-input/supply-chain/submissions/[id]/page.tsx",
+        "src/components/views/supply-chain/AIReviewPanel.tsx",
+        "src/components/views/supply-chain/SubmissionDetail.tsx",
+        "src/components/views/supply-chain/SubmissionEvidencePanel.tsx",
+        "src/app/dashboard/data-input/supply-chain/submissions/page.tsx",
+        "src/components/views/supply-chain/StatusBadge.tsx",
+        "src/app/dashboard/data-input/supply-chain/suppliers/[id]/page.tsx",
+        "src/components/views/supply-chain/SupplierProgramProfile.tsx",
+        "src/components/views/supply-chain/SupplierEngagementHistory.tsx",
+        "src/components/views/supply-chain/SubmissionCreatePanel.tsx",
+        "src/app/dashboard/data-input/supply-chain/suppliers/page.tsx",
+        "src/components/views/supply-chain/SupplierTable.tsx",
+        "src/components/views/supply-chain/SupplierCreatePanel.tsx",
+        "src/components/views/supply-chain/EcoVadisPanel.tsx",
+        "src/app/dashboard/data-input/team/page.tsx",
+        "src/app/dashboard/data-input/update-sites-properties/page.tsx",
+        "src/components/views/add-sites-properties/AddSites.tsx"
+      ],
+      "protected_behavior": [
+        "Preserve selected actor/company/property, approved layout/copy and source identity",
+        "Keep loading/error/empty/missing-data distinctions and hidden features",
+        "No unrelated redesign, invented calculations or unsupported capability promises"
+      ],
+      "recipe_ids": [
+        "feature-data-input"
+      ],
+      "verification_status": "configured-unverified"
+    },
+    {
+      "id": "due-diligence",
+      "purpose": "Deal documents, assessments, findings, reviews and source reports",
+      "owner_role": "Task-scoped feature lead; current goal/session grants scope",
+      "routes": [
+        "/dashboard/due-diligence"
+      ],
+      "allowed_paths": [
+        "src/app/dashboard/due-diligence/page.tsx",
+        "src/components/views/due-diligence/DueDiligenceSourceEntry.tsx",
+        "src/components/common/ModuleAIRail.tsx"
+      ],
+      "source_files": [
+        "src/app/dashboard/due-diligence/page.tsx",
+        "src/components/views/due-diligence/DueDiligenceSourceEntry.tsx",
+        "src/components/common/ModuleAIRail.tsx"
+      ],
+      "protected_behavior": [
+        "Preserve selected actor/company/property, approved layout/copy and source identity",
+        "Keep loading/error/empty/missing-data distinctions and hidden features",
+        "No unrelated redesign, invented calculations or unsupported capability promises"
+      ],
+      "recipe_ids": [
+        "feature-due-diligence"
+      ],
+      "verification_status": "configured-unverified"
+    },
+    {
+      "id": "esg-intelligence",
+      "purpose": "Sector-selected ESG source briefings with freshness/confidence",
+      "owner_role": "Task-scoped feature lead; current goal/session grants scope",
+      "routes": [
+        "/dashboard/esg-intelligence"
+      ],
+      "allowed_paths": [
+        "src/app/dashboard/esg-intelligence/page.tsx",
+        "src/components/views/esg-intelligence/EsgIntelligencePage.tsx"
+      ],
+      "source_files": [
+        "src/app/dashboard/esg-intelligence/page.tsx",
+        "src/components/views/esg-intelligence/EsgIntelligencePage.tsx"
+      ],
+      "protected_behavior": [
+        "Preserve selected actor/company/property, approved layout/copy and source identity",
+        "Keep loading/error/empty/missing-data distinctions and hidden features",
+        "No unrelated redesign, invented calculations or unsupported capability promises"
+      ],
+      "recipe_ids": [
+        "feature-esg-intelligence"
+      ],
+      "verification_status": "configured-unverified"
+    },
+    {
+      "id": "initiatives-and-investment",
+      "purpose": "Initiative portfolios, proposal/review/apply and financial source links",
+      "owner_role": "Task-scoped feature lead; current goal/session grants scope",
+      "routes": [
+        "/dashboard/initiatives-and-investment/monitoring",
+        "/dashboard/initiatives-and-investment"
+      ],
+      "allowed_paths": [
+        "src/app/dashboard/initiatives-and-investment/monitoring/page.tsx",
+        "src/app/dashboard/initiatives-and-investment/monitoring/redirect-target.ts",
+        "src/app/dashboard/initiatives-and-investment/page.tsx",
+        "src/components/views/data-input/AssetInitiativesInvestments.tsx",
+        "src/components/views/marketplace/MarketplaceEntryLink.tsx",
+        "src/components/views/marketplace/MarketplaceOpportunityRail.tsx"
+      ],
+      "source_files": [
+        "src/app/dashboard/initiatives-and-investment/monitoring/page.tsx",
+        "src/app/dashboard/initiatives-and-investment/monitoring/redirect-target.ts",
+        "src/app/dashboard/initiatives-and-investment/page.tsx",
+        "src/components/views/data-input/AssetInitiativesInvestments.tsx",
+        "src/components/views/marketplace/MarketplaceEntryLink.tsx",
+        "src/components/views/marketplace/MarketplaceOpportunityRail.tsx"
+      ],
+      "protected_behavior": [
+        "Preserve selected actor/company/property, approved layout/copy and source identity",
+        "Keep loading/error/empty/missing-data distinctions and hidden features",
+        "No unrelated redesign, invented calculations or unsupported capability promises"
+      ],
+      "recipe_ids": [
+        "feature-initiatives-and-investment"
+      ],
+      "verification_status": "configured-unverified"
+    },
+    {
+      "id": "marketplace",
+      "purpose": "Solution matching, RFPs and reviewed actions; currently hidden",
+      "owner_role": "Task-scoped feature lead; current goal/session grants scope",
+      "routes": [
+        "/dashboard/marketplace/admin",
+        "/dashboard/marketplace/credits",
+        "/dashboard/marketplace/learning",
+        "/dashboard/marketplace",
+        "/dashboard/marketplace/portfolio",
+        "/dashboard/marketplace/pricing",
+        "/dashboard/marketplace/provider/alerts",
+        "/dashboard/marketplace/provider/performance",
+        "/dashboard/marketplace/reports",
+        "/dashboard/marketplace/rfps"
+      ],
+      "allowed_paths": [
+        "src/app/dashboard/marketplace/admin/page.tsx",
+        "src/components/views/marketplace/MarketplacePage.tsx",
+        "src/app/dashboard/marketplace/credits/page.tsx",
+        "src/app/dashboard/marketplace/learning/page.tsx",
+        "src/app/dashboard/marketplace/page.tsx",
+        "src/app/dashboard/marketplace/portfolio/page.tsx",
+        "src/app/dashboard/marketplace/pricing/page.tsx",
+        "src/app/dashboard/marketplace/provider/alerts/page.tsx",
+        "src/app/dashboard/marketplace/provider/performance/page.tsx",
+        "src/app/dashboard/marketplace/reports/page.tsx",
+        "src/app/dashboard/marketplace/rfps/page.tsx"
+      ],
+      "source_files": [
+        "src/app/dashboard/marketplace/admin/page.tsx",
+        "src/components/views/marketplace/MarketplacePage.tsx",
+        "src/app/dashboard/marketplace/credits/page.tsx",
+        "src/app/dashboard/marketplace/learning/page.tsx",
+        "src/app/dashboard/marketplace/page.tsx",
+        "src/app/dashboard/marketplace/portfolio/page.tsx",
+        "src/app/dashboard/marketplace/pricing/page.tsx",
+        "src/app/dashboard/marketplace/provider/alerts/page.tsx",
+        "src/app/dashboard/marketplace/provider/performance/page.tsx",
+        "src/app/dashboard/marketplace/reports/page.tsx",
+        "src/app/dashboard/marketplace/rfps/page.tsx"
+      ],
+      "protected_behavior": [
+        "Preserve selected actor/company/property, approved layout/copy and source identity",
+        "Keep loading/error/empty/missing-data distinctions and hidden features",
+        "No unrelated redesign, invented calculations or unsupported capability promises"
+      ],
+      "recipe_ids": [
+        "feature-marketplace"
+      ],
+      "verification_status": "configured-unverified"
+    },
+    {
+      "id": "metrics",
+      "purpose": "Filtered environmental analytics and source-backed metrics",
+      "owner_role": "Task-scoped feature lead; current goal/session grants scope",
+      "routes": [
+        "/dashboard/metrics/environmental-dashboard",
+        "/dashboard/metrics/saved-source"
+      ],
+      "allowed_paths": [
+        "src/app/dashboard/metrics/environmental-dashboard/page.tsx",
+        "src/components/views/metrics-analytics/environmental/EnvironmentalDashboard.tsx",
+        "src/components/views/marketplace/MarketplaceEntryLink.tsx",
+        "src/components/views/marketplace/MarketplaceOpportunityRail.tsx",
+        "src/app/dashboard/metrics/saved-source/page.tsx",
+        "src/components/views/data-input/initiatives/SavedInitiativeSourceEntry.tsx"
+      ],
+      "source_files": [
+        "src/app/dashboard/metrics/environmental-dashboard/page.tsx",
+        "src/components/views/metrics-analytics/environmental/EnvironmentalDashboard.tsx",
+        "src/components/views/marketplace/MarketplaceEntryLink.tsx",
+        "src/components/views/marketplace/MarketplaceOpportunityRail.tsx",
+        "src/app/dashboard/metrics/saved-source/page.tsx",
+        "src/components/views/data-input/initiatives/SavedInitiativeSourceEntry.tsx"
+      ],
+      "protected_behavior": [
+        "Preserve selected actor/company/property, approved layout/copy and source identity",
+        "Keep loading/error/empty/missing-data distinctions and hidden features",
+        "No unrelated redesign, invented calculations or unsupported capability promises"
+      ],
+      "recipe_ids": [
+        "feature-metrics"
+      ],
+      "verification_status": "configured-unverified"
+    },
+    {
+      "id": "dashboard",
+      "purpose": "Shared dashboard shell and navigation",
+      "owner_role": "Task-scoped feature lead; current goal/session grants scope",
+      "routes": [
+        "/dashboard"
+      ],
+      "allowed_paths": [
+        "src/app/dashboard/page.tsx",
+        "src/components/common/MainCard.tsx",
+        "src/components/common/PageHeader.tsx",
+        "src/hooks/usePinnedCards.ts",
+        "src/components/common/GetStartedCard.tsx",
+        "src/components/common/GetStartedCardAgent.tsx"
+      ],
+      "source_files": [
+        "src/app/dashboard/page.tsx",
+        "src/components/common/MainCard.tsx",
+        "src/components/common/PageHeader.tsx",
+        "src/hooks/usePinnedCards.ts",
+        "src/components/common/GetStartedCard.tsx",
+        "src/components/common/GetStartedCardAgent.tsx"
+      ],
+      "protected_behavior": [
+        "Preserve selected actor/company/property, approved layout/copy and source identity",
+        "Keep loading/error/empty/missing-data distinctions and hidden features",
+        "No unrelated redesign, invented calculations or unsupported capability promises"
+      ],
+      "recipe_ids": [
+        "feature-home"
+      ],
+      "verification_status": "configured-unverified"
+    },
+    {
+      "id": "profile",
+      "purpose": "Actor profile, roles, team and preferences",
+      "owner_role": "Task-scoped feature lead; current goal/session grants scope",
+      "routes": [
+        "/dashboard/profile",
+        "/dashboard/profile/team"
+      ],
+      "allowed_paths": [
+        "src/app/dashboard/profile/page.tsx",
+        "src/components/views/profile/UnitPreferences.tsx",
+        "src/components/views/profile/ProfileInfo.tsx",
+        "src/app/dashboard/profile/team/page.tsx",
+        "src/components/views/profile/TeamManagement.tsx"
+      ],
+      "source_files": [
+        "src/app/dashboard/profile/page.tsx",
+        "src/components/views/profile/UnitPreferences.tsx",
+        "src/components/views/profile/ProfileInfo.tsx",
+        "src/app/dashboard/profile/team/page.tsx",
+        "src/components/views/profile/TeamManagement.tsx"
+      ],
+      "protected_behavior": [
+        "Preserve selected actor/company/property, approved layout/copy and source identity",
+        "Keep loading/error/empty/missing-data distinctions and hidden features",
+        "No unrelated redesign, invented calculations or unsupported capability promises"
+      ],
+      "recipe_ids": [
+        "feature-profile"
+      ],
+      "verification_status": "configured-unverified"
+    },
+    {
+      "id": "reports",
+      "purpose": "Framework/period source binding, review, narrative and export",
+      "owner_role": "Task-scoped feature lead; current goal/session grants scope",
+      "routes": [
+        "/dashboard/reports/ai-spend",
+        "/dashboard/reports/eu-taxonomy",
+        "/dashboard/reports/financed-emissions",
+        "/dashboard/reports/issb",
+        "/dashboard/reports/leadership/esg-leadership/environmental",
+        "/dashboard/reports/leadership/esg-leadership/governance",
+        "/dashboard/reports/leadership/esg-leadership/social",
+        "/dashboard/reports/leadership/performance-targets/environmental",
+        "/dashboard/reports/leadership/performance-targets/governance",
+        "/dashboard/reports/leadership/performance-targets/social",
+        "/dashboard/reports/leadership/reports-disclosures",
+        "/dashboard/reports/leadership/senior-decision-maker",
+        "/dashboard/reports/plan",
+        "/dashboard/reports/report-generator/fund-management-view",
+        "/dashboard/reports/report-generator/management-view",
+        "/dashboard/reports/report-generator/nzif-supplement-view",
+        "/dashboard/reports/report-generator",
+        "/dashboard/reports/report-generator/performance-view",
+        "/dashboard/reports/report-generator/real-estate-performance-view",
+        "/dashboard/reports/report-generator/real-estate-view",
+        "/dashboard/reports/reports-and-disclosure",
+        "/dashboard/reports/scope3"
+      ],
+      "allowed_paths": [
+        "src/app/dashboard/reports/ai-spend/page.tsx",
+        "src/components/views/reports-ai-spend/ReportsAISpendPage.tsx",
+        "src/app/dashboard/reports/eu-taxonomy/page.tsx",
+        "src/components/views/eu-taxonomy/EUTaxonomyPage.tsx",
+        "src/app/dashboard/reports/financed-emissions/page.tsx",
+        "src/components/views/financed-emissions/FinancedEmissionsPage.tsx",
+        "src/app/dashboard/reports/issb/page.tsx",
+        "src/components/views/report-generator/Issb.tsx",
+        "src/app/dashboard/reports/leadership/esg-leadership/environmental/page.tsx",
+        "src/components/views/strategies/leadership/esg-leadership/EsgLeadershipList.tsx",
+        "src/app/dashboard/reports/leadership/esg-leadership/governance/page.tsx",
+        "src/app/dashboard/reports/leadership/esg-leadership/social/page.tsx",
+        "src/app/dashboard/reports/leadership/performance-targets/environmental/page.tsx",
+        "src/components/views/strategies/leadership/performance-targets/PerformanceTargetList.tsx",
+        "src/app/dashboard/reports/leadership/performance-targets/governance/page.tsx",
+        "src/app/dashboard/reports/leadership/performance-targets/social/page.tsx",
+        "src/app/dashboard/reports/leadership/reports-disclosures/page.tsx",
+        "src/components/views/strategies/reports-disclosures/reportsDisclosures.tsx",
+        "src/app/dashboard/reports/leadership/senior-decision-maker/page.tsx",
+        "src/components/views/strategies/leadership/senior-decision-maker/seniorDecisionMaker.tsx",
+        "src/app/dashboard/reports/plan/page.tsx",
+        "src/store/index.ts",
+        "src/lib/api/index.ts",
+        "src/app/dashboard/reports/report-generator/fund-management-view/page.tsx",
+        "src/components/views/fund-management-view/FundManagementView.tsx",
+        "src/app/dashboard/reports/report-generator/management-view/page.tsx",
+        "src/components/views/management-view/ManagementView.tsx",
+        "src/app/dashboard/reports/report-generator/nzif-supplement-view/page.tsx",
+        "src/components/views/nzif-supplement-view/NzifSupplementView.tsx",
+        "src/app/dashboard/reports/report-generator/page.tsx",
+        "src/components/views/report-generator/ReportsGeneratorPage.tsx",
+        "src/app/dashboard/reports/report-generator/performance-view/page.tsx",
+        "src/components/views/performance-view/PerformanceView.tsx",
+        "src/app/dashboard/reports/report-generator/real-estate-performance-view/page.tsx",
+        "src/components/views/real-estate-performance-view/PerformanceView.tsx",
+        "src/app/dashboard/reports/report-generator/real-estate-view/page.tsx",
+        "src/components/views/real-estate-view/RealEstateView.tsx",
+        "src/app/dashboard/reports/reports-and-disclosure/page.tsx",
+        "src/components/views/reports-and-disclosure/ReportsDisclosurePage.tsx",
+        "src/app/dashboard/reports/scope3/page.tsx",
+        "src/components/views/scope3/Scope3Page.tsx"
+      ],
+      "source_files": [
+        "src/app/dashboard/reports/ai-spend/page.tsx",
+        "src/components/views/reports-ai-spend/ReportsAISpendPage.tsx",
+        "src/app/dashboard/reports/eu-taxonomy/page.tsx",
+        "src/components/views/eu-taxonomy/EUTaxonomyPage.tsx",
+        "src/app/dashboard/reports/financed-emissions/page.tsx",
+        "src/components/views/financed-emissions/FinancedEmissionsPage.tsx",
+        "src/app/dashboard/reports/issb/page.tsx",
+        "src/components/views/report-generator/Issb.tsx",
+        "src/app/dashboard/reports/leadership/esg-leadership/environmental/page.tsx",
+        "src/components/views/strategies/leadership/esg-leadership/EsgLeadershipList.tsx",
+        "src/app/dashboard/reports/leadership/esg-leadership/governance/page.tsx",
+        "src/app/dashboard/reports/leadership/esg-leadership/social/page.tsx",
+        "src/app/dashboard/reports/leadership/performance-targets/environmental/page.tsx",
+        "src/components/views/strategies/leadership/performance-targets/PerformanceTargetList.tsx",
+        "src/app/dashboard/reports/leadership/performance-targets/governance/page.tsx",
+        "src/app/dashboard/reports/leadership/performance-targets/social/page.tsx",
+        "src/app/dashboard/reports/leadership/reports-disclosures/page.tsx",
+        "src/components/views/strategies/reports-disclosures/reportsDisclosures.tsx",
+        "src/app/dashboard/reports/leadership/senior-decision-maker/page.tsx",
+        "src/components/views/strategies/leadership/senior-decision-maker/seniorDecisionMaker.tsx",
+        "src/app/dashboard/reports/plan/page.tsx",
+        "src/store/index.ts",
+        "src/lib/api/index.ts",
+        "src/app/dashboard/reports/report-generator/fund-management-view/page.tsx",
+        "src/components/views/fund-management-view/FundManagementView.tsx",
+        "src/app/dashboard/reports/report-generator/management-view/page.tsx",
+        "src/components/views/management-view/ManagementView.tsx",
+        "src/app/dashboard/reports/report-generator/nzif-supplement-view/page.tsx",
+        "src/components/views/nzif-supplement-view/NzifSupplementView.tsx",
+        "src/app/dashboard/reports/report-generator/page.tsx",
+        "src/components/views/report-generator/ReportsGeneratorPage.tsx",
+        "src/app/dashboard/reports/report-generator/performance-view/page.tsx",
+        "src/components/views/performance-view/PerformanceView.tsx",
+        "src/app/dashboard/reports/report-generator/real-estate-performance-view/page.tsx",
+        "src/components/views/real-estate-performance-view/PerformanceView.tsx",
+        "src/app/dashboard/reports/report-generator/real-estate-view/page.tsx",
+        "src/components/views/real-estate-view/RealEstateView.tsx",
+        "src/app/dashboard/reports/reports-and-disclosure/page.tsx",
+        "src/components/views/reports-and-disclosure/ReportsDisclosurePage.tsx",
+        "src/app/dashboard/reports/scope3/page.tsx",
+        "src/components/views/scope3/Scope3Page.tsx"
+      ],
+      "protected_behavior": [
+        "Preserve selected actor/company/property, approved layout/copy and source identity",
+        "Keep loading/error/empty/missing-data distinctions and hidden features",
+        "No unrelated redesign, invented calculations or unsupported capability promises"
+      ],
+      "recipe_ids": [
+        "feature-reports"
+      ],
+      "verification_status": "configured-unverified"
+    },
+    {
+      "id": "risk-management",
+      "purpose": "General, Climate and Nature risk with saved-source and action workflows",
+      "owner_role": "Task-scoped feature lead; current goal/session grants scope",
+      "routes": [
+        "/dashboard/risk-management/climate-risk/climate-opportunities",
+        "/dashboard/risk-management/climate-risk/climate-risk-overview",
+        "/dashboard/risk-management/climate-risk/physical-risk",
+        "/dashboard/risk-management/climate-risk/saved-assessment",
+        "/dashboard/risk-management/climate-risk/transition-risk",
+        "/dashboard/risk-management/materiality-assessment",
+        "/dashboard/risk-management/nature-risk/economic-activity",
+        "/dashboard/risk-management/nature-risk/opportunities",
+        "/dashboard/risk-management/nature-risk/overview",
+        "/dashboard/risk-management/nature-risk",
+        "/dashboard/risk-management/nature-risk/physical-risk",
+        "/dashboard/risk-management/nature-risk/prepare",
+        "/dashboard/risk-management/nature-risk/saved-summary",
+        "/dashboard/risk-management/nature-risk/transition-risk",
+        "/dashboard/risk-management/overview",
+        "/dashboard/risk-management/overview/portfolio",
+        "/dashboard/risk-management/records/[companyId]/[riskId]",
+        "/dashboard/risk-management/risk-assessment/risk-documentation/environmental",
+        "/dashboard/risk-management/risk-assessment/risk-documentation/governance",
+        "/dashboard/risk-management/risk-assessment/risk-documentation/social",
+        "/dashboard/risk-management/risk-assessment/risk-level/environmental",
+        "/dashboard/risk-management/risk-assessment/risk-level/governance",
+        "/dashboard/risk-management/risk-assessment/risk-level/social",
+        "/dashboard/risk-management/risk-monitoring",
+        "/dashboard/risk-management/risk-register",
+        "/dashboard/risk-management/sources/[companyId]/[riskId]/[module]/[recordId]"
+      ],
+      "allowed_paths": [
+        "src/app/dashboard/risk-management/climate-risk/climate-opportunities/page.tsx",
+        "src/components/views/risk-management/climate-risk/ClimateOpportunities.tsx",
+        "src/app/dashboard/risk-management/climate-risk/climate-risk-overview/page.tsx",
+        "src/components/views/risk-management/climate-risk/ClimateRiskCompanyViews.tsx",
+        "src/app/dashboard/risk-management/climate-risk/physical-risk/page.tsx",
+        "src/components/views/risk-management/climate-risk/PhysicalRisk.tsx",
+        "src/app/dashboard/risk-management/climate-risk/saved-assessment/page.tsx",
+        "src/components/views/risk-management/climate-risk/SavedClimateSourceEntry.tsx",
+        "src/app/dashboard/risk-management/climate-risk/transition-risk/page.tsx",
+        "src/components/views/risk-management/climate-risk/transition-plan/TransitionRiskPageViews.tsx",
+        "src/app/dashboard/risk-management/materiality-assessment/page.tsx",
+        "src/components/views/data-input/AssetMaterialityAssessment.tsx",
+        "src/app/dashboard/risk-management/nature-risk/economic-activity/page.tsx",
+        "src/components/views/nature-risk/NatureRiskOverviewView.tsx",
+        "src/app/dashboard/risk-management/nature-risk/opportunities/page.tsx",
+        "src/components/views/nature-risk/NatureOpportunitiesView.tsx",
+        "src/app/dashboard/risk-management/nature-risk/overview/page.tsx",
+        "src/app/dashboard/risk-management/nature-risk/page.tsx",
+        "src/app/dashboard/risk-management/nature-risk/physical-risk/page.tsx",
+        "src/components/views/nature-risk/NatureRiskLocateView.tsx",
+        "src/app/dashboard/risk-management/nature-risk/prepare/page.tsx",
+        "src/components/views/nature-risk/NatureRiskPrepareView.tsx",
+        "src/app/dashboard/risk-management/nature-risk/saved-summary/page.tsx",
+        "src/components/views/nature-risk/SavedNatureSourceEntry.tsx",
+        "src/app/dashboard/risk-management/nature-risk/transition-risk/page.tsx",
+        "src/components/views/nature-risk/TransitionRiskView.tsx",
+        "src/app/dashboard/risk-management/overview/page.tsx",
+        "src/components/views/risk-management/overview/Overview.tsx",
+        "src/components/views/marketplace/MarketplaceEntryLink.tsx",
+        "src/components/views/marketplace/MarketplaceOpportunityRail.tsx",
+        "src/app/dashboard/risk-management/overview/portfolio/page.tsx",
+        "src/components/views/risk-management/overview/RiskPortfolioView.tsx",
+        "src/app/dashboard/risk-management/records/[companyId]/[riskId]/page.tsx",
+        "src/store/index.ts",
+        "src/components/views/risk-management/risk-assessment/RiskDetailWorkspace.tsx",
+        "src/app/dashboard/risk-management/risk-assessment/risk-documentation/environmental/page.tsx",
+        "src/components/views/risk-management/risk-assessment/risk-documentation/Environmental.tsx",
+        "src/app/dashboard/risk-management/risk-assessment/risk-documentation/governance/page.tsx",
+        "src/components/views/risk-management/risk-assessment/risk-documentation/Governance.tsx",
+        "src/app/dashboard/risk-management/risk-assessment/risk-documentation/social/page.tsx",
+        "src/components/views/risk-management/risk-assessment/risk-documentation/Social.tsx",
+        "src/app/dashboard/risk-management/risk-assessment/risk-level/environmental/page.tsx",
+        "src/components/views/risk-management/risk-assessment/risk-level/environmental.tsx",
+        "src/app/dashboard/risk-management/risk-assessment/risk-level/governance/page.tsx",
+        "src/components/views/risk-management/risk-assessment/risk-level/governance.tsx",
+        "src/app/dashboard/risk-management/risk-assessment/risk-level/social/page.tsx",
+        "src/components/views/risk-management/risk-assessment/risk-level/social.tsx",
+        "src/app/dashboard/risk-management/risk-monitoring/page.tsx",
+        "src/components/views/risk-management/risk-monitoring/risk-monitoring.tsx",
+        "src/app/dashboard/risk-management/risk-register/page.tsx",
+        "src/components/common/ContainerCard.tsx",
+        "src/components/views/risk-management/risk-assessment/CompanyRiskRegister.tsx",
+        "src/components/ui/select.tsx",
+        "src/context/RiskLevelContext.tsx",
+        "src/app/dashboard/risk-management/sources/[companyId]/[riskId]/[module]/[recordId]/page.tsx",
+        "src/components/views/risk-management/risk-assessment/RiskSourceInspectionView.tsx"
+      ],
+      "source_files": [
+        "src/app/dashboard/risk-management/climate-risk/climate-opportunities/page.tsx",
+        "src/components/views/risk-management/climate-risk/ClimateOpportunities.tsx",
+        "src/app/dashboard/risk-management/climate-risk/climate-risk-overview/page.tsx",
+        "src/components/views/risk-management/climate-risk/ClimateRiskCompanyViews.tsx",
+        "src/app/dashboard/risk-management/climate-risk/physical-risk/page.tsx",
+        "src/components/views/risk-management/climate-risk/PhysicalRisk.tsx",
+        "src/app/dashboard/risk-management/climate-risk/saved-assessment/page.tsx",
+        "src/components/views/risk-management/climate-risk/SavedClimateSourceEntry.tsx",
+        "src/app/dashboard/risk-management/climate-risk/transition-risk/page.tsx",
+        "src/components/views/risk-management/climate-risk/transition-plan/TransitionRiskPageViews.tsx",
+        "src/app/dashboard/risk-management/materiality-assessment/page.tsx",
+        "src/components/views/data-input/AssetMaterialityAssessment.tsx",
+        "src/app/dashboard/risk-management/nature-risk/economic-activity/page.tsx",
+        "src/components/views/nature-risk/NatureRiskOverviewView.tsx",
+        "src/app/dashboard/risk-management/nature-risk/opportunities/page.tsx",
+        "src/components/views/nature-risk/NatureOpportunitiesView.tsx",
+        "src/app/dashboard/risk-management/nature-risk/overview/page.tsx",
+        "src/app/dashboard/risk-management/nature-risk/page.tsx",
+        "src/app/dashboard/risk-management/nature-risk/physical-risk/page.tsx",
+        "src/components/views/nature-risk/NatureRiskLocateView.tsx",
+        "src/app/dashboard/risk-management/nature-risk/prepare/page.tsx",
+        "src/components/views/nature-risk/NatureRiskPrepareView.tsx",
+        "src/app/dashboard/risk-management/nature-risk/saved-summary/page.tsx",
+        "src/components/views/nature-risk/SavedNatureSourceEntry.tsx",
+        "src/app/dashboard/risk-management/nature-risk/transition-risk/page.tsx",
+        "src/components/views/nature-risk/TransitionRiskView.tsx",
+        "src/app/dashboard/risk-management/overview/page.tsx",
+        "src/components/views/risk-management/overview/Overview.tsx",
+        "src/components/views/marketplace/MarketplaceEntryLink.tsx",
+        "src/components/views/marketplace/MarketplaceOpportunityRail.tsx",
+        "src/app/dashboard/risk-management/overview/portfolio/page.tsx",
+        "src/components/views/risk-management/overview/RiskPortfolioView.tsx",
+        "src/app/dashboard/risk-management/records/[companyId]/[riskId]/page.tsx",
+        "src/store/index.ts",
+        "src/components/views/risk-management/risk-assessment/RiskDetailWorkspace.tsx",
+        "src/app/dashboard/risk-management/risk-assessment/risk-documentation/environmental/page.tsx",
+        "src/components/views/risk-management/risk-assessment/risk-documentation/Environmental.tsx",
+        "src/app/dashboard/risk-management/risk-assessment/risk-documentation/governance/page.tsx",
+        "src/components/views/risk-management/risk-assessment/risk-documentation/Governance.tsx",
+        "src/app/dashboard/risk-management/risk-assessment/risk-documentation/social/page.tsx",
+        "src/components/views/risk-management/risk-assessment/risk-documentation/Social.tsx",
+        "src/app/dashboard/risk-management/risk-assessment/risk-level/environmental/page.tsx",
+        "src/components/views/risk-management/risk-assessment/risk-level/environmental.tsx",
+        "src/app/dashboard/risk-management/risk-assessment/risk-level/governance/page.tsx",
+        "src/components/views/risk-management/risk-assessment/risk-level/governance.tsx",
+        "src/app/dashboard/risk-management/risk-assessment/risk-level/social/page.tsx",
+        "src/components/views/risk-management/risk-assessment/risk-level/social.tsx",
+        "src/app/dashboard/risk-management/risk-monitoring/page.tsx",
+        "src/components/views/risk-management/risk-monitoring/risk-monitoring.tsx",
+        "src/app/dashboard/risk-management/risk-register/page.tsx",
+        "src/components/common/ContainerCard.tsx",
+        "src/components/views/risk-management/risk-assessment/CompanyRiskRegister.tsx",
+        "src/components/ui/select.tsx",
+        "src/context/RiskLevelContext.tsx",
+        "src/app/dashboard/risk-management/sources/[companyId]/[riskId]/[module]/[recordId]/page.tsx",
+        "src/components/views/risk-management/risk-assessment/RiskSourceInspectionView.tsx"
+      ],
+      "protected_behavior": [
+        "Preserve selected actor/company/property, approved layout/copy and source identity",
+        "Keep loading/error/empty/missing-data distinctions and hidden features",
+        "No unrelated redesign, invented calculations or unsupported capability promises"
+      ],
+      "recipe_ids": [
+        "nature-actions",
+        "climate-ui-source-contract"
+      ],
+      "verification_status": "configured-unverified"
+    },
+    {
+      "id": "strategies",
+      "purpose": "E/S/G plans, objectives, policies, execution and review",
+      "owner_role": "Task-scoped feature lead; current goal/session grants scope",
+      "routes": [
+        "/dashboard/strategies/execution",
+        "/dashboard/strategies/objectives/environmental",
+        "/dashboard/strategies/objectives/governance",
+        "/dashboard/strategies/objectives/social",
+        "/dashboard/strategies/policies-procedures/environmental",
+        "/dashboard/strategies/policies-procedures/governance",
+        "/dashboard/strategies/policies-procedures/social",
+        "/dashboard/strategies/regulation/[category]",
+        "/dashboard/strategies/strategy/environmental",
+        "/dashboard/strategies/strategy/governance",
+        "/dashboard/strategies/strategy/plans/[planId]",
+        "/dashboard/strategies/strategy/social",
+        "/dashboard/strategies/targets/[category]"
+      ],
+      "allowed_paths": [
+        "src/app/dashboard/strategies/execution/page.tsx",
+        "src/components/views/strategies/execution/StrategyExecutionView.tsx",
+        "src/app/dashboard/strategies/objectives/environmental/page.tsx",
+        "src/components/views/strategies/connected/StrategyWorkspace.tsx",
+        "src/components/views/strategies/connected/StrategyWorkspaceContext.tsx",
+        "src/components/views/strategies/connected/StrategyReviewPanel.tsx",
+        "src/components/views/strategies/objectives/StrategyObjectiveV2List.tsx",
+        "src/app/dashboard/strategies/objectives/governance/page.tsx",
+        "src/app/dashboard/strategies/objectives/social/page.tsx",
+        "src/app/dashboard/strategies/policies-procedures/environmental/page.tsx",
+        "src/components/views/strategies/policies-procedures/environmental.tsx",
+        "src/app/dashboard/strategies/policies-procedures/governance/page.tsx",
+        "src/components/views/strategies/policies-procedures/governance.tsx",
+        "src/app/dashboard/strategies/policies-procedures/social/page.tsx",
+        "src/components/views/strategies/policies-procedures/social.tsx",
+        "src/app/dashboard/strategies/regulation/[category]/page.tsx",
+        "src/components/views/strategies/regulation/RegulationModule.tsx",
+        "src/components/views/strategies/shared/strategyNavigation.tsx",
+        "src/app/dashboard/strategies/strategy/environmental/page.tsx",
+        "src/components/views/strategies/strategy/StrategyPlanV2List.tsx",
+        "src/app/dashboard/strategies/strategy/governance/page.tsx",
+        "src/app/dashboard/strategies/strategy/plans/[planId]/page.tsx",
+        "src/components/views/strategies/strategy/StrategyPlanDetailView.tsx",
+        "src/app/dashboard/strategies/strategy/social/page.tsx",
+        "src/app/dashboard/strategies/targets/[category]/page.tsx",
+        "src/components/views/targets/SmartTargetsPanel.tsx"
+      ],
+      "source_files": [
+        "src/app/dashboard/strategies/execution/page.tsx",
+        "src/components/views/strategies/execution/StrategyExecutionView.tsx",
+        "src/app/dashboard/strategies/objectives/environmental/page.tsx",
+        "src/components/views/strategies/connected/StrategyWorkspace.tsx",
+        "src/components/views/strategies/connected/StrategyWorkspaceContext.tsx",
+        "src/components/views/strategies/connected/StrategyReviewPanel.tsx",
+        "src/components/views/strategies/objectives/StrategyObjectiveV2List.tsx",
+        "src/app/dashboard/strategies/objectives/governance/page.tsx",
+        "src/app/dashboard/strategies/objectives/social/page.tsx",
+        "src/app/dashboard/strategies/policies-procedures/environmental/page.tsx",
+        "src/components/views/strategies/policies-procedures/environmental.tsx",
+        "src/app/dashboard/strategies/policies-procedures/governance/page.tsx",
+        "src/components/views/strategies/policies-procedures/governance.tsx",
+        "src/app/dashboard/strategies/policies-procedures/social/page.tsx",
+        "src/components/views/strategies/policies-procedures/social.tsx",
+        "src/app/dashboard/strategies/regulation/[category]/page.tsx",
+        "src/components/views/strategies/regulation/RegulationModule.tsx",
+        "src/components/views/strategies/shared/strategyNavigation.tsx",
+        "src/app/dashboard/strategies/strategy/environmental/page.tsx",
+        "src/components/views/strategies/strategy/StrategyPlanV2List.tsx",
+        "src/app/dashboard/strategies/strategy/governance/page.tsx",
+        "src/app/dashboard/strategies/strategy/plans/[planId]/page.tsx",
+        "src/components/views/strategies/strategy/StrategyPlanDetailView.tsx",
+        "src/app/dashboard/strategies/strategy/social/page.tsx",
+        "src/app/dashboard/strategies/targets/[category]/page.tsx",
+        "src/components/views/targets/SmartTargetsPanel.tsx"
+      ],
+      "protected_behavior": [
+        "Preserve selected actor/company/property, approved layout/copy and source identity",
+        "Keep loading/error/empty/missing-data distinctions and hidden features",
+        "No unrelated redesign, invented calculations or unsupported capability promises"
+      ],
+      "recipe_ids": [
+        "feature-strategies"
+      ],
+      "verification_status": "configured-unverified"
+    },
+    {
+      "id": "sustainability-ai",
+      "purpose": "Science, research, model and edge capability surfaces",
+      "owner_role": "Task-scoped feature lead; current goal/session grants scope",
+      "routes": [
+        "/dashboard/sustainability-ai/edge-ai"
+      ],
+      "allowed_paths": [
+        "src/app/dashboard/sustainability-ai/edge-ai/page.tsx",
+        "src/components/views/edge-ai/EdgeAIPage.tsx",
+        "src/context/AuthContext.tsx",
+        "src/lib/api/initiatives-api.ts"
+      ],
+      "source_files": [
+        "src/app/dashboard/sustainability-ai/edge-ai/page.tsx",
+        "src/components/views/edge-ai/EdgeAIPage.tsx",
+        "src/context/AuthContext.tsx",
+        "src/lib/api/initiatives-api.ts"
+      ],
+      "protected_behavior": [
+        "Preserve selected actor/company/property, approved layout/copy and source identity",
+        "Keep loading/error/empty/missing-data distinctions and hidden features",
+        "No unrelated redesign, invented calculations or unsupported capability promises"
+      ],
+      "recipe_ids": [
+        "feature-sustainability-ai"
+      ],
+      "verification_status": "configured-unverified"
+    },
+    {
+      "id": "targets",
+      "purpose": "Baseline/target populations and approved decarbonization scenarios",
+      "owner_role": "Task-scoped feature lead; current goal/session grants scope",
+      "routes": [
+        "/dashboard/targets",
+        "/dashboard/targets/saved-source"
+      ],
+      "allowed_paths": [
+        "src/app/dashboard/targets/page.tsx",
+        "src/components/common/Button.tsx",
+        "src/components/common/MainCard.tsx",
+        "src/components/common/PageHeader.tsx",
+        "src/components/views/ai-manager/AiInsightAssistant.tsx",
+        "src/store/slice/aiInsightSlice.ts",
+        "src/context/AuthContext.tsx",
+        "src/components/common/ContainerCard.tsx",
+        "src/components/common/Tabs.tsx",
+        "src/components/views/ai-manager/ExpertAdvisor.tsx",
+        "src/components/common/AssistantPanelShell.tsx",
+        "src/components/views/targets/SmartTargetsPanel.tsx",
+        "src/store/index.ts",
+        "src/components/views/targets/DecarbonizationPlanner.tsx",
+        "src/lib/ai-module-naming.ts",
+        "src/app/dashboard/targets/saved-source/page.tsx",
+        "src/components/views/data-input/initiatives/SavedInitiativeSourceEntry.tsx"
+      ],
+      "source_files": [
+        "src/app/dashboard/targets/page.tsx",
+        "src/components/common/Button.tsx",
+        "src/components/common/MainCard.tsx",
+        "src/components/common/PageHeader.tsx",
+        "src/components/views/ai-manager/AiInsightAssistant.tsx",
+        "src/store/slice/aiInsightSlice.ts",
+        "src/context/AuthContext.tsx",
+        "src/components/common/ContainerCard.tsx",
+        "src/components/common/Tabs.tsx",
+        "src/components/views/ai-manager/ExpertAdvisor.tsx",
+        "src/components/common/AssistantPanelShell.tsx",
+        "src/components/views/targets/SmartTargetsPanel.tsx",
+        "src/store/index.ts",
+        "src/components/views/targets/DecarbonizationPlanner.tsx",
+        "src/lib/ai-module-naming.ts",
+        "src/app/dashboard/targets/saved-source/page.tsx",
+        "src/components/views/data-input/initiatives/SavedInitiativeSourceEntry.tsx"
+      ],
+      "protected_behavior": [
+        "Preserve selected actor/company/property, approved layout/copy and source identity",
+        "Keep loading/error/empty/missing-data distinctions and hidden features",
+        "No unrelated redesign, invented calculations or unsupported capability promises"
+      ],
+      "recipe_ids": [
+        "feature-targets"
+      ],
+      "verification_status": "configured-unverified"
+    },
+    {
+      "id": "user-preferences",
+      "purpose": "Display units and compatibility settings entrypoints",
+      "owner_role": "Task-scoped feature lead; current goal/session grants scope",
+      "routes": [
+        "/dashboard/user-preferences/add-sites-properties",
+        "/dashboard/user-preferences/data-inputs-assets",
+        "/dashboard/user-preferences/profile"
+      ],
+      "allowed_paths": [
+        "src/app/dashboard/user-preferences/add-sites-properties/page.tsx",
+        "src/app/dashboard/user-preferences/data-inputs-assets/page.tsx",
+        "src/components/ui/tabs.tsx",
+        "src/components/ui/input.tsx",
+        "src/components/ui/select.tsx",
+        "src/app/dashboard/user-preferences/profile/page.tsx",
+        "src/components/common/Button.tsx",
+        "src/components/ui/label.tsx",
+        "src/components/views/profile/TeamListHeader.tsx",
+        "src/components/views/profile/TeamTableList.tsx",
+        "src/components/ui/badge.tsx"
+      ],
+      "source_files": [
+        "src/app/dashboard/user-preferences/add-sites-properties/page.tsx",
+        "src/app/dashboard/user-preferences/data-inputs-assets/page.tsx",
+        "src/components/ui/tabs.tsx",
+        "src/components/ui/input.tsx",
+        "src/components/ui/select.tsx",
+        "src/app/dashboard/user-preferences/profile/page.tsx",
+        "src/components/common/Button.tsx",
+        "src/components/ui/label.tsx",
+        "src/components/views/profile/TeamListHeader.tsx",
+        "src/components/views/profile/TeamTableList.tsx",
+        "src/components/ui/badge.tsx"
+      ],
+      "protected_behavior": [
+        "Preserve selected actor/company/property, approved layout/copy and source identity",
+        "Keep loading/error/empty/missing-data distinctions and hidden features",
+        "No unrelated redesign, invented calculations or unsupported capability promises"
+      ],
+      "recipe_ids": [
+        "feature-user-preferences"
+      ],
+      "verification_status": "configured-unverified"
+    },
+    {
+      "id": "world-watch",
+      "purpose": "World risk context and simulator scenarios",
+      "owner_role": "Task-scoped feature lead; current goal/session grants scope",
+      "routes": [
+        "/dashboard/world-watch/co-scientist",
+        "/dashboard/world-watch",
+        "/dashboard/world-watch/quick-esg",
+        "/dashboard/world-watch/simulator",
+        "/dashboard/world-watch/world-risk"
+      ],
+      "allowed_paths": [
+        "src/app/dashboard/world-watch/co-scientist/page.tsx",
+        "src/components/common/ModuleAIRail.tsx",
+        "src/components/views/co-scientist/CoScientistPage.tsx",
+        "src/app/dashboard/world-watch/page.tsx",
+        "src/app/dashboard/world-watch/quick-esg/page.tsx",
+        "src/app/dashboard/world-watch/simulator/page.tsx",
+        "src/components/views/world-simulator/WorldSimulatorPage.tsx",
+        "src/app/dashboard/world-watch/world-risk/page.tsx",
+        "src/components/views/world-risk/WorldRiskPage.tsx"
+      ],
+      "source_files": [
+        "src/app/dashboard/world-watch/co-scientist/page.tsx",
+        "src/components/common/ModuleAIRail.tsx",
+        "src/components/views/co-scientist/CoScientistPage.tsx",
+        "src/app/dashboard/world-watch/page.tsx",
+        "src/app/dashboard/world-watch/quick-esg/page.tsx",
+        "src/app/dashboard/world-watch/simulator/page.tsx",
+        "src/components/views/world-simulator/WorldSimulatorPage.tsx",
+        "src/app/dashboard/world-watch/world-risk/page.tsx",
+        "src/components/views/world-risk/WorldRiskPage.tsx"
+      ],
+      "protected_behavior": [
+        "Preserve selected actor/company/property, approved layout/copy and source identity",
+        "Keep loading/error/empty/missing-data distinctions and hidden features",
+        "No unrelated redesign, invented calculations or unsupported capability promises"
+      ],
+      "recipe_ids": [
+        "feature-world-watch"
+      ],
+      "verification_status": "configured-unverified"
+    },
+    {
+      "id": "authentication",
+      "purpose": "Existing public sign-in and session/return-path boundary",
+      "owner_role": "Task-scoped identity lead",
+      "routes": [
+        "/login"
+      ],
+      "allowed_paths": [
+        "src/app/(auth)/login/page.tsx"
+      ],
+      "source_files": [
+        "src/app/(auth)/login/page.tsx"
+      ],
+      "protected_behavior": [
+        "Preserve sign-in, company/session boundary and honest verification"
+      ],
+      "recipe_ids": [
+        "frontend-auth-return-path",
+        "login-read-only"
+      ],
+      "verification_status": "configured-unverified"
+    }
+  ]
+}

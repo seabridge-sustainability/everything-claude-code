@@ -1,6 +1,6 @@
 ---
 name: sea-skill-map
-description: "Use when choosing, auditing, or explaining which SeaBridgeAI procedural skills, workflows, checklists, or reviewer lenses should apply to a task without loading the full skill catalog."
+description: "Select the smallest useful ECC workflow for a task using the canonical routing manifest and current project policy."
 ---
 
 # sea-skill-map

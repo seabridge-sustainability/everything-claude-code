@@ -20,7 +20,7 @@ Review changed files for:
 - Text overlap, inaccessible controls, missing labels, and poor keyboard flow.
 - Route regressions and broken navigation.
 
-Prefer concrete screenshots, route checks, or Playwright evidence when available.
+For UI component/layout changes, require the source-bound specification and D-only before/after desktop/mobile screenshot, video and trace bundle described in [the existing browser workflow](../../agent-tooling/skills/seabridge-browser-autonomy/SKILL.md). Inspect playback and protected layout/copy/tokens. Missing or stale evidence fails the affected UI acceptance; anonymous captures do not prove authenticated behavior. Keep the review scoped to the requested change.
 
 <!-- SEABRIDGE_GOAL_SKILL_INHERITANCE_START -->
 ## /goal Inheritance

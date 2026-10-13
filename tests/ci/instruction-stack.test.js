@@ -130,16 +130,16 @@ test('the documented Windows ECC root resolves to the active checkout', () => {
 test('canonical safety rule supports bounded approval and controls Actions cost', () => {
   const canonical = currentPolicy();
   assert.match(canonical, /clearly bounded sequence named in advance/);
-  assert.match(canonical, /Do not ask again for steps already included/);
-  assert.match(canonical, /one integration owner and one completed-batch push per repository/);
-  assert.match(canonical, /Subagents never push or dispatch, rerun, or cancel workflows/);
-  assert.match(canonical, /inspect active or queued runs/);
+  assert.match(canonical, /Do not (?:ask again for steps already included|re-ask for included steps)/);
+  assert.match(canonical, /one integration owner\/(?:completed-batch push per repo)|one integration owner and one completed-batch push per repository/);
+  assert.match(canonical, /Subagents never push(?: or dispatch, rerun, or cancel workflows|\/dispatch\/rerun\/cancel workflows)/);
+  assert.match(canonical, /inspect active(?: or queued runs|\/queued runs)/);
   assert.match(canonical, /at most one corrective push/);
-  assert.match(canonical, /blocks only the dependent subtask/);
-  assert.match(canonical, /do not mark the whole goal blocked/);
+  assert.match(canonical, /blocks only the dependent subtask|block only dependent work/);
+  assert.match(canonical, /do not mark the whole goal blocked|never block the whole goal while meaningful work remains/);
   assert.match(canonical, /verified junction or symbolic-link entry/);
   assert.match(canonical, /named development\/test data job/);
-  assert.match(canonical, /maximum total ceiling of USD 5 for one batch/);
+  assert.match(canonical, /maximum total ceiling of USD 5 for one batch|USD 5 total, never per call/);
   assert.match(canonical, /hard nine-call limit/);
 });
 
@@ -148,7 +148,7 @@ test('every ECC runtime receives the Actions batch and budget rules', () => {
   for (const stack of lib.effectiveStacks(root)) {
     assert.match(stack.text, /one integration owner/i, `${stack.harness}: integration owner`);
     assert.match(stack.text, /90%/i, `${stack.harness}: budget threshold`);
-    assert.match(stack.text, /release batch|completed batch/i, `${stack.harness}: batch`);
+    assert.match(stack.text, /release batch|completed[ -]batch/i, `${stack.harness}: batch`);
     assert.match(stack.text, /hard spending stop|hard budget/i, `${stack.harness}: spending stop`);
   }
 });
@@ -158,8 +158,8 @@ test('all runtime instructions retain independent-session scope and separate del
   for (const stack of lib.effectiveStacks(root)) {
     assert.match(stack.text, /ecc session register/, stack.harness);
     assert.match(stack.text, /check-write/, stack.harness);
-    assert.match(stack.text, /Release owner only:.*release-acquire.*check-release.*bind fixed full SHA/s, stack.harness);
-    assert.match(stack.text, /Separate implementation\/verification\/publication\/deploy/, stack.harness);
+    assert.match(stack.text, /Release(?: owner only|: owner).*release-acquire.*check-release.*(?:bind )?fixed full SHA/s, stack.harness);
+    assert.match(stack.text, /Separate implementation\/\s*verification\/publication\/deploy/, stack.harness);
   }
 });
 
@@ -171,7 +171,7 @@ test('workflow text does not reintroduce a second approval gate', () => {
   );
   assert.doesNotMatch(agents, /separate push approval gate/);
   assert.match(agents, /clearly bounded sequence named in advance/);
-  assert.match(agents, /Do not ask again for steps already included/);
+  assert.match(agents, /Do not (?:ask again for steps already included|re-ask for included steps)/);
   assert.match(worktree, /explicit.*approval/is);
   assert.match(worktree, /primary/i);
   assert.doesNotMatch(worktree, /always create a worktree/i);
@@ -189,14 +189,14 @@ test('default instructions require runtime evidence without unconditional test e
   const goalSync = fs.readFileSync(path.resolve(__dirname, '..', '..', 'scripts', 'sync-goal-protocol.ps1'), 'utf8');
   assert.doesNotMatch(goalSync, /parts\.Add|New-GoalBlock/);
   for (const {text, harness} of lib.effectiveStacks(path.resolve(__dirname, '..', '..'))) {
-    assert.match(text, /Browser\/terminal\/API\/simulator proof/, harness);
-    assert.match(text, /performance\s+budgets/);
-    assert.match(text, /accessibility/);
-    assert.match(text, /design-system constraints/);
-    assert.match(text, /Repeated QA becomes a narrow skill\/script/);
+    assert.match(text, /Tests\/CI are not\s+product proof/, harness);
+    assert.match(text, /signed-in UI\/durable/, harness);
+    assert.match(text, /Bind subject\/source\/revision\/code\/environment/, harness);
+    assert.match(text, /Repeated QA\s+becomes a (?:narrow|focused) skill\/script/, harness);
+    assert.match(text, /No universal\s+coverage\/TDD\/review ritual/, harness);
   }
   assert.doesNotMatch(agents, /Minimum coverage:\s*80%/);
-  assert.match(agents, /No fixed coverage/);
+  assert.match(agents, /No fixed coverage|No universal\s+coverage\/TDD\/review ritual/);
 });
 
 test('thin navigation files do not duplicate the canonical goal contract', () => {
@@ -283,10 +283,9 @@ test('product repositories must carry the exact ECC safety and goal blocks', () 
       .find(result => result.harness === 'codex');
     assert.deepStrictEqual(policy.failures, []);
 
-    fs.writeFileSync(
-      path.join(fixture, 'AGENTS.md'),
-      canonicalAgents.replace('one completed-batch push', 'one push for every edit')
-    );
+    const mutation = canonicalAgents.replace('completed-batch push', 'push for every edit');
+    assert.notStrictEqual(mutation, canonicalAgents, 'negative control must actually mutate the contract');
+    fs.writeFileSync(path.join(fixture, 'AGENTS.md'), mutation);
     policy = lib.checkRepo(fixture, fixture, 64 * 1024, { enforceCanonicalPolicy: true })
       .find(result => result.harness === 'codex');
     assert.ok(policy.failures.some(failure => failure.includes('canonical block 1 drifted')));

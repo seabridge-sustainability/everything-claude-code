@@ -1,6 +1,6 @@
 ---
 name: persistent-goal-execution
-description: "Use when designing or reviewing long-running agent work that needs persisted goals, definitions of done, subtasks, blockers, validation evidence, or cross-session continuity."
+description: "Review or design durable long-running work. Coding tasks reuse ECC goal records; product-agent persistence is a separate application design concern."
 ---
 
 # persistent-goal-execution

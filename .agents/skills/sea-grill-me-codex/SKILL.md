@@ -1,6 +1,6 @@
 ---
 name: sea-grill-me-codex
-description: "SeaBridgeAI adaptation of the \"Grill-Me-Codex\" workflow — Claude interviews and adversarially plans with Codex CLI, then hands execution to Codex and reviews the result. Use for architecturally significant or ambiguous feature work when Codex CLI is available, to cut token cost versus single-model execution."
+description: "Compatibility entry for an explicitly requested Claude/Codex planning collaboration; reuse bounded requirements discovery and the ECC Pstack plan/judge contract."
 ---
 
 # sea-grill-me-codex

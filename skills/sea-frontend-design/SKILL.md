@@ -15,7 +15,7 @@ Use for manageesg-frontend, OpenSeaBri UI, dashboards, reports, charts, forms, f
 
 ## Required Inputs
 
-Route; component path; backend caller; available data shape; design conventions; target user workflow.
+Route; exact component paths; backend caller; available data shape; design conventions; target user workflow; requested delta and protected behavior; before/after acceptance scenarios; desktop/mobile viewports; required UI states. Resolve material ambiguity with `sea-requirements-discovery`, using current source first. A sufficient existing ticket needs no repeated interview or timed ceremony.
 
 ## Expected Outputs
 
@@ -23,7 +23,7 @@ Reachable UI; honest loading/empty/error states; responsive behavior; API/state 
 
 ## Mandatory Verification
 
-Check route/menu visibility, API existence, request/response contract, filter propagation, no dead buttons, no overlapping text, mobile/desktop behavior, and browser screenshots when risk warrants.
+Every changed UI component/layout requires the [existing browser workflow](../../agent-tooling/skills/seabridge-browser-autonomy/SKILL.md): source-bound specification before editing, before/after desktop/mobile screenshots and successful video/trace playback on D: only. Missing prerequisites block the affected proof; never substitute a fixture, 401 or screenshot for signed-in behavior/persistence. Check route/menu visibility, API contracts, filter propagation, buttons, text overlap and keyboard flow. Compare approved layout/copy/tokens and call out missing baseline approval; do not redesign adjacent surfaces.
 
 ## Failure Conditions
 

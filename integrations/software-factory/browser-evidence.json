@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "playwrightVersion": "1.64.0",
+  "encoder": {"path":"C:/Users/adelm/AppData/Local/Microsoft/WinGet/Packages/Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe/ffmpeg-8.1-full_build/bin/ffmpeg.exe"},
+  "probe": {"path":"C:/Users/adelm/AppData/Local/Microsoft/WinGet/Packages/Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe/ffmpeg-8.1-full_build/bin/ffprobe.exe"},
+  "root": "D:/SeaBridgeAI-data/agent-evidence/playwright",
+  "volumeDevice": 3497698903,
+  "minimumFreeBytes": 1610612736,
+  "maximumRunBytes": 536870912,
+  "maximumCaptureMilliseconds": 120000,
+  "allowedOrigins": ["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:8000", "http://127.0.0.1:8000"]
+}
