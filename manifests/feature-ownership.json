@@ -827,6 +827,7 @@
         "src/components/views/data-input/AssetMaterialityAssessment.tsx",
         "src/app/dashboard/risk-management/nature-risk/economic-activity/page.tsx",
         "src/components/views/nature-risk/NatureRiskOverviewView.tsx",
+        "src/components/views/nature-risk/",
         "src/app/dashboard/risk-management/nature-risk/opportunities/page.tsx",
         "src/components/views/nature-risk/NatureOpportunitiesView.tsx",
         "src/app/dashboard/risk-management/nature-risk/overview/page.tsx",
