@@ -36,3 +36,6 @@
 
 # Hashed Fusion assets: provenance.json pins their SHA-256 over LF bytes (tests/ci/fusion-bundle.test.js)
 skills/video-editing/assets/fusion/** text eol=lf
+
+# This retained upstream license is SHA-256 pinned over LF bytes.
+integrations/scroll-craft/reference/LICENSE text eol=lf
