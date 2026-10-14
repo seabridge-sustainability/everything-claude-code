@@ -126,7 +126,7 @@ function queue() { const file = safeState(path.join(STATE,'feedback.json')); ret
 export async function factoryRequest(request) {
   if (!request || typeof request !== 'object' || Array.isArray(request)) fail('Factory request required');
   const operation = request.operation;
-  const allowed = { status: [], intake: [], queue: [], claim: ['id','version','owner'], release:['id','version','token'], propose:['id','version','token','reproduction','acceptance'], prepare: [], verify: [], fuzz: [], contract: [],journey:[], 'ui-features':['feature_ids'], 'ui-admit':['contract'], 'ui-capture':['admission','phase','route','state','checks'], 'ui-validate':['admission','receipts'], 'ui-image':['file','admission'] };
+  const allowed = { status: [], intake: [], queue: [], claim: ['id','version','owner'], release:['id','version','token'], propose:['id','version','token','reproduction','acceptance'], prepare: [], verify: [], fuzz: [], contract: [],journey:[], maintain:['base','head'], 'ui-features':['feature_ids'], 'ui-admit':['contract'], 'ui-capture':['admission','phase','route','state','checks'], 'ui-validate':['admission','receipts'], 'ui-image':['file','admission'] };
   if (!Object.hasOwn(allowed, operation) || Object.keys(request).some(key => key !== 'operation' && !allowed[operation].includes(key))) fail('Known operation and bounded typed arguments required');
   if (operation === 'status') return { mode: config().feedback.mode, feedbackEnabled: config().feedback.enabled,
     queueRecords: queue().items.length, verifierInstalled: fs.existsSync(path.join(STATE,'verifier-installation.json')), schedulerEnabled: false, providerCalls: 0 };
@@ -136,6 +136,7 @@ export async function factoryRequest(request) {
   if (operation === 'release') return releaseFeedback(path.join(STATE,'feedback.json'),request);
   if (operation === 'propose') return proposeFeedback(path.join(STATE,'feedback.json'),request);
   if (operation === 'contract') return (await import('./contracts.mjs')).verifyContracts();
+  if (operation === 'maintain') return require('./feature-maintenance.cjs').maintain(request);
   if (operation === 'ui-features') return require('./ui-contract.cjs').features(request.feature_ids);
   if (operation === 'ui-admit') return require('./ui-contract.cjs').admit(request.contract);
   if (operation === 'ui-capture') return (await import('./ui-browser.mjs')).capture(request);

@@ -4,6 +4,13 @@ const c=require('../../integrations/software-factory/ui-contract.cjs');
 const storage=require('../../scripts/lib/browser-evidence');
 const available=process.platform==='win32'&&fs.existsSync('D:/SeaBridgeAI-data');
 const contract=()=>({version:1,id:'contract-negative-proof',feature_ids:['authentication'],routes:['/login'],files:['src/app/(auth)/login/page.tsx'],requested_delta:'Verify existing login only',protected_behavior:['Keep authentication and layout'],before:'Existing public login',after:['Public login remains reachable'],viewports:[{id:'desktop',width:1440,height:900},{id:'mobile',width:390,height:844}],states:['default'],recipe_ids:['login-read-only'],baseline:{status:'unavailable'}});
+test('only the credential-free primary Next HMR socket bypasses application websocket blocking',async()=>{
+  const {developmentHmrSocket}=await import('../../integrations/software-factory/ui-browser.mjs');
+  assert.equal(developmentHmrSocket(new URL('ws://localhost:3000/_next/webpack-hmr?sessionId=canary')),true);
+  assert.equal(developmentHmrSocket(new URL('ws://localhost:3000/_next/hmr?sessionId=canary')),true);
+  for(const url of ['ws://localhost:3000/api/socket','ws://localhost:3001/_next/webpack-hmr','wss://localhost:3000/_next/webpack-hmr','ws://outside.example/_next/webpack-hmr'])assert.equal(developmentHmrSocket(new URL(url)),false);
+  const credentials=new URL('ws://localhost:3000/_next/hmr');credentials.username='canary';credentials.password='canary';assert.equal(developmentHmrSocket(credentials),false); // pragma: allowlist secret -- synthetic in-memory denial-test URL, no account credential
+});
 test('managed frontend gate rejects component writes without before evidence and leaves read-only tools usable',{skip:!fs.existsSync(c.FRONT)&&'Sibling frontend absent; actual managed frontend check unverified'},()=>{
   const gate=require('../../integrations/software-factory/ui-write-gate.cjs');
   assert.deepEqual(gate.checkUI(c.FRONT,{tool_name:'Read',tool_input:{file_path:'src/app/(auth)/login/page.tsx'}},null),{required:false});

@@ -25,31 +25,45 @@ function prepare(){
 function spec(host){
   const p=prepare(),npm=path.join(process.env.APPDATA,'npm/node_modules');
   if(host==='claude')return {exe:path.join(os.homedir(),'.local/bin/claude.exe'),args:['-p',prompt,'--output-format','json','--max-turns','6','--max-budget-usd','0.625','--tools','Read','--strict-mcp-config','--mcp-config',p.config,'--allowedTools',[...policyReadRules,'mcp__seabridge-pstack__pstack_find_workflow','mcp__seabridge-pstack__pstack_read_skill','mcp__seabridge-pstack__pstack_factory'].join(',')],env:{}};
-  if(host==='gemini')return {exe:process.execPath,entry:path.join(npm,'@google/gemini-cli/dist/index.js'),args:[path.join(npm,'@google/gemini-cli/dist/index.js'),'-p',prompt,'--approval-mode','plan','--allowed-mcp-server-names','seabridge-pstack','--output-format','stream-json'],env:{GEMINI_CLI_SYSTEM_SETTINGS_PATH:p.gemini}};
+  if(host==='gemini'){
+    const entry=path.join(npm,'@google/gemini-cli/bundle/gemini.js');
+    return {exe:process.execPath,entry,args:[entry,'-p',prompt,'--approval-mode','plan','--allowed-mcp-server-names','seabridge-pstack','--output-format','stream-json'],env:{GEMINI_CLI_SYSTEM_SETTINGS_PATH:p.gemini}};
+  }
   if(host==='codex'){
     const toml=require('@iarna/toml').parse(fs.readFileSync(path.join(os.homedir(),'.codex/config.toml'),'utf8'));
-    const args=[path.join(npm,'@openai/codex/bin/codex.js'),'exec','--json','--no-daemon','--sandbox','read-only'];
+    const args=[path.join(npm,'@openai/codex/bin/codex.js'),'exec','--json','--sandbox','read-only'];
     for(const name of Object.keys(toml.mcp_servers||{}))if(name!=='seabridge-pstack')args.push('-c','mcp_servers.'+name+'.enabled=false');
     args.push(prompt);return {exe:process.execPath,entry:args[0],args,env:{}};
   }
   if(host==='opencode'){
     const config=path.join(DIR,'native-canary-opencode.json');
     if(!fs.existsSync(config))write(config,{mcp:{'seabridge-pstack':{type:'local',command:[server.command,...server.args],enabled:true}},permission:{'*':'deny',read:'allow','seabridge-pstack_*':'allow'},agent:{'ecc-ui-canary':{mode:'primary',steps:6,permission:{'*':'deny',read:'allow','seabridge-pstack_*':'allow'}}}});
-    return {exe:process.execPath,entry:path.join(npm,'opencode-ai/bin/opencode'),args:[path.join(npm,'opencode-ai/bin/opencode'),'run','--agent','ecc-ui-canary','--format','json','--pure',prompt],env:{OPENCODE_CONFIG:config}};
+    return {exe:path.join(npm,'opencode-ai/bin/opencode.exe'),args:['run','--agent','ecc-ui-canary','--format','json',prompt],env:{OPENCODE_CONFIG:config}};
   }
-  if(host==='cursor')throw Error('Cursor editor installed; a separately approved agent CLI installation is required');
+  if(host==='cursor'){
+    const version=path.join(os.homedir(),'AppData/Local/cursor-agent/versions/2026.10.01-e373342');
+    return {exe:path.join(version,'node.exe'),entry:path.join(version,'index.js'),args:[path.join(version,'index.js'),'--print','--mode','ask','--output-format','json',prompt],env:{CURSOR_INVOKED_AS:'agent'}};
+  }
   throw Error('Unknown canary host');
 }
 function redact(value){let text=value;for(const [key,secret]of Object.entries(process.env))if(/KEY|TOKEN|SECRET|PASSWORD/.test(key)&&secret&&secret.length>=8)text=text.split(secret).join('[REDACTED]');return text.replace(/sk-[a-zA-Z0-9_-]{20,}/g,'[REDACTED]');}
-async function run(host){
-  const approval=read(APPROVAL);
-  if(!approval.authorization?.softCapsAcknowledged||approval.authorization.maximumTotalUsd!==5||approval.authorization.maximumNativeCanaryInvocations!==8)throw Error('Exact current-session approved batch required');
+function approvalLimits(approval){
+  const a=approval.authorization;
+  if(!/^[a-z0-9-]{1,100}$/.test(approval.id||'')||!a?.softCapsAcknowledged||!Number.isInteger(a.maximumNativeCanaryInvocations)||a.maximumNativeCanaryInvocations<1||a.maximumNativeCanaryInvocations>8||!Number.isFinite(a.maximumTotalUsd)||a.maximumTotalUsd<=0||a.maximumTotalUsd>5||a.retries!==0)throw Error('Explicit bounded current-session batch with no retries required');
+  return {maximumInvocations:a.maximumNativeCanaryInvocations,maximumExposureUsd:a.maximumTotalUsd};
+}
+async function run(host,{approvalFile=APPROVAL}={}){
+  if(path.dirname(path.resolve(approvalFile))!==DIR)throw Error('Batch must be bounded metadata in the existing private run directory');
+  const approval=read(approvalFile),limits=approvalLimits(approval);
+  const ledgerFile=approval.id==='ecc-native-ui-canary-20261013'?LEDGER:path.join(DIR,approval.id+'-ledger.json');
   if(os.freemem()<2.5*1024**3)throw Error('Live native canary blocked: preserved RAM/headroom unavailable');
-  const ledger=fs.existsSync(LEDGER)?read(LEDGER):{version:1,batch:approval.id,maximumInvocations:8,maximumExposureUsd:5,calls:[],providerRequests:'not independently observable for every client',softCapsAcknowledged:true};
-  if(ledger.batch!==approval.id||ledger.calls.length>=8||ledger.calls.some(c=>c.host===host))throw Error('Canary batch exhausted or retry prohibited');
+  const ledger=fs.existsSync(ledgerFile)?read(ledgerFile):{version:1,batch:approval.id,...limits,calls:[],providerRequests:'not independently observable for every client',softCapsAcknowledged:true};
+  const exposure=ledger.calls.reduce((sum,c)=>sum+(c.providerCostUsd??c.reservedMaximumUsd),0);
+  if(ledger.batch!==approval.id||ledger.calls.length>=limits.maximumInvocations||exposure+0.625>limits.maximumExposureUsd||ledger.calls.some(c=>c.host===host))throw Error('Canary batch exhausted or retry prohibited');
+  if(approval.nativeHarnesses&&!approval.nativeHarnesses.includes(host))throw Error('Client not named in approved batch');
   if(ledger.calls.some(c=>c.state==='running'))throw Error('Serialize native canaries');
   const launch=spec(host);if(!fs.existsSync(launch.exe)||(launch.entry&&!fs.existsSync(launch.entry)))throw Error('Installed native executable absent; no auto-install');
-  const call={id:crypto.randomUUID(),host,startedAt:new Date().toISOString(),reservedMaximumUsd:0.625,state:'running',nativeWriteGuardProof:false,visualProof:false};ledger.calls.push(call);write(LEDGER,ledger);
+  const call={id:crypto.randomUUID(),host,startedAt:new Date().toISOString(),reservedMaximumUsd:0.625,state:'running',nativeWriteGuardProof:false,visualProof:false};ledger.calls.push(call);write(ledgerFile,ledger);
   let stdout='',stderr='',timedOut=false;const maximum=2*1024*1024;
   const child=spawn(launch.exe,launch.args,{cwd:ROOT,env:{...process.env,...launch.env},windowsHide:true,stdio:['ignore','pipe','pipe']});
   const stop=()=>{
@@ -65,9 +79,9 @@ async function run(host){
   call.finishedAt=new Date().toISOString();call.exitCode=code;call.state=timedOut?'timeout':code===0?'completed-needs-evidence-review':'failed';call.output=outputFile;
   call.providerCostUsd=null;call.providerRequests=null;
   if(host==='claude'){try{const r=JSON.parse(output);call.providerCostUsd=r.total_cost_usd??null;call.reportedAgentTurns=r.num_turns??null;}catch{}}
-  call.failureIsNotZeroCost=call.providerCostUsd===null;write(LEDGER,ledger);
+  call.failureIsNotZeroCost=call.providerCostUsd===null;write(ledgerFile,ledger);
   return {host,state:call.state,exitCode:code,output:outputFile,providerCostUsd:call.providerCostUsd,providerRequests:call.providerRequests,nativeWriteGuardProof:false,visualProof:false};
 }
-async function main(){const [operation,host]=process.argv.slice(2);const result=operation==='prepare'?prepare():operation==='run'?await run(host):(()=>{throw Error('prepare | run claude|codex|gemini|opencode|cursor');})();console.log(JSON.stringify(result,null,2));}
+async function main(){const [operation,host,approvalFile]=process.argv.slice(2);const result=operation==='prepare'?prepare():operation==='run'?await run(host,approvalFile?{approvalFile}:{}):(()=>{throw Error('prepare | run claude|codex|gemini|opencode|cursor [approved-batch.json]');})();console.log(JSON.stringify(result,null,2));}
 if(require.main===module)main().catch(e=>{console.error('Native canary BLOCKED: '+e.message);process.exitCode=2;});
-module.exports={prepare,spec,run};
+module.exports={prepare,spec,run,approvalLimits};

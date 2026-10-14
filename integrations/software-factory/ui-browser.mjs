@@ -5,6 +5,9 @@ import { createRequire } from 'node:module';
 const require=createRequire(import.meta.url), contracts=require('./ui-contract.cjs'), storage=require('../../scripts/lib/browser-evidence.js');
 const hash=storage.hashFile;
 const same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
+export function developmentHmrSocket(target){
+  return target.protocol==='ws:'&&target.hostname==='localhost'&&target.port==='3000'&&['/_next/webpack-hmr','/_next/hmr'].includes(target.pathname)&&!target.username&&!target.password;
+}
 export function localPublicImage(target){
   if(target.pathname!=='/_next/image')return true;
   const asset=target.searchParams.get('url');
@@ -48,11 +51,9 @@ export async function capture({admission,phase,route,state='default',checks=[]})
       if(Date.now()-start>storage.policy.maximumCaptureMilliseconds)throw Error('Capture deadline exceeded');
       const context=await browser.newContext({viewport:{width:viewport.width,height:viewport.height},deviceScaleFactor:1,serviceWorkers:'block',recordVideo:{size:{width:viewport.width,height:viewport.height}}});
       context.setDefaultTimeout(5000);context.setDefaultNavigationTimeout(15000);
-      await context.routeWebSocket('**/*',socket=>{
-        const target=new URL(socket.url());
-        if(target.protocol==='ws:'&&target.hostname==='localhost'&&target.port==='3000'&&target.pathname==='/_next/webpack-hmr')return socket.connectToServer();
-        return socket.close();
-      });
+      // Leave Next's allowed HMR socket native. Proxying it through Playwright
+      // can interrupt Turbopack hydration; application sockets remain blocked.
+      await context.routeWebSocket(target=>!developmentHmrSocket(target),socket=>socket.close());
       const errors=[];let page;
       try {
         await context.route('**/*',r=>{

@@ -1,7 +1,7 @@
 'use strict';
 const test=require('node:test');
 const assert=require('node:assert/strict');
-const {spec}=require('../../integrations/software-factory/native-canary.cjs');
+const {spec,approvalLimits}=require('../../integrations/software-factory/native-canary.cjs');
 
 test('Claude canary explicitly permits only the three normalized central-policy reads',()=>{
   const launch=spec('claude');
@@ -18,4 +18,20 @@ test('Claude canary explicitly permits only the three normalized central-policy 
   assert.deepEqual(allowed.filter(rule=>rule.startsWith('mcp__')),['mcp__seabridge-pstack__pstack_find_workflow','mcp__seabridge-pstack__pstack_read_skill','mcp__seabridge-pstack__pstack_factory']);
   assert.ok(!launch.args.includes('--dangerously-skip-permissions'));
   assert.deepEqual(launch.env,{});
+});
+test('Cursor uses only the pinned installed runtime in fresh read-only ask mode',()=>{
+  const launch=spec('cursor');
+  assert.ok(launch.exe.replaceAll('\\','/').endsWith('/cursor-agent/versions/2026.10.01-e373342/node.exe'));
+  assert.equal(launch.args[launch.args.indexOf('--mode')+1],'ask');
+  for(const flag of ['--force','--yolo','--trust','--approve-mcps','--continue','--resume','--worktree'])assert.ok(!launch.args.includes(flag));
+});
+test('Windows canaries use installed package entrypoints and supported Codex flags',()=>{
+  assert.ok(spec('gemini').entry.replaceAll('\\','/').endsWith('/@google/gemini-cli/bundle/gemini.js'));
+  assert.ok(spec('opencode').exe.replaceAll('\\','/').endsWith('/opencode-ai/bin/opencode.exe'));
+  assert.ok(!spec('codex').args.includes('--no-daemon'));
+});
+test('a new smaller batch cannot enlarge exposure, hide retries or omit soft-cap acknowledgement',()=>{
+  const approval={id:'reviewed-two-client-batch',authorization:{softCapsAcknowledged:true,maximumNativeCanaryInvocations:2,maximumTotalUsd:1.25,retries:0}};
+  assert.deepEqual(approvalLimits(approval),{maximumInvocations:2,maximumExposureUsd:1.25});
+  for(const change of [{maximumTotalUsd:6},{maximumNativeCanaryInvocations:9},{retries:1},{softCapsAcknowledged:false}])assert.throws(()=>approvalLimits({...approval,authorization:{...approval.authorization,...change}}));
 });

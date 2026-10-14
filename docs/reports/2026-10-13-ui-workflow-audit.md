@@ -4,7 +4,24 @@ Reviewed 2026-10-13 against the user's complete pasted transcript and current so
 
 ## Result
 
-ECC contains shared policy loaders, task routing, Pstack/Ponytail and selected Matt/Addy workflows. The implementation now adds D-only managed Playwright capture, source-bound UI contracts, feature discovery, existing-bridge MCP operations and a gate for fresh managed frontend writes. Full native-app adoption, authenticated feature recipes and automatic merged-change knowledge maintenance remain incomplete.
+ECC contains shared policy loaders, task routing, Pstack/Ponytail and selected Matt/Addy workflows. The implementation adds D-only managed Playwright capture, source-bound UI contracts, feature discovery, existing-bridge MCP operations and a gate for fresh managed frontend writes. Accepted-change metadata maintenance and provider-free Jev advisory replay are now implemented. Full native-app adoption, feature-specific authenticated acceptance and automatic merge scheduling remain incomplete.
+
+## Completion follow-up (2026-10-13, evening America/New_York)
+
+- The actual standard Playwright runner passed desktop and mobile login/storage tests. The broker's earlier Loading failure was reproduced independently: blocking the current Next `/_next/hmr` socket prevented Turbopack hydration. Both exact primary HMR paths are now permitted; other application sockets remain blocked. Actual before/after captures passed at both viewports, all four WebMs fully decoded with FFmpeg, media/phase/source validation passed, and the login screenshots were visually inspected. All retained media is on D:.
+- The existing signed-in session validated with HTTP 200 and reached the primary dashboard with no page errors. The shared journey now manages profiles, screenshot and successful video on D, serializes capture and restores process settings. No authenticated network trace is retained, to avoid copying credential headers/API payloads. This proves dashboard/session readiness, not selected-property workflows, durable Save/reopen, attachments, exports or scientific validity.
+- Accepted-feature maintenance ran against actual published frontend revision `120eb12298061c33223c0e1661ab47e708b10244`, recording affected Risk Management sources and recipe identities. Drafts are excluded by reading accepted Git objects; UI admission scope is unchanged. The checkpoint is explicit, without a new scheduler or automatic semantic documentation rewrite.
+- The optional Jev assessment, current wire normalizer and dependency-free replay evaluator are in the existing Pstack guide. It rejects stale/invalid inputs and abstains when all checks are excluded, on ties, insufficient declared modal probability and non-passing deterministic gates. It is always advisory, with no paid calls, dependency install, credential setup, calibrated-probability claim or release authority.
+- Cursor CLI `2026.10.01-e373342` was installed in the approved new directory without replacement, PATH change or service restart. Native Cursor is blocked by missing login. Gemini CLI 0.63.0 rejected the existing consumer account with `UNSUPPORTED_CLIENT`; this is not an absent executable. Codex's unsupported `--no-daemon` flag and installed Gemini/OpenCode Windows entrypoints were corrected locally. OpenCode's bounded fresh invocation timed out; its existing local model listener was absent. No client failure or unknown cost is counted as a native pass/zero spend. The no-retry batch is preserved; fresh Claude/Codex proof needs the pending new bounded approval.
+- Six saved client registrations again passed 18 actual SDK UI requests without model calls. Focused local tests and the 26-case fresh-session/instruction regression suite passed; final counts are in the private run record. These are separate from native model behavior, vision and write-guard proof.
+- Backend central-reference application is still held by the live Climate checkout reservation: root registration was rejected and no bypass was performed. The prepared one-line patch is with the system manager. Frontend tooling commit `8881c907` remains local while active owners hold product changes; no foreign work was published. Hosted CI remains unverified. Supply-Chain Watch is confirmed `disabled_manually`.
+
+Proofs are retained in the existing private run directory; browser media is under
+`D:/SeaBridgeAI-data/agent-evidence/playwright`. Running product services and agents
+were preserved. A timed-out canary's newly spawned process tree was retired; no
+pre-existing agent process was stopped. No new worktrees or ruling Markdown files
+were created. Colibri's assessment was already complete and is linked from the guide;
+its model/provider activation remains optional and separately gated.
 
 ## Implementation checkpoint (2026-10-13)
 

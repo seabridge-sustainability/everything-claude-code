@@ -170,6 +170,80 @@ clients and unsupported native adapters are not retroactively certified.
 
 ## Upstream boundary and maintenance
 
+### Accepted-change feature maintenance
+
+After the product owner publishes an accepted frontend change, run
+`node integrations/software-factory/cli.mjs maintain request.json` or existing
+`pstack_factory` / `suite_factory` with
+`{"operation":"maintain","base":"FULL_PREVIOUS_SHA","head":"FULL_PUBLISHED_SHA"}`.
+The current remote development tip must equal head and base must be its ancestor.
+The deterministic checker identifies affected declared view domains, rejects
+unmapped UI and missing recipes, and retains immutable source hashes and recipe
+identities under the existing ignored factory evidence directory. It reads Git
+objects at the accepted revision, so working drafts cannot become accepted knowledge.
+View-namespace inference supports knowledge routing only; exact UI admission and
+write scopes are unchanged. This does not rewrite the module guide or declare a
+recipe verified. Run it at the existing accepted-change checkpoint; no scheduler,
+new coordinator, Git hook installation or automatic product edits are activated.
+
+### Jev assessment and optional evaluation
+
+Jev is useful for assessing textual agent traces: whether claims have evidence,
+whether the final report separates proved and unverified outcomes, and whether
+the workflow follows the requested scope. Real tests, visual inspection,
+tenant/security checks and release ownership remain independent gates.
+
+ECC already has disabled/shadow typed routing in `scripts/jev-route.js`;
+that older Vercel response format is separate from current DeepEval JevEval.
+The [DeepEval documentation](https://deepeval.com/docs/metrics-jev-eval) describes
+weighted Noul/Score/Choice questions and conversation/trajectory evaluation.
+Its [pinned scoring implementation](https://github.com/confident-ai/deepeval/blob/e102be7f91a3f22e2f693a0f137204f549e0a19c/deepeval/metrics/jev_eval/utils.py)
+allows strict Noul decisions at 0.5 and returns 1 when every question is N/A.
+Neither establishes certainty or usable evidence.
+
+Use the dependency-free offline evaluator now:
+`node integrations/software-factory/jev-evaluation.cjs packet.json`.
+Its explicit ECC replay envelope contains `rubric` (version 1, declared
+minimumModalProbability, checks with id/type/weight and option credits for score/choice),
+`evidence` (caller-supplied sourceRevision and reference hashes,
+deterministicGates), matching SHA-256 digests produced by exported `digest`,
+`provenance` (`fixture-replay` or `provider-replay`) and keyed `answers`.
+Noul answers use `noul`; score/choice answers use normalized `probabilities`;
+`applicable:false` with a bounded `reason` is an explicit replay exclusion. This is not the provider wire
+schema or a drop-in DeepEval replacement. Scoring is deterministic; stale hashes,
+missing answers and malformed distributions are rejected. All checks excluded, ties,
+insufficient declared modal probability or non-passing deterministic evidence produce
+ABSTAIN. Results always remain advisory and cannot authorize implementation or merge.
+Probability floors need validation on labeled SeaBridge cases; no calibration is claimed.
+The floor uses modal probability, not TypeSafe's separately reported confidence.
+Reference hashes and gate results remain caller assertions; artifact contents and
+provider-replay origin are not independently verified. The returned input digest
+binds answers/provenance too. ADVISORY means a valid report, never accepted work.
+For an already authorized TypeSafe response, use
+`node integrations/software-factory/jev-evaluation.cjs normalize response.json rubric.json`.
+This validates the pinned current Noul/Score/Choice wire format and returns normalized
+answers, retaining separately reported confidence and usage. It does not contact
+the provider, authenticate the response or infer cost. Older boolean wire responses
+and model alias/drift are rejected; fixture normalization is not a live API proof.
+
+[TypeSafe](https://docs.typesafe.ai/models) lists pinned `jev-1.13.0` as text-only
+at USD 0.042 per million input tokens, with output tokens free. It cannot review
+screenshots/video/audio itself. The [direct API](https://docs.typesafe.ai/api)
+uses a different Noul wire format and `TYPESAFE_API_KEY`.
+[Direct-provider ZDR](https://docs.typesafe.ai/legal) requires enterprise terms;
+no account entitlement was verified. Do not send private traces or assume the
+existing gateway's requested ZDR covers the direct service.
+
+No Jev provider calls, credentials, dependency installation, automatic model
+dispatch or release gating are activated. A later live evaluation needs a reviewed
+sanitized evidence packet, current account/privacy permission, pinned API/model,
+explicit call/USD limits and honest provider cost telemetry. DeepEval main was
+reviewed; package-version import compatibility remains unverified.
+
+Colibri's completed [assessment](../reports/coding-system-improvements-20261013/COLIBRI_EVALUATION.md)
+recommends an opt-in future pilot. No download or activation is required for this
+workflow; E: remains Docker-only under central policy.
+
 Full upstream: `integrations/company-dev-tools/sources/cursor-plugins/pstack`, ignored reference export, 167 files including all 52 skill bodies and references. Pin and all Git blob/SHA-256 identities: `integrations/pstack/source-manifest.json`. MIT license retained in the selected adapter family. `node integrations/pstack/import.mjs` restores that exact download and refuses differing existing files. No upstream code runs during download.
 
 Ten adapted catalog entries cover arena, architect, verification creation/maintenance, interrogate, reflect, correct, how, why and blast-radius. `node integrations/pstack/catalog.mjs` idempotently adds them without changing prior catalog entries; the normal catalog builder retains them on rebuild.
