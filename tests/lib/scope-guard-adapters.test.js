@@ -37,6 +37,22 @@ function event(cwd, runtime, tool, args) {
   const payload = normalizePayload(runtime, { cwd, session_id: 'native-adapter', tool_name: tool, tool_input: args });
   return execute('guard-event', { cwd, sessionId: 'adapter', guardMode: 'block', event: 'pre', payload });
 }
+test('Codex native patch command envelope preserves scope and rejects ambiguity', () => {
+  const cwd = fixture();
+  const patch = file => `*** Begin Patch\n*** Add File: ${file}\n+canary\n*** End Patch`;
+  const inside = patch('owned/canary.txt'), outside = patch('../outside.txt');
+  assert.equal(event(cwd, 'codex', 'apply_patch', { command: inside }).allowed, true);
+  assert.equal(event(cwd, 'codex', 'apply_patch', { command: outside }).allowed, false);
+  assert.equal(event(cwd, 'codex', 'apply_patch', { command: patch('README.md') }).allowed, false);
+  assert.equal(event(cwd, 'codex', 'apply_patch', { command: 'echo invalid' }).allowed, false);
+  assert.equal(event(cwd, 'codex', 'apply_patch', { input: inside }).allowed, true);
+  assert.equal(event(cwd, 'codex', 'Bash', { command: inside }).allowed, false);
+  assert.throws(() => normalizePayload('codex', { tool_name: 'apply_patch', tool_input: { command: outside, input: inside } }), /ambiguous/);
+  assert.throws(() => normalizePayload('codex', { tool_name: 'apply_patch', tool_input: { command: outside, patch: inside } }), /ambiguous/);
+  assert.throws(() => normalizePayload('codex', { tool_name: 'apply_patch', tool_input: { command: null } }), /native patch/);
+  assert.throws(() => normalizePayload('codex', { tool_name: 'apply_patch', tool_input: { command: 'x'.repeat(1024 * 1024 + 1) } }), /native patch/);
+  assert.equal(fs.existsSync(path.join(cwd, 'owned/canary.txt')), false);
+});
 test('Gemini replace and read tools obey the same fence; opaque shell remains denied', () => {
   const cwd = fixture();
   assert.equal(event(cwd, 'gemini', 'replace', { file_path: 'owned/a.js' }).allowed, true);

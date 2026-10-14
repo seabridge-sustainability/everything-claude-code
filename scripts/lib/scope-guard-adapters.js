@@ -6,6 +6,19 @@ function normalizePayload(runtime, payload) {
   const result = { ...payload };
   const name = payload.tool_name || payload.toolName;
   const args = payload.tool_input ?? payload.toolInput;
+  // Native Codex hooks use command for apply_patch as well as Bash. Translate
+  // only the exact patch tool; shell execution must remain opaque and denied.
+  if (runtime === 'codex' && String(name).replace(/^functions\./, '') === 'apply_patch'
+      && args && typeof args === 'object' && !Array.isArray(args)
+      && Object.hasOwn(args, 'command')) {
+    if (typeof args.command !== 'string' || Buffer.byteLength(args.command, 'utf8') > 1024 * 1024) {
+      throw new Error('invalid native patch command');
+    }
+    for (const alias of ['input', 'patch']) {
+      if (Object.hasOwn(args, alias) && args[alias] !== args.command) throw new Error('ambiguous native patch input');
+    }
+    result.tool_input = { ...args, input: args.command };
+  }
   if (runtime === 'gemini') {
     const reads = ['read_file', 'read_many_files', 'list_directory', 'search_file_content', 'glob'];
     if (reads.includes(name)) result.tool_name = 'Read';
