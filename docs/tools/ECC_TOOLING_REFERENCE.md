@@ -19,14 +19,33 @@ LLM-optimized output, reducing token consumption by 60–90% on verbose commands
 
 ## caveman — Token Compression
 
-Compresses agent output ~65–75% with terse prose that preserves technical
-accuracy. Auto-activates via SessionStart hook after install.
+Always on for all coding agents (owner decision 2026-10-14, v4.0.1, vendor
+defaults). Source: https://github.com/JuliusBrussee/caveman.
 
-- Reference: `references/caveman/`
-- Skills: `/caveman` (intensity `lite`/`full`/`ultra`/`wenyan`),
-  `/caveman-commit`, `/caveman-review`, `/caveman-compress`
-- Install (Claude Code): `claude plugin marketplace add JuliusBrussee/caveman && claude plugin install caveman@caveman`
-- Codex: `$caveman` in prompts. Gemini: `gemini extensions install caveman`.
+- Install/upgrade: `npx @caveman-ai/cli@latest` (interactive) or
+  `npx -y @caveman-ai/cli@latest setup --yes`; preview with `setup --dry-run`.
+  Needs Node 22.13+. Leaves a global `caveman` command.
+- Six modules, all on: output (terse voice), input (shrinks logs/JSON/CSV/test
+  output before the model reads them), waste fixes, routing (Auto, active only
+  after `caveman login`), scripts (Blocks), browse.
+- Wires Claude Code (`~/.claude/settings.json`, `~/.claude.json` MCP), Codex
+  (`~/.codex/hooks.json`, `config.toml`), Gemini (`settings.json`, `.env`) and
+  OpenCode (`opencode.jsonc`, `plugins/caveman-native.js`), and starts the local
+  `caveman-proxy`. Cursor, Windsurf and Cline use always-on user rules
+  (`~/.cursor/rules/caveman.mdc`, `~/.windsurf/rules/caveman.md`,
+  `~/.clinerules/caveman.md`).
+- Check: `caveman status`, `caveman learn`. Switch one module off:
+  `caveman off <module>`. Uninstall: `npx -y github:JuliusBrussee/caveman -- --uninstall`.
+- Data: CLI telemetry is on by default (install ID, OS, IP, token counts; no
+  prompts or code). `caveman telemetry off` or `DO_NOT_TRACK=1` disables it.
+  Auto routing sends recent asks plus attached context to Caveman Cloud; stop
+  with `caveman off routing`.
+- Evidence: the input module compresses tool output. When exact values,
+  citations or native units matter, re-read the source file or turn input off
+  for that session; compressed output is not evidence.
+- Skills: `/caveman`, `/ultracave`, `/megacave`, `/caveman-commit`,
+  `/caveman-review`, `/caveman-compress`. Say `stop caveman` for normal prose.
+- Local reference copy: `references/caveman/` (pre-4.0; may lag upstream).
 
 ## codeburn — Token Usage Dashboard
 
