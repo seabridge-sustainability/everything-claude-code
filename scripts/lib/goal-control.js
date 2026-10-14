@@ -631,7 +631,7 @@ function evaluateClaim(claim, bundle, options = {}) {
   const latestObservedAt = status.proofs
     .map(proof => proof.observed_at)
     .filter(Boolean)
-    .sort()
+    .sort((left, right) => Date.parse(left) - Date.parse(right))
     .at(-1);
   let reasons = [];
 
@@ -663,6 +663,20 @@ function evaluateClaim(claim, bundle, options = {}) {
     if (status.complete) reasons.push('all required proofs are met; use complete rather than blocked');
     if (!resume) reasons.push('a current resume receipt is required for a blocked claim');
     if (goal.status !== 'blocked') reasons.push(`goal status is ${goal.status}, not blocked`);
+    if (resume && Date.parse(resume.observed_at) < Date.parse(goal.updated_at)) {
+      reasons.push('resume receipt predates the active goal update');
+    }
+    if (resume && latestObservedAt && Date.parse(resume.observed_at) < Date.parse(latestObservedAt)) {
+      reasons.push('resume receipt predates the latest outcome evidence');
+    }
+    const unexplained = [...new Set(unmet.map(proof => proof.lane_id))]
+      .filter(laneId => !laneById.get(laneId)?.blocker?.trim());
+    if (unexplained.length) {
+      reasons.push(`unmet lanes lack a concrete blocker reason: ${unexplained.join(', ')}`);
+    }
+    if (status.parallel.pending) {
+      reasons.push(`${status.parallel.pending} delegated assignment(s) await integration or explicit retirement; independent review work remains`);
+    }
     const nonBlocked = unmet.filter(proof => laneById.get(proof.lane_id)?.status !== 'blocked');
     if (nonBlocked.length) {
       reasons.push(`unmet proofs still have non-blocked lanes: ${nonBlocked.map(proof => proof.id).join(', ')}`);

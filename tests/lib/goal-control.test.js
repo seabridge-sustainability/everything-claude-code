@@ -550,6 +550,90 @@ test('allows blocked only when every unmet lane is blocked and no independent wo
   assert.strictEqual(result.allowed, true);
 });
 
+function blockedBundle(overrides = {}) {
+  return {
+    goal: goal({
+      status: 'blocked',
+      lanes: [
+        { id: 'product', description: 'API and UI', status: 'blocked', blocker: 'Awaiting eligible inputs', next_action: null },
+        { id: 'science', description: 'Scientific validation', status: 'blocked', blocker: 'Awaiting admitted method', next_action: null },
+      ],
+    }),
+    outcomes: [],
+    resume: resume({ blocked_lanes: ['product', 'science'] }),
+    ...overrides,
+  };
+}
+
+for (const harness of ['codex', 'claude', 'gemini', 'opencode', 'copilot-local', 'copilot-cli']) {
+  test(`blocked freshness denies stale goal snapshot for ${harness}`, () => {
+    const bundle = blockedBundle();
+    bundle.goal.updated_at = '2026-09-29T15:00:00Z';
+    bundle.resume.source_harness = harness;
+    const result = evaluateClaim('blocked', bundle, { now: '2026-09-29T16:00:00Z' });
+    assert.strictEqual(result.allowed, false);
+    assert.match(result.reasons.join(' '), /resume receipt predates the active goal update/);
+    bundle.resume.observed_at = '2026-09-29T15:30:00Z';
+    assert.strictEqual(evaluateClaim('blocked', bundle).allowed, true);
+  });
+
+  test(`blocked freshness denies stale outcome snapshot for ${harness}`, () => {
+    const bundle = blockedBundle();
+    bundle.resume.source_harness = harness;
+    bundle.outcomes = [{ ...outcome('latest-attempt', 'heat-browser', 'ui_displayed', '2026-09-29T15:00:00Z'), outcome: 'fail' }];
+    const result = evaluateClaim('blocked', bundle);
+    assert.strictEqual(result.allowed, false);
+    assert.match(result.reasons.join(' '), /resume receipt predates the latest outcome evidence/);
+    bundle.resume.observed_at = '2026-09-29T15:30:00Z';
+    assert.strictEqual(evaluateClaim('blocked', bundle).allowed, true);
+  });
+
+  test(`blocked freshness denies unexplained blockers for ${harness}`, () => {
+    for (const blocker of [null, '', '   ']) {
+      const bundle = blockedBundle();
+      bundle.resume.source_harness = harness;
+      bundle.goal.lanes = bundle.goal.lanes.map(lane => ({ ...lane, blocker }));
+      const result = evaluateClaim('blocked', bundle);
+      assert.strictEqual(result.allowed, false);
+      assert.match(result.reasons.join(' '), /unmet lanes lack a concrete blocker reason: product, science/);
+    }
+  });
+
+  test(`blocked freshness denies unreviewed delegated work for ${harness}`, () => {
+    const bundle = blockedBundle({ assignments: [assignment({ owner_runtime: harness })] });
+    bundle.resume.source_harness = harness;
+    const result = evaluateClaim('blocked', bundle, { now: '2026-09-29T16:00:00Z' });
+    assert.strictEqual(result.allowed, false);
+    assert.match(result.reasons.join(' '), /delegated assignment\(s\) await integration or explicit retirement/);
+    bundle.integrations = [integration({
+      outcome: 'not_adopted',
+      limitations: ['Worker result was not adopted; eligible scientific inputs remain unavailable.'],
+    })];
+    bundle.resume.observed_at = '2026-09-29T15:30:00Z';
+    const retired = evaluateClaim('blocked', bundle, { now: '2026-09-29T16:00:00Z' });
+    assert.strictEqual(retired.allowed, true);
+    assert.strictEqual(retired.status.complete, false);
+  });
+}
+
+for (const claim of ['blocked', 'complete']) {
+  test(`${claim} freshness orders mixed UTC offsets chronologically`, () => {
+    const bundle = blockedBundle();
+    bundle.goal.status = claim;
+    bundle.outcomes = [
+      outcome('later-offset', 'heat-browser', 'ui_displayed', '2026-09-29T14:00:00-04:00'),
+      outcome('earlier-utc', 'flood-validation', 'independently_validated', '2026-09-29T17:00:00Z'),
+    ].map(receipt => ({ ...receipt, outcome: claim === 'blocked' ? 'fail' : 'pass' }));
+    bundle.resume.observed_at = '2026-09-29T17:30:00Z';
+    bundle.resume.blocked_lanes = claim === 'blocked' ? ['product', 'science'] : [];
+    const stale = evaluateClaim(claim, bundle, { now: '2026-09-29T19:00:00Z' });
+    assert.strictEqual(stale.allowed, false);
+    assert.match(stale.reasons.join(' '), /resume receipt predates the latest outcome evidence/);
+    bundle.resume.observed_at = '2026-09-29T18:30:00Z';
+    assert.strictEqual(evaluateClaim(claim, bundle, { now: '2026-09-29T19:00:00Z' }).allowed, true);
+  });
+}
+
 test('denies on-track after an unmet vertical-slice checkpoint expires', () => {
   const result = evaluateClaim('on-track', {
     goal: goal(),

@@ -50,6 +50,35 @@ controlled mode and registered session. No second goal schema or new rulebook.
   Missing optional inputs block only dependent lanes. Do not stop the whole goal
   while independent authorized work remains.
 
+## Dependency-local continuation and fail-fast gates
+
+- Reconcile resolved approvals, ownership handoffs, commits and current evidence
+  before repeating a blocker. A copied historical status is not a current audit.
+  For each required lane name the actual dependency, remedy/owner and next safe
+  action. Continue ready implementation, bounded review or worker integration;
+  missing scientific inputs never justify invented values or waived admission.
+- Treat register/admit/check commands as dependencies: require exit 0 AND the
+  expected successful structured result before dispatch, writes or claims.
+  A failed gate permits only safe independent reads or an owned unapplied patch,
+  not a source edit. Never chain a failed gate into implementation or report a
+  denied reservation as registered. Refresh legitimate snapshots once after
+  changed source; never bypass guards or repeat unchanged checks indefinitely.
+- A blocked claim needs a fresh goal/outcome snapshot, a concrete reason for
+  every unmet lane, no ready independent work and no unreviewed worker result.
+  Pending assignments need integration or explicit non-passing retirement;
+  labeling all lanes blocked cannot replace those obligations.
+- On an explicit owner resumption/correction, refresh the ECC plan and resume
+  receipt, then pursue the authorized next action. A stale native UI label is
+  not proof of a current blocker. Respect actual owner pauses and host safety,
+  permission, resource and budget stops; agents cannot change host-controlled
+  goal status or promise automatic vendor continuation without runtime proof.
+- For an owner-authorized SeaBridge local backend launch without bootstrap-write
+  or provider grants, use `scripts/dev/run_backend.ps1 -ReadOnlyStartup` after
+  verifying the integrated mode. Reuse healthy servers; a restart still needs its
+  coordinated authorization. Never fall back to normal seeding/provider startup
+  to clear a readiness blocker. This mode protects startup only: it grants no
+  API write/provider permission and is not proof that the live mode is active.
+
 ## Completion
 
 Use `ecc goal-runtime final` for the actual runtime/session and evidence-based claim.
