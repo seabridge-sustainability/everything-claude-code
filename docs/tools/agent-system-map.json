@@ -30,7 +30,7 @@
     ],
     "semanticIndex": "not-run"
   },
-  "sourceFingerprint": "ac7088cf83909715ae70a8dd9d13aaa08d41e8946a1abab1cf07dde6ec6d85c8",
+  "sourceFingerprint": "fcacb5dcdda9f1adee8d4c464df08bc00fac6fc0455a46176895b63695e1d1a9",
   "sources": [
     {
       "path": "../manageesg-backend/AGENTS.md",
@@ -46,7 +46,7 @@
     },
     {
       "path": ".agents/rules/seabridge-agent-baseline.md",
-      "sha256": "a6feb98676c99b874b1fd2b443bd18d58c22cb0df7ce69b4ae3c4f08b595a2b8"
+      "sha256": "5960f80a592bb0ba01be60ec13decd60c84326533cbba603cbd0d2be64af3559"
     },
     {
       "path": ".clinerules",
@@ -74,7 +74,7 @@
     },
     {
       "path": ".github/copilot-instructions.md",
-      "sha256": "b624dd618b44f6e9992ebc30938c4380bdff32ad71396d6cdccabafc5f66d1a4"
+      "sha256": "4c16123cf9491a08b5f08df8e3c5cd2a641cc2af26f3708b9f088b31821c7c00"
     },
     {
       "path": ".github/workflows/ci.yml",
@@ -130,7 +130,7 @@
     },
     {
       "path": "docs/tools/PSTACK_ECC_GUIDE.md",
-      "sha256": "e8f8f8074ddc8ac01c6333ca5b9f51a3b15cd435fd5df1a5014ea61afba8233b"
+      "sha256": "f218d3f9637a691268de0a49ffb3a45f9c4ee4492519fd57e0e8a3496d47f2f0"
     },
     {
       "path": "hooks/codex-hooks.json",
@@ -178,11 +178,11 @@
     },
     {
       "path": "integrations/pstack/cli.mjs",
-      "sha256": "50259afd646450c21b8763b68e69f15bbbd3308b8ecebb1eca5a2915c79bea0e"
+      "sha256": "0d3812b67644e9e498c21f05ecb5e76dce8d747bf130cb84c7f9ff5e06292f08"
     },
     {
       "path": "integrations/pstack/mcp.mjs",
-      "sha256": "40d56c4c7f55d2ca84b25c0cb9b351b6da7f7a754251b4bafe371323139ded1b"
+      "sha256": "86dc05af3674603fe26500326b77d9535bcd826d4d093b46d486dec16ef835bc"
     },
     {
       "path": "integrations/pstack/runtime.mjs",
@@ -210,11 +210,11 @@
     },
     {
       "path": "integrations/software-factory/journey.mjs",
-      "sha256": "8024ec92dcca2940133ac4c81001b6ff37d79334b939f29e616d14afba9bb05a"
+      "sha256": "b0f3444e52bc2d51e824505dc06c6cc468b572fa3a954f7732c9844c922ee631"
     },
     {
       "path": "integrations/software-factory/mcp.mjs",
-      "sha256": "7ad23e691b568a6099c891c3528edab922493a7b69b492daac919a1d3369dfc0"
+      "sha256": "cc58a072dba2018b1ea959a4b5cbccce7b5cd05129d7f6a56abe29150822c09b"
     },
     {
       "path": "integrations/software-factory/policy.yaml",
@@ -222,7 +222,7 @@
     },
     {
       "path": "integrations/software-factory/runtime.mjs",
-      "sha256": "3a26a521267a41ca9520f67abeb5162cb837b13daf8584de1f6a1c5b8d12ff83"
+      "sha256": "95e13360007777550b5029158640ffa44068857c91c1f41140c1a8a4ca711aeb"
     },
     {
       "path": "integrations/software-factory/schema-reader.py",
@@ -334,7 +334,7 @@
     },
     {
       "path": "scripts/fresh-agent-session.js",
-      "sha256": "977266c7a7cd7d589277d12f94f0d6a50f4c2f6ea80a768facf9292b24f17d0a"
+      "sha256": "75074e802e7998405fdcb5e4a19a9f0256f66d88e685b8a09f2c75fd2d1a2ef3"
     },
     {
       "path": "scripts/goal-control.js",
@@ -358,7 +358,7 @@
     },
     {
       "path": "scripts/hooks/seabridge-git-guard.js",
-      "sha256": "399282f6ab12099de857381e7cdaa13627dd6411d3b388fcae40e1fc653842b0"
+      "sha256": "985db6ecc160a1cb3348e222c4b4342d50a279a725ccb06a45d53f929c10c04f"
     },
     {
       "path": "scripts/knowledge-adoption.js",
@@ -390,7 +390,7 @@
     },
     {
       "path": "scripts/lib/fresh-session-guard.js",
-      "sha256": "973e715b5c69cf9a3384e33f265c6bfd04666d992ab3864bd30a5c46717813a8"
+      "sha256": "66b3bf79ddeed930a1a21053c49f14aaca5b94a6649a53ec6548643060f1c9bc"
     },
     {
       "path": "scripts/lib/github-coordination/actions.js",
@@ -458,7 +458,7 @@
     },
     {
       "path": "scripts/sync-instruction-adapters.js",
-      "sha256": "2de1e0e12e629a080f90e09b7031540389cc4421638c9e238ba334e006d8899a"
+      "sha256": "230960554f2bef1808d25f5d84e5ec6198ec25728dead5e4c02dfbaea3a6d625"
     },
     {
       "path": "skills/goal-default/SKILL.md",
@@ -498,7 +498,7 @@
     },
     {
       "path": "skills/sea-verify-seabridge/SKILL.md",
-      "sha256": "2001b4808c5ff6105c0d8f449ebf490d8d244329a708e25222e4daee67f1cab3"
+      "sha256": "a81d0e11c265db24d552360cc761167cdb15c38f807043064396c1b15da63db9"
     },
     {
       "path": "skills/sea-verify-seabridge/features/README.md",
@@ -522,7 +522,7 @@
     },
     {
       "path": "tests/ci/instruction-stack.test.js",
-      "sha256": "a311afc6c2004b834b5c3d6e5877e4a5eeb88aaa8dc3d259adffc55edf0f8830"
+      "sha256": "d1ec55604459908a04be7154658fb4500986aa8612c296342a2d991a16e48f6e"
     },
     {
       "path": "tests/ci/workflow-cost-contract.test.js",
@@ -534,7 +534,7 @@
     },
     {
       "path": "tests/lib/fresh-session-guard.test.js",
-      "sha256": "bb91b02b5813f45d3c730ce29f8c5e50515dd8d895ed2f2494212dcea3765fb4"
+      "sha256": "9f1af38f6bd4ea15fca9fc4bb6cc8d1ec3a590107413dc37b96c123dd786c797"
     },
     {
       "path": "tests/lib/goal-control.test.js",
@@ -566,7 +566,7 @@
     },
     {
       "path": "tests/lib/seabridge-git-guard.test.js",
-      "sha256": "d25ab21d3fe004a57737e38c8977cf6402ea388152c545c8c8f7f0746b988f06"
+      "sha256": "ac7ca7e74e973ebc99d89c578bc97803003f9d1c5cbdad72f841c578967dd245"
     },
     {
       "path": "tests/lib/session-coordination.test.js",
@@ -606,7 +606,7 @@
     },
     {
       "path": "tests/scripts/pstack-integration.test.mjs",
-      "sha256": "3372ffdc4a4debd14ffc1de5742c52e78bff8f6e1b94531de3709ae47318d6f1"
+      "sha256": "da7d51eff7154a1e0ea3dc06f7b7de15f2721811c8235d90eefa2fa35f963f54"
     },
     {
       "path": "tests/scripts/software-factory.test.js",
@@ -640,7 +640,7 @@
       "id": "file:.agents/rules/seabridge-agent-baseline.md",
       "type": "source",
       "path": ".agents/rules/seabridge-agent-baseline.md",
-      "sha256": "a6feb98676c99b874b1fd2b443bd18d58c22cb0df7ce69b4ae3c4f08b595a2b8"
+      "sha256": "5960f80a592bb0ba01be60ec13decd60c84326533cbba603cbd0d2be64af3559"
     },
     {
       "id": "file:.clinerules",
@@ -682,7 +682,7 @@
       "id": "file:.github/copilot-instructions.md",
       "type": "source",
       "path": ".github/copilot-instructions.md",
-      "sha256": "b624dd618b44f6e9992ebc30938c4380bdff32ad71396d6cdccabafc5f66d1a4"
+      "sha256": "4c16123cf9491a08b5f08df8e3c5cd2a641cc2af26f3708b9f088b31821c7c00"
     },
     {
       "id": "file:.github/workflows/ci.yml",
@@ -754,7 +754,7 @@
       "id": "file:docs/tools/PSTACK_ECC_GUIDE.md",
       "type": "source",
       "path": "docs/tools/PSTACK_ECC_GUIDE.md",
-      "sha256": "e8f8f8074ddc8ac01c6333ca5b9f51a3b15cd435fd5df1a5014ea61afba8233b"
+      "sha256": "f218d3f9637a691268de0a49ffb3a45f9c4ee4492519fd57e0e8a3496d47f2f0"
     },
     {
       "id": "file:GEMINI.md",
@@ -832,13 +832,13 @@
       "id": "file:integrations/pstack/cli.mjs",
       "type": "source",
       "path": "integrations/pstack/cli.mjs",
-      "sha256": "50259afd646450c21b8763b68e69f15bbbd3308b8ecebb1eca5a2915c79bea0e"
+      "sha256": "0d3812b67644e9e498c21f05ecb5e76dce8d747bf130cb84c7f9ff5e06292f08"
     },
     {
       "id": "file:integrations/pstack/mcp.mjs",
       "type": "source",
       "path": "integrations/pstack/mcp.mjs",
-      "sha256": "40d56c4c7f55d2ca84b25c0cb9b351b6da7f7a754251b4bafe371323139ded1b"
+      "sha256": "86dc05af3674603fe26500326b77d9535bcd826d4d093b46d486dec16ef835bc"
     },
     {
       "id": "file:integrations/pstack/runtime.mjs",
@@ -880,13 +880,13 @@
       "id": "file:integrations/software-factory/journey.mjs",
       "type": "source",
       "path": "integrations/software-factory/journey.mjs",
-      "sha256": "8024ec92dcca2940133ac4c81001b6ff37d79334b939f29e616d14afba9bb05a"
+      "sha256": "b0f3444e52bc2d51e824505dc06c6cc468b572fa3a954f7732c9844c922ee631"
     },
     {
       "id": "file:integrations/software-factory/mcp.mjs",
       "type": "source",
       "path": "integrations/software-factory/mcp.mjs",
-      "sha256": "7ad23e691b568a6099c891c3528edab922493a7b69b492daac919a1d3369dfc0"
+      "sha256": "cc58a072dba2018b1ea959a4b5cbccce7b5cd05129d7f6a56abe29150822c09b"
     },
     {
       "id": "file:integrations/software-factory/policy.yaml",
@@ -898,7 +898,7 @@
       "id": "file:integrations/software-factory/runtime.mjs",
       "type": "source",
       "path": "integrations/software-factory/runtime.mjs",
-      "sha256": "3a26a521267a41ca9520f67abeb5162cb837b13daf8584de1f6a1c5b8d12ff83"
+      "sha256": "95e13360007777550b5029158640ffa44068857c91c1f41140c1a8a4ca711aeb"
     },
     {
       "id": "file:integrations/software-factory/schema-reader.py",
@@ -1072,7 +1072,7 @@
       "id": "file:scripts/fresh-agent-session.js",
       "type": "source",
       "path": "scripts/fresh-agent-session.js",
-      "sha256": "977266c7a7cd7d589277d12f94f0d6a50f4c2f6ea80a768facf9292b24f17d0a"
+      "sha256": "75074e802e7998405fdcb5e4a19a9f0256f66d88e685b8a09f2c75fd2d1a2ef3"
     },
     {
       "id": "file:scripts/goal-control.js",
@@ -1108,7 +1108,7 @@
       "id": "file:scripts/hooks/seabridge-git-guard.js",
       "type": "source",
       "path": "scripts/hooks/seabridge-git-guard.js",
-      "sha256": "399282f6ab12099de857381e7cdaa13627dd6411d3b388fcae40e1fc653842b0"
+      "sha256": "985db6ecc160a1cb3348e222c4b4342d50a279a725ccb06a45d53f929c10c04f"
     },
     {
       "id": "file:scripts/knowledge-adoption.js",
@@ -1156,7 +1156,7 @@
       "id": "file:scripts/lib/fresh-session-guard.js",
       "type": "source",
       "path": "scripts/lib/fresh-session-guard.js",
-      "sha256": "973e715b5c69cf9a3384e33f265c6bfd04666d992ab3864bd30a5c46717813a8"
+      "sha256": "66b3bf79ddeed930a1a21053c49f14aaca5b94a6649a53ec6548643060f1c9bc"
     },
     {
       "id": "file:scripts/lib/github-coordination/actions.js",
@@ -1258,7 +1258,7 @@
       "id": "file:scripts/sync-instruction-adapters.js",
       "type": "source",
       "path": "scripts/sync-instruction-adapters.js",
-      "sha256": "2de1e0e12e629a080f90e09b7031540389cc4421638c9e238ba334e006d8899a"
+      "sha256": "230960554f2bef1808d25f5d84e5ec6198ec25728dead5e4c02dfbaea3a6d625"
     },
     {
       "id": "file:skills/goal-default/SKILL.md",
@@ -1324,7 +1324,7 @@
       "id": "file:skills/sea-verify-seabridge/SKILL.md",
       "type": "source",
       "path": "skills/sea-verify-seabridge/SKILL.md",
-      "sha256": "2001b4808c5ff6105c0d8f449ebf490d8d244329a708e25222e4daee67f1cab3"
+      "sha256": "a81d0e11c265db24d552360cc761167cdb15c38f807043064396c1b15da63db9"
     },
     {
       "id": "file:tests/ci/agent-adoption-doctor.test.js",
@@ -1354,7 +1354,7 @@
       "id": "file:tests/ci/instruction-stack.test.js",
       "type": "source",
       "path": "tests/ci/instruction-stack.test.js",
-      "sha256": "a311afc6c2004b834b5c3d6e5877e4a5eeb88aaa8dc3d259adffc55edf0f8830"
+      "sha256": "d1ec55604459908a04be7154658fb4500986aa8612c296342a2d991a16e48f6e"
     },
     {
       "id": "file:tests/ci/workflow-cost-contract.test.js",
@@ -1372,7 +1372,7 @@
       "id": "file:tests/lib/fresh-session-guard.test.js",
       "type": "source",
       "path": "tests/lib/fresh-session-guard.test.js",
-      "sha256": "bb91b02b5813f45d3c730ce29f8c5e50515dd8d895ed2f2494212dcea3765fb4"
+      "sha256": "9f1af38f6bd4ea15fca9fc4bb6cc8d1ec3a590107413dc37b96c123dd786c797"
     },
     {
       "id": "file:tests/lib/goal-control.test.js",
@@ -1420,7 +1420,7 @@
       "id": "file:tests/lib/seabridge-git-guard.test.js",
       "type": "source",
       "path": "tests/lib/seabridge-git-guard.test.js",
-      "sha256": "d25ab21d3fe004a57737e38c8977cf6402ea388152c545c8c8f7f0746b988f06"
+      "sha256": "ac7ca7e74e973ebc99d89c578bc97803003f9d1c5cbdad72f841c578967dd245"
     },
     {
       "id": "file:tests/lib/session-coordination.test.js",
@@ -1480,7 +1480,7 @@
       "id": "file:tests/scripts/pstack-integration.test.mjs",
       "type": "source",
       "path": "tests/scripts/pstack-integration.test.mjs",
-      "sha256": "3372ffdc4a4debd14ffc1de5742c52e78bff8f6e1b94531de3709ae47318d6f1"
+      "sha256": "da7d51eff7154a1e0ea3dc06f7b7de15f2721811c8235d90eefa2fa35f963f54"
     },
     {
       "id": "file:tests/scripts/software-factory.test.js",
@@ -2056,6 +2056,18 @@
     },
     {
       "from": "file:docs/tools/PSTACK_ECC_GUIDE.md",
+      "to": "file:AGENTS.md",
+      "type": "mentions-path",
+      "evidence": "docs/tools/PSTACK_ECC_GUIDE.md"
+    },
+    {
+      "from": "file:docs/tools/PSTACK_ECC_GUIDE.md",
+      "to": "file:CLAUDE.md",
+      "type": "mentions-path",
+      "evidence": "docs/tools/PSTACK_ECC_GUIDE.md"
+    },
+    {
+      "from": "file:docs/tools/PSTACK_ECC_GUIDE.md",
       "to": "file:integrations/pstack/cli.mjs",
       "type": "mentions-path",
       "evidence": "docs/tools/PSTACK_ECC_GUIDE.md"
@@ -2191,6 +2203,18 @@
       "to": "file:integrations/pstack/runtime.mjs",
       "type": "verified-code-import",
       "evidence": "integrations/pstack/cli.mjs"
+    },
+    {
+      "from": "file:integrations/pstack/mcp.mjs",
+      "to": "file:AGENTS.md",
+      "type": "mentions-path",
+      "evidence": "integrations/pstack/mcp.mjs"
+    },
+    {
+      "from": "file:integrations/pstack/mcp.mjs",
+      "to": "file:CLAUDE.md",
+      "type": "mentions-path",
+      "evidence": "integrations/pstack/mcp.mjs"
     },
     {
       "from": "file:integrations/pstack/mcp.mjs",
@@ -4876,10 +4900,10 @@
     }
   ],
   "build": {
-    "generatedAt": "2026-10-13T20:32:05.151Z",
-    "sourceCommit": "6eb77eff2d32d3d4510e9b7cc458071692096804",
+    "generatedAt": "2026-10-14T00:45:10.150Z",
+    "sourceCommit": "49a66684618fc3f3e219bea4f00e99d4f573dd92",
     "sourceDirty": false,
-    "policyCommit": "d76a0c0e5b3c638d4d0e20f7c2d90c940f7dbf65",
+    "policyCommit": "6fff8c49563d6bedc1fa557a293c9f3cd27c98f7",
     "policyDirty": false
   }
 }

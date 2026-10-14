@@ -29,7 +29,7 @@ test('git -C is resolved; inspection failure and opaque writes are not allowed s
   assert.equal(decide('git -C "../ecc space" commit -m fix', cwd, dir => { received = dir; return ecc(); }), null);
   assert.equal(received, path.resolve(cwd, '../ecc space'));
   assert.equal(decide('git commit -m fix', cwd, () => { throw Error('missing'); })[0], 'ask');
-  for (const command of ['cd $OTHER; git commit -m fix', '(cd a && make); git commit -m fix', 'popd; git commit -m fix', 'git -c alias.publish=push publish', 'git --git-dir elsewhere commit', 'GIT_DIR=x git commit -m fix', 'git -C $TARGET push']) assert.equal(decide(command, cwd, ecc)[0], 'ask', command);
+  for (const command of ['cd $OTHER; git commit -m fix', '(cd $D && git commit -m fix)', '(cd a && git commit -m fix', 'popd; git commit -m fix', 'git -c alias.publish=push publish', 'git --git-dir elsewhere commit', 'GIT_DIR=x git commit -m fix', 'git -C $TARGET push']) assert.equal(decide(command, cwd, ecc)[0], 'ask', command);
   assert.equal(decide('git commit -m fix && git push', cwd, product)[0], 'ask');
 });
 test('read-only and unrelated tools remain unaffected; malformed events deny', () => {
@@ -107,13 +107,13 @@ test('Git Bash /c/ paths resolve to the drive for direct and compound -C', () =>
   const expected = process.platform === 'win32' ? path.resolve('C:/Users/x/ecc') : '/c/Users/x/ecc';
   assert.deepEqual([...new Set(seen)], [expected]);
 });
-test('a plain directory outside any repository is not a protected target; a missing one still asks', () => {
+test('a plain directory outside any repository, or one not created yet, is not a protected target', () => {
   const fs = require('node:fs');
   const os = require('node:os');
   const plain = fs.mkdtempSync(path.join(os.tmpdir(), 'guard-plain-'));
   try {
     assert.equal(decide(`$O="${plain}"; Push-Location $O; git apply --whitespace=nowarn fix.diff 2>&1; Pop-Location`, cwd), null);
-    assert.equal(decide(`cd "${path.join(plain, 'missing')}"; git apply fix.diff`, cwd)[0], 'ask');
+    assert.equal(decide(`cd "${path.join(plain, 'missing')}"; git apply fix.diff`, cwd), null);
   } finally { fs.rmSync(plain, { recursive: true, force: true }); }
 });
 test('redirections are not git arguments (2026-10-13 release push)', () => {
@@ -123,6 +123,41 @@ test('redirections are not git arguments (2026-10-13 release push)', () => {
   assert.equal(decide('git status; git push origin "$C" > out.txt', cwd, dev)[0], 'ask', 'variable destination still asks');
   assert.equal(decide('git status; git push origin 463ed18:main > "$S/o" 2>&1', cwd, dev)[0], 'ask', 'main destination still asks');
   assert.equal(decide('cd x; git reset --hard HEAD > /dev/null', cwd, () => ({ ecc: false, product: true, branch: 'development' }))[0], 'deny');
+});
+test('scratch repositories created inside the command are not protected targets (2026-10-13 subagents)', () => {
+  const fs = require('node:fs');
+  const os = require('node:os');
+  const base = fs.mkdtempSync(path.join(os.tmpdir(), 'guard-new-'));
+  try {
+    for (const command of [
+      `cd "${base}" && rm -rf mk && mkdir mk && cd mk && git init -q . && git config user.email a@b && git add -A && git commit -qm base && git apply ../p.diff`,
+      `$T="${base}\\stack"; New-Item -ItemType Directory $T | Out-Null; Push-Location $T; git init -q; git apply --whitespace=nowarn a.diff; Pop-Location`,
+    ]) assert.equal(decide(command, cwd), null, command);
+    for (const command of [
+      `cd "${base}" && git clone https://example.invalid/manageesg-backend.git be && cd be && git commit -m x`,
+      `cd "${base}" && git worktree add -q --detach w origin/main && cd w && git commit -m x`,
+    ]) assert.equal(decide(command, cwd)[0], 'ask', command);
+  } finally { fs.rmSync(base, { recursive: true, force: true }); }
+});
+test('a cd inside ( ... ) moves only the commands inside it', () => {
+  const seen = [];
+  const at = dir => { seen.push(dir); return { ecc: false, product: true, branch: 'development' }; };
+  assert.equal(decide('(cd ../a && git apply x.patch && git add -A); git commit -m y', cwd, at), null);
+  assert.equal(decide('cd ../b && git apply p.diff; diff <(cd ../w && cat f) f', cwd, at), null);
+  assert.equal(decide('diff <(cd ../w && cat f) f; git commit -m x', cwd, at)[0], 'ask', 'a subshell cd before an outer mutation stays ambiguous');
+  assert.deepEqual(seen, [path.resolve(cwd, '../a'), path.resolve(cwd, '../a'), cwd, path.resolve(cwd, '../b')]);
+  const main = () => ({ ecc: false, product: true, branch: 'main' });
+  assert.equal(decide('(cd ../dev && git apply p.diff); git commit -m x', cwd, main)[0], 'ask', 'outer commit stays on the protected cwd');
+});
+test('heredoc data bodies are not commands; shell-fed bodies and continuations still count', () => {
+  const main = () => ({ ecc: false, product: true, branch: 'main' });
+  const notes = "S=../p; cat > $S/NOTES.md <<'EOF'\n# notes\nApply from root: `git apply s.patch`\ncd ../other; git commit -m x\nEOF\necho done";
+  const py = "cd ../p && python - <<'PYEOF'\nimport subprocess\n# git push origin main\nPYEOF";
+  const ps = '$n = @"\ngit commit -m "x"\n"@; Add-Content notes.md $n';
+  for (const command of [notes, py, ps]) assert.equal(decide(command, cwd, main), null, command);
+  assert.equal(decide("bash <<'EOF'\ngit commit -m x\nEOF", cwd, main)[0], 'ask', 'shell-fed heredoc still runs git');
+  assert.equal(decide('cd ../p && \\\n git commit -m x', cwd, main)[0], 'ask', 'continuation joins and resolves to main');
+  assert.equal(decide("cat <<'EOF' | sh\ngit push origin main\nEOF", cwd, main)[0], 'ask', 'pipe-to-shell body still runs git');
 });
 test('actual stdin runner emits native denial protocol', () => {
   const file = path.resolve(__dirname, '../../scripts/hooks/seabridge-git-guard.js');

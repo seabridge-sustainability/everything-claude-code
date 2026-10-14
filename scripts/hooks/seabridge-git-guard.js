@@ -2,6 +2,7 @@
 'use strict';
 // Supplementary Claude guard, NOT an approval issuer or a general shell sandbox.
 const { execFileSync } = require('node:child_process');
+const fs = require('node:fs');
 const path = require('node:path');
 const READ = new Set(['status', 'diff', 'log', 'show', 'rev-parse', 'rev-list', 'ls-files', 'ls-tree', 'ls-remote', 'check-ref-format', 'help', 'version', '--version',
   'grep', 'blame', 'annotate', 'cat-file', 'describe', 'shortlog', 'for-each-ref', 'show-ref', 'show-branch', 'name-rev', 'merge-base', 'diff-tree', 'diff-index',
@@ -87,7 +88,37 @@ function literalDir(base, value) {
 // invocation only when its target is literal: literal cd steps before it (none inside a subshell or undone
 // by popd), literal -C, no alternate git dir, no branch switch alongside other mutations, and no expanded
 // push/reset/clean args.
+function closingParen(text, open) {
+  let depth = 0, quoted = false;
+  for (let i = open; i < text.length; i += 1) {
+    if (text[i] === "'") quoted = !quoted;
+    else if (!quoted && text[i] === '(') depth += 1;
+    else if (!quoted && text[i] === ')' && (depth -= 1) === 0) return i;
+  }
+  return -1;
+}
+
+// Heredoc and here-string bodies fed to a non-shell program (cat > NOTES.md, python -, node -) are data, not
+// commands; bodies fed to a shell interpreter stay visible. Backslash-newline continuations are joined.
+function stripDataBodies(command) {
+  const out = [];
+  let end = null;
+  for (const line of command.replace(/\\\r?\n/g, ' ').split(/\r?\n/)) {
+    if (end) {
+      if (end.here ? line.trimStart().startsWith(end.mark) : line.replace(/^\t+/, '').trim() === end.mark) end = null;
+      continue;
+    }
+    out.push(line);
+    const shell = /(?:^|[\s;&|(])(?:bash|sh|zsh|pwsh|powershell(?:\.exe)?|cmd|iex|Invoke-Expression|source|\.)\s*(?:-\S+\s*)*<<|\|\s*(?:bash|sh|zsh|pwsh|powershell(?:\.exe)?|cmd|iex|Invoke-Expression)\b/i;
+    const doc = line.match(/<<-?\s*(['"]?)([A-Za-z_][\w-]*)\1/);
+    if (doc && !shell.test(line)) end = { mark: doc[2], here: false };
+    else if (/@(["'])\s*$/.test(line) && !/(?:iex|Invoke-Expression)\b/i.test(line)) end = { mark: `${line.trimEnd().slice(-1)}@`, here: true };
+  }
+  return out.join('\n');
+}
+
 function decideCompound(command, cwd, inspector) {
+  command = stripDataBodies(command);
   const mutations = [];
   for (const match of command.matchAll(INVOCATION)) {
     const rest = match[1], tokens = gitArgs(rest);
@@ -106,13 +137,25 @@ function decideCompound(command, cwd, inspector) {
   if (mutations.length > 1 && mutations.some(m => (m.op === 'checkout' || m.op === 'switch') && !m.args.includes('--detach'))) return AMBIGUOUS;
   const vars = literalVars(command);
   const steps = [...command.matchAll(DIR_CHANGE), ...command.matchAll(DIR_POP)].sort((a, b) => a.index - b.index);
-  if (steps.some(s => /^[({]/.test(s[0].trimStart()))) return AMBIGUOUS;
+  // A cd inside ( ... ) only moves the commands inside those parentheses; { ... } blocks stay unresolved.
+  for (const step of steps) {
+    const lead = step[0].trimStart();
+    if (lead.startsWith('{')) return AMBIGUOUS;
+    if (lead.startsWith('(')) {
+      step.scopeEnd = closingParen(command, step.index + step[0].indexOf('('));
+      if (step.scopeEnd < 0) return AMBIGUOUS;
+      // A subshell cd with no git inside, followed by a git mutation, reads like a target change; keep asking.
+      const inside = mutations.some(m => m.at > step.index && m.at < step.scopeEnd);
+      if (!inside && mutations.some(m => m.at > step.scopeEnd)) return AMBIGUOUS;
+    }
+  }
   let result = null;
   for (const { op, args, dirs, at } of mutations) {
     let dir = cwd;
     const stack = [];
     for (const step of steps) {
       if (step.index >= at) break;
+      if (step.scopeEnd !== undefined && at > step.scopeEnd) continue;
       if (!step[1]) { if (!stack.length) return AMBIGUOUS; dir = stack.pop(); continue; }
       const target = literalDir(dir, expand(step[2].replace(/^(['"])(.*)\1$/, '$2'), vars, step.index));
       if (!target) return AMBIGUOUS;
@@ -123,7 +166,15 @@ function decideCompound(command, cwd, inspector) {
     if (['reset', 'clean'].includes(op) && args.some(a => /[$`]/.test(a))) return AMBIGUOUS;
     // A push may name its source through a variable only when the destination branch is literal.
     if (op === 'push' && args.some(a => /[$`]/.test(a) && !LITERAL_PUSH_REF.test(a))) return AMBIGUOUS;
-    const decision = decideOperation(op, args, dir, inspector);
+    // A directory created later in this command (mkdir; git init) holds no existing repository or branch.
+    // Clone, worktree and submodule can materialize a protected checkout there, so they stay unresolved.
+    const scoped = target => {
+      try { return inspector(target); } catch (error) {
+        if (!fs.existsSync(target) && !/\b(?:clone|worktree\s+add|submodule)\b/i.test(command)) return { repo: false };
+        throw error;
+      }
+    };
+    const decision = decideOperation(op, args, dir, scoped);
     if (decision?.[0] === 'deny') return decision;
     result = result || decision;
   }
