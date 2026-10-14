@@ -4,7 +4,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { execFileSync, spawnSync } = require('node:child_process');
+const { execFileSync, spawnSync, spawn } = require('node:child_process');
 const engine = require('../../scripts/lib/coding-execution');
 // Explicit fixture identity verifier; this is NOT a live-model identity claim.
 const c = { ...engine, apply:(state,event,options={}) => engine.apply(state,event,{
@@ -108,10 +108,16 @@ test('concrete reviewed processes reject, repair and pause for externally signed
   const event=host.readApproval(entry);assert.equal(host.authorizeApproval({...event,proposal:entry.proposal}),true);
   assert.equal(host.authorizeApproval({...event,binding:'0'.repeat(64),proposal:entry.proposal}),false);
   assert.equal(host.authorizeCitation({chunk_id:'0'.repeat(64)}),false);
+  // Local coordination is not permission to execute a publication side effect.
+  coord.execute('release-acquire',{cwd:f.plan.repo,sessionId:f.plan.session,branch:'approved-batch',candidate:effect.candidate,
+    actionsBudgetStatus:'known',actionsBudgetUsed:0,actionsBudgetLimit:400,actionsBudgetCheckedAt:new Date().toISOString(),actionsBudgetSource:'owner-screenshot',actionsStopUsage:'yes',expectedActionsUsd:1,expectedWorkflows:'Local bare fixture'});
+  assert.throws(()=>host.executeEffect(entry.proposal,entry.binding),/reviewed origin publication receipt required/);
+  coord.execute('release-end',{cwd:f.plan.repo,sessionId:f.plan.session,outcome:'aborted-before-push',evidence:'Local-only receipt denied effect before a Git push; own fixture only'});
   // Exercise the actual Git effect against our own bare fixture, never GitHub.
   const bare=path.join(trust,'remote.git');execFileSync('git',['init','--bare','-q',bare],{stdio:'pipe'});
   execFileSync('git',['remote','add','origin',bare],{cwd:f.plan.repo,stdio:'pipe'});
   coord.execute('release-acquire',{cwd:f.plan.repo,sessionId:f.plan.session,branch:'approved-batch',candidate:effect.candidate,
+    newBranchBase:effect.candidate,publicationEvidence:'Fixture owner signed exact proposal approving this synthetic baseline history for the new local bare target',
     actionsBudgetStatus:'known',actionsBudgetUsed:0,actionsBudgetLimit:400,actionsBudgetCheckedAt:new Date().toISOString(),actionsBudgetSource:'owner-screenshot',actionsStopUsage:'yes',expectedActionsUsd:1,expectedWorkflows:'Local bare fixture'});
   const done=await operational.run(f.file,host);assert.equal(done.state.phase,'completed');
   assert.equal(host.verifyEffect(effect,done.state.effects.publish.receipt),true);
@@ -120,6 +126,422 @@ test('concrete reviewed processes reject, repair and pause for externally signed
   const impostor=crypto.generateKeyPairSync('ed25519');fs.writeFileSync(approval,JSON.stringify({payload,signature:crypto.sign(null,Buffer.from(store.canonicalJson(payload)),impostor.privateKey).toString('base64')}));
   assert.equal(host.readApproval(entry),null);
   fs.appendFileSync(check.path,'\n// unapproved edit');assert.throws(()=>concrete.createBoundHost(spec,{stateFile:f.file,plan:f.plan}),/source changed/);
+});
+
+test('concrete recovery never relabels a successful or unmetered process as retryable failure', t => {
+  const f=fixture(t,['opencode']),trust=path.join(f.plan.repo,'.ecc/goal/trust');fs.mkdirSync(trust);
+  const adapter=path.join(trust,'adapter.js');fs.writeFileSync(adapter,'// Not executed by this receipt-validation test.\n');
+  const pin={path:adapter,sha256:store.sha256File(adapter)},approval=path.join(trust,'approval.json');fs.writeFileSync(approval,'{}');
+  const spec={version:1,plan_sha256:engine.digest(f.plan),timeout_ms:1000,receipts:path.join(f.plan.repo,'.ecc/goal/processes'),
+    workers:{'worker-0':{launch:pin,check:pin}},critic:pin,approval_key:pin,approval_file:approval,effects:[]};
+  const host=concrete.createBoundHost(spec,{stateFile:f.file,plan:f.plan}),worker=f.plan.workers[0],node={token:'fixture-token'};
+  const receipt=path.join(spec.receipts,'receipt.json'),usage={tool_calls:1,retries:0,ci_runs:0,cost_usd:0};
+  for(const value of [{exit:0,usage},{exit:null,usage},{exit:1,usage:null},{exit:1,usage:{}}]){
+    fs.writeFileSync(receipt,JSON.stringify({worker:worker.id,token:node.token,phase:'exited',...value}));
+    assert.equal(host.inspectWorker(worker,node),null);
+  }
+  fs.writeFileSync(receipt,JSON.stringify({worker:worker.id,token:node.token,phase:'exited',exit:1,usage}));
+  assert.deepEqual(host.inspectWorker(worker,node),{status:'failed',usage});
+});
+
+function journalFixture(t, leaseMs=5000, successful=false) {
+  const f=fixture(t,['opencode']);f.plan.limits.lease_ms=leaseMs;f.plan.workers[0].max_attempts=2;
+  const trust=path.join(f.plan.repo,'.ecc/goal/trust');fs.mkdirSync(trust);
+  const workerScript=path.join(trust,'local-failing-adapter.js');
+  // Deterministic local process only; does not claim model/native protection.
+  fs.writeFileSync(workerScript,`const fs=require('node:fs');const w=JSON.parse(fs.readFileSync(0,'utf8'));const log=event=>fs.appendFileSync('code.txt','\\n'+JSON.stringify({event,pid:process.pid,at:Date.now()}));log('start');setTimeout(()=>{log('close');console.log(JSON.stringify({agent:w.agent,runtime:w.runtime,token:w.token,native_protection:false,usage:{tool_calls:1,retries:0,ci_runs:0,cost_usd:0}}));process.exit(1);},1500);`);
+  const dummy=path.join(trust,'unused-verifier.js');fs.writeFileSync(dummy,'throw Error("This failed-attempt fixture must not reach a critic/effect");\n');
+  const pinned=file=>({path:file,sha256:store.sha256File(file)}),approval=path.join(trust,'approval.json');fs.writeFileSync(approval,'{}');
+  let check=pinned(dummy),critic=pinned(dummy);
+  if(successful){
+    // Synthetic native attestation exercises the contract only, not a vendor CLI.
+    fs.writeFileSync(workerScript,`const fs=require('node:fs');const w=JSON.parse(fs.readFileSync(0,'utf8'));const v={design:'approved',data:42,delta:'delivered',launches:1,events:[{event:'start',pid:process.pid,at:Date.now()}]};fs.writeFileSync('code.txt',JSON.stringify(v));setTimeout(()=>{v.events.push({event:'close',pid:process.pid,at:Date.now()});fs.writeFileSync('code.txt',JSON.stringify(v));console.log(JSON.stringify({agent:w.agent,runtime:w.runtime,token:w.token,native_protection:true,usage:{tool_calls:1,retries:0,ci_runs:0,cost_usd:0}}));},1500);`);
+    const checkFile=path.join(trust,'independent-check.js'),criticFile=path.join(trust,'independent-critic.js');
+    fs.writeFileSync(checkFile,`const fs=require('node:fs'),crypto=require('node:crypto');const v=JSON.parse(fs.readFileSync('code.txt','utf8'));const evidence={path:'code.txt',sha256:crypto.createHash('sha256').update(fs.readFileSync('code.txt')).digest('hex'),kind:'local-check'};console.log(JSON.stringify({passed:v.design==='approved'&&v.data===42&&v.delta==='delivered',evidence:[evidence],preservation:[{id:'preserve',evidence}],citations:[]}));`);
+    fs.writeFileSync(criticFile,`const fs=require('node:fs'),{state:s}=JSON.parse(fs.readFileSync(0,'utf8'));const accepted=Object.values(s.nodes).every(n=>n.result.status==='pass');console.log(JSON.stringify({report:{agent:s.plan.critic,join_sha256:s.join_sha256,accepted,rejections:accepted?[]:[{worker:'worker-0',reason:'failed-acceptance'}]},usage:{tool_calls:1,retries:0,ci_runs:0,cost_usd:0}}));`);
+    check=pinned(checkFile);critic=pinned(criticFile);
+  }
+  const spec={version:1,plan_sha256:engine.digest(f.plan),timeout_ms:10000,receipts:path.join(f.plan.repo,'.ecc/goal/processes'),
+    workers:{'worker-0':{launch:{...pinned(workerScript),failure_journal:'direct-child-v1'},check}},
+    critic:{...critic,failure_journal:'direct-child-v1',budget:{tool_calls:3,retries:0,ci_runs:0,cost_usd:0}},approval_key:pinned(dummy),approval_file:approval,effects:[]};
+  const config=path.join(trust,'host-config.json');fs.writeFileSync(config,JSON.stringify(spec));c.create(f.file,f.plan);
+  const hostFile=path.resolve(__dirname,'../../scripts/lib/coding-execution-host.js');
+  const supervisor=path.join(trust,'supervisor.js');
+  fs.writeFileSync(supervisor,`const c=require(${JSON.stringify(path.resolve(__dirname,'../../scripts/lib/coding-execution.js'))}),r=require(${JSON.stringify(path.resolve(__dirname,'../../scripts/lib/coding-execution-runner.js'))});const file=process.argv[2],host=r.pinnedHost(${JSON.stringify(hostFile)},${JSON.stringify(store.sha256File(hostFile))},{stateFile:file,plan:c.load(file).plan});r.run(file,host,{maxIterations:1,maxMilliseconds:20000}).then(v=>console.log(JSON.stringify({pid:process.pid,state:v.state,stopped:v.stopped}))).catch(e=>{console.error(e.message);process.exitCode=2;});`);
+  const env={...process.env,ECC_EXECUTION_HOST_CONFIG:config,ECC_EXECUTION_HOST_CONFIG_SHA256:store.sha256File(config)};
+  return {...f,spec,hostFile,supervisor,env};
+}
+async function waitFixture(predicate,timeout=15000) {
+  const end=Date.now()+timeout;
+  while(Date.now()<end){if(predicate())return;await new Promise(r=>setTimeout(r,30));}
+  throw Error('bounded own-fixture checkpoint timed out');
+}
+function journalHeadroom(t) {
+  if(os.freemem()<2.5*1024**3){t.skip('Actual 2 GiB reserve plus bounded supervisor/child headroom unavailable');return false;}
+  return true;
+}
+
+test('local journal race launches exactly once per token and recovers the winning call', async t => {
+  if(!journalHeadroom(t))return;
+  const f=journalFixture(t,30000),state=engine.transaction(f.file,s=>c.apply(s,{type:'dispatch',actor:'parent'}));
+  const worker=f.plan.workers[0],node=state.nodes[worker.id],input={...worker,assignment:f.assignments[0],
+    remaining_budget:{tool_calls:10,retries:2,ci_runs:0,cost_usd:0},goal_sha256:f.plan.goal_sha256,
+    token:node.token,revision:f.plan.revision,environment:f.plan.environment};
+  const host=concrete.createBoundHost(f.spec,{stateFile:f.file,plan:f.plan}),crypto=require('node:crypto');
+  const statuses=await Promise.all([0,1].map(()=>{
+    const call_id=crypto.randomUUID(),requestFile=path.join(f.spec.receipts,call_id+'.request.json'),started_at=Date.now();
+    fs.writeFileSync(requestFile,JSON.stringify({version:1,call_id,plan:f.plan,plan_sha256:engine.digest(f.plan),
+      wrapper_sha256:store.sha256File(f.hostFile),state_file:f.file,entry:f.spec.workers[worker.id].launch,input,
+      input_sha256:engine.digest(input),cwd:worker.repo,started_at,deadline:started_at+10000}));
+    return new Promise((resolve,reject)=>{const p=spawn(process.execPath,['--max-old-space-size=64',f.hostFile,'--failure-journal-child',requestFile],{stdio:'ignore',windowsHide:true});p.once('error',reject);p.once('close',resolve);});
+  }));
+  assert.deepEqual(statuses.sort(),[0,2]);
+  const events=fs.readFileSync(path.join(worker.repo,'code.txt'),'utf8').split('\n').filter(x=>x.startsWith('{')).map(JSON.parse);
+  assert.equal(events.filter(e=>e.event==='start').length,1);
+  assert.deepEqual(host.inspectWorker(worker,node),{status:'failed',usage:{tool_calls:1,retries:0,ci_runs:0,cost_usd:0}});
+});
+
+test('local child journal survives test-owned supervisor death and charges failed usage once', async t => {
+  if(!journalHeadroom(t))return;
+  const f=journalFixture(t),worker=f.plan.workers[0],code=path.join(worker.repo,'code.txt');
+  const first=spawn(process.execPath,['--max-old-space-size=64',f.supervisor,f.file],{env:f.env,stdio:'ignore',windowsHide:true});
+  const closed=new Promise((resolve,reject)=>{first.once('error',reject);first.once('close',resolve);});
+  await waitFixture(()=>fs.readFileSync(code,'utf8').includes('"event":"start"'));
+  const before=engine.load(f.file),token=before.nodes[worker.id].token;
+  first.kill();await closed; // Only the process created by this test is stopped.
+  const request=JSON.parse(fs.readFileSync(path.join(f.file+'.runner-lock'),'utf8')).pendingCalls.find(p=>p.method==='launchWorker');
+  const receiptFile=path.join(f.spec.receipts,request.callId+'.json');
+  await waitFixture(()=>fs.existsSync(receiptFile));const receipt=JSON.parse(fs.readFileSync(receiptFile,'utf8'));
+  assert.equal(receipt.direct_child_closed,true);assert.equal(receipt.exit,1);
+  await waitFixture(()=>Date.now()>before.nodes[worker.id].lease_until);
+  const next=()=>{const r=spawnSync(process.execPath,['--max-old-space-size=64',f.supervisor,f.file],{env:f.env,encoding:'utf8',windowsHide:true,timeout:20000,maxBuffer:1024*1024});assert.equal(r.status,0,r.stderr);return JSON.parse(r.stdout);};
+  const second=next();assert.notEqual(second.pid,first.pid);
+  assert.equal(second.state.nodes[worker.id].attempts,2);assert.equal(second.state.nodes[worker.id].usage.tool_calls,2);
+  assert.equal(second.state.spent_usd,0);assert.deepEqual(second.state.effects,{});
+  const events=fs.readFileSync(code,'utf8').split('\n').filter(x=>x.startsWith('{')).map(JSON.parse),starts=events.filter(e=>e.event==='start');
+  assert.equal(starts.length,2);assert.ok(starts[1].at>=receipt.closed_at,'replacement must follow verified direct-child closure');
+  const third=next();assert.equal(third.state.phase,'budget-exhausted');assert.equal(third.state.nodes[worker.id].usage.tool_calls,2);
+  assert.equal(fs.readFileSync(code,'utf8').split('"event":"start"').length-1,2);
+  assert.equal(concrete.createBoundHost(f.spec,{stateFile:f.file,plan:f.plan}).inspectWorker(worker,{token}).usage.tool_calls,1);
+});
+
+test('recovered results require stopped timely evidence and parent identity, then consume usage once', t => {
+  const f=fixture(t,['opencode']),s=c.apply(c.initialize(f.plan),{type:'dispatch',actor:'parent'}),node=s.nodes['worker-0'];
+  const result=f.result(s),receipt={closed_at:node.lease_until-1,snapshot_at:node.lease_until},event={type:'recover-result',actor:'parent',result,receipt};
+  const now=node.lease_until+1,verified={now,verifyRecoveredResult:()=>true};
+  assert.throws(()=>c.apply(s,event,{now}),/trusted stopped-worker/);
+  assert.throws(()=>c.apply(s,event,{now,verifyRecoveredResult:()=>Promise.resolve(true)}),/trusted stopped-worker/);
+  assert.throws(()=>c.apply(s,{...event,actor:'worker-0'},verified),/parent\/root/);
+  assert.throws(()=>c.apply(s,{...event,receipt:{closed_at:node.lease_until+1}},verified),/original lease/);
+  assert.throws(()=>c.apply(s,{type:'result',actor:'worker-0',result},verified),/stale or duplicate/);
+  assert.throws(()=>c.apply(s,event,{...verified,verifyPreservation:()=>false}),/semantic preservation/);
+  const recovered=c.apply(s,event,verified);
+  assert.equal(recovered.phase,'critic');assert.equal(recovered.dispatches,1);
+  assert.equal(recovered.nodes['worker-0'].status,'done');assert.equal(recovered.nodes['worker-0'].usage.tool_calls,1);
+  assert.throws(()=>c.apply(recovered,event,verified),/active worker reconciliation|stale or duplicate/);
+  const exhausted=c.apply(s,{...event,result:{...result,usage:{...result.usage,tool_calls:11}}},verified);
+  assert.equal(exhausted.phase,'budget-exhausted');assert.equal(exhausted.nodes['worker-0'].status,'done');
+  assert.equal(exhausted.nodes['worker-0'].usage.tool_calls,11);
+  assert.throws(()=>c.apply(exhausted,event,verified),/active worker reconciliation/);
+});
+
+test('recovered results still reject expired assignments, ownership and changed source', t => {
+  const f=fixture(t,['opencode']),s=c.apply(c.initialize(f.plan),{type:'dispatch',actor:'parent'}),node=s.nodes['worker-0'];
+  const event={type:'recover-result',actor:'parent',result:f.result(s),receipt:{closed_at:node.lease_until-1,snapshot_at:node.lease_until}};
+  const options={now:node.lease_until+1,verifyRecoveredResult:()=>true};
+  assert.throws(()=>c.apply(s,event,{...options,now:Date.parse(f.plan.workers[0].expires_at)+1}),/expired assignment/);
+  fs.appendFileSync(path.join(f.plan.workers[0].repo,'code.txt'),'changed');
+  assert.throws(()=>c.apply(s,event,options),/unreported worker mutations|stale/);
+  coord.execute('close',{cwd:f.plan.workers[0].repo,sessionId:'worker-0'});
+  assert.throws(()=>c.apply(s,event,options),/closed/);
+});
+
+test('concrete successful recovery rejects missing, changed and unprotected journal bindings', t => {
+  if(os.freemem()<1024**3){t.skip('One GiB for bounded metadata/check fixture unavailable');return;}
+  const f=journalFixture(t,60000,true),worker=f.plan.workers[0];
+  const state=engine.transaction(f.file,s=>c.apply(s,{type:'dispatch',actor:'parent'})),node=state.nodes[worker.id];
+  const code=path.join(worker.repo,'code.txt'),originalCode=JSON.stringify({design:'approved',data:42,delta:'delivered',launches:1});
+  fs.writeFileSync(code,originalCode);
+  const host=concrete.createBoundHost(f.spec,{stateFile:f.file,plan:f.plan}),call_id=require('node:crypto').randomUUID(),started_at=Date.now()-5;
+  const input={...worker,assignment:f.assignments[0],remaining_budget:{tool_calls:10,retries:2,ci_runs:0,cost_usd:0},
+    token:node.token,revision:f.plan.revision,environment:f.plan.environment,goal_sha256:f.plan.goal_sha256};
+  const request={version:1,call_id,plan:f.plan,plan_sha256:engine.digest(f.plan),wrapper_sha256:store.sha256File(f.hostFile),
+    state_file:f.file,entry:f.spec.workers[worker.id].launch,input,input_sha256:engine.digest(input),cwd:worker.repo,started_at,deadline:started_at+10000};
+  fs.writeFileSync(path.join(f.spec.receipts,call_id+'.request.json'),JSON.stringify(request));
+  const request_sha256=engine.digest(request),wrapper_pid=process.pid;
+  fs.writeFileSync(path.join(f.spec.receipts,call_id+'.claim'),JSON.stringify({request_sha256,wrapper_pid}));
+  const attemptKey=engine.digest({plan_sha256:request.plan_sha256,worker_id:worker.id,token:node.token});
+  fs.writeFileSync(path.join(f.plan.repo,'.ecc/goal','journal-attempt-'+attemptKey+'.claim'),JSON.stringify({version:1,
+    plan_sha256:request.plan_sha256,worker_id:worker.id,token:node.token,call_id,request_sha256,wrapper_pid}));
+  const projection=store.captureRepositoryState(worker.repo,{excludePaths:[path.join(worker.repo,'.ecc/goal')]}),closed_at=Date.now();
+  const closure_snapshot={head:projection.head,tree_fingerprint:projection.tree_fingerprint},usage={tool_calls:1,retries:0,ci_runs:0,cost_usd:0};
+  const value={agent:worker.agent,runtime:worker.runtime,token:node.token,native_protection:true,usage};
+  // Synthetic metadata proves concrete binding denials, not actual child closure.
+  const receipt={version:1,request_sha256,call_id,wrapper_pid,adapter_pid:process.pid,phase:'exited',direct_child_closed:true,
+    exit:0,signal:null,closed_at,snapshot_at:closed_at,usage,value,value_sha256:engine.digest(value),closure_snapshot,
+    closure_snapshot_sha256:engine.digest(closure_snapshot)};
+  const file=path.join(f.spec.receipts,call_id+'.json');fs.writeFileSync(file,JSON.stringify(receipt));
+  const observed=host.inspectWorker(worker,node);assert.equal(observed.status,'completed');
+  const event={worker,node,result:observed.result,receipt:observed.receipt,revision:f.plan.revision,environment:f.plan.environment};
+  assert.equal(host.verifyRecoveredResult(event,f.plan),true);
+  for(const mutate of [
+    r=>{delete r.closure_snapshot;delete r.closure_snapshot_sha256;},
+    r=>{r.closure_snapshot=null;r.closure_snapshot_sha256=engine.digest(null);},
+    r=>{r.closure_snapshot.tree_fingerprint='f'.repeat(64);r.closure_snapshot_sha256=engine.digest(r.closure_snapshot);},
+    r=>{r.usage=null;},
+    r=>{r.value.native_protection=false;r.value_sha256=engine.digest(r.value);},
+    r=>{r.value.token='f'.repeat(64);r.value_sha256=engine.digest(r.value);},
+    r=>{r.closed_at=node.lease_until+1;},
+    r=>{r.snapshot_at=node.lease_until+1;},
+  ]){
+    const changed=structuredClone(receipt);mutate(changed);fs.writeFileSync(file,JSON.stringify(changed));
+    assert.equal(host.inspectWorker(worker,node),null);
+    assert.equal(host.verifyRecoveredResult(event,f.plan),false);
+  }
+  fs.writeFileSync(file,JSON.stringify(receipt));
+  assert.equal(host.verifyRecoveredResult({...event,receipt:{...event.receipt,journal_sha256:'f'.repeat(64)}},f.plan),false);
+  fs.appendFileSync(code,'\nchanged after inspection');assert.equal(host.verifyRecoveredResult(event,f.plan),false);
+  fs.writeFileSync(code,originalCode);
+  // A mutable private dependency changes the trusted check's output while the
+  // source fingerprint stays fixed; transition verification must not reuse cache.
+  const checkFile=f.spec.workers[worker.id].check.path,toggle=path.join(worker.repo,'.ecc/goal/check-deny');
+  fs.writeFileSync(checkFile,fs.readFileSync(checkFile,'utf8').replace('passed:v.design',"passed:!fs.existsSync('.ecc/goal/check-deny')&&v.design"));
+  f.spec.workers[worker.id].check.sha256=store.sha256File(checkFile);
+  // Updating the caller's spec does not retroactively authorize changed code
+  // in an already-created host. A new reviewed binding is required.
+  assert.equal(host.inspectWorker(worker,node),null);
+  assert.equal(host.verifyRecoveredResult(event,f.plan),false);
+  const freshHost=concrete.createBoundHost(f.spec,{stateFile:f.file,plan:f.plan}),fresh=freshHost.inspectWorker(worker,node);
+  assert.equal(fresh.status,'completed');fs.writeFileSync(toggle,'deny');
+  assert.equal(freshHost.verifyRecoveredResult({...event,result:fresh.result,receipt:fresh.receipt},f.plan),false);
+  fs.unlinkSync(toggle);
+  coord.execute('close',{cwd:f.plan.repo,sessionId:f.plan.session});
+  assert.equal(freshHost.inspectWorker(worker,node),null);
+});
+
+test('critic usage is identity-bound, charged once before decisions and bounded on every counter', t => {
+  const f=fixture(t,['local-process-verification']);f.plan.limits.usd=1;
+  const s=f.joined(),usage={tool_calls:1,retries:0,ci_runs:0,cost_usd:0.1};
+  const receipt={attempt_sha256:c.digest({plan_sha256:c.digest(f.plan),critic:f.plan.critic,join_sha256:s.join_sha256}),
+    join_sha256:s.join_sha256,budget:{tool_calls:2,retries:0,ci_runs:0,cost_usd:0.5}};
+  const event={type:'critic-usage',actor:f.plan.parent,usage,receipt},options={verifyCriticUsage:()=>true};
+  assert.throws(()=>c.apply(s,event),/trusted critic usage/);
+  assert.throws(()=>c.apply(s,event,{verifyCriticUsage:()=>Promise.resolve(true)}),/trusted critic usage/);
+  assert.throws(()=>c.apply(s,{...event,actor:f.plan.critic},options),/parent/);
+  assert.throws(()=>c.apply(s,{...event,receipt:{...receipt,join_sha256:'f'.repeat(64)}},options),/binding/);
+  const charged=c.apply(s,event,options);assert.equal(charged.spent_usd,0.1);assert.equal(charged.phase,'critic');
+  assert.equal(c.apply(charged,event,options).spent_usd,0.1);
+  assert.throws(()=>c.apply(charged,{...event,usage:{...usage,tool_calls:2}},options),/receipt changed/);
+  const report={agent:f.plan.critic,join_sha256:s.join_sha256,accepted:true,rejections:[]};
+  assert.throws(()=>c.apply(s,{type:'critic',actor:f.plan.critic,report,receipt}),/consumed/);
+  const accepted=c.apply(charged,{type:'critic',actor:f.plan.critic,report,receipt});
+  assert.equal(accepted.phase,'synthesis');assert.equal(accepted.spent_usd,0.1);
+  assert.throws(()=>c.apply(accepted,{type:'critic',actor:f.plan.critic,report,receipt}),/barrier/);
+  const rejected=c.apply(charged,{type:'critic',actor:f.plan.critic,receipt,
+    report:{...report,accepted:false,rejections:[{worker:'worker-0',reason:'failed-acceptance'}]}});
+  assert.equal(rejected.phase,'repair');assert.equal(rejected.spent_usd,0.1);
+  for(const [counter,value] of Object.entries({tool_calls:3,retries:1,ci_runs:1,cost_usd:0.6})){
+    const exhausted=c.apply(s,{...event,usage:{...usage,[counter]:value}},options);
+    assert.equal(exhausted.phase,'budget-exhausted');assert.equal(Object.keys(exhausted.critic_usage).length,1);
+    assert.throws(()=>c.apply(exhausted,{type:'dispatch',actor:f.plan.parent}),/planned\/repair/);
+  }
+  const exhausted=c.apply(s,{...event,usage:{...usage,cost_usd:1.1},receipt:{...receipt,budget:{...receipt.budget,cost_usd:2}}},options);
+  assert.equal(exhausted.phase,'budget-exhausted');assert.equal(exhausted.spent_usd,1.1);
+});
+
+function criticJournalFixture(t){
+  const f=journalFixture(t,60000,true),worker=f.plan.workers[0];
+  fs.writeFileSync(path.join(worker.repo,'code.txt'),JSON.stringify({design:'approved',data:42,delta:'delivered',launches:1}));
+  f.plan.limits.usd=1;
+  const critic=f.spec.critic.path;
+  fs.writeFileSync(critic,`const fs=require('node:fs'),{state:s}=JSON.parse(fs.readFileSync(0,'utf8'));fs.appendFileSync('.ecc/goal/critic-launches','start\\n');setTimeout(()=>console.log(JSON.stringify({report:{agent:s.plan.critic,join_sha256:s.join_sha256,accepted:true,rejections:[]},usage:{tool_calls:1,retries:0,ci_runs:0,cost_usd:0.1}})),1500);`);
+  f.spec.critic={path:critic,sha256:store.sha256File(critic),failure_journal:'direct-child-v1',budget:{tool_calls:2,retries:0,ci_runs:0,cost_usd:0.5}};
+  f.spec.plan_sha256=c.digest(f.plan);
+  const state=engine.transaction(f.file,()=>f.joined());
+  const config=f.env.ECC_EXECUTION_HOST_CONFIG;fs.writeFileSync(config,JSON.stringify(f.spec));
+  f.env.ECC_EXECUTION_HOST_CONFIG_SHA256=store.sha256File(config);
+  return {...f,state};
+}
+
+test('concrete critic journal reuses metered receipt and denies changed or unknown evidence without launch', async t => {
+  if(os.freemem()<1024**3){t.skip('One GiB for bounded metadata fixture unavailable');return;}
+  const f=criticJournalFixture(t),state=f.state,host=concrete.createBoundHost(f.spec,{stateFile:f.file,plan:f.plan});
+  const call_id=require('node:crypto').randomUUID(),started_at=Date.now()-5;
+  const input={state,remaining_budget:f.spec.critic.budget},request={version:1,operation:'critic',call_id,
+    plan:f.plan,plan_sha256:c.digest(f.plan),wrapper_sha256:store.sha256File(f.hostFile),state_file:f.file,
+    entry:f.spec.critic,input,input_sha256:c.digest(input),cwd:f.plan.repo,started_at,deadline:started_at+10000};
+  fs.writeFileSync(path.join(f.spec.receipts,call_id+'.request.json'),JSON.stringify(request));
+  const request_sha256=c.digest(request),wrapper_pid=process.pid;
+  fs.writeFileSync(path.join(f.spec.receipts,call_id+'.claim'),JSON.stringify({request_sha256,wrapper_pid}));
+  const attempt_sha256=c.digest({plan_sha256:request.plan_sha256,critic:f.plan.critic,join_sha256:state.join_sha256});
+  fs.writeFileSync(path.join(f.plan.repo,'.ecc/goal','journal-attempt-'+attempt_sha256+'.claim'),JSON.stringify({version:1,
+    plan_sha256:request.plan_sha256,critic:f.plan.critic,join_sha256:state.join_sha256,call_id,request_sha256,wrapper_pid}));
+  const report={agent:f.plan.critic,join_sha256:state.join_sha256,accepted:true,rejections:[]};
+  const usage={tool_calls:1,retries:0,ci_runs:0,cost_usd:0.1},value={report,usage};
+  // Synthetic receipt tests bindings only; the process-crash case is separate.
+  const receipt={version:1,request_sha256,call_id,wrapper_pid,adapter_pid:process.pid,phase:'exited',direct_child_closed:true,
+    exit:0,signal:null,closed_at:Date.now(),usage,value,value_sha256:c.digest(value)};
+  const receiptFile=path.join(f.spec.receipts,call_id+'.json');fs.writeFileSync(receiptFile,JSON.stringify(receipt));
+  const control={callId:require('node:crypto').randomUUID()},observed=await host.review(state,control);
+  assert.deepEqual(observed.report,report);assert.equal(host.verifyCriticUsage(observed,f.plan),true);
+  const charged=engine.transaction(f.file,s=>c.apply(s,{type:'critic-usage',actor:f.plan.parent,...observed},{verifyCriticUsage:host.verifyCriticUsage}));
+  assert.equal(charged.spent_usd,0.1);
+  const resumed=await host.review(charged,control);assert.deepEqual(resumed,observed);
+  assert.equal(c.apply(charged,{type:'critic-usage',actor:f.plan.parent,...resumed},{verifyCriticUsage:host.verifyCriticUsage}).spent_usd,0.1);
+  assert.equal(host.verifyCritic({actor:f.plan.critic,...resumed},f.plan),true);
+  for(const mutate of [r=>{r.usage=null;},r=>{r.request_sha256='f'.repeat(64);},r=>{r.direct_child_closed=false;}]){
+    const changed=structuredClone(receipt);mutate(changed);fs.writeFileSync(receiptFile,JSON.stringify(changed));
+    const held=await host.review(charged,control);assert.equal(held.usage,null);
+    assert.equal(host.verifyCriticUsage(observed,f.plan),false);
+  }
+  fs.writeFileSync(receiptFile,JSON.stringify({...receipt,exit:1}));
+  const failed=await host.review(charged,control);assert.equal(failed.report,null);assert.deepEqual(failed.usage,usage);
+  fs.writeFileSync(receiptFile,JSON.stringify(receipt));
+  assert.equal(host.verifyCriticUsage({...observed,receipt:{...observed.receipt,journal_sha256:'f'.repeat(64)}},f.plan),false);
+  fs.appendFileSync(path.join(f.plan.workers[0].repo,'code.txt'),'changed');
+  assert.equal(host.verifyCriticUsage(observed,f.plan),true); // Spend must remain reconciled despite stale acceptance.
+  assert.throws(()=>c.apply(charged,{type:'critic',actor:f.plan.critic,...observed},{verifyCritic:host.verifyCritic}),/stale/);
+  assert.equal(fs.existsSync(path.join(f.plan.repo,'.ecc/goal/critic-launches')),false);
+});
+
+test('critic prelaunch budget denial releases supervision without implying missing receipts stopped', async t => {
+  const f=criticJournalFixture(t);f.spec.critic.budget.tool_calls=0;
+  const host=concrete.createBoundHost(f.spec,{stateFile:f.file,plan:f.plan});
+  for(let i=0;i<2;i++){
+    const result=await operational.run(f.file,host);
+    assert.equal(result.stopped,'critic-admission-blocked');assert.equal(result.state.spent_usd,0);
+    assert.equal(fs.existsSync(f.file+'.runner-lock'),false);
+    assert.equal(fs.existsSync(path.join(f.plan.repo,'.ecc/goal/critic-launches')),false);
+  }
+  assert.equal(host.confirmStopped({callId:require('node:crypto').randomUUID()}),false);
+});
+
+test('production factory rejects legacy unmetered configuration before creating receipts or launching', t => {
+  const f=journalFixture(t),file=f.env.ECC_EXECUTION_HOST_CONFIG;
+  const before={config:process.env.ECC_EXECUTION_HOST_CONFIG,hash:process.env.ECC_EXECUTION_HOST_CONFIG_SHA256};
+  const write=spec=>{fs.writeFileSync(file,JSON.stringify(spec));process.env.ECC_EXECUTION_HOST_CONFIG=file;
+    process.env.ECC_EXECUTION_HOST_CONFIG_SHA256=store.sha256File(file);};
+  t.after(()=>{for(const [key,value] of [['ECC_EXECUTION_HOST_CONFIG',before.config],['ECC_EXECUTION_HOST_CONFIG_SHA256',before.hash]]){
+    if(value===undefined)delete process.env[key];else process.env[key]=value;}});
+  for(const [change,pattern] of [
+    [s=>{delete s.critic.failure_journal;},/production critic/],
+    [s=>{delete s.critic.budget;},/usage/],
+    [s=>{s.critic.budget.tool_calls=0;},/positive tool-call/],
+    [s=>{delete s.workers['worker-0'].launch.failure_journal;},/production workers/],
+    [s=>{s.workers.extra=s.workers['worker-0'];},/exact plan/],
+  ]){
+    const spec=structuredClone(f.spec);change(spec);write(spec);
+    assert.throws(()=>concrete.createHost({stateFile:f.file,plan:f.plan}),pattern);
+    assert.equal(fs.existsSync(spec.receipts),false);
+  }
+  write(f.spec);const host=concrete.createHost({stateFile:f.file,plan:f.plan});
+  assert.equal(typeof host.verifyCriticUsage,'function');assert.equal(typeof host.verifyRecoveredResult,'function');
+  assert.equal(fs.readdirSync(f.spec.receipts).length,0);
+});
+
+test('concrete parent queue binds sources, owner, exact response and verified closure', t => {
+  if(os.freemem()<1024**3){t.skip('One GiB for bounded metadata fixture unavailable');return;}
+  const f=journalFixture(t),directory=path.join(f.plan.repo,'.ecc/goal/queue');fs.mkdirSync(directory);
+  const queueFile=path.join(directory,'workspace.json'),trust=path.dirname(f.spec.critic.path),root=path.resolve(__dirname,'../..');
+  const checker=path.join(trust,'queue-check.js');
+  // Deterministic verifier fixture only: no provider, service or native-model claim.
+  fs.writeFileSync(checker,`const fs=require('node:fs'),r=JSON.parse(fs.readFileSync(0,'utf8'));console.log(JSON.stringify({version:1,nonce:fs.existsSync('.ecc/goal/wrong-queue-nonce')?'wrong':r.nonce,plan_sha256:r.plan_sha256,operation:r.operation,id:r.entry.id,owner:r.entry.owner,resource:r.resource,token:r.token,allowed:true,stopped:fs.existsSync('.ecc/goal/closure-verified')}));`);
+  const required=['scripts/lib/coding-execution-host.js','scripts/lib/coding-execution.js','scripts/lib/coding-execution-runner.js',
+    'scripts/lib/session-coordination.js','scripts/lib/goal-store.js','scripts/lib/goal-control.js','scripts/lib/atomic-write.js',
+    'scripts/lib/workspace-queue.js','scripts/lib/workspace-queue-store.js','schemas/coding-execution.schema.json',
+    'schemas/goal-control.schema.json','manifests/goal-proof-profiles.json'];
+  const entry={path:checker,sha256:store.sha256File(checker)};
+  f.spec.queue={file:queueFile,timeout_ms:1000,gate:entry,cessation:entry,
+    source_pins:Object.fromEntries(required.map(file=>[file,store.sha256File(path.join(root,file))]))};
+  const context={stateFile:f.file,plan:f.plan,queueFile};
+  const host=concrete.createBoundHost(f.spec,context),queue=operational.bindQueue;
+  assert.throws(()=>queue(host,context),/pinned parent/);
+  assert.throws(()=>host.createQueueCapabilities({...context,queueFile:queueFile+'.other'}),/exact queue/);
+  const capabilities=host.createQueueCapabilities(context);
+  const create=require('../../scripts/lib/workspace-queue-store').createQueueStore;
+  const bound=create({...capabilities,file:queueFile});
+  const now=Date.now(),request={id:'writer-one',owner:f.plan.session,goalId:f.goalDocument.goal_id,kind:'writer',resource:f.plan.repo,
+    state:'waiting',reason:'scoped local controller check',enqueuedAt:new Date(now).toISOString(),nextCheckpointAt:new Date(now+60000).toISOString(),
+    independentAction:'source review',dependsOn:[]};
+  bound.enqueue([request]);const claim=bound.acquire({id:request.id,owner:request.owner,leaseMilliseconds:60000});
+  assert.equal(claim.acquired,true);assert.equal(claim.authorizationGranted,false);
+  const before=fs.readFileSync(queueFile,'utf8');
+  assert.throws(()=>bound.release({...claim,outcome:'completed'}),/cessation unverified/);
+  assert.equal(fs.readFileSync(queueFile,'utf8'),before);
+  fs.writeFileSync(path.join(f.plan.repo,'.ecc/goal/closure-verified'),'own fixture closure');
+  assert.equal(bound.release({...claim,outcome:'completed'}).released,true);
+  const telemetry=capabilities.readTelemetry();assert.equal(telemetry.reserveRamGiB,2);
+  assert.ok(Number.isFinite(telemetry.freeRamGiB)&&telemetry.freeRamGiB>=0);
+  const oversized={...request,id:'oversized-heavy',kind:'heavy-check',resource:'local-machine',peakRamGiB:os.totalmem()/1024**3+1};
+  bound.enqueue([oversized]);
+  const held=bound.acquire({id:oversized.id,owner:oversized.owner,leaseMilliseconds:1000});
+  assert.equal(held.acquired,false);assert.equal(held.decision.state,'waiting-resource');
+  const nonceFile=path.join(f.plan.repo,'.ecc/goal/wrong-queue-nonce');fs.writeFileSync(nonceFile,'wrong');
+  assert.equal(capabilities.checkGate({...request,operation:'acquire'}),null);fs.unlinkSync(nonceFile);
+  assert.throws(()=>capabilities.assertWrite([path.join(directory,'foreign.json')]),/outside queue/);
+  const worker=f.plan.workers[0],workerEntry={...request,id:'worker-two',owner:worker.session,resource:worker.repo,operation:'acquire'};
+  assert.equal(capabilities.checkGate(workerEntry).allowed,true);
+  const originalNow=Date.now;
+  try{
+    Date.now=()=>now+3600000+30000;
+    assert.equal(capabilities.checkGate(workerEntry),null);
+    assert.equal(capabilities.checkGate({...workerEntry,operation:'release'}).allowed,true);
+  }finally{Date.now=originalNow;}
+  const goalBytes=fs.readFileSync(f.plan.goal_file),queueBytes=fs.readFileSync(queueFile,'utf8');
+  assert.throws(()=>capabilities.atomicWrite(queueFile,queueBytes,{beforeRename(){
+    const changed=JSON.parse(goalBytes);changed.objective='owner corrected goal';fs.writeFileSync(f.plan.goal_file,JSON.stringify(changed));
+  }}),/goal changed/);
+  assert.equal(fs.readFileSync(queueFile,'utf8'),queueBytes);fs.writeFileSync(f.plan.goal_file,goalBytes);
+  const deadlineNow=Date.now;
+  try{
+    const publicationDeadline=deadlineNow()+1000;
+    assert.throws(()=>capabilities.atomicWrite(queueFile,queueBytes,{publicationDeadline,
+      beforeRename(){Date.now=()=>publicationDeadline+1;}}),/queue lease expired before publication/);
+    assert.equal(fs.readFileSync(queueFile,'utf8'),queueBytes);
+  }finally{Date.now=deadlineNow;}
+  fs.appendFileSync(checker,'\n// changed after binding');
+  assert.equal(capabilities.checkGate({...request,operation:'acquire'}),null);
+  assert.equal(capabilities.confirmStopped({...request,token:claim.token}),false);
+  assert.throws(()=>capabilities.readTelemetry(),/source changed/);
+});
+
+test('local critic child survives supervisor death with one review, charge and decision', async t => {
+  if(!journalHeadroom(t))return;
+  const f=criticJournalFixture(t),log=path.join(f.plan.repo,'.ecc/goal/critic-launches');
+  const first=spawn(process.execPath,['--max-old-space-size=64',f.supervisor,f.file],{env:f.env,stdio:'ignore',windowsHide:true});
+  const closed=new Promise((resolve,reject)=>{first.once('error',reject);first.once('close',resolve);});
+  await waitFixture(()=>fs.existsSync(log));first.kill();await closed;
+  await waitFixture(()=>fs.readdirSync(f.spec.receipts).some(name=>/^[a-f0-9-]{36}\.json$/.test(name)));
+  const resumed=spawnSync(process.execPath,['--max-old-space-size=64',f.supervisor,f.file],{env:f.env,encoding:'utf8',windowsHide:true,timeout:30000,maxBuffer:1024*1024});
+  assert.equal(resumed.status,0,resumed.stderr);const result=JSON.parse(resumed.stdout);
+  assert.equal(result.state.phase,'synthesis');assert.equal(result.state.spent_usd,0.1);
+  assert.equal(Object.keys(result.state.critic_usage).length,1);
+  assert.equal(fs.readFileSync(log,'utf8'),'start\n');assert.deepEqual(result.state.effects,{});
+  assert.equal(result.state.audit.filter(e=>e.type==='critic').length,1);
+});
+
+test('local successful child is adopted after supervisor death without relaunch or effects', async t => {
+  if(!journalHeadroom(t))return;
+  const f=journalFixture(t,8000,true),worker=f.plan.workers[0],code=path.join(worker.repo,'code.txt');
+  const first=spawn(process.execPath,['--max-old-space-size=64',f.supervisor,f.file],{env:f.env,stdio:'ignore',windowsHide:true});
+  const closed=new Promise((resolve,reject)=>{first.once('error',reject);first.once('close',resolve);});
+  await waitFixture(()=>fs.readFileSync(code,'utf8').includes('"event":"start"'));
+  const before=engine.load(f.file),node=before.nodes[worker.id];first.kill();await closed;
+  const pending=JSON.parse(fs.readFileSync(f.file+'.runner-lock','utf8')).pendingCalls.find(p=>p.method==='launchWorker');
+  const receiptFile=path.join(f.spec.receipts,pending.callId+'.json');await waitFixture(()=>fs.existsSync(receiptFile));
+  const receipt=JSON.parse(fs.readFileSync(receiptFile,'utf8'));assert.equal(receipt.exit,0);
+  assert.ok(receipt.closed_at<=node.lease_until);assert.ok(receipt.closure_snapshot);
+  await waitFixture(()=>Date.now()>node.lease_until);
+  const host=concrete.createBoundHost(f.spec,{stateFile:f.file,plan:f.plan});
+  const observed=host.inspectWorker(worker,node);assert.equal(observed.status,'completed');
+  const next=()=>{const r=spawnSync(process.execPath,['--max-old-space-size=64',f.supervisor,f.file],{env:f.env,encoding:'utf8',windowsHide:true,timeout:20000,maxBuffer:1024*1024});assert.equal(r.status,0,r.stderr);return JSON.parse(r.stdout);};
+  const second=next();assert.notEqual(second.pid,first.pid);
+  assert.equal(second.state.dispatches,1);assert.equal(second.state.nodes[worker.id].attempts,1);
+  assert.equal(second.state.nodes[worker.id].usage.tool_calls,1);assert.equal(second.state.repairs,0);
+  assert.equal(second.state.phase,'synthesis');assert.equal(second.state.critique.accepted,true);
+  next();const fourth=next();assert.equal(fourth.stopped,'locally-verified-no-effects');
+  assert.equal(fourth.state.phase,'approval');assert.deepEqual(fourth.state.effects,{});
+  assert.equal(JSON.parse(fs.readFileSync(code,'utf8')).launches,1);
 });
 
 test('same contract supports parallel Codex/Claude/Gemini/OpenCode workers and a durable join', async t => {
@@ -423,6 +845,243 @@ test('operational recovery never duplicates a live or unmetered expired worker',
   host.launchWorker=()=>{launches++;throw Error('must not launch');};host.inspectWorker=()=>({status:'running'});
   const held=await operational.run(f.file,host); assert.equal(held.stopped,'worker-reconciliation-required'); assert.equal(launches,0);
   host.inspectWorker=()=>({status:'failed'});assert.equal((await operational.run(f.file,host)).stopped,'worker-reconciliation-required');assert.equal(launches,0);
+});
+
+test('controller accepts unchanged preserved drafts but rejects foreign edits and new unowned files', t => {
+  const f=fixture(t,['local-process-verification']),w=f.plan.workers[0];
+  const draft=path.join(w.repo,'foreign-draft.txt');fs.writeFileSync(draft,'preserved draft');
+  coord.execute('close',{cwd:w.repo,sessionId:w.session});w.session='worker-preserved';
+  coord.execute('register',{cwd:w.repo,sessionId:w.session,scopes:w.scopes,objective:'owned output only',doneWhen:'draft preserved',ttl:120});
+  fs.writeFileSync(path.join(w.repo,'code.txt'),'owned delivered output');
+  const started=c.apply(c.initialize(f.plan),{type:'dispatch',actor:f.plan.parent});
+  const result=()=>({...f.result(started),changed_paths:coord.execute('check-changes',{cwd:w.repo,sessionId:w.session}).paths});
+  const accepted=c.apply(started,{type:'result',actor:w.agent,result:result()});
+  assert.equal(accepted.phase,'critic');assert.deepEqual(accepted.nodes[w.id].result.changed_paths,['code.txt']);
+  assert.equal(fs.readFileSync(draft,'utf8'),'preserved draft');
+  fs.writeFileSync(draft,'unauthorized foreign change');
+  assert.throws(()=>c.apply(started,{type:'result',actor:w.agent,result:{...f.result(started),changed_paths:['code.txt']}}),/foreign baseline changed/);
+  fs.writeFileSync(draft,'preserved draft');fs.writeFileSync(path.join(w.repo,'new-unowned.txt'),'unauthorized');
+  assert.throws(()=>c.apply(started,{type:'result',actor:w.agent,result:{...f.result(started),changed_paths:['code.txt']}}),/outside owned|outside.*scope/);
+});
+
+test('successful no-effect synthesis stops locally without approval or completion claims', async t => {
+  const f=fixture(t,['local-process-verification']);c.create(f.file,f.plan);
+  let effects=0,approvals=0;
+  const host=Object.fromEntries(operational.REQUIRED.map(key=>[key,()=>false]));
+  host.launchWorker=async worker=>f.result(c.load(f.file),worker.id);
+  host.review=async state=>({agent:f.plan.critic,join_sha256:state.join_sha256,accepted:true,rejections:[]});
+  host.verifyCritic=event=>event.actor===f.plan.critic&&event.report.join_sha256===c.load(f.file).join_sha256;
+  host.verifyPreservation=({result})=>result.status==='pass';
+  host.proposeEffects=()=>[];
+  host.readApproval=()=>{approvals++;return null;};host.executeEffect=()=>{effects++;throw Error('must not execute');};
+  const first=await operational.run(f.file,host);
+  assert.equal(first.stopped,'locally-verified-no-effects');assert.equal(first.state.phase,'approval');
+  assert.equal(first.state.synthesis.claim,'locally-verified');assert.deepEqual(first.state.effects,{});
+  const second=await operational.run(f.file,host);
+  assert.equal(second.stopped,'locally-verified-no-effects');assert.equal(second.state.dispatches,1);
+  assert.equal(effects,0);assert.equal(approvals,0);assert.notEqual(second.state.phase,'completed');
+});
+
+test('optional queue binding requires exact pinned parent, synchronous capabilities and unchanged source', t => {
+  const f=fixture(t,['local-process-verification']),hostFile=path.join(f.plan.repo,'.ecc/goal/queue-host.js');
+  const context={plan:f.plan,stateFile:f.file,queueFile:path.join(f.plan.repo,'.ecc/goal/queue.json')};
+  const keys=operational.REQUIRED.map(key=>JSON.stringify(key)+':()=>false').join(',');
+  const write=extra=>fs.writeFileSync(hostFile,'module.exports={createHost:()=>({'+keys+extra+'})};');
+  const load=()=>operational.pinnedHost(hostFile,store.sha256File(hostFile),context);
+  assert.throws(()=>operational.bindQueue({},context),/pinned parent/);
+  write('');assert.throws(()=>operational.bindQueue(load(),context),/capabilities unavailable/);
+  write(',createQueueCapabilities:()=>Promise.resolve({})');assert.throws(()=>operational.bindQueue(load(),context),/synchronous/);
+  write(',createQueueCapabilities:()=>({})');assert.throws(()=>operational.bindQueue(load(),context),/missing trusted queue/);
+  write(',createQueueCapabilities:()=>({withFileLock:()=>{},atomicWrite:()=>{},assertWrite:()=>false,readTelemetry:()=>({}),checkGate:()=>false,confirmStopped:()=>false})');
+  const denied=operational.bindQueue(load(),context);assert.throws(()=>denied.snapshot(),/ownership unavailable/);
+  const coordFile=path.resolve(__dirname,'../../scripts/lib/session-coordination.js');
+  const storeFile=path.resolve(__dirname,'../../scripts/lib/goal-store.js');
+  const atomicFile=path.resolve(__dirname,'../../scripts/lib/atomic-write.js');
+  write(`,createQueueCapabilities:ctx=>({withFileLock:require(${JSON.stringify(storeFile)}).withFileLock,atomicWrite:require(${JSON.stringify(atomicFile)}).writeFileAtomic,assertWrite:targets=>{const path=require('node:path');const checked=require(${JSON.stringify(coordFile)}).execute('check-write',{cwd:ctx.plan.repo,sessionId:ctx.plan.session,paths:targets.map(file=>path.relative(ctx.plan.repo,file).split(path.sep).join('/'))});return checked.allowed===true&&checked.session===ctx.plan.session;},readTelemetry:()=>({observedAt:new Date().toISOString(),freeRamGiB:require('node:os').freemem()/1024**3,reserveRamGiB:2}),checkGate:()=>false,confirmStopped:()=>false})`);
+  const permitted=operational.bindQueue(load(),context);
+  assert.deepEqual(permitted.snapshot().entries,[]);assert.equal(fs.existsSync(context.queueFile),false);
+  const host=load();fs.appendFileSync(hostFile,'\n// changed after review');
+  assert.throws(()=>operational.bindQueue(host,context),/source changed/);
+  write('');const refreshed=load();
+  assert.throws(()=>operational.bindQueue(refreshed,{...context,plan:{...f.plan,environment:'changed'}}),/exact pinned/);
+});
+
+test('queue invocation progression preserves checkpoints, owner pause and original-token recovery gates', async t => {
+  const f=fixture(t,['local-process-verification']);c.create(f.file,f.plan);
+  engine.transaction(f.file,()=>f.synthesized());
+  const directory=path.join(f.plan.repo,'.ecc/goal'),hostFile=path.join(directory,'invocation-host.js');
+  const fixturePaths={queue:path.join(directory,'invocation-queue.json'),
+    control:path.join(directory,'invocation-control.json'),calls:path.join(directory,'invocation-calls.jsonl')};
+  const fixtureModules=Object.fromEntries([
+    ['engine','coding-execution'],['coord','session-coordination'],['store','goal-store'],
+    ['atomic','atomic-write'],['queue','workspace-queue'],
+  ].map(([key,name])=>[key,path.resolve(__dirname,'../../scripts/lib/'+name+'.js')]));
+  const now=Date.now(),fixtureEntry={id:'invocation',owner:f.plan.session,goalId:'execution',
+    kind:'heavy-check',resource:'synthetic-machine',state:'waiting',reason:'offline invocation progression',
+    independentAction:'inspect fixture evidence',enqueuedAt:new Date(now).toISOString(),
+    nextCheckpointAt:new Date(now+60000).toISOString(),dependsOn:[],peakRamGiB:1};
+  let control={freeRamGiB:2,dependency:'waiting',stopped:true,recoverAllowed:false,expectedToken:null};
+  const writeControl=delta=>{control={...control,...delta};fs.writeFileSync(fixturePaths.control,JSON.stringify(control));};
+  writeControl({});
+  // This reviewed synthetic host uses real controller/store/locks/atomic writes.
+  // Telemetry and recovery attestations are explicit fixtures, not native proof.
+  function createHost({plan,stateFile}){
+    const fs=require('node:fs'),path=require('node:path');
+    const engine=require(fixtureModules.engine),coord=require(fixtureModules.coord);
+    const store=require(fixtureModules.store),atomic=require(fixtureModules.atomic);
+    const {resourceKey}=require(fixtureModules.queue);
+    const read=()=>JSON.parse(fs.readFileSync(fixturePaths.control,'utf8'));
+    const unexpected=()=>{throw Error('fixture must not launch a worker, critic or effect');};
+    return {
+      launchWorker:unexpected,inspectWorker:unexpected,review:unexpected,executeEffect:unexpected,inspectEffect:unexpected,
+      confirmStopped:()=>true,verifyCritic:()=>false,verifyPreservation:()=>false,
+      authorizeCitation:()=>false,readApproval:()=>null,authorizeApproval:()=>false,verifyEffect:()=>false,
+      proposeEffects(){
+        fs.appendFileSync(fixturePaths.calls,JSON.stringify({sequence:engine.load(stateFile).sequence})+'\n');
+        return [];
+      },
+      queueDescriptor(){
+        return {file:fixturePaths.queue,entry:fixtureEntry,lease_ms:60000,ready:true,
+          config_sha256:engine.digest({entry:fixtureEntry,lease_ms:60000}),
+          checkpoint_sha256:engine.digest(engine.load(stateFile)),dependency_sha256:engine.digest(read().dependency)};
+      },
+      createQueueCapabilities(){
+        return {
+          withFileLock:store.withFileLock,
+          atomicWrite(file,content,options={}){
+            return atomic.writeFileAtomic(file,content,{...options,beforeRename(){
+              options.beforeRename?.();
+              if(options.publicationDeadline!==undefined&&Date.now()>=options.publicationDeadline)
+                throw Error('queue lease expired before publication');
+            }});
+          },
+          assertWrite(paths){
+            const checked=coord.execute('check-write',{cwd:plan.repo,sessionId:plan.session,
+              paths:paths.map(file=>path.relative(plan.repo,file).split(path.sep).join('/'))});
+            return checked.allowed===true&&checked.session===plan.session;
+          },
+          readTelemetry(){return {observedAt:new Date().toISOString(),freeRamGiB:read().freeRamGiB,reserveRamGiB:2};},
+          checkGate(entry){
+            const current=read();
+            return {allowed:entry.operation!=='recover'||(current.recoverAllowed===true
+              &&entry.token===current.expectedToken),owner:entry.owner,resource:resourceKey(entry)};
+          },
+          confirmStopped:()=>read().stopped===true,
+        };
+      },
+    };
+  }
+  fs.writeFileSync(hostFile,'const fixtureModules='+JSON.stringify(fixtureModules)+';\n'
+    +'const fixturePaths='+JSON.stringify(fixturePaths)+';\n'
+    +'const fixtureEntry='+JSON.stringify(fixtureEntry)+';\nmodule.exports.createHost='+createHost.toString()+';\n');
+  const context={stateFile:f.file,plan:f.plan};
+  const host=operational.pinnedHost(hostFile,store.sha256File(hostFile),context);
+  const run=()=>operational.runWithQueue(f.file,host,context);
+  const records=()=>JSON.parse(fs.readFileSync(fixturePaths.queue,'utf8')).entries;
+  const calls=()=>fs.existsSync(fixturePaths.calls)?fs.readFileSync(fixturePaths.calls,'utf8').trim().split('\n').length:0;
+
+  assert.equal((await run()).stopped,'queue-waiting');
+  const waiting=records()[0],initialState=fs.readFileSync(f.file,'utf8');
+  assert.equal(waiting.state,'waiting');assert.equal(waiting.token,undefined);assert.equal(calls(),0);
+  writeControl({freeRamGiB:8,dependency:'resource-resolved'});
+  const first=await run(),firstEntry=records()[0];
+  assert.equal(first.stopped,'locally-verified-no-effects');assert.equal(firstEntry.id,waiting.id);
+  assert.equal(firstEntry.state,'completed');assert.equal(records().length,1);assert.equal(calls(),1);
+  assert.equal(firstEntry.invocation.admitted_dependency_sha256,engine.digest(control.dependency));
+  assert.notEqual(fs.readFileSync(f.file,'utf8'),initialState);
+
+  const unchangedQueue=fs.readFileSync(fixturePaths.queue,'utf8'),unchangedState=fs.readFileSync(f.file,'utf8');
+  assert.equal((await run()).stopped,'queue-awaiting-checkpoint-or-dependency-change');
+  assert.equal(fs.readFileSync(fixturePaths.queue,'utf8'),unchangedQueue);
+  assert.equal(fs.readFileSync(f.file,'utf8'),unchangedState);assert.equal(calls(),1);
+
+  writeControl({dependency:'dependency-evidence-changed'});
+  assert.equal((await run()).stopped,'locally-verified-no-effects');
+  assert.equal(records().length,2);assert.equal(calls(),2);
+  assert.notEqual(records()[1].id,firstEntry.id);assert.ok(records()[1].dependsOn.includes(firstEntry.id));
+  assert.deepEqual(records()[0],firstEntry);
+
+  engine.transaction(f.file,state=>engine.apply(state,{type:'recover',actor:f.plan.parent},operational.options(host)));
+  assert.equal((await run()).stopped,'locally-verified-no-effects');
+  assert.equal(records().length,3);assert.equal(calls(),3);
+  assert.ok(records()[2].dependsOn.includes(records()[1].id));
+
+  // Retain a real store-minted token when cessation cannot be established.
+  // Never simulate supervisor death or claim native recovery from these flags.
+  writeControl({dependency:'closure-unknown',stopped:false});
+  assert.equal((await run()).stopped,'queue-reconciliation-required');
+  const retained=records().at(-1),retainedBytes=fs.readFileSync(fixturePaths.queue,'utf8');
+  assert.equal(retained.state,'running');assert.match(retained.token,/^[a-f0-9]{48}$/);
+  assert.equal(calls(),4);
+  const wrongToken=(retained.token[0]==='0'?'1':'0')+retained.token.slice(1);
+  writeControl({recoverAllowed:true,expectedToken:wrongToken});
+  await assert.rejects(run(),/invocation recovery authority unavailable/);
+  assert.equal(fs.readFileSync(fixturePaths.queue,'utf8'),retainedBytes);assert.equal(calls(),4);
+  writeControl({expectedToken:retained.token});
+  await assert.rejects(run(),/invocation cessation\/spend unverified/);
+  assert.equal(fs.readFileSync(fixturePaths.queue,'utf8'),retainedBytes);assert.equal(calls(),4);
+  assert.equal(records().at(-1).token,retained.token);
+  assert.deepEqual(records().at(-1).invocation.original_supervisor,retained.invocation.original_supervisor);
+
+  const paused=JSON.parse(retainedBytes);
+  paused.entries.at(-1).state='owner-paused';paused.entries.at(-1).explicitOwnerPause=true;
+  fs.writeFileSync(fixturePaths.queue,JSON.stringify(paused));
+  const pausedBytes=fs.readFileSync(fixturePaths.queue,'utf8');
+  writeControl({dependency:'changed-after-owner-pause',stopped:true});
+  assert.equal((await run()).stopped,'queue-owner-paused');
+  assert.equal(fs.readFileSync(fixturePaths.queue,'utf8'),pausedBytes);assert.equal(calls(),4);
+  assert.deepEqual(engine.load(f.file).effects,{});
+});
+
+
+test('absolute queue deadline includes stale supervisor reconciliation before any host launch', async t => {
+  const f=fixture(t,['local-process-verification']);c.create(f.file,f.plan);
+  let clock=Date.now(),calls=0,confirmed=0;
+  const host=Object.fromEntries(operational.REQUIRED.map(key=>[key,()=>{calls++;return false;} ]));
+  host.confirmStopped=()=>{confirmed++;clock+=1000;return true;};
+  const queue={id:'original-invocation',token:'a'.repeat(48),binding_sha256:'b'.repeat(64)};
+  fs.writeFileSync(f.file+'.runner-lock',JSON.stringify({pid:2147483647,host:os.hostname(),
+    plan_sha256:engine.digest(f.plan),nonce:'d'.repeat(32),pendingCalls:[{method:'review',callId:'old-call'}],queue}));
+  const originalNow=Date.now;
+  try{
+    Date.now=()=>clock;
+    const result=await operational.run(f.file,host,{maxIterations:1,maxMilliseconds:300000,
+      invocation:{...queue,leaseUntil:new Date(clock+50).toISOString(),plan_sha256:engine.digest(f.plan),
+        checkpoint_sha256:engine.digest(c.load(f.file))}});
+    assert.equal(result.stopped,'runner-budget');assert.equal(confirmed,1);assert.equal(calls,0);
+    assert.equal(result.state.dispatches,0);assert.deepEqual(result.state.effects,{});
+    assert.equal(fs.existsSync(f.file+'.runner-lock'),false);
+  }finally{Date.now=originalNow;}
+});
+
+test('pinned local processes persist critic rejection and resume in a fresh supervisor without effects', t => {
+  // Bound this actual process exercise; never reclaim RAM by killing sessions.
+  if(os.freemem()/1024**3<2.5){t.skip('2 GiB preserved RAM plus bounded supervisor/child headroom unavailable');return;}
+  const f=fixture(t,['local-process-verification']);c.create(f.file,f.plan);
+  const trust=path.join(f.plan.repo,'.ecc/goal/local-process-proof');fs.mkdirSync(trust);
+  const engineFile=path.resolve(__dirname,'../../scripts/lib/coding-execution.js');
+  const coordFile=path.resolve(__dirname,'../../scripts/lib/session-coordination.js');
+  const storeFile=path.resolve(__dirname,'../../scripts/lib/goal-store.js');
+  const workerFile=path.join(trust,'worker.js'),criticFile=path.join(trust,'critic.js'),hostFile=path.join(trust,'host.js');
+  fs.writeFileSync(workerFile,`const fs=require('node:fs'),path=require('node:path');const c=require(${JSON.stringify(engineFile)}),coord=require(${JSON.stringify(coordFile)}),store=require(${JSON.stringify(storeFile)});const w=JSON.parse(fs.readFileSync(0,'utf8'));const p=path.join(w.repo,'code.txt');const second=fs.readFileSync(p,'utf8').includes('missing');const value={design:'approved',data:42,delta:second?'delivered':'missing'};fs.writeFileSync(p,JSON.stringify(value));const snapshot=store.captureRepositoryState(w.repo,{excludePaths:[path.join(w.repo,'.ecc/goal')]});const evidence={path:'code.txt',sha256:store.sha256File(p),kind:'local-check'};console.log(JSON.stringify({version:1,worker:w.id,agent:w.agent,runtime:w.runtime,token:w.token,revision:w.revision,environment:w.environment,status:second?'pass':'fail',head:snapshot.head,tree_fingerprint:snapshot.tree_fingerprint,changed_paths:coord.execute('check-changes',{cwd:w.repo,sessionId:w.session}).paths,evidence:[evidence],citations:[],usd:0,usage:{tool_calls:1,retries:0,ci_runs:0,cost_usd:0},preservation:{contract_sha256:c.digest(w.assignment.change_contract),checks:[{id:'preserve',evidence}]}}));`);
+  fs.writeFileSync(criticFile,`const fs=require('node:fs');const {state:s}=JSON.parse(fs.readFileSync(0,'utf8'));const rejections=Object.values(s.nodes).filter(n=>n.result.status!=='pass').map(n=>({worker:n.result.worker,reason:'failed-acceptance'}));console.log(JSON.stringify({agent:s.plan.critic,join_sha256:s.join_sha256,accepted:rejections.length===0,rejections}));`);
+  fs.writeFileSync(hostFile,`const fs=require('node:fs'),cp=require('node:child_process'),c=require(${JSON.stringify(engineFile)}),store=require(${JSON.stringify(storeFile)});module.exports.createHost=({plan,stateFile})=>{const stopped=new Set(),reviews=new Map();function run(file,expected,input,cwd,control){if(store.sha256File(file)!==expected)throw Error('protected local adapter changed');const child=cp.spawnSync(process.execPath,['--max-old-space-size=64',file],{cwd,input:JSON.stringify(input),encoding:'utf8',windowsHide:true,timeout:10000,maxBuffer:1024*1024});if(child.status!==null)stopped.add(control.callId);if(child.status!==0)throw Error('local process failed; usage is not inferred');return JSON.parse(child.stdout);}return{launchWorker:(w,ctl)=>run(${JSON.stringify(workerFile)},${JSON.stringify(store.sha256File(workerFile))},w,w.repo,ctl),inspectWorker:()=>null,confirmStopped:({callId})=>stopped.has(callId),review:(s,ctl)=>{const r=run(${JSON.stringify(criticFile)},${JSON.stringify(store.sha256File(criticFile))},{state:s},plan.repo,ctl);reviews.set(c.digest(r),s.join_sha256);return r;},verifyCritic:e=>e.actor===plan.critic&&reviews.get(c.digest(e.report))===e.report.join_sha256,verifyPreservation:({worker,result})=>{const v=JSON.parse(fs.readFileSync(worker.repo+'/code.txt','utf8'));return v.design==='approved'&&v.data===42&&v.delta==='delivered'&&result.evidence[0].sha256===store.sha256File(worker.repo+'/code.txt');},authorizeCitation:()=>false,proposeEffects:()=>[],readApproval:()=>null,authorizeApproval:()=>false,executeEffect:()=>{throw Error('no effect configured');},inspectEffect:()=>null,verifyEffect:()=>false};};`);
+  const runnerFile=path.resolve(__dirname,'../../scripts/lib/coding-execution-runner.js');
+  function run(maxIterations){
+    const script=`const fs=require('node:fs'),c=require(${JSON.stringify(engineFile)}),r=require(${JSON.stringify(runnerFile)});const file=${JSON.stringify(f.file)};const host=r.pinnedHost(${JSON.stringify(hostFile)},${JSON.stringify(store.sha256File(hostFile))},{stateFile:file,plan:c.load(file).plan});r.run(file,host,{maxIterations:${maxIterations},maxMilliseconds:30000}).then(v=>console.log(JSON.stringify({pid:process.pid,stopped:v.stopped,state:v.state}))).catch(e=>{console.error(e.message);process.exitCode=2;});`;
+    const child=spawnSync(process.execPath,['--max-old-space-size=128','-e',script],{encoding:'utf8',windowsHide:true,timeout:40000,maxBuffer:1024*1024});
+    assert.equal(child.status,0,child.stderr);return JSON.parse(child.stdout);
+  }
+  const first=run(2);
+  assert.equal(first.stopped,'runner-budget');assert.equal(first.state.phase,'repair');
+  assert.equal(first.state.repairs,1);assert.equal(first.state.dispatches,1);
+  const second=run(10);
+  assert.notEqual(first.pid,second.pid);assert.equal(second.stopped,'locally-verified-no-effects');
+  assert.equal(second.state.repairs,1);assert.equal(second.state.dispatches,2);assert.equal(second.state.nodes['worker-0'].attempts,2);
+  assert.equal(second.state.nodes['worker-0'].usage.tool_calls,2);assert.equal(second.state.spent_usd,0);
+  assert.equal(second.state.phase,'approval');assert.equal(second.state.synthesis.claim,'locally-verified');
+  assert.deepEqual(second.state.effects,{});assert.equal(fs.existsSync(f.file+'.runner-lock'),false);
+  assert.ok(second.state.audit.some(event=>event.type==='critic'));
 });
 
 test('operational CLI requires exact trusted host pin and all verifiers', t => {

@@ -16,7 +16,7 @@ function git(cwd, ...args) {
   assert.equal(result.status, 0, result.stderr);
   return result.stdout.trim();
 }
-function fixture() {
+function fixture(withOther = true) {
   const root = path.join(workspace, `repo-${counter++}`);
   fs.mkdirSync(root);
   git(root, 'init', '--initial-branch=fixture');
@@ -26,7 +26,7 @@ function fixture() {
   git(root, 'add', 'README.md');
   git(root, '-c', 'core.hooksPath=', 'commit', '-m', 'fixture');
   const other = `${root}-worktree`;
-  git(root, 'worktree', 'add', '--detach', other, 'HEAD');
+  if (withOther) git(root, 'worktree', 'add', '--detach', other, 'HEAD');
   return { root, other, sha: git(root, 'rev-parse', 'HEAD') };
 }
 function register(cwd, sessionId, scopes, now = Date.now()) {
@@ -46,8 +46,8 @@ function budgetArgs(now = Date.now()) {
 
 after(() => fs.rmSync(workspace, { recursive: true, force: true }));
 
-function guardFixture(mode = 'block', overrides = {}) {
-  const f = fixture();
+function guardFixture(mode = 'block', overrides = {}, prepare = null) {
+  const f = fixture(false);
   const now = Date.now();
   const goal = { schema: 'ecc.active-goal.v1', goal_id: 'fence', mode: 'controlled', proof_profile: 'security', objective: 'Typed write fence', current_priority: 'Run negative controls', non_goals: [],
     user_visible_proofs: [{ id: 'fence', description: 'Fence behavior', lane_id: 'guard', required_stage: 'authentic_input_processed', required_evidence_kinds: ['test','runtime'], required_repositories: ['fixture'], allowed_result_classes: ['other'], acceptance_predicate: 'Negative controls fail closed', requires_authentic: false, requires_user_visible: false, subject_scope: null, required: true }],
@@ -55,6 +55,7 @@ function guardFixture(mode = 'block', overrides = {}) {
     forecast: { state: 'not_set', confidence: 'none', basis: null, critical_path: [], likely_hours: null, next_checkpoint_at: null, checkpoint_started_at: null, checkpoint_proof_id: null, updated_at: new Date(now).toISOString() }, status: 'active', updated_at: new Date(now).toISOString() };
   fs.mkdirSync(path.join(f.root, '.ecc/goal'), { recursive: true });
   fs.writeFileSync(path.join(f.root, '.ecc/goal/active-goal.yaml'), JSON.stringify(goal));
+  if (prepare) prepare(f.root);
   register(f.root, 'fence', ['README.md', 'owned', '.ecc/goal', 'artifacts/agent-runs/scope-guard']);
   execute('guard-bind', { cwd: f.root, sessionId: 'fence', guardMode: mode, deadline: new Date(now + 600000).toISOString(), toolLimit: 40, turnLimit: 20, protectedPaths: ['README.md'], ...overrides });
   function event(tool, input, eventName = 'pre', extra = {}) {
@@ -118,6 +119,126 @@ test('guard f: committed, staged, unstaged, deleted, renamed and untracked chang
   git(root, 'update-ref', 'refs/remotes/origin/development', 'HEAD');
   assert.equal(event(null, null, 'final').allowed, false);
   assert.throws(() => execute('check-changes', { cwd: root, sessionId: 'fence', upstream: 'refs/remotes/origin/development' }), /outside owned/);
+});
+
+test('fresh native fence binds unchanged inherited drafts without granting write ownership', () => {
+  const { root, event } = guardFixture('block', {}, root => {
+    fs.writeFileSync(path.join(root,'retained.txt'),'tracked baseline\n');
+    git(root,'add','retained.txt');git(root,'-c','core.hooksPath=','commit','-m','owned synthetic baseline');
+    fs.appendFileSync(path.join(root,'retained.txt'),'foreign draft\n');
+    fs.writeFileSync(path.join(root,'foreign.txt'),'untracked draft\n');
+  });
+  const before=fs.readFileSync(path.join(root,'retained.txt'));
+  assert.equal(event('Read',{file_path:'retained.txt'}).allowed,true);
+  assert.equal(event('Write',{file_path:'owned/new.js',content:'scoped'}).allowed,true);
+  assert.equal(event('Edit',{file_path:'retained.txt',content:'unauthorized'}).allowed,false);
+  assert.equal(event('Write',{file_path:'foreign.txt',content:'unauthorized'}).allowed,false);
+  assert.equal(event('Bash',{command:'echo unsafe > outside.txt'}).allowed,false);
+  assert.equal(event('Write',{file_path:'.ecc/config.json'}).allowed,false);
+  assert.equal(event('Edit',{file_path:'README.md'}).allowed,false);
+  fs.mkdirSync(path.join(root,'owned'));fs.writeFileSync(path.join(root,'owned/new.js'),'scoped');
+  assert.equal(event(null,null,'final').allowed,true);
+  const checked=execute('check-changes',{cwd:root,sessionId:'fence'});
+  assert.equal(checked.allowed,true);assert.ok(checked.paths.includes('owned/new.js'));
+  assert.deepEqual(checked.preservedForeign.sort(),['foreign.txt','retained.txt']);
+  assert.equal(checked.foreignOwnershipGranted,false);assert.deepEqual(fs.readFileSync(path.join(root,'retained.txt')),before);
+  assert.throws(()=>execute('release-acquire',{cwd:root,sessionId:'fence',branch:'fixture',candidate:git(root,'rev-parse','HEAD'),...budget()}),/outside owned|clean worktree/);
+});
+
+test('native inherited tracked drafts bind assume-unchanged and skip-worktree flags', () => {
+  for(const flag of ['--assume-unchanged','--skip-worktree','--fsmonitor-valid']) {
+    const f=guardFixture('block',{},root=>{
+      fs.writeFileSync(path.join(root,'retained.txt'),'base\n');git(root,'add','retained.txt');
+      git(root,'-c','core.hooksPath=','commit','-m','retained fixture');
+      fs.appendFileSync(path.join(root,'retained.txt'),'draft\n');
+    });
+    if(flag==='--fsmonitor-valid')git(f.root,'config','core.fsmonitor','true');
+    git(f.root,'update-index',flag,'retained.txt');
+    assert.equal(f.event('Read',{}).allowed,false,flag);
+    assert.equal(f.event(null,null,'final').allowed,false,flag);
+  }
+});
+
+test('native same-byte replacement and baseline injection fail closed', () => {
+  const f=guardFixture('block',{},root=>fs.writeFileSync(path.join(root,'foreign.txt'),'draft\n'));
+  const file=path.join(f.root,'foreign.txt'),replacement=path.join(f.root,'replacement.tmp');
+  fs.copyFileSync(file,replacement);fs.unlinkSync(file);fs.renameSync(replacement,file);
+  assert.equal(f.event('Read',{}).allowed,false);
+  const empty=guardFixture();
+  const registry=path.join(repository(empty.root).directory,'registry.json'),state=JSON.parse(fs.readFileSync(registry,'utf8'));
+  state.sessions.find(s=>s.id==='fence').preservedForeign={version:2,files:[{path:'injected.txt',index:'',indexFlags:'',absent:true}]};
+  fs.writeFileSync(registry,JSON.stringify(state));assert.equal(empty.event('Read',{}).allowed,false);
+});
+
+test('native index visibility refuses hidden clean, dirty and owned tracked files', () => {
+  for(const flag of ['--assume-unchanged','--skip-worktree']) {
+    for(const dirty of [false,true])assert.throws(()=>guardFixture('block',{},root=>{
+      git(root,'update-index',flag,'README.md');
+      if(dirty)fs.appendFileSync(path.join(root,'README.md'),'hidden draft\n');
+    }),/native index hides tracked paths/);
+    for(const owned of [false,true]) {
+      const f=guardFixture('block',{},root=>{
+        fs.writeFileSync(path.join(root,'retained.txt'),'clean\n');git(root,'add','retained.txt');
+        git(root,'-c','core.hooksPath=','commit','-m','visible fixture');
+      });
+      const file=owned?'README.md':'retained.txt';git(f.root,'update-index',flag,file);
+      assert.equal(f.event('Read',{}).allowed,false);
+      assert.equal(f.event(null,null,'final').allowed,false);
+      assert.throws(()=>execute('check-changes',{cwd:f.root,sessionId:'fence'}),/native index hides tracked paths/);
+      git(f.root,'update-index',flag==='--assume-unchanged'?'--no-assume-unchanged':'--no-skip-worktree',file);
+      assert.equal(f.event('Read',{}).allowed,true);
+    }
+  }
+});
+
+test('legacy standard foreign ledgers remain readable but require fresh registration for native binding', () => {
+  const f=guardFixture('block',{},root=>fs.writeFileSync(path.join(root,'foreign.txt'),'draft\n'));
+  const file=path.join(repository(f.root).directory,'registry.json'),state=JSON.parse(fs.readFileSync(file,'utf8'));
+  const session=state.sessions.find(s=>s.id==='fence');delete session.guard;
+  session.preservedForeign.version=1;session.preservedForeign.files.forEach(entry=>{delete entry.indexFlags;delete entry.indexMonitor;});
+  fs.writeFileSync(file,JSON.stringify(state));
+  assert.equal(execute('check-changes',{cwd:f.root,sessionId:'fence'}).allowed,true);
+  assert.throws(()=>execute('guard-bind',{cwd:f.root,sessionId:'fence',guardMode:'block'}),/fresh flag-bound/);
+});
+
+test('native foreign metadata batching handles spaces and Unicode beyond 128 files', t => {
+  const names=Array.from({length:130},(_,i)=>`retained ${String(i).padStart(3,'0')} caf\u00e9.txt`);
+  const {root,event}=guardFixture('block',{},root=>{
+    for(const name of names)fs.writeFileSync(path.join(root,name),'base\n');
+    git(root,'add','--',...names);git(root,'-c','core.hooksPath=','commit','-m','retained batch');
+    for(const name of names)fs.appendFileSync(path.join(root,name),'draft\n');
+  });
+  const start=performance.now();assert.equal(event('Read',{}).allowed,true);
+  t.diagnostic(`Measured 130-file/1430-byte native verification: ${(performance.now()-start).toFixed(1)} ms; synthetic tiny-file fixture, not a 1-GiB benchmark`);
+  fs.appendFileSync(path.join(root,names[129]),'changed');
+  assert.equal(event('Read',{}).allowed,false);
+});
+
+test('native inherited draft mutation, deletion, staging and committed history all deny completion', () => {
+  for(const mutate of [
+    root=>fs.appendFileSync(path.join(root,'foreign.txt'),'changed'),
+    root=>fs.unlinkSync(path.join(root,'foreign.txt')),
+    root=>git(root,'add','foreign.txt'),
+    root=>{git(root,'add','foreign.txt');git(root,'-c','core.hooksPath=','commit','-m','unauthorized synthetic publication');},
+  ]){
+    const {root,event}=guardFixture('block',{},root=>fs.writeFileSync(path.join(root,'foreign.txt'),'draft\n'));
+    mutate(root);assert.equal(event(null,null,'final').allowed,false);
+    assert.equal(event('Read',{}).allowed,false);
+  }
+});
+
+test('removing or replacing native foreign ledger bindings fails closed', () => {
+  for(const mutate of [
+    session=>{session.preservedForeign.files=[];},
+    session=>{delete session.preservedForeign;},
+    session=>{delete session.guard.foreignBaselineSha256;},
+    session=>{delete session.preservedForeign;delete session.guard.foreignBaselineSha256;},
+  ]){
+    const {root,event}=guardFixture('block',{},root=>fs.writeFileSync(path.join(root,'foreign.txt'),'draft\n'));
+    const file=path.join(repository(root).directory,'registry.json'),state=JSON.parse(fs.readFileSync(file,'utf8'));
+    mutate(state.sessions.find(session=>session.id==='fence'));fs.writeFileSync(file,JSON.stringify(state));
+    assert.equal(event('Read',{}).allowed,false);
+  }
 });
 
 test('completion detects staged content restored in working tree, deletes and both rename paths', () => {
@@ -388,11 +509,10 @@ test('inherited deletions remain absent and cannot be silently restored', () => 
   assert.throws(() => execute('check-changes', { cwd: root, sessionId: 'writer' }), /foreign baseline changed/);
 });
 
-test('linked inherited paths and native guard conversion do not gain a preservation exception', () => {
+test('linked inherited paths do not gain a preservation exception', () => {
   const { root, other } = fixture();
   fs.writeFileSync(path.join(root, 'foreign.txt'), 'draft\n');
   register(root, 'writer', ['owned.txt']);
-  assert.throws(() => execute('guard-bind', { cwd: root, sessionId: 'writer', guardMode: 'block' }), /no inherited foreign/);
   const linked = path.join(root, 'linked');
   fs.symlinkSync(other, linked, process.platform === 'win32' ? 'junction' : 'dir');
   assert.throws(() => register(other, 'linked-writer', ['owned.txt']), /already owned|overlaps/);
@@ -529,6 +649,171 @@ test('negative control: removing overlap enforcement breaks the denial assertion
     '--scope', 'app/shared', '--objective', 'mutant', '--done-when', 'denial expected'], { cwd: other, encoding: 'utf8', windowsHide: true });
   assert.equal(result.status, 0, result.stderr);
   assert.throws(() => assert.equal(result.status, 2), assert.AssertionError);
+});
+
+function publicationFixture() {
+  const f = fixture(false);
+  // Configuration only: no network, provider or production remote is used.
+  git(f.root, 'remote', 'add', 'origin', path.join(workspace, 'unused-local-remote.git'));
+  git(f.root, 'update-ref', 'refs/remotes/origin/development', f.sha);
+  return f;
+}
+function fixtureCommit(root, file, content, message) {
+  if (content === null) fs.unlinkSync(path.join(root, file));
+  else fs.writeFileSync(path.join(root, file), content);
+  git(root, 'add', '--', file);
+  git(root, '-c', 'core.hooksPath=', 'commit', '-m', message);
+  return git(root, 'rev-parse', 'HEAD');
+}
+
+test('publication derives origin target and checks every outgoing commit including reverted paths', () => {
+  const { root, sha } = publicationFixture();
+  register(root, 'release', ['README.md']);
+  fixtureCommit(root, 'foreign.txt', 'temporary\n', 'temporary foreign change');
+  const candidate = fixtureCommit(root, 'foreign.txt', null, 'revert foreign change');
+  assert.equal(git(root, 'diff', '--name-only', sha, candidate), '');
+  assert.throws(() => execute('release-acquire', { cwd: root, sessionId: 'release', branch: 'development', candidate, ...budget() }), /outside owned write scope: foreign.txt/);
+  assert.equal(execute('status', { cwd: root }).release, null);
+});
+
+test('publication requires exact inherited commit inclusion and evidence, even for owned paths', () => {
+  const { root, sha } = publicationFixture();
+  const candidate = fixtureCommit(root, 'README.md', 'inherited owned draft\n', 'inherited unpublished commit');
+  register(root, 'release', ['README.md']);
+  const opts = { cwd: root, sessionId: 'release', branch: 'development', candidate, ...budget() };
+  assert.throws(() => execute('release-acquire', opts), /inherited unpublished/);
+  assert.throws(() => execute('release-acquire', { ...opts, includeOwnedCommits: [candidate] }), /publication-evidence/);
+  assert.throws(() => execute('release-acquire', { ...opts, includeOwnedCommits: [candidate.slice(0, 12)], publicationEvidence: 'fixture review' }), /full commit SHA/);
+  assert.throws(() => execute('release-acquire', { ...opts, includeOwnedCommits: [candidate, candidate], publicationEvidence: 'fixture review' }), /unique/);
+  assert.throws(() => execute('release-acquire', { ...opts, includeOwnedCommits: [candidate, sha], publicationEvidence: 'fixture review' }), /inherited outgoing commits only/);
+  const result = invoke(root, ['release-acquire', '--session', 'release', '--branch', 'development', '--candidate', candidate,
+    '--include-owned-commit', candidate, '--publication-evidence', 'Exact fixture commit reviewed as owned; no external permission granted', ...budgetArgs()]);
+  assert.equal(result.status, 0, result.stderr);
+  const receipt = JSON.parse(result.stdout).publication;
+  assert.equal(receipt.targetRef, 'refs/remotes/origin/development');
+  assert.equal(receipt.targetSha, sha);
+  assert.deepEqual(receipt.outgoingCommits, [candidate]);
+  assert.deepEqual(receipt.includedInheritedCommits, [candidate]);
+  assert.deepEqual(receipt.touchedPaths, ['README.md']);
+  assert.equal(receipt.publishable, true);
+  assert.equal(execute('check-release', opts).approvalRequired, true);
+});
+
+test('publication permits owned commits made after registration and pins origin destination and target', () => {
+  const { root, sha } = publicationFixture();
+  register(root, 'release', ['README.md']);
+  const candidate = fixtureCommit(root, 'README.md', 'new owned delta\n', 'new owned change');
+  const opts = { cwd: root, sessionId: 'release', branch: 'development', candidate, ...budget() };
+  const release = execute('release-acquire', opts);
+  assert.equal(release.publication.targetSha, sha);
+  assert.deepEqual(release.publication.includedInheritedCommits, []);
+  assert.equal(execute('check-release', opts).allowed, true);
+  git(root, 'update-ref', 'refs/remotes/origin/development', candidate);
+  assert.throws(() => execute('check-release', opts), /target changed/);
+  git(root, 'update-ref', 'refs/remotes/origin/development', sha);
+  git(root, 'remote', 'set-url', 'origin', path.join(workspace, 'different-local-remote.git'));
+  assert.throws(() => execute('check-release', opts), /destination changed/);
+});
+
+test('publication pins pushurl separately and rejects multiple destinations', () => {
+  const { root, sha } = publicationFixture();
+  register(root, 'release', ['README.md']);
+  const opts = { cwd: root, sessionId: 'release', branch: 'development', candidate: sha, ...budget() };
+  const release = execute('release-acquire', opts);
+  assert.match(release.publication.destinationSha256, /^[a-f0-9]{64}$/);
+  assert.equal(JSON.stringify(release).includes('unused-local-remote.git'), false, 'URLs/credentials are not recorded');
+  git(root, 'config', 'remote.origin.pushurl', path.join(workspace, 'redirected.git'));
+  assert.throws(() => execute('check-release', opts), /destination changed/);
+  execute('release-end', { cwd: root, sessionId: 'release', outcome: 'aborted-before-push', evidence: 'Fixture destination change; no push occurred' });
+  git(root, 'config', '--add', 'remote.origin.pushurl', path.join(workspace, 'second.git'));
+  assert.throws(() => execute('release-acquire', opts), /exactly one origin push destination/);
+});
+
+test('publication rejects divergent fetched targets without merging or moving HEAD', () => {
+  const { root, sha } = publicationFixture();
+  register(root, 'release', ['README.md']);
+  const candidate = fixtureCommit(root, 'README.md', 'candidate branch\n', 'candidate');
+  // Create only a diagnostic fixture object, not a new checkout or branch.
+  const tree = git(root, 'rev-parse', `${sha}^{tree}`);
+  const sibling = git(root, 'commit-tree', tree, '-p', sha, '-m', 'published sibling');
+  git(root, 'update-ref', 'refs/remotes/origin/development', sibling);
+  assert.throws(() => execute('release-acquire', { cwd: root, sessionId: 'release', branch: 'development', candidate, ...budget() }), /not an ancestor/);
+  assert.equal(git(root, 'rev-parse', 'HEAD'), candidate);
+  assert.equal(git(root, 'status', '--porcelain'), '');
+});
+
+test('publication rejects already-different fetch/push destinations and multiple fetch URLs', () => {
+  const { root, sha } = publicationFixture();
+  register(root, 'release', ['README.md']);
+  const opts = { cwd: root, sessionId: 'release', branch: 'development', candidate: sha, ...budget() };
+  git(root, 'config', 'remote.origin.pushurl', path.join(workspace, 'different-before-acquire.git'));
+  assert.throws(() => execute('release-acquire', opts), /matching origin fetch and push/);
+  assert.equal(execute('status', { cwd: root }).release, null);
+  git(root, 'config', '--unset', 'remote.origin.pushurl');
+  git(root, 'config', '--add', 'remote.origin.url', path.join(workspace, 'second-fetch.git'));
+  assert.throws(() => execute('release-acquire', opts), /matching origin|exactly one origin/);
+});
+
+test('publication rename review includes both source and destination even when tree contents are unchanged', () => {
+  const { root, sha } = publicationFixture();
+  register(root, 'release', ['renamed.md']);
+  git(root, 'mv', 'README.md', 'renamed.md');
+  git(root, '-c', 'core.hooksPath=', 'commit', '-m', 'rename fixture file');
+  assert.throws(() => execute('release-acquire', { cwd: root, sessionId: 'release', branch: 'development', candidate: git(root, 'rev-parse', 'HEAD'), ...budget() }), /outside owned write scope: README.md/);
+  assert.equal(git(root, 'show', `${sha}:README.md`), fs.readFileSync(path.join(root, 'renamed.md'), 'utf8').trim());
+});
+
+test('publication merge review conservatively retains paths changed against every parent', () => {
+  const { root, sha } = publicationFixture();
+  register(root, 'release', ['README.md']);
+  const own = fixtureCommit(root, 'README.md', 'own parent\n', 'own fixture parent');
+  fixtureCommit(root, 'published.txt', 'published fixture path\n', 'candidate tree with other parent changes');
+  const mergeTree = git(root, 'rev-parse', 'HEAD^{tree}');
+  const merge = git(root, 'commit-tree', mergeTree, '-p', own, '-p', sha, '-m', 'synthetic merge fixture');
+  // Fixture-only HEAD replacement to install the synthetic merge object; no shared repo operation.
+  git(root, 'update-ref', 'HEAD', merge);
+  git(root, 'update-ref', 'refs/remotes/origin/development', sha);
+  assert.throws(() => execute('release-acquire', { cwd: root, sessionId: 'release', branch: 'development', candidate: merge, ...budget() }), /outside owned write scope: published.txt/);
+});
+
+test('publication missing target needs explicit exact baseline history evidence; existing targets cannot opt out', () => {
+  const { root, sha } = publicationFixture();
+  register(root, 'release', ['README.md']);
+  const opts = { cwd: root, sessionId: 'release', branch: 'new-fixture-target', candidate: sha, ...budget() };
+  assert.throws(() => execute('release-acquire', opts), /new-branch-base/);
+  assert.throws(() => execute('release-acquire', { ...opts, newBranchBase: sha }), /baseline history/);
+  const r = execute('release-acquire', { ...opts, newBranchBase: sha, publicationEvidence: 'Owner-approved exact synthetic baseline history for this local fixture target' });
+  assert.equal(r.publication.mode, 'origin-new');
+  assert.equal(r.publication.base, sha);
+  assert.equal(r.publication.targetSha, null);
+  assert.equal(execute('check-release', opts).allowed, true);
+  git(root, 'update-ref', 'refs/remotes/origin/new-fixture-target', sha);
+  assert.throws(() => execute('check-release', opts), /target changed/);
+  execute('release-end', { cwd: root, sessionId: 'release', outcome: 'aborted-before-push', evidence: 'Fixture target appeared; no push' });
+  assert.throws(() => execute('release-acquire', { ...opts, branch: 'development', newBranchBase: sha, publicationEvidence: 'Cannot override existing target' }), /cannot replace/);
+});
+
+test('publication no-origin fixture lease stays local-only and cannot silently acquire an origin later', () => {
+  const { root, sha } = fixture(false);
+  register(root, 'release', ['README.md']);
+  const opts = { cwd: root, sessionId: 'release', branch: 'fixture', candidate: sha, ...budget() };
+  const release = execute('release-acquire', opts);
+  assert.equal(release.publication.publishable, false);
+  assert.equal(release.publication.mode, 'local-only');
+  assert.equal(execute('check-release', opts).publication.publishable, false);
+  git(root, 'remote', 'add', 'origin', path.join(workspace, 'later-origin.git'));
+  assert.throws(() => execute('check-release', opts), /destination changed/);
+});
+
+test('publication guarded sessions cannot hide inherited foreign commits behind their frozen base', () => {
+  const f = guardFixture('block', {}, root => {
+    fs.appendFileSync(path.join(root, '.git/info/exclude'), '\n.ecc/\nartifacts/\n');
+    const baseline = git(root, 'rev-parse', 'HEAD');
+    fixtureCommit(root, 'foreign.txt', 'inherited foreign code\n', 'foreign inherited fixture');
+    git(root, 'remote', 'add', 'origin', path.join(workspace, 'guard-origin.git'));
+    git(root, 'update-ref', 'refs/remotes/origin/development', baseline);
+  });
+  assert.throws(() => execute('release-acquire', { cwd: f.root, sessionId: 'fence', branch: 'development', candidate: git(f.root, 'rev-parse', 'HEAD'), ...budget() }), /outside owned write scope: foreign.txt/);
 });
 
 test('malformed registry and lock contention never overwrite existing coordination', () => {

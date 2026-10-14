@@ -36,9 +36,35 @@ the implementation would exceed the task boundary. Otherwise continue locally.
 
 ## Failure Conditions
 
-Stop or re-triage if the task lacks acceptance criteria, required access is
-missing, verification cannot prove the result, or work would require unapproved
-commit, push, PR, issue mutation, install, migration, live call, or cleanup.
+Block or re-triage only the dependent lane when acceptance/access/verification
+is missing or an action exceeds the existing scoped authorization. Reuse valid
+covered approvals instead of asking again. Continue independent authorized work;
+pause only on an explicit owner request and retain genuine host/resource/budget
+limits. Never turn a queue wait into an unsupported whole-goal blocked claim.
+
+For RAM-heavy checks, shared-backend use, repository writers and releases, record
+resource/repository, owner, reason, enqueue time, next checkpoint and independent
+action in the existing ECC records. `node scripts/workspace-queue.js status` reads
+current RAM and effective ownership, never grants a lease or starts a service.
+Reconcile service state separately; lease expiry alone permits no takeover. Root
+coordinates bounded writer handoffs and consolidated releases. Diagnose aging/
+circular waits; do not create worktrees/ports, kill sessions, repeat empty polls
+or bypass normal gates.
+
+The queue-aware controller CLI uses only an explicitly reviewed, pinned host and
+queue configuration. Admission binds the current goal/plan/session, checkpoint,
+dependency evidence and supervisor; it does not grant authority. A fresh
+invocation reuses resolved dependency evidence, not a new session copy. Unchanged
+completed checkpoints do not run again. Interrupted claims retain their original
+token: recovery requires verified supervisor death, job cessation, known spend,
+current ownership/source/dependencies and resource headroom. Expiry alone is not
+permission to take a slot. Absolute lease deadlines include admission and lock
+reconciliation time. Owner-paused/cancelled histories require their actual owner
+checkpoint; unknown effects remain inspection/reconciliation, never replay.
+
+This is opt-in controller behavior, not an installed vendor daemon or proof that
+existing Claude/Codex/Gemini/OpenCode chats automatically continue. Run the
+matching native harness acceptance before claiming native activation.
 
 ## Cross-Agent Notes
 

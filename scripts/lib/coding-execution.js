@@ -212,25 +212,54 @@ function apply(state, event, options = {}) {
       }
       next.dispatches += pending.length; next.phase = 'workers'; break;
     }
+    case 'recover-result':
     case 'result': {
+      const recovering=event.type==='recover-result';
+      if(recovering){
+        parent();
+        demand(['workers','repair'].includes(next.phase),'result recovery requires active worker reconciliation');
+      }
       assert('result', event.result);
       const result = event.result, worker = plan.workers.find(w => w.id === result.worker);
       demand(worker, 'unknown worker'); live(worker);
       const node = next.nodes[worker.id];
-      demand(event.actor === worker.agent && result.agent === worker.agent && result.runtime === worker.runtime, 'worker identity/runtime mismatch');
-      demand(node.status === 'running' && node.token === result.token && now < node.lease_until, 'stale or duplicate worker result');
+      demand((recovering||event.actor===worker.agent)&&result.agent===worker.agent&&result.runtime===worker.runtime,'worker identity/runtime mismatch');
+      demand(node.status==='running'&&node.token===result.token,'stale or duplicate worker result');
+      if(recovering){
+        demand(Number.isSafeInteger(node.lease_until)&&now>=node.lease_until,'worker lease has not expired for recovery');
+        demand(Number.isSafeInteger(event.receipt?.closed_at)&&event.receipt.closed_at<=node.lease_until,
+          'worker completion was not within its original lease');
+        demand(Number.isSafeInteger(event.receipt.snapshot_at)&&event.receipt.snapshot_at>=event.receipt.closed_at
+          &&event.receipt.snapshot_at<=node.lease_until,'worker snapshot was not within its original lease');
+        demand(typeof options.verifyRecoveredResult==='function'&&options.verifyRecoveredResult({
+          worker:structuredClone(worker),node:structuredClone(node),result:structuredClone(result),
+          receipt:structuredClone(event.receipt),revision:plan.revision,environment:plan.environment,
+        },structuredClone(plan))===true,'trusted stopped-worker result verifier required');
+      }else demand(now<node.lease_until,'stale or duplicate worker result');
       demand(result.revision === plan.revision && result.environment === plan.environment, 'stale goal revision or environment');
       demand(result.changed_paths.every(file => worker.scopes.some(scope => {
         const clean = inside(worker.repo, file), normalized = coordination.scope(scope); return clean === normalized || clean.startsWith(`${normalized}/`);
       })), 'unauthorized mutation reported');
-      const mutations = coordination.execute('check-changes', { cwd: worker.repo, sessionId: worker.session, now }).paths;
+      const checked = coordination.execute('check-changes', { cwd: worker.repo, sessionId: worker.session, now });
+      demand(checked.allowed === true && checked.session === worker.session, 'verified worker change check required');
+      const mutations = checked.paths;
       demand(mutations.every(file => result.changed_paths.map(p => inside(worker.repo, p)).includes(coordination.scope(file))), 'unreported worker mutations');
-      const stateNow = captureRepositoryState(worker.repo, { excludePaths: [path.join(worker.repo, '.ecc/goal')] });
-      demand([...stateNow.dirty_paths].every(file => result.changed_paths.includes(file)), 'unreported worker mutations');
+      // Canonical check-changes covers committed/staged/unstaged/untracked paths
+      // and validates unchanged foreign baselines. Whole-tree dirty_paths also
+      // includes those preserved drafts (and collapsed untracked directories),
+      // which are not worker mutations. Whole-tree evidence freshness remains
+      // mandatory in currentEvidence; no foreign edit is omitted from its hash.
       demand(result.usage.cost_usd === result.usd, 'inconsistent reported worker cost');
+      if(recovering){
+        // Validate the reconstructed result against CURRENT source, citations,
+        // ownership and independent semantic preservation before charging it.
+        // Mark this token consumed even if its usage exhausts the budget.
+        node.result=result;node.status='done';evidence(true);
+      }
       accountUsage(next,node,worker,result.usage);
       if (next.phase === 'budget-exhausted') break;
-      node.result = result; node.status = 'done'; evidence(); maybeJoin(next); break;
+      if(!recovering){node.result=result;node.status='done';evidence();}
+      maybeJoin(next);break;
     }
     case 'worker-error': {
       const worker = plan.workers.find(w => w.id === event.worker); demand(worker, 'unknown worker');
@@ -243,6 +272,23 @@ function apply(state, event, options = {}) {
       accountUsage(next,node,worker,event.usage);
       if (next.phase !== 'budget-exhausted') next.phase = 'repair'; break;
     }
+    case 'critic-usage': {
+      parent();demand(next.phase==='critic','critic usage requires current join');assert('usage',event.usage);
+      const key=digest({plan_sha256:digest(plan),critic:plan.critic,join_sha256:next.join_sha256});
+      demand(event.receipt?.attempt_sha256===key&&event.receipt.join_sha256===next.join_sha256,'critic usage binding mismatch');
+      assert('usage',event.receipt.budget);
+      demand(typeof options.verifyCriticUsage==='function'&&options.verifyCriticUsage(event,plan)===true,'trusted critic usage verifier required');
+      const record={usage:structuredClone(event.usage),receipt_sha256:digest(event.receipt)};
+      next.critic_usage??={};
+      if(Object.hasOwn(next.critic_usage,key)){
+        demand(digest(next.critic_usage[key])===digest(record),'critic usage receipt changed');break;
+      }
+      next.critic_usage[key]=record;next.spent_usd+=event.usage.cost_usd;
+      const used={tool_calls:0,retries:0,ci_runs:0,cost_usd:0};
+      for(const entry of Object.values(next.critic_usage))for(const counter of Object.keys(used))used[counter]+=entry.usage[counter];
+      if(next.spent_usd>plan.limits.usd||Object.keys(used).some(counter=>used[counter]>event.receipt.budget[counter]))next.phase='budget-exhausted';
+      break;
+    }
     case 'critic': {
       demand(next.phase === 'critic', 'join barrier not satisfied'); assert('critique', event.report); evidence();
       demand(event.actor === plan.critic && event.report.agent === plan.critic, 'independent critic required');
@@ -252,6 +298,10 @@ function apply(state, event, options = {}) {
       demand(event.report.accepted ? !event.report.rejections.length && !failures.length : event.report.rejections.length > 0, 'critic decision contradicts outputs');
       demand(failures.every(id => event.report.rejections.some(r => r.worker === id)), 'critic omitted failed output');
       demand(typeof options.verifyCritic === 'function' && options.verifyCritic(event, plan) === true, 'trusted independent critic identity verifier required');
+      if(event.receipt!==undefined){
+        const key=digest({plan_sha256:digest(plan),critic:plan.critic,join_sha256:next.join_sha256});
+        demand(next.critic_usage?.[key]?.receipt_sha256===digest(event.receipt),'critic usage must be consumed before decision');
+      }
       if (event.report.accepted) evidence(true);
       next.critique = event.report;
       next.history.push({ join_sha256: next.join_sha256, critique: event.report, results: Object.values(next.nodes).map(n => n.result) });

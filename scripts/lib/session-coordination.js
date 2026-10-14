@@ -208,20 +208,141 @@ function changedPaths(repo, base, upstream) {
   return [...new Set(outputs.flatMap(output => output.split('\0').filter(Boolean)))];
 }
 
+function fullCommit(repo, value, label) {
+  if (typeof value !== 'string' || !/^(?:[a-f0-9]{40}|[a-f0-9]{64})$/.test(value)) {
+    throw new Error(`${label} must be a full commit SHA`);
+  }
+  if (git(repo.root, ['rev-parse', '--verify', `${value}^{commit}`]) !== value) {
+    throw new Error(`${label} must resolve to the exact full commit SHA`);
+  }
+  return value;
+}
+function originDestination(repo) {
+  if (!git(repo.root, ['remote']).split('\n').includes('origin')) return null;
+  const fetchUrls = git(repo.root, ['remote', 'get-url', '--all', 'origin']).split('\n').filter(Boolean);
+  const urls = git(repo.root, ['remote', 'get-url', '--push', '--all', 'origin']).split('\n').filter(Boolean);
+  // A lease binds one destination, never credentials or a multi-destination push.
+  if (urls.length !== 1) throw new Error('publication requires exactly one origin push destination');
+  if (fetchUrls.length !== 1 || fetchUrls[0] !== urls[0]) {
+    throw new Error('publication requires one matching origin fetch and push destination');
+  }
+  return crypto.createHash('sha256').update(urls[0]).digest('hex');
+}
+function originTarget(repo, targetRef) {
+  try { return git(repo.root, ['rev-parse', '--verify', '-q', `${targetRef}^{commit}`]); }
+  catch (error) {
+    if (error.status === 1) return null;
+    throw new Error('origin publication target unavailable');
+  }
+}
+function outgoingPublication(repo, base, candidate) {
+  try { git(repo.root, ['merge-base', '--is-ancestor', base, candidate]); }
+  catch { throw new Error('publication baseline is not an ancestor of candidate; reconcile owned integration first'); }
+  const commits = git(repo.root, ['rev-list', '--reverse', '--topo-order', `${base}..${candidate}`]).split('\n').filter(Boolean);
+  if (commits.length > 1000) throw new Error('publication history exceeds bounded review; reconcile the explicit batch');
+  // Net tree equality can hide a foreign file introduced and later reverted.
+  // Merge differences against all parents are intentionally conservative.
+  const paths = [...new Set(commits.flatMap(commit => git(repo.root,
+    ['diff-tree', '--no-commit-id', '--root', '-m', '-r', '--name-only', '--no-renames', '-z', commit, '--'])
+    .split('\0').filter(Boolean)))].sort();
+  return { commits, paths };
+}
+function publicationReceipt(repo, session, branch, candidate, options) {
+  const targetRef = `refs/remotes/origin/${branch}`;
+  const destinationSha256 = originDestination(repo);
+  const targetSha = destinationSha256 ? originTarget(repo, targetRef) : null;
+  let base = targetSha || session.base, mode = destinationSha256 ? 'origin-existing' : 'local-only';
+  if (destinationSha256 && !targetSha) {
+    base = fullCommit(repo, options.newBranchBase, 'new-branch-base');
+    requireText(options.publicationEvidence, 'publication-evidence approving the exact new-branch baseline history');
+    mode = 'origin-new';
+  } else if (options.newBranchBase) throw new Error('new-branch-base cannot replace an existing origin target or local-only baseline');
+  const outgoing = outgoingPublication(repo, base, candidate);
+  if (outgoing.paths.length) ownedPaths(repo, session, outgoing.paths);
+  const included = options.includeOwnedCommits || [];
+  if (!Array.isArray(included) || new Set(included).size !== included.length) throw new Error('include-owned-commit requires unique full commit SHAs');
+  included.forEach(commit => fullCommit(repo, commit, 'include-owned-commit'));
+  const inherited = destinationSha256 ? outgoing.commits.filter(commit => {
+    try { git(repo.root, ['merge-base', '--is-ancestor', commit, session.base]); return true; }
+    catch (error) { if (error.status === 1) return false; throw error; }
+  }) : [];
+  if (included.some(commit => !inherited.includes(commit))) throw new Error('include-owned-commit must identify inherited outgoing commits only');
+  if (inherited.some(commit => !included.includes(commit))) throw new Error('inherited unpublished commits require explicit include-owned-commit and publication-evidence');
+  const evidence = included.length || mode === 'origin-new'
+    ? requireText(options.publicationEvidence, 'publication-evidence') : null;
+  return { version: 1, mode, publishable: destinationSha256 !== null, targetRef, targetSha,
+    base, destinationSha256, outgoingCommits: outgoing.commits, touchedPaths: outgoing.paths,
+    includedInheritedCommits: included, publicationEvidence: evidence,
+    limitation: 'fetched-reference and recorded ownership evidence only; not live remote freshness or owner authorization' };
+}
+function verifyPublication(repo, session, release) {
+  const pinned = release.publication;
+  if (!pinned || pinned.version !== 1) throw new Error('release lacks publication ownership receipt; end or re-acquire after review');
+  let destination;
+  try { destination = originDestination(repo); }
+  catch { throw new Error('origin publication destination changed or became invalid after acquisition'); }
+  if (destination !== pinned.destinationSha256) throw new Error('origin publication destination changed after acquisition');
+  const target = destination ? originTarget(repo, `refs/remotes/origin/${release.branch}`) : null;
+  if (target !== pinned.targetSha) throw new Error('origin publication target changed after acquisition');
+  const current = publicationReceipt(repo, session, release.branch, release.candidate, {
+    newBranchBase: pinned.mode === 'origin-new' ? pinned.base : undefined,
+    includeOwnedCommits: pinned.includedInheritedCommits, publicationEvidence: pinned.publicationEvidence,
+  });
+  if (JSON.stringify(current) !== JSON.stringify(pinned)) throw new Error('publication ownership receipt changed after acquisition');
+  return current;
+}
+
 // Standard shared-checkout sessions can inherit other owners' UNSTAGED drafts.
-// Freeze bytes and index entries, never ownership. Loops, native fences and
-// publication retain their stricter whole-checkout requirements.
+// Freeze bytes and index entries, never ownership. Native fences bind the exact
+// preservation ledger; loops and publication keep whole-checkout requirements.
 function owns(session, relative) {
   const clean = scope(relative);
   return session.scopes.some(s => clean === s || clean.startsWith(`${s}/`));
 }
-function foreignSnapshot(repo, relative, expected, declaredBytes) {
-  safePath(repo, relative);
-  const index = git(repo.root, ['ls-files', '--stage', '-z', '--', relative]);
-  if (expected && index !== expected.index) throw new Error(`foreign baseline changed or staged: ${relative}`);
-  if (git(repo.root, ['ls-files', '--unmerged', '-z', '--', relative])) {
-    throw new Error('foreign baseline has unresolved index entries');
+// Batch stable index metadata, not stat-cache timestamps. Never cache file bytes
+// across events; flags can otherwise hide a dirty tracked file from Git status.
+function foreignIndex(repo, paths) {
+  const entries = new Map(paths.map(relative => [relative, { index: '', indexFlags: '', indexMonitor: '' }]));
+  for (let offset = 0; offset < paths.length;) {
+    const batch = []; let length = 0;
+    while (offset < paths.length && batch.length < 128 && (!batch.length || length + paths[offset].length < 12000)) {
+      length += paths[offset].length; batch.push(paths[offset++]);
+    }
+    const specs = batch.map(relative => `:(literal)${relative}`);
+    for (const record of git(repo.root, ['ls-files', '--stage', '-z', '--', ...specs]).split('\0').filter(Boolean)) {
+      const tab = record.indexOf('\t'), relative = record.slice(tab + 1), entry = entries.get(relative);
+      if (tab < 0 || !entry || !/^\d+ [a-f0-9]+ 0$/.test(record.slice(0, tab))) {
+        throw new Error('foreign baseline has unresolved index entries');
+      }
+      entry.index += record + '\0';
+    }
+    for (const record of git(repo.root, ['ls-files', '-v', '-z', '--', ...specs]).split('\0').filter(Boolean)) {
+      const entry = entries.get(record.slice(2));
+      if (!entry || !/^[A-Za-z] /.test(record)) throw new Error('invalid foreign index flags');
+      entry.indexFlags += record + '\0';
+    }
+    for (const record of git(repo.root, ['ls-files', '-f', '-z', '--', ...specs]).split('\0').filter(Boolean)) {
+      const entry = entries.get(record.slice(2));
+      if (!entry || !/^[A-Za-z] /.test(record)) throw new Error('invalid foreign index flags');
+      entry.indexMonitor += record + '\0';
+    }
   }
+  return entries;
+}
+function foreignSnapshot(repo, relative, expected, declaredBytes, metadata) {
+  safePath(repo, relative);
+  const current = metadata || foreignIndex(repo, [relative]).get(relative);
+  const { index, indexFlags, indexMonitor } = current;
+  if (expected && index !== expected.index) throw new Error(`foreign baseline changed or staged: ${relative}`);
+  if (expected && Object.hasOwn(expected, 'indexFlags') && indexFlags !== expected.indexFlags) {
+    throw new Error(`foreign baseline changed or staged: ${relative}`);
+  }
+  if (expected && Object.hasOwn(expected, 'indexMonitor') && indexMonitor !== expected.indexMonitor) {
+    throw new Error(`foreign baseline changed or staged: ${relative}`);
+  }
+  // Legacy standard-session records remain readable; native conversion requires
+  // a freshly registered v2 ledger, never an implicit baseline upgrade.
+  const flags = !expected || Object.hasOwn(expected, 'indexFlags') ? { indexFlags, indexMonitor } : {};
   const file = path.join(repo.root, relative);
   let stat;
   try { stat = fs.lstatSync(file); } catch (error) { if (error.code !== 'ENOENT') throw error; }
@@ -229,7 +350,7 @@ function foreignSnapshot(repo, relative, expected, declaredBytes) {
     if ((expected && !expected.absent) || (declaredBytes !== undefined && declaredBytes !== null)) {
       throw new Error(`foreign baseline changed: ${relative}`);
     }
-    return { path: relative, index, absent: true };
+    return { path: relative, index, ...flags, absent: true };
   }
   if (declaredBytes !== undefined && declaredBytes !== stat.size) throw new Error('foreign baseline changed after size admission');
   if (expected && (expected.absent || expected.bytes !== stat.size || expected.mode !== stat.mode
@@ -258,7 +379,7 @@ function foreignSnapshot(repo, relative, expected, declaredBytes) {
   if (after.size !== stat.size || after.mtimeMs !== stat.mtimeMs || after.ino !== stat.ino) {
     throw new Error('foreign baseline changed during capture');
   }
-  return { path: relative, index, absent: false, bytes: stat.size,
+  return { path: relative, index, ...flags, absent: false, bytes: stat.size,
     sha256: hash.digest('hex'), mode: stat.mode, inode: stat.ino, device: stat.dev };
 }
 function captureForeign(repo, session) {
@@ -277,21 +398,30 @@ function captureForeign(repo, session) {
     catch (error) { if (error.code !== 'ENOENT') throw error; declared.set(relative, null); }
     if (totalBytes > 1024 * 1024 * 1024) throw new Error('foreign baseline exceeds bounded byte count');
   }
-  const files = paths.map(file => foreignSnapshot(repo, file, undefined, declared.get(file)));
+  const metadata = foreignIndex(repo, paths);
+  const files = paths.map(file => foreignSnapshot(repo, file, undefined, declared.get(file), metadata.get(file)));
+  if (JSON.stringify([...foreignIndex(repo, paths)]) !== JSON.stringify([...metadata])) {
+    throw new Error('foreign baseline changed during capture');
+  }
   const finalStaged = git(repo.root, ['diff', '--cached', '--name-only', '--no-renames', '-z', '--'])
     .split('\0').filter(Boolean);
   if (finalStaged.some(file => !owns(session, file))) throw new Error('foreign staging cannot be inherited');
-  return { version: 1, files };
+  return { version: 2, files };
 }
 function preservedForeign(repo, session) {
-  if (!session.preservedForeign || session.loop || session.guard) return new Set();
+  if (!session.preservedForeign || session.loop) return new Set();
   const baseline = session.preservedForeign;
-  if (baseline.version !== 1 || !Array.isArray(baseline.files) || baseline.files.length > 2000) {
+  if (session.guard && baseline.files?.length) {
+    const fingerprint = crypto.createHash('sha256').update(JSON.stringify(baseline)).digest('hex');
+    if (session.guard.foreignBaselineSha256 !== fingerprint) throw new Error('foreign preservation binding changed');
+  }
+  if (![1, 2].includes(baseline.version) || !Array.isArray(baseline.files) || baseline.files.length > 2000) {
     throw new Error('invalid foreign preservation baseline');
   }
   let totalBytes = 0;
   for (const file of baseline.files) {
-    if (!file || typeof file.absent !== 'boolean' || (!file.absent
+    if (!file || typeof file.absent !== 'boolean' || (baseline.version === 2
+        && (typeof file.indexFlags !== 'string' || typeof file.indexMonitor !== 'string')) || (!file.absent
         && (!Number.isSafeInteger(file.bytes) || file.bytes < 0))) throw new Error('invalid foreign byte bound');
     totalBytes += file.bytes || 0;
     if (totalBytes > 1024 * 1024 * 1024) throw new Error('foreign baseline exceeds bounded byte count');
@@ -303,33 +433,196 @@ function preservedForeign(repo, session) {
     '--no-renames', '--diff-merges=first-parent', '-z', `${session.base}..HEAD`, '--'])
     .split('\0').map(file => file.replace(/^\n+|\n+$/g, '')).filter(Boolean).map(scope)) : new Set();
   const preserved = new Set();
+  const metadata = foreignIndex(repo, baseline.files.map(file => file.path));
   for (const file of baseline.files) {
     if (!file || typeof file.path !== 'string' || owns(session, file.path)
         || preserved.has(file.path) || (!file.absent && !/^[a-f0-9]{64}$/.test(file.sha256))) {
       throw new Error('invalid foreign preservation entry');
     }
     if (committed.has(scope(file.path))) throw new Error(`foreign baseline entered committed history: ${file.path}`);
-    if (JSON.stringify(foreignSnapshot(repo, file.path, file)) !== JSON.stringify(file)) {
+    if (JSON.stringify(foreignSnapshot(repo, file.path, file, undefined, metadata.get(file.path))) !== JSON.stringify(file)) {
       throw new Error(`foreign baseline changed or staged: ${file.path}; preserve its owner and re-register after handoff`);
     }
     preserved.add(file.path);
+  }
+  if (JSON.stringify([...foreignIndex(repo, baseline.files.map(file => file.path))]) !== JSON.stringify([...metadata])) {
+    throw new Error('foreign baseline changed during capture');
   }
   return preserved;
 }
 
 // This is a typed-tool fence, not a shell parser or OS sandbox. The session
 // registry owns the contract/counters; active-goal owns the owner revision.
-function goalRevision(repo) {
+// workspaceRoot is a reviewed host capability derived by the fresh wrapper,
+// never a manifest root override or native tool payload.
+function goalReference(repo, goalFile, workspaceRoot = null) {
+  function exactPath(value, regular = false) {
+    if (typeof value !== 'string' || !path.isAbsolute(value)) throw Error('absolute goal reference required');
+    const input = value.replace(/\\/g, '/');
+    if (/^\/\//.test(input) || /[\x00-\x1f]/.test(input)
+        || input.split('/').some(part => part === '.' || part === '..' || (part && /[. ]$/.test(part)))) throw Error('ambiguous goal reference');
+    const absolute = path.resolve(value), volume = path.parse(absolute).root;
+    const normalized = absolute.replace(/\\/g, '/');
+    const compare = value => process.platform === 'win32' ? value.toLowerCase() : value;
+    if (compare(input) !== compare(normalized)) throw Error('noncanonical goal reference');
+    safePath({ root: volume }, path.relative(volume, absolute).replace(/\\/g, '/'));
+    const stat = fs.lstatSync(absolute);
+    if ((regular && (!stat.isFile() || stat.nlink !== 1 || stat.size > 256 * 1024))
+        || (!regular && !stat.isDirectory())) throw Error('bounded regular unlinked goal reference required');
+    const real = fs.realpathSync.native(absolute);
+    if (compare(real.replace(/\\/g, '/')) !== compare(normalized)) throw Error('aliased goal reference');
+    return compare(real);
+  }
+  const file = exactPath(goalFile ?? path.join(repo.root, '.ecc/goal/active-goal.yaml'), true);
+  const local = exactPath(repo.root);
+  const inside = (root, file) => {
+    const relative = path.relative(root, file);
+    return relative !== '' && relative !== '..' && !relative.startsWith('..' + path.sep) && !path.isAbsolute(relative);
+  };
+  let boundary = local;
+  if (!inside(local, file)) {
+    if (!workspaceRoot) throw Error('goal reference outside repository');
+    boundary = exactPath(workspaceRoot);
+    if (!inside(boundary, local) || !inside(exactPath(path.join(boundary, 'artifacts')), file)) throw Error('goal reference outside reviewed artifacts');
+  }
+  const original = fs.lstatSync(file, { bigint: true });
+  const sameFile = (first, second) => first.isFile() && second.isFile()
+    && first.nlink === 1n && second.nlink === 1n
+    && ['dev','ino','size','mtimeNs','ctimeNs'].every(field => first[field] === second[field]);
+  const descriptor = fs.openSync(file, fs.constants.O_RDONLY | (fs.constants.O_NOFOLLOW || 0));
+  try {
+    const stat = fs.fstatSync(descriptor, { bigint: true });
+    if (!sameFile(original, stat) || stat.size > 256n * 1024n) throw Error('goal identity changed before read');
+    let raw = Buffer.alloc(256 * 1024 + 1);
+    let length = 0, count;
+    while (length < raw.length && (count = fs.readSync(descriptor, raw, length, raw.length - length, null)) > 0) length += count;
+    if (length > 256 * 1024) throw Error('goal document too large');
+    raw = raw.subarray(0, length);
+    if (!sameFile(original, fs.fstatSync(descriptor, { bigint: true }))) throw Error('goal identity changed during read');
+    const text = raw.toString('utf8').replace(/^\uFEFF/, '');
+    const yaml = require('js-yaml');
+    const goal = /\.ya?ml$/i.test(file) ? yaml.load(text, { json: true, schema: yaml.JSON_SCHEMA }) : JSON.parse(text);
+    const { assertDocument, validateGoalSemantics } = require('./goal-control');
+    assertDocument('goal', goal, 'scope guard goal');
+    validateGoalSemantics(goal);
+    if (exactPath(file, true) !== file
+        || !sameFile(original, fs.fstatSync(descriptor, { bigint: true }))
+        || !sameFile(original, fs.lstatSync(file, { bigint: true }))) throw Error('goal identity changed during validation');
+    const reference = { file, sha256: crypto.createHash('sha256').update(raw).digest('hex'), boundary };
+    // The semantic revision and byte digest refer to one stable captured file.
+    Object.defineProperty(reference, 'document', { value: goal });
+    return reference;
+  } finally { fs.closeSync(descriptor); }
+}
+function goalRevision(repo, reference = null) {
   const { readStructuredFile, assertDocument, validateGoalSemantics } = require('./goal-control');
-  const file = path.join(repo.root, '.ecc/goal/active-goal.yaml');
-  safePath(repo, '.ecc/goal/active-goal.yaml');
-  const goal = readStructuredFile(file);
+  let goal;
+  if (reference) {
+    const current = goalReference(repo, reference.file, reference.boundary === repo.root ? null : reference.boundary);
+    if (JSON.stringify(current) !== JSON.stringify(reference)) throw Error('protected goal reference changed');
+    goal = current.document;
+  } else {
+    const file = path.join(repo.root, '.ecc/goal/active-goal.yaml');
+    safePath(repo, '.ecc/goal/active-goal.yaml');
+    goal = readStructuredFile(file);
+  }
   assertDocument('goal', goal, 'scope guard goal');
   validateGoalSemantics(goal);
   const revision = { goal_id: goal.goal_id, objective: goal.objective,
     current_priority: goal.current_priority, non_goals: goal.non_goals,
     owner_corrections: goal.owner_corrections, user_visible_proofs: goal.user_visible_proofs };
   return { id: goal.goal_id, revision: crypto.createHash('sha256').update(JSON.stringify(revision)).digest('hex') };
+}
+function assignmentReference(repo, reference, request, session, runtime, now = Date.now()) {
+  if (session.managedAssignment) {
+    const expected = session.managedAssignment;
+    if (!request || JSON.stringify(reference) !== JSON.stringify(expected.goalReference)
+        || request.id !== expected.assignmentId || request.ownerAgent !== expected.ownerAgent) throw Error('registered worker assignment/goal binding required');
+  } else if (request) throw Error('managed assignment must be pinned on registered session');
+  if (!request && reference?.boundary !== repo.root) return null;
+  if (!reference || reference.boundary !== repo.root || (request && (typeof request.id !== 'string'
+      || typeof request.ownerAgent !== 'string'))) throw Error('repository-local managed worker assignment required');
+  const selected = goalReference(repo, reference.file);
+  if (JSON.stringify(selected) !== JSON.stringify(reference) || (request && selected.document.status !== 'active')) throw Error('worker goal changed or inactive');
+  function ledger(name) {
+    const file = path.join(path.dirname(selected.file), name);
+    safePath(repo, path.relative(repo.root, file).replace(/\\/g, '/'));
+    const before = fs.lstatSync(file, { bigint:true });
+    if (!before.isFile() || before.nlink !== 1n || before.size > 1024n * 1024n) throw Error('bounded worker ledger required');
+    const fd = fs.openSync(file, fs.constants.O_RDONLY | (fs.constants.O_NOFOLLOW || 0));
+    const same = stat => stat.isFile() && ['dev','ino','size','mtimeNs','ctimeNs','nlink'].every(key => stat[key] === before[key]);
+    try {
+      if (!same(fs.fstatSync(fd,{bigint:true}))) throw Error('worker ledger changed before read');
+      const bytes = Buffer.alloc(1024 * 1024 + 1); let length = 0, count;
+      while (length < bytes.length && (count = fs.readSync(fd,bytes,length,bytes.length-length,null)) > 0) length += count;
+      if (length > 1024 * 1024 || !same(fs.fstatSync(fd,{bigint:true}))) throw Error('worker ledger changed during read');
+      const rows = bytes.subarray(0,length).toString('utf8').replace(/^\uFEFF/,'').split(/\r?\n/).filter(line => line.trim() && !line.trim().startsWith('#')).map(JSON.parse);
+      safePath(repo,path.relative(repo.root,file).replace(/\\/g,'/'));
+      if (!same(fs.lstatSync(file,{bigint:true})) || !same(fs.fstatSync(fd,{bigint:true}))) throw Error('worker ledger changed during validation');
+      return {file,rows};
+    } finally { fs.closeSync(fd); }
+  }
+  if (!request) {
+    const file = path.join(path.dirname(selected.file),'assignments.jsonl');
+    safePath(repo,path.relative(repo.root,file).replace(/\\/g,'/'));
+    if (fs.existsSync(file) && ledger('assignments.jsonl').rows.some(row => row.managed_execution?.session_id === session.id)) throw Error('managed worker assignment reference required');
+    return null;
+  }
+  const assignments = ledger('assignments.jsonl'), integrations = ledger('integrations.jsonl');
+  const matches = assignments.rows.filter(row => row.assignment_id === request.id);
+  if (matches.length !== 1) throw Error('unique worker assignment required');
+  if (assignments.rows.filter(row => row.managed_execution?.session_id === session.id).length !== 1) throw Error('one managed assignment per session required');
+  const assignment = matches[0], { assertDocument, latestExecutableCorrection } = require('./goal-control');
+  assertDocument('assignment', assignment);
+  const recordDigest = crypto.createHash('sha256').update(JSON.stringify(assignment)).digest('hex');
+  if (recordDigest !== session.managedAssignment.recordSha256) throw Error('registered worker assignment changed');
+  const managed = assignment.managed_execution;
+  const declaredRoot = typeof managed?.repository_root === 'string' ? managed.repository_root.replace(/\\/g,'/') : '';
+  const actualRoot = repo.root.replace(/\\/g,'/');
+  if (!managed || managed.session_id !== session.id
+      || (process.platform === 'win32' ? declaredRoot.toLowerCase() !== actualRoot.toLowerCase() : declaredRoot !== actualRoot)
+      || assignment.goal_id !== selected.document.goal_id || assignment.owner_runtime !== runtime
+      || assignment.owner_agent !== request.ownerAgent) throw Error('managed worker identity mismatch');
+  const issued = Date.parse(assignment.issued_at), expires = Date.parse(assignment.lease_expires_at);
+  if (!Number.isFinite(session.registeredAt) || !Number.isFinite(issued) || !Number.isFinite(expires)
+      || issued < session.registeredAt || issued > now || expires <= now || expires <= issued) throw Error('fresh unexpired worker assignment required');
+  const correction = latestExecutableCorrection(selected.document);
+  if (correction && issued < Date.parse(correction.recorded_at)) throw Error('worker assignment superseded');
+  if (integrations.rows.some(row => row.assignment_id === assignment.assignment_id)) throw Error('worker assignment already settled; prior usage cannot reset');
+  const scopes = assignment.scope_paths.map(scope);
+  if (assignment.acceptance_ids.some(id => !selected.document.user_visible_proofs.some(proof => proof.id === id && proof.required))) throw Error('worker assignment lacks current required output');
+  const support = ['.ecc/fresh-session/' + session.id, ...(runtime === 'antigravity' ? ['.agents/hooks.json'] : [])].map(scope);
+  for (const owned of session.scopes) {
+    if (!support.includes(owned) && !scopes.some(allowed => owned === allowed || owned.startsWith(allowed + '/'))) throw Error('worker scope exceeds assignment');
+  }
+  if (scopes.some(value => /^(?:\.ecc|\.git|\.agents)(?:\/|$)/i.test(value))) throw Error('worker cannot own assignment/guard metadata');
+  const closureReserve = managed.closure_reserve, toolCeiling = assignment.budget.max_tool_calls - closureReserve;
+  if (!Number.isSafeInteger(toolCeiling) || toolCeiling < 10) throw Error('worker cap cannot cover preflight and parent reserve');
+  return { file:assignments.file, id:assignment.assignment_id,
+    sha256:recordDigest,
+    ownerAgent:assignment.owner_agent, runtime, repositoryRoot:repo.root, sessionId:session.id, closureReserve, toolCeiling };
+}
+function pinManagedAssignment(repo,state,session,options,now) {
+  if (session.guard || session.managedAssignment) throw Error('managed session already has an assignment or guard');
+  const assignment=options.assignment, reference=options.goalReference;
+  require('./goal-control').assertDocument('assignment',assignment);
+  const selected=goalReference(repo,reference?.file);
+  const managed=assignment.managed_execution;
+  if (reference?.boundary !== repo.root || JSON.stringify(selected) !== JSON.stringify(reference)
+      || selected.document.status !== 'active' || assignment.goal_id !== selected.document.goal_id
+      || !managed || managed.session_id !== session.id || managed.repository_root !== repo.root
+      || Date.parse(assignment.issued_at) < session.registeredAt || Date.parse(assignment.issued_at) > now
+      || Date.parse(assignment.lease_expires_at) <= now) throw Error('fresh repository-local managed assignment required');
+  if (state.sessions.some(other => other.managedAssignment?.assignmentId === assignment.assignment_id
+      && other.managedAssignment.goalReference.file === reference.file)) throw Error('managed assignment already pinned; no counter reset');
+  const scopes=assignment.scope_paths.map(scope), support=['.ecc/fresh-session/'+session.id,
+    ...(assignment.owner_runtime==='antigravity'?['.agents/hooks.json']:[])].map(scope);
+  if (scopes.some(value=>/^(?:\.ecc|\.git|\.agents)(?:\/|$)/i.test(value))
+      || session.scopes.some(value=>!support.includes(value)&&!scopes.some(allowed=>value===allowed||value.startsWith(allowed+'/')))
+      || assignment.budget.max_tool_calls-managed.closure_reserve < 10) throw Error('managed scope/cap does not admit execution');
+  session.managedAssignment={goalReference:reference,assignmentId:assignment.assignment_id,ownerAgent:assignment.owner_agent,
+    recordSha256:crypto.createHash('sha256').update(JSON.stringify(assignment)).digest('hex')};
+  return session.managedAssignment;
 }
 function normalizeToolPath(repo, value, cwd = repo.root) {
   if (typeof value !== 'string' || !value || /[\x00-\x1f]/.test(value)) throw new Error('invalid tool path');
@@ -412,13 +705,34 @@ function validateGuard(guard) {
     scope(check.path);
   }
 }
-function bindGuard(repo, session, options, now) {
+function assertNativeVisibleIndex(repo) {
+  // Clean tracked files may not appear in the dirty preservation ledger.
+  // Concealment flags cannot hide them from native final/change checks.
+  for (const record of git(repo.root, ['ls-files', '-v', '-z', '--']).split('\0').filter(Boolean)) {
+    if (!/^[A-Za-z] /.test(record)) throw new Error('native index visibility unavailable');
+    if (/[a-z]/.test(record[0]) || record[0] === 'S') throw new Error('native index hides tracked paths');
+  }
+}
+function bindGuard(repo, session, options, now, state) {
   if (session.guard) throw new Error('guard already bound; use a new session after a correction or mode change');
-  if (session.preservedForeign?.files.length) throw new Error('native guard requires no inherited foreign changes');
+  if (session.preservedForeign?.files.length && session.preservedForeign.version !== 2) {
+    throw new Error('native guard requires a fresh flag-bound foreign baseline');
+  }
+  if (session.preservedForeign?.files.length) preservedForeign(repo, session);
   if (!['audit', 'block'].includes(options.guardMode)) throw new Error('guard-mode must be audit or block');
-  const goal = goalRevision(repo);
+  assertNativeVisibleIndex(repo);
+  const reference = options.goalReference;
+  const goal = goalRevision(repo, reference);
+  const worker = assignmentReference(repo, reference || goalReference(repo), options.workerAssignment, session, options.runtime, now);
+  if (worker && (JSON.stringify(worker) !== JSON.stringify(options.workerAssignment)
+      || Number(options.toolLimit) > worker.toolCeiling
+      || state.sessions.some(other => other.guard?.goalId === goal.id && other.guard?.workerAssignment?.id === worker.id))) {
+    throw Error('worker assignment already bound or cap widened');
+  }
   const deadline = Date.parse(options.deadline);
   const guard = { mode: options.guardMode, goalId: goal.id, goalRevision: goal.revision,
+    ...(reference ? { goalReference: structuredClone(reference) } : {}),
+    ...(worker ? { workerAssignment: worker } : {}),
     implementationSha256: implementationDigest(),
     nativeSessionId: options.nativeSessionId || session.id,
     base: session.base, scopes: [...session.scopes], deadline,
@@ -426,6 +740,8 @@ function bindGuard(repo, session, options, now) {
     allowedOperations: options.allowedOperations || ['read', 'write', 'patch'],
     toolLimit: Number(options.toolLimit), turnLimit: Number(options.turnLimit), tools: 0, turnIds: [],
     budgets: { providerUsd: 0, ciRuns: 0, resourceTelemetry: 'unverified' } };
+  guard.foreignBaselineSha256 = crypto.createHash('sha256')
+    .update(JSON.stringify(session.preservedForeign ?? null)).digest('hex');
   validateGuard(guard);
   if (deadline <= now || deadline > session.expiresAt) throw new Error('guard deadline must be within the active lease');
   session.guard = guard;
@@ -436,10 +752,20 @@ function verifyGuard(repo, session, mode, now) {
   validateGuard(guard);
   if (guard.implementationSha256 !== implementationDigest()) throw new Error('protected guard/check configuration changed');
   if (guard.mode !== mode || guard.base !== session.base || JSON.stringify(guard.scopes) !== JSON.stringify(session.scopes)) throw new Error('scope guard binding mismatch');
-  const goal = goalRevision(repo);
+  const goal = goalRevision(repo, guard.goalReference);
   if (goal.id !== guard.goalId || goal.revision !== guard.goalRevision) throw new Error('stale owner goal revision');
+  const worker = assignmentReference(repo,guard.goalReference || goalReference(repo),guard.workerAssignment,session,guard.workerAssignment?.runtime,now);
+  if (guard.workerAssignment) {
+    if (JSON.stringify(worker) !== JSON.stringify(guard.workerAssignment) || guard.toolLimit > worker.toolCeiling) throw Error('worker assignment changed or cap widened');
+  }
   if (now >= guard.deadline || guard.tools > guard.toolLimit || guard.turnIds.length > guard.turnLimit) throw new Error('scope guard budget exhausted');
   verifyLoop(repo, session);
+  // A legacy/empty binding cannot acquire a foreign exception later. Deleting,
+  // replacing or editing the frozen ledger is configuration tampering.
+  const current = crypto.createHash('sha256').update(JSON.stringify(session.preservedForeign ?? null)).digest('hex');
+  if (current !== guard.foreignBaselineSha256) throw new Error('foreign preservation binding changed');
+  assertNativeVisibleIndex(repo);
+  preservedForeign(repo, session);
   for (const check of guard.protected) if (checkDigest(repo, check.path) !== check.sha256) throw new Error('protected guard/check configuration changed');
   return guard;
 }
@@ -461,10 +787,14 @@ function guardEvent(repo, state, options, now) {
       if (guard.turnIds.length > guard.turnLimit) throw new Error('scope guard budget exhausted');
       action = { operation: 'turn' };
     } else if (options.event === 'final') {
-      const paths = changedPaths(repo, guard.base);
+      const preserved = preservedForeign(repo, session);
+      const paths = changedPaths(repo, guard.base).filter(file => !preserved.has(file));
       if (paths.length) ownedPaths(repo, session, paths);
       action = { operation: 'final' };
     } else if (options.event === 'pre') {
+      // Exhausted managed attempts never execute or consume the parent's reserve.
+      // Denial telemetry remains in the append-only event log, not charged tools.
+      if (guard.workerAssignment && guard.tools >= guard.toolLimit) throw new Error('scope guard budget exhausted');
       guard.tools += 1;
       if (guard.tools > guard.toolLimit) throw new Error('scope guard budget exhausted');
       const cwd = options.payload?.cwd || repo.root;
@@ -489,6 +819,8 @@ function guardEvent(repo, state, options, now) {
       'opaque tool requires a verified restricted execution boundary', 'invalid tool path', 'ambiguous tool path',
       'outside owned write scope', 'linked path is not an owned scope',
       'session missing, closed, or expired', 'session belongs to another worktree']
+      .concat(['foreign preservation binding changed', 'foreign baseline changed or staged', 'foreign baseline entered committed history',
+        'native index hides tracked paths', 'native index visibility unavailable'])
       .find(code => error.message.startsWith(code)) || 'scope guard state/input unavailable or malformed';
   }
   const decision = { allowed: mode === 'audit' || reason === null, wouldDeny: reason !== null,
@@ -528,7 +860,7 @@ function execute(command, options = {}) {
       conflicts(state, repo, scopes, sessionId, now);
       const session = { id: sessionId, state: 'active', worktree: repo.root, scopes,
         objective: requireText(options.objective, 'objective'), doneWhen: requireText(options.doneWhen, 'done-when'),
-        base: git(repo.root, ['rev-parse', 'HEAD']), updatedAt: now, expiresAt: expiry(options.ttl, now) };
+        base: git(repo.root, ['rev-parse', 'HEAD']), registeredAt:now, updatedAt: now, expiresAt: expiry(options.ttl, now) };
       const loop = pinLoop(repo, options, scopes);
       if (loop) session.loop = loop;
       else session.preservedForeign = captureForeign(repo, session);
@@ -546,7 +878,8 @@ function execute(command, options = {}) {
     const session = current(state, repo, sessionId, now);
     conflicts(state, repo, session.scopes, sessionId, now);
     if (command !== 'close' && command !== 'release-end') verifyLoop(repo, session);
-    if (command === 'guard-bind') return bindGuard(repo, session, options, now);
+    if (command === 'assignment-bind') return pinManagedAssignment(repo,state,session,options,now);
+    if (command === 'guard-bind') return bindGuard(repo, session, options, now, state);
     if (command === 'check-write') {
       ownedPaths(repo, session, options.paths || []);
       return { allowed: true, session: sessionId, paths: options.paths };
@@ -601,8 +934,9 @@ function execute(command, options = {}) {
         session.loop || session.guard ? undefined : options.upstream);
       if (paths.length) ownedPaths(repo, session, paths);
       if (git(repo.root, ['status', '--porcelain'])) throw new Error('release requires a clean worktree');
+      const publication = publicationReceipt(repo, session, branch, candidate, options);
       const actionsBudget = actionsBudgetReceipt(options, now);
-      state.release = { owner: sessionId, branch, candidate, actionsBudget,
+      state.release = { owner: sessionId, branch, candidate, actionsBudget, publication,
         retryEvidence: previous?.outcome === 'failed' ? options.retryEvidence : null,
         expiresAt: expiry(options.ttl, now) };
       return state.release;
@@ -625,9 +959,10 @@ function execute(command, options = {}) {
       if (options.branch !== release.branch || options.candidate !== release.candidate
           || git(repo.root, ['rev-parse', 'HEAD']) !== release.candidate) throw new Error('release branch/candidate mismatch; never chase the latest shared tip');
       if (git(repo.root, ['status', '--porcelain'])) throw new Error('release worktree changed after acquisition');
+      verifyPublication(repo, session, release);
       return { allowed: true, ...release, approvalRequired: true };
     }
     throw new Error(`unknown session command: ${command}`);
   });
 }
-module.exports = { execute, checkSession, repository, overlaps, scope, normalizeToolPath, patchPaths, typedAction, validateGuard };
+module.exports = { execute, checkSession, repository, overlaps, scope, normalizeToolPath, patchPaths, typedAction, validateGuard, goalReference, assignmentReference };

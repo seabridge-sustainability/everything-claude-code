@@ -95,6 +95,7 @@ function loadBundle(args) {
 }
 
 function help() {
+  process.stdout.write('Fresh managed worker: --managed-session ID --managed-repo DIR --closure-reserve N together. Register first; goal is repository-local. Startup probes count; parent reserve grants no extra worker tools.\n');
   process.stdout.write('Retained artifact verification: --evidence-root DIR (repeatable), --evidence-map SHA256=FILE (repeatable, pinned relocation index/ledger). These do not refresh source fingerprints or authorize acceptance.\n');
   process.stdout.write('New assignments require --work-kind output|blocker, --ram-gib N, --disk-gib N, and --disk-path DIR; blockers also require --defect-evidence FILE.\n');
   process.stdout.write('Terminal integration outcomes superseded/not_adopted require --limitation REASON; failed or over-budget receipts remain history, never passing proof.\n');
@@ -301,6 +302,23 @@ function commandAssignLocked(args) {
     },
     source_harness: optionValue(args, '--source-harness', process.env.ECC_SOURCE_HARNESS || 'unknown'),
   };
+  const managedSession = optionValue(args,'--managed-session');
+  const managedRepo = optionValue(args,'--managed-repo');
+  const reserve = optionValue(args,'--closure-reserve');
+  if ([managedSession,managedRepo,reserve].some(value => value !== null)) {
+    if (!managedSession || !managedRepo || reserve === null) throw Error('managed assignment requires --managed-session, --managed-repo and --closure-reserve');
+    const coordination = require('./lib/session-coordination');
+    const repo = coordination.repository(managedRepo), owner = coordination.checkSession({cwd:repo.root,sessionId:managedSession});
+    coordination.goalReference(repo,path.resolve(paths.goal)); // Repository-local only; no implicit root expansion.
+    const closureReserve = parseInteger(reserve,'--closure-reserve');
+    if (owner.guard || !Number.isFinite(owner.registeredAt) || Date.parse(issuedAt) < owner.registeredAt
+        || closureReserve < 1 || assignment.budget.max_tool_calls - closureReserve < 10) throw Error('fresh managed assignment and bounded parent reserve required');
+    const assignedScopes = scopePaths.map(coordination.scope);
+    const support = ['.ecc/fresh-session/' + managedSession, ...(ownerRuntime === 'antigravity' ? ['.agents/hooks.json'] : [])].map(coordination.scope);
+    if (assignedScopes.some(value => /^(?:\.ecc|\.git|\.agents)(?:\/|$)/i.test(value))
+        || owner.scopes.some(value => !support.includes(value) && !assignedScopes.some(allowed => value === allowed || value.startsWith(allowed+'/')))) throw Error('managed session exceeds assignment scope');
+    assignment.managed_execution = {repository_root:repo.root,session_id:managedSession,closure_reserve:closureReserve};
+  }
   // Optional for historical assignment records; mandatory for v3 execution.
   const changeContractFile = optionValue(args, '--change-contract');
   if (changeContractFile) assignment.change_contract = readStructuredFile(changeContractFile);
@@ -310,6 +328,7 @@ function commandAssignLocked(args) {
   assertDocument('assignment', assignment, `assignment ${assignment.assignment_id}`);
   const assignments = readJsonLines(paths.assignments);
   const integrations = readJsonLines(paths.integrations);
+  if (assignment.managed_execution && assignments.some(row => row.managed_execution?.session_id === assignment.managed_execution.session_id)) throw Error('managed session already has an assignment');
   validateBundle({
     goal,
     outcomes: readJsonLines(paths.outcomes),
@@ -323,6 +342,13 @@ function commandAssignLocked(args) {
   checkAssignmentCapacity(goal.goal_id, assignments, integrations, capacity, {
     freeRamGib: os.freemem() / gib, freeDiskGib: stats.bavail * stats.bsize / gib,
   });
+  if (assignment.managed_execution) {
+    const coordination=require('./lib/session-coordination'), repo=coordination.repository(assignment.managed_execution.repository_root);
+    coordination.execute('assignment-bind',{cwd:repo.root,sessionId:assignment.managed_execution.session_id,assignment,
+      goalReference:coordination.goalReference(repo,path.resolve(paths.goal))});
+    // Explicit empty history for a fresh managed assignment, never overwrite receipts.
+    if (!fs.existsSync(paths.integrations)) fs.closeSync(fs.openSync(paths.integrations,'wx'));
+  }
   const write = appendJsonLine(paths.assignments, assignment, 'assignment_id');
   return { assigned: true, ...write, assignment, paths };
 }

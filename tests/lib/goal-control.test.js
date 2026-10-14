@@ -565,6 +565,37 @@ function blockedBundle(overrides = {}) {
   };
 }
 
+for (const mapping of ['unmapped', 'optional', 'already-met']) {
+  test(`blocked claim rejects active independent lane with ${mapping} proof mapping`, () => {
+    const bundle = blockedBundle();
+    bundle.goal.lanes.push({
+      id: 'retained-flood-implementation', description: 'Authorized retained-data implementation',
+      status: 'active', blocker: null, next_action: 'Implement the bounded retained-data interval.',
+    });
+    if (mapping !== 'unmapped') {
+      bundle.goal.user_visible_proofs.push({
+        ...bundle.goal.user_visible_proofs[0], id: 'retained-flood-result',
+        lane_id: 'retained-flood-implementation', required: mapping === 'already-met',
+      });
+      if (mapping === 'already-met') {
+        bundle.outcomes.push(outcome('retained-proof', 'retained-flood-result', 'ui_displayed'));
+      }
+    }
+    const result = evaluateClaim('blocked', bundle);
+    assert.strictEqual(result.allowed, false);
+    assert.match(result.reasons.join(' '), /active lanes have next actions: retained-flood-implementation/);
+  });
+}
+
+test('blocked claim preserves complete/deferred lanes and dependency remedies', () => {
+  const bundle = blockedBundle();
+  for (const status of ['complete', 'deferred']) {
+    bundle.goal.lanes.push({ id: status, description: status, status, blocker: null, next_action: 'Historical or deferred task.' });
+  }
+  bundle.goal.lanes[0].next_action = 'Obtain missing eligible source inputs from their owner.';
+  assert.strictEqual(evaluateClaim('blocked', bundle).allowed, true);
+});
+
 for (const harness of ['codex', 'claude', 'gemini', 'opencode', 'copilot-local', 'copilot-cli']) {
   test(`blocked freshness denies stale goal snapshot for ${harness}`, () => {
     const bundle = blockedBundle();

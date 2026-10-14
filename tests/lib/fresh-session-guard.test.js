@@ -9,11 +9,11 @@ const { test, after } = require('node:test');
 const testedRoot = process.env.ECC_PREFLIGHT_TEST_ROOT || path.resolve(__dirname,'../..');
 const { prepare, configuration, launch } = require(path.join(testedRoot,'scripts/fresh-agent-session.js'));
 const { run } = require(path.join(testedRoot,'scripts/hooks/fresh-session-guard.js'));
-const { preflight, SUPPORTED, execute, workspaceBoundary } = require(path.join(testedRoot,'scripts/lib/fresh-session-guard.js'));
+const { preflight, SUPPORTED, execute, workspaceBoundary, repository, goalReference } = require(path.join(testedRoot,'scripts/lib/fresh-session-guard.js'));
 const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-fresh-preflight-'));
 let count = 0;
 after(() => fs.rmSync(temp, { recursive: true, force: true }));
-function fixture(runtime, centralLayout = false) {
+function fixture(runtime, centralLayout = false, goalFile = null) {
   const box = path.join(temp, String(count++));
   const cwd = centralLayout ? path.join(box,'manageesg-backend') : box; fs.mkdirSync(cwd,{recursive:true});
   for (const args of [['init','--initial-branch='+(centralLayout?'seabridge_development':'fixture')],['config','user.name','ECC Test'],['config','user.email','test@example.invalid']]) {
@@ -27,8 +27,10 @@ function fixture(runtime, centralLayout = false) {
     user_visible_proofs:[{id:'guard',description:'Guard',lane_id:'guard',required_stage:'authentic_input_processed',required_evidence_kinds:['test','runtime'],required_repositories:['fixture'],allowed_result_classes:['other'],acceptance_predicate:'Allowed write and outside rejection',requires_authentic:false,requires_user_visible:false,subject_scope:null,required:true}],
     lanes:[{id:'guard',description:'Guard',status:'active',blocker:null,next_action:'Preflight'}],owner_corrections:[],
     forecast:{state:'not_set',confidence:'none',basis:null,critical_path:[],likely_hours:null,next_checkpoint_at:null,checkpoint_started_at:null,checkpoint_proof_id:null,updated_at:now},status:'active',updated_at:now };
-  fs.mkdirSync(path.join(cwd,'.ecc/goal'), { recursive: true });
-  fs.writeFileSync(path.join(cwd,'.ecc/goal/active-goal.yaml'),JSON.stringify(goal));
+  const selectedGoal = goalFile === null ? path.join(cwd,'.ecc/goal/active-goal.yaml')
+    : path.join(centralLayout ? box : cwd, goalFile);
+  fs.mkdirSync(path.dirname(selectedGoal), { recursive: true });
+  fs.writeFileSync(selectedGoal,JSON.stringify(goal));
   const policyRoot = path.join(cwd,'policy'); fs.mkdirSync(policyRoot);
   for (const name of ['AGENTS.md','AGENTS_SYSTEM.md','CLAUDE.md']) fs.writeFileSync(path.join(policyRoot,name),'SYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1\n');
   if(centralLayout) fs.appendFileSync(path.join(policyRoot,'AGENTS_SYSTEM.md'),`Code: ${box} only; one active checkout/repo. E: Docker only.\n`);
@@ -36,9 +38,10 @@ function fixture(runtime, centralLayout = false) {
   const addPolicy=spawnSync('git',['add','.gitignore','policy'],{cwd,encoding:'utf8',windowsHide:true});assert.equal(addPolicy.status,0,addPolicy.stderr);
   const commitPolicy=spawnSync('git',['commit','-m','fixture policy baseline'],{cwd,encoding:'utf8',windowsHide:true});assert.equal(commitPolicy.status,0,commitPolicy.stderr);
   const session = 'fresh-' + count;
-  execute('register',{cwd,sessionId:session,scopes:['owned','.ecc/fresh-session','.agents/hooks.json'],objective:'Preflight',doneWhen:'Checked',ttl:30});
-  const plan = prepare({runtime,session,cwd,policyRoot,executable:process.execPath,args:['--help'],toolLimit:40,turnLimit:10});
-  return {cwd,session,policyRoot,plan,options:{cwd,sessionId:session,policyRoot,configFile:plan.environment.ECC_FRESH_SESSION_CONFIG}};
+  execute('register',{cwd,sessionId:session,scopes:['owned','.ecc/fresh-session','.agents/hooks.json',...(goalFile !== null && !centralLayout ? [goalFile] : [])],objective:'Preflight',doneWhen:'Checked',ttl:30});
+  const plan = prepare({runtime,session,cwd,policyRoot,executable:process.execPath,args:['--help'],toolLimit:40,turnLimit:10,
+    ...(goalFile === null ? {} : {goalFile:selectedGoal})});
+  return {cwd,session,policyRoot,plan,selectedGoal,options:{cwd,sessionId:session,policyRoot,configFile:plan.environment.ECC_FRESH_SESSION_CONFIG}};
 }
 function payload(runtime,cwd,file='owned/ok.txt',nativeId='fresh-native') {
   if (runtime==='antigravity') return {conversationId:nativeId,workspacePaths:[cwd],toolCall:{name:'write_to_file',args:{TargetFile:file}}};
@@ -48,6 +51,111 @@ function payload(runtime,cwd,file='owned/ok.txt',nativeId='fresh-native') {
 function allowed(result,runtime) {
   return runtime==='antigravity' ? result.output?.decision==='allow' : result.exit===0 && !result.output;
 }
+function workerFixture(cap = 24, reserve = 3, extraScope = null, centralLayout = false) {
+  const f = fixture('claude',centralLayout); execute('close',{cwd:f.cwd,sessionId:f.session});
+  const session = f.session + '-worker';
+  execute('register',{cwd:f.cwd,sessionId:session,scopes:['owned','.ecc/fresh-session/'+session,...(extraScope ? [extraScope] : [])],objective:'Fresh bounded worker',doneWhen:'Exact cap',ttl:30});
+  const assignment = {schema:'ecc.assignment.v1',assignment_id:'worker-'+count,goal_id:'fresh',description:'Verify exact tool cap',acceptance_ids:['guard'],
+    owner_runtime:'claude',owner_agent:'worker-owner',scope_paths:['owned'],issued_at:new Date().toISOString(),lease_expires_at:new Date(Date.now()+600000).toISOString(),
+    budget:{max_tool_calls:cap,max_retries:0,max_ci_runs:0,max_cost_usd:0},source_harness:'fixture',
+    managed_execution:{repository_root:repository(f.cwd).root,session_id:session,closure_reserve:reserve}};
+  const ledger = path.join(path.dirname(f.selectedGoal),'assignments.jsonl'), integrations = path.join(path.dirname(f.selectedGoal),'integrations.jsonl');
+  fs.writeFileSync(ledger,JSON.stringify(assignment)+'\n'); fs.writeFileSync(integrations,'');
+  if (!extraScope && cap-reserve>=10) execute('assignment-bind',{cwd:f.cwd,sessionId:session,assignment,goalReference:goalReference(repository(f.cwd),f.selectedGoal)});
+  const manifest = {...f.plan.manifest,session,toolLimit:undefined,workerAssignment:{id:assignment.assignment_id,ownerAgent:assignment.owner_agent}};
+  return {...f,session,assignment,ledger,integrations,manifest};
+}
+function prepareWorker(f) {
+  const plan = prepare(f.manifest);
+  return {...f,plan,options:{...f.options,sessionId:f.session,configFile:plan.environment.ECC_FRESH_SESSION_CONFIG}};
+}
+test('managed worker derives exact assignment cap, counts startup and preserves parent reserve', () => {
+  const f = prepareWorker(workerFixture());
+  assert.equal(f.plan.manifest.toolLimit,21);
+  const p = payload('claude',f.cwd);
+  preflight({...f.options,runtime:'claude',payload:p});
+  const status = () => execute('status',{cwd:f.cwd}).sessions.find(s => s.id === f.session).guard;
+  assert.equal(status().tools,5,'five matching-identity startup probes count; wrong-identity probe does not');
+  for (let n=0;n<16;n++) assert.equal(allowed(run('claude','pre',p,f.options),'claude'),true);
+  assert.equal(status().tools,21);
+  assert.equal(allowed(run('claude','pre',p,f.options),'claude'),false);
+  assert.equal(status().tools,21,'exhaustion denied before charge; separate log retains refusal');
+  assert.equal(allowed(run('claude','pre',p,f.options),'claude'),false);
+  assert.equal(status().tools,21,'repeated refusals cannot spend parent reserve');
+  assert.equal(status().workerAssignment.closureReserve,3,'parent settlement reserve is not extra worker tool authority');
+});
+test('worker default cannot widen cap and explicit over-cap, omitted binding or wrong scope refuses', () => {
+  const f = workerFixture();
+  assert.throws(()=>prepare({...f.manifest,toolLimit:200}),/cap exceeds exact assignment/);
+  assert.throws(()=>prepare({...f.manifest,workerAssignment:undefined}),/registered worker assignment/);
+  assert.throws(()=>prepare({...f.manifest,workerAssignment:{...f.manifest.workerAssignment,ownerAgent:'wrong'}}),/registered worker assignment/);
+  assert.throws(()=>prepare(workerFixture(12,3).manifest),/must be pinned/);
+  assert.throws(()=>prepare(workerFixture(24,3,'outside').manifest),/must be pinned/);
+  const otherGoal=path.join(f.cwd,'.ecc/other/active-goal.yaml');fs.mkdirSync(path.dirname(otherGoal),{recursive:true});fs.copyFileSync(f.selectedGoal,otherGoal);
+  assert.throws(()=>prepare({...f.manifest,goalFile:otherGoal,workerAssignment:undefined}),/registered worker assignment\/goal/);
+  const external=workerFixture(24,3,null,true), externalGoal=path.join(path.dirname(external.cwd),'artifacts/other/active-goal.yaml');
+  fs.mkdirSync(path.dirname(externalGoal),{recursive:true});fs.copyFileSync(external.selectedGoal,externalGoal);
+  assert.throws(()=>prepare({...external.manifest,goalFile:externalGoal,workerAssignment:undefined}),/registered worker assignment\/goal/);
+});
+test('worker assignment append remains valid but mutation, expiry and terminal usage fail closed', () => {
+  for (const change of ['mutation','expiry','settled','goal']) {
+    const f = prepareWorker(workerFixture()), p = payload('claude',f.cwd);
+    assert.equal(allowed(run('claude','pre',p,f.options),'claude'),true);
+    fs.appendFileSync(f.ledger,JSON.stringify({...f.assignment,assignment_id:'unrelated',managed_execution:{...f.assignment.managed_execution,session_id:'unrelated'}})+'\n');
+    assert.equal(allowed(run('claude','pre',p,f.options),'claude'),true,'unrelated append is not a matching-record revision');
+    if (change==='mutation') fs.writeFileSync(f.ledger,JSON.stringify({...f.assignment,budget:{...f.assignment.budget,max_tool_calls:200}})+'\n');
+    if (change==='expiry') fs.writeFileSync(f.ledger,JSON.stringify({...f.assignment,lease_expires_at:new Date(Date.now()-1).toISOString()})+'\n');
+    if (change==='settled') fs.appendFileSync(f.integrations,JSON.stringify({assignment_id:f.assignment.assignment_id,usage:{tool_calls:29}})+'\n');
+    if (change==='goal') {const g=JSON.parse(fs.readFileSync(f.selectedGoal));g.current_priority='Owner correction';fs.writeFileSync(f.selectedGoal,JSON.stringify(g));}
+    assert.equal(allowed(run('claude','pre',p,f.options),'claude'),false,change);
+  }
+  const f = workerFixture(); fs.writeFileSync(f.integrations,JSON.stringify({assignment_id:f.assignment.assignment_id,usage:{tool_calls:1}})+'\n');
+  assert.throws(()=>prepare(f.manifest),/already settled/);
+});
+test('closed historical worker binding cannot reset under a rewritten assignment/session', () => {
+  const f = prepareWorker(workerFixture()), p = payload('claude',f.cwd);
+  assert.equal(allowed(run('claude','pre',p,f.options),'claude'),true);
+  execute('close',{cwd:f.cwd,sessionId:f.session});
+  const replacement = f.session+'-replacement';
+  execute('register',{cwd:f.cwd,sessionId:replacement,scopes:['owned','.ecc/fresh-session/'+replacement],objective:'No reset',doneWhen:'Refused',ttl:30});
+  fs.writeFileSync(f.ledger,JSON.stringify({...f.assignment,issued_at:new Date().toISOString(),managed_execution:{...f.assignment.managed_execution,session_id:replacement}})+'\n');
+  const rewritten=JSON.parse(fs.readFileSync(f.ledger,'utf8'));
+  assert.throws(()=>execute('assignment-bind',{cwd:f.cwd,sessionId:replacement,assignment:rewritten,
+    goalReference:goalReference(repository(f.cwd),f.selectedGoal)}),/already pinned/);
+});
+test('two actual hook subprocesses race for one worker slot; at most one is permitted', async () => {
+  const f = prepareWorker(workerFixture()), p=payload('claude',f.cwd);
+  preflight({...f.options,runtime:'claude',payload:p});
+  for (let n=0;n<15;n++) assert.equal(allowed(run('claude','pre',p,f.options),'claude'),true);
+  const invoke = () => new Promise((resolve,reject) => {
+    const child = require('node:child_process').spawn(process.execPath,[path.join(testedRoot,'scripts/hooks/fresh-session-guard.js'),'claude','pre'],
+      {cwd:f.cwd,env:{...process.env,...f.plan.environment},windowsHide:true,stdio:['pipe','pipe','pipe']});
+    let output='',errors='';child.stdout.on('data',part=>output+=part);child.stderr.on('data',part=>errors+=part);
+    child.on('error',reject);child.on('close',code=>resolve({exit:code,output:output.trim()?JSON.parse(output):null,errors}));child.stdin.end(JSON.stringify(p));
+  });
+  const results=await Promise.all([invoke(),invoke()]);
+  assert.equal(results.filter(result=>allowed(result,'claude')).length,1);
+  assert.ok(results.every(result=>result.exit===0));
+});
+test('existing assignment CLI emits managed contract and rejects partial or duplicate session bindings', () => {
+  const f = workerFixture(24,3,'owned/sub'); fs.writeFileSync(f.ledger,'');
+  const {commandAssign} = require(path.join(testedRoot,'scripts/goal-control.js'));
+  const args = ['--dir',path.dirname(f.selectedGoal),'--description','Verify exact tool cap','--acceptance','guard','--work-kind','output',
+    '--owner-runtime','claude','--owner-agent','worker-owner','--scope','owned','--lease-until',new Date(Date.now()+600000).toISOString(),
+    '--max-tool-calls','24','--max-retries','0','--max-ci-runs','0','--max-cost-usd','0','--ram-gib','0.01','--disk-gib','0','--disk-path',f.cwd,
+    '--managed-session',f.session,'--managed-repo',f.cwd,'--closure-reserve','3'];
+  // Synthetic resource telemetry for this isolated parser/contract fixture only.
+  // Production admission still uses current kernel facts.
+  const original = os.freemem; os.freemem = () => 8 * 1024 ** 3;
+  try {
+    assert.throws(()=>commandAssign(args.slice(0,-2)),/managed assignment requires/);
+    const result=commandAssign(args); assert.equal(result.assigned,true);
+    assert.deepEqual(result.assignment.managed_execution,{repository_root:repository(f.cwd).root,session_id:f.session,closure_reserve:3});
+    assert.throws(()=>commandAssign(args),/already has an assignment/);
+    const plan=prepare({...f.manifest,workerAssignment:{id:result.assignment.assignment_id,ownerAgent:'worker-owner'}});
+    assert.equal(plan.manifest.toolLimit,21);
+  } finally {os.freemem=original;}
+});
 for (const runtime of SUPPORTED) test(runtime + ': automatic once-only preflight and actual allowed/blocked callback decisions', () => {
   const f=fixture(runtime), p=payload(runtime,f.cwd);
   const first=run(runtime,'pre',p,f.options);
@@ -67,13 +175,18 @@ for (const runtime of SUPPORTED) test(runtime + ': automatic once-only preflight
   assert.equal(allowed(run(runtime,'pre',p,f.options),runtime),true);
   assert.equal(fs.readFileSync(log,'utf8').trim().split('\n').length,entries.length+1,'cached preflight must not repeat probes');
 });
-test('managed admission retains the inherited foreign-change refusal',()=>{
+test('managed admission preserves inherited drafts but refuses ownership or changed bytes',()=>{
   const f=fixture('claude');execute('close',{cwd:f.cwd,sessionId:f.session});
   fs.writeFileSync(path.join(f.cwd,'foreign.txt'),'OTHER_OWNER_DRAFT');
-  const session=f.session+'-foreign';execute('register',{cwd:f.cwd,sessionId:session,scopes:['owned','.ecc/fresh-session'],objective:'Guard inherited draft',doneWhen:'Refused',ttl:30});
+  const session=f.session+'-foreign';execute('register',{cwd:f.cwd,sessionId:session,scopes:['owned','.ecc/fresh-session'],objective:'Guard inherited draft',doneWhen:'Preserved with scoped denies',ttl:30});
   const plan=prepare({...f.plan.manifest,session});const options={...f.options,sessionId:session,configFile:plan.environment.ECC_FRESH_SESSION_CONFIG};
-  assert.throws(()=>preflight({...options,runtime:'claude',payload:payload('claude',f.cwd)}),/inherited foreign/);
+  const receipt=preflight({...options,runtime:'claude',payload:payload('claude',f.cwd)});
+  assert.equal(receipt.results.length,6);
+  assert.equal(allowed(run('claude','pre',payload('claude',f.cwd,'owned/ok.txt'),options),'claude'),true);
+  assert.equal(allowed(run('claude','pre',payload('claude',f.cwd,'foreign.txt'),options),'claude'),false);
   assert.equal(fs.readFileSync(path.join(f.cwd,'foreign.txt'),'utf8'),'OTHER_OWNER_DRAFT');
+  fs.appendFileSync(path.join(f.cwd,'foreign.txt'),'OTHER_OWNER_UPDATE');
+  assert.equal(allowed(run('claude','pre',payload('claude',f.cwd,'owned/ok.txt'),options),'claude'),false);
 });
 test('changed central policy, native config, expired ownership and owner correction invalidate admission', () => {
   for(const mutation of ['policy','config','close','goal']) {
@@ -115,6 +228,49 @@ test('prepared launch refuses reuse, trust/permission bypass, changed argv and u
   assert.throws(()=>launch({...f.plan,environment:{...f.plan.environment,ECC_FRESH_SESSION_REQUIRED:'0'}}),/binding mismatch/);
   assert.equal(run('claude','startup',{session_id:'fresh-native',cwd:f.cwd},f.options).exit,0);
   assert.throws(()=>prepare(f.plan.manifest),/existing bindings/);
+});
+
+test('Codex launch denies failed native trust and rechecks owner, goal and configuration after observation', async () => {
+  const helper = require(path.join(testedRoot, 'scripts/lib/codex-hook-readiness.js'));
+  const original = helper.inspectCodexHooks;
+  try {
+    const denied = fixture('codex');
+    helper.inspectCodexHooks = async () => { throw Error('Native guard untrusted'); };
+    await assert.rejects(() => launch(denied.plan), /untrusted/);
+    for (const change of ['owner', 'goal', 'config', 'config-bytes', 'manifest']) {
+      const f = fixture('codex');
+      // Synthetic successful metadata only; mutation must still prevent spawn.
+      helper.inspectCodexHooks = async () => {
+        if (change === 'owner') execute('close', { cwd:f.cwd, sessionId:f.session });
+        if (change === 'goal') { const goal = JSON.parse(fs.readFileSync(f.selectedGoal)); goal.current_priority = 'Owner changed during probe'; fs.writeFileSync(f.selectedGoal, JSON.stringify(goal)); }
+        if (change === 'config') { const b = JSON.parse(fs.readFileSync(f.options.configFile)); fs.writeFileSync(path.join(f.cwd,b.nativeConfig), '{}'); }
+        if (change === 'config-bytes') { const b = JSON.parse(fs.readFileSync(f.options.configFile)); fs.appendFileSync(path.join(f.cwd,b.nativeConfig), ' '); }
+        if (change === 'manifest') { f.plan.manifest.args = ['--version']; f.plan.args[f.plan.args.length-1] = '--version'; }
+        return { ready:true };
+      };
+      await assert.rejects(() => launch(f.plan), /closed|goal reference mismatch|hook config changed|binding changed/);
+    }
+  } finally { helper.inspectCodexHooks = original; }
+});
+
+test('managed Codex arguments reject attached config/workspace overrides, alternate profiles and feature changes', () => {
+  const f = fixture('codex');
+  for (const flag of ['-cfeatures.hooks=false', '-Coutside', '-rretired', '-woutside', '-y', '-pother', '--profile=other', '--enable=plugins', '--cd=outside']) {
+    assert.throws(() => prepare({ ...f.plan.manifest, args:[flag] }), /arguments required/);
+  }
+  assert.throws(() => launch({ ...f.plan, manifest:{ ...f.plan.manifest, args:['-cfeatures.hooks=false'] } }), /arguments required/);
+  assert.throws(() => launch({ ...f.plan, executable:path.resolve(__filename), manifest:{ ...f.plan.manifest, executable:path.resolve(__filename) } }), /executable\/argument binding changed/);
+});
+
+test('private fresh-session state and scope-guard logs stay local without hiding code or handoffs', () => {
+  for (const file of ['.ecc/fresh-session/fixture/binding.json', '.ecc/fresh-session/fixture/hooks.json', 'artifacts/agent-runs/scope-guard/fixture.jsonl']) {
+    const r = spawnSync('git', ['check-ignore', '--no-index', '--', file], { cwd:testedRoot, encoding:'utf8', windowsHide:true });
+    assert.equal(r.status, 0, `Runtime metadata must not dirty the release checkout: ${file}`);
+  }
+  for (const file of ['scripts/hooks/fresh-session-guard.js', '.ecc/source.js', '.ecc/handoff.json', 'artifacts/agent-runs/scope-guard-source.js']) {
+    const r = spawnSync('git', ['check-ignore', '--no-index', '--', file], { cwd:testedRoot, encoding:'utf8', windowsHide:true });
+    assert.equal(r.status, 1, `Source or handoff must remain visible: ${file}`);
+  }
 });
 test('OpenCode actual plugin callback automatically preflights and throws before outside execution; unmanaged processes unchanged', async () => {
   const plugin=await import(pathToFileURL(path.join(testedRoot,'.opencode/plugins/ecc-fresh-session-guard.mjs')).href);
@@ -184,4 +340,141 @@ test('compacted central workspace declaration keeps the primary checkout fence a
   assert.equal(workspaceBoundary(f.cwd,f.policyRoot).branch,'seabridge_development');
   fs.writeFileSync(system,'SYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1\nCode malformed compact declaration\n');
   assert.throws(()=>workspaceBoundary(f.cwd,f.policyRoot),/Malformed central workspace/);
+});
+
+test('selected external artifact goal admits without a repository default and stays write protected',()=>{
+  const f=fixture('claude',true,'artifacts/owned-task/active-goal.yaml');
+  assert.equal(fs.existsSync(path.join(f.cwd,'.ecc/goal/active-goal.yaml')),false);
+  const before=fs.readFileSync(f.selectedGoal),p=payload('claude',f.cwd);
+  assert.equal(allowed(run('claude','pre',p,f.options),'claude'),true);
+  assert.equal(allowed(run('claude','pre',payload('claude',f.cwd,f.selectedGoal),f.options),'claude'),false);
+  const saved=JSON.parse(fs.readFileSync(f.options.configFile));
+  assert.deepEqual(saved.goalReference,f.plan.manifest.goalReference);
+  assert.equal(saved.goalReference.file,f.plan.manifest.goalFile);
+  assert.deepEqual(fs.readFileSync(f.selectedGoal),before);
+  assert.equal(fs.existsSync(path.join(f.cwd,'.ecc/goal/active-goal.yaml')),false);
+});
+
+test('selected goal changes invalidate cached startup, pre, turn and final',()=>{
+  for(const change of ['priority','bytes','missing']){
+    const f=fixture('claude',true,'artifacts/owned-task/active-goal.yaml'),p=payload('claude',f.cwd);
+    assert.equal(allowed(run('claude','pre',p,f.options),'claude'),true);
+    if(change==='missing')fs.unlinkSync(f.selectedGoal);
+    else if(change==='bytes')fs.appendFileSync(f.selectedGoal,'\n');
+    else{const goal=JSON.parse(fs.readFileSync(f.selectedGoal));goal.current_priority='Owner correction';fs.writeFileSync(f.selectedGoal,JSON.stringify(goal));}
+    assert.equal(run('claude','startup',{session_id:'fresh-native',cwd:f.cwd},f.options).exit,2,change);
+    assert.equal(allowed(run('claude','pre',p,f.options),'claude'),false,change);
+    for(const event of ['turn','final'])assert.equal(run('claude',event,{...p,turn_id:'fresh-turn'},f.options).output?.decision,'block',change+':'+event);
+  }
+});
+
+test('goal references reject invalid paths, documents and generic-project external goals',()=>{
+  const f=fixture('claude',true,'artifacts/owned-task/active-goal.yaml');
+  const repo=repository(f.cwd),workspace=workspaceBoundary(f.cwd,f.policyRoot).workspace;
+  const foreign=fixture('claude');
+  const missing=path.join(workspace,'artifacts/missing.yaml');
+  for(const file of [missing,path.join(workspace,'artifacts'),f.selectedGoal+'/../active-goal.yaml',
+      f.selectedGoal+':stream',f.selectedGoal+'.',f.selectedGoal+' ',foreign.selectedGoal]){
+    assert.throws(()=>goalReference(repo,file,workspace),undefined,file);
+  }
+  assert.throws(()=>goalReference(repository(foreign.cwd),f.selectedGoal),/outside repository/);
+  const invalid=path.join(workspace,'artifacts/invalid.yaml');
+  fs.writeFileSync(invalid,'{}');
+  assert.throws(()=>goalReference(repo,invalid,workspace),/invalid scope guard goal/);
+  fs.writeFileSync(invalid,' '.repeat(256*1024+1));
+  assert.throws(()=>goalReference(repo,invalid,workspace),/bounded regular/);
+  if(process.platform==='win32'){
+    assert.throws(()=>goalReference(repo,'\\\\?\\'+f.selectedGoal,workspace));
+    assert.throws(()=>goalReference(repo,'\\\\.\\'+f.selectedGoal,workspace));
+  }
+});
+
+test('selected artifact goal rejects linked ancestors on admission and cached startup',()=>{
+  const f=fixture('claude',true,'artifacts/owned-task/active-goal.yaml'),p=payload('claude',f.cwd);
+  assert.equal(allowed(run('claude','pre',p,f.options),'claude'),true);
+  const directory=path.dirname(f.selectedGoal),moved=directory+'-retained';
+  fs.renameSync(directory,moved);
+  fs.symlinkSync(moved,directory,process.platform==='win32'?'junction':'dir');
+  assert.throws(()=>goalReference(repository(f.cwd),f.selectedGoal,path.dirname(f.cwd)),/linked path/);
+  assert.equal(run('claude','startup',{session_id:'fresh-native',cwd:f.cwd},f.options).exit,2);
+});
+
+test('manifest or persisted goal substitution is rejected before launch or cached admission',()=>{
+  const f=fixture('claude',true,'artifacts/owned-task/active-goal.yaml'),p=payload('claude',f.cwd);
+  assert.equal(allowed(run('claude','pre',p,f.options),'claude'),true);
+  const other=path.join(path.dirname(f.selectedGoal),'other-goal.yaml');
+  fs.copyFileSync(f.selectedGoal,other);
+  assert.throws(()=>launch({...f.plan,manifest:{...f.plan.manifest,goalFile:other}}),/goal reference mismatch/);
+  const binding=JSON.parse(fs.readFileSync(f.options.configFile));
+  binding.goalReference=goalReference(repository(f.cwd),other,path.dirname(f.cwd));
+  fs.writeFileSync(f.options.configFile,JSON.stringify(binding));
+  assert.equal(run('claude','startup',{session_id:'fresh-native',cwd:f.cwd},f.options).exit,2);
+});
+
+test('repository-local selected goal remains protected inside registered scopes',()=>{
+  const f=fixture('claude',false,'selected-goal.yaml'),p=payload('claude',f.cwd);
+  assert.equal(allowed(run('claude','pre',p,f.options),'claude'),true);
+  assert.equal(allowed(run('claude','pre',payload('claude',f.cwd,f.selectedGoal),f.options),'claude'),false);
+});
+
+test('stripped references and unbound version downgrade cannot replace the selected goal',()=>{
+  const f=fixture('claude',true,'artifacts/owned-task/active-goal.yaml');
+  const binding=JSON.parse(fs.readFileSync(f.options.configFile));
+  const manifest={...f.plan.manifest};delete manifest.goalFile;delete manifest.goalReference;
+  delete binding.goalReference;
+  fs.writeFileSync(f.options.configFile,JSON.stringify(binding));
+  assert.throws(()=>launch({...f.plan,manifest}),/goal reference required/);
+  assert.equal(run('claude','startup',{session_id:'fresh-native',cwd:f.cwd},f.options).exit,2);
+  binding.version=1;fs.writeFileSync(f.options.configFile,JSON.stringify(binding));
+  assert.throws(()=>launch({...f.plan,version:1,manifest}),/version 2/);
+  assert.equal(run('claude','startup',{session_id:'fresh-native',cwd:f.cwd},f.options).exit,2);
+  assert.equal(execute('status',{cwd:f.cwd}).sessions.find(s=>s.id===f.session).guard,undefined);
+});
+
+test('goal identity replacement during open or parse and in-place parse mutation fail closed',()=>{
+  for(const stage of ['open-replace','parse-replace','parse-mutate']){
+    const f=fixture('claude',true,'artifacts/owned-task/active-goal.yaml');
+    const original=fs.readFileSync(f.selectedGoal),repo=repository(f.cwd),workspace=path.dirname(f.cwd);
+    const originalOpen=fs.openSync,yaml=require('js-yaml'),originalParse=yaml.load;
+    let changed=false;
+    const mutate=()=>{
+      changed=true;
+      if(stage==='parse-mutate')fs.appendFileSync(f.selectedGoal,'\n');
+      else{fs.renameSync(f.selectedGoal,f.selectedGoal+'.retained');fs.writeFileSync(f.selectedGoal,original);}
+    };
+    try{
+      if(stage==='open-replace')fs.openSync=function(file,...args){
+        if(!changed&&path.resolve(String(file)).toLowerCase()===f.selectedGoal.toLowerCase())mutate();
+        return originalOpen.call(this,file,...args);
+      };
+      else yaml.load=function(...args){const parsed=originalParse.apply(this,args);if(!changed)mutate();return parsed;};
+      assert.throws(()=>goalReference(repo,f.selectedGoal,workspace),/goal identity changed/);
+      assert.equal(changed,true,stage);
+    }finally{fs.openSync=originalOpen;yaml.load=originalParse;}
+  }
+});
+
+test('serialized primary handoff binds distinct task goals without a shared default or cross-invalidation',()=>{
+  const f=fixture('claude',true,'artifacts/first/active-goal.yaml');
+  execute('close',{cwd:f.cwd,sessionId:f.session});
+  const goalFiles=[f.selectedGoal,path.join(path.dirname(f.cwd),'artifacts/second/active-goal.yaml')];
+  const owners=['task-first','task-second'],options=[];
+  for(let i=0;i<owners.length;i++){
+    if(i>0)execute('close',{cwd:f.cwd,sessionId:owners[i-1]}); // One primary integration writer; no gate relaxation.
+    const goal=JSON.parse(fs.readFileSync(f.selectedGoal));goal.goal_id=owners[i];
+    fs.mkdirSync(path.dirname(goalFiles[i]),{recursive:true});fs.writeFileSync(goalFiles[i],JSON.stringify(goal));
+    execute('register',{cwd:f.cwd,sessionId:owners[i],scopes:['owned/'+owners[i],'.ecc/fresh-session/'+owners[i]],
+      objective:'Own task only',doneWhen:'Distinct goal respected',ttl:30});
+    const prepared=prepare({...f.plan.manifest,session:owners[i],goalFile:goalFiles[i]});
+    const current={cwd:f.cwd,sessionId:owners[i],policyRoot:f.policyRoot,configFile:prepared.environment.ECC_FRESH_SESSION_CONFIG};
+    options.push(current);
+    assert.equal(allowed(run('claude','pre',payload('claude',f.cwd,'owned/'+owners[i]+'/ok.txt',owners[i]),current),'claude'),true);
+  }
+  const registry=execute('status',{cwd:f.cwd});
+  for(const owner of owners)assert.equal(registry.sessions.find(s=>s.id===owner).guard.goalId,owner);
+  const corrected=JSON.parse(fs.readFileSync(goalFiles[0]));corrected.current_priority='First task owner correction';
+  fs.writeFileSync(goalFiles[0],JSON.stringify(corrected));
+  assert.equal(run('claude','startup',{session_id:owners[0],cwd:f.cwd},options[0]).exit,2);
+  assert.equal(allowed(run('claude','pre',payload('claude',f.cwd,'owned/'+owners[1]+'/ok.txt',owners[1]),options[1]),'claude'),true);
+  assert.equal(fs.existsSync(path.join(f.cwd,'.ecc/goal/active-goal.yaml')),false);
 });

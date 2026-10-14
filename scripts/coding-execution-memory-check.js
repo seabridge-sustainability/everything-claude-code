@@ -5,14 +5,16 @@
 const fs=require('node:fs'),crypto=require('node:crypto'),path=require('node:path');
 const {spawn}=require('node:child_process');
 const {pin}=require('./lib/coding-execution-host');
-const {digest}=require('./lib/coding-execution');
+const {digest,assert:assertContract}=require('./lib/coding-execution');
 function matches(ref,result){
+  try{assertContract('citation',ref);}catch{return false;}
   const hit=result?.chunk??result?.hit??result;
   return ref.scope==='engineering:seabridge-code' && hit &&
     ['source_id','version','citation','source_revision','line_start','line_end','chunk_id','policy_epoch'].every(key=>hit[key]===ref[key]);
 }
 async function authorize(ref,config){
-  if(ref.scope!=='engineering:seabridge-code'||config.scope!=='engineering:seabridge-code')return false;
+  try{assertContract('citation',ref);}catch{return false;}
+  if(config?.scope!=='engineering:seabridge-code')return false;
   const python=pin(config.python),proxy=pin(config.proxy);
   for(const dependency of config.dependency_pins||[])pin(dependency);
   const url=new URL(config.url);

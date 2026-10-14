@@ -681,6 +681,12 @@ function evaluateClaim(claim, bundle, options = {}) {
     if (nonBlocked.length) {
       reasons.push(`unmet proofs still have non-blocked lanes: ${nonBlocked.map(proof => proof.id).join(', ')}`);
     }
+    // Proof completion is not task exhaustion. An optional/already-met/unmapped
+    // lane can still carry explicitly declared, authorized continuation work.
+    const activeActions = goal.lanes.filter(lane => lane.status === 'active' && lane.next_action?.trim());
+    if (activeActions.length) {
+      reasons.push(`active lanes have next actions: ${activeActions.map(lane => lane.id).join(', ')}`);
+    }
     if (resume?.independent_work_remaining.length) {
       reasons.push(`independent work remains: ${resume.independent_work_remaining.join('; ')}`);
     }

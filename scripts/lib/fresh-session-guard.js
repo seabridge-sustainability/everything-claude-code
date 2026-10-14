@@ -32,7 +32,7 @@ if (fs.existsSync(engineBinding)) {
   process.env.NODE_PATH = modules + (process.env.NODE_PATH ? path.delimiter + process.env.NODE_PATH : '');
   require('node:module').Module._initPaths();
 }
-const { execute, checkSession, repository } = require(path.join(engineRoot, 'scripts/lib/session-coordination.js'));
+const { execute, checkSession, repository, goalReference, assignmentReference } = require(path.join(engineRoot, 'scripts/lib/session-coordination.js'));
 const { normalizePayload, denialOutput } = require(path.join(engineRoot, 'scripts/lib/scope-guard-adapters.js'));
 const { normalize: normalizeAntigravity } = require(path.join(engineRoot, 'scripts/hooks/antigravity-scope-guard.js'));
 const { writeFileAtomic } = require(path.join(engineRoot, 'scripts/lib/atomic-write.js'));
@@ -85,7 +85,7 @@ function workspaceBoundary(cwd, policyRoot) {
 }
 function context({ cwd, runtime, sessionId, payload, policyRoot, configFile }) {
   const native = normalize(runtime, payload, cwd);
-  workspaceBoundary(cwd, policyRoot);
+  const workspace = workspaceBoundary(cwd, policyRoot);
   const repo = repository(cwd);
   const session = checkSession({ cwd, sessionId });
   if (!configFile || !path.isAbsolute(configFile)) throw Error('reviewed fresh launch config required');
@@ -93,6 +93,22 @@ function context({ cwd, runtime, sessionId, payload, policyRoot, configFile }) {
   if (relative.startsWith('../') || path.isAbsolute(relative) || fs.lstatSync(configFile).isSymbolicLink()) throw Error('fresh config must be inside owned worktree');
   const files = policyFiles(policyRoot);
   const binding = JSON.parse(fs.readFileSync(configFile, 'utf8'));
+  if (binding.version !== 2 && !(binding.version === 1 && session.guard
+      && !session.guard.goalReference && !binding.goalReference)) throw Error('Unbound legacy or unknown fresh binding refused');
+  if (binding.version === 2 && !binding.goalReference) throw Error('reviewed goal reference missing');
+  if (binding.goalReference || session.guard?.goalReference) {
+    if (!binding.goalReference) throw Error('reviewed goal reference missing');
+    const selected = goalReference(repo, binding.goalReference.file, workspace?.workspace ?? null);
+    if (JSON.stringify(selected) !== JSON.stringify(binding.goalReference)
+        || (session.guard && JSON.stringify(selected) !== JSON.stringify(session.guard.goalReference))) throw Error('reviewed goal reference changed');
+  }
+  if (binding.workerAssignment || session.guard?.workerAssignment) {
+    if (!binding.workerAssignment || !assignmentReference) throw Error('managed worker assignment binding required');
+    const current = assignmentReference(repo,binding.goalReference,binding.workerAssignment,session,runtime);
+    if (JSON.stringify(current) !== JSON.stringify(binding.workerAssignment)
+        || binding.toolLimit > current.toolCeiling
+        || (session.guard && JSON.stringify(session.guard.workerAssignment) !== JSON.stringify(current))) throw Error('managed worker assignment changed');
+  } else if (assignmentReference && binding.goalReference) assignmentReference(repo,binding.goalReference,null,session,runtime);
   const nativeConfig = path.resolve(repo.root, binding.nativeConfig || '');
   if (!binding.nativeConfig || path.relative(repo.root, nativeConfig).startsWith('..')
       || fs.lstatSync(nativeConfig).isSymbolicLink() || hash(nativeConfig) !== binding.nativeConfigSha256) throw Error('native config changed or outside worktree');
@@ -137,7 +153,12 @@ function preflight(options) {
     execute('guard-bind', { cwd: ctx.repo.root, sessionId: ctx.session.id, guardMode: 'block',
       nativeSessionId: ctx.native.session_id, deadline: new Date(ctx.session.expiresAt).toISOString(),
       toolLimit: config.toolLimit, turnLimit: config.turnLimit,
-      protectedPaths: [ctx.relative, config.nativeConfig, '.ecc/goal/active-goal.yaml'] });
+      ...(config.workerAssignment ? {workerAssignment:config.workerAssignment,runtime:options.runtime} : {}),
+      ...(config.goalReference ? { goalReference: config.goalReference } : {}),
+      protectedPaths: [ctx.relative, config.nativeConfig,
+        ...(config.goalReference ? (config.goalReference.boundary === ctx.repo.root
+          ? [path.relative(ctx.repo.root, config.goalReference.file).replace(/\\/g, '/')] : [])
+          : ['.ecc/goal/active-goal.yaml'])] });
     ctx = context(options);
   }
   if (ctx.session.guard.nativeSessionId !== ctx.native.session_id || ctx.session.guard.mode !== 'block') throw Error('fresh guard identity/mode mismatch');
@@ -147,7 +168,7 @@ function preflight(options) {
   const probes = [
     ['allowed-owned-write', { ...base, tool_input: { file_path: target } }, true],
     ['blocked-outside-write', { ...base, tool_input: { file_path: '../ecc-preflight-outside' } }, false],
-    ['blocked-policy-write', { ...base, tool_input: { file_path: '.ecc/goal/active-goal.yaml' } }, false],
+    ['blocked-policy-write', { ...base, tool_input: { file_path: ctx.binding.goalReference?.file ?? '.ecc/goal/active-goal.yaml' } }, false],
     ['blocked-config-write', { ...base, tool_input: { file_path: ctx.relative } }, false],
     ['blocked-opaque-shell', { ...base, tool_name: 'Bash', tool_input: { command: 'echo ECC_PREFLIGHT' } }, false],
     ['blocked-wrong-identity', { ...base, session_id: ctx.native.session_id + '-wrong', tool_input: { file_path: target } }, false],
@@ -176,4 +197,4 @@ function guard(options, event) {
     guardMode: 'block', event, payload: ctx.native });
 }
 module.exports = { SUPPORTED, normalize, policyFiles, workspaceBoundary, context, preflight, guard,
-  execute, checkSession, repository, denialOutput, engineRoot };
+  execute, checkSession, repository, goalReference, assignmentReference, denialOutput, engineRoot };
