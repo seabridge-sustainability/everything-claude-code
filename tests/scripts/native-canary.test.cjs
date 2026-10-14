@@ -29,6 +29,9 @@ test('Windows canaries use installed package entrypoints and supported Codex fla
   assert.ok(spec('gemini').entry.replaceAll('\\','/').endsWith('/@google/gemini-cli/bundle/gemini.js'));
   assert.ok(spec('opencode').exe.replaceAll('\\','/').endsWith('/opencode-ai/bin/opencode.exe'));
   assert.ok(!spec('codex').args.includes('--no-daemon'));
+  const prompt=spec('codex').args.at(-1);
+  for(const name of ['AGENTS.md','AGENTS_SYSTEM.md','CLAUDE.md'])assert.ok(prompt.includes('seabridge-policy:///'+name));
+  assert.ok(prompt.includes('Do not run shell'));
 });
 test('a new smaller batch cannot enlarge exposure, hide retries or omit soft-cap acknowledgement',()=>{
   const approval={id:'reviewed-two-client-batch',authorization:{softCapsAcknowledged:true,maximumNativeCanaryInvocations:2,maximumTotalUsd:1.25,retries:0}};

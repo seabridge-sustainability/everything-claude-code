@@ -16,7 +16,7 @@ const clients = [
   { name: 'VS Code', file: 'AppData/Roaming/Code/User/mcp.json', section: 'servers', value: { type: 'stdio', ...stdio } },
   { name: 'Cursor', file: '.cursor/mcp.json', section: 'mcpServers' },
   { name: 'Codex', file: '.codex/config.toml', section: 'mcp_servers', toml: true },
-  { name: 'Antigravity', file: '.gemini/antigravity/mcp_config.json', section: 'mcpServers', optional: true }
+  { name: 'Antigravity', file: '.gemini/config/mcp_config.json', section: 'mcpServers', optional: true }
 ];
 function parse(raw, isToml) {
   if (isToml) return toml.parse(raw);

@@ -1,11 +1,35 @@
 import { require, findWorkflow, readEntry } from '../dev-suite/runtime.mjs';
-import { preparePlan, validateReview, verifyFeature, features } from './runtime.mjs';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { ROOT, preparePlan, validateReview, verifyFeature, features } from './runtime.mjs';
 import { registerFactoryTool } from '../software-factory/mcp.mjs';
 const { McpServer } = require('@modelcontextprotocol/sdk/server/mcp.js');
 const { StdioServerTransport } = require('@modelcontextprotocol/sdk/server/stdio.js');
 const { z } = require('zod');
 export async function startMcp() {
   const server = new McpServer({ name: 'seabridge-pstack', version: '1.0.0' }, { instructions: 'ECC-controlled Pstack. Find and read exact adapted workflows through pstack_find_workflow/pstack_read_skill or the existing shared suite. Prepare plan packets, validate exact candidate/judge reviews, and run bounded verification. Tools do not call LLM providers or authorize implementation. Current project policy and one active ECC goal control scope; GSD and upstream skills support that goal. No service restarts, worktrees, publication, cloud dispatch or shared data mutations.' });
+  // Fixed, optional resources let clients without a local Read tool load the
+  // existing authority. No arbitrary path parameter or additional rulebook.
+  const policyRoot = path.resolve(ROOT, '../manageesg-backend');
+  for (const name of ['AGENTS.md', 'AGENTS_SYSTEM.md', 'CLAUDE.md']) {
+    server.registerResource(name, 'seabridge-policy:///' + name, {
+      mimeType: 'text/markdown', description: 'Current SeaBridgeAI central instruction file; applies only within SeaBridgeAI.'
+    }, async uri => {
+      const file = path.join(policyRoot, name), stat = await fs.lstat(file);
+      const actualRoot = await fs.realpath(policyRoot);
+      if (!stat.isFile() || stat.isSymbolicLink() || stat.size > 65536
+        || path.resolve(await fs.realpath(file)) !== path.join(actualRoot, name)) throw Error('Bounded regular central instruction file required');
+      const handle = await fs.open(file, 'r');
+      try {
+        const current = await handle.stat();
+        if (current.ino !== stat.ino || current.size !== stat.size) throw Error('Central instruction file changed before read');
+        const buffer = Buffer.alloc(65537), { bytesRead } = await handle.read(buffer, 0, buffer.length, 0);
+        const after = await handle.stat();
+        if (bytesRead > 65536 || bytesRead !== current.size || after.size !== current.size || after.mtimeMs !== current.mtimeMs) throw Error('Central instruction file changed during read');
+        return { contents: [{ uri: uri.href, mimeType: 'text/markdown', text: buffer.subarray(0, bytesRead).toString('utf8') }] };
+      } finally { await handle.close(); }
+    });
+  }
   const tool = (name, description, schema, handler) => server.tool(name, description, schema, async args => {
     try { return { content: [{ type: 'text', text: JSON.stringify(await handler(args)) }] }; }
     catch (e) { return { isError: true, content: [{ type: 'text', text: e.message }] }; }

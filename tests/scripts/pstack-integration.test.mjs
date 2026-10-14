@@ -16,6 +16,21 @@ function completedReview(packet) {
 }
 
 test('complete pinned source verifies every Git blob and SHA256', async () => { assert.equal((await sourceIntegrity()).files, 167); });
+test('fixed central policy resources return current source and reject arbitrary paths', async () => {
+  const client = new Client({ name: 'pstack-policy-reader-proof', version: '1.0.0' });
+  await client.connect(new StdioClientTransport({ command: process.execPath, args: [path.join(ROOT, 'integrations/pstack/cli.mjs'), 'mcp'], stderr: 'pipe' }));
+  try {
+    const names = ['AGENTS.md', 'AGENTS_SYSTEM.md', 'CLAUDE.md'];
+    assert.deepEqual((await client.listResources()).resources.map(r => r.uri).sort(), names.map(n => 'seabridge-policy:///' + n).sort());
+    assert.equal((await client.listResourceTemplates()).resourceTemplates.length, 0);
+    for (const name of names) {
+      const result = await client.readResource({ uri: 'seabridge-policy:///' + name });
+      assert.equal(result.contents.length, 1);
+      assert.equal(result.contents[0].text, await fs.readFile(path.resolve(ROOT, '../manageesg-backend', name), 'utf8'));
+    }
+    for (const uri of ['seabridge-policy:///.env', 'seabridge-policy:///../.env', 'file:///C:/Windows/win.ini']) await assert.rejects(client.readResource({ uri }));
+  } finally { await client.close(); }
+});
 test('Pstack routing has one primary and digest-checked adapter reads', async () => {
   for (const [query, name] of [['multi-model planning', 'arena'], ['verification skill', 'create-verification-skill'], ['maintain verification', 'maintain-verification-skill'], ['adversarial review', 'interrogate']]) {
     const found = await findWorkflow({ query });

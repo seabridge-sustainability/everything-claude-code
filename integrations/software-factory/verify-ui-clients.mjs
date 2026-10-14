@@ -9,7 +9,7 @@ const ROOT=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../..');
 const {Client}=require('@modelcontextprotocol/sdk/client/index.js');
 const {StdioClientTransport}=require('@modelcontextprotocol/sdk/client/stdio.js');
 const toml=require('@iarna/toml'),jsonc=require('jsonc-parser');
-const configs=[['Claude','.claude.json','mcpServers'],['Gemini','.gemini/settings.json','mcpServers'],['OpenCode','.config/opencode/opencode.json','mcp'],['VS Code','AppData/Roaming/Code/User/mcp.json','servers'],['Cursor','.cursor/mcp.json','mcpServers'],['Codex','.codex/config.toml','mcp_servers']];
+const configs=[['Claude','.claude.json','mcpServers'],['Gemini','.gemini/settings.json','mcpServers'],['Antigravity','.gemini/config/mcp_config.json','mcpServers'],['OpenCode','.config/opencode/opencode.json','mcp'],['VS Code','AppData/Roaming/Code/User/mcp.json','servers'],['Cursor','.cursor/mcp.json','mcpServers'],['Codex','.codex/config.toml','mcp_servers']];
 const results=[];
 for(const [host,file,key]of configs){
   const raw=fs.readFileSync(path.join(os.homedir(),file),'utf8'),cfg=file.endsWith('.toml')?toml.parse(raw):jsonc.parse(raw.replace(/^\uFEFF/,''));
@@ -30,5 +30,6 @@ for(const [host,file,key]of configs){
     results.push({host,server:name,registrationSha256:crypto.createHash('sha256').update(raw).digest('hex'),sdkStdioProof:true,uiFeatureDiscovery:true,incompleteSpecDenied:true,cMediaDenied:true,nativeAgentInvocationProved:false,calls:3});
   }finally{await client.close();}
 }
-const receipt={checkedAt:new Date().toISOString(),results,calls:18,providerCalls:0,newServices:0,restartedSessions:0,nativeAgentInvocationProved:false,limitation:'Saved registrations exercised through MCP SDK. Separate native client/model/vision and authenticated product proofs are required.'};
-const output=path.join(ROOT,'artifacts/agent-runs/pstack/engineering-skills/ui-workflow-audit-20261013','ui-clients-'+Date.now()+'.json');fs.writeFileSync(output,JSON.stringify(receipt,null,2)+'\n');console.log(JSON.stringify({clients:results.length,calls:18,providerCalls:0,output}));
+const calls=results.reduce((sum,result)=>sum+result.calls,0);
+const receipt={checkedAt:new Date().toISOString(),results,calls,providerCalls:0,newServices:0,restartedSessions:0,nativeAgentInvocationProved:false,limitation:'Saved registrations exercised through MCP SDK. Separate native client/model/vision and authenticated product proofs are required.'};
+const output=path.join(ROOT,'artifacts/agent-runs/pstack/engineering-skills/ui-workflow-audit-20261013','ui-clients-'+Date.now()+'.json');fs.writeFileSync(output,JSON.stringify(receipt,null,2)+'\n');console.log(JSON.stringify({clients:results.length,calls,providerCalls:0,output}));

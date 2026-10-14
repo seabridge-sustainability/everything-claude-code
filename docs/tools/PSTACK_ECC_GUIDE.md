@@ -170,6 +170,23 @@ clients and unsupported native adapters are not retroactively certified.
 
 ## Upstream boundary and maintenance
 
+Clients without a permitted local file reader can load the existing central
+instructions from `seabridge-pstack` MCP resources:
+`seabridge-policy:///AGENTS.md`, `seabridge-policy:///AGENTS_SYSTEM.md` and
+`seabridge-policy:///CLAUDE.md`. They return current source, read-only, with a
+64 KiB bound per file and no arbitrary path/template. These instructions apply
+only within SeaBridgeAI; resources do not grant permissions. Existing sessions
+retain their loaded server until an owner chooses to reconnect or starts a fresh session.
+
+Antigravity's current registration is `C:/Users/adelm/.gemini/config/mcp_config.json`
+([official MCP documentation](https://www.antigravity.google/docs/mcp/)).
+The legacy `.gemini/antigravity/mcp_config.json` path is not the current target.
+`node integrations/software-factory/verify-ui-clients.mjs` exercises seven saved
+registrations through the MCP SDK, including Antigravity, without model calls.
+This verifies transport and UI admission refusals; native account/model/vision
+proof remains separate. A provider-free reader proof does not certify a native
+model run. An exhausted no-retry batch requires new bounded live-eval approval.
+
 ### Accepted-change feature maintenance
 
 After the product owner publishes an accepted frontend change, run
