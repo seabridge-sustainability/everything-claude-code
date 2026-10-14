@@ -16,6 +16,34 @@ function completedReview(packet) {
 }
 
 test('complete pinned source verifies every Git blob and SHA256', async () => { assert.equal((await sourceIntegrity()).files, 167); });
+test('read-only MCP canary exposes three tools, rejects mutable inputs and bounds successful dispatches', async () => {
+  const client = new Client({ name: 'pstack-read-only-canary-proof', version: '1.0.0' });
+  await client.connect(new StdioClientTransport({ command: process.execPath, args: [path.join(ROOT, 'integrations/pstack/cli.mjs'), 'mcp', '--canary'], stderr: 'pipe' }));
+  try {
+    const tools = (await client.listTools()).tools;
+    assert.deepEqual(tools.map(t => t.name).sort(), ['pstack_find_workflow', 'pstack_read_skill', 'pstack_factory'].sort());
+    assert.ok(tools.every(t => t.annotations.readOnlyHint && !t.annotations.destructiveHint && !t.annotations.openWorldHint));
+    const call = arguments_ => client.callTool({ name: 'pstack_factory', arguments: arguments_ });
+    async function denied(args) {
+      try { assert.equal((await call(args)).isError, true); }
+      catch (error) { if (error.code !== -32602) throw error; }
+    }
+    await denied({ operation: 'prepare' });
+    await denied({ operation: 'ui-admit', contract: { version: 1 } });
+    await denied({ operation: 'ui-image', file: 'D:/SeaBridgeAI-data/not-real.png' });
+    const found = await client.callTool({ name: 'pstack_find_workflow', arguments: { query: 'frontend UI verification' } });
+    assert.ok(!found.isError);
+    const selected = JSON.parse(found.content[0].text)[0];
+    assert.ok(!(await client.callTool({ name: 'pstack_read_skill', arguments: { id: selected.id } })).isError);
+    assert.ok(!(await call({ operation: 'ui-features' })).isError);
+    const vague = await call({ operation: 'ui-admit', contract: {} });
+    assert.equal(vague.isError, true); assert.match(vague.content[0].text, /Incomplete UI specification/);
+    const image = await call({ operation: 'ui-image', file: 'C:/ecc-canary-not-a-real-image.png' });
+    assert.equal(image.isError, true); assert.match(image.content[0].text, /D-only browser evidence/);
+    const sixth = await call({ operation: 'ui-features' });
+    assert.equal(sixth.isError, true); assert.match(sixth.content[0].text, /tool-call limit/);
+  } finally { await client.close(); }
+});
 test('fixed central policy resources return current source and reject arbitrary paths', async () => {
   const client = new Client({ name: 'pstack-policy-reader-proof', version: '1.0.0' });
   await client.connect(new StdioClientTransport({ command: process.execPath, args: [path.join(ROOT, 'integrations/pstack/cli.mjs'), 'mcp'], stderr: 'pipe' }));

@@ -17,7 +17,10 @@ try {
   else if (command === 'verify') result = await verifyFeature(input);
   else if (command === 'factory') result = await (await import('../software-factory/runtime.mjs')).factoryRequest(await request());
   else if (command === 'status') result = { revision, source: await sourceIntegrity(), features, providerCalls: 0, runtime: 'ECC-controlled; agent-native model calls are separately authorized' };
-  else if (command === 'mcp') await (await import('./mcp.mjs')).startMcp();
+  else if (command === 'mcp') {
+    if (input && input !== '--canary') throw Error('Only the explicit --canary MCP mode is supported');
+    await (await import('./mcp.mjs')).startMcp({ canary: input === '--canary' });
+  }
   else throw Error('Usage: node integrations/pstack/cli.mjs status | find|read|plan|review|factory request.json|- | verify FEATURE | mcp');
   if (result) { console.log(JSON.stringify(result, null, 2)); if (result.verdict === 'FAIL') process.exitCode = 1; if (result.verdict === 'BLOCKED') process.exitCode = 2; }
 } catch (error) { console.error('ECC Pstack: ' + error.message); process.exitCode = 1; }

@@ -33,6 +33,11 @@ function spec(host){
     const toml=require('@iarna/toml').parse(fs.readFileSync(path.join(os.homedir(),'.codex/config.toml'),'utf8'));
     const args=[path.join(npm,'@openai/codex/bin/codex.js'),'exec','--json','--sandbox','read-only'];
     for(const name of Object.keys(toml.mcp_servers||{}))if(name!=='seabridge-pstack')args.push('-c','mcp_servers.'+name+'.enabled=false');
+    const tools=['pstack_find_workflow','pstack_read_skill','pstack_factory'];
+    args.push('-c','mcp_servers.seabridge-pstack.args='+JSON.stringify([...server.args,'--canary']),'-c','mcp_servers.seabridge-pstack.enabled_tools='+JSON.stringify(tools));
+    // Invocation-only approval for the server's independently checked read-only
+    // canary surface. The normal server's mutating operations are not exposed.
+    for(const tool of tools)args.push('-c','mcp_servers.seabridge-pstack.tools.'+tool+'.approval_mode="approve"');
     args.push(prompt);return {exe:process.execPath,entry:args[0],args,env:{}};
   }
   if(host==='opencode'){

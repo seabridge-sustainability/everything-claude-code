@@ -187,6 +187,17 @@ This verifies transport and UI admission refusals; native account/model/vision
 proof remains separate. A provider-free reader proof does not certify a native
 model run. An exhausted no-retry batch requires new bounded live-eval approval.
 
+The prepared Codex proof uses invocation-only MCP overrides and
+`node integrations/pstack/cli.mjs mcp --canary`. This restricted server exposes
+only workflow lookup, skill reading and a factory limited to feature discovery,
+an empty invalid UI contract and the fixed invalid C-drive image. Mutable
+operations, nonempty contracts and D-drive image inputs are rejected at schema
+validation; five tool dispatches maximum. Its read-only annotations match that
+restricted surface. The normal factory retains its original permission boundary.
+Only those three canary tools receive per-tool `approval_mode="approve"` for the
+fresh invocation, using the [documented Codex configuration](https://learn.chatgpt.com/docs/config-file/config-reference).
+Global settings, default server approvals and OS sandbox settings are unchanged.
+
 ### Accepted-change feature maintenance
 
 After the product owner publishes an accepted frontend change, run

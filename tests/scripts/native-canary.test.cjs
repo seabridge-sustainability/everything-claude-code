@@ -32,6 +32,11 @@ test('Windows canaries use installed package entrypoints and supported Codex fla
   const prompt=spec('codex').args.at(-1);
   for(const name of ['AGENTS.md','AGENTS_SYSTEM.md','CLAUDE.md'])assert.ok(prompt.includes('seabridge-policy:///'+name));
   assert.ok(prompt.includes('Do not run shell'));
+  const overrides=spec('codex').args.filter((value,index,args)=>args[index-1]==='-c');
+  assert.ok(overrides.some(value=>value.startsWith('mcp_servers.seabridge-pstack.args=')&&value.includes('--canary')));
+  assert.ok(overrides.includes('mcp_servers.seabridge-pstack.enabled_tools=["pstack_find_workflow","pstack_read_skill","pstack_factory"]'));
+  assert.deepEqual(overrides.filter(value=>value.includes('.approval_mode=')),['pstack_find_workflow','pstack_read_skill','pstack_factory'].map(name=>'mcp_servers.seabridge-pstack.tools.'+name+'.approval_mode="approve"'));
+  assert.ok(!overrides.some(value=>value.startsWith('approval_policy=')||value.includes('default_tools_approval_mode=')));
 });
 test('a new smaller batch cannot enlarge exposure, hide retries or omit soft-cap acknowledgement',()=>{
   const approval={id:'reviewed-two-client-batch',authorization:{softCapsAcknowledged:true,maximumNativeCanaryInvocations:2,maximumTotalUsd:1.25,retries:0}};
