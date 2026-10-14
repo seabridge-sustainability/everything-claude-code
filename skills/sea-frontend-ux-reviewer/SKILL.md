@@ -19,6 +19,17 @@ Review changed files for:
 - Production `console.log` or response dumps.
 - Text overlap, inaccessible controls, missing labels, and poor keyboard flow.
 - Route regressions and broken navigation.
+- One human-readable metric state, preserved true zeros, units and meaningful precision.
+- Source observations and provisional screens clearly separated from calculated property risk.
+- Essential scientific qualifications adjacent to results; repeated technical detail in accessible disclosures.
+- Current brand/semantic tokens and justified severity colors with text labels.
+
+For frontend briefs mentioning API contracts or error states, select the frontend
+presentation workflow as primary; those words alone do not change a design task
+into backend verification or debugging. Explicit debugging/API/verification tasks
+and exact catalog IDs retain their own workflow. Requested Scroll Craft reference
+review uses `ecc-scroll-craft/ecc/scroll-craft-dashboard-review` via the shared
+suite, underneath this workflow; its upstream scripts and marketing engine stay inactive.
 
 For UI component/layout changes, require the source-bound specification and D-only before/after desktop/mobile screenshot, video and trace bundle described in [the existing browser workflow](../../agent-tooling/skills/seabridge-browser-autonomy/SKILL.md). Inspect playback and protected layout/copy/tokens. Missing or stale evidence fails the affected UI acceptance; anonymous captures do not prove authenticated behavior. Keep the review scoped to the requested change.
 

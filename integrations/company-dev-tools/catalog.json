@@ -37,6 +37,12 @@
         "addyosmani-agent-skills"
       ],
       "manifest": "../engineering-skills/adaptation.json"
+    },
+    "ecc-scroll-craft": {
+      "repository": "https://github.com/nateherkai/scroll-craft",
+      "revision": "75d81f74e83692add18cd7a8a8e078b8a887a579",
+      "execution": "ECC dashboard adapter only; retained upstream is reference only",
+      "manifest": "../scroll-craft/source-manifest.json"
     }
   },
   "skills": [
@@ -3610,6 +3616,16 @@
       "file": "skills/ponytail/ponytail-help/SKILL.md",
       "sha256": "6f2039a06b0399ecf26d02ebadefaa7e7fbf4bfe62afe3cf2d56183d5aa96f13",
       "revision": "2961b52fc1fe6a5a87c7a959a79512e5c2f3ffe5",
+      "adapted": true
+    },
+    {
+      "id": "ecc-scroll-craft/ecc/scroll-craft-dashboard-review",
+      "name": "scroll-craft-dashboard-review",
+      "source": "ecc-scroll-craft",
+      "plugin": "ecc",
+      "description": "Review SeaBridge dashboard typography, spacing, responsive readability and scroll-position evidence using brand assets and existing D-only browser tools; selectively adapts Scroll Craft without its marketing engine.",
+      "file": "skills/ecc-scroll-craft/scroll-craft-dashboard-review/SKILL.md",
+      "sha256": "f10555e5cfeff483e5fc018fea17be7c30d7f758c94ea8e5a7dfbc165d2cd192",
       "adapted": true
     }
   ],

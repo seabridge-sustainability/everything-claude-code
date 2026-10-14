@@ -17,6 +17,19 @@ test('actual D preflight pins volume identity and media stays inside one run', {
   assert.throws(()=>storage.mediaPath('C:/test.png'), /admitted D/);
   assert.throws(()=>storage.mediaPath('../test.png'), /invalid relative/);
   const config=storage.configurePlaywright();
+  const next=storage.configurePlaywright();
+  assert.notEqual(config.outputDir,next.outputDir);
+  assert.notEqual(config.reporter[1][1].outputFolder,next.reporter[1][1].outputFolder);
+  assert.ok(config.outputDir.startsWith(run.directory+'/media/playwright/'));
+  const retained=storage.mediaPath('retained.png');fs.writeFileSync(retained,'retained screenshot fixture');
+  fs.mkdirSync(config.outputDir,{recursive:true});fs.mkdirSync(next.outputDir,{recursive:true});
+  // Simulate the runner cleaning its own disposable output; retained evidence
+  // and a later invocation must remain outside that deletion boundary.
+  assert.equal(storage.evidencePath(config.outputDir),config.outputDir);
+  assert.ok(config.outputDir.startsWith(run.directory+'/media/playwright/'));
+  fs.rmSync(config.outputDir,{recursive:true});
+  assert.equal(fs.readFileSync(retained,'utf8'),'retained screenshot fixture');
+  assert.ok(fs.existsSync(next.outputDir));
   assert.equal(config.use.video,'on'); assert.equal(config.use.trace,'on');
   assert.ok(config.outputDir.startsWith('D:/'));
   assert.ok(config.reporter[1][1].outputFolder.startsWith('D:/'));

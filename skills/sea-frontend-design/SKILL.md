@@ -21,6 +21,24 @@ Route; exact component paths; backend caller; available data shape; design conve
 
 Reachable UI; honest loading/empty/error states; responsive behavior; API/state verification notes.
 
+## Dashboard presentation and references
+
+Use current SeaBridge brand assets and semantic tokens, existing Radix/Tailwind/
+Recharts components and the [frontend UX standard](../../docs/harness/standards/frontend-ux.md).
+Preserve scientific meaning and essential qualifications beside the metric;
+collapse repeated provenance, technical enums and diagnostic prose. True zero,
+missing, withheld, pending and failed are different states. No arbitrary risk
+colors, fake scores, API changes or new component packages to improve presentation.
+
+When reference review is requested, retrieve exact shared ID
+`ecc-scroll-craft/ecc/scroll-craft-dashboard-review` through `suite_read_skill` or
+the existing dev-suite CLI. It is a supporting typography/responsive/scroll-state
+review, not a second orchestrator or a marketing engine. UI/UX Pro Max, Motion Sites
+and 21st.dev are optional visual references only; do not generate a new brand,
+import components blindly or create per-project design rulebooks. Motion is optional
+after readability works, with reduced-motion behavior; missing packages need their
+actual reviewed installation approval. Prefer existing components and CSS.
+
 ## Mandatory Verification
 
 Every changed UI component/layout requires the [existing browser workflow](../../agent-tooling/skills/seabridge-browser-autonomy/SKILL.md): source-bound specification before editing, before/after desktop/mobile screenshots and successful video/trace playback on D: only. Missing prerequisites block the affected proof; never substitute a fixture, 401 or screenshot for signed-in behavior/persistence. Check route/menu visibility, API contracts, filter propagation, buttons, text overlap and keyboard flow. Compare approved layout/copy/tokens and call out missing baseline approval; do not redesign adjacent surfaces.

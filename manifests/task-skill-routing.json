@@ -1,7 +1,7 @@
 {
   "version": 1,
   "authority": "Current host and project policy, latest owner request and one active goal",
-  "codingSources": ["mattpocock-skills", "addyosmani-agent-skills", "ecc-engineering", "cursor-pstack", "ponytail"],
+  "codingSources": ["mattpocock-skills", "addyosmani-agent-skills", "ecc-engineering", "cursor-pstack", "ponytail", "ecc-scroll-craft"],
   "always": ["Karpathy assumptions, simplicity, surgical edits and observable success", "Resolve material ambiguity from source before asking", "Preserve protected behavior and concurrent work", "Verify claims with appropriate actual evidence"],
   "routes": [
     {"id":"ponytail-review","patterns":["\\bponytail\\b.*\\breview\\b"],"source":"ponytail","name":"ponytail-review","skill":"sea-ponytail"},
@@ -18,10 +18,12 @@
     {"id":"maintain-verification","patterns":["maintain.verification|verification.maintenance|feature.map.drift"],"source":"cursor-pstack","name":"maintain-verification-skill","skill":"sea-verify-seabridge"},
     {"id":"create-verification","patterns":["create.verification|verification.skill|verify.seabridge|verification.first"],"source":"cursor-pstack","name":"create-verification-skill","skill":"sea-verify-seabridge"},
     {"id":"adversarial-alias","patterns":["adversarial.review"],"source":"cursor-pstack","name":"interrogate","skill":"sea-adversarial-review"},
+    {"id":"scroll-craft","patterns":["scroll[ -]?craft"],"source":"ecc-scroll-craft","name":"scroll-craft-dashboard-review","skill":"sea-frontend-ux-reviewer"},
     {"id":"finance-audit","patterns":["(?:audit|check|debug|formula).*(?:spreadsheet|xlsx|financial model)|(?:spreadsheet|xlsx|financial model).*(?:audit|check|debug|formula)"],"source":"financial-services","plugin":"fsi-financial-analysis","name":"audit-xls","skill":"sea-dev-suite"},
     {"id":"finance-statements","patterns":["3.statement"],"source":"financial-services","plugin":"fsi-financial-analysis","name":"3-statement-model","skill":"sea-dev-suite"},
     {"id":"finance-dcf","patterns":["\\bdcf\\b"],"source":"financial-services","plugin":"fsi-financial-analysis","name":"dcf-model","skill":"sea-dev-suite"},
     {"id":"finance-author","patterns":["spreadsheet|xlsx|balance sheet|cash.flow|financial model"],"source":"financial-services","plugin":"fsi-financial-analysis","name":"xlsx-author","skill":"sea-dev-suite"},
+    {"id":"frontend-presentation","patterns":["(?=.*(?:frontend|\\bui\\b|dashboard))(?=.*(?:\\bui\\b|design|layout|typograph|spacing|empty.state|readability|visual.hierarchy|accessibility|responsive))"],"excludePatterns":["^(?:debug|diagnose|investigate|profile|review code|code review|security review|auth review)\\b"],"source":"addyosmani-agent-skills","name":"frontend-ui-engineering","skill":"sea-frontend-ux-reviewer"},
     {"id":"debug","patterns":["debug|diagnos|\\bbug\\b|regression|stack.trace|\\berror\\b|\\bfailure\\b"],"source":"mattpocock-skills","name":"diagnosing-bugs","skill":"sea-systematic-debugging"},
     {"id":"security","patterns":["security|hardening|tenant.isolation|auth.review"],"source":"addyosmani-agent-skills","name":"security-and-hardening","skill":"sea-security-reviewer"},
     {"id":"review","patterns":["code.review|review.code|review.*(?:diff|pull.request|commit)|pr.review"],"source":"addyosmani-agent-skills","name":"code-review-and-quality","skill":"sea-code-review-response"},

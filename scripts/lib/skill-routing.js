@@ -16,6 +16,7 @@ function policy() {
   if (value.version !== 1 || !Array.isArray(value.routes) || !Array.isArray(value.codingSources)
       || new Set(value.routes.map(x=>x.id)).size !== value.routes.length) throw Error('Invalid task-routing policy');
   for (const row of value.routes) if (!row.id || !row.source || !row.name || !row.skill || !Array.isArray(row.patterns)) throw Error('Incomplete task route');
+  for (const row of value.routes) if (row.excludePatterns && (!Array.isArray(row.excludePatterns) || row.excludePatterns.some(p=>typeof p!=='string'))) throw Error('Invalid task route exclusions');
   return { ...value, sha256: sha(raw) };
 }
 function rankWorkflows(c, { query, limit = 10, kind = 'all', profile = 'auto' }) {
@@ -24,7 +25,8 @@ function rankWorkflows(c, { query, limit = 10, kind = 'all', profile = 'auto' })
   const p = policy(), q = query.trim().toLowerCase(), terms = q.split(/\s+/).filter(Boolean);
   const all = [...(kind !== 'command' ? c.skills.map(e=>({...e,kind:'skill'})) : []), ...(kind !== 'skill' ? c.commands.map(e=>({...e,kind:'command'})) : [])];
   const exact = all.find(e=>e.id.toLowerCase()===q);
-  const route = p.routes.find(row=>row.patterns.some(pattern=>new RegExp(pattern,'i').test(q)));
+  const route = p.routes.find(row=>row.patterns.some(pattern=>new RegExp(pattern,'i').test(q))
+    && !(row.excludePatterns || []).some(pattern=>new RegExp(pattern,'i').test(q)));
   const primary = exact || (route && all.find(e=>e.kind==='skill'&&e.source===route.source&&e.name===route.name&&(!route.plugin||e.plugin===route.plugin)));
   // A recognized coding task does not compete with unrelated company templates.
   const chosenProfile = profile !== 'auto' ? profile : p.codingSources.includes(primary?.source) ? 'coding' : primary ? 'company' : 'all';

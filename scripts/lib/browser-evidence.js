@@ -99,13 +99,18 @@ function mediaPath(requested, category = 'media') {
 }
 function configurePlaywright({ repository = 'frontend', task = 'playwright' } = {}) {
   const run = currentRun({ repository, task });
+  // Playwright cleans outputDir at invocation start. Keep it separate from
+  // retained screenshots and from every previous invocation of this admission.
+  const invocation = `${Date.now()}-${crypto.randomBytes(5).toString('hex')}`;
+  const outputDir = mediaPath(`playwright/${invocation}`);
+  const reportDir = mediaPath(`playwright/${invocation}`, 'reports');
   for (const key of ['TEMP','TMP','TMPDIR']) process.env[key] = `${run.directory}/tmp`;
-  process.env.PLAYWRIGHT_HTML_OUTPUT_DIR = `${run.directory}/reports/html`;
-  process.env.PLAYWRIGHT_JSON_OUTPUT_FILE = `${run.directory}/reports/results.json`;
+  process.env.PLAYWRIGHT_HTML_OUTPUT_DIR = `${reportDir}/html`;
+  process.env.PLAYWRIGHT_JSON_OUTPUT_FILE = `${reportDir}/results.json`;
   const preload = path.join(ROOT, 'scripts/lib/playwright-evidence-preload.js').replace(/\\/g,'/');
   const argument = `--require="${preload}"`;
   if (!(process.env.NODE_OPTIONS || '').includes(preload)) process.env.NODE_OPTIONS = `${process.env.NODE_OPTIONS || ''} ${argument}`.trim();
-  return { outputDir: `${run.directory}/media`, reporter: [['list'], ['html', { outputFolder: `${run.directory}/reports/html`, open: 'never' }]],
+  return { outputDir, reporter: [['list'], ['html', { outputFolder: `${reportDir}/html`, open: 'never' }]],
     use: { trace: 'on', video: 'on', screenshot: 'on' }, run };
 }
 const WRAPPED = Symbol.for('ecc.d-only-playwright.wrapper');

@@ -24,6 +24,30 @@ test('unknown task and invalid impact cannot silently choose an unrelated primar
   assert.throws(()=>taskRoute(c,{query:'review',impact:{unrecognized:true}}),/boolean/);
   assert.throws(()=>rankWorkflows(c,{query:'debug',profile:'unsupported'}),/bounded/);
 });
+
+test('frontend presentation intent survives incidental error and API words',()=>{
+  for(const query of ['frontend UI empty state error handling','frontend UI preserve API contracts',
+    'risk dashboard layout with missing data','frontend design accessibility regression']) {
+    const primary=rankWorkflows(c,{query,profile:'coding'}).find(e=>e.routingRole==='primary');
+    assert.equal(primary.canonicalSkill,'sea-frontend-ux-reviewer',query);
+    assert.equal(primary.name,'frontend-ui-engineering',query);
+  }
+});
+
+test('explicit debug API verification and exact workflow selections remain authoritative',()=>{
+  for(const [query,name] of [['debug frontend UI error','diagnosing-bugs'],
+    ['frontend API endpoint contract','api-and-interface-design'],
+    ['create verification skill for frontend UI','create-verification-skill'],
+    ['maintain verification skill frontend','maintain-verification-skill'],
+    ['security review frontend UI','security-and-hardening']]) {
+    assert.equal(rankWorkflows(c,{query,profile:'coding'})[0].name,name,query);
+  }
+  const api=c.skills.find(e=>e.name==='api-and-interface-design');
+  assert.equal(rankWorkflows(c,{query:api.id,profile:'coding'})[0].id,api.id);
+  const scroll=rankWorkflows(c,{query:'scroll craft dashboard review',profile:'coding'})[0];
+  assert.equal(scroll.id,'ecc-scroll-craft/ecc/scroll-craft-dashboard-review');
+  assert.equal(scroll.canonicalSkill,'sea-frontend-ux-reviewer');
+});
 test('legacy orchestrators delegate without old file-count, consensus-loop or missing policy defaults',()=>{
   const senior=fs.readFileSync(path.join(root,'skills/sea-senior-dev-workflow/SKILL.md'),'utf8'),grill=fs.readFileSync(path.join(root,'skills/sea-grill-me-codex/SKILL.md'),'utf8');
   assert.match(senior,/canonical routing/);assert.doesNotMatch(senior,/Controlled Auto Mode Policy|Self-Verification Loop|SEABRIDGE_CODING_AGENT_SYSTEM/);

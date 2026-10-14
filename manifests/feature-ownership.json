@@ -810,7 +810,8 @@
         "/dashboard/risk-management/risk-assessment/risk-level/social",
         "/dashboard/risk-management/risk-monitoring",
         "/dashboard/risk-management/risk-register",
-        "/dashboard/risk-management/sources/[companyId]/[riskId]/[module]/[recordId]"
+        "/dashboard/risk-management/sources/[companyId]/[riskId]/[module]/[recordId]",
+        "/dashboard/risk-management/nature-risk/biodiversity-markets"
       ],
       "allowed_paths": [
         "src/app/dashboard/risk-management/climate-risk/climate-opportunities/page.tsx",
@@ -869,7 +870,21 @@
         "src/components/ui/select.tsx",
         "src/context/RiskLevelContext.tsx",
         "src/app/dashboard/risk-management/sources/[companyId]/[riskId]/[module]/[recordId]/page.tsx",
-        "src/components/views/risk-management/risk-assessment/RiskSourceInspectionView.tsx"
+        "src/components/views/risk-management/risk-assessment/RiskSourceInspectionView.tsx",
+        "src/components/views/risk-management/climate-risk/OpenAccessPropertyAnalysis.tsx",
+        "src/components/views/risk-management/climate-risk/OpenAccessMethodsLimitations.tsx",
+        "src/components/views/nature-risk/NatureProjectionMatrix.tsx",
+        "src/components/views/nature-risk/NaturePredictiveAnalysis.tsx",
+        "src/lib/utils/risk-presentation.ts",
+        "src/lib/utils/risk-presentation.test.ts",
+        "src/components/views/nature-risk/projectionMatrix.ts",
+        "src/components/views/nature-risk/projectionMatrix.test.ts",
+        "src/components/views/nature-risk/NaturePredictiveAnalysis.test.tsx",
+        "src/components/views/risk-management/climate-risk/PhysicalRisk.native-layout.test.tsx",
+        "src/components/views/risk-management/climate-risk/OpenAccessMethodsLimitations.test.tsx",
+        "e2e/risk-presentation-readonly.spec.ts",
+        "src/components/views/risk-management/climate-risk/PhysicalRisk.openaccess-placeholder.test.tsx",
+        "src/app/dashboard/risk-management/nature-risk/biodiversity-markets/page.tsx"
       ],
       "source_files": [
         "src/app/dashboard/risk-management/climate-risk/climate-opportunities/page.tsx",
@@ -927,7 +942,21 @@
         "src/components/ui/select.tsx",
         "src/context/RiskLevelContext.tsx",
         "src/app/dashboard/risk-management/sources/[companyId]/[riskId]/[module]/[recordId]/page.tsx",
-        "src/components/views/risk-management/risk-assessment/RiskSourceInspectionView.tsx"
+        "src/components/views/risk-management/risk-assessment/RiskSourceInspectionView.tsx",
+        "src/components/views/risk-management/climate-risk/OpenAccessPropertyAnalysis.tsx",
+        "src/components/views/risk-management/climate-risk/OpenAccessMethodsLimitations.tsx",
+        "src/components/views/nature-risk/NatureProjectionMatrix.tsx",
+        "src/components/views/nature-risk/NaturePredictiveAnalysis.tsx",
+        "src/lib/utils/risk-presentation.ts",
+        "src/lib/utils/risk-presentation.test.ts",
+        "src/components/views/nature-risk/projectionMatrix.ts",
+        "src/components/views/nature-risk/projectionMatrix.test.ts",
+        "src/components/views/nature-risk/NaturePredictiveAnalysis.test.tsx",
+        "src/components/views/risk-management/climate-risk/PhysicalRisk.native-layout.test.tsx",
+        "src/components/views/risk-management/climate-risk/OpenAccessMethodsLimitations.test.tsx",
+        "e2e/risk-presentation-readonly.spec.ts",
+        "src/components/views/risk-management/climate-risk/PhysicalRisk.openaccess-placeholder.test.tsx",
+        "src/app/dashboard/risk-management/nature-risk/biodiversity-markets/page.tsx"
       ],
       "protected_behavior": [
         "Preserve selected actor/company/property, approved layout/copy and source identity",
@@ -1203,13 +1232,28 @@
       "purpose": "Existing public sign-in and session/return-path boundary",
       "owner_role": "Task-scoped identity lead",
       "routes": [
-        "/login"
+        "/login",
+        "/",
+        "/forgot-password",
+        "/generate-password",
+        "/register",
+        "/verify-email"
       ],
       "allowed_paths": [
-        "src/app/(auth)/login/page.tsx"
+        "src/app/(auth)/login/page.tsx",
+        "src/app/page.tsx",
+        "src/app/(auth)/forgot-password/page.tsx",
+        "src/app/(auth)/generate-password/page.tsx",
+        "src/app/(auth)/register/page.tsx",
+        "src/app/(auth)/verify-email/page.tsx"
       ],
       "source_files": [
-        "src/app/(auth)/login/page.tsx"
+        "src/app/(auth)/login/page.tsx",
+        "src/app/page.tsx",
+        "src/app/(auth)/forgot-password/page.tsx",
+        "src/app/(auth)/generate-password/page.tsx",
+        "src/app/(auth)/register/page.tsx",
+        "src/app/(auth)/verify-email/page.tsx"
       ],
       "protected_behavior": [
         "Preserve sign-in, company/session boundary and honest verification"
@@ -1218,6 +1262,109 @@
         "frontend-auth-return-path",
         "login-read-only"
       ],
+      "verification_status": "configured-unverified"
+    },
+    {
+      "id": "shared-presentation",
+      "purpose": "SeaBridge brand-v3 reusable presentation primitives; bounded representative pilots before module adoption",
+      "owner_role": "Task-scoped integration lead; current goal/session grants exact write scope",
+      "routes": [
+        "/dashboard",
+        "/dashboard/targets",
+        "/dashboard/data-input/sites-properties",
+        "/dashboard/risk-management/climate-risk/physical-risk",
+        "/dashboard/ai-manager",
+        "/dashboard/reports/report-generator"
+      ],
+      "allowed_paths": [
+        "src/components/common/PageHeader.tsx",
+        "src/components/common/ContainerCard.tsx",
+        "e2e/shared-presentation-readonly.spec.ts",
+        "src/app/dashboard/targets/page.tsx",
+        "src/components/views/add-sites-properties/SitesPropertiesList.tsx",
+        "src/components/common/Input.tsx",
+        "src/components/common/Button.tsx",
+        "src/components/common/Input.test.tsx",
+        "src/components/common/Button.test.tsx",
+        "e2e/shared-controls-readonly.spec.ts",
+        "src/app/dashboard/layout.tsx",
+        "src/components/common/Header.tsx",
+        "src/components/common/Sidebar.tsx",
+        "src/components/common/MenuItem.tsx",
+        "src/app/dashboard/layout.test.tsx",
+        "src/components/common/MenuItem.test.tsx",
+        "e2e/navigation-presentation-readonly.spec.ts"
+      ],
+      "source_files": [
+        "src/components/common/PageHeader.tsx",
+        "src/components/common/ContainerCard.tsx",
+        "src/app/dashboard/targets/page.tsx",
+        "src/components/views/add-sites-properties/SitesPropertiesList.tsx",
+        "src/components/common/Input.tsx",
+        "src/components/common/Button.tsx",
+        "src/app/dashboard/layout.tsx",
+        "src/components/common/Header.tsx",
+        "src/components/common/Sidebar.tsx",
+        "src/components/common/MenuItem.tsx"
+      ],
+      "protected_behavior": [
+        "Preserve caller actions/back navigation, DOM order, props, styles and children",
+        "Preserve selected actor/company/property, auth/tenant boundaries, API/calculations and persistence",
+        "Keep hidden/disabled modules and current theme/route gates",
+        "Use existing semantic tokens and brand v3; no new global palette/font selectors or animation engine"
+      ],
+      "recipe_ids": [
+        "shared-presentation-readonly"
+      ],
+      "verification_status": "configured-unverified"
+    },
+    {
+      "id": "supplier-portal",
+      "purpose": "Token-scoped supplier intake, profile, reported GHG, commitments, document uploads and submission",
+      "routes": [
+        "/portal/supplier"
+      ],
+      "allowed_paths": [
+        "src/app/portal/supplier/page.tsx"
+      ],
+      "source_files": [
+        "src/app/portal/supplier/page.tsx",
+        "src/lib/api/supplier-portal-api.ts"
+      ],
+      "protected_behavior": [
+        "Preserve supplier invitation token, scoped company/year, validation and upload/submission semantics",
+        "Presentation work grants no writes to supplier records, documents or authorization settings",
+        "Keep unreported/unknown figures distinct from genuine zero; preserve error/loading/step states"
+      ],
+      "recipe_ids": [
+        "supplier-portal-presentation"
+      ],
+      "owner_role": "Task-scoped feature lead; metadata grants no writer or release ownership",
+      "verification_status": "configured-unverified"
+    },
+    {
+      "id": "risk-share-viewer",
+      "purpose": "Share-token risk report viewer with optional password/session gate, scenario/horizon selection, map and export presentation",
+      "routes": [
+        "/share/risk-management/[token]"
+      ],
+      "allowed_paths": [
+        "src/app/share/risk-management/[token]/page.tsx"
+      ],
+      "source_files": [
+        "src/app/share/risk-management/[token]/page.tsx",
+        "src/components/views/risk-management/share/shareViewScope.ts",
+        "src/components/views/risk-management/share/viewerApi.ts"
+      ],
+      "protected_behavior": [
+        "Preserve token/password/session authorization, share scope, source identity and scenario/horizon",
+        "Keep source risk values, scientific limitations, map and export contracts intact",
+        "No credential/config changes or weakening public-viewer authorization to obtain screenshots"
+      ],
+      "recipe_ids": [
+        "risk-share-viewer-presentation"
+      ],
+      "owner_role": "Task-scoped feature lead; metadata grants no writer or release ownership",
       "verification_status": "configured-unverified"
     }
   ]

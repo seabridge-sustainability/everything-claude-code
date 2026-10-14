@@ -1,0 +1,118 @@
+{
+  "schema": "seabridge.scroll-craft.source.v1",
+  "repository": "https://github.com/nateherkai/scroll-craft",
+  "revision": "75d81f74e83692add18cd7a8a8e078b8a887a579",
+  "license": "MIT",
+  "sourceDirectory": "integrations/company-dev-tools/sources/scroll-craft",
+  "files": [
+    {
+      "path": "LICENSE",
+      "retained": "integrations/scroll-craft/reference/LICENSE",
+      "sha256": "dd471a27eca72488a53e6ea6fbe9392d81aa3f01e950e63fe328affb2ddfa6e3"
+    },
+    {
+      "path": "README.md",
+      "retained": "integrations/scroll-craft/reference/README.md",
+      "sha256": "fb78570c66c520296567be4a176919da0456027cb94bdeca3cb5ca2a06f43bbb"
+    },
+    {
+      "path": "plugins/nateherk-design/skills/scroll-craft/SKILL.md",
+      "retained": "integrations/scroll-craft/reference/plugins/nateherk-design/skills/scroll-craft/SKILL.md",
+      "sha256": "6e798bb51c3dcbe4f35f098dcdd3cdd20d08e538a33993bcae909c9fd0a500a1"
+    },
+    {
+      "path": "plugins/nateherk-design/skills/scroll-craft/references/approved-collection.md",
+      "retained": "integrations/scroll-craft/reference/plugins/nateherk-design/skills/scroll-craft/references/approved-collection.md",
+      "sha256": "8a963a46af4c6ed40656fb5b21589629ee3ce30aa06a8b31c10bc132b74f2780"
+    },
+    {
+      "path": "plugins/nateherk-design/skills/scroll-craft/references/assets.md",
+      "retained": "integrations/scroll-craft/reference/plugins/nateherk-design/skills/scroll-craft/references/assets.md",
+      "sha256": "0cc3871ad903ccaf3bf769cf3a05a54a9326ed558ac3e45e57f19043ce70efa6"
+    },
+    {
+      "path": "plugins/nateherk-design/skills/scroll-craft/references/devices.md",
+      "retained": "integrations/scroll-craft/reference/plugins/nateherk-design/skills/scroll-craft/references/devices.md",
+      "sha256": "e5ae5a4f2924fc1b13177bf0b0ac10f04e686edd916dc33755ed1420a6a478f5"
+    },
+    {
+      "path": "plugins/nateherk-design/skills/scroll-craft/references/feel.md",
+      "retained": "integrations/scroll-craft/reference/plugins/nateherk-design/skills/scroll-craft/references/feel.md",
+      "sha256": "3951f1f0331f329dab14e8766edeecb6ce8e05437ea8986c48a074726bef41a0"
+    },
+    {
+      "path": "plugins/nateherk-design/skills/scroll-craft/references/hero-depth.md",
+      "retained": "integrations/scroll-craft/reference/plugins/nateherk-design/skills/scroll-craft/references/hero-depth.md",
+      "sha256": "2426fb9703d4398b1e3b666b2db7f4b68e7cd41112da77700a7d63f2965dd726"
+    },
+    {
+      "path": "plugins/nateherk-design/skills/scroll-craft/references/taste.md",
+      "retained": "integrations/scroll-craft/reference/plugins/nateherk-design/skills/scroll-craft/references/taste.md",
+      "sha256": "f33c581024f466ab98612ae291aa46ccbc326875f8fa0918a3f45455a2c60e80"
+    },
+    {
+      "path": "plugins/nateherk-design/skills/scroll-craft/references/uniqueness.md",
+      "retained": "integrations/scroll-craft/reference/plugins/nateherk-design/skills/scroll-craft/references/uniqueness.md",
+      "sha256": "0fd65a43624da868ca2027946bd4ce152605d6ea856eeae93b35721714c8b20e"
+    },
+    {
+      "path": "plugins/nateherk-design/skills/scroll-craft/references/verify.md",
+      "retained": "integrations/scroll-craft/reference/plugins/nateherk-design/skills/scroll-craft/references/verify.md",
+      "sha256": "de645d648f738f3e19452083eadcc649cb8477058b6ad79ab4fa29198406150a"
+    },
+    {
+      "path": "plugins/nateherk-design/skills/scroll-craft/references/worldflight.md",
+      "retained": "integrations/scroll-craft/reference/plugins/nateherk-design/skills/scroll-craft/references/worldflight.md",
+      "sha256": "451fead8f90604423b113cd0b0d3bfb6be1f7ca7a7b5ab9e2688ea3da762af4c"
+    },
+    {
+      "path": "plugins/nateherk-design/skills/scroll-craft/references/worlds.md",
+      "retained": "integrations/scroll-craft/reference/plugins/nateherk-design/skills/scroll-craft/references/worlds.md",
+      "sha256": "dea3e4cc20c7245f87638a6d88eb2e3fc22a69dabc9f75f001dd97a3121077bd"
+    }
+  ],
+  "executionReview": [
+    {
+      "path": "plugins/nateherk-design/skills/scroll-craft/scripts/shoot.mjs",
+      "sha256": "963b1f2f0425783979b41ce0fcd2c668d47376735612816a83ca8142bb225be0",
+      "status": "not-exposed-or-executed",
+      "reason": "Defaults to lab/shots and localhost:4500; launches browser and ffmpeg without ECC D-only profile/temp guards"
+    },
+    {
+      "path": "plugins/nateherk-design/skills/scroll-craft/scripts/serve.mjs",
+      "sha256": "3dff774c47f1ebecb22f6bb2618d1ec13c99f21a92ce53e984ed0ae525c3327e",
+      "status": "not-exposed-or-executed",
+      "reason": "Starts an additional server; use existing approved localhost:3000 instead"
+    },
+    {
+      "path": "plugins/nateherk-design/skills/scroll-craft/scripts/kie.mjs",
+      "sha256": "6d4a1d4cfb3ed6400cd9a453064b2949d72581f03ba56abe2038be4c78ebc136",
+      "status": "not-exposed-or-executed",
+      "reason": "External asset provider calls; no provider authorization or execution included"
+    },
+    {
+      "path": "plugins/nateherk-design/skills/scroll-craft/scripts/doctor.mjs",
+      "sha256": "92aade1921c12cce3ebc27e3c0f727d1bfaf1e0678deb7bd930a93248dbb37d9",
+      "status": "not-exposed-or-executed",
+      "reason": "Can invoke kie.mjs probe; not a provider-free health check"
+    },
+    {
+      "path": "plugins/nateherk-design/skills/scroll-craft/scripts/workspace.mjs",
+      "sha256": "98896557c62c12452d2258c26e7984b0f0d69d87938650fa20705ba1b0ba193b",
+      "status": "not-exposed-or-executed",
+      "reason": "Creates upstream project structure; not an ECC or product bootstrap"
+    },
+    {
+      "path": "plugins/nateherk-design/skills/scroll-craft/scripts/worldflight-assert.mjs",
+      "sha256": "6932652d313a5e72d9d023f74eaa4dd893752ad7db33d010d586a56f929c8449",
+      "status": "not-exposed-or-executed",
+      "reason": "Browser assertions for upstream scroll engine; not authenticated dashboard proof"
+    }
+  ],
+  "adaptedWorkflowId": "ecc-scroll-craft/ecc/scroll-craft-dashboard-review",
+  "rawHooksExecuted": false,
+  "engineInstalled": false,
+  "newMcpServers": 0,
+  "productInstructionFilesAdded": 0,
+  "providerCalls": 0
+}
