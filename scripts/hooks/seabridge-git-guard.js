@@ -29,7 +29,7 @@ function readOnly(op, args) {
 }
 
 // Skip pager options and identity/display -c settings; any other global option stays unresolved.
-const SAFE_CONFIG = /^(?:user\.(?:name|email)|core\.(?:autocrlf|safecrlf|quotepath)|color\.[\w.]+|advice\.\w+|init\.defaultBranch)=/i;
+const SAFE_CONFIG = /^(?:user\.(?:name|email)|core\.(?:autocrlf|safecrlf|quotepath|longpaths)|color\.[\w.]+|advice\.\w+|init\.defaultBranch)=/i;
 function subcommand(tokens, i) {
   for (;;) {
     if (tokens[i] === '--no-pager' || tokens[i] === '-P') i += 1;

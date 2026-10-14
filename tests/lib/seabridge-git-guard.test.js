@@ -159,6 +159,14 @@ test('heredoc data bodies are not commands; shell-fed bodies and continuations s
   assert.equal(decide('cd ../p && \\\n git commit -m x', cwd, main)[0], 'ask', 'continuation joins and resolves to main');
   assert.equal(decide("cat <<'EOF' | sh\ngit push origin main\nEOF", cwd, main)[0], 'ask', 'pipe-to-shell body still runs git');
 });
+test('core.longpaths is a safe -c setting (2026-10-14 subagent patch check)', () => {
+  const dev = () => ({ ecc: false, product: true, branch: 'development' });
+  const main = () => ({ ecc: false, product: true, branch: 'main' });
+  const cmd = 'FE=../fe; for f in a b; do git -c core.longpaths=true -c core.autocrlf=false diff --no-index orig/$f mirror/$f; done; git -C $FE -c core.longpaths=true apply --check p.patch && echo ok';
+  assert.equal(decide(cmd, cwd, dev), null);
+  assert.equal(decide('git status; git -c core.longpaths=true commit -m x', cwd, main)[0], 'ask', 'main stays protected');
+  assert.equal(decide('cd x; git -c core.sshCommand=evil fetch', cwd, dev)[0], 'ask', 'other core keys stay unresolved');
+});
 test('actual stdin runner emits native denial protocol', () => {
   const file = path.resolve(__dirname, '../../scripts/hooks/seabridge-git-guard.js');
   const result = spawnSync(process.execPath, [file], { input: JSON.stringify({ cwd, tool_input: { command: 'git push --force' } }), encoding: 'utf8' });
