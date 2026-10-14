@@ -1,6 +1,6 @@
 ---
 name: session-mobility
-description: Move Claude Code sessions across devices using --teleport (cloudÃ¢â€ â€™local) and Remote Control (localÃ¢â€ Âphone/web). Covers setup, enabling remote control by default, and cross-device workflow patterns.
+description: Move Claude Code sessions across devices using --teleport (cloud to local) and Remote Control (local to phone/web). Covers setup, enabling remote control by default, and cross-device workflow patterns.
 origin: ECC
 ---
 
