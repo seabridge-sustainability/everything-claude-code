@@ -47,6 +47,9 @@ test('explicit debug API verification and exact workflow selections remain autho
   const scroll=rankWorkflows(c,{query:'scroll craft dashboard review',profile:'coding'})[0];
   assert.equal(scroll.id,'ecc-scroll-craft/ecc/scroll-craft-dashboard-review');
   assert.equal(scroll.canonicalSkill,'sea-frontend-ux-reviewer');
+  const assets=rankWorkflows(c,{query:'Higgsfield brand assets for frontend',profile:'coding'})[0];
+  assert.equal(assets.id,'ecc-higgsfield/ecc/higgsfield-frontend-assets');
+  assert.equal(assets.canonicalSkill,'sea-frontend-ux-reviewer');
 });
 test('legacy orchestrators delegate without old file-count, consensus-loop or missing policy defaults',()=>{
   const senior=fs.readFileSync(path.join(root,'skills/sea-senior-dev-workflow/SKILL.md'),'utf8'),grill=fs.readFileSync(path.join(root,'skills/sea-grill-me-codex/SKILL.md'),'utf8');

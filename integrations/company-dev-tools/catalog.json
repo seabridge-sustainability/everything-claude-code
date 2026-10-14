@@ -43,6 +43,11 @@
       "revision": "75d81f74e83692add18cd7a8a8e078b8a887a579",
       "execution": "ECC dashboard adapter only; retained upstream is reference only",
       "manifest": "../scroll-craft/source-manifest.json"
+    },
+    "ecc-higgsfield": {
+      "repository": "https://github.com/higgsfield-ai/cli",
+      "execution": "Opt-in installed CLI; no provider invocation or native MCP registration",
+      "excludedRepository": "https://github.com/higgsfield-ai/higgsfield"
     }
   },
   "skills": [
@@ -3616,6 +3621,16 @@
       "file": "skills/ponytail/ponytail-help/SKILL.md",
       "sha256": "6f2039a06b0399ecf26d02ebadefaa7e7fbf4bfe62afe3cf2d56183d5aa96f13",
       "revision": "2961b52fc1fe6a5a87c7a959a79512e5c2f3ffe5",
+      "adapted": true
+    },
+    {
+      "id": "ecc-higgsfield/ecc/higgsfield-frontend-assets",
+      "name": "higgsfield-frontend-assets",
+      "source": "ecc-higgsfield",
+      "plugin": "ecc",
+      "description": "Prepare optional SeaBridgeAI brand assets through the installed Higgsfield CLI while preserving provider, data, cost, and D-only evidence boundaries.",
+      "file": "skills/ecc-higgsfield/higgsfield-frontend-assets/SKILL.md",
+      "sha256": "2fb3143950a042db9ea4df5036fa37f813b6dab51c5bff9a0281c8f47a7584da",
       "adapted": true
     },
     {

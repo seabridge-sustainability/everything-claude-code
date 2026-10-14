@@ -1,7 +1,7 @@
 {
   "version": 1,
   "authority": "Current host and project policy, latest owner request and one active goal",
-  "codingSources": ["mattpocock-skills", "addyosmani-agent-skills", "ecc-engineering", "cursor-pstack", "ponytail", "ecc-scroll-craft"],
+  "codingSources": ["mattpocock-skills", "addyosmani-agent-skills", "ecc-engineering", "cursor-pstack", "ponytail", "ecc-scroll-craft", "ecc-higgsfield"],
   "always": ["Karpathy assumptions, simplicity, surgical edits and observable success", "Resolve material ambiguity from source before asking", "Preserve protected behavior and concurrent work", "Verify claims with appropriate actual evidence"],
   "routes": [
     {"id":"ponytail-review","patterns":["\\bponytail\\b.*\\breview\\b"],"source":"ponytail","name":"ponytail-review","skill":"sea-ponytail"},
@@ -19,6 +19,7 @@
     {"id":"create-verification","patterns":["create.verification|verification.skill|verify.seabridge|verification.first"],"source":"cursor-pstack","name":"create-verification-skill","skill":"sea-verify-seabridge"},
     {"id":"adversarial-alias","patterns":["adversarial.review"],"source":"cursor-pstack","name":"interrogate","skill":"sea-adversarial-review"},
     {"id":"scroll-craft","patterns":["scroll[ -]?craft"],"source":"ecc-scroll-craft","name":"scroll-craft-dashboard-review","skill":"sea-frontend-ux-reviewer"},
+    {"id":"higgsfield-assets","patterns":["(?=.*higgsfield)(?=.*(?:asset|image|video|visual|brand|marketing))"],"source":"ecc-higgsfield","name":"higgsfield-frontend-assets","skill":"sea-frontend-ux-reviewer"},
     {"id":"finance-audit","patterns":["(?:audit|check|debug|formula).*(?:spreadsheet|xlsx|financial model)|(?:spreadsheet|xlsx|financial model).*(?:audit|check|debug|formula)"],"source":"financial-services","plugin":"fsi-financial-analysis","name":"audit-xls","skill":"sea-dev-suite"},
     {"id":"finance-statements","patterns":["3.statement"],"source":"financial-services","plugin":"fsi-financial-analysis","name":"3-statement-model","skill":"sea-dev-suite"},
     {"id":"finance-dcf","patterns":["\\bdcf\\b"],"source":"financial-services","plugin":"fsi-financial-analysis","name":"dcf-model","skill":"sea-dev-suite"},

@@ -91,6 +91,13 @@ Scroll Craft is an opt-in supporting reference through exact shared workflow
 fidelity, spacing, typography and responsive scroll-position review; it does not
 activate mandatory marketing variety, heroes, video, pointer effects or a new engine.
 
+Optional branded imagery may use exact shared workflow
+`ecc-higgsfield/ecc/higgsfield-frontend-assets`. Prefer existing assets and
+product components for risk dashboards. The installed Higgsfield CLI is separate
+from the similarly named GPU-training GitHub repository; CLI installation is not
+proof of account/API access. Generated originals stay on D:, and model calls,
+uploads and spending need their own current authorization.
+
 For read-only presentation QA, inspect the actual server handlers: GET alone
 does not establish a cost-free or mutation-free operation. The managed shared
 pilot blocks Cecil dataset synchronization and `/api/v1/targets/insights`, whose

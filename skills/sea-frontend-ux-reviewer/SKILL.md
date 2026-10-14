@@ -30,6 +30,9 @@ into backend verification or debugging. Explicit debugging/API/verification task
 and exact catalog IDs retain their own workflow. Requested Scroll Craft reference
 review uses `ecc-scroll-craft/ecc/scroll-craft-dashboard-review` via the shared
 suite, underneath this workflow; its upstream scripts and marketing engine stay inactive.
+Optional asset requests use `ecc-higgsfield/ecc/higgsfield-frontend-assets` under
+this same primary workflow. Provider access and cost need separate authorization;
+generated assets never establish risk data or authenticated UI correctness.
 
 For UI component/layout changes, require the source-bound specification and D-only before/after desktop/mobile screenshot, video and trace bundle described in [the existing browser workflow](../../agent-tooling/skills/seabridge-browser-autonomy/SKILL.md). Inspect playback and protected layout/copy/tokens. Missing or stale evidence fails the affected UI acceptance; anonymous captures do not prove authenticated behavior. Keep the review scoped to the requested change.
 
