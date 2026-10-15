@@ -112,11 +112,22 @@ for (const testFile of testFiles) {
 
   // Parse results from combined output
   const combined = `${stdout}\n${stderr}`;
-  const passedMatch = combined.match(/Passed:\s*(\d+)/);
+  // Node emits TAP or the newer spec summary. Count a single complete
+  // top-level pair, not nested summaries or duplicate child reports.
+  const nodePassed = [...combined.matchAll(/^(?:#|\u2139) pass (\d+)\s*$/gm)];
+  const nodeFailed = [...combined.matchAll(/^(?:#|\u2139) fail (\d+)\s*$/gm)];
+  const nodeSummary = nodePassed.length === 1 && nodeFailed.length === 1;
+  const ambiguousNodeSummary = nodePassed.length > 1 || nodeFailed.length > 1
+    || nodePassed.length !== nodeFailed.length;
+  const passedMatch = nodeSummary ? nodePassed[0] : combined.match(/Passed:\s*(\d+)/);
   const failedMatch = combined.match(/Failed:\s*(\d+)/);
 
   if (passedMatch) totalPassed += parseInt(passedMatch[1], 10);
-  const reportedFailures = failedMatch ? parseInt(failedMatch[1], 10) : 0;
+  const reportedFailures = Math.max(
+    failedMatch ? parseInt(failedMatch[1], 10) : 0,
+    ...nodeFailed.map(match => parseInt(match[1], 10)),
+    ambiguousNodeSummary ? 1 : 0
+  );
   const processFailed = Boolean(result.error) || result.status !== 0;
   totalFailed += processFailed ? Math.max(reportedFailures, 1) : reportedFailures;
 
@@ -127,6 +138,8 @@ for (const testFile of testFiles) {
     failureReason = result.signal
       ? `terminated by signal ${result.signal}`
       : `exited with status ${result.status}`;
+  } else if (ambiguousNodeSummary) {
+    failureReason = 'reported ambiguous or incomplete Node test summaries';
   } else if (reportedFailures > 0) {
     failureReason = `reported ${reportedFailures} failed tests`;
   }

@@ -103,6 +103,54 @@ const tests = [
     assert.deepStrictEqual(result.annotations, []);
     assert.ok(result.logs.includes('Error: local failure'));
   }],
+  ['TAP summary contributes successful cases', () => {
+    const r = run({status:0, stdout:'TAP version 13\n# tests 4\n# pass 4\n# fail 0\n'});
+    assert.strictEqual(r.status,0); assert.ok(r.logs.some(x => /Passed:\s+4\s/.test(x)));
+  }],
+  ['Node spec summary contributes successful cases', () => {
+    const r = run({status:0, stdout:'ℹ tests 3\nℹ pass 3\nℹ fail 0\n'});
+    assert.strictEqual(r.status,0); assert.ok(r.logs.some(x => /Passed:\s+3\s/.test(x)));
+  }],
+  ['top-level Node summary wins over nested and legacy output', () => {
+    const r = run({status:0, stdout:'    # pass 99\n    # fail 0\n# Passed: 99, Failed: 0\n# pass 2\n# fail 0\n'});
+    assert.strictEqual(r.status,0); assert.ok(r.logs.some(x => /Passed:\s+2\s/.test(x)));
+  }],
+  ['TAP failures fail despite a zero child exit', () => {
+    const r = run({status:0, stdout:'# pass 2\n# fail 1\n'});
+    assert.strictEqual(r.status,1); assert.strictEqual(r.annotations.length,1);
+  }],
+  ['spec failures in stderr fail the gate', () => {
+    const r = run({status:0, stderr:'ℹ pass 1\nℹ fail 2\n'});
+    assert.strictEqual(r.status,1); assert.ok(r.logs.some(x => /Failed:\s+2\s/.test(x)));
+  }],
+  ['nonzero child exits still fail a passing TAP summary', () => {
+    const r = run({status:1, stdout:'# pass 3\n# fail 0\n'});
+    assert.strictEqual(r.status,1); assert.strictEqual(r.annotations.length,1);
+  }],
+  ['nested summaries alone cannot add duplicate cases', () => {
+    const r = run({status:0, stdout:'    # pass 90\n    # fail 0\n'});
+    assert.strictEqual(r.status,0); assert.ok(r.logs.some(x => /Passed:\s+0\s/.test(x)));
+  }],
+  ['incomplete Node pass summary cannot hide behind legacy output', () => {
+    const r = run({status:0, stdout:'# pass 9\nPassed: 2, Failed: 0'});
+    assert.strictEqual(r.status,1); assert.ok(r.logs.some(x => /Passed:\s+2\s/.test(x)));
+  }],
+  ['multiple top-level pairs cannot mask a later failure', () => {
+    const r = run({status:0, stdout:'# pass 2\n# fail 0\n# pass 3\n# fail 1\n'});
+    assert.strictEqual(r.status,1); assert.match(r.annotations[0], /ambiguous/);
+  }],
+  ['passing Node output cannot erase a legacy failure', () => {
+    const r = run({status:0, stdout:'Passed: 2, Failed: 1\n# pass 2\n# fail 0\n'});
+    assert.strictEqual(r.status,1); assert.ok(r.logs.some(x => /Failed:\s+1\s/.test(x)));
+  }],
+  ['incomplete Node failure summary cannot be ignored', () => {
+    const r = run({status:0, stdout:'# fail 1\nPassed: 2, Failed: 0'});
+    assert.strictEqual(r.status,1);
+  }],
+  ['multiple passing pairs are rejected rather than double counted', () => {
+    const r = run({status:0, stdout:'# pass 2\n# fail 0\n# pass 3\n# fail 0\n'});
+    assert.strictEqual(r.status,1); assert.match(r.annotations[0], /ambiguous/);
+  }],
 ];
 
 let failed = 0;
