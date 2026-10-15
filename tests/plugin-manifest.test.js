@@ -18,6 +18,7 @@ const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
 const { readHooksConfig } = require('../scripts/lib/hooks-config');
+const { expandImports } = require('../scripts/check-instruction-stack');
 
 const repoRoot = path.resolve(__dirname, '..');
 const packageJsonPath = path.join(repoRoot, 'package.json');
@@ -125,11 +126,14 @@ test('package-lock.json root version matches package.json', () => {
   assert.strictEqual(packageLock.packages[''].version, expectedVersion);
 });
 
-test('AGENTS.md version line matches package.json', () => {
+test('root AGENTS remains a canonical loader and release identity matches package.json', () => {
   const agentsSource = fs.readFileSync(rootAgentsPath, 'utf8');
-  const match = agentsSource.match(new RegExp(`^\\*\\*Version:\\*\\* (${semverPattern})$`, 'm'));
-  assert.ok(match, 'Expected AGENTS.md to declare a top-level version line');
-  assert.strictEqual(match[1], expectedVersion);
+  assert.match(agentsSource, /SEABRIDGE_CORE_ENTRY:/);
+  assert.doesNotMatch(agentsSource, /^\*\*Version:\*\*/m, "loading adapters do not duplicate package metadata");
+  const loaded = expandImports(rootAgentsPath);
+  assert.deepStrictEqual(loaded.missing, []);
+  assert.ok(loaded.files.length >= 3, 'root loader must resolve the central system import');
+  assert.strictEqual(fs.readFileSync(versionFilePath, 'utf8').trim(), expectedVersion);
 });
 
 test('docs/tr/AGENTS.md version line matches package.json', () => {

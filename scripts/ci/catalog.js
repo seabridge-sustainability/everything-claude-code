@@ -16,6 +16,7 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.join(__dirname, '../..');
+const INSTRUCTION_STACK_PATH = path.join(__dirname, '..', 'check-instruction-stack.js');
 const README_PATH = path.join(ROOT, 'README.md');
 const AGENTS_PATH = path.join(ROOT, 'AGENTS.md');
 const README_ZH_CN_PATH = path.join(ROOT, 'README.zh-CN.md');
@@ -216,6 +217,17 @@ function parseZhDocsReadmeExpectations(readmeContent) {
   }
 
   return expectations;
+}
+
+function isCanonicalLoader(content, entryPath) {
+  if (!/<!--\s*SEABRIDGE_CORE_ENTRY:\s*[^\s]+\.md\s*-->/.test(content)) return false;
+  if (/providing\s+\d+\s+specialized agents/i.test(content)) return false;
+  const { expandImports, REQUIRED } = require(INSTRUCTION_STACK_PATH);
+  const loaded = expandImports(entryPath);
+  if (loaded.missing.length) throw Error('AGENTS.md loader has missing policy imports: ' + loaded.missing.join(', '));
+  if (loaded.files.length < 2) throw Error('AGENTS.md loader must resolve its canonical source');
+  for (const invariant of REQUIRED) if (!invariant.re.test(loaded.text)) throw Error('AGENTS.md loader missing invariant: ' + invariant.id);
+  return true;
 }
 
 function parseAgentsDocExpectations(agentsContent) {
@@ -578,8 +590,8 @@ function createDocumentSpecs(paths = {}) {
     },
     {
       filePath: agentsPath,
-      parseExpectations: parseAgentsDocExpectations,
-      syncContent: syncEnglishAgents,
+      parseExpectations: content => isCanonicalLoader(content, agentsPath) ? [] : parseAgentsDocExpectations(content),
+      syncContent: (content, catalog) => isCanonicalLoader(content, agentsPath) ? content : syncEnglishAgents(content, catalog),
     },
     {
       filePath: zhRootReadmePath,

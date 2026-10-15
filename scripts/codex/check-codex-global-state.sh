@@ -81,15 +81,8 @@ require_file "$CONFIG_FILE" "Global config.toml"
 require_file "$AGENTS_FILE" "Global AGENTS.md"
 
 if [[ -f "$AGENTS_FILE" ]]; then
-  # Match the complete current root source, including project loading adapters.
-  # A title alone can accept stale or incomplete installed instructions.
-  if node - "$REPO_ROOT/AGENTS.md" "$AGENTS_FILE" <<'NODE'
-const fs = require('fs');
-const normalize = text => text.replace(/\r\n/g, '\n').trim();
-const expected = normalize(fs.readFileSync(process.argv[2], 'utf8'));
-const installed = normalize(fs.readFileSync(process.argv[3], 'utf8'));
-process.exit(expected && installed.includes(expected) ? 0 : 1);
-NODE
+  # Validate the actual global-directory form, not copied relative loader text.
+  if node "$REPO_ROOT/scripts/codex/global-agent-instructions.js" check "$REPO_ROOT" "$AGENTS_FILE"
   then
     ok "AGENTS contains ECC root instructions"
   else

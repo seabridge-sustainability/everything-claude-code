@@ -40,6 +40,11 @@ test('Cursor uses native AGENTS discovery and generated rules are on demand', ()
     encoding: 'utf8',
   });
   assert.strictEqual(result.status, 0, result.stderr);
+  const loader = read('.cursor/rules/common-agents.md');
+  assert.match(loader, /SEABRIDGE_CORE_ENTRY:/);
+  const loaded = require('../../scripts/check-instruction-stack').expandImports(path.join(root, '.cursor/rules/common-agents.md'));
+  assert.deepStrictEqual(loaded.missing, []);
+  assert.strictEqual((loaded.text.match(/<!-- SEABRIDGE_SAFETY_RULE_START -->/g) || []).length, 1);
   const files = fs.readdirSync(path.join(root, '.cursor', 'rules')).filter((name) => /\.(?:md|mdc)$/.test(name));
   const always = files.filter((name) => /alwaysApply:\s*true/.test(read(path.join('.cursor/rules', name))));
   assert.deepStrictEqual(always, []);

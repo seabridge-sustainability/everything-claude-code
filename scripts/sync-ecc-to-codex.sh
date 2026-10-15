@@ -180,6 +180,10 @@ if ! command -v node >/dev/null 2>&1; then
   exit 1
 fi
 
+# Resolve scoped policy before backups/config/hook mutations. A missing import
+# must fail before installation, not leave a partly installed relative loader.
+ECC_GLOBAL_INSTRUCTIONS="$(node "$REPO_ROOT/scripts/codex/global-agent-instructions.js" render "$REPO_ROOT")"
+
 log "Mode: $MODE"
 log "Repo root: $REPO_ROOT"
 log "Codex home: $CODEX_HOME"
@@ -230,10 +234,7 @@ ECC_END_MARKER="<!-- END ECC -->"
 
 compose_ecc_block() {
   printf '%s\n' "$ECC_BEGIN_MARKER"
-  cat "$AGENTS_ROOT_SRC"
-  printf '\n\n---\n\n'
-  printf '# Codex Supplement (From ECC .codex/AGENTS.md)\n\n'
-  cat "$AGENTS_CODEX_SUPP_SRC"
+  printf '%s\n' "$ECC_GLOBAL_INSTRUCTIONS"
   printf '\n%s\n' "$ECC_END_MARKER"
 }
 

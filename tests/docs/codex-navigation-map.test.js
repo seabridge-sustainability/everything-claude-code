@@ -3,6 +3,7 @@
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
+const { expandImports } = require('../../scripts/check-instruction-stack');
 
 const repoRoot = path.resolve(__dirname, '..', '..');
 const guidePath = 'docs/CODEX-NAVIGATION-GUIDE.md';
@@ -68,12 +69,18 @@ test('Codex navigation map documents PR diff packet workflow', () => {
   }
 });
 
-test('README and Codex supplement link to the navigation map', () => {
+test('on-demand Codex docs link the navigation map while loaders resolve canonical policy', () => {
   const readme = read('README.md');
-  const codexAgents = read('.codex/AGENTS.md');
+  const codexDocs = read('.codex-plugin/README.md');
 
   assert.ok(readme.includes(guidePath), 'README.md must link the Codex navigation map');
-  assert.ok(codexAgents.includes(guidePath), '.codex/AGENTS.md must link the Codex navigation map');
+  assert.ok(codexDocs.includes(guidePath), 'on-demand Codex documentation must link the navigation map');
+  for (const entry of ['AGENTS.md', '.codex/AGENTS.md']) {
+    assert.match(read(entry), /SEABRIDGE_CORE_ENTRY:/);
+    const loaded = expandImports(path.join(repoRoot, entry));
+    assert.deepStrictEqual(loaded.missing, []);
+    assert.ok(loaded.files.some(file => path.basename(file) === 'AGENTS_SYSTEM.md'));
+  }
 });
 
 console.log(`\nResults: Passed: ${passed}, Failed: ${failed}`);

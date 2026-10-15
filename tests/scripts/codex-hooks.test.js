@@ -1123,8 +1123,8 @@ if (
       assert.strictEqual(syncResult.status, 0, `${syncResult.stdout}\n${syncResult.stderr}`);
 
       const syncedAgents = fs.readFileSync(agentsPath, 'utf8');
-      const rootInstructions = fs.readFileSync(path.join(repoRoot, 'AGENTS.md'), 'utf8').replace(/\r\n/g, '\n').trim();
-      assert.ok(syncedAgents.replace(/\r\n/g, '\n').includes(rootInstructions), 'sync must preserve the complete current ECC root instructions');
+      const rootInstructions = require('../../scripts/codex/global-agent-instructions').render(repoRoot).trim();
+      assert.ok(syncedAgents.replace(/\r\n/g, '\n').includes(rootInstructions), 'sync must use the verified global-directory instruction form');
       assert.match(syncedAgents, /^# Codex Supplement \(From ECC \.codex\/AGENTS\.md\)/m);
 
       const syncedConfig = fs.readFileSync(configPath, 'utf8');

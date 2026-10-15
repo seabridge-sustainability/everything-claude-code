@@ -316,7 +316,7 @@
     },
     {
       "command": "goal",
-      "description": "Run the SeaBridgeAI goal protocol - persistent objective, Definition of Done, validation plan, and execution loop until validated or blocked.",
+      "description": "Pursue an explicit SeaBridgeAI goal through working outcomes, bounded execution and evidence.",
       "type": "testing",
       "primaryAgents": [],
       "allAgents": [],

@@ -2,12 +2,32 @@
 
 const fs = require('fs');
 const path = require('path');
+const { execFileSync } = require('child_process');
 
 const repoRoot = process.env.ECC_UNICODE_SCAN_ROOT
   ? path.resolve(process.env.ECC_UNICODE_SCAN_ROOT)
   : path.resolve(__dirname, '..', '..');
 
 const writeMode = process.argv.includes('--write');
+
+// Pinned third-party content retains its upstream presentation/attribution.
+// This affects emoji style only, never bidi/zero-width/tag-smuggling checks.
+function vendorPresentationRoots() {
+  const base = 'integrations/company-dev-tools/';
+  const file = path.join(repoRoot, base, 'catalog.json');
+  if (!fs.existsSync(file)) return [];
+  const catalog = JSON.parse(fs.readFileSync(file, 'utf8'));
+  if (catalog.schema !== 'seabridge.dev-suite.catalog.v1') return [];
+  const pinned = source => /^[a-f0-9]{40}$/.test(catalog.sources?.[source]?.revision || '');
+  const roots = (catalog.plugins || []).filter(row => pinned(row.source)
+    && /^[A-Za-z0-9_-]+$/.test(row.name)).map(row => `${base}plugins/${row.name}/`);
+  for (const row of catalog.skills || []) {
+    if (pinned(row.source) && /^skills\/[A-Za-z0-9_/-]+\/SKILL\.md$/.test(row.file)
+        && !row.file.split('/').includes('..')) roots.push(base + row.file.slice(0, -'SKILL.md'.length));
+  }
+  return roots;
+}
+const presentationRoots = vendorPresentationRoots();
 
 const ignoredDirs = new Set([
   '.git',
@@ -113,6 +133,17 @@ function canAutoWrite(relativePath) {
 }
 
 function listFiles(dirPath) {
+  if (dirPath === repoRoot && fs.existsSync(path.join(repoRoot, '.git'))) {
+    // Scan tracked plus new non-ignored source, not populated nested clones,
+    // submodules or ignored generated exports. Never mutate those by --write.
+    const inventory = execFileSync('git', ['ls-files', '-z', '--cached', '--others', '--exclude-standard'], {
+      cwd: repoRoot, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024,
+    });
+    return [...new Set(inventory.split('\0').filter(Boolean))]
+      .map(relative => path.join(repoRoot, relative))
+      .filter(file => !shouldSkip(file) && isTextFile(file)
+        && fs.existsSync(file) && fs.lstatSync(file).isFile());
+  }
   const results = [];
   for (const entry of fs.readdirSync(dirPath, { withFileTypes: true })) {
     const entryPath = path.join(dirPath, entry.name);
@@ -252,6 +283,7 @@ const violations = [];
 
 for (const filePath of listFiles(repoRoot)) {
   const relativePath = path.relative(repoRoot, filePath);
+  const importedPresentation = presentationRoots.some(prefix => relativePath.split(path.sep).join('/').startsWith(prefix));
   let text;
   try {
     text = fs.readFileSync(filePath, 'utf8');
@@ -261,6 +293,7 @@ for (const filePath of listFiles(repoRoot)) {
 
   if (
     writeMode &&
+    !importedPresentation &&
     !writeModeSkip.has(path.normalize(relativePath)) &&
     canAutoWrite(relativePath)
   ) {
@@ -272,9 +305,14 @@ for (const filePath of listFiles(repoRoot)) {
     }
   }
 
+  // FE0F immediately after a pictograph is visible emoji presentation, not an
+  // invisible instruction. An orphan selector and every other dangerous code
+  // point still fail in imported content. Native ECC rules remain unchanged.
+  const securityText = importedPresentation
+    ? text.replace(/(\p{Extended_Pictographic})\uFE0F/gu, '$1 ') : text;
   const fileViolations = [
-    ...collectDangerousInvisibleMatches(text),
-    ...collectMatches(text, emojiRe, 'emoji'),
+    ...collectDangerousInvisibleMatches(securityText),
+    ...(importedPresentation ? [] : collectMatches(text, emojiRe, 'emoji')),
   ];
 
   for (const violation of fileViolations) {

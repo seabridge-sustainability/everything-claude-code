@@ -3,6 +3,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { expandImports, REQUIRED } = require('./check-instruction-stack');
 
 const root = path.resolve(__dirname, '..');
 const cursorDir = path.join(root, '.cursor', 'rules');
@@ -28,6 +29,15 @@ function stripSafety(text) {
 
 const expected = new Map();
 for (const [name, description] of Object.entries(mappings)) {
+  const existing = path.join(cursorDir, 'common-' + name + '.md');
+  const current = fs.existsSync(existing) ? fs.readFileSync(existing, 'utf8').replace(/\r\n/g, '\n') : '';
+  if (name === 'agents' && /<!--\s*SEABRIDGE_CORE_ENTRY:/.test(current)) {
+    const loaded = expandImports(existing);
+    if (loaded.missing.length) throw new Error('Cursor loader has missing policy imports: ' + loaded.missing.join(', '));
+    for (const invariant of REQUIRED) if (!invariant.re.test(loaded.text)) throw new Error('Cursor loader missing invariant: ' + invariant.id);
+    expected.set('common-agents.md', current);
+    continue; // Preserve the canonical loading adapter; generate only on-demand workflow rules.
+  }
   const source = fs.readFileSync(path.join(root, 'rules', 'common', name + '.md'), 'utf8');
   expected.set(
     'common-' + name + '.md',

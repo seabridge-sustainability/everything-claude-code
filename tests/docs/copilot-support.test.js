@@ -3,6 +3,7 @@
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
+const { expandImports, REQUIRED } = require('../../scripts/check-instruction-stack');
 
 const repoRoot = path.resolve(__dirname, '..', '..');
 const promptDir = path.join(repoRoot, '.github', 'prompts');
@@ -81,10 +82,15 @@ test('Copilot docs advertise slash prompt invocation instead of hash commands', 
 });
 
 test('Copilot instructions include a prompt defense baseline', () => {
-  const instructions = read('.github/copilot-instructions.md');
-  assert.ok(instructions.includes('## Prompt Defense Baseline'));
-  assert.ok(instructions.includes('untrusted input'));
-  assert.match(instructions, /never print, log, commit, or copy credential values/i);
+  const entry = path.join(repoRoot, '.github/copilot-instructions.md');
+  const loaded = expandImports(entry);
+  assert.match(read('.github/copilot-instructions.md'), /SEABRIDGE_CORE_ENTRY:/);
+  assert.deepStrictEqual(loaded.missing, []);
+  assert.ok(loaded.files.length >= 3, 'Copilot must resolve the central policy and system import');
+  assert.strictEqual((loaded.text.match(/<!-- SEABRIDGE_SAFETY_RULE_START -->/g) || []).length, 1);
+  for (const invariant of REQUIRED) assert.ok(invariant.re.test(loaded.text), invariant.id);
+  assert.match(loaded.text, /untrusted input/i);
+  assert.match(loaded.text, /never print, log, commit, or copy credential values/i);
 });
 
 test('README documents prompt-file settings and surfaces', () => {

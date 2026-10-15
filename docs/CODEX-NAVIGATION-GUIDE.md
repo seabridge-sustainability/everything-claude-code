@@ -8,24 +8,23 @@ work, preparing a PR-quality diff, or handing context to a reviewer.
 
 Read in this order:
 
-1. `AGENTS.md` - universal project rules, agent routing, testing expectations,
-   and commit workflow.
-2. `.codex/AGENTS.md` - Codex-specific setup, MCP, skill discovery, and
-   hook-parity limits.
+1. `AGENTS.md` and `.codex/AGENTS.md` - loading adapters that resolve the
+   canonical backend `AGENTS.md` and `AGENTS_SYSTEM.md`.
+2. `.codex-plugin/README.md` - on-demand Codex installation, MCP and hook-trust guidance.
 3. `docs/COMMAND-AGENT-MAP.md` - command to agent and skill routing.
 4. This guide - repo navigation, diff packet shape, and PR review lanes for
    Codex sessions.
 
-If those files disagree, prefer the more specific file for the current task:
-Codex-specific behavior belongs in `.codex/AGENTS.md`; general contribution
-policy belongs in `AGENTS.md` and `CONTRIBUTING.md`.
+The backend `AGENTS.md`, `AGENTS_SYSTEM.md` and `CLAUDE.md` hold shared policy.
+ECC loading adapters do not define independent policy. Keep navigation and setup
+details in on-demand docs; the host hierarchy and latest owner request control.
 
 ## Surface Map
 
 | Surface | What It Owns | Codex Use |
 |---------|---------------|-----------|
-| `AGENTS.md` | Cross-harness operating rules | Read before any repo work |
-| `.codex/AGENTS.md` | Codex-only guidance | Read after root instructions |
+| `AGENTS.md` | Canonical policy loading adapter | Resolve before repo work |
+| `.codex/AGENTS.md` | Codex policy loading adapter | Resolve central instructions |
 | `.codex/config.toml` | Codex sandbox, MCP, profiles, agent roles | Inspect when setup or MCP behavior matters |
 | `.codex/agents/` | Codex multi-agent role layers | Use for explorer, reviewer, and docs researcher roles |
 | `.agents/skills/` | Codex-facing skill copies | Use when Codex needs native skill loading |
@@ -152,7 +151,7 @@ docs-only changes, run the targeted docs test and review links for drift.
 - Do not open broad PRs that mix unrelated skill, command, install, and release
   changes unless the user explicitly wants a release bundle.
 - Do not leave a Codex docs change discoverable only through README prose. Link
-  it from `.codex/AGENTS.md` when it affects Codex behavior.
+  it from the on-demand `.codex-plugin/README.md` when it affects Codex behavior.
 
 ## Fast Commands
 

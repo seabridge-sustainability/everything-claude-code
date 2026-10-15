@@ -187,6 +187,7 @@ function runCatalogValidator(overrides = {}) {
 
   const resolvedOverrides = {
     ROOT: repoRoot,
+    INSTRUCTION_STACK_PATH: path.join(validatorsDir, '..', 'check-instruction-stack.js'),
     README_PATH: path.join(repoRoot, 'README.md'),
     AGENTS_PATH: path.join(repoRoot, 'AGENTS.md'),
     README_ZH_CN_PATH: path.join(repoRoot, 'README.zh-CN.md'),
@@ -558,6 +559,30 @@ function runTests() {
     const result = runCatalogValidator();
     assert.strictEqual(result.code, 0, `Should pass, got stderr: ${result.stderr}`);
     assert.ok(result.stdout.includes('Documentation counts match the repository catalog.'), 'Should report matching counts');
+  })) passed++; else failed++;
+
+  if (test('canonical loader catalog validation preserves imports and rejects broken or unsafe policy', () => {
+    const testDir = createTestDir();
+    try {
+      writeCatalogFixture(testDir);
+      const policyDir = path.join(testDir, 'manageesg-backend');
+      fs.mkdirSync(policyDir);
+      const policy = path.join(policyDir, 'AGENTS.md');
+      const { canonicalBlocks } = require('../../scripts/check-instruction-stack');
+      const text = 'SYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1\n' + canonicalBlocks(repoRoot).join('\n');
+      fs.writeFileSync(policy, text);
+      const entry = path.join(testDir, 'AGENTS.md');
+      const loader = '<!-- SEABRIDGE_CORE_ENTRY: manageesg-backend/AGENTS.md -->\n';
+      fs.writeFileSync(entry, loader);
+      const { runCatalogCheck } = require('../../scripts/ci/catalog');
+      assert.ok(runCatalogCheck({ root: testDir }).checks.every(check => check.ok));
+      runCatalogCheck({ root: testDir, writeMode: true });
+      assert.strictEqual(fs.readFileSync(entry, 'utf8'), loader, 'catalog synchronization must not expand instruction loaders');
+      fs.writeFileSync(policy, text.replace('**Ask first:**', '**Missing gate:**'));
+      assert.throws(() => runCatalogCheck({ root: testDir }), /missing invariant: ask-first-list/);
+      fs.unlinkSync(policy);
+      assert.throws(() => runCatalogCheck({ root: testDir }), /missing policy imports/);
+    } finally { cleanupTestDir(testDir); }
   })) passed++; else failed++;
 
   if (test('fails when README and AGENTS catalog counts drift', () => {

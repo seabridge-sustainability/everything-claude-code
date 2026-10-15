@@ -216,6 +216,62 @@ if (
   passed++;
 else failed++;
 
+if (test('Git inventory excludes generated exports but still rejects tracked and new unsafe source', () => {
+  const root = makeTempRoot('ecc-unicode-git-inventory-');
+  const git = args => {
+    const result = spawnSync('git', args, { cwd: root, encoding: 'utf8' });
+    assert.strictEqual(result.status, 0, result.stderr);
+  };
+  try {
+    git(['init', '-q']);
+    fs.writeFileSync(path.join(root, '.gitignore'), 'generated/\n');
+    fs.mkdirSync(path.join(root, 'generated'));
+    fs.writeFileSync(path.join(root, 'generated/unsafe.md'), zeroWidthSpace);
+    fs.writeFileSync(path.join(root, 'tracked.md'), 'Safe source\n');
+    git(['add', '.gitignore', 'tracked.md']);
+    assert.strictEqual(runCheck(root).status, 0);
+    fs.writeFileSync(path.join(root, 'tracked.md'), zeroWidthSpace);
+    assert.notStrictEqual(runCheck(root).status, 0, 'Tracked unsafe bytes remain rejected');
+    fs.writeFileSync(path.join(root, 'tracked.md'), 'Safe source\n');
+    fs.writeFileSync(path.join(root, 'new.py'), `value = "${zeroWidthSpace}"\n`);
+    assert.notStrictEqual(runCheck(root).status, 0, 'New non-ignored source remains checked');
+    assert.strictEqual(fs.readFileSync(path.join(root, 'generated/unsafe.md'), 'utf8'), zeroWidthSpace);
+  } finally {
+    fs.rmSync(root, { recursive: true });
+  }
+})) passed++;
+else failed++;
+
+if (test('pinned vendor presentation retains emoji but never hidden instructions or orphan selectors', () => {
+  const root = makeTempRoot('ecc-unicode-pinned-presentation-');
+  const base = path.join(root, 'integrations/company-dev-tools');
+  const plugin = path.join(base, 'plugins/retained-plugin');
+  fs.mkdirSync(plugin, { recursive: true });
+  const file = path.join(plugin, 'README.md');
+  const catalog = { schema: 'seabridge.dev-suite.catalog.v1', sources: { upstream: { revision: 'a'.repeat(40) } },
+    plugins: [{ source: 'upstream', name: 'retained-plugin' }], skills: [] };
+  fs.writeFileSync(path.join(base, 'catalog.json'), JSON.stringify(catalog));
+  const visible = `Upstream presentation ${warningEmoji}\n`;
+  try {
+    fs.writeFileSync(file, visible);
+    assert.strictEqual(runCheck(root, ['--write']).status, 0);
+    assert.strictEqual(fs.readFileSync(file, 'utf8'), visible, 'Preserve pinned original content');
+    for (const hidden of [zeroWidthSpace, String.fromCodePoint(0x202E), String.fromCodePoint(0xE0041), String.fromCodePoint(0xFE0F)]) {
+      fs.writeFileSync(file, `Hidden ${hidden}\n`);
+      assert.notStrictEqual(runCheck(root).status, 0, 'Imported hidden instructions remain blocked');
+    }
+    fs.writeFileSync(file, visible);
+    catalog.sources.upstream.revision = 'unverified';
+    fs.writeFileSync(path.join(base, 'catalog.json'), JSON.stringify(catalog));
+    assert.notStrictEqual(runCheck(root).status, 0, 'Unpinned content receives no presentation exception');
+    fs.writeFileSync(path.join(root, 'native.md'), visible);
+    assert.notStrictEqual(runCheck(root).status, 0, 'Native ECC emoji rule remains unchanged');
+  } finally {
+    fs.rmSync(root, { recursive: true });
+  }
+})) passed++;
+else failed++;
+
 console.log(`\nPassed: ${passed}`);
 console.log(`Failed: ${failed}`);
 process.exit(failed > 0 ? 1 : 0);

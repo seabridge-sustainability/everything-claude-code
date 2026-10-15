@@ -9,58 +9,49 @@ const { spawnSync } = require('child_process');
 const root = path.resolve(__dirname, '..', '..');
 const script = path.join(root, 'scripts', 'sync-safety-rule.ps1');
 const source = fs.readFileSync(script, 'utf8');
-
 assert.match(source, /missing root/);
 assert.match(source, /missing AGENTS\.md/);
-assert.match(source, /missing safety markers/);
+assert.match(source, /missing central safety markers/);
+assert.match(source, /expandImports/);
 assert.match(source, /\$eccRoot = Split-Path -Parent \$PSScriptRoot/);
-assert.match(source, /Join-Path \$workspaceRoot "manageesg-backend"/);
+assert.match(source, /Join-Path \$workspaceRoot "manageesg-backend\\AGENTS_SYSTEM\.md"/);
+assert.doesNotMatch(source, /WriteAllText|WriteAllBytes|Set-Content|Copy-Item/);
 
 if (process.platform === 'win32') {
-  const missing = path.join(os.tmpdir(), `ecc-missing-safety-root-${process.pid}`);
-  const result = spawnSync('powershell', [
-    '-NoProfile',
-    '-ExecutionPolicy', 'Bypass',
-    '-File', script,
-    '-Check',
-    '-Roots', missing,
-    '-CanonicalFile', path.join(root, 'protocols', 'SAFETY_AUTHORIZATION_RULE.md')
-  ], { encoding: 'utf8', windowsHide: true });
-  assert.notStrictEqual(result.status, 0, 'missing root must fail closed');
-  assert.match(`${result.stdout}\n${result.stderr}`, /PREFLIGHT FAIL/);
-
-  const fixture = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-safety-worktree-'));
+  const fixture = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-safety-loader-'));
   try {
-    const fixtureEcc = path.join(fixture, 'ecc-worktree');
-    const fixtureScript = path.join(fixtureEcc, 'scripts', 'sync-safety-rule.ps1');
-    const canonical = fs.readFileSync(path.join(root, 'protocols', 'SAFETY_AUTHORIZATION_RULE.md'), 'utf8');
-    fs.mkdirSync(path.dirname(fixtureScript), { recursive: true });
-    fs.mkdirSync(path.join(fixtureEcc, 'protocols'), { recursive: true });
-    fs.copyFileSync(script, fixtureScript);
-    fs.writeFileSync(path.join(fixtureEcc, 'protocols', 'SAFETY_AUTHORIZATION_RULE.md'), canonical);
-
-    const repos = ['ecc-worktree', 'manageesg-backend', 'manageesg-frontend', 'openseabri', 'autoresearch', 'climada-stack', '_upstream'];
-    for (const repo of repos) {
-      const repoRoot = path.join(fixture, repo);
-      fs.mkdirSync(repoRoot, { recursive: true });
-      fs.writeFileSync(path.join(repoRoot, 'AGENTS.md'), canonical);
+    const ecc = path.join(fixture, 'ecc-worktree');
+    const backend = path.join(fixture, 'manageesg-backend');
+    const copiedScript = path.join(ecc, 'scripts', 'sync-safety-rule.ps1');
+    fs.mkdirSync(path.dirname(copiedScript), { recursive: true });
+    fs.mkdirSync(backend);
+    fs.copyFileSync(script, copiedScript);
+    fs.copyFileSync(path.join(root, 'scripts', 'check-instruction-stack.js'), path.join(ecc, 'scripts', 'check-instruction-stack.js'));
+    const canonical = path.join(backend, 'AGENTS_SYSTEM.md');
+    fs.writeFileSync(canonical, require('../../scripts/check-instruction-stack').canonicalBlocks(root)[0]);
+    const central = path.join(backend, 'AGENTS.md');
+    fs.writeFileSync(central, '@AGENTS_SYSTEM.md\n');
+    const entry = path.join(ecc, 'AGENTS.md');
+    const loader = '<!-- SEABRIDGE_CORE_ENTRY: ../manageesg-backend/AGENTS.md -->\n';
+    fs.writeFileSync(entry, loader);
+    function check(roots = ecc) {
+      const result = spawnSync('powershell', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', copiedScript, '-Check', '-Roots', roots],
+        { encoding: 'utf8', windowsHide: true });
+      return { status: result.status, output: String(result.stdout) + '\n' + String(result.stderr) };
     }
-    const worktreeAgents = path.join(fixtureEcc, 'AGENTS.md');
-    fs.writeFileSync(worktreeAgents, canonical.replace('## Safety And Authorization Rule', '## Safety Rule Drift'));
-    const unrelated = path.join(fixture, 'unrelated-main');
-    fs.mkdirSync(unrelated);
-    fs.writeFileSync(path.join(unrelated, 'AGENTS.md'), 'must not be scanned');
-
-    const isolated = spawnSync('powershell', [
-      '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', fixtureScript, '-Check'
-    ], { encoding: 'utf8', windowsHide: true });
-    const isolatedOutput = `${isolated.stdout}\n${isolated.stderr}`;
-    assert.notStrictEqual(isolated.status, 0, 'the copied worktree must be scanned by default');
-    assert.match(isolatedOutput, /ecc-worktree[\\/]AGENTS\.md/);
-    assert.doesNotMatch(isolatedOutput, /unrelated-main/);
-  } finally {
-    fs.rmSync(fixture, { recursive: true, force: true });
-  }
+    const passed = check();
+    assert.strictEqual(passed.status, 0, passed.output);
+    assert.strictEqual(fs.readFileSync(entry, 'utf8'), loader, 'validation must not stamp policy into a loader');
+    assert.notStrictEqual(check(path.join(fixture, 'missing')).status, 0);
+    fs.unlinkSync(entry);
+    assert.match(check().output, /missing AGENTS\.md/);
+    fs.writeFileSync(entry, '<!-- SEABRIDGE_CORE_ENTRY: ../missing/AGENTS.md -->\n');
+    assert.match(check().output, /missing policy import/);
+    fs.writeFileSync(entry, loader);
+    fs.writeFileSync(central, fs.readFileSync(canonical, 'utf8').replace('**Ask first:**', '**Removed gate:**'));
+    assert.match(check().output, /drifted effective safety/);
+    fs.writeFileSync(canonical, 'no safety block');
+    assert.match(check().output, /missing central safety markers/);
+  } finally { fs.rmSync(fixture, { recursive: true, force: true }); }
 }
-
-console.log('safety sync coverage: 9 checks passed');
+console.log('safety sync coverage: loader/import validation and non-writing checks passed');

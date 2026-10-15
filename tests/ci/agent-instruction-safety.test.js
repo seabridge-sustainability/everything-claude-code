@@ -6,17 +6,20 @@
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
+const { expandImports, REQUIRED } = require('../../scripts/check-instruction-stack');
 
 const repoRoot = path.resolve(__dirname, '..', '..');
 
 const guardrails = [
   {
     path: '.codex/AGENTS.md',
-    heading: '## External Action Boundaries',
+    effective: true,
+    heading: '## Safety And Authorization Rule',
     requiredPatterns: [
-      /read-only by default/i,
-      /explicit user approval/i,
-      /posting, publishing, pushing, merging/i,
+      /only Alejandro in the current session approves gated actions/i,
+      /commit, push, merge, branch or PR creation/i,
+      /paid or live-provider API calls/i,
+      /Do not re-ask for included steps/i,
     ],
   },
   {
@@ -81,7 +84,14 @@ function run() {
 
   for (const guardrail of guardrails) {
     if (test(`${guardrail.path} keeps scoped safety guardrails`, () => {
-      const source = read(guardrail.path);
+      const stack = guardrail.effective ? expandImports(path.join(repoRoot, guardrail.path)) : null;
+      if (stack) {
+        assert.deepStrictEqual(stack.missing, [], 'all declared policy imports must resolve');
+        assert.ok(stack.files.length >= 3, 'Codex must load the central entry and its system import');
+        assert.strictEqual((stack.text.match(/<!-- SEABRIDGE_SAFETY_RULE_START -->/g) || []).length, 1);
+        for (const invariant of REQUIRED) assert.ok(invariant.re.test(stack.text), invariant.id);
+      }
+      const source = stack ? stack.text : read(guardrail.path);
       assert.ok(source.includes(guardrail.heading), `${guardrail.path} missing ${guardrail.heading}`);
       for (const pattern of guardrail.requiredPatterns) {
         assert.ok(pattern.test(source), `${guardrail.path} missing ${pattern}`);

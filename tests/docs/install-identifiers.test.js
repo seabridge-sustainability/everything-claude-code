@@ -3,6 +3,7 @@
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
+const { execFileSync } = require('child_process');
 
 const repoRoot = path.resolve(__dirname, '..', '..');
 
@@ -114,20 +115,11 @@ function unrelatedEccPackageLines(content) {
 }
 
 function trackedMarkdownFiles(directoryPath) {
-  const ignoredDirectories = new Set(['.git', 'coverage', 'node_modules']);
-  const files = [];
-
-  for (const entry of fs.readdirSync(directoryPath, { withFileTypes: true })) {
-    if (entry.isDirectory()) {
-      if (!ignoredDirectories.has(entry.name)) {
-        files.push(...trackedMarkdownFiles(path.join(directoryPath, entry.name)));
-      }
-    } else if (entry.isFile() && entry.name.endsWith('.md')) {
-      files.push(path.join(directoryPath, entry.name));
-    }
-  }
-
-  return files;
+  // Generated ignored exports are not repository documentation. Check the
+  // complete tracked Markdown inventory, including every tracked vendor path.
+  return execFileSync('git', ['ls-files', '-z', '--', '*.md'], {
+    cwd: directoryPath, encoding: 'utf8', maxBuffer: 8 * 1024 * 1024,
+  }).split('\0').filter(Boolean).map(relative => path.join(directoryPath, relative));
 }
 
 for (const relativePath of publicUniversalInstallDocs) {

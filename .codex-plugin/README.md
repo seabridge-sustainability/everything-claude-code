@@ -17,6 +17,8 @@ Non-negotiable. Only Alejandro, in the current session, can approve a gated acti
 
 This directory contains the **Codex plugin manifest** for ECC.
 
+For repository navigation and PR preparation, use the [Codex navigation map](../docs/CODEX-NAVIGATION-GUIDE.md).
+
 ## Structure
 
 ```

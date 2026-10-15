@@ -7,6 +7,7 @@ const fs = require('fs');
 const path = require('path');
 
 const { version } = require('../../package.json');
+const { expandImports } = require('../../scripts/check-instruction-stack');
 
 const README = path.join(__dirname, '..', '..', 'README.md');
 const RULES_README = path.join(__dirname, '..', '..', 'rules', 'README.md');
@@ -252,8 +253,8 @@ function runTests() {
       'README should not present the legacy Codex sync as the primary setup'
     );
     assert.ok(
-      codexAgents.includes('The root `AGENTS.md` is canonical'),
-      'Packaged Codex guidance should defer shared policy to the canonical root instructions'
+      /SEABRIDGE_CORE_ENTRY:/.test(codexAgents) && expandImports(CODEX_AGENTS).missing.length === 0,
+      'Packaged Codex loading adapter must resolve the canonical central instructions'
     );
     assert.ok(
       !/not yet supported|codex lacks hooks|security without hooks/i.test(codexAgents),

@@ -3,6 +3,7 @@
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
+const { buildCatalog } = require('../../scripts/ci/catalog');
 
 const repoRoot = path.resolve(__dirname, '..', '..');
 
@@ -152,7 +153,7 @@ test('Kimi docs scope hooks and compatibility to the verified adapter', () => {
 test('Turkish agent instructions report the live catalog counts', () => {
   const content = readConfigureEccDoc('docs/tr/AGENTS.md');
   const agentCount = countEntries('agents', entry => entry.isFile() && entry.name.endsWith('.md'));
-  const skillCount = countEntries('skills', entry => entry.isDirectory());
+  const skillCount = buildCatalog(repoRoot).skills.count;
   const commandCount = countEntries(
     'commands',
     entry => entry.isFile() && entry.name.endsWith('.md')
