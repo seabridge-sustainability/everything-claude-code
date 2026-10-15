@@ -125,7 +125,24 @@ function planQueues(entries, { now, telemetry, checkGate } = {}) {
           || !Number.isFinite(telemetry?.reserveRamGiB) || telemetry.reserveRamGiB < 2) {
         result('waiting-resource', 'fresh trusted RAM telemetry and existing minimum headroom required'); continue;
       }
-      if (telemetry.freeRamGiB - entry.peakRamGiB < telemetry.reserveRamGiB) {
+      let available = telemetry.freeRamGiB;
+      // Legacy component callers may supply a point observation. The pinned
+      // concrete host always supplies this complete recent kernel window.
+      if (telemetry.recentSamples !== undefined) {
+        const samples = telemetry.recentSamples;
+        const valid = Array.isArray(samples) && samples.length === 5 && samples.every((sample, index) => {
+          const at = timestamp(sample?.observedAt), previous = index ? timestamp(samples[index - 1]?.observedAt) : at;
+          return Number.isFinite(at) && now - at >= 0 && now - at <= 30000
+            && Number.isFinite(sample?.freeRamGiB) && sample.freeRamGiB >= 0
+            && (!index || at - previous >= 250);
+        });
+        if (!valid || samples[4].observedAt !== telemetry.observedAt
+            || samples[4].freeRamGiB !== telemetry.freeRamGiB) {
+          result('waiting-resource', 'complete fresh recent RAM window required'); continue;
+        }
+        available = Math.min(available, ...samples.map(sample => sample.freeRamGiB));
+      }
+      if (available - entry.peakRamGiB < telemetry.reserveRamGiB) {
         result('waiting-resource', 'insufficient RAM headroom'); continue;
       }
     }

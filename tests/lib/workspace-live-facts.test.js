@@ -1,6 +1,6 @@
 'use strict';
 const assert = require('node:assert/strict');
-const { collectFacts } = require('../../scripts/lib/workspace-live-facts');
+const { collectFacts, collectMemoryWindow } = require('../../scripts/lib/workspace-live-facts');
 const now = Date.parse('2026-10-14T03:45:00Z');
 const root = 'C:/Users/adelm/SeaBridgeAI/everything-claude-code';
 const options = { repositories: [{ id: 'ecc', root }], clock: () => now,
@@ -47,5 +47,19 @@ test('stale or incomplete status remains unknown', () => {
 test('workspace escapes and duplicate repo identities are rejected', () => {
   assert.throws(() => collectFacts({ ...options, repositories: [{ id: 'x', root: root + '/../../outside' }] }), /approved C/);
   assert.throws(() => collectFacts({ ...options, repositories: [{ id: 'x', root }, { id: 'x', root }] }), /unique/);
+});
+test('bounded memory window retains the low observation and uses no files or child processes', () => {
+  let at=now, index=0, waits=0;
+  const result=collectMemoryWindow({clock:()=>at,wait:ms=>{assert.equal(ms,250);at+=ms;waits++;},
+    freeRamBytes:()=>[5,1,5,5,5][index++]*1024**3,totalRamBytes:()=>32*1024**3});
+  assert.equal(waits,4);assert.equal(result.recentSamples.length,5);
+  assert.equal(Math.min(...result.recentSamples.map(s=>s.freeRamGiB)),1);
+  assert.equal(result.reserveRamGiB,2);assert.equal(result.observedAt,new Date(now+1000).toISOString());
+});
+test('unknown, impossible and non-monotonic memory sampling fails closed', () => {
+  for(const freeRamBytes of [()=>NaN,()=>-1,()=>64*1024**3,()=>{throw Error('unknown');}]){
+    assert.throws(()=>collectMemoryWindow({clock:()=>now,wait:()=>{},freeRamBytes,totalRamBytes:()=>32*1024**3}));
+  }
+  assert.throws(()=>collectMemoryWindow({clock:()=>now,wait:()=>{},freeRamBytes:()=>4,totalRamBytes:()=>32}),/monotonic/);
 });
 console.log(JSON.stringify({ passed, failed: 0, scope: 'canonical read-only collector fixtures', writes: 0, paidCalls: 0 }));

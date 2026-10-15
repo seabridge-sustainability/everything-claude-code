@@ -296,6 +296,14 @@ try {
     assert.throws(() => store.acquire({ id: 'a', owner: 'owner-a', leaseMilliseconds: 1000 }), /readiness changed/);
     assert.equal(fs.readFileSync(file, 'utf8'), before);
   });
+  test('enqueue and independent writer claim never wait for a RAM sampling window',()=>{
+    let reads=0;
+    const {store}=fixture({readTelemetry:()=>{reads++;throw Error('RAM unknown');}});
+    store.enqueue([request('heavy'),request('writer',{kind:'writer',resource:'C:/Repo'})]);
+    assert.equal(reads,0);
+    const claim=store.acquire({id:'writer',owner:'owner-writer',leaseMilliseconds:1000});
+    assert.equal(claim.acquired,true);assert.equal(reads,0);
+  });
   test('injected running lease and missing write capability fail closed', () => {
     const { store } = fixture();
     assert.throws(() => store.enqueue([request('a', { state: 'running', token: 'forged' })]), /inject/);

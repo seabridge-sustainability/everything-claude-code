@@ -13,7 +13,7 @@ const { preflight, SUPPORTED, execute, workspaceBoundary, repository, goalRefere
 const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-fresh-preflight-'));
 let count = 0;
 after(() => fs.rmSync(temp, { recursive: true, force: true }));
-function fixture(runtime, centralLayout = false, goalFile = null) {
+function fixture(runtime, centralLayout = false, goalFile = null, toolProfile = undefined) {
   const box = path.join(temp, String(count++));
   const cwd = centralLayout ? path.join(box,'manageesg-backend') : box; fs.mkdirSync(cwd,{recursive:true});
   for (const args of [['init','--initial-branch='+(centralLayout?'seabridge_development':'fixture')],['config','user.name','ECC Test'],['config','user.email','test@example.invalid']]) {
@@ -39,7 +39,7 @@ function fixture(runtime, centralLayout = false, goalFile = null) {
   const commitPolicy=spawnSync('git',['commit','-m','fixture policy baseline'],{cwd,encoding:'utf8',windowsHide:true});assert.equal(commitPolicy.status,0,commitPolicy.stderr);
   const session = 'fresh-' + count;
   execute('register',{cwd,sessionId:session,scopes:['owned','.ecc/fresh-session','.agents/hooks.json',...(goalFile !== null && !centralLayout ? [goalFile] : [])],objective:'Preflight',doneWhen:'Checked',ttl:30});
-  const plan = prepare({runtime,session,cwd,policyRoot,executable:process.execPath,args:['--help'],toolLimit:40,turnLimit:10,
+  const plan = prepare({runtime,session,cwd,policyRoot,executable:process.execPath,args:['--help'],toolLimit:40,turnLimit:10,toolProfile,
     ...(goalFile === null ? {} : {goalFile:selectedGoal})});
   return {cwd,session,policyRoot,plan,selectedGoal,options:{cwd,sessionId:session,policyRoot,configFile:plan.environment.ECC_FRESH_SESSION_CONFIG}};
 }
@@ -69,6 +69,22 @@ function prepareWorker(f) {
   const plan = prepare(f.manifest);
   return {...f,plan,options:{...f.options,sessionId:f.session,configFile:plan.environment.ECC_FRESH_SESSION_CONFIG}};
 }
+test('fresh local-no-mcp profile is invocation-local, pinned and preserves hooks',()=>{
+  const f=fixture('claude',false,null,'local-no-mcp');
+  assert.ok(f.plan.args.includes('--strict-mcp-config'));
+  assert.equal(f.plan.args[f.plan.args.indexOf('--mcp-config')+1],'{"mcpServers":{}}');
+  assert.ok(f.plan.args.includes('--settings'));
+  const binding=JSON.parse(fs.readFileSync(f.plan.environment.ECC_FRESH_SESSION_CONFIG,'utf8'));
+  assert.equal(binding.toolProfile,'local-no-mcp');
+  const cfg=JSON.parse(fs.readFileSync(path.join(f.cwd,binding.nativeConfig),'utf8'));
+  assert.ok(cfg.hooks.SessionStart&&cfg.hooks.PreToolUse);
+  const changed=structuredClone(f.plan);delete changed.manifest.toolProfile;
+  assert.throws(()=>launch(changed),/tool profile changed/);
+});
+test('unreviewed or unsupported light profiles refuse before native launch',()=>{
+  assert.throws(()=>fixture('claude',false,null,'anything-else'),/local-no-mcp/);
+  assert.throws(()=>fixture('codex',false,null,'local-no-mcp'),/local-no-mcp/);
+});
 test('managed worker derives exact assignment cap, counts startup and preserves parent reserve', () => {
   const f = prepareWorker(workerFixture());
   assert.equal(f.plan.manifest.toolLimit,21);

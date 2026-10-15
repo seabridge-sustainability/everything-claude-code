@@ -10,6 +10,25 @@ const REPOSITORIES = [
   { id: 'frontend', root: ROOT + '/manageesg-frontend' },
 ];
 const normal = value => path.win32.normalize(value).replace(/\\/g, '/').replace(/\/+$/, '').toLowerCase();
+// Bounded launch-time sampling, not a daemon or a claim about future capacity.
+// Keep the existing two-GiB reserve. Five kernel readings over >=1 second prevent
+// one transient high reading from being treated as sustained launch headroom.
+function collectMemoryWindow({ freeRamBytes = () => os.freemem(),
+  totalRamBytes = () => os.totalmem(), clock = Date.now,
+  wait = ms => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms) } = {}) {
+  const recentSamples = [];
+  for (let index = 0; index < 5; index++) {
+    if (index) wait(250);
+    const free = freeRamBytes(), total = totalRamBytes(), at = clock();
+    if (!Number.isFinite(at) || !Number.isFinite(free) || !Number.isFinite(total)
+        || total <= 0 || free < 0 || free > total
+        || (index && at - Date.parse(recentSamples[index - 1].observedAt) < 250)) {
+      throw Error('complete monotonic kernel RAM window required');
+    }
+    recentSamples.push({ observedAt: new Date(at).toISOString(), freeRamGiB: free / 1024 ** 3 });
+  }
+  return { ...recentSamples[4], reserveRamGiB: 2, recentSamples };
+}
 function collectFacts({ repositories = REPOSITORIES, status = cwd => coord.execute('status', { cwd }),
   freeRamBytes = () => os.freemem(), totalRamBytes = () => os.totalmem(), clock = Date.now } = {}) {
   const now = clock();
@@ -62,4 +81,4 @@ function collectFacts({ repositories = REPOSITORIES, status = cwd => coord.execu
   return facts;
 }
 if (require.main === module) console.log(JSON.stringify(collectFacts(), null, 2));
-module.exports = { collectFacts };
+module.exports = { collectFacts, collectMemoryWindow };

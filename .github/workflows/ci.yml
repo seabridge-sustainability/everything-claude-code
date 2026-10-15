@@ -79,6 +79,7 @@ jobs:
         with:
           name: coverage-ubuntu-node20-npm
           path: coverage/
+          retention-days: 3
 
   compatibility:
     name: Compatibility (Node ${{ matrix.node }}, ${{ matrix.pm }})

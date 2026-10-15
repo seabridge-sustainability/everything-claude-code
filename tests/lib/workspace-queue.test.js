@@ -136,4 +136,22 @@ test('different local heavy labels cannot split machine-wide RAM pool', () => {
   assert.equal(resourceKey(request('a', { kind: 'backend', resource: 'localhost:8000' })), 'backend:127.0.0.1:8000');
   assert.throws(() => plan([request('a', { kind: 'backend', resource: 'localhost:8015' })]), /primary backend/);
 });
+function windowTelemetry(values=[5,5,5,5,5]) {
+  return {observedAt:iso(0),freeRamGiB:values[4],reserveRamGiB:2,
+    recentSamples:values.map((freeRamGiB,index)=>({observedAt:iso(-1000+index*250),freeRamGiB}))};
+}
+test('recent low-water observation blocks a transient final high value',()=>{
+  assert.equal(state(plan([request('a')],{telemetry:windowTelemetry([5,2.5,5,5,5])}),'a'),'waiting-resource');
+  assert.equal(state(plan([request('a')],{telemetry:windowTelemetry()}),'a'),'ready-for-atomic-recheck');
+});
+test('incomplete stale reordered future and mismatched windows never grant admission',()=>{
+  const variants=[
+    t=>t.recentSamples.pop(),t=>{t.recentSamples[0].observedAt=iso(-31000);},
+    t=>{t.recentSamples[1].observedAt=t.recentSamples[0].observedAt;},
+    t=>{t.recentSamples[4].observedAt=iso(1000);},t=>{t.freeRamGiB=6;},
+    t=>{t.recentSamples[2].freeRamGiB=NaN;},t=>{t.recentSamples=[];}
+  ];
+  for(const change of variants){const telemetry=windowTelemetry();change(telemetry);
+    assert.equal(state(plan([request('a')],{telemetry}),'a'),'waiting-resource');}
+});
 process.stdout.write(JSON.stringify({ passed, failed: 0, source: 'canonical readiness fixtures', processesLaunched: 0, filesWritten: 0, paidCalls: 0 }) + '\n');

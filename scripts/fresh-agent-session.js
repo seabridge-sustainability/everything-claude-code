@@ -35,6 +35,16 @@ function reviewedArguments(runtime, args) {
     throw Error('Reviewed fresh arguments required; no config/trust bypass, attached overrides or workspace expansion');
   }
 }
+function toolProfileArguments(runtime, profile, args) {
+  if (profile === undefined) return [];
+  if (runtime !== 'claude' || profile !== 'local-no-mcp'
+      || args.some(arg => /^--(?:mcp-config|strict-mcp-config)(?:=|$)/.test(arg))) {
+    throw Error('Reviewed local-no-mcp profile requires Claude and no competing MCP arguments');
+  }
+  // Invocation-local only. No global config, credential copy, permission bypass,
+  // model turn, process termination or assertion about managed-policy servers.
+  return ['--strict-mcp-config', '--mcp-config', '{"mcpServers":{}}'];
+}
 function prepare(manifest) {
   const { runtime, session, cwd, policyRoot, executable, args = [], turnLimit = 40 } = manifest;
   configuration(runtime); policyFiles(policyRoot);
@@ -50,6 +60,7 @@ function prepare(manifest) {
   if (workerAssignment && toolLimit > workerAssignment.toolCeiling) throw Error('Worker tool cap exceeds exact assignment');
   if (!path.isAbsolute(executable) || !fs.statSync(executable).isFile()) throw Error('Reviewed fresh executable required');
   reviewedArguments(runtime, args);
+  const profileArgs = toolProfileArguments(runtime, manifest.toolProfile, args);
   if (!Number.isSafeInteger(toolLimit) || toolLimit < 10 || !Number.isSafeInteger(turnLimit) || turnLimit < 1) throw Error('Bounded tool/turn budgets required');
   const directory = '.ecc/fresh-session/' + session;
   const binding = directory + '/binding.json';
@@ -81,6 +92,7 @@ function prepare(manifest) {
   }
   const bindingText = JSON.stringify({ version: 2, runtime, session, cwd: repo.root, toolLimit, turnLimit,
     ...(workerAssignment ? {workerAssignment} : {}),
+    ...(manifest.toolProfile ? {toolProfile:manifest.toolProfile} : {}),
     reviewedLaunch: { executable, argumentsSha256: crypto.createHash('sha256').update(JSON.stringify(args)).digest('hex') },
     nativeConfig: config, nativeConfigSha256, goalReference: selectedGoal, taskRoute:route, workflow,
     catalogSha256:crypto.createHash('sha256').update(fs.readFileSync(catalogFile)).digest('hex'), uiVerification }, null, 2) + '\n';
@@ -92,6 +104,7 @@ function prepare(manifest) {
     ECC_CORE_POLICY_ROOT: policyRoot, ECC_FRESH_SESSION_CONFIG: path.join(repo.root, binding),
     ECC_SESSION_ID: session, ECC_OWNED_WORKTREE: repo.root };
   const argv = [...args];
+  argv.unshift(...profileArgs);
   if (runtime === 'claude') argv.unshift('--settings', fullConfig);
   if (runtime === 'gemini') environment.GEMINI_CLI_SYSTEM_SETTINGS_PATH = fullConfig;
   if (runtime === 'opencode') environment.OPENCODE_CONFIG = fullConfig;
@@ -100,7 +113,7 @@ function prepare(manifest) {
     for (const [name, value] of Object.entries(cfg.hooks)) argv.unshift('-c', 'hooks.' + name + '=' + toml(value));
   }
   return { version: 2, runtime, cwd: repo.root, session, executable, args: argv, environment,
-    manifest: { runtime, session, cwd: repo.root, policyRoot, executable, args, toolLimit, turnLimit, goalFile: selectedGoal.file, goalReference: selectedGoal, ...(workerAssignment ? {workerAssignment} : {}), ...(manifest.task?{task:manifest.task}:{}), ...(uiVerification?{uiVerification}:{}) },
+    manifest: { runtime, session, cwd: repo.root, policyRoot, executable, args, toolLimit, turnLimit, goalFile: selectedGoal.file, goalReference: selectedGoal, ...(workerAssignment ? {workerAssignment} : {}), ...(manifest.toolProfile?{toolProfile:manifest.toolProfile}:{}), ...(manifest.task?{task:manifest.task}:{}), ...(uiVerification?{uiVerification}:{}) },
     fresh_only: true, no_provider_or_model_override: true, status: 'prepared-not-native-proof',
     limitation: runtime === 'codex' ? 'Codex requires operator /hooks review/trust of the exact new hook definition; no trust bypass supplied.'
       : 'Use this managed launch; direct IDE starts or unsupported clients are not certified protected.' };
@@ -116,6 +129,7 @@ function validateLaunch(plan) {
       || plan.environment.ECC_FRESH_GUARD_ROOT !== root || plan.environment.ECC_SESSION_ID !== plan.session
       || plan.environment.ECC_CORE_POLICY_ROOT !== m.policyRoot || plan.environment.ECC_OWNED_WORKTREE !== plan.cwd) throw Error('Prepared launch binding mismatch');
   const binding = JSON.parse(fs.readFileSync(plan.environment.ECC_FRESH_SESSION_CONFIG, 'utf8'));
+  if (binding.toolProfile !== m.toolProfile) throw Error('Prepared tool profile changed');
   reviewedArguments(plan.runtime, m.args);
   if (binding.runtime !== plan.runtime || binding.session !== plan.session || binding.cwd !== plan.cwd
       || binding.toolLimit !== m.toolLimit || binding.turnLimit !== m.turnLimit
@@ -142,6 +156,7 @@ function validateLaunch(plan) {
   if (JSON.stringify(actual) !== JSON.stringify(expected)) throw Error('Native hook config changed');
   const config = path.join(plan.cwd, binding.nativeConfig);
   let expectedArgs = [...m.args];
+  expectedArgs.unshift(...toolProfileArguments(plan.runtime, m.toolProfile, m.args));
   if (plan.runtime === 'claude') expectedArgs.unshift('--settings', config);
   if (plan.runtime === 'codex') {
     expectedArgs.unshift('-c','features.hooks=true');
@@ -180,7 +195,7 @@ function main(argv = process.argv.slice(2)) {
   if (command === '--help' || !command) {
     console.log('Worker opt-in: workerAssignment {id, ownerAgent}; exact assignment must already pin this registered repository/session. Cap cannot exceed assignment minus parent closure reserve; native interception is separate proof.');
     console.log('fresh-agent-session prepare <host-manifest.json> | launch <prepared-plan.json> | capabilities');
-    console.log('Manifest: runtime, registered session, owned cwd, central policyRoot, absolute executable, args, toolLimit, turnLimit, optional reviewed absolute goalFile. Own .ecc/fresh-session and (Antigravity) .agents/hooks.json. No automatic permission grant or provider call.');
+    console.log('Manifest: runtime, registered session, owned cwd, central policyRoot, absolute executable, args, toolLimit, turnLimit, optional reviewed absolute goalFile and Claude-only toolProfile: local-no-mcp. Own .ecc/fresh-session and (Antigravity) .agents/hooks.json. No automatic permission grant or provider call.');
     return;
   }
   if (command === 'capabilities') {

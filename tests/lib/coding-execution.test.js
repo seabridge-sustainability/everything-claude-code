@@ -440,6 +440,59 @@ test('production factory rejects legacy unmetered configuration before creating 
   assert.equal(fs.readdirSync(f.spec.receipts).length,0);
 });
 
+test('controller adoption and later evidence recheck enforce the pinned synthetic artifact policy',t=>{
+  const f=fixture(t,['opencode']),w=f.plan.workers[0];
+  const input='tests/fixtures/synthetic.json',output='artifacts/agent-runs/proof/result.json';
+  fs.mkdirSync(path.dirname(path.join(w.repo,input)),{recursive:true});fs.writeFileSync(path.join(w.repo,input),'{}');
+  fs.mkdirSync(path.dirname(path.join(w.repo,output)),{recursive:true});
+  w.scopes.push('artifacts/agent-runs/proof');
+  coord.execute('close',{cwd:w.repo,sessionId:w.session});
+  coord.execute('register',{cwd:w.repo,sessionId:w.session+'-proof',scopes:w.scopes,
+    objective:'Synthetic output contract fixture',doneWhen:'receipt checked',ttl:30});
+  w.session+='-proof';
+  w.data_policy={mode:'synthetic-only',fixture:{path:input,sha256:store.sha256File(path.join(w.repo,input))},
+    outputs:[{path:output,checks:['roundtrip']}]};
+  f.writeAssignments();
+  const receipt={schema:'ecc.synthetic-verification.v1',fixture_sha256:w.data_policy.fixture.sha256,
+    checks:[{id:'roundtrip',passed:true,count:1}]};
+  fs.writeFileSync(path.join(w.repo,output),store.canonicalJson(receipt));
+  let state=c.apply(c.initialize(f.plan),{type:'dispatch',actor:'parent'});
+  const result=f.result(state),ref={path:output,kind:'local-check',sha256:store.sha256File(path.join(w.repo,output))};
+  result.changed_paths=coord.execute('check-changes',{cwd:w.repo,sessionId:w.session}).paths;
+  result.evidence=[ref];result.preservation.checks[0].evidence=ref;
+  state=c.apply(state,{type:'result',actor:w.agent,result});assert.equal(state.phase,'critic');
+  fs.writeFileSync(path.join(w.repo,output),store.canonicalJson({...receipt,payload:'SYNTHETIC_PRIVATE_CANARY'}));
+  const current=store.captureRepositoryState(w.repo,{excludePaths:[path.join(w.repo,'.ecc/goal')]});
+  state.nodes[w.id].result.head=current.head;state.nodes[w.id].result.tree_fingerprint=current.tree_fingerprint;
+  const changed=store.sha256File(path.join(w.repo,output));state.nodes[w.id].result.evidence[0].sha256=changed;
+  state.nodes[w.id].result.preservation.checks[0].evidence.sha256=changed;
+  assert.throws(()=>engine.currentEvidence(state),error=>error.message==='synthetic output policy rejected artifact');
+});
+
+test('concrete host rejects malformed stdout and raw usage without retaining private canaries',async t=>{
+  for(const malformed of [true,false]){
+    const f=fixture(t,['opencode']),trust=path.join(f.plan.repo,'.ecc/goal/private-output-test');
+    fs.mkdirSync(trust);
+    const entry=(name,text)=>{const file=path.join(trust,name+'.js');fs.writeFileSync(file,text);
+      return {path:file,sha256:store.sha256File(file)};};
+    const canary='SYNTHETIC_PRIVATE_CANARY';
+    const readInput="require('node:fs').readFileSync(0,'utf8');";
+    const launch=entry('launch',readInput+(malformed?`process.stdout.write('not-json-${canary}');`
+      :`console.log(JSON.stringify({usage:{property_analysis:'${canary}'}}));`));
+    const inert=entry('inert',"console.log('{}');");
+    const spec={version:1,plan_sha256:c.digest(f.plan),timeout_ms:1000,
+      workers:{'worker-0':{launch,check:inert}},critic:inert,approval_key:inert,
+      approval_file:inert.path,receipts:path.join(trust,'receipts'),effects:[]};
+    const host=concrete.createBoundHost(spec,{stateFile:f.file,plan:f.plan});
+    await assert.rejects(()=>host.launchWorker(f.plan.workers[0],{callId:require('node:crypto').randomUUID()}),
+      error=>!error.message.includes(canary)&&/usage reconciliation/.test(error.message));
+    for(const name of fs.readdirSync(spec.receipts)){
+      const raw=fs.readFileSync(path.join(spec.receipts,name),'utf8');
+      assert.ok(!raw.includes(canary));assert.equal(JSON.parse(raw).usage,null);
+    }
+  }
+});
+
 test('concrete parent queue binds sources, owner, exact response and verified closure', t => {
   if(os.freemem()<1024**3){t.skip('One GiB for bounded metadata fixture unavailable');return;}
   const f=journalFixture(t),directory=path.join(f.plan.repo,'.ecc/goal/queue');fs.mkdirSync(directory);
@@ -449,7 +502,7 @@ test('concrete parent queue binds sources, owner, exact response and verified cl
   fs.writeFileSync(checker,`const fs=require('node:fs'),r=JSON.parse(fs.readFileSync(0,'utf8'));console.log(JSON.stringify({version:1,nonce:fs.existsSync('.ecc/goal/wrong-queue-nonce')?'wrong':r.nonce,plan_sha256:r.plan_sha256,operation:r.operation,id:r.entry.id,owner:r.entry.owner,resource:r.resource,token:r.token,allowed:true,stopped:fs.existsSync('.ecc/goal/closure-verified')}));`);
   const required=['scripts/lib/coding-execution-host.js','scripts/lib/coding-execution.js','scripts/lib/coding-execution-runner.js',
     'scripts/lib/session-coordination.js','scripts/lib/goal-store.js','scripts/lib/goal-control.js','scripts/lib/atomic-write.js',
-    'scripts/lib/workspace-queue.js','scripts/lib/workspace-queue-store.js','schemas/coding-execution.schema.json',
+    'scripts/lib/workspace-queue.js','scripts/lib/workspace-queue-store.js','scripts/lib/workspace-live-facts.js','schemas/coding-execution.schema.json',
     'schemas/goal-control.schema.json','manifests/goal-proof-profiles.json'];
   const entry={path:checker,sha256:store.sha256File(checker)};
   f.spec.queue={file:queueFile,timeout_ms:1000,gate:entry,cessation:entry,
@@ -481,6 +534,8 @@ test('concrete parent queue binds sources, owner, exact response and verified cl
   assert.equal(bound.release({...claim,outcome:'completed'}).released,true);
   const telemetry=capabilities.readTelemetry();assert.equal(telemetry.reserveRamGiB,2);
   assert.ok(Number.isFinite(telemetry.freeRamGiB)&&telemetry.freeRamGiB>=0);
+  assert.equal(telemetry.recentSamples.length,5);
+  assert.ok(Date.parse(telemetry.observedAt)-Date.parse(telemetry.recentSamples[0].observedAt)>=1000);
   const oversized={...request,id:'oversized-heavy',kind:'heavy-check',resource:'local-machine',peakRamGiB:os.totalmem()/1024**3+1};
   bound.enqueue([oversized]);
   const held=bound.acquire({id:oversized.id,owner:oversized.owner,leaseMilliseconds:1000});

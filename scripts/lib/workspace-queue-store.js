@@ -129,10 +129,12 @@ function createQueueStore({ file, withFileLock, atomicWrite, assertWrite, readTe
     return decision?.allowed === true && decision.owner === entry.owner
       && decision.resource === resourceKey(entry) ? decision : null;
   }
-  function plan(state){
+  function plan(state, targetId = null){
     // Real telemetry callbacks may do ownership/source checks first. Capture
     // planner time after the observation, never before its timestamp exists.
-    const telemetry=synchronous(readTelemetry),now=synchronous(clock);
+    const needsMemory=targetId ? state.entries.find(entry=>entry.id===targetId)?.kind==='heavy-check'
+      :state.entries.some(entry=>entry.kind==='heavy-check'&&entry.state==='waiting');
+    const telemetry=needsMemory?synchronous(readTelemetry):undefined,now=synchronous(clock);
     return planQueues([...state.entries, ...peerClaims],{now,telemetry,checkGate:entry=>trustedGate(entry,'acquire')});
   }
   function onMachine(write, action) {
@@ -191,7 +193,7 @@ function createQueueStore({ file, withFileLock, atomicWrite, assertWrite, readTe
             if(recovering)demand(synchronous(confirmStopped,structuredClone(checked))===true,
               'invocation cessation/spend changed before publication');
             const pending={...state,entries:state.entries.map(value=>value.id===entry.id?{...value,state:'waiting'}:value)};
-            const telemetry=synchronous(readTelemetry),now=synchronous(clock);
+            const telemetry=entry.kind==='heavy-check'?synchronous(readTelemetry):undefined,now=synchronous(clock);
             const decision=planQueues([...pending.entries, ...peerClaims],{now,telemetry,checkGate:value=>
               value.id===entry.id?trustedGate(checked,operation):trustedGate(value,'acquire')})
               .decisions.find(value=>value.id===entry.id);
@@ -226,7 +228,8 @@ function createQueueStore({ file, withFileLock, atomicWrite, assertWrite, readTe
       }
       state.entries.push(...added);
       demand(state.entries.length <= 1000, 'queue history limit requires owner checkpoint');
-      plan(state);
+      // Enqueue records work; it does not admit a launch. Publication below
+      // still validates the whole queue. Do not sample/wait for RAM here.
       return { changed: true, result: { enqueued: added.map(entry => entry.id) } };
     });
   }
@@ -239,13 +242,13 @@ function createQueueStore({ file, withFileLock, atomicWrite, assertWrite, readTe
         demand(/^[a-f0-9]{64}$/.test(dependencySha256),'current dependency evidence required');
         entry.invocation.admitted_dependency_sha256=dependencySha256;
       }
-      const observed = plan(state).decisions.find(value => value.id === id);
+      const observed = plan(state,id).decisions.find(value => value.id === id);
       if (observed.state !== 'ready-for-atomic-recheck') {
         return { changed: false, result: { acquired: false, decision: observed } };
       }
       // Recheck authoritative gate after planning and immediately before commit.
       demand(trustedGate(entry, 'acquire'), 'queue authority changed before claim');
-      const fresh = plan(state).decisions.find(value => value.id === id);
+      const fresh = plan(state,id).decisions.find(value => value.id === id);
       demand(fresh.state === 'ready-for-atomic-recheck', 'queue readiness changed before claim');
       entry.state = 'running';
       if(entry.invocation){
@@ -284,7 +287,7 @@ function createQueueStore({ file, withFileLock, atomicWrite, assertWrite, readTe
       // never cessation. Token and original entitlement remain unchanged.
       demand(trustedGate(entry,'recover'),'invocation recovery authority unavailable');
       const ready=()=>{
-        const telemetry=synchronous(readTelemetry),projected=structuredClone(state.entries);
+        const telemetry=entry.kind==='heavy-check'?synchronous(readTelemetry):undefined,projected=structuredClone(state.entries);
         projected.find(value=>value.id===id).state='waiting';
         return planQueues([...projected, ...peerClaims],{now:synchronous(clock),telemetry,checkGate:value=>
           value.id===id?trustedGate(entry,'recover'):trustedGate(value,'acquire')})

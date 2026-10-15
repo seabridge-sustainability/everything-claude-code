@@ -22,7 +22,10 @@ function outsideWorkers(file,plan){
     rel=coord.scope(rel);
     demand(!w.scopes.some(s=>coord.overlaps(rel,coord.scope(s))),'trust input overlaps worker write scope');}
 }
-function json(output){demand(Buffer.byteLength(output)<1024*1024,'host output too large');return JSON.parse(output);}
+function json(output){
+  demand(Buffer.byteLength(output)<1024*1024,'host output too large');
+  try{return JSON.parse(output);}catch{throw Error('invalid reviewed host JSON');}
+}
 // Opt-in cooperative journal for reviewed adapters that have no descendants.
 // This is not a sandbox or a claim that killing a PID stops a process tree.
 const JOURNAL='direct-child-v1';
@@ -240,6 +243,11 @@ function createBoundHost(spec,{stateFile,plan}){
       const child=spawnSync(process.execPath,[binding.check.path],{cwd:w.repo,input:JSON.stringify({worker:w,plan_revision:plan.revision,environment:plan.environment}),encoding:'utf8',windowsHide:true,timeout:spec.timeout_ms,maxBuffer:1024*1024});
       demand(child.status===0,'protected independent acceptance check failed');
       const result=json(child.stdout);demand(typeof result.passed==='boolean'&&Array.isArray(result.evidence)&&Array.isArray(result.preservation),'invalid protected check output');
+      if(w.data_policy){
+        demand(Object.keys(result).every(key=>['passed','evidence','preservation','citations'].includes(key))
+          &&(!result.citations||result.citations.length===0),'synthetic checker envelope rejected');
+        engine.verifySyntheticArtifacts(w,[...result.evidence,...result.preservation.map(value=>value.evidence)]);
+      }
       checks.set(key,result);
     }
     return checks.get(key);
@@ -277,7 +285,8 @@ function createBoundHost(spec,{stateFile,plan}){
     const child=spawn(process.execPath,[script],{cwd,windowsHide:true,stdio:['pipe','pipe','pipe']});
     const identity={worker:input.id??null,token:input.token??null};
     running.set(callId,child);persist(callId,{pid:child.pid,phase:'running',method:entry.path,...identity});
-    let output='',overflow=false;
+    let output='',overflow=false,inputError=false;
+    child.stdin.on('error',()=>{inputError=true;}); // Early child exit must not crash the parent on EPIPE.
     const abort=()=>child.kill();signal?.addEventListener('abort',abort,{once:true});
     const timer=setTimeout(abort,spec.timeout_ms);
     const result=await new Promise((resolve,reject)=>{
@@ -286,8 +295,18 @@ function createBoundHost(spec,{stateFile,plan}){
       child.once('error',reject);child.once('close',code=>resolve({code,output}));
       child.stdin.end(JSON.stringify(input));
     }).finally(()=>{clearTimeout(timer);signal?.removeEventListener('abort',abort);running.delete(callId);});
-    if(result.code!==0||overflow){persist(callId,{pid:child.pid,phase:'exited',exit:result.code,usage:null,...identity});throw Error('reviewed host process failed; usage reconciliation required');}
-    const value=json(result.output);persist(callId,{pid:child.pid,phase:'exited',exit:0,usage:value.usage??null,...identity});return value;
+    if(result.code!==0||overflow||inputError){persist(callId,{pid:child.pid,phase:'exited',exit:result.code,usage:null,...identity});throw Error('reviewed host process failed; usage reconciliation required');}
+    let value,usage=null;
+    try{
+      value=json(result.output);
+      // Legacy component critics may return only their typed report. Missing
+      // usage remains unknown; production factories still require metered journals.
+      if(value?.usage!==undefined){engine.assert('usage',value.usage);usage=value.usage;}
+    }catch{
+      persist(callId,{pid:child.pid,phase:'exited',exit:0,usage:null,...identity});
+      throw Error('reviewed host output invalid; usage reconciliation required');
+    }
+    persist(callId,{pid:child.pid,phase:'exited',exit:0,usage,...identity});return value;
   }
   function approved(entry){
     pin(spec.approval_key);
@@ -309,6 +328,8 @@ function createBoundHost(spec,{stateFile,plan}){
     return {head:snapshot.head,tree_fingerprint:snapshot.tree_fingerprint};
   };
   function buildResult(worker,launched,expectedSnapshot,{fresh=false}={}){
+    if(worker.data_policy)demand(Object.keys(launched).every(key=>
+      ['agent','runtime','token','native_protection','usage'].includes(key)),'synthetic launch envelope rejected');
     engine.assert('usage',launched.usage);
     demand(launched.agent===worker.agent&&launched.runtime===worker.runtime&&launched.token===worker.token,'native adapter identity mismatch');
     demand(launched.native_protection===true,'reviewed adapter did not attest activated native protection');
@@ -363,7 +384,7 @@ function createBoundHost(spec,{stateFile,plan}){
       'scripts/lib/coding-execution-runner.js',
       'scripts/lib/session-coordination.js','scripts/lib/goal-store.js',
       'scripts/lib/goal-control.js','scripts/lib/atomic-write.js',
-      'scripts/lib/workspace-queue.js','scripts/lib/workspace-queue-store.js',
+      'scripts/lib/workspace-queue.js','scripts/lib/workspace-queue-store.js','scripts/lib/workspace-live-facts.js',
       'schemas/coding-execution.schema.json','schemas/goal-control.schema.json',
       'manifests/goal-proof-profiles.json'];
     const queueConfigSha=engine.digest(q);
@@ -489,9 +510,7 @@ function createBoundHost(spec,{stateFile,plan}){
         }});
       },
       readTelemetry(){
-        authority();const os=require('node:os'),free=os.freemem(),total=os.totalmem();
-        demand(Number.isFinite(free)&&Number.isFinite(total)&&total>0&&free>=0&&free<=total,'known OS queue RAM required');
-        return {observedAt:new Date().toISOString(),freeRamGiB:free/1024**3,reserveRamGiB:2};
+        authority();return require('./workspace-live-facts').collectMemoryWindow();
       },
       checkGate(entry){
         try{

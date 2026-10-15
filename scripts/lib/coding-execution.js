@@ -41,6 +41,60 @@ function workerAuthority(worker, now) {
     demand(active.scopes.some(owned => clean === owned || clean.startsWith(`${owned}/`)), 'worker scope not owned');
   }
 }
+// Opt-in evidence contract, not a native read sandbox. The immutable plan pins
+// this policy. Reviewed fixture pins cannot prove a hostile adapter read nothing
+// else; native transcript/input containment remains a separately verified layer.
+function verifySyntheticArtifacts(worker, references = null) {
+  if (worker.data_policy === undefined) return;
+  try {
+    const policy = worker.data_policy;
+    assert('synthetic_output_policy', policy);
+    const fixture = inside(worker.repo, policy.fixture.path);
+    demand(fixture.startsWith('tests/fixtures/'), 'reviewed fixture required');
+    demand(!worker.scopes.some(scope => coordination.overlaps(fixture, coordination.scope(scope))), 'fixture cannot be worker-owned');
+    const read = (relative, maximum) => {
+      const file = path.join(worker.repo, relative), before = fs.lstatSync(file);
+      demand(before.isFile() && before.nlink === 1 && before.size <= maximum, 'bounded regular artifact required');
+      const fd = fs.openSync(file, 'r');
+      try {
+        const opened = fs.fstatSync(fd);
+        demand(opened.ino === before.ino && opened.dev === before.dev && opened.nlink === 1, 'artifact identity changed');
+        const bytes = Buffer.alloc(maximum + 1), size = fs.readSync(fd, bytes, 0, bytes.length, 0);
+        const after = fs.fstatSync(fd), current = fs.lstatSync(file);
+        demand(size <= maximum && after.size === size && current.ino === opened.ino
+          && current.dev === opened.dev && current.nlink === 1 && !current.isSymbolicLink()
+          && after.mtimeMs === before.mtimeMs && after.size === before.size, 'artifact changed during read');
+        return bytes.subarray(0, size);
+      } finally { fs.closeSync(fd); }
+    };
+    demand(sha256Buffer(read(fixture, 65536)) === policy.fixture.sha256, 'fixture changed');
+    const outputs = new Map();
+    for (const output of policy.outputs) {
+      const relative = inside(worker.repo, output.path);
+      demand(relative.startsWith('artifacts/agent-runs/') && !/(^|\/)(?:tmp|temp|scratchpads?|logs?|transcripts?)(\/|\.|$)/i.test(relative), 'exact private-free proof destination required');
+      demand(!outputs.has(relative) && worker.scopes.some(scope => coordination.overlaps(relative, coordination.scope(scope))), 'unique owned proof destination required');
+      outputs.set(relative, output);
+    }
+    if (references === null) return;
+    demand(Array.isArray(references) && references.length > 0, 'proof references required');
+    const seen = new Set();
+    for (const ref of references) {
+      const relative = inside(worker.repo, ref.path), output = outputs.get(relative);
+      demand(output && ref.kind === 'local-check', 'undeclared proof reference');
+      const bytes = read(relative, 16384), text = bytes.toString('utf8'), receipt = JSON.parse(text);
+      demand(sha256Buffer(bytes) === ref.sha256 && text === canonicalJson(receipt), 'canonical pinned proof required');
+      assert('synthetic_verification', receipt);
+      demand(receipt.fixture_sha256 === policy.fixture.sha256 && receipt.checks.length === output.checks.length
+        && new Set(receipt.checks.map(check => check.id)).size === receipt.checks.length
+        && receipt.checks.every(check => output.checks.includes(check.id)), 'exact reviewed checks required');
+      seen.add(relative);
+    }
+    demand(seen.size === outputs.size, 'all declared proof outputs required');
+  } catch {
+    // Never echo rejected JSON, record values or parser diagnostics into logs.
+    throw Error('synthetic output policy rejected artifact');
+  }
+}
 function checkPlan(plan, now) {
   assert('plan', plan); owner(plan, now);
   demand(path.isAbsolute(plan.repo) && path.isAbsolute(plan.goal_file), 'absolute repository and goal paths required');
@@ -57,6 +111,7 @@ function checkPlan(plan, now) {
   const repositories = new Map(plan.workers.map(worker => [worker.id, coordination.repository(worker.repo).common]));
   demand(plan.parent !== plan.critic, 'critic must be independent of planner');
   for (const worker of plan.workers) {
+    verifySyntheticArtifacts(worker);
     const assignment = assignments.find(item => item.assignment_id === worker.assignment_id);
     demand(assignment && digest(assignment) === worker.assignment_sha256, 'missing or changed goal assignment');
     demand(assignment.owner_agent === worker.agent && assignment.owner_runtime === worker.runtime, 'assignment owner/runtime mismatch');
@@ -136,6 +191,7 @@ function currentEvidence(state, authorizeCitation, verifyPreservation, requireRe
   for (const worker of state.plan.workers) {
     const result = state.nodes[worker.id].result;
     if (!result) continue;
+    verifySyntheticArtifacts(worker, [...result.evidence, ...(result.preservation?.checks || []).map(check => check.evidence)]);
     const captured = captureRepositoryState(worker.repo, { excludePaths: [path.join(worker.repo, '.ecc/goal')] });
     demand(captured.head === result.head && captured.tree_fingerprint === result.tree_fingerprint, 'stale worker repository evidence');
     const contract = assignmentFor(state.plan, worker).change_contract;
@@ -452,4 +508,4 @@ async function dispatchParallel(file, launch, options = {}) {
   }));
   return load(file);
 }
-module.exports = { assert, digest, initialize, apply, create, load, transaction, dispatchParallel, currentEvidence, recoverLock };
+module.exports = { assert, digest, initialize, apply, create, load, transaction, dispatchParallel, currentEvidence, recoverLock, verifySyntheticArtifacts };

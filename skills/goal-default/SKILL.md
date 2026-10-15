@@ -30,6 +30,13 @@ limited to the central approved workspace's artifacts. Version 2 preparation is
 required for new launches. This closes a path-binding gap, not native interception
 proof or permission to reactivate paused goals.
 
+For a new Claude worker whose task needs only built-in local tools, the prepared
+manifest may opt into `toolProfile: local-no-mcp`. The launcher pins the profile
+and supplies an empty strict MCP configuration for that invocation only, retaining
+native hooks and budgets. It edits no global settings or active sessions. Other
+harnesses fail closed for this unverified profile. This is a startup-footprint
+option, not measured RAM savings, native containment or managed-policy override.
+
 Managed Codex launches first query the installed client's native hook metadata
 without starting a thread/model turn. Both exact guard definitions must be enabled,
 synchronous and trusted; missing/untrusted/ambiguous metadata refuses that launch.
@@ -180,6 +187,23 @@ registration atop a commit does not approve publishing it. A new target needs
 explicit approval of its exact baseline history as well as its name. Local-only
 leases cannot execute controller pushes. These checks do not fetch current remote
 state, grant owner approval or replace normal hooks, clean-checkout and budget gates.
+
+## Private-data proof workers
+
+Default to reviewed synthetic fixtures and minimal field projections. Never put raw
+client/property analyses in worker prompts, scratchpads, temp files, stdout, chat,
+logs, transcripts or handoff notes. D: storage is not authorization to export data.
+Necessary real private artifacts require the applicable explicit tenant-scoped
+destination/access/retention grant; do not duplicate them per worker.
+
+For cooperating controller proof workers, pin `data_policy.mode: synthetic-only`
+in the immutable plan: one reviewed `tests/fixtures/` hash outside worker write
+scope and exact owned `artifacts/agent-runs/` outputs/check IDs. Outputs use bounded
+canonical `ecc.synthetic-verification.v1` JSON containing only fixture hash,
+check IDs, verdicts and counts. Adoption/recovery rejects undeclared artifacts,
+raw fields, changed pins, links, oversize or stale receipts. Existing legacy plans
+without this policy are not privacy-certified. This is evidence validation, not
+native read/transcript containment; scoped writes alone cannot prove that layer.
 
 ## Completion
 
