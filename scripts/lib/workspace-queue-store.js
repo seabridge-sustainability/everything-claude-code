@@ -16,14 +16,97 @@ function synchronous(callback, ...args) {
   }
   return value;
 }
+// A host-owned index contains queue paths, never a second ownership/lease ledger.
+// All participating stores lock their own file, then this common machine index.
+// Registered queue state is published BEFORE a claim can be returned. Missing or
+// corrupt retained state is unknown capacity, not permission to reuse its slot.
+function createMachineQueueGuard({ file, withFileLock, atomicWrite, assertWrite, clock = Date.now }) {
+  demand(path.isAbsolute(file), 'absolute machine queue index required');
+  for (const callback of [withFileLock, atomicWrite, assertWrite, clock]) {
+    demand(typeof callback === 'function' && callback.constructor?.name !== 'AsyncFunction',
+      'synchronous reviewed machine capability required');
+  }
+  const index = path.resolve(file), directory = path.dirname(index), lock = index + '.lock';
+  const canonical = value => process.platform === 'win32' ? value.toLowerCase() : value;
+  function regular(target) {
+    demand(fs.lstatSync(target).isFile() && !fs.lstatSync(target).isSymbolicLink()
+      && canonical(fs.realpathSync(target)) === canonical(target), 'linked machine queue state forbidden');
+  }
+  function verify() {
+    demand(canonical(fs.realpathSync(directory)) === canonical(directory), 'linked machine directory forbidden');
+    for (const target of [index, lock]) if (fs.existsSync(target)) regular(target);
+    demand(synchronous(assertWrite, [index, lock]) === true, 'machine index ownership unavailable');
+  }
+  function queueState(target) {
+    regular(target);
+    demand(fs.statSync(target).size <= 1024 * 1024, 'machine queue state too large');
+    const state = JSON.parse(fs.readFileSync(target, 'utf8'));
+    demand(state.version === 1 && Number.isSafeInteger(state.sequence) && state.sequence >= 0,
+      'invalid machine queue state');
+    validateEntries(state.entries, synchronous(clock), { persisted: true });
+    return state;
+  }
+  return { run(queueFile, initialize, action) {
+    const target = path.resolve(queueFile);
+    demand(path.isAbsolute(queueFile) && target !== index && target !== lock,
+      'distinct absolute participating queue required');
+    verify();
+    return synchronous(withFileLock, lock, () => {
+      verify();
+      let queues = [];
+      if (fs.existsSync(index)) {
+        demand(fs.statSync(index).size <= 65536, 'machine queue index too large');
+        const state = JSON.parse(fs.readFileSync(index, 'utf8'));
+        demand(state.version === 1 && Array.isArray(state.queues) && state.queues.length <= 64,
+          'invalid machine queue index');
+        queues = state.queues;
+        demand(queues.every(value => typeof value === 'string' && path.isAbsolute(value)
+          && path.resolve(value) === value && value !== index && value !== lock)
+          && new Set(queues.map(canonical)).size === queues.length, 'invalid machine queue paths');
+      }
+      const write = () => synchronous(atomicWrite, index, JSON.stringify({ version: 1, queues }),
+        { validateParent: verify, beforeRename: verify });
+      const peers = [];
+      let totalBytes = 0;
+      for (const queue of queues) {
+        const state = queueState(queue); // An expired live claim still occupies capacity.
+        totalBytes += fs.statSync(queue).size;
+        demand(totalBytes <= 8 * 1024 * 1024, 'aggregate machine queue state too large');
+        if (canonical(queue) === canonical(target)) continue;
+        const prefix = crypto.createHash('sha256').update(canonical(queue)).digest('hex');
+        for (const entry of state.entries.filter(value => value.kind === 'heavy-check' && value.state === 'running')) {
+          peers.push({ ...entry, id: 'machine-' + prefix + '-' + entry.id, dependsOn: [] });
+          demand(peers.length < 1000, 'machine claim history requires reconciliation');
+        }
+      }
+      if (initialize) {
+        synchronous(initialize); // Creates only this parent's empty queue when absent.
+        queueState(target);
+        if (!queues.some(value => canonical(value) === canonical(target))) {
+          demand(queues.length < 64, 'machine queue index requires owner checkpoint');
+          queues.push(target); write(); // Fail before an unindexed claim can be published.
+        }
+      }
+      const result = synchronous(action, peers);
+      // A terminal queue no longer occupies a machine slot. Do not infer this
+      // from a lease deadline, PID absence, or deletion of its file.
+      if (initialize && !queueState(target).entries.some(value => value.kind === 'heavy-check' && value.state === 'running')) {
+        queues = queues.filter(value => canonical(value) !== canonical(target)); write();
+      }
+      return result;
+    });
+  } };
+}
 function createQueueStore({ file, withFileLock, atomicWrite, assertWrite, readTelemetry,
-  checkGate, confirmStopped, clock = Date.now }) {
+  checkGate, confirmStopped, machine, clock = Date.now }) {
   demand(path.isAbsolute(file), 'absolute queue path required');
   for (const callback of [withFileLock, atomicWrite, assertWrite, readTelemetry, checkGate, confirmStopped, clock]) {
     demand(typeof callback === 'function', 'reviewed queue capability required');
     demand(callback.constructor?.name !== 'AsyncFunction', 'asynchronous queue capability forbidden');
   }
   const resolved = path.resolve(file), directory = path.dirname(resolved), lock = resolved + '.queue.lock';
+  demand(machine === undefined || typeof machine.run === 'function', 'reviewed machine queue guard required');
+  let peerClaims = [];
   demand(fs.existsSync(directory), 'reviewed queue directory must already exist');
   function verifyPath() {
     const compare = value => process.platform === 'win32' ? value.toLowerCase() : value;
@@ -50,11 +133,24 @@ function createQueueStore({ file, withFileLock, atomicWrite, assertWrite, readTe
     // Real telemetry callbacks may do ownership/source checks first. Capture
     // planner time after the observation, never before its timestamp exists.
     const telemetry=synchronous(readTelemetry),now=synchronous(clock);
-    return planQueues(state.entries,{now,telemetry,checkGate:entry=>trustedGate(entry,'acquire')});
+    return planQueues([...state.entries, ...peerClaims],{now,telemetry,checkGate:entry=>trustedGate(entry,'acquire')});
+  }
+  function onMachine(write, action) {
+    if (!machine) return action(); // Legacy component mode, not host-wide proof.
+    const initialize = write ? () => {
+      verifyPath();
+      if (!fs.existsSync(resolved)) synchronous(atomicWrite, resolved,
+        JSON.stringify({ version: 1, sequence: 0, entries: [] }), { validateParent: verifyPath });
+    } : null;
+    return synchronous(machine.run.bind(machine), resolved, initialize, peers => {
+      peerClaims = peers;
+      try { return action(); } finally { peerClaims = []; }
+    });
   }
   function transaction(action) {
     verifyPath();
     return synchronous(withFileLock, lock, () => {
+      return onMachine(true, () => {
       verifyPath();
       const state = read();
       const priorClaims=new Map(state.entries.filter(entry=>entry.state==='running').map(entry=>[entry.id,structuredClone(entry)]));
@@ -96,7 +192,7 @@ function createQueueStore({ file, withFileLock, atomicWrite, assertWrite, readTe
               'invocation cessation/spend changed before publication');
             const pending={...state,entries:state.entries.map(value=>value.id===entry.id?{...value,state:'waiting'}:value)};
             const telemetry=synchronous(readTelemetry),now=synchronous(clock);
-            const decision=planQueues(pending.entries,{now,telemetry,checkGate:value=>
+            const decision=planQueues([...pending.entries, ...peerClaims],{now,telemetry,checkGate:value=>
               value.id===entry.id?trustedGate(checked,operation):trustedGate(value,'acquire')})
               .decisions.find(value=>value.id===entry.id);
             demand(decision.state==='ready-for-atomic-recheck','queue readiness changed before publication');
@@ -106,14 +202,17 @@ function createQueueStore({ file, withFileLock, atomicWrite, assertWrite, readTe
         }});
       }
       return { ...outcome.result, sequence: state.sequence, authorizationGranted: false };
+      });
     });
   }
   function snapshot() {
     verifyPath();
     return synchronous(withFileLock, lock, () => {
+      return onMachine(false, () => {
       verifyPath();
       const state = read();
       return { ...state, plan: plan(state) };
+      });
     });
   }
   function enqueue(entries) {
@@ -187,7 +286,7 @@ function createQueueStore({ file, withFileLock, atomicWrite, assertWrite, readTe
       const ready=()=>{
         const telemetry=synchronous(readTelemetry),projected=structuredClone(state.entries);
         projected.find(value=>value.id===id).state='waiting';
-        return planQueues(projected,{now:synchronous(clock),telemetry,checkGate:value=>
+        return planQueues([...projected, ...peerClaims],{now:synchronous(clock),telemetry,checkGate:value=>
           value.id===id?trustedGate(entry,'recover'):trustedGate(value,'acquire')})
           .decisions.find(value=>value.id===id)?.state==='ready-for-atomic-recheck';
       };
@@ -224,4 +323,4 @@ function createQueueStore({ file, withFileLock, atomicWrite, assertWrite, readTe
   }
   return { enqueue, acquire, recover, release, snapshot };
 }
-module.exports = { createQueueStore };
+module.exports = { createQueueStore, createMachineQueueGuard };

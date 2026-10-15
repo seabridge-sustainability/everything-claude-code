@@ -432,7 +432,24 @@ function createBoundHost(spec,{stateFile,plan}){
       return response;
     }
     engine.initialize(plan);authority();assertWrite([queueFile,queueLock]);
+    // One installed ECC Git-common directory across linked worktrees/goals.
+    // This private host index is not a goal-owned writer lease or global agent
+    // configuration; workers cannot obtain .git scopes. Existing IDE sessions
+    // are not hot-adopted. Only this explicitly pinned opt-in host participates.
+    const machineDirectory=coord.repository(root).directory;
+    fs.mkdirSync(machineDirectory,{recursive:true});regular(machineDirectory);
+    const machineFile=path.join(machineDirectory,'machine-queues.json');
+    const machine=require('./workspace-queue-store').createMachineQueueGuard({
+      file:machineFile,withFileLock:store.withFileLock,atomicWrite:writeFileAtomic,
+      assertWrite(targets){
+        authority();regular(machineDirectory);outsideWorkers(machineDirectory,plan);
+        demand(targets.every(target=>target===machineFile||target===machineFile+'.lock'),
+          'outside private machine index');
+        return true;
+      },
+    });
     return {
+      machine,
       assertWrite,
       describeInvocation(){
         const descriptor=structuredClone(q.config),entry=descriptor?.entry;

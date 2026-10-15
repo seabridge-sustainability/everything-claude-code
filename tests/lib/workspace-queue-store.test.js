@@ -2,7 +2,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const assert = require('node:assert/strict');
-const { createQueueStore } = require('../../scripts/lib/workspace-queue-store');
+const { createQueueStore, createMachineQueueGuard } = require('../../scripts/lib/workspace-queue-store');
 const { resourceKey } = require('../../scripts/lib/workspace-queue');
 const { withFileLock } = require('../../scripts/lib/goal-store');
 const { writeFileAtomic: atomicWrite } = require('../../scripts/lib/atomic-write');
@@ -34,6 +34,118 @@ const invocationAcquire=id=>({id,owner:'owner-'+id,leaseMilliseconds:1000,
 const invocationRecover=id=>({id,owner:'owner-'+id,bindingSha256:binding,
   supervisor:supervisor(202),leaseMilliseconds:1000,dependencySha256:dependency,checkpointSha256:checkpoint});
 try {
+  function shared(overrides = {}) {
+    return createMachineQueueGuard({ file: path.join(root, 'machine-' + count++ + '.json'),
+      withFileLock, atomicWrite,
+      assertWrite: targets => targets.every(target => path.dirname(target) === root),
+      clock: () => now, ...overrides });
+  }
+  test('distinct goal stores cannot spend the same machine headroom, even with identical job IDs', () => {
+    const machine = shared(), a = fixture({machine}), b = fixture({machine});
+    a.store.enqueue([request('same', {owner:'alpha',goalId:'goal-alpha'})]);
+    b.store.enqueue([request('same', {owner:'beta',goalId:'goal-beta'})]);
+    const claim=a.store.acquire({id:'same',owner:'alpha',leaseMilliseconds:1000});
+    assert.equal(claim.acquired,true);
+    const denied=b.store.acquire({id:'same',owner:'beta',leaseMilliseconds:1000});
+    assert.equal(denied.acquired,false);assert.equal(denied.decision.blockingOwner,'alpha');
+    assert.equal(b.store.snapshot().entries.length,1); // Peer claims are not copied into goal state.
+    assert.equal(b.store.snapshot().plan.decisions[0].state,'waiting-owner');
+    a.store.release({...claim,outcome:'completed'});
+    assert.equal(b.store.acquire({id:'same',owner:'beta',leaseMilliseconds:1000}).acquired,true);
+  });
+  test('expired or unverified peer claim remains held until its exact owner proves cessation', () => {
+    let clock=now,stopped=false;
+    const machine=shared({clock:()=>clock});
+    const telemetry=()=>({observedAt:new Date(clock).toISOString(),freeRamGiB:5,reserveRamGiB:2});
+    const a=fixture({machine,clock:()=>clock,readTelemetry:telemetry,confirmStopped:()=>stopped});
+    const b=fixture({machine,clock:()=>clock,readTelemetry:telemetry});
+    a.store.enqueue([request('a')]);b.store.enqueue([request('b')]);
+    const claim=a.store.acquire({id:'a',owner:'owner-a',leaseMilliseconds:1});clock++;
+    assert.equal(b.store.acquire({id:'b',owner:'owner-b',leaseMilliseconds:1000}).acquired,false);
+    assert.throws(()=>a.store.release({...claim,outcome:'completed'}),/cessation unverified/);
+    assert.equal(b.store.acquire({id:'b',owner:'owner-b',leaseMilliseconds:1000}).acquired,false);
+    stopped=true;a.store.release({...claim,outcome:'completed'});
+    assert.equal(b.store.acquire({id:'b',owner:'owner-b',leaseMilliseconds:1000}).acquired,true);
+  });
+  test('uncertain local publication retains a discoverable machine hold, never an unindexed claim', () => {
+    const machine=shared();let fail=false;
+    const a=fixture({machine,atomicWrite:(file,bytes,options)=>{
+      const result=atomicWrite(file,bytes,options);
+      if(fail&&JSON.parse(bytes).entries.some(entry=>entry.state==='running'))throw Error('uncertain publication');
+      return result;
+    }}),b=fixture({machine});
+    a.store.enqueue([request('a')]);b.store.enqueue([request('b')]);fail=true;
+    assert.throws(()=>a.store.acquire({id:'a',owner:'owner-a',leaseMilliseconds:1000}),/uncertain publication/);
+    assert.equal(JSON.parse(fs.readFileSync(a.file)).entries[0].state,'running');
+    assert.equal(b.store.acquire({id:'b',owner:'owner-b',leaseMilliseconds:1000}).acquired,false);
+  });
+  test('machine index failure happens before publishing a running local claim', () => {
+    let fail=false;
+    const machine=shared({atomicWrite:(...args)=>{if(fail)throw Error('index unavailable');return atomicWrite(...args);}});
+    const a=fixture({machine});a.store.enqueue([request('a')]);fail=true;
+    assert.throws(()=>a.store.acquire({id:'a',owner:'owner-a',leaseMilliseconds:1000}),/index unavailable/);
+    assert.equal(JSON.parse(fs.readFileSync(a.file)).entries[0].state,'waiting');
+  });
+  test('missing or corrupt registered peer state is unknown capacity, not a free slot', () => {
+    const machine=shared(),a=fixture({machine}),b=fixture({machine});
+    a.store.enqueue([request('a')]);b.store.enqueue([request('b')]);
+    a.store.acquire({id:'a',owner:'owner-a',leaseMilliseconds:1000});
+    const bytes=fs.readFileSync(a.file),backup=a.file+'.retained';fs.renameSync(a.file,backup);
+    assert.throws(()=>b.store.acquire({id:'b',owner:'owner-b',leaseMilliseconds:1000}),/ENOENT/);
+    fs.renameSync(backup,a.file);fs.writeFileSync(a.file,'{}');
+    assert.throws(()=>b.store.acquire({id:'b',owner:'owner-b',leaseMilliseconds:1000}),/invalid machine queue/);
+    fs.writeFileSync(a.file,bytes);
+  });
+  test('machine exclusion never waives the per-goal gate or its RAM floor', () => {
+    const machine=shared(),a=fixture({machine,checkGate:entry=>({allowed:entry.operation==='enqueue',owner:entry.owner,resource:resourceKey(entry)})});
+    a.store.enqueue([request('a')]);
+    assert.equal(a.store.acquire({id:'a',owner:'owner-a',leaseMilliseconds:1000}).decision.state,'waiting-gate');
+    const b=fixture({machine,readTelemetry:()=>({observedAt:new Date(now).toISOString(),freeRamGiB:2.5,reserveRamGiB:2})});
+    b.store.enqueue([request('b')]);
+    assert.equal(b.store.acquire({id:'b',owner:'owner-b',leaseMilliseconds:1000}).decision.state,'waiting-resource');
+  });
+  test('a read-only machine snapshot creates no queue state or index', () => {
+    const index=path.join(root,'snapshot-index.json'),machine=shared({file:index}),a=fixture({machine});
+    assert.deepEqual(a.store.snapshot().entries,[]);
+    assert.equal(fs.existsSync(index),false);assert.equal(fs.existsSync(a.file),false);
+  });
+  test('a heavy peer does not block an independent repository writer', () => {
+    const machine=shared(),a=fixture({machine}),b=fixture({machine});
+    a.store.enqueue([request('a')]);
+    a.store.acquire({id:'a',owner:'owner-a',leaseMilliseconds:1000});
+    b.store.enqueue([request('writer',{kind:'writer',resource:path.resolve(root)})]);
+    assert.equal(b.store.acquire({id:'writer',owner:'owner-writer',leaseMilliseconds:1000}).acquired,true);
+  });
+  test('another process cannot claim a different goal file while the machine transaction is live', () => {
+    const index=path.join(root,'process-index.json');let competing=false,childResult;
+    const modulePath=require.resolve('../../scripts/lib/workspace-queue-store');
+    const lockPath=require.resolve('../../scripts/lib/goal-store');
+    const atomicPath=require.resolve('../../scripts/lib/atomic-write');
+    const child=`const fs=require('node:fs'),path=require('node:path');
+      const {createQueueStore,createMachineQueueGuard}=require(${JSON.stringify(modulePath)});
+      const {withFileLock}=require(${JSON.stringify(lockPath)}),{writeFileAtomic:atomicWrite}=require(${JSON.stringify(atomicPath)});
+      const root=${JSON.stringify(root)},clock=()=>${now};
+      const assertWrite=targets=>targets.every(p=>path.dirname(p)===root);
+      const machine=createMachineQueueGuard({file:${JSON.stringify(index)},withFileLock,atomicWrite,assertWrite,clock});
+      const store=createQueueStore({file:process.argv[1],machine,withFileLock,atomicWrite,assertWrite,clock,
+        readTelemetry:()=>({observedAt:new Date(clock()).toISOString(),freeRamGiB:5,reserveRamGiB:2}),
+        checkGate:e=>({allowed:true,owner:e.owner,resource:'heavy-check:local-machine'}),confirmStopped:()=>true});
+      try{store.acquire({id:'b',owner:'owner-b',leaseMilliseconds:1000});console.log('UNEXPECTED');}
+      catch(e){if(!e.message.includes('goal state is locked'))throw e;console.log('BLOCKED');}`;
+    let b;
+    const machine=shared({file:index,withFileLock:(lock,action)=>withFileLock(lock,()=>{
+      if(competing){competing=false;childResult=require('node:child_process').spawnSync(process.execPath,
+        ['--max-old-space-size=64','-e',child,b.file],{encoding:'utf8',windowsHide:true,timeout:5000,maxBuffer:8192});}
+      return action();
+    })});
+    const a=fixture({machine});b=fixture({machine});
+    a.store.enqueue([request('a')]);b.store.enqueue([request('b')]);
+    const before=fs.readFileSync(b.file,'utf8');competing=true;
+    assert.equal(a.store.acquire({id:'a',owner:'owner-a',leaseMilliseconds:1000}).acquired,true);
+    assert.equal(childResult.status,0,childResult.stderr);assert.equal(childResult.stdout.trim(),'BLOCKED');
+    assert.equal(fs.readFileSync(b.file,'utf8'),before);
+    assert.equal(b.store.acquire({id:'b',owner:'owner-b',leaseMilliseconds:1000}).acquired,false);
+  });
   test('invocation acquisition records original supervisor and dependency without accepting missing custody',()=>{
     const {store,file}=fixture();store.enqueue([invocationRequest('custody')]);
     const before=fs.readFileSync(file,'utf8');

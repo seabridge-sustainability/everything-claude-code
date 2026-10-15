@@ -458,7 +458,15 @@ test('concrete parent queue binds sources, owner, exact response and verified cl
   const host=concrete.createBoundHost(f.spec,context),queue=operational.bindQueue;
   assert.throws(()=>queue(host,context),/pinned parent/);
   assert.throws(()=>host.createQueueCapabilities({...context,queueFile:queueFile+'.other'}),/exact queue/);
-  const capabilities=host.createQueueCapabilities(context);
+  // Keep private host bookkeeping inside this test's disposable repository.
+  // Production resolves the installed ECC's Git-common directory, not plan.repo.
+  const originalRepository=coord.repository;
+  let capabilities;
+  try{
+    coord.repository=cwd=>originalRepository(cwd===root?f.plan.repo:cwd);
+    capabilities=host.createQueueCapabilities(context);
+  }finally{coord.repository=originalRepository;}
+  assert.equal(typeof capabilities.machine.run,'function');
   const create=require('../../scripts/lib/workspace-queue-store').createQueueStore;
   const bound=create({...capabilities,file:queueFile});
   const now=Date.now(),request={id:'writer-one',owner:f.plan.session,goalId:f.goalDocument.goal_id,kind:'writer',resource:f.plan.repo,
