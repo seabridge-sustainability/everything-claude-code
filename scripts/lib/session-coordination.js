@@ -170,6 +170,11 @@ function read(repo) {
         || (s.metadataOnly && (s.guard || s.loop || state.release?.owner === s.id))) throw new Error('invalid session record');
     ids.add(s.id);
     s.scopes.forEach(scope);
+    if (s.releaseObservation && (s.state !== 'closed' || s.guard || s.loop || s.metadataOnly
+        || !/^[a-f0-9]{40,64}$/.test(s.releaseObservation.candidate)
+        || typeof s.releaseObservation.branch !== 'string'
+        || !/^[a-f0-9]{64}$/.test(s.releaseObservation.destinationSha256)
+        || !Number.isFinite(s.releaseObservation.startedAt))) throw new Error('invalid release observer');
   }
   if (state.release && (!ids.has(state.release.owner) || !Number.isFinite(state.release.expiresAt)
       || !/^[a-f0-9]{40,64}$/.test(state.release.candidate) || typeof state.release.branch !== 'string')) throw new Error('invalid release record');
@@ -203,7 +208,7 @@ function conflicts(state, repo, scopes, sessionId, now, metadataOnly = false) {
     if (other.id === sessionId || other.state !== 'active'
         || (other.expiresAt <= now && state.release?.owner !== other.id)) continue;
     const otherMetadata = other.worktree === repo.root ? metadataSession(repo, other, state) : other.metadataOnly;
-    if (other.worktree === repo.root && !metadataOnly && !otherMetadata) throw new Error(`worktree already owned by ${other.id}; serialize or explicitly hand off this checkout; do not automatically create another worktree`);
+    if (other.worktree === repo.root && !metadataOnly && !otherMetadata) throw new Error(`worktree already owned by ${other.id}; preserve its work and continue independent preparation. Use an existing clean owned integration slot or central rule 3's covered bounded detached slot; only uncovered paths/branches need new approval`);
     if (scopes.some(a => other.scopes.some(b => overlaps(a, b)))) throw new Error(`write scope overlaps session ${other.id}; no automatic takeover`);
   }
 }
@@ -873,6 +878,22 @@ function ownedPaths(repo, session, paths) {
     if (!session.scopes.some(allowed => clean === allowed || clean.startsWith(`${allowed}/`))) throw new Error(`outside owned write scope: ${relative}`);
   }
 }
+function finishOrRenewRelease(state, sessionId, options, now) {
+  const release = state.release;
+  if (!release || release.owner !== sessionId) throw new Error('session does not own the release');
+  if ((options.branch !== undefined && options.branch !== release.branch)
+      || (options.candidate !== undefined && options.candidate !== release.candidate)
+      || (options.expectedReleaseSha256 !== undefined && options.expectedReleaseSha256 !== crypto.createHash('sha256')
+        .update(JSON.stringify(release)).digest('hex'))) throw new Error('release-end receipt/branch/candidate changed');
+  if (options.command === 'release-renew') {
+    release.expiresAt = expiry(options.ttl, now);
+    return release;
+  }
+  if (!['completed', 'failed', 'superseded', 'aborted-before-push'].includes(options.outcome)) throw new Error('terminal --outcome required');
+  state.releases.push({ ...release, outcome: options.outcome, evidence: requireText(options.evidence, 'terminal evidence'), endedAt: now });
+  state.release = null;
+  return state.releases.at(-1);
+}
 function execute(command, options = {}) {
   const repo = repository(options.cwd);
   const now = options.now === undefined ? Date.now() : options.now;
@@ -887,6 +908,27 @@ function execute(command, options = {}) {
   }
   const sessionId = id(options.sessionId);
   return transaction(repo, state => {
+    const observer = state.sessions.find(s => s.id === sessionId && s.releaseObservation);
+    if (observer) {
+      // Source state is closed so older clients fail closed for writes while
+      // still allowing everyone to read the existing version-1 registry.
+      if (observer.worktree !== repo.root) throw new Error('session belongs to another worktree');
+      if (command === 'close' && state.release?.owner !== sessionId) {
+        delete observer.releaseObservation;
+        observer.updatedAt = now;
+        return observer;
+      }
+      if (!['release-end', 'release-renew'].includes(command)) throw new Error('release observer has no source, commit or push authority');
+      const release = state.release, pinned = observer.releaseObservation;
+      if (release?.owner !== sessionId || release.candidate !== pinned.candidate || release.branch !== pinned.branch
+          || release.publication?.destinationSha256 !== pinned.destinationSha256
+          || originDestination(repo) !== pinned.destinationSha256
+          || options.branch !== pinned.branch || options.candidate !== pinned.candidate) throw new Error('release observer binding changed');
+      const result = finishOrRenewRelease(state, sessionId, {...options, command}, now);
+      if (command === 'release-renew') observer.expiresAt = result.expiresAt;
+      observer.updatedAt = now;
+      return result;
+    }
     if (command === 'guard-event') return guardEvent(repo, state, options, now);
     if (command === 'register') {
       if (state.sessions.some(s => s.id === sessionId)) throw new Error('session ID already exists; renew or use a new ID');
@@ -914,6 +956,21 @@ function execute(command, options = {}) {
       return session;
     }
     const session = current(state, repo, sessionId, now);
+    if (command === 'release-observe') {
+      const release = state.release;
+      if (release?.owner !== sessionId || session.guard || session.loop || !release.publication?.publishable
+          || options.branch !== release.branch || options.candidate !== release.candidate
+          || originDestination(repo) !== release.publication.destinationSha256) throw new Error('release observer requires its own published branch/candidate');
+      if (git(repo.root, ['rev-parse', 'HEAD']) !== release.candidate || git(repo.root, ['status', '--porcelain'])) throw new Error('release observer requires a clean candidate checkout');
+      const published = git(repo.root, ['ls-remote', '--exit-code', 'origin', `refs/heads/${release.branch}`]).split(/\s+/);
+      if (published.length !== 2 || published[0] !== release.candidate || published[1] !== `refs/heads/${release.branch}`) throw new Error('release candidate is not the published branch tip');
+      session.releaseObservation = {candidate: release.candidate, branch: release.branch,
+        destinationSha256: release.publication.destinationSha256, startedAt: now};
+      session.state = 'closed';
+      session.updatedAt = now;
+      delete session.preservedForeign;
+      return {...session, sourceOwnershipClosed: true, releaseRetained: true, gitOperationsAllowed: false};
+    }
     if (command === 'metadata-only') {
       if (state.release?.owner === sessionId || session.guard || session.loop) throw new Error('release or guarded execution cannot convert to metadata-only');
       if (!goalMetadataScopes(repo, session.scopes)) throw new Error('metadata-only requires ignored task goal scopes');
@@ -994,18 +1051,10 @@ function execute(command, options = {}) {
     const release = state.release;
     if (!release || release.owner !== sessionId) throw new Error('session does not own the release');
     if (command === 'release-end') {
-      if ((options.branch !== undefined && options.branch !== release.branch)
-          || (options.candidate !== undefined && options.candidate !== release.candidate)
-          || (options.expectedReleaseSha256 !== undefined && options.expectedReleaseSha256 !== crypto.createHash('sha256')
-            .update(JSON.stringify(release)).digest('hex'))) throw new Error('release-end receipt/branch/candidate changed');
-      if (!['completed', 'failed', 'superseded', 'aborted-before-push'].includes(options.outcome)) throw new Error('terminal --outcome required');
-      state.releases.push({ ...release, outcome: options.outcome, evidence: requireText(options.evidence, 'terminal evidence'), endedAt: now });
-      state.release = null;
-      return state.releases.at(-1);
+      return finishOrRenewRelease(state, sessionId, {...options, command}, now);
     }
     if (command === 'release-renew') {
-      release.expiresAt = expiry(options.ttl, now);
-      return release;
+      return finishOrRenewRelease(state, sessionId, {...options, command}, now);
     }
     if (command === 'check-release') {
       if (!release.actionsBudget) throw new Error('release lacks Actions budget receipt; end or re-acquire with a fresh receipt');

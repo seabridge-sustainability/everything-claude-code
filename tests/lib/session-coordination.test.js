@@ -745,6 +745,63 @@ function publicationFixture() {
   git(f.root, 'update-ref', 'refs/remotes/origin/development', f.sha);
   return f;
 }
+function observerFixture() {
+  const f = publicationFixture(), remote = f.root + '-remote.git';
+  git(f.root, 'remote', 'set-url', 'origin', remote);
+  git(f.root, 'init', '--bare', remote);
+  git(f.root, 'push', 'origin', 'HEAD:refs/heads/development');
+  register(f.root, 'publisher', ['README.md']);
+  const options = {cwd:f.root, sessionId:'publisher', branch:'development', candidate:f.sha};
+  const release = execute('release-acquire', {...options, ...budget()});
+  return {...f, options, release};
+}
+test('published owner becomes source-free observer; successor writes while release stays exclusive', () => {
+  const f = observerFixture();
+  const observer = execute('release-observe', f.options);
+  assert.equal(observer.state, 'closed');
+  assert.equal(observer.sourceOwnershipClosed, true);
+  assert.deepEqual(execute('status', {cwd:f.root}).release, f.release);
+  assert.throws(() => checkSession({cwd:f.root,sessionId:'publisher'}), /closed/);
+  for (const command of ['check-write','check-changes','guard-bind','renew','release-acquire','check-release','metadata-only','handoff-file']) {
+    assert.throws(() => execute(command, {...f.options, paths:['README.md']}), /observer has no/);
+  }
+  register(f.root, 'successor', ['README.md']);
+  assert.equal(execute('check-write', {cwd:f.root, sessionId:'successor', paths:['README.md']}).allowed, true);
+  fs.appendFileSync(path.join(f.root,'README.md'), 'successor draft\n');
+  const draft = fs.readFileSync(path.join(f.root,'README.md'));
+  assert.throws(() => execute('release-acquire', {...f.options,sessionId:'successor',...budget()}), /release owned/);
+  assert.throws(() => execute('release-end', {...f.options,candidate:'0'.repeat(40),outcome:'completed',evidence:'wrong'}), /binding changed/);
+  assert.throws(() => execute('close', f.options), /observer has no/);
+  execute('release-renew', {...f.options, ttl:30});
+  execute('release-end', {...f.options,outcome:'completed',evidence:'exact fixture CI terminal'});
+  assert.equal(execute('close', f.options).releaseObservation, undefined);
+  assert.deepEqual(fs.readFileSync(path.join(f.root,'README.md')), draft);
+  assert.equal(execute('status', {cwd:f.root}).release, null);
+});
+test('observer transition rejects foreign owner, wrong checkout/candidate, drafts and unpublished candidates', () => {
+  const f = observerFixture();
+  assert.throws(() => execute('release-observe', {...f.options,sessionId:'foreign'}), /missing/);
+  const other = f.root + '-observer'; git(f.root, 'worktree', 'add', '--detach', other, 'HEAD');
+  assert.throws(() => execute('release-observe', {...f.options,cwd:other}), /another worktree/);
+  assert.throws(() => execute('release-observe', {...f.options,candidate:'0'.repeat(40)}), /own published/);
+  fs.appendFileSync(path.join(f.root,'README.md'), 'draft\n');
+  assert.throws(() => execute('release-observe', f.options), /clean candidate/);
+  assert.equal(execute('status',{cwd:f.root}).sessions[0].state,'active');
+  const g = observerFixture();
+  git(g.root,'push','origin',':refs/heads/development');
+  assert.throws(() => execute('release-observe',g.options));
+  assert.equal(execute('status',{cwd:g.root}).sessions[0].state,'active');
+});
+test('observer release destination cannot drift or be reacquired through a legacy closed session', () => {
+  const f=observerFixture(); execute('release-observe',f.options);
+  const file=path.join(repository(f.root).directory,'registry.json');
+  const state=JSON.parse(fs.readFileSync(file,'utf8'));
+  assert.equal(state.version,1); assert.equal(state.sessions[0].state,'closed');
+  assert.equal(state.sessions[0].scopes.length,1,'retained audit scopes do not reserve files');
+  git(f.root,'remote','set-url','origin',path.join(workspace,'other-remote.git'));
+  assert.throws(()=>execute('release-end',{...f.options,outcome:'completed',evidence:'terminal'}),/binding changed/);
+  assert.deepEqual(execute('status',{cwd:f.root}).release,f.release);
+});
 function fixtureCommit(root, file, content, message) {
   if (content === null) fs.unlinkSync(path.join(root, file));
   else fs.writeFileSync(path.join(root, file), content);

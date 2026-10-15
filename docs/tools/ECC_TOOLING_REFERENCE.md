@@ -1,5 +1,31 @@
 # ECC Tooling Reference
 
+## Verified Git guard and source-free CI observation
+
+The supplementary Claude Git guard can be installed with
+`node scripts/install-seabridge-git-guard.js --expected-sha256 SOURCE_SHA256 --expected-loader-sha256 CURRENT_LOADER_SHA256`.
+Review both digests first. This explicit installer changes only the existing
+`git-guard.js` loader, keeps its old bytes for rollback and installs a content-addressed
+snapshot beside it. It never changes settings, permissions or hook trust. Development
+checkout edits no longer alter the installed guard. Missing/tampered snapshots deny;
+updates require another reviewed installation. Do not disable the digest check.
+
+After a push is verified at the exact origin branch tip, the publishing owner may run
+`ecc session release-observe --session ID --branch NAME --candidate FULL_SHA`.
+This closes its source reservation while retaining its pinned CI/deploy release.
+The observer cannot write, commit, push, rebind or reacquire a source slot. Existing
+clients see a closed source session; the normal release still blocks competing
+publication. Other owners may prepare local changes without pausing their goals.
+Use the finite `release-watch` where its workflow allowlist applies, then
+`release-end` and `close` with the same exact branch/candidate. No lease takeover,
+CI cancellation or early deploy closure is authorized. For unsupported workflows,
+observe exact CI normally and end only your own release with verified evidence.
+
+Bind a scoped repair's resume receipt to its actual owned checkout. Unrelated live
+backend edits must not invalidate an ECC-only source task; this does not establish
+backend code adoption or remove any required backend/runtime/scientific proof.
+Before retiring that checkout, refresh the receipt against the durable repository.
+
 Load this file only when a specific tool below is actually needed. The root
 `AGENTS.md` / `CLAUDE.md` adapters intentionally carry only one-line pointers
 here to keep always-loaded context small.
@@ -20,7 +46,7 @@ LLM-optimized output, reducing token consumption by 60–90% on verbose commands
 ## caveman — Token Compression
 
 Always on for all coding agents (owner decision 2026-10-14, v4.0.1, vendor
-defaults). Source: https://github.com/JuliusBrussee/caveman.
+defaults). Source: [Caveman](https://github.com/JuliusBrussee/caveman).
 
 - Install/upgrade: `npx @caveman-ai/cli@latest` (interactive) or
   `npx -y @caveman-ai/cli@latest setup --yes`; preview with `setup --dry-run`.

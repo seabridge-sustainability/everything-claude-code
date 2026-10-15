@@ -103,7 +103,7 @@ function main(args = process.argv.slice(2)) {
       } catch (error) {
         decision.admitted = false;
         decision.reason = `session coordination: ${error.message}`;
-        decision.next_action = 'Register task write scopes in the approved primary checkout with ecc session register, then pass --session or ECC_SESSION_ID. A new worktree requires explicit owner approval.';
+        decision.next_action = 'Register task write scopes in an approved owned checkout with ecc session register, then pass --session or ECC_SESSION_ID. Central rule 3 covers bounded detached integration slots; only uncovered paths or new branches require new approval. Preserve other owners and continue independent work.';
       }
     }
     if (validationError) decision.validation_error = validationError;

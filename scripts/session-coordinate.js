@@ -4,7 +4,8 @@
 const { execute } = require('./lib/session-coordination');
 function main(args = process.argv.slice(2)) {
   if (!args.length || args.includes('--help')) {
-    console.log('ecc session <register|status|renew|check-write|check-changes|guard-bind|handoff-file|metadata-only|close|release-acquire|check-release|release-renew|release-end|release-watch>');
+    console.log('ecc session <register|status|renew|check-write|check-changes|guard-bind|handoff-file|metadata-only|close|release-acquire|check-release|release-observe|release-renew|release-end|release-watch>');
+    console.log('After verified publication: release-observe --session ID --branch NAME --candidate FULL_SHA closes only that owner source reservation, retains the pinned release and forbids further writes/commits/pushes. Old clients see a closed source session; no takeover or CI cancellation.');
     console.log('Ignored task goal scopes register as metadata-only: disjoint source writers continue, no Git commits/releases. A legacy goal-only owner can convert itself with metadata-only; never convert another owner.');
     console.log('Guard binding: --guard-mode audit|block --native-session ID --deadline ISO_UTC --tool-limit N --turn-limit N --protected-path FILE (repeatable) --allowed-operation read|write|patch (repeatable). New session required for rebinding; opaque execution denied, resource telemetry unverified, provider/CI budget zero.');
     console.log('Options: --session ID --scope relative/path (repeatable) --objective TEXT --done-when TEXT --ttl-minutes 120');

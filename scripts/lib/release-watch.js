@@ -81,7 +81,11 @@ async function watchRelease(options, dependencies = {}) {
     const release = state.release, session = state.sessions.find(item => item.id === options.sessionId);
     demand(release?.owner === options.sessionId && release.branch === options.branch
       && release.candidate === options.candidate, 'release owner or candidate changed; no mutation');
-    demand(session?.state === 'active' && session.expiresAt > now()
+    const observation = session?.releaseObservation;
+    const ownsSource = session?.state === 'active';
+    const ownsObservation = session?.state === 'closed' && observation?.branch === options.branch
+      && observation.candidate === options.candidate && observation.destinationSha256 === destination;
+    demand((ownsSource || ownsObservation) && session.expiresAt > now()
       && normalRoot(session.worktree) === root, 'owner session expired or belongs to another checkout');
     demand(release.publication?.publishable === true
       && release.publication.destinationSha256 === destination, 'release publication destination mismatch');

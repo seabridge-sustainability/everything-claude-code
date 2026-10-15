@@ -71,6 +71,25 @@ test('security-only success ends exactly own pinned lease and optional close fol
   assert.equal(f.mutations[0].data.candidate, SHA);
   assert.equal(f.mutations[0].data.branch, 'seabridge_development');
 });
+test('source-closed owner observation can finish exact CI without reacquiring source authority', async () => {
+  const f=fixture({closeSession:'yes'});
+  f.state.sessions[0].state='closed';
+  f.state.sessions[0].releaseObservation={branch:f.options.branch,candidate:SHA,
+    destinationSha256:f.state.release.publication.destinationSha256,startedAt:1};
+  const result=await f.watch();
+  assert.equal(result.state,'ended'); assert.equal(result.sessionClosed,true);
+  assert.deepEqual(f.mutations.map(row=>row.command),['release-end','close']);
+});
+test('closed owner without its exact observer binding retains the release', async () => {
+  for(const changed of ['missing','candidate','destination']) {
+    const f=fixture(); f.state.sessions[0].state='closed';
+    if(changed!=='missing') f.state.sessions[0].releaseObservation={branch:f.options.branch,
+      candidate:changed==='candidate'?'b'.repeat(40):SHA,
+      destinationSha256:changed==='destination'?'0'.repeat(64):f.state.release.publication.destinationSha256};
+    await assert.rejects(f.watch(),/owner session/);
+    assert.equal(f.mutations.length,0);
+  }
+});
 test('no run and missing expected run retain lease', async () => {
   const empty = fixture(); empty.controls.runs = [];
   assert.equal((await empty.watch()).state, 'retained'); assert.equal(empty.mutations.length, 0);
