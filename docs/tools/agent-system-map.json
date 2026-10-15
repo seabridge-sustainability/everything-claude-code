@@ -30,7 +30,7 @@
     ],
     "semanticIndex": "not-run"
   },
-  "sourceFingerprint": "ed162af90c8df76f544fad3a0732c3a6a3422ba1295ada6c8886912c67754999",
+  "sourceFingerprint": "75744f015fc6d06733e37371a605bb4f2e0f0258699f7b6fac67ad8fef3171c6",
   "sources": [
     {
       "path": "../manageesg-backend/AGENTS.md",
@@ -342,7 +342,7 @@
     },
     {
       "path": "scripts/goal-runtime-bridge.js",
-      "sha256": "67d28284fbba6a882caeadb16416c9346d6c42a81a26425dd44e8d48d109bd95"
+      "sha256": "24c0a4f0efe4627b2c7e1dd063e5a9166449d3e1c6bd6ee4861fc8471ab9fa49"
     },
     {
       "path": "scripts/hooks/antigravity-scope-guard.js",
@@ -418,7 +418,7 @@
     },
     {
       "path": "scripts/lib/session-coordination.js",
-      "sha256": "cfbcc9f68c7b6e6be199c7757c9d417e4dc9e9d6dbd7bdea1ea82fc4a577c747"
+      "sha256": "9c0b60f8e14e73d031fe2614d450d6438625da434ecfe6a00b581ab04cfcdfcf"
     },
     {
       "path": "scripts/lib/skill-routing.js",
@@ -450,7 +450,7 @@
     },
     {
       "path": "scripts/session-coordinate.js",
-      "sha256": "84b094e4c22e685315eb84340a8d08143e90f0182c6469d134b2bfeffaed3211"
+      "sha256": "ae5f459811774e8cd1065e3de4df9f029ec459408560cdda80f54573474ba3de"
     },
     {
       "path": "scripts/skill-route.js",
@@ -570,7 +570,7 @@
     },
     {
       "path": "tests/lib/session-coordination.test.js",
-      "sha256": "8b741f520a4ae5deecd17d5309420179711589acdf43ad679209810f75d4694c"
+      "sha256": "f3f84ad9de9f42e4821adb675ccc0a9c93dc6dbcc1a3ce1240d86dcc12e93f49"
     },
     {
       "path": "tests/lib/skill-routing.test.js",
@@ -1084,7 +1084,7 @@
       "id": "file:scripts/goal-runtime-bridge.js",
       "type": "source",
       "path": "scripts/goal-runtime-bridge.js",
-      "sha256": "67d28284fbba6a882caeadb16416c9346d6c42a81a26425dd44e8d48d109bd95"
+      "sha256": "24c0a4f0efe4627b2c7e1dd063e5a9166449d3e1c6bd6ee4861fc8471ab9fa49"
     },
     {
       "id": "file:scripts/hooks/antigravity-scope-guard.js",
@@ -1198,7 +1198,7 @@
       "id": "file:scripts/lib/session-coordination.js",
       "type": "source",
       "path": "scripts/lib/session-coordination.js",
-      "sha256": "cfbcc9f68c7b6e6be199c7757c9d417e4dc9e9d6dbd7bdea1ea82fc4a577c747"
+      "sha256": "9c0b60f8e14e73d031fe2614d450d6438625da434ecfe6a00b581ab04cfcdfcf"
     },
     {
       "id": "file:scripts/lib/skill-routing.js",
@@ -1246,7 +1246,7 @@
       "id": "file:scripts/session-coordinate.js",
       "type": "source",
       "path": "scripts/session-coordinate.js",
-      "sha256": "84b094e4c22e685315eb84340a8d08143e90f0182c6469d134b2bfeffaed3211"
+      "sha256": "ae5f459811774e8cd1065e3de4df9f029ec459408560cdda80f54573474ba3de"
     },
     {
       "id": "file:scripts/skill-route.js",
@@ -1426,7 +1426,7 @@
       "id": "file:tests/lib/session-coordination.test.js",
       "type": "source",
       "path": "tests/lib/session-coordination.test.js",
-      "sha256": "8b741f520a4ae5deecd17d5309420179711589acdf43ad679209810f75d4694c"
+      "sha256": "f3f84ad9de9f42e4821adb675ccc0a9c93dc6dbcc1a3ce1240d86dcc12e93f49"
     },
     {
       "id": "file:tests/lib/skill-routing.test.js",
@@ -4828,14 +4828,14 @@
     }
   ],
   "build": {
-    "generatedAt": "2026-10-15T01:21:12-04:00",
-    "sourceCommit": "3f87a7e2f6d7cc08132ab07e16a40bca1e7fe44e",
+    "generatedAt": "2026-10-15T04:02:48-04:00",
+    "sourceCommit": "f823c4d062a89e0fe0ceefec9117c3655d434782",
     "sourceDirty": false,
-    "policyCommit": "b1cc9a3237d229c8337372366a66a54dc2b9dd71",
+    "policyCommit": "e799143447b7bc30989156a09cd4c8feeaadf14d",
     "policyDirty": false,
     "verificationOnly": true,
     "provenanceMode": "exact-git-object-export",
-    "sourceTree": "79bc9a7ff77dd75759d431baa72a60b1a399ba12",
-    "policyTree": "2c302626cdba53202ac01a3f79731e254dc056b4"
+    "sourceTree": "6fb7e6a1e19b3ea38706cf30add2a174c0b187ea",
+    "policyTree": "1596cc6fe86c9604cb0bda8c05b22abf18e86df6"
   }
 }
