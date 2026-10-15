@@ -258,7 +258,7 @@ function check(root = ROOT, destination = OUTPUT) {
   }
 }
 
-function materialize(root = ROOT) {
+function verifyPolicySnapshot(root = ROOT) {
   const stored = JSON.parse(fs.readFileSync(file(root, OUTPUT), 'utf8'));
   if (stored.build?.sourceDirty !== false || stored.build?.policyDirty !== false
       || !/^[a-f0-9]{40}$/.test(stored.build?.policyCommit || '')) {
@@ -285,12 +285,17 @@ function materialize(root = ROOT) {
       throw new Error('refusing to overwrite existing central policy');
     }
   }
+  return { policyCommit: stored.build.policyCommit, snapshot, destination };
+}
+
+function materialize(root = ROOT) {
+  const { policyCommit, snapshot, destination } = verifyPolicySnapshot(root);
   fs.mkdirSync(destination, { recursive: true });
   for (const row of snapshot) {
     const target = file(root, row.path);
     if (!fs.existsSync(target)) fs.writeFileSync(target, row.text, { flag: 'wx' });
   }
-  return { policyCommit: stored.build.policyCommit, files: snapshot.length };
+  return { policyCommit, files: snapshot.length };
 }
 
 function main(args = process.argv.slice(2), root = ROOT) {
@@ -323,4 +328,4 @@ if (require.main === module) {
   try { process.exitCode = main(); }
   catch (error) { process.stderr.write(`${error.message}\n`); process.exitCode = 1; }
 }
-module.exports = { SOURCES, OUTPUT, sourceRows, buildMap, buildMetadata, check, materialize, main };
+module.exports = { SOURCES, OUTPUT, sourceRows, buildMap, buildMetadata, check, verifyPolicySnapshot, materialize, main };

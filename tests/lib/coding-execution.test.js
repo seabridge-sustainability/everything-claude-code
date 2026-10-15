@@ -825,7 +825,7 @@ test('operational runner joins, rejects once, repairs, pauses and resumes exact 
     proposeEffects: async () => [{...f.effect,kind:'shared-write',target:effectFile,payload_sha256:store.sha256Buffer('EXACT_EFFECT')}],
     readApproval: async entry => grant?{binding:entry.binding,receipt:'fixture-external-owner',expires_at:new Date(Date.now()+60000).toISOString()}:null,
     authorizeApproval: event => grant && event.receipt==='fixture-external-owner' && event.proposal.target===effectFile,
-    executeEffect: async proposal => { executed++; fs.writeFileSync(effectFile,'EXACT_EFFECT',{flag:'wx'}); throw Error('fixture interruption after exact side effect'); },
+    executeEffect: async _proposal => { executed++; fs.writeFileSync(effectFile,'EXACT_EFFECT',{flag:'wx'}); throw Error('fixture interruption after exact side effect'); },
     inspectEffect: async () => fs.existsSync(effectFile)?{path:effectFile,sha256:store.sha256File(effectFile)}:null,
     verifyEffect: (proposal,receipt) => receipt?.path===effectFile && receipt.sha256===proposal.payload_sha256 && store.sha256File(effectFile)===receipt.sha256,
   };

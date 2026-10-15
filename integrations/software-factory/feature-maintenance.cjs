@@ -7,6 +7,7 @@ const hash=bytes=>crypto.createHash('sha256').update(bytes).digest('hex');
 function coversFeature(f,file){return f.allowed_paths.some(p=>file===p||file.startsWith(p.replace(/\/$/,'')+'/'))||
   (f.source_files||[]).some(p=>{const domain=p.match(/^src\/components\/views\/[^/]+\//)?.[0];return domain&&file.startsWith(domain);});}
 function classifyChanges(files,features){
+  // eslint-disable-next-line no-control-regex -- Reject C0 control bytes in declared source paths.
   if(!Array.isArray(files)||files.length>2000||files.some(f=>typeof f!=='string'||f.startsWith('/')||/[\\:\x00-\x1f]/.test(f)||f.split('/').includes('..')))throw Error('Bounded exact source paths required');
   const ui=files.filter(f=>/^src\/(app|components)\/.*\.(tsx|css)$/.test(f)&&!/(\.test\.|\.spec\.)/.test(f));
   // Knowledge routing may infer the declared view namespace; this never expands

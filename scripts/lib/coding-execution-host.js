@@ -188,7 +188,7 @@ async function runJournalChild(requestFile){
       // Preserve known usage even when the report is absent or malformed.
       usage=parsed.usage;let report=null;
       try{engine.assert('critique',parsed.report);demand(parsed.report.agent===request.plan.critic
-        &&parsed.report.join_sha256===request.input.state.join_sha256,'critic output identity mismatch');report=parsed.report;}catch{}
+        &&parsed.report.join_sha256===request.input.state.join_sha256,'critic output identity mismatch');report=parsed.report;}catch{/* Preserve known usage while leaving an invalid critique report absent. */}
       value={report,usage};
     }else{
     demand(parsed.agent===request.input.agent&&parsed.runtime===request.input.runtime

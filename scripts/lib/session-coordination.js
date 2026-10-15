@@ -140,6 +140,9 @@ function actionsBudgetReceipt(options, now) {
   if (!['yes', 'no', 'unknown'].includes(stopUsage)) throw new Error('actions-stop-usage must be yes, no, or unknown');
   const usedUsd = status === 'known' ? usd(options.actionsBudgetUsed, 'actions-budget-used', true) : null;
   const limitUsd = status === 'known' ? usd(options.actionsBudgetLimit, 'actions-budget-limit') : null;
+  if (status === 'known' && usedUsd + expectedUsd >= limitUsd) {
+    throw new Error('projected Actions usage reaches the hard spending stop; a 90% exception cannot raise it');
+  }
   const projectedPercent = status === 'known' ? 100 * (usedUsd + expectedUsd) / limitUsd : null;
   const exceptionNeeded = status === 'unknown' || projectedPercent >= 90 || stopUsage !== 'yes';
   const ownerCostApproval = options.ownerCostApproval
@@ -482,6 +485,7 @@ function goalReference(repo, goalFile, workspaceRoot = null) {
   function exactPath(value, regular = false) {
     if (typeof value !== 'string' || !path.isAbsolute(value)) throw Error('absolute goal reference required');
     const input = value.replace(/\\/g, '/');
+    // eslint-disable-next-line no-control-regex -- Reject C0 control bytes in goal references.
     if (/^\/\//.test(input) || /[\x00-\x1f]/.test(input)
         || input.split('/').some(part => part === '.' || part === '..' || (part && /[. ]$/.test(part)))) throw Error('ambiguous goal reference');
     const absolute = path.resolve(value), volume = path.parse(absolute).root;
@@ -648,6 +652,7 @@ function pinManagedAssignment(repo,state,session,options,now) {
   return session.managedAssignment;
 }
 function normalizeToolPath(repo, value, cwd = repo.root) {
+  // eslint-disable-next-line no-control-regex -- Reject C0 control bytes before normalizing tool paths.
   if (typeof value !== 'string' || !value || /[\x00-\x1f]/.test(value)) throw new Error('invalid tool path');
   let input = value.replace(/\\/g, '/');
   if (process.platform === 'win32') input = input.replace(/^\/([a-z])\//i, '$1:/');
@@ -1005,6 +1010,12 @@ function execute(command, options = {}) {
     if (command === 'check-release') {
       if (!release.actionsBudget) throw new Error('release lacks Actions budget receipt; end or re-acquire with a fresh receipt');
       if (release.expiresAt <= now) throw new Error('release lease expired; inspect bound runs before renewal');
+      const budget = release.actionsBudget;
+      actionsBudgetReceipt({ actionsBudgetStatus: budget.status, actionsBudgetSource: budget.source,
+        actionsBudgetCheckedAt: budget.checkedAt, actionsBudgetUsed: budget.usedUsd,
+        actionsBudgetLimit: budget.limitUsd, expectedActionsUsd: budget.expectedUsd,
+        expectedWorkflows: budget.expectedWorkflows.join(','), actionsStopUsage: budget.stopUsage,
+        ownerCostApproval: budget.ownerCostApproval }, now);
       if (options.branch !== release.branch || options.candidate !== release.candidate
           || git(repo.root, ['rev-parse', 'HEAD']) !== release.candidate) throw new Error('release branch/candidate mismatch; never chase the latest shared tip');
       if (git(repo.root, ['status', '--porcelain'])) throw new Error('release worktree changed after acquisition');

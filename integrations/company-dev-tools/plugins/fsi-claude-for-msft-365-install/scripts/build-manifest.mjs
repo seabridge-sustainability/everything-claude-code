@@ -75,10 +75,6 @@ const KEYS = {
     pattern: /^[A-Za-z0-9]{20,}$/,
     hint: "From Azure Portal → your Foundry resource → Keys and Endpoint → KEY 1",
   },
-  graph_client_id: {
-    pattern: /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
-    hint: "Entra app (client) ID for Microsoft Graph — Outlook only; omit to use Anthropic's multi-tenant app via the admin consent URL",
-  },
   gateway_url: { pattern: /^https:\/\//, hint: "HTTPS base URL" },
   gateway_token: { pattern: /./, hint: "gateway API key", secret: true },
   gateway_auth_header: { pattern: /^(x-api-key|authorization)$/i, hint: "auth header scheme (default: x-api-key)" },

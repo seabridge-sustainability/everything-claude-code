@@ -28,6 +28,7 @@ function installNativeEncoder(nativeRequire){
   executable.executablePath=()=>encoder;executable.executablePathOrDie=()=>pinnedTool('encoder');
 }
 function coordinate(value) {
+  // eslint-disable-next-line no-control-regex -- Reject C0 control bytes before resolving evidence paths.
   if (typeof value !== 'string' || !value || /[\x00-\x1f]/.test(value)) fail('a bounded path is required');
   const s = value.replace(/\\/g, '/');
   if (s.length > 600 || s.startsWith('//') || s.split('/').some(p => p === '.' || p === '..' || (p && /[. ]$/.test(p)) || /^(?:con|prn|aux|nul|com[0-9]|lpt[0-9])(?:\.|$)/i.test(p)) || /:/.test(s.slice(2))) fail('ambiguous path or traversal');
@@ -90,6 +91,7 @@ function mediaPath(requested, category = 'media') {
   if (requested && /^[a-zA-Z]:[\\/]|^[\\/]/.test(requested)) destination = requested;
   else {
     const relative = requested || `${Date.now()}-${crypto.randomBytes(5).toString('hex')}.png`;
+    // eslint-disable-next-line no-control-regex -- Reject C0 control bytes in relative capture paths.
     if (typeof relative !== 'string' || relative.split(/[\\/]/).some(p => p === '..') || /[:\x00-\x1f]/.test(relative)) fail('invalid relative capture path');
     destination = `${run.directory}/${category}/${relative.replace(/\\/g,'/')}`;
   }
@@ -144,7 +146,7 @@ function guardBrowser(browser) {
     const dir = opts.recordVideo?.dir ? mediaPath(opts.recordVideo.dir,'videos') : `${currentRun().directory}/videos`;
     evidencePath(dir); return guardContext(await original.call(this,{ ...opts, recordVideo: { ...opts.recordVideo, dir } }));
   });
-  wrap(browser,'newPage',original => async function(opts = {}) { const context = await this.newContext(opts); return context.newPage(); });
+  wrap(browser,'newPage',_original => async function(opts = {}) { const context = await this.newContext(opts); return context.newPage(); });
   return browser;
 }
 function installPlaywrightGuards(playwright,{nativeRequire}={}) {

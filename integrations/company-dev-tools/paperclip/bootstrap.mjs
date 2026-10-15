@@ -4,9 +4,9 @@ import { fileURLToPath } from 'node:url';
 const root = path.dirname(fileURLToPath(import.meta.url));
 const base = 'http://127.0.0.1:3183/api';
 const selectedModels = { OpenCode: 'ollama/qwen3.5-opencode:32k' };
-try { const settings = JSON.parse(await fs.readFile('C:/Users/adelm/.claude/settings.json', 'utf8')); if (typeof settings.model === 'string') selectedModels.Claude = settings.model; } catch {}
-try { const settings = JSON.parse(await fs.readFile('C:/Users/adelm/.gemini/settings.json', 'utf8')); const model = typeof settings.model === 'string' ? settings.model : settings.model?.name; if (model) selectedModels.Gemini = model; } catch {}
-try { const config = await fs.readFile('C:/Users/adelm/.codex/config.toml', 'utf8'); const model = config.match(/^model\s*=\s*"([^"\n]+)"/m)?.[1]; if (model) selectedModels.Codex = model; } catch {}
+try { const settings = JSON.parse(await fs.readFile('C:/Users/adelm/.claude/settings.json', 'utf8')); if (typeof settings.model === 'string') selectedModels.Claude = settings.model; } catch { /* Optional local model settings may be absent or unreadable; retain existing defaults. */ }
+try { const settings = JSON.parse(await fs.readFile('C:/Users/adelm/.gemini/settings.json', 'utf8')); const model = typeof settings.model === 'string' ? settings.model : settings.model?.name; if (model) selectedModels.Gemini = model; } catch { /* Optional local model settings may be absent or unreadable; retain existing defaults. */ }
+try { const config = await fs.readFile('C:/Users/adelm/.codex/config.toml', 'utf8'); const model = config.match(/^model\s*=\s*"([^"\n]+)"/m)?.[1]; if (model) selectedModels.Codex = model; } catch { /* Optional local model settings may be absent or unreadable; retain existing defaults. */ }
 async function api(route, method = 'GET', body) {
   const response = await fetch(base + route, { method, headers: { 'content-type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body), signal: AbortSignal.timeout(20000) });
   if (!response.ok) throw new Error(`${method} ${route}: HTTP${response.status}`);

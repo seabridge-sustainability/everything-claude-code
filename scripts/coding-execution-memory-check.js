@@ -2,7 +2,7 @@
 'use strict';
 // A consumer of Second Brain's four-tool proxy, NOT another retrieval engine.
 // The reviewed proxy reads its token locally; this process never reads it.
-const fs=require('node:fs'),crypto=require('node:crypto'),path=require('node:path');
+const fs=require('node:fs'),path=require('node:path');
 const {spawn}=require('node:child_process');
 const {pin}=require('./lib/coding-execution-host');
 const {digest,assert:assertContract}=require('./lib/coding-execution');

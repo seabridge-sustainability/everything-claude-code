@@ -9,6 +9,7 @@ const validate=new Ajv({allErrors:true}).compile(require('../../schemas/ui-chang
 const hash=value=>crypto.createHash('sha256').update(value).digest('hex');
 function registry(){return JSON.parse(fs.readFileSync(path.join(ROOT,'manifests/feature-ownership.json'),'utf8'));}
 function safeSource(file){
+  // eslint-disable-next-line no-control-regex -- Reject C0 control bytes in exact relative source paths.
   if(typeof file!=='string'||file.startsWith('/')||/[:\\\x00-\x1f]/.test(file)||file.split('/').some(x=>x==='..'||x==='.'||!x||/[. ]$/.test(x)))throw Error('Exact relative source path required');
   const full=path.resolve(FRONT,file);let cursor=full;
   while(cursor!==FRONT){if(fs.existsSync(cursor)&&fs.lstatSync(cursor).isSymbolicLink())throw Error('Linked source refused');cursor=path.dirname(cursor);}

@@ -10,6 +10,7 @@ export async function download() {
   const tree = await response.json();
   if (tree.truncated || tree.sha !== revision) throw Error('Complete pinned tree required');
   const files = tree.tree.filter(e => e.type === 'blob');
+  // eslint-disable-next-line no-control-regex -- Reject C0 control bytes in imported source paths.
   if (!files.length || files.some(e => e.mode !== '100644' && e.mode !== '100755' || e.path.split('/').some(p => !p || p === '.' || p === '..') || /[\\:\x00-\x1f]/.test(e.path)) || files.reduce((n,e) => n + e.size,0) > 20 * 1024 * 1024) throw Error('Unexpected or oversized source tree');
   const receipts = []; let cursor = 0;
   await Promise.all(Array.from({ length: 6 }, async () => {

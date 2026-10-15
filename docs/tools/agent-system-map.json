@@ -30,7 +30,7 @@
     ],
     "semanticIndex": "not-run"
   },
-  "sourceFingerprint": "4d23d4f417172cf026bc7f7bb2eb236e1fe0558d4bd88880dc4a476727b69d45",
+  "sourceFingerprint": "8ff6f075302e664a469c6c06c5b47bf201f6a1772244161e729a51722059a0bb",
   "sources": [
     {
       "path": "../manageesg-backend/AGENTS.md",
@@ -78,7 +78,7 @@
     },
     {
       "path": ".github/workflows/ci.yml",
-      "sha256": "6a387781efe7fe8338b4cc774ff447917a8b72ae5dd2d233ad9a8184605a8cb9"
+      "sha256": "026bd946d4b1517dd36b639f23fecb59ea868d2bffa97a5f89c0b9af53d62b2e"
     },
     {
       "path": ".github/workflows/harness.yml",
@@ -174,7 +174,7 @@
     },
     {
       "path": "integrations/ponytail/runtime.mjs",
-      "sha256": "09daceb04af70bfaea9f945117f847482f3307fb02a6d5cbc340a319687e0b09"
+      "sha256": "6a5bd817e1df5c680354d885e2de87e208d677153bf82cea9e78fcbebeda180e"
     },
     {
       "path": "integrations/pstack/cli.mjs",
@@ -294,11 +294,11 @@
     },
     {
       "path": "scripts/agent-system-map.js",
-      "sha256": "1b8f3f6021381afdebbfc0e8a5dfdb21455d5fb110f7d37b7e58d137d402651d"
+      "sha256": "2cf85b3d71b75e33b05d8a0abc36f0aa912c60c17aa75af95c856a7fc659813c"
     },
     {
       "path": "scripts/check-instruction-stack.js",
-      "sha256": "0df81c428f89f2c89522a1f5a2be8f268931a749e6c37fb0d5270758bc2b5410"
+      "sha256": "ada206605aceda6a4352cd120785096ae7fd97caf53df435a23865e1584e98f9"
     },
     {
       "path": "scripts/ci/detect-ci-scope.js",
@@ -306,7 +306,7 @@
     },
     {
       "path": "scripts/coding-execution-memory-check.js",
-      "sha256": "ea2e4d98d6a9a76b89b7aaf056066f49299fe420e7c99f775d3d5f109b9a0f12"
+      "sha256": "a68f3d628624049ec030bc86be9e01a79b7b61b073ab9edb0d52ba2f6bfc17db"
     },
     {
       "path": "scripts/coding-execution-run.js",
@@ -378,7 +378,7 @@
     },
     {
       "path": "scripts/lib/coding-execution-host.js",
-      "sha256": "ff95b54091aa6e162faf01fb71212e8f87870314470c59c606bd6f9dcccb37fc"
+      "sha256": "7fe930aef313655d2cc7b199efe2d24c3cb9dc33c352e6192abeef3ed4223f04"
     },
     {
       "path": "scripts/lib/coding-execution-runner.js",
@@ -418,7 +418,7 @@
     },
     {
       "path": "scripts/lib/session-coordination.js",
-      "sha256": "300d888d6e3f2e136c9395af58177b1e5346d064acd31230db2aba5c9d086140"
+      "sha256": "cfbcc9f68c7b6e6be199c7757c9d417e4dc9e9d6dbd7bdea1ea82fc4a577c747"
     },
     {
       "path": "scripts/lib/skill-routing.js",
@@ -522,7 +522,7 @@
     },
     {
       "path": "tests/ci/instruction-stack.test.js",
-      "sha256": "c7f34a863b1a4b39d14f3a0f6ccedc39ad511f1a76edc9664af2daae45fcd700"
+      "sha256": "724c5342fbc00837a9cfc6966dacf65bac3341f03629d438a63c07e69fdeedd9"
     },
     {
       "path": "tests/ci/workflow-cost-contract.test.js",
@@ -530,7 +530,7 @@
     },
     {
       "path": "tests/lib/coding-execution.test.js",
-      "sha256": "f82a91f9c2e657ae9b438d8e9777f6e3e2a62bc4bab944b94419b5440c84d05a"
+      "sha256": "1115b8ab5519e476207b0be41f393626b7d7c9db319bc153cf4bc1669e9ebbe2"
     },
     {
       "path": "tests/lib/fresh-session-guard.test.js",
@@ -570,7 +570,7 @@
     },
     {
       "path": "tests/lib/session-coordination.test.js",
-      "sha256": "94561457adfe971a9a8c7a4c7f6e0ddf69fd268aff9f695cb3137da124cd7c19"
+      "sha256": "8b741f520a4ae5deecd17d5309420179711589acdf43ad679209810f75d4694c"
     },
     {
       "path": "tests/lib/skill-routing.test.js",
@@ -688,7 +688,7 @@
       "id": "file:.github/workflows/ci.yml",
       "type": "source",
       "path": ".github/workflows/ci.yml",
-      "sha256": "6a387781efe7fe8338b4cc774ff447917a8b72ae5dd2d233ad9a8184605a8cb9"
+      "sha256": "026bd946d4b1517dd36b639f23fecb59ea868d2bffa97a5f89c0b9af53d62b2e"
     },
     {
       "id": "file:.github/workflows/harness.yml",
@@ -826,7 +826,7 @@
       "id": "file:integrations/ponytail/runtime.mjs",
       "type": "source",
       "path": "integrations/ponytail/runtime.mjs",
-      "sha256": "09daceb04af70bfaea9f945117f847482f3307fb02a6d5cbc340a319687e0b09"
+      "sha256": "6a5bd817e1df5c680354d885e2de87e208d677153bf82cea9e78fcbebeda180e"
     },
     {
       "id": "file:integrations/pstack/cli.mjs",
@@ -1012,13 +1012,13 @@
       "id": "file:scripts/agent-system-map.js",
       "type": "source",
       "path": "scripts/agent-system-map.js",
-      "sha256": "1b8f3f6021381afdebbfc0e8a5dfdb21455d5fb110f7d37b7e58d137d402651d"
+      "sha256": "2cf85b3d71b75e33b05d8a0abc36f0aa912c60c17aa75af95c856a7fc659813c"
     },
     {
       "id": "file:scripts/check-instruction-stack.js",
       "type": "source",
       "path": "scripts/check-instruction-stack.js",
-      "sha256": "0df81c428f89f2c89522a1f5a2be8f268931a749e6c37fb0d5270758bc2b5410"
+      "sha256": "ada206605aceda6a4352cd120785096ae7fd97caf53df435a23865e1584e98f9"
     },
     {
       "id": "file:scripts/ci/detect-ci-scope.js",
@@ -1030,7 +1030,7 @@
       "id": "file:scripts/coding-execution-memory-check.js",
       "type": "source",
       "path": "scripts/coding-execution-memory-check.js",
-      "sha256": "ea2e4d98d6a9a76b89b7aaf056066f49299fe420e7c99f775d3d5f109b9a0f12"
+      "sha256": "a68f3d628624049ec030bc86be9e01a79b7b61b073ab9edb0d52ba2f6bfc17db"
     },
     {
       "id": "file:scripts/coding-execution-run.js",
@@ -1138,7 +1138,7 @@
       "id": "file:scripts/lib/coding-execution-host.js",
       "type": "source",
       "path": "scripts/lib/coding-execution-host.js",
-      "sha256": "ff95b54091aa6e162faf01fb71212e8f87870314470c59c606bd6f9dcccb37fc"
+      "sha256": "7fe930aef313655d2cc7b199efe2d24c3cb9dc33c352e6192abeef3ed4223f04"
     },
     {
       "id": "file:scripts/lib/coding-execution-runner.js",
@@ -1198,7 +1198,7 @@
       "id": "file:scripts/lib/session-coordination.js",
       "type": "source",
       "path": "scripts/lib/session-coordination.js",
-      "sha256": "300d888d6e3f2e136c9395af58177b1e5346d064acd31230db2aba5c9d086140"
+      "sha256": "cfbcc9f68c7b6e6be199c7757c9d417e4dc9e9d6dbd7bdea1ea82fc4a577c747"
     },
     {
       "id": "file:scripts/lib/skill-routing.js",
@@ -1354,7 +1354,7 @@
       "id": "file:tests/ci/instruction-stack.test.js",
       "type": "source",
       "path": "tests/ci/instruction-stack.test.js",
-      "sha256": "c7f34a863b1a4b39d14f3a0f6ccedc39ad511f1a76edc9664af2daae45fcd700"
+      "sha256": "724c5342fbc00837a9cfc6966dacf65bac3341f03629d438a63c07e69fdeedd9"
     },
     {
       "id": "file:tests/ci/workflow-cost-contract.test.js",
@@ -1366,7 +1366,7 @@
       "id": "file:tests/lib/coding-execution.test.js",
       "type": "source",
       "path": "tests/lib/coding-execution.test.js",
-      "sha256": "f82a91f9c2e657ae9b438d8e9777f6e3e2a62bc4bab944b94419b5440c84d05a"
+      "sha256": "1115b8ab5519e476207b0be41f393626b7d7c9db319bc153cf4bc1669e9ebbe2"
     },
     {
       "id": "file:tests/lib/fresh-session-guard.test.js",
@@ -1426,7 +1426,7 @@
       "id": "file:tests/lib/session-coordination.test.js",
       "type": "source",
       "path": "tests/lib/session-coordination.test.js",
-      "sha256": "94561457adfe971a9a8c7a4c7f6e0ddf69fd268aff9f695cb3137da124cd7c19"
+      "sha256": "8b741f520a4ae5deecd17d5309420179711589acdf43ad679209810f75d4694c"
     },
     {
       "id": "file:tests/lib/skill-routing.test.js",
@@ -4132,6 +4132,12 @@
     },
     {
       "from": "file:tests/ci/instruction-stack.test.js",
+      "to": "file:../manageesg-backend/AGENTS.md",
+      "type": "mentions-path",
+      "evidence": "tests/ci/instruction-stack.test.js"
+    },
+    {
+      "from": "file:tests/ci/instruction-stack.test.js",
       "to": "file:.agents/rules/seabridge-agent-baseline.md",
       "type": "mentions-path",
       "evidence": "tests/ci/instruction-stack.test.js"
@@ -4972,14 +4978,14 @@
     }
   ],
   "build": {
-    "generatedAt": "2026-10-14T22:31:23-04:00",
-    "sourceCommit": "d7b88db6447d37395ba44557373fddce9a678cf6",
+    "generatedAt": "2026-10-14T23:16:27-04:00",
+    "sourceCommit": "1d20afe698e862a63e1a168fdb79d217db0e4c13",
     "sourceDirty": false,
     "policyCommit": "2955ce656598ede6c2f01d14d25eb1b102c8d3dc",
     "policyDirty": false,
     "verificationOnly": true,
     "provenanceMode": "exact-git-object-export",
-    "sourceTree": "c5e09a8a44e164024c478197dfc199c3a4c26482",
+    "sourceTree": "286ba6bc05014386636a7be66138dcf7a0cc14ab",
     "policyTree": "cbfa70bf1d8f6410bf17d10405308cd8cff9649e"
   }
 }

@@ -20,6 +20,7 @@ export async function sourceIntegrity() {
 }
 function relative(value) {
   if (value === '.') return value;
+  // eslint-disable-next-line no-control-regex -- Reject C0 control bytes in repository-relative paths.
   if (typeof value !== 'string' || !value || path.isAbsolute(value) || /[\\:\x00-\x1f]/.test(value) || value.split('/').some(p => !p || p === '.' || p === '..' || /[. ]$/.test(p) || /^(con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\.|$)/i.test(p))) throw Error('Bounded repository-relative paths required');
   return value;
 }

@@ -2,7 +2,7 @@ import os from 'node:os';
 import path from 'node:path';
 import fs from 'node:fs/promises';
 import { spawn } from 'node:child_process';
-import { ROOT, contextEntry, reviewEntry, status, findWorkflow, readEntry, prepareReview } from './runtime.mjs';
+import { contextEntry, reviewEntry, status, findWorkflow, readEntry, prepareReview } from './runtime.mjs';
 const [command, ...args] = process.argv.slice(2);
 try {
   if (command === 'mcp') await (await import('./mcp.mjs')).startMcp();
