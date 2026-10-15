@@ -4828,14 +4828,14 @@
     }
   ],
   "build": {
-    "generatedAt": "2026-10-15T00:27:53-04:00",
-    "sourceCommit": "e63a3a01c3587ace74af72685433d6906975cea5",
+    "generatedAt": "2026-10-15T01:21:12-04:00",
+    "sourceCommit": "3f87a7e2f6d7cc08132ab07e16a40bca1e7fe44e",
     "sourceDirty": false,
-    "policyCommit": "97c5b6f0223e29f4dab8484c73ca5047f61f93a8",
+    "policyCommit": "b1cc9a3237d229c8337372366a66a54dc2b9dd71",
     "policyDirty": false,
     "verificationOnly": true,
     "provenanceMode": "exact-git-object-export",
-    "sourceTree": "52ebd563092732ba223713bfeacc3a9693e68f52",
-    "policyTree": "c982e5284b36451d01c32eee4c09c796a46bb15c"
+    "sourceTree": "79bc9a7ff77dd75759d431baa72a60b1a399ba12",
+    "policyTree": "2c302626cdba53202ac01a3f79731e254dc056b4"
   }
 }
