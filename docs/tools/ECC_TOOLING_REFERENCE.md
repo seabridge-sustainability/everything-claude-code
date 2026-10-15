@@ -40,9 +40,13 @@ defaults). Source: https://github.com/JuliusBrussee/caveman.
   prompts or code). `caveman telemetry off` or `DO_NOT_TRACK=1` disables it.
   Auto routing sends recent asks plus attached context to Caveman Cloud; stop
   with `caveman off routing`.
-- Evidence: the input module compresses tool output. When exact values,
-  citations or native units matter, re-read the source file or turn input off
-  for that session; compressed output is not evidence.
+- Evidence: the input module compresses every tool result through the proxy,
+  including a re-read of the same file, and marks each cut with
+  `<<ccr:HANDLE>>`. Compressed output is not evidence. Before quoting or
+  computing exact values, citations, IDs or native units from marked output,
+  recover the byte-exact original with the `caveman_retrieve` MCP tool (no
+  query) or `caveman tools retrieve <HANDLE>`. Compression cannot be excluded
+  per file or repo; `caveman off input` disables it for every agent.
 - Skills: `/caveman`, `/ultracave`, `/megacave`, `/caveman-commit`,
   `/caveman-review`, `/caveman-compress`. Say `stop caveman` for normal prose.
 - Local reference copy: `references/caveman/` (pre-4.0; may lag upstream).

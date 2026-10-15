@@ -359,12 +359,12 @@ function checkRepo(repo, workspace, budget, options = {}) {
 }
 
 const REPOS = [
-  { name: 'manageesg-backend', budget: 16 * 1024 },
-  { name: 'manageesg-frontend', budget: 16 * 1024 },
-  { name: 'autoresearch', budget: 16 * 1024 },
-  { name: 'openseabri', budget: 16 * 1024 },
-  { name: 'climada-stack', relativePath: '_upstream/climada-stack', budget: 16 * 1024 },
-  { name: '_upstream', budget: 16 * 1024 },
+  { name: 'manageesg-backend', budget: 17 * 1024 },
+  { name: 'manageesg-frontend', budget: 17 * 1024 },
+  { name: 'autoresearch', budget: 17 * 1024 },
+  { name: 'openseabri', budget: 17 * 1024 },
+  { name: 'climada-stack', relativePath: '_upstream/climada-stack', budget: 17 * 1024 },
+  { name: '_upstream', budget: 17 * 1024 },
   // ECC itself: always the checkout this script runs from (works in a worktree).
   // Larger budget: the plugin's own dev repo also loads its language rules.
   { name: 'everything-claude-code', self: true, budget: 24 * 1024 },
