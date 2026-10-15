@@ -40,14 +40,15 @@ function collectFacts({ repositories = REPOSITORIES, status = cwd => coord.execu
       }
       for (const entry of state.sessions) {
         if (!entry || typeof entry.state !== 'string' || typeof entry.id !== 'string'
-            || typeof entry.worktree !== 'string' || !Number.isFinite(entry.expiresAt)) {
+            || typeof entry.worktree !== 'string' || !Number.isFinite(entry.expiresAt)
+            || (entry.metadataOnly !== undefined && typeof entry.metadataOnly !== 'boolean')) {
           throw new Error('invalid ECC owner record');
         }
       }
       if (state.release !== null && (!state.release || typeof state.release.owner !== 'string'
           || !Number.isFinite(state.release.expiresAt))) throw new Error('invalid ECC release record');
       facts.repositories.push({ id: repository.id, root: repository.root, known: true,
-        activePrimaryOwners: state.sessions.filter(entry => entry.state === 'active'
+        activePrimaryOwners: state.sessions.filter(entry => entry.state === 'active' && !entry.metadataOnly
           && entry.expiresAt > state.now && normal(entry.worktree) === normal(repository.root)).map(entry => entry.id),
         releaseOwner: state.release?.owner ?? null,
         releaseNeedsReconciliation: state.release !== null && state.release.expiresAt <= state.now,

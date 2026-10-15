@@ -25,6 +25,7 @@ test('status failure is not an empty ownership list', () => {
 test('effective primary owners exclude historical and other-checkout records', () => {
   const sessions = [
     { id: 'active', state: 'active', worktree: root.toUpperCase() + '/', expiresAt: now + 1000 },
+    { id: 'goal-only', state: 'active', worktree: root, expiresAt: now + 1000, metadataOnly: true },
     { id: 'expired', state: 'active', worktree: root, expiresAt: now - 1 },
     { id: 'closed', state: 'closed', worktree: root, expiresAt: now + 1000 },
     { id: 'other', state: 'active', worktree: 'E:/approved-legacy-release', expiresAt: now + 1000 },

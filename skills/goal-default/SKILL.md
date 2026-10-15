@@ -51,9 +51,10 @@ is not interception proof, and this guard does not activate direct IDE starts.
   never interpret this skill as blanket approval.
 - Delegate independent required outputs with disjoint ownership, bounded costs,
   closure reserve and available configured models; reuse completed workers.
-  Use primary checkouts. Release worktrees under SeaBridgeAI/.worktrees have standing
-  approval (AGENTS_SYSTEM rule 3: land on the normal branch, then remove); new
-  branches and other worktrees require explicit owner approval.
+  Use the primary normally. Central rule 3 covers bounded detached release/
+  integration worktrees under SeaBridgeAI/.worktrees; reuse one clean owned slot
+  per repo, not one per worker, and retire after normal-branch publication.
+  Other locations, new branches and paused foreign work stay gated.
   More agents are not automatically faster or cheaper. Only root integrates/releases.
 - At product checkpoints or suspected drift, use a bounded read-only evaluator;
   retain deterministic ownership/outcome gates. Reject activity-only progress,
@@ -121,7 +122,10 @@ is not interception proof, and this guard does not activate direct IDE starts.
 - For an owner-authorized SeaBridge local backend launch without bootstrap-write
   or provider grants, use `scripts/dev/run_backend.ps1 -ReadOnlyStartup` after
   verifying the integrated mode. Reuse healthy servers; a restart still needs its
-  coordinated authorization. Never fall back to normal seeding/provider startup
+  coordinated authorization, which may cover a task-bounded activation sequence
+  rather than each command. Reuse applicable grants; unknown controller, unsafe
+  headroom, active acceptance or changed data/provider risk gates activation only.
+  Never fall back to normal seeding/provider startup
   to clear a readiness blocker. This mode protects startup only: it grants no
   API write/provider permission and is not proof that the live mode is active.
 
@@ -140,13 +144,30 @@ per-goal capacity accounting alone does not prove machine-wide headroom. Seriali
 heavy acceptance while constrained. Reuse verified3000/8000 and coordinate any
 authorized restart. Unknown resources, ownership or spending are not permission.
 
-Hold source slots only for bounded ready changes, then close/handoff legitimately.
+Read-only inspection/research and shared-service reuse need no exclusive source/
+backend slot. Hold source slots only for bounded ready changes, then close/handoff
+legitimately. Release waits do not pause another goal or independent local work.
+Ignored task goal records auto-register metadata-only; a legacy goal-only owner
+can run `ecc session metadata-only --session ID` itself. This cannot commit/release
+or waive overlapping-path checks; never convert another session. Local fetch/rebase
+of a clean owned integration checkout need not wait for another owner's CI.
+Bundle necessary contract-preserving CI compatibility repairs before publication;
+keep local logical commits, not a remote push for every small step.
 Do not release a live CI/deploy lease merely to shorten another agent's queue.
+After an authorized backend push, the publishing owner can use
+`ecc session release-watch --session ID --repository OWNER/REPO --branch NAME
+--candidate FULL_SHA --expected-workflows security-scan,backend-tests
+--close-session yes` (docs-only: expected `security-scan` only). It is finite,
+uses existing gh authentication and the same lease, and verifies exact run/attempt
+and deployment-step evidence before owner-only release-end then close. Unknown
+workflows, missing proof or uncertain cloud cessation retain the lease; inspect
+that concrete dependency, not a peer's entire goal. No daemon/schedule, rerun,
+restart, new authorization or automatic adoption by existing vendor sessions.
 Lease expiry is not proof a process stopped. Root consolidates ready owned changes
 and checks normal release/budget/remote/CI gates; no worker pushes or CI-to-test.
 Review queue aging and cycles hourly or at a missed checkpoint. Reorder ready
-tasks/request exact owner handoff; never auto-takeover, kill agents, bypass hooks,
-spawn workaround worktrees/servers, or spend repeated turns polling unchanged state.
+tasks without stopping another owner's goal; never auto-takeover, kill agents,
+bypass hooks, create unapproved worktrees/servers or poll unchanged state repeatedly.
 Queue library claims require reviewed parent capabilities and atomic rechecks;
 the status command launches nothing and does not automatically resume IDE chats.
 Use supported continuation after dependency resolution; do not claim all vendor

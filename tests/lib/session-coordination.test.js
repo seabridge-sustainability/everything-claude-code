@@ -353,6 +353,70 @@ test('same checkout cannot be shared by two live owners even with disjoint paths
   assert.throws(() => register(root, 'two', ['app/two']), /worktree already owned/);
 });
 
+test('ignored goal metadata shares a source checkout without touching its staged index', () => {
+  const { root } = fixture(false);
+  fs.writeFileSync(path.join(root, '.gitignore'), '.ecc/\n');
+  git(root, 'add', '.gitignore');
+  git(root, '-c', 'core.hooksPath=', 'commit', '-m', 'ignore local goal records');
+  register(root, 'writer', ['README.md']);
+  fs.writeFileSync(path.join(root, 'README.md'), 'source writer draft\n');
+  git(root, 'add', 'README.md');
+  const staged = git(root, 'diff', '--cached', '--binary');
+  const meta = register(root, 'goal-meta', ['.ecc/goal/task-a']);
+  assert.equal(meta.metadataOnly, true);
+  register(root, 'second-goal', ['.ecc/goal/task-b']);
+  assert.equal(execute('check-write', { cwd: root, sessionId: 'goal-meta', paths: ['.ecc/goal/task-a/resume-receipt.yaml'] }).allowed, true);
+  assert.throws(() => execute('check-write', { cwd: root, sessionId: 'goal-meta', paths: ['README.md'] }), /outside owned/);
+  assert.throws(() => register(root, 'overlap-goal', ['.ecc/goal/task-a/nested']), /overlaps session/);
+  for (const command of ['check-changes', 'release-acquire', 'guard-bind', 'assignment-bind']) {
+    assert.throws(() => execute(command, { cwd: root, sessionId: 'goal-meta' }), /metadata-only sessions cannot/);
+  }
+  execute('renew', { cwd: root, sessionId: 'goal-meta', ttl: 30 });
+  execute('close', { cwd: root, sessionId: 'goal-meta' });
+  assert.equal(git(root, 'diff', '--cached', '--binary'), staged);
+  assert.equal(checkSession({ cwd: root, sessionId: 'writer' }).id, 'writer');
+});
+
+test('legacy ignored goal owners no longer block source writers, with tracked/non-goal scopes still exclusive', () => {
+  const { root } = fixture(false);
+  fs.writeFileSync(path.join(root, '.gitignore'), '.ecc/\n');
+  git(root, 'add', '.gitignore');
+  git(root, '-c', 'core.hooksPath=', 'commit', '-m', 'ignore local goal records');
+  const goal = '.ecc/workspace-recovery/old/private/.ecc/goal-997a';
+  register(root, 'legacy-goal', [goal]);
+  // Simulate a v1 registry created before automatic metadata classification.
+  const registry = path.join(repository(root).directory, 'registry.json');
+  const state = JSON.parse(fs.readFileSync(registry, 'utf8'));
+  delete state.sessions[0].metadataOnly;
+  fs.writeFileSync(registry, JSON.stringify(state));
+  const before = fs.readFileSync(registry, 'utf8');
+  assert.equal(checkSession({ cwd: root, sessionId: 'legacy-goal' }).metadataOnly, true);
+  assert.equal(execute('status', { cwd: root }).sessions.find(item => item.id === 'legacy-goal').metadataOnly, true);
+  assert.equal(fs.readFileSync(registry, 'utf8'), before, 'effective classification never takes over a foreign record');
+  register(root, 'source', ['README.md']);
+  assert.throws(() => execute('check-changes', { cwd: root, sessionId: 'legacy-goal' }), /metadata-only/);
+  assert.throws(() => register(root, 'another-source', ['app/unrelated']), /worktree already owned/);
+  execute('metadata-only', { cwd: root, sessionId: 'legacy-goal' });
+  assert.equal(execute('check-write', { cwd: root, sessionId: 'source', paths: ['README.md'] }).allowed, true);
+});
+
+test('tracked goal-looking files and non-goal ignored files cannot gain metadata privileges', () => {
+  const { root, other } = fixture();
+  fs.mkdirSync(path.join(root, '.ecc/goal'), { recursive: true });
+  fs.writeFileSync(path.join(root, '.ecc/goal/tracked.yaml'), 'tracked fixture\n');
+  git(root, 'add', '.ecc/goal/tracked.yaml');
+  git(root, '-c', 'core.hooksPath=', 'commit', '-m', 'tracked goal-looking source');
+  const record = register(root, 'tracked', ['.ecc/goal/tracked.yaml']);
+  assert.equal(record.metadataOnly, undefined);
+  assert.throws(() => execute('metadata-only', { cwd: root, sessionId: 'tracked' }), /requires ignored/);
+  assert.throws(() => register(root, 'second', ['README.md']), /worktree already owned/);
+  execute('close', { cwd: root, sessionId: 'tracked' });
+  const plain = register(root, 'plain', ['.ecc/other-state']);
+  assert.equal(plain.metadataOnly, undefined);
+  assert.throws(() => execute('metadata-only', { cwd: root, sessionId: 'plain' }), /requires ignored/);
+  assert.throws(() => register(other, 'same-goal', ['.ecc/other-state']), /overlaps session/);
+});
+
 test('links added after reservation cannot redirect an owned edit outside the worktree', () => {
   const { root, other } = fixture();
   register(root, 'one', ['linked']);

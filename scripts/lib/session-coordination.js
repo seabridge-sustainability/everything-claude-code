@@ -42,6 +42,25 @@ function safePath(repo, relative) {
   return clean;
 }
 function overlaps(a, b) { return a === b || a.startsWith(`${b}/`) || b.startsWith(`${a}/`); }
+// Ignored, task-specific goal records never own a checkout's Git integration slot.
+// They retain normal path-overlap protection and cannot commit or publish.
+function goalMetadataScopes(repo, scopes) {
+  const goalPath = /^\.ecc\/(?:goal(?:\/|$)|workspace-recovery\/.+\/private\/\.ecc\/goal-[^/]+(?:\/|$))/;
+  if (!scopes.length || !scopes.every(item => goalPath.test(item))) return false;
+  for (const relative of scopes) {
+    safePath(repo, relative);
+    if (git(repo.root, ['ls-files', '--', relative])) return false;
+    try { git(repo.root, ['check-ignore', '-q', '--', relative]); }
+    catch { return false; }
+  }
+  return true;
+}
+function metadataSession(repo, session, state) {
+  if (session.guard || session.loop || state.release?.owner === session.id) return false;
+  const eligible = goalMetadataScopes(repo, session.scopes);
+  if (session.metadataOnly && !eligible) throw new Error('invalid goal metadata scope');
+  return eligible;
+}
 function checkDigest(repo, relative) {
   const clean = safePath(repo, relative);
   const full = path.join(repo.root, clean);
@@ -143,7 +162,9 @@ function read(repo) {
     id(s.id);
     if (ids.has(s.id) || !Number.isFinite(s.expiresAt) || !Number.isFinite(s.updatedAt)
         || !['active', 'closed'].includes(s.state) || typeof s.worktree !== 'string'
-        || !Array.isArray(s.scopes) || !s.scopes.length || !/^[a-f0-9]{40,64}$/.test(s.base)) throw new Error('invalid session record');
+        || !Array.isArray(s.scopes) || !s.scopes.length || !/^[a-f0-9]{40,64}$/.test(s.base)
+        || (s.metadataOnly !== undefined && typeof s.metadataOnly !== 'boolean')
+        || (s.metadataOnly && (s.guard || s.loop || state.release?.owner === s.id))) throw new Error('invalid session record');
     ids.add(s.id);
     s.scopes.forEach(scope);
   }
@@ -174,11 +195,12 @@ function current(state, repo, sessionId, now) {
   if (s.worktree !== repo.root) throw new Error('session belongs to another worktree');
   return s;
 }
-function conflicts(state, repo, scopes, sessionId, now) {
+function conflicts(state, repo, scopes, sessionId, now, metadataOnly = false) {
   for (const other of state.sessions) {
     if (other.id === sessionId || other.state !== 'active'
         || (other.expiresAt <= now && state.release?.owner !== other.id)) continue;
-    if (other.worktree === repo.root) throw new Error(`worktree already owned by ${other.id}; serialize or explicitly hand off this checkout; do not automatically create another worktree`);
+    const otherMetadata = other.worktree === repo.root ? metadataSession(repo, other, state) : other.metadataOnly;
+    if (other.worktree === repo.root && !metadataOnly && !otherMetadata) throw new Error(`worktree already owned by ${other.id}; serialize or explicitly hand off this checkout; do not automatically create another worktree`);
     if (scopes.some(a => other.scopes.some(b => overlaps(a, b)))) throw new Error(`write scope overlaps session ${other.id}; no automatic takeover`);
   }
 }
@@ -186,10 +208,11 @@ function checkSession({ cwd, sessionId, now = Date.now() }) {
   const repo = repository(cwd);
   const state = read(repo);
   const session = current(state, repo, sessionId, now);
-  conflicts(state, repo, session.scopes, session.id, now);
+  const metadataOnly = metadataSession(repo, session, state);
+  conflicts(state, repo, session.scopes, session.id, now, metadataOnly);
   verifyLoop(repo, session);
   if (session.guard) verifyGuard(repo, session, session.guard.mode, now);
-  return session;
+  return metadataOnly ? { ...session, metadataOnly: true } : session;
 }
 function changedPaths(repo, base, upstream) {
   if (upstream) {
@@ -776,7 +799,7 @@ function guardEvent(repo, state, options, now) {
   let session, action, reason = null;
   try {
     session = current(state, repo, options.sessionId, now);
-    conflicts(state, repo, session.scopes, session.id, now);
+    conflicts(state, repo, session.scopes, session.id, now, session.metadataOnly);
     const guard = verifyGuard(repo, session, mode, now);
     const nativeId = options.payload?.session_id || options.payload?.conversation_id;
     if (nativeId !== guard.nativeSessionId) throw new Error('native session identity mismatch');
@@ -848,8 +871,15 @@ function ownedPaths(repo, session, paths) {
 function execute(command, options = {}) {
   const repo = repository(options.cwd);
   const now = options.now === undefined ? Date.now() : options.now;
-  if (command === 'status') return { ...read(repo), commonDirectory: repo.common, now,
-    limitation: 'same Git clone and cooperating wrappers only; no permission grant or proof of CI/deployment' };
+  if (command === 'status') {
+    const state = read(repo);
+    // Derive legacy goal-only mode without rewriting another owner's record.
+    const sessions = state.sessions.map(session => session.state === 'active'
+      && session.worktree === repo.root && metadataSession(repo, session, state)
+      ? { ...session, metadataOnly: true } : session);
+    return { ...state, sessions, commonDirectory: repo.common, now,
+      limitation: 'same Git clone and cooperating wrappers only; no permission grant or proof of CI/deployment' };
+  }
   const sessionId = id(options.sessionId);
   return transaction(repo, state => {
     if (command === 'guard-event') return guardEvent(repo, state, options, now);
@@ -857,26 +887,41 @@ function execute(command, options = {}) {
       if (state.sessions.some(s => s.id === sessionId)) throw new Error('session ID already exists; renew or use a new ID');
       const scopes = (options.scopes || []).map(item => safePath(repo, item));
       if (!scopes.length) throw new Error('at least one --scope required');
-      conflicts(state, repo, scopes, sessionId, now);
+      const metadataOnly = goalMetadataScopes(repo, scopes);
+      if (metadataOnly && (options.loopTarget || options.checkFiles?.length)) throw new Error('metadata-only cannot own an execution loop');
+      conflicts(state, repo, scopes, sessionId, now, metadataOnly);
       const session = { id: sessionId, state: 'active', worktree: repo.root, scopes,
         objective: requireText(options.objective, 'objective'), doneWhen: requireText(options.doneWhen, 'done-when'),
-        base: git(repo.root, ['rev-parse', 'HEAD']), registeredAt:now, updatedAt: now, expiresAt: expiry(options.ttl, now) };
+        base: git(repo.root, ['rev-parse', 'HEAD']), registeredAt:now, updatedAt: now, expiresAt: expiry(options.ttl, now),
+        ...(metadataOnly ? { metadataOnly: true } : {}) };
       const loop = pinLoop(repo, options, scopes);
       if (loop) session.loop = loop;
-      else session.preservedForeign = captureForeign(repo, session);
+      else if (!metadataOnly) session.preservedForeign = captureForeign(repo, session);
       state.sessions.push(session);
       return session;
     }
     if (command === 'renew') {
       const session = state.sessions.find(s => s.id === sessionId);
       if (!session || session.state !== 'active' || session.worktree !== repo.root) throw new Error('cannot renew another/closed session');
-      conflicts(state, repo, session.scopes, sessionId, now);
+      conflicts(state, repo, session.scopes, sessionId, now, metadataSession(repo, session, state));
       session.expiresAt = expiry(options.ttl, now);
       session.updatedAt = now;
       return session;
     }
     const session = current(state, repo, sessionId, now);
-    conflicts(state, repo, session.scopes, sessionId, now);
+    if (command === 'metadata-only') {
+      if (state.release?.owner === sessionId || session.guard || session.loop) throw new Error('release or guarded execution cannot convert to metadata-only');
+      if (!goalMetadataScopes(repo, session.scopes)) throw new Error('metadata-only requires ignored task goal scopes');
+      session.metadataOnly = true;
+      delete session.preservedForeign;
+      session.updatedAt = now;
+      return { ...session, foreignOwnershipGranted: false, gitOperationsAllowed: false };
+    }
+    const metadataOnly = metadataSession(repo, session, state);
+    if (metadataOnly) {
+      if (!['check-write', 'close'].includes(command)) throw new Error('metadata-only sessions cannot commit, guard, integrate or release; register a source writer');
+    }
+    conflicts(state, repo, session.scopes, sessionId, now, metadataOnly);
     if (command !== 'close' && command !== 'release-end') verifyLoop(repo, session);
     if (command === 'assignment-bind') return pinManagedAssignment(repo,state,session,options,now);
     if (command === 'guard-bind') return bindGuard(repo, session, options, now, state);
@@ -944,6 +989,10 @@ function execute(command, options = {}) {
     const release = state.release;
     if (!release || release.owner !== sessionId) throw new Error('session does not own the release');
     if (command === 'release-end') {
+      if ((options.branch !== undefined && options.branch !== release.branch)
+          || (options.candidate !== undefined && options.candidate !== release.candidate)
+          || (options.expectedReleaseSha256 !== undefined && options.expectedReleaseSha256 !== crypto.createHash('sha256')
+            .update(JSON.stringify(release)).digest('hex'))) throw new Error('release-end receipt/branch/candidate changed');
       if (!['completed', 'failed', 'superseded', 'aborted-before-push'].includes(options.outcome)) throw new Error('terminal --outcome required');
       state.releases.push({ ...release, outcome: options.outcome, evidence: requireText(options.evidence, 'terminal evidence'), endedAt: now });
       state.release = null;

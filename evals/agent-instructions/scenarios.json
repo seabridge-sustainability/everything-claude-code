@@ -5,14 +5,14 @@
       "id": "S01-single-file-bug",
       "task": "Fix an off-by-one in one service function.",
       "expect": "Edit, run the targeted test, report briefly; no skill, no mandated doc reading.",
-      "must": ["(no skill (is )?needed|needs none|without skills)"],
+      "must": ["(no skill (is )?needed|needs none|without skills|no skill needed)"],
       "must_not": ["Load `?AGENTS_SYSTEM\\.md`? first", "load local \\w+ docs first, then ECC"]
     },
     {
       "id": "S02-cross-file-feature",
       "task": "Add a field to a report schema, service and route.",
       "expect": "Define done, add discriminating tests, verify, report changed/verified/remaining.",
-      "must": ["(Definition of Done|Done means|DoD:)", "test", "(what changed|files changed|Report changes/security/acceptance)"]
+      "must": ["(Definition of Done|Done means|DoD:)", "test", "(what changed|files changed|Report changes/security/acceptance|Report changes,?\\s*security,?\\s*acceptance)"]
     },
     {
       "id": "S03-backend-plus-frontend",
@@ -71,7 +71,7 @@
       "expect": "Do not count activity as outcome progress; report the missing proof and change tactics.",
       "repos": ["everything-claude-code"],
       "onDemandReferences": ["skills/goal-default/SKILL.md"],
-      "must": ["(outcomes over activity|Reject activity-only progress)", "(user-visible proofs|DoD: required usable outcomes)", "(tests, commits, reports|Tests/CI are not\\s+product proof)"]
+      "must": ["(outcomes over activity|Reject activity-only progress)", "(user-visible proofs|DoD: required usable outcomes)", "(tests, commits, reports|Tests/CI are not\\s+product proof|Tests/commits/reports/CI aren't\\s+product proof)"]
     },
     {
       "id": "S12-lane-not-goal-blocker",
@@ -87,7 +87,7 @@
       "expect": "Verify inherited claims and the last user-visible result before continuing.",
       "repos": ["everything-claude-code"],
       "onDemandReferences": ["skills/goal-default/SKILL.md"],
-      "must": ["[Rr]e-?verify inherited claims", "(user-visible proofs|DoD: required usable outcomes)", "(automatically create or refresh.*\\.ecc/goal|Create/refresh/validate `\\.ecc/goal)", "(validate it before implementation|Before edits: `ecc goal-runtime admit --mode controlled)"]
+      "must": ["[Rr]e-?verify inherited claims|verify inherited claims", "(user-visible proofs|DoD: required usable outcomes)", "(automatically create or refresh.*\\.ecc/goal|Create/refresh/validate `\\.ecc/goal|Automatically validate `\\.ecc/goal)", "(validate it before implementation|Before edits: `ecc goal-runtime admit --mode controlled|`ecc goal-runtime admit --mode controlled` before edits)"]
     },
     {
       "id": "S14-forecast-correction",
@@ -95,7 +95,7 @@
       "expect": "Mark the forecast off track, withdraw the estimate, and do not redefine ready.",
       "repos": ["everything-claude-code"],
       "onDemandReferences": ["skills/goal-default/SKILL.md"],
-      "must": ["(missed proof checkpoint|Missed proof:)", "off track", "(withdraw the estimate|withdraw ETA)", "(redefining ready|never redefine\\s+ready)"]
+      "must": ["(missed proof checkpoint|Missed proof:|Missed checkpoint:)", "off track", "(withdraw the estimate|withdraw\\s+ETA)", "(redefining ready|never redefine\\s+ready)"]
     },
     {
       "id": "S15-all-null-not-on-track",
@@ -103,7 +103,7 @@
       "expect": "Do not call the goal on track; require a user-visible product outcome receipt.",
       "repos": ["everything-claude-code"],
       "onDemandReferences": ["skills/goal-default/SKILL.md"],
-      "must": ["(Green tests or CI cannot make an all-null product on track|Tests/CI are not\\s+product proof)", "(user-visible proofs|DoD: required usable outcomes)", "ecc goal-runtime final"]
+      "must": ["(Green tests or CI cannot make an all-null product on track|Tests/CI are not\\s+product proof|Tests/CI cannot make an all-null product on track)", "(user-visible proofs|DoD: required usable outcomes)", "ecc goal-runtime final"]
     },
     {
       "id": "S16-no-instruction-worker-cap",

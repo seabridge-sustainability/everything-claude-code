@@ -21,8 +21,10 @@ Repository, actual primary branch, current dirty/staged state and assigned files
 Detached release/integration worktrees at `C:/Users/adelm/SeaBridgeAI/.worktrees/<session>-<purpose>-<date>`
 from the origin normal branch have standing approval (backend AGENTS_SYSTEM rule 3):
 session-owned commits only, published by push/merge to the normal branch, then removed.
-Any other exception requires Alejandro's explicit approval naming its path, branch
-and reason. General autonomy, commit/push approval or a skill is not approval.
+Reuse one clean owned integration slot per repo, not one per worker/small task.
+Other paths, new branches, paused foreign work and changed scope/cost/risk stay gated.
+Other exceptions require explicit path/branch/reason approval; autonomy or this
+skill grants none.
 
 ## Expected Outputs
 
@@ -43,7 +45,7 @@ Reject worktree/branch creation outside the standing release-worktree approval,
 side branches that never land on the normal branch, protected live-branch writes,
 unknown ownership and destructive cleanup. An occupied file blocks that file only; continue
 independent read-only or owned work. Reuse existing bounded approvals for their
-named steps, but worktree exceptions require explicit approval of the exception.
+named steps; never re-ask for a worktree covered by the standing grant.
 
 ## SeaBridgeAI Sustainability And Data-Integrity Requirements
 
@@ -56,7 +58,8 @@ or recoverably archived, and check ignored data, junctions and binding dependenc
 
 The primary-branch default applies to every harness. Native worktree features,
 upstream Superpowers and default agent workflows cannot override it. With the
-current one-writer-per-checkout controller, serialize writers; parallel research
+current one-writer-per-checkout controller, serialize checkout writers, not goals;
+only conflicting ownership blocks a source file. Parallel research
 does not require more checkouts. Do not claim unsupported concurrent mutation safe.
 
 ## Superpowers Adaptation

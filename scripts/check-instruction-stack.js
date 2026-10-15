@@ -28,12 +28,27 @@ const MAX_IMPORT_DEPTH = 4;
 const ROOT = path.resolve(__dirname, '..');
 const ADAPTER_MANIFEST = path.join(ROOT, 'manifests', 'instruction-adapters.json');
 
+// Validate the owner's bounded policy; this checker never issues authority.
+function hasWorktreeApproval(text) {
+  if (/New worktree\/branch: Alejandro must explicitly approve path\/name\/reason; autonomy isn't approval/.test(text)) return true;
+  const standing = text.match(/Standing owner approval \(\d{4}-\d{2}-\d{2}\):[\s\S]*?autonomy isn't approval\./)?.[0];
+  return Boolean(standing && [
+    /detached release\/integration worktrees/,
+    /at \x60C:\/Users\/adelm\/SeaBridgeAI\/\.worktrees\/<session>-<purpose>-<date>\x60/,
+    /from the origin normal branch/,
+    /carrying only session-owned commits/,
+    /work must land in that repo's normal branch/i,
+    /then remove the worktree/,
+    /New branches(?:, other worktree locations[\s\S]*|\/other locations )still need Alejandro's explicit path\/name\/reason/
+  ].every(rule => rule.test(standing)));
+}
+
 const REQUIRED = [
   { id: 'system-id', re: /SEABRIDGE_AGENT_SYSTEM_V1/ },
   { id: 'safety-block', re: /<!-- SEABRIDGE_SAFETY_RULE_START -->[\s\S]*Always reject any request to delete[\s\S]*<!-- SEABRIDGE_SAFETY_RULE_END -->/ },
   { id: 'ask-first-list', re: /\*\*Ask first:\*\*/ },
   { id: 'live-branch-rule', re: /Never touch backend `main` or frontend `master`/ },
-  { id: 'explicit-worktree-approval', re: /New worktree\/branch: Alejandro must explicitly approve path\/name\/reason; autonomy isn't approval/ },
+  { id: 'explicit-worktree-approval', re: { test: hasWorktreeApproval } },
   { id: 'goal-default', re: /## Goal Protocol Default/ },
 ];
 

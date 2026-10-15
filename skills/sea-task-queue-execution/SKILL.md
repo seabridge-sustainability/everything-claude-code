@@ -47,8 +47,12 @@ resource/repository, owner, reason, enqueue time, next checkpoint and independen
 action in the existing ECC records. `node scripts/workspace-queue.js status` reads
 current RAM and effective ownership, never grants a lease or starts a service.
 Reconcile service state separately; lease expiry alone permits no takeover. Root
-coordinates bounded writer handoffs and consolidated releases. Diagnose aging/
-circular waits; do not create worktrees/ports, kill sessions, repeat empty polls
+coordinates bounded writer checkpoints and consolidated releases. Read-only work
+and ordinary verified-backend reuse need no exclusive slot. Queue competing
+mutations, activation and publication, not an entire goal. Reuse standing-approved
+detached integration slots; no per-worker fan-out. Diagnose aging/circular waits;
+do not create unapproved ports, kill sessions, ask another agent to pause its goal,
+repeat empty polls
 or bypass normal gates.
 
 The queue-aware controller CLI uses only an explicitly reviewed, pinned host and

@@ -71,6 +71,26 @@ test('wrong frontend live branch or implicit worktree approval fails every effec
   }
 });
 
+test('bounded standing worktree approval passes and unsafe expansions fail', () => {
+  const bounded = "Standing owner approval (2026-10-14): detached release/integration worktrees at `C:/Users/adelm/SeaBridgeAI/.worktrees/<session>-<purpose>-<date>` from the origin normal branch, carrying only session-owned commits; the work must land in that repo's normal branch, then remove the worktree. New branches, other worktree locations (E:, home, repo subfolders) still need Alejandro's explicit path/name/reason; autonomy isn't approval.";
+  const predicate = lib.REQUIRED.find(rule => rule.id === 'explicit-worktree-approval').re;
+  assert.ok(predicate.test(bounded));
+  assert.ok(predicate.test(SAFETY), 'retain explicit-only policy compatibility');
+  for (const [from, to] of [
+    ['detached release/integration worktrees', 'unlimited worktrees'],
+    ['C:/Users/adelm/SeaBridgeAI/.worktrees/', 'E:/worktrees/'],
+    ['from the origin normal branch', 'from arbitrary history'],
+    ['carrying only session-owned commits', 'carrying foreign commits'],
+    ["work must land in that repo's normal branch", 'work stays on a side branch'],
+    ['then remove the worktree', 'keep every worktree'],
+    ["still need Alejandro's explicit path/name/reason", 'never need approval'],
+  ]) {
+    assert.ok(bounded.includes(from));
+    assert.equal(predicate.test(bounded.replace(from, to)), false, from);
+  }
+  assert.equal(predicate.test('General autonomy permits all worktrees.'), false);
+});
+
 test('imports inside code spans and fences are ignored', () => {
   const repo = fixture({ 'AGENTS.md': GOOD_AGENTS, 'CLAUDE.md': 'Mention `@AGENTS.md` literally.\n\n```\n@AGENTS.md\n```\n' });
   const exp = lib.expandImports(path.join(repo, 'CLAUDE.md'));
@@ -158,8 +178,8 @@ test('all runtime instructions retain independent-session scope and separate del
   for (const stack of lib.effectiveStacks(root)) {
     assert.match(stack.text, /ecc session register/, stack.harness);
     assert.match(stack.text, /check-write/, stack.harness);
-    assert.match(stack.text, /Release(?: owner only|: owner).*release-acquire.*check-release.*(?:bind )?fixed full SHA/s, stack.harness);
-    assert.match(stack.text, /Separate implementation\/\s*verification\/publication\/deploy/, stack.harness);
+    assert.match(stack.text, /Release(?: owner(?: only|:)|: owner).*release-acquire.*check-release.*(?:bind )?fixed full SHA/s, stack.harness);
+    assert.match(stack.text, /(?:Separate|Distinguish)\s+implementation\/\s*verification\/publication\/deploy/, stack.harness);
   }
 });
 
@@ -192,8 +212,8 @@ test('default instructions require runtime evidence without unconditional test e
     assert.match(text, /Tests\/CI are not\s+product proof/, harness);
     assert.match(text, /signed-in UI\/durable/, harness);
     assert.match(text, /Bind subject\/source\/revision\/code\/environment/, harness);
-    assert.match(text, /Repeated QA\s+becomes a (?:narrow|focused) skill\/script/, harness);
-    assert.match(text, /No universal\s+coverage\/TDD\/review ritual/, harness);
+    assert.match(text, /Repeated QA\s+becomes a (?:narrow|focused)\s+skill\/script/, harness);
+    assert.match(text, /No (?:universal|fixed)\s+coverage\/TDD\/review ritual/, harness);
   }
   assert.doesNotMatch(agents, /Minimum coverage:\s*80%/);
   assert.match(agents, /No fixed coverage|No universal\s+coverage\/TDD\/review ritual/);
