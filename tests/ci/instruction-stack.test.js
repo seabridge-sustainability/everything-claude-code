@@ -258,7 +258,8 @@ test('registry covers every advertised runtime and all effective ECC adapters pa
     'openclaw', 'adal', 'joycode', 'codebuddy', 'zed',
   ];
   assert.deepStrictEqual(registry.adapters.map(adapter => adapter.id).sort(), expected.sort());
-  const results = lib.checkRepo(root, path.dirname(root), 64 * 1024);
+  const results = lib.checkRepo(root, path.dirname(root), 64 * 1024,
+    process.env.ECC_VERIFY_POLICY_SNAPSHOT === '1' ? { policySnapshotRoot: root } : {});
   for (const result of results) assert.deepStrictEqual(result.failures, [], `${result.harness}: ${result.failures.join('; ')}`);
 });
 
@@ -466,6 +467,47 @@ test('compatibility adapters carry no copies of central safety or goal policy', 
     assert.deepStrictEqual(lib.expandImports(path.join(root, entry)).missing, []);
   }
   assert.strictEqual(fs.existsSync(path.join(root, 'protocols/MVP_EXECUTION_FOCUS.md')), false);
+});
+
+test('explicit verified policy snapshots report external launcher proof as unverified', () => {
+  const crypto = require('crypto');
+  const workspace = fixture({
+    'everything-claude-code/AGENTS.md': '@../manageesg-backend/AGENTS.md\n',
+    'manageesg-backend/AGENTS.md': GOOD_AGENTS + '\nUse `scripts/dev/run_backend.ps1`.\n',
+    'manageesg-backend/AGENTS_SYSTEM.md': '# additional policy\n',
+    'manageesg-backend/CLAUDE.md': '@AGENTS.md\n',
+  });
+  try {
+    const root = path.join(workspace, 'everything-claude-code');
+    const snapshot = ['AGENTS.md', 'AGENTS_SYSTEM.md', 'CLAUDE.md'].map(name => {
+      const text = fs.readFileSync(path.join(workspace, 'manageesg-backend', name), 'utf8');
+      return { path: `../manageesg-backend/${name}`, text,
+        sha256: crypto.createHash('sha256').update(text).digest('hex') };
+    });
+    const target = path.join(root, 'docs/tools/agent-system-map.json');
+    fs.mkdirSync(path.dirname(target), { recursive: true });
+    const map = { build: { sourceDirty: false, policyDirty: false, policyCommit: 'a'.repeat(40) },
+      policySnapshot: snapshot, sources: snapshot.map(({ path: file, sha256 }) => ({ path: file, sha256 })) };
+    fs.writeFileSync(target, JSON.stringify(map));
+    assert(lib.checkRepo(root, workspace, 32768).some(row => row.failures.some(f => f.includes('scripts/dev/run_backend.ps1'))));
+    const options = { policySnapshotRoot: root };
+    for (const row of lib.checkRepo(root, workspace, 32768, options)) {
+      assert.deepStrictEqual(row.failures, []);
+      assert.strictEqual(row.unverifiedExternalReferences[0].path, 'scripts/dev/run_backend.ps1');
+    }
+    // An ECC-owned missing reference is never covered by the external snapshot.
+    fs.appendFileSync(path.join(root, 'AGENTS.md'), '\nRead `docs/missing.md`.\n');
+    assert(lib.checkRepo(root, workspace, 32768, options).some(row => row.failures.some(f => f.includes('docs/missing.md'))));
+    fs.appendFileSync(path.join(workspace, 'manageesg-backend/AGENTS.md'), '\nchanged policy');
+    assert.throws(() => lib.checkRepo(root, workspace, 32768, options), /overwrite existing central policy/);
+    fs.writeFileSync(path.join(workspace, 'manageesg-backend/AGENTS.md'), snapshot[0].text);
+    fs.mkdirSync(path.join(workspace, 'manageesg-backend/.git'));
+    assert.throws(() => lib.checkRepo(root, workspace, 32768, options), /cannot replace live backend validation/);
+    fs.rmdirSync(path.join(workspace, 'manageesg-backend/.git'));
+    map.policySnapshot[0].text += '\ncorruption';
+    fs.writeFileSync(target, JSON.stringify(map));
+    assert.throws(() => lib.checkRepo(root, workspace, 32768, options), /digest mismatch/);
+  } finally { fs.rmSync(workspace, { recursive: true, force: true }); }
 });
 
 console.log(`instruction-stack: ${passed} passed`);

@@ -658,6 +658,29 @@ test('release acquisition records a fresh Actions budget receipt and fails close
   assert.equal(result.actionsBudget.source, 'github-org-budget-ui');
 });
 
+test('a 90 percent exception cannot override the unchanged hard Actions stop', () => {
+  const { root, sha } = fixture();
+  const now = Date.now();
+  register(root, 'release', ['README.md'], now);
+  const base = { cwd: root, sessionId: 'release', branch: 'development', candidate: sha, now,
+    ...budget(now), actionsBudgetLimit: 500, ownerCostApproval: 'Owner approves a bounded 90 percent exception only' };
+  for (const expectedActionsUsd of [1, 2]) {
+    assert.throws(() => execute('release-acquire', { ...base, actionsBudgetUsed: 499, expectedActionsUsd }), /hard spending stop/);
+  }
+  assert.equal(execute('release-acquire', { ...base, actionsBudgetUsed: 498, expectedActionsUsd: 1 }).actionsBudget.limitUsd, 500);
+});
+
+test('check-release revalidates billing freshness even while its lease remains active', () => {
+  const { root, sha } = fixture();
+  const now = Date.now();
+  register(root, 'release', ['README.md'], now);
+  const options = { cwd: root, sessionId: 'release', branch: 'development', candidate: sha, now,
+    ttl: 120, ...budget(now) };
+  execute('release-acquire', options);
+  assert.equal(execute('check-release', { ...options, now: now + 3599999 }).allowed, true);
+  assert.throws(() => execute('check-release', { ...options, now: now + 3600001 }), /within the last hour/);
+});
+
 test('release expiry is not proof a remote job stopped; it prevents takeover', () => {
   const { root, other, sha } = fixture();
   register(root, 'release', ['README.md'], 100);

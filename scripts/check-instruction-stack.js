@@ -16,7 +16,7 @@
  * broken path references, and text duplicated between CLAUDE.md and AGENTS.md.
  * Loading semantics: code.claude.com/docs/en/memory, developers.openai.com/codex/guides/agents-md
  *
- * Usage: node scripts/check-instruction-stack.js [--json] [--workspace <dir>]
+ * Usage: node scripts/check-instruction-stack.js [--json] [--workspace <dir>] [--policy-snapshot]
  * Exit 1 on any failure.
  */
 
@@ -291,6 +291,15 @@ function duplicatedLines(repo) {
 
 function checkRepo(repo, workspace, budget, options = {}) {
   const results = [];
+  // CI imports a hash-bound documentation snapshot, not the private backend
+  // checkout. Report its operational launcher as unverified, never as present.
+  // All other references and the normal live-checkout mode stay strict.
+  let snapshotFiles;
+  if (options.policySnapshotRoot) {
+    const { snapshot, destination } = require('./agent-system-map').verifyPolicySnapshot(options.policySnapshotRoot);
+    if (fs.existsSync(path.join(destination, '.git'))) throw new Error('snapshot mode cannot replace live backend validation');
+    snapshotFiles = new Set(snapshot.map(row => path.resolve(options.policySnapshotRoot, row.path)));
+  }
   const isEcc = fs.existsSync(path.join(repo, 'manifests', 'instruction-adapters.json'));
   const expectedBlocks = isEcc ? canonicalBlocks(repo) : [];
   const productPolicyFailures = [];
@@ -309,6 +318,7 @@ function checkRepo(repo, workspace, budget, options = {}) {
   for (const s of effectiveStacks(repo)) {
     const bytes = Buffer.byteLength(s.text, 'utf8');
     const failures = [...productPolicyFailures];
+    const unverifiedExternalReferences = [];
     if (s.harness === 'codex' && bytes > CODEX_CAP) failures.push(`exceeds Codex 32 KiB cap (${bytes} B): the tail is silently truncated`);
     if (bytes > budget) failures.push(`exceeds budget ${budget} B (${bytes} B)`);
     for (const r of REQUIRED) if (!r.re.test(s.text)) failures.push(`missing invariant: ${r.id}`);
@@ -347,11 +357,15 @@ function checkRepo(repo, workspace, budget, options = {}) {
     }
     for (const source of s.files) {
       for (const ref of brokenPathRefs(readText(source), path.dirname(source), workspace)) {
-        failures.push(`broken path reference: ${ref}`);
+        if (snapshotFiles?.has(path.resolve(source)) && ref === 'scripts/dev/run_backend.ps1') {
+          unverifiedExternalReferences.push({ source: path.basename(source), path: ref,
+            reason: 'operational backend source is not shipped in the policy snapshot' });
+        } else failures.push(`broken path reference: ${ref}`);
       }
     }
     if (s.harness === 'claude') for (const d of duplicatedLines(repo)) failures.push(`CLAUDE.md duplicates AGENTS.md: "${d.slice(0, 70)}…"`);
-    results.push({ repo: path.basename(repo), harness: s.harness, bytes, files: s.files.map((f) => path.relative(repo, f) || f), failures });
+    results.push({ repo: path.basename(repo), harness: s.harness, bytes, files: s.files.map((f) => path.relative(repo, f) || f), failures,
+      ...(unverifiedExternalReferences.length ? { unverifiedExternalReferences } : {}) });
   }
   if (isEcc) {
     const registry = loadAdapterRegistry(repo);
@@ -412,7 +426,8 @@ function main(argv) {
   const all = [];
   for (const r of REPOS) {
     const repo = r.self ? path.resolve(__dirname, '..') : path.join(workspace, r.relativePath || r.name);
-    if (fs.existsSync(repo)) all.push(...checkRepo(repo, workspace, r.budget, { enforceCanonicalPolicy: !r.self }));
+    if (fs.existsSync(repo)) all.push(...checkRepo(repo, workspace, r.budget, { enforceCanonicalPolicy: !r.self,
+      ...(argv.includes('--policy-snapshot') ? { policySnapshotRoot: ROOT } : {}) }));
   }
   if (argv.includes('--json')) {
     process.stdout.write(JSON.stringify(all, null, 1) + '\n');
@@ -420,6 +435,7 @@ function main(argv) {
     for (const r of all) {
       console.log(`${r.failures.length ? 'FAIL' : 'PASS'}  ${r.repo.padEnd(20)} ${r.harness.padEnd(7)} ${String(r.bytes).padStart(6)} B  ${r.files.join(' + ')}`);
       for (const f of r.failures) console.log(`      - ${f}`);
+      for (const ref of r.unverifiedExternalReferences || []) console.log(`      - UNVERIFIED external source: ${ref.path} (${ref.reason})`);
     }
   }
   return all.some((r) => r.failures.length) ? 1 : 0;

@@ -64,6 +64,7 @@ jobs:
           node tests/run-all.js
         env:
           CLAUDE_CODE_PACKAGE_MANAGER: npm
+          ECC_VERIFY_POLICY_SNAPSHOT: '1'
       - name: Run full test suite with coverage
         if: github.event_name == 'pull_request'
         run: |
@@ -71,6 +72,7 @@ jobs:
           npm run coverage
         env:
           CLAUDE_CODE_PACKAGE_MANAGER: npm
+          ECC_VERIFY_POLICY_SNAPSHOT: '1'
       - name: Upload coverage report
         if: github.event_name == 'pull_request' && always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -276,7 +278,7 @@ jobs:
       - name: Validate effective ECC agent instructions
         run: |
           node scripts/agent-system-map.js materialize
-          node scripts/check-instruction-stack.js --workspace "$RUNNER_TEMP"
+          node scripts/check-instruction-stack.js --workspace "$RUNNER_TEMP" --policy-snapshot
 
       - name: Evaluate all advertised agent instruction adapters
         run: node tests/ci/instruction-scenarios.test.js

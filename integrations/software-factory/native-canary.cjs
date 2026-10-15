@@ -83,7 +83,7 @@ async function run(host,{approvalFile=APPROVAL}={}){
   const outputFile=path.join(DIR,`native-${host}-${call.id}.log`);fs.writeFileSync(outputFile,output+'\nSTDERR\n'+errors);
   call.finishedAt=new Date().toISOString();call.exitCode=code;call.state=timedOut?'timeout':code===0?'completed-needs-evidence-review':'failed';call.output=outputFile;
   call.providerCostUsd=null;call.providerRequests=null;
-  if(host==='claude'){try{const r=JSON.parse(output);call.providerCostUsd=r.total_cost_usd??null;call.reportedAgentTurns=r.num_turns??null;}catch{}}
+  if(host==='claude'){try{const r=JSON.parse(output);call.providerCostUsd=r.total_cost_usd??null;call.reportedAgentTurns=r.num_turns??null;}catch{/* Unparseable output keeps provider cost and request counts unknown. */}}
   call.failureIsNotZeroCost=call.providerCostUsd===null;write(ledgerFile,ledger);
   return {host,state:call.state,exitCode:code,output:outputFile,providerCostUsd:call.providerCostUsd,providerRequests:call.providerRequests,nativeWriteGuardProof:false,visualProof:false};
 }
