@@ -434,8 +434,14 @@ test('SeaBridge primary roots reject automatic orchestration before effects', ()
 test('Legacy SeaBridge worktree outside the primary root is detected through its Git marker', () => {
   const fixture = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-marker-scope-'));
   try {
-    fs.writeFileSync(path.join(fixture, '.git'), 'gitdir: C:/Users/adelm/SeaBridgeAI/manageesg-backend/.git/worktrees/legacy\n');
-    assert.throws(() => buildOrchestrationPlan({ repoRoot: fixture, workers: [{ task: 'bounded task' }], launcherCommand: 'agent' }), /Automatic worktree orchestration is disabled/);
+    for (const gitDir of [
+      'C:/Users/adelm/SeaBridgeAI/manageesg-backend/.git/worktrees/legacy',
+      'C:\\Users\\adelm\\SeaBridgeAI\\manageesg-backend\\.git\\worktrees\\legacy',
+      'E:/SeaBridgeAI/manageesg-frontend/.git/worktrees/legacy'
+    ]) {
+      fs.writeFileSync(path.join(fixture, '.git'), 'gitdir: ' + gitDir + '\n');
+      assert.throws(() => buildOrchestrationPlan({ repoRoot: fixture, workers: [{ task: 'bounded task' }], launcherCommand: 'agent' }), /Automatic worktree orchestration is disabled/);
+    }
   } finally {
     fs.rmSync(fixture, { recursive: true, force: true });
   }

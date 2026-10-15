@@ -10,7 +10,11 @@ function assertGenericWorkspace(repoRoot) {
   const marker = path.join(root, '.git');
   if (fs.existsSync(marker) && fs.lstatSync(marker).isFile()) {
     const value = fs.readFileSync(marker, 'utf8').trim();
-    if (value.startsWith('gitdir: ')) candidates.push(path.resolve(root, value.slice(8)));
+    if (value.startsWith('gitdir: ')) {
+      const gitDir = value.slice(8).trim();
+      // Preserve absolute Windows markers when tests or tools run on POSIX.
+      candidates.push(gitDir, path.resolve(root, gitDir));
+    }
   }
   if (candidates.some(value => /^(?:c:\/users\/adelm\/seabridgeai|e:\/seabridgeai)(?:\/|$)/.test(
     value.toLowerCase().replace(/\\/g, '/')

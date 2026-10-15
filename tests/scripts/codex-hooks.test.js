@@ -21,6 +21,7 @@ const pluginCacheCheckScript = path.join(repoRoot, 'scripts', 'codex', 'check-pl
 const mergeCodexConfigScript = path.join(repoRoot, 'scripts', 'codex', 'merge-codex-config.js');
 const mergeMcpConfigScript = path.join(repoRoot, 'scripts', 'codex', 'merge-mcp-config.js');
 const syncScript = path.join(repoRoot, 'scripts', 'sync-ecc-to-codex.sh');
+const sanityScript = path.join(repoRoot, 'scripts', 'codex', 'check-codex-global-state.sh');
 const packageJson = JSON.parse(fs.readFileSync(path.join(repoRoot, 'package.json'), 'utf8'));
 const packageVersion = packageJson.version;
 const deterministicPackageEnv = {
@@ -1122,7 +1123,8 @@ if (
       assert.strictEqual(syncResult.status, 0, `${syncResult.stdout}\n${syncResult.stderr}`);
 
       const syncedAgents = fs.readFileSync(agentsPath, 'utf8');
-      assert.match(syncedAgents, /^# Everything Claude Code \(ECC\) — Agent Instructions/m);
+      const rootInstructions = fs.readFileSync(path.join(repoRoot, 'AGENTS.md'), 'utf8').replace(/\r\n/g, '\n').trim();
+      assert.ok(syncedAgents.replace(/\r\n/g, '\n').includes(rootInstructions), 'sync must preserve the complete current ECC root instructions');
       assert.match(syncedAgents, /^# Codex Supplement \(From ECC \.codex\/AGENTS\.md\)/m);
 
       const syncedConfig = fs.readFileSync(configPath, 'utf8');
@@ -1154,6 +1156,12 @@ if (
       for (const roleFile of ['explorer.toml', 'reviewer.toml', 'docs-researcher.toml']) {
         assert.ok(fs.existsSync(path.join(codexDir, 'agents', roleFile)));
       }
+
+      // A superficially valid title must not replace the managed root source.
+      fs.writeFileSync(agentsPath, syncedAgents.replace(rootInstructions, '# Everything Claude Code (ECC) — Agent Instructions'));
+      const staleRoot = runBash(sanityScript, { env: makeHermeticCodexEnv(homeDir, codexDir) });
+      assert.strictEqual(staleRoot.status, 1, 'sanity must reject missing or stale root instructions');
+      assert.match(staleRoot.stdout, /\[FAIL\] AGENTS missing ECC root instructions/);
     } finally {
       cleanup(homeDir);
     }

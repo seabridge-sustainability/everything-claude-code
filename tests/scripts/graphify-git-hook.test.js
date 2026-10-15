@@ -22,6 +22,7 @@ const HOOK = path.resolve(__dirname, '../../scripts/git-hooks/graphify-rebuild.s
 const FRESHNESS = path.resolve(__dirname, '../../scripts/knowledge-freshness.js');
 const BOUNDARY = [
   '# SeaBridgeAI knowledge boundary (test)',
+  '.ecc/',
   'docs/reports/', 'reports/', 'artifacts/', 'logs/', '/data/',
   '**/site-packages/', 'references/', 'vendor/', 'third_party/', '_upstream/', '*.env', '.env.*',
   '',
@@ -161,6 +162,12 @@ try {
   run('fails closed when .graphifyignore lacks the knowledge boundary marker', () => {
     const leaky = makeRepo('leaky', 'node_modules/\n');
     commitFile(leaky, 'src/app.py');
+    assert.deepStrictEqual(calls(1500), []);
+  });
+
+  run('fails closed when session metadata is not excluded', () => {
+    const metadata = makeRepo('metadata', BOUNDARY.replace('.ecc/\n', ''));
+    commitFile(metadata, 'src/app.py');
     assert.deepStrictEqual(calls(1500), []);
   });
 
