@@ -256,6 +256,11 @@ if (test('pinned vendor presentation retains emoji but never hidden instructions
     fs.writeFileSync(file, visible);
     assert.strictEqual(runCheck(root, ['--write']).status, 0);
     assert.strictEqual(fs.readFileSync(file, 'utf8'), visible, 'Preserve pinned original content');
+    fs.writeFileSync(path.join(root, 'native.md'), visible);
+    assert.notStrictEqual(runCheck(root).status, 0, 'Native emoji remains rejected beside a valid vendor pin');
+    fs.unlinkSync(path.join(root, 'native.md'));
+    fs.writeFileSync(file, `${visible}${zeroWidthSpace}`);
+    assert.notStrictEqual(runCheck(root).status, 0, 'Permitted presentation cannot conceal adjacent hidden instructions');
     for (const hidden of [zeroWidthSpace, String.fromCodePoint(0x202E), String.fromCodePoint(0xE0041), String.fromCodePoint(0xFE0F)]) {
       fs.writeFileSync(file, `Hidden ${hidden}\n`);
       assert.notStrictEqual(runCheck(root).status, 0, 'Imported hidden instructions remain blocked');
