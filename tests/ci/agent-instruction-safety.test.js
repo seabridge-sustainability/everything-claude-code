@@ -17,8 +17,8 @@ const guardrails = [
     heading: '## Safety And Authorization Rule',
     requiredPatterns: [
       /only Alejandro in the current session approves gated actions/i,
-      /commit, push, merge, branch or PR creation/i,
-      /paid or live-provider API calls/i,
+      /\b(?:commit, push, merge, branch or PR creation|commit\/push\/merge\/branch\/PR)\b/i,
+      /\b(?:paid or live-provider API calls|paid\/live-provider APIs)\b/i,
       /Do not re-ask for included steps/i,
     ],
   },
@@ -91,13 +91,29 @@ function run() {
         assert.strictEqual((stack.text.match(/<!-- SEABRIDGE_SAFETY_RULE_START -->/g) || []).length, 1);
         for (const invariant of REQUIRED) assert.ok(invariant.re.test(stack.text), invariant.id);
       }
-      const source = stack ? stack.text : read(guardrail.path);
+      // Markdown line wrapping is not a change to the authorization rule.
+      const source = (stack ? stack.text : read(guardrail.path)).replace(/\s+/g, ' ');
       assert.ok(source.includes(guardrail.heading), `${guardrail.path} missing ${guardrail.heading}`);
       for (const pattern of guardrail.requiredPatterns) {
         assert.ok(pattern.test(source), `${guardrail.path} missing ${pattern}`);
       }
     })) passed++; else failed++;
   }
+
+  if (test('line wrapping never waives a required authorization action', () => {
+    const pattern = guardrails[0].requiredPatterns[1];
+    const wrapped = 'commit, push, merge,\nbranch or PR creation';
+    assert.ok(pattern.test(wrapped.replace(/\s+/g, ' ')));
+    assert.ok(!pattern.test(wrapped.replace('PR creation', 'unrelated action').replace(/\s+/g, ' ')));
+  })) passed++; else failed++;
+
+  if (test('published compact policy retains every scoped approval requirement', () => {
+    const snapshot = require('../../docs/tools/agent-system-map.json').policySnapshot;
+    const source = snapshot.find(row => row.path.endsWith('/AGENTS_SYSTEM.md')).text.replace(/\s+/g, ' ');
+    for (const pattern of guardrails[0].requiredPatterns) assert.ok(pattern.test(source), `${pattern}`);
+    assert.ok(!guardrails[0].requiredPatterns[1].test(source.replace('commit/push/merge/branch/PR', 'unrelated action')));
+    assert.ok(!guardrails[0].requiredPatterns[2].test(source.replace('paid/live-provider APIs', 'unrelated action')));
+  })) passed++; else failed++;
 
   console.log(`\nPassed: ${passed}`);
   console.log(`Failed: ${failed}`);

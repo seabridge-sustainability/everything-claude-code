@@ -11,17 +11,25 @@ const timestamp = value => typeof value === 'string' ? Date.parse(value) : NaN;
 function demand(value, reason) { if (!value) throw new Error(reason); }
 function identity(value) {
   demand(typeof value === 'string' && value.trim(), 'resource identity required');
-  let normalized = value.trim().replace(/\\/g, '/').toLowerCase();
+  let normalized = value.trim().replace(/\\/g, '/');
   demand(!normalized.split('/').includes('..'), 'traversal resource identity forbidden');
   // Same Windows repository cannot acquire multiple slots through spelling
   // aliases. Native device/UNC/ADS and ambiguous trailing-dot paths fail closed.
-  normalized = normalized.replace(/^\/([a-z])\//, '$1:/');
-  if (/^[a-z]:\//.test(normalized)) {
+  if (process.platform === 'win32') normalized = normalized.replace(/^\/([a-z])\//i, '$1:/');
+  if (/^[a-z]:\//i.test(normalized)) {
+    normalized = normalized.toLowerCase();
     demand(!normalized.slice(2).includes(':'), 'ADS resource identity forbidden');
     demand(!normalized.split('/').slice(1).some(part => part !== '.' && /[. ]$/.test(part)), 'ambiguous resource path forbidden');
     normalized = path.win32.normalize(normalized).replace(/\\/g, '/').replace(/\/+$/, '');
+  } else if (normalized.startsWith('/')) {
+    // Native POSIX repositories are case-sensitive. Do not invent Windows
+    // aliases for them, or accept POSIX/UNC spellings on a Windows controller.
+    demand(process.platform !== 'win32' && !value.includes('\\')
+      && !normalized.startsWith('//') && !normalized.includes(':'), 'native POSIX repository required');
+    normalized = path.posix.normalize(normalized).replace(/\/+$/, '') || '/';
   } else {
     demand(!normalized.startsWith('/') && !normalized.includes(':') && !normalized.includes('/'), 'absolute Windows repository or simple resource identity required');
+    normalized = normalized.toLowerCase();
   }
   return normalized;
 }
@@ -36,7 +44,8 @@ function resourceKey(entry) {
     return 'backend:127.0.0.1:8000';
   }
   const family = ['release', 'writer'].includes(entry.kind) ? 'repository' : entry.kind;
-  demand(/^(?:[a-z]:[\\/]|\/[a-z]\/)/i.test(entry.resource), 'absolute repository identity required');
+  demand(/^(?:[a-z]:[\\/]|\/[a-z]\/)/i.test(entry.resource)
+    || (process.platform !== 'win32' && path.posix.isAbsolute(entry.resource)), 'absolute repository identity required');
   return family + ':' + identity(entry.resource);
 }
 function validateEntries(entries, now, { persisted = false } = {}) {

@@ -17,6 +17,43 @@ function plan(entries, options = {}) {
 function state(result, id) { return result.decisions.find(entry => entry.id === id).state; }
 let passed = 0;
 function test(name, action) { action(); passed++; process.stdout.write('PASS ' + name + '\n'); }
+
+function platformQueue(platform) {
+  const module = { exports: {} };
+  const source = require('node:fs').readFileSync(require.resolve('../../scripts/lib/workspace-queue'), 'utf8');
+  require('node:vm').runInNewContext(source, { require, module, process: { platform } });
+  return module.exports;
+}
+
+test('native POSIX repository identities retain case and canonical separators', () => {
+  const linux = platformQueue('linux');
+  const entry = resource => request('posix', { kind: 'writer', resource });
+  assert.equal(linux.resourceKey(entry('/tmp/Repo//./')), 'repository:/tmp/Repo');
+  assert.notEqual(linux.resourceKey(entry('/tmp/Repo')), linux.resourceKey(entry('/tmp/repo')));
+  assert.notEqual(linux.resourceKey(entry('/c/Repo')), linux.resourceKey(entry('/c/repo')));
+  assert.notEqual(linux.resourceKey(entry('/c/Repo')), linux.resourceKey(entry('C:/Repo')));
+  for (const resource of ['/tmp/../Repo', '//server/repo', '/tmp\\Repo', '/tmp/Repo:stream']) {
+    assert.throws(() => linux.resourceKey(entry(resource)));
+  }
+});
+
+test('Windows keeps drive aliases and refuses a second POSIX spelling', () => {
+  const windows = platformQueue('win32');
+  const entry = resource => request('windows', { kind: 'writer', resource });
+  assert.equal(windows.resourceKey(entry('/c/Repo/')), windows.resourceKey(entry('C:\\Repo')));
+  assert.throws(() => windows.resourceKey(entry('/tmp/Repo')));
+});
+
+test('POSIX writer and release share one slot without merging distinct case-sensitive repositories', () => {
+  const linux = platformQueue('linux');
+  const entries = [request('a', { kind: 'writer', resource: '/tmp/Repo', state: 'running', leaseUntil: iso(1000) }),
+    request('b', { kind: 'release', resource: '/tmp/Repo/' }),
+    request('c', { kind: 'writer', resource: '/tmp/repo' })];
+  const result = linux.planQueues(entries, { now, telemetry: { observedAt: iso(0), freeRamGiB: 5, reserveRamGiB: 2 },
+    checkGate: entry => ({ allowed: true, owner: entry.owner, resource: linux.resourceKey(entry) }) });
+  assert.equal(state(result, 'b'), 'waiting-owner');
+  assert.equal(state(result, 'c'), 'ready-for-atomic-recheck');
+});
 test('ready positive control grants no authorization', () => {
   const result = plan([request('a')]);
   assert.equal(state(result, 'a'), 'ready-for-atomic-recheck');
@@ -53,7 +90,7 @@ test('missing or wrong-owner authority never becomes readiness', () => {
   }
 });
 test('Windows trailing, duplicate, dot and Git Bash aliases share one slot', () => {
-  const { resourceKey } = require('../../scripts/lib/workspace-queue');
+  const { resourceKey } = platformQueue('win32');
   for (const resource of ['C:\\Repo\\', 'c:/repo//', 'c:/repo/.', '/c/repo']) {
     assert.equal(resourceKey(request('a', { kind: 'writer', resource })), 'repository:c:/repo');
   }
