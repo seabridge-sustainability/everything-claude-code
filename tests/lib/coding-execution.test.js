@@ -40,7 +40,8 @@ function fixture(t, runtimes = ['claude','gemini']) {
       checkpoint_started_at:null,checkpoint_proof_id:null,updated_at:new Date().toISOString()},status:'active',updated_at:new Date().toISOString(),
   };
   fs.writeFileSync(goal, JSON.stringify(goalDocument));
-  coord.execute('register', { cwd: root, sessionId: 'parent', scopes: ['.ecc/goal'], objective: 'controller', doneWhen: 'checks', ttl:120 });
+  // This operational controller binds guards/queues; goal-only metadata cannot grant that authority.
+  coord.execute('register', { cwd: root, sessionId: 'parent', scopes: ['code.txt', '.ecc/goal'], objective: 'controller', doneWhen: 'checks', ttl:120 });
   const workers = runtimes.map((runtime, index) => {
     const id = `worker-${index}`, workerRepo = repo(id);
     fs.writeFileSync(path.join(workerRepo,'.ecc/goal/baseline.json'),JSON.stringify({design:'approved',data:42}));
