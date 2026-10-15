@@ -30,7 +30,7 @@
     ],
     "semanticIndex": "not-run"
   },
-  "sourceFingerprint": "75744f015fc6d06733e37371a605bb4f2e0f0258699f7b6fac67ad8fef3171c6",
+  "sourceFingerprint": "004eb76aead39d029f38647ca6b87cc52146e45492af63fc3e011857fff0071a",
   "sources": [
     {
       "path": "../manageesg-backend/AGENTS.md",
@@ -78,7 +78,7 @@
     },
     {
       "path": ".github/workflows/ci.yml",
-      "sha256": "026bd946d4b1517dd36b639f23fecb59ea868d2bffa97a5f89c0b9af53d62b2e"
+      "sha256": "7e610371b35e5453f6ad0c2a678d82b88f68ca69d476b33c31b3415cec5d88ce"
     },
     {
       "path": ".github/workflows/harness.yml",
@@ -274,7 +274,7 @@
     },
     {
       "path": "schemas/coding-execution.schema.json",
-      "sha256": "c2663084868fdb1d872b3f9377ab9944fa63de570ccbb4b29333a637bbb560c2"
+      "sha256": "076d52a064d9602c7f9502a544f70c84c2a9d7e8d49b702f1a2f53002d377afa"
     },
     {
       "path": "schemas/goal-control.schema.json",
@@ -334,7 +334,7 @@
     },
     {
       "path": "scripts/fresh-agent-session.js",
-      "sha256": "522b06f5d560774f5cfb58910b6ca802ddca1027abd0d146924ad3a481b26743"
+      "sha256": "65b388ea4787eb89cddafce06d384c1ca50323254690db30af8c551217bed575"
     },
     {
       "path": "scripts/goal-control.js",
@@ -378,7 +378,7 @@
     },
     {
       "path": "scripts/lib/coding-execution-host.js",
-      "sha256": "7fe930aef313655d2cc7b199efe2d24c3cb9dc33c352e6192abeef3ed4223f04"
+      "sha256": "467e9c0d40afc61b773fd827d5adba07dace109e8d72fe8d72e9bae5aca95c95"
     },
     {
       "path": "scripts/lib/coding-execution-runner.js",
@@ -386,7 +386,7 @@
     },
     {
       "path": "scripts/lib/coding-execution.js",
-      "sha256": "27d406058b9b1031bd02a650a40e3aa83efe0e123dfe7308ee2c342345ca76ff"
+      "sha256": "ee870d290a1917a2fd903a3e068c88b0a7ac32be84761ddeffcc123fb731273d"
     },
     {
       "path": "scripts/lib/fresh-session-guard.js",
@@ -462,7 +462,7 @@
     },
     {
       "path": "skills/goal-default/SKILL.md",
-      "sha256": "3083b4749b399b96938e21fc4e81c74c403394d55163ca150cf0c067b193c461"
+      "sha256": "9dae220f35b25423c493bb9e90c7d7afb4f1f711c3f90ae3838eeb655185d537"
     },
     {
       "path": "skills/parallel-execution-optimizer/SKILL.md",
@@ -530,11 +530,11 @@
     },
     {
       "path": "tests/lib/coding-execution.test.js",
-      "sha256": "2740a01facb7f5532a7dd0d260575f3f530f37175797a9115887b766a67cef15"
+      "sha256": "802b931fd68f48b84b1f1525007b7b59ecfaff3dcce6025471c882097bb5fb2f"
     },
     {
       "path": "tests/lib/fresh-session-guard.test.js",
-      "sha256": "fab03fe323a2b6567d6fa290ab2fd75631e9b3c1d7b575840e0d921e7bb28790"
+      "sha256": "76360f8c66a174feb7202f5f3de67d4e20706399627669fe112ecc8ae112791f"
     },
     {
       "path": "tests/lib/goal-control.test.js",
@@ -688,7 +688,7 @@
       "id": "file:.github/workflows/ci.yml",
       "type": "source",
       "path": ".github/workflows/ci.yml",
-      "sha256": "026bd946d4b1517dd36b639f23fecb59ea868d2bffa97a5f89c0b9af53d62b2e"
+      "sha256": "7e610371b35e5453f6ad0c2a678d82b88f68ca69d476b33c31b3415cec5d88ce"
     },
     {
       "id": "file:.github/workflows/harness.yml",
@@ -982,7 +982,7 @@
       "id": "file:schemas/coding-execution.schema.json",
       "type": "source",
       "path": "schemas/coding-execution.schema.json",
-      "sha256": "c2663084868fdb1d872b3f9377ab9944fa63de570ccbb4b29333a637bbb560c2"
+      "sha256": "076d52a064d9602c7f9502a544f70c84c2a9d7e8d49b702f1a2f53002d377afa"
     },
     {
       "id": "file:schemas/goal-control.schema.json",
@@ -1072,7 +1072,7 @@
       "id": "file:scripts/fresh-agent-session.js",
       "type": "source",
       "path": "scripts/fresh-agent-session.js",
-      "sha256": "522b06f5d560774f5cfb58910b6ca802ddca1027abd0d146924ad3a481b26743"
+      "sha256": "65b388ea4787eb89cddafce06d384c1ca50323254690db30af8c551217bed575"
     },
     {
       "id": "file:scripts/goal-control.js",
@@ -1138,7 +1138,7 @@
       "id": "file:scripts/lib/coding-execution-host.js",
       "type": "source",
       "path": "scripts/lib/coding-execution-host.js",
-      "sha256": "7fe930aef313655d2cc7b199efe2d24c3cb9dc33c352e6192abeef3ed4223f04"
+      "sha256": "467e9c0d40afc61b773fd827d5adba07dace109e8d72fe8d72e9bae5aca95c95"
     },
     {
       "id": "file:scripts/lib/coding-execution-runner.js",
@@ -1150,7 +1150,7 @@
       "id": "file:scripts/lib/coding-execution.js",
       "type": "source",
       "path": "scripts/lib/coding-execution.js",
-      "sha256": "27d406058b9b1031bd02a650a40e3aa83efe0e123dfe7308ee2c342345ca76ff"
+      "sha256": "ee870d290a1917a2fd903a3e068c88b0a7ac32be84761ddeffcc123fb731273d"
     },
     {
       "id": "file:scripts/lib/fresh-session-guard.js",
@@ -1264,7 +1264,7 @@
       "id": "file:skills/goal-default/SKILL.md",
       "type": "source",
       "path": "skills/goal-default/SKILL.md",
-      "sha256": "3083b4749b399b96938e21fc4e81c74c403394d55163ca150cf0c067b193c461"
+      "sha256": "9dae220f35b25423c493bb9e90c7d7afb4f1f711c3f90ae3838eeb655185d537"
     },
     {
       "id": "file:skills/parallel-execution-optimizer/SKILL.md",
@@ -1366,13 +1366,13 @@
       "id": "file:tests/lib/coding-execution.test.js",
       "type": "source",
       "path": "tests/lib/coding-execution.test.js",
-      "sha256": "2740a01facb7f5532a7dd0d260575f3f530f37175797a9115887b766a67cef15"
+      "sha256": "802b931fd68f48b84b1f1525007b7b59ecfaff3dcce6025471c882097bb5fb2f"
     },
     {
       "id": "file:tests/lib/fresh-session-guard.test.js",
       "type": "source",
       "path": "tests/lib/fresh-session-guard.test.js",
-      "sha256": "fab03fe323a2b6567d6fa290ab2fd75631e9b3c1d7b575840e0d921e7bb28790"
+      "sha256": "76360f8c66a174feb7202f5f3de67d4e20706399627669fe112ecc8ae112791f"
     },
     {
       "id": "file:tests/lib/goal-control.test.js",
@@ -4828,14 +4828,14 @@
     }
   ],
   "build": {
-    "generatedAt": "2026-10-15T04:02:48-04:00",
-    "sourceCommit": "f823c4d062a89e0fe0ceefec9117c3655d434782",
+    "generatedAt": "2026-10-15T14:16:01-04:00",
+    "sourceCommit": "340916c6c5338943bbbc20b3fc69133cb06377bc",
     "sourceDirty": false,
     "policyCommit": "e799143447b7bc30989156a09cd4c8feeaadf14d",
     "policyDirty": false,
     "verificationOnly": true,
     "provenanceMode": "exact-git-object-export",
-    "sourceTree": "6fb7e6a1e19b3ea38706cf30add2a174c0b187ea",
+    "sourceTree": "c7cd934dd6e8215ae87e0fb1533b9369dac56195",
     "policyTree": "1596cc6fe86c9604cb0bda8c05b22abf18e86df6"
   }
 }
