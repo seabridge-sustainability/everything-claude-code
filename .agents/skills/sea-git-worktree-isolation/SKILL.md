@@ -1,6 +1,6 @@
 ---
 name: sea-git-worktree-isolation
-description: "Coordinate safe work on SeaBridgeAI primary branches; inspect dirty checkouts and file ownership, and handle worktree exceptions only when Alejandro explicitly approves their path, branch and reason."
+description: "Coordinate safe work on SeaBridgeAI primary branches; inspect dirty checkouts and file ownership, use standing-approved detached release worktrees under SeaBridgeAI/.worktrees, and handle other worktree exceptions only when Alejandro explicitly approves their path, branch and reason."
 ---
 
 # sea-git-worktree-isolation
