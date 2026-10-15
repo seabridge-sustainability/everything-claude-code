@@ -8,17 +8,20 @@ const rootDir = path.resolve(__dirname, "..")
 const opencodeDir = path.join(rootDir, ".opencode")
 const distDir = path.join(opencodeDir, "dist")
 
-fs.rmSync(distDir, { recursive: true, force: true })
-
 let tscEntrypoint
 
 try {
-  tscEntrypoint = require.resolve("typescript/bin/tsc", { paths: [rootDir] })
+  // Both manifests declare TypeScript. Reuse an existing OpenCode-local
+  // compiler when root dev dependencies are absent; never download one here.
+  tscEntrypoint = require.resolve("typescript/bin/tsc", { paths: [rootDir, opencodeDir] })
 } catch {
   throw new Error(
-    "TypeScript compiler not found. Install root dev dependencies before publishing so .opencode/dist can be built."
+    "TypeScript compiler not found in declared root or OpenCode dev dependencies; existing dist was preserved."
   )
 }
+
+// Resolve prerequisites before replacing generated output.
+fs.rmSync(distDir, { recursive: true, force: true })
 
 execFileSync(process.execPath, [tscEntrypoint, "-p", path.join(opencodeDir, "tsconfig.json")], {
   cwd: rootDir,

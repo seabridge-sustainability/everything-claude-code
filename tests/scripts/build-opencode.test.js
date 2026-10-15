@@ -34,6 +34,27 @@ function main() {
   const buildScript = path.join(repoRoot, "scripts", "build-opencode.js")
   const distEntry = path.join(repoRoot, ".opencode", "dist", "index.js")
   const tests = [
+    ["missing compiler preserves existing output and a declared OpenCode-local compiler works", () => {
+      const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "ecc-build-prerequisites-"))
+      try {
+        fs.mkdirSync(path.join(tempDir, "scripts"), { recursive: true })
+        fs.copyFileSync(buildScript, path.join(tempDir, "scripts/build-opencode.js"))
+        const output = path.join(tempDir, ".opencode/dist/index.js")
+        fs.mkdirSync(path.dirname(output), { recursive: true })
+        fs.writeFileSync(output, "preserved output")
+        const absent = spawnSync(process.execPath, [path.join(tempDir, "scripts/build-opencode.js")], { encoding: "utf8" })
+        assert.notStrictEqual(absent.status, 0)
+        assert.strictEqual(fs.readFileSync(output, "utf8"), "preserved output")
+        const compiler = path.join(tempDir, ".opencode/node_modules/typescript/bin/tsc")
+        fs.mkdirSync(path.dirname(compiler), { recursive: true })
+        fs.writeFileSync(compiler, "const fs=require('fs'),path=require('path');const out=path.resolve(__dirname,'../../../dist');fs.mkdirSync(out,{recursive:true});fs.writeFileSync(path.join(out,'index.js'),'compiled fixture');")
+        const fallback = spawnSync(process.execPath, [path.join(tempDir, "scripts/build-opencode.js")], { encoding: "utf8" })
+        assert.strictEqual(fallback.status, 0, fallback.stderr)
+        assert.strictEqual(fs.readFileSync(output, "utf8"), "compiled fixture")
+      } finally {
+        fs.rmSync(tempDir, { recursive: true, force: true })
+      }
+    }],
     ["package.json exposes the OpenCode build and prepack hooks", () => {
       assert.strictEqual(packageJson.scripts["build:opencode"], "node scripts/build-opencode.js")
       assert.strictEqual(packageJson.scripts.prepack, "npm run build:opencode")
