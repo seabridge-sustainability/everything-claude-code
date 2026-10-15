@@ -1,6 +1,6 @@
 ---
 name: sea-git-worktree-isolation
-description: Coordinate safe work on SeaBridgeAI primary branches; inspect dirty checkouts and file ownership, and handle worktree exceptions only when Alejandro explicitly approves their path, branch and reason.
+description: Coordinate safe work on SeaBridgeAI primary branches; inspect dirty checkouts and file ownership, use standing-approved detached release worktrees under SeaBridgeAI/.worktrees, and handle other worktree exceptions only when Alejandro explicitly approves their path, branch and reason.
 ---
 
 # sea-git-worktree-isolation
@@ -18,8 +18,11 @@ authorize a new worktree: coordinate disjoint scopes or serialize conflicting ed
 ## Required Inputs
 
 Repository, actual primary branch, current dirty/staged state and assigned files.
-An exception additionally requires Alejandro's explicit approval naming its path,
-branch and reason. General autonomy, commit/push approval or a skill is not approval.
+Detached release/integration worktrees at `C:/Users/adelm/SeaBridgeAI/.worktrees/<session>-<purpose>-<date>`
+from the origin normal branch have standing approval (backend AGENTS_SYSTEM rule 3):
+session-owned commits only, published by push/merge to the normal branch, then removed.
+Any other exception requires Alejandro's explicit approval naming its path, branch
+and reason. General autonomy, commit/push approval or a skill is not approval.
 
 ## Expected Outputs
 
@@ -36,17 +39,18 @@ baseline reconciliation. Do not restart another session to refresh instructions.
 
 ## Failure Conditions
 
-Reject automatic worktree/branch creation, protected live-branch writes, unknown
-ownership and destructive cleanup. An occupied file blocks that file only; continue
+Reject worktree/branch creation outside the standing release-worktree approval,
+side branches that never land on the normal branch, protected live-branch writes,
+unknown ownership and destructive cleanup. An occupied file blocks that file only; continue
 independent read-only or owned work. Reuse existing bounded approvals for their
 named steps, but worktree exceptions require explicit approval of the exception.
 
 ## SeaBridgeAI Sustainability And Data-Integrity Requirements
 
 Commit/push only the task-owned completed batch to the mapped branch with approval.
-Never remove a worktree merely because its lease expired: prove it is unused, clean,
-and published or recoverably archived, and check ignored data, junctions and binding
-dependencies. Preserve unresolved work and report it. Never remove repos/data volumes.
+Remove your release worktree once its work is on the normal branch. Never remove
+a worktree merely because its lease expired: prove it is unused, clean, and published
+or recoverably archived, and check ignored data, junctions and binding dependencies. Preserve unresolved work and report it. Never remove repos/data volumes.
 
 ## Cross-Agent Compatibility Notes
 

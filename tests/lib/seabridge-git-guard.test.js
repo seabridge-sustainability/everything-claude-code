@@ -167,6 +167,59 @@ test('core.longpaths is a safe -c setting (2026-10-14 subagent patch check)', ()
   assert.equal(decide('git status; git -c core.longpaths=true commit -m x', cwd, main)[0], 'ask', 'main stays protected');
   assert.equal(decide('cd x; git -c core.sshCommand=evil fetch', cwd, dev)[0], 'ask', 'other core keys stay unresolved');
 });
+test('2026-10-14 overnight blockers: mktemp scratch dirs, python -c text, subshell lint, unsigned scratch commits', () => {
+  const mk = 'P=../patches; T=$(mktemp -d); cd ../be && git archive --format=tar cfd66b0 app | tar -xf - -C "$T" && cd "$T" && git init -q && git -c core.autocrlf=false apply "$P/a.patch"; rm -rf "$T"';
+  assert.equal(decide(mk, cwd), null, 'fresh mktemp directory is not a protected target');
+  assert.equal(decide('T=$(mktemp -d); git clone https://example.invalid/manageesg-backend.git "$T" && cd "$T" && git commit -m x', cwd)[0], 'ask', 'clone into mktemp stays protected');
+  assert.equal(decide('T=$(mktemp); cd "$T" && git commit -m x', cwd)[0], 'ask', 'mktemp without -d is a file, not a fresh directory');
+  const seen = [];
+  const at = dir => { seen.push(dir); return { ecc: false, product: true, branch: 'development' }; };
+  const py = 'O=../overnight; python -I -c "\nfrom pathlib import Path\nO=Path(r\'C:/x/overnight\')\nd=O/\'integ-next\'\n"; cd $O/integ-next && git apply --reject a.diff';
+  assert.equal(decide(py, cwd, at), null);
+  assert.deepEqual(seen, [path.resolve(cwd, '../overnight', 'integ-next')]);
+  const lint = 'cd ../p && R=python; (cd work && $R -m ruff check a.py); (cd base && $R -m ruff check a.py)\nmkdir fresh && cd fresh && git init -q . ; git apply ../p.patch';
+  assert.equal(decide(lint, cwd), null, 'later cd sets the target after lint subshells');
+  assert.equal(decide('(cd work && ruff check a.py); git commit -m x', cwd, () => ({ ecc: false, product: true, branch: 'development' }))[0], 'ask', 'no later cd: still ambiguous');
+  const scratch = 'cd work && ( [ -d .git ] || git init -q ) && git add -A && git -c user.name=x -c user.email=x@x -c commit.gpgsign=false commit -q -m base';
+  assert.equal(decide(scratch, cwd, () => ({ ecc: false, product: false, branch: 'master', remote: false })), null);
+  for (const repo of [{ product: true, remote: true }, { ecc: true, remote: true }, { product: false, ecc: false, remote: true }]) {
+    assert.equal(decide(scratch, cwd, () => ({ branch: 'development', ...repo }))[0], 'ask', JSON.stringify(repo));
+  }
+  assert.equal(decide('git -c commit.gpgsign=false commit -m x', cwd, () => ({ product: true, ecc: false, branch: 'development', remote: true }))[0], 'ask');
+});
+test('standing owner approval for detached release worktrees (2026-10-14)', () => {
+  const fs = require('node:fs');
+  const os = require('node:os');
+  const base = fs.mkdtempSync(path.join(os.tmpdir(), 'guard-wt-'));
+  const approvals = path.join(base, 'worktrees.txt');
+  fs.writeFileSync(approvals, `# owner-approved release worktrees\n${base.replace(/\\/g, '/')}/.worktrees/*\n`);
+  const previous = process.env.SEABRIDGE_GUARD_WORKTREE_APPROVALS;
+  process.env.SEABRIDGE_GUARD_WORKTREE_APPROVALS = approvals;
+  const dev = () => ({ ecc: false, product: true, branch: 'development' });
+  const wt = `${base.replace(/\\/g, '/')}/.worktrees/zprop-fe-release-20261014b`;
+  try {
+    const release = `cd ../fe && git fetch -q origin development; W=${wt}; git worktree add -q --detach $W origin/development && cd $W && git -c core.autocrlf=false apply --check p.patch && git apply p.patch && git add -A && git commit -qm fix && git push origin HEAD:development 2>&1 | tail -2`;
+    assert.equal(decide(release, cwd, dev), null, 'approved detached release worktree runs unattended');
+    assert.equal(decide(`git worktree add --detach ${wt} origin/development`, cwd, dev), null, 'direct form');
+    assert.equal(decide(`W=${wt}; git worktree add -q --detach $W origin/development && cd $W && git push origin HEAD:main`, cwd, dev)[0], 'ask', 'main stays protected from the worktree');
+    assert.equal(decide(`W=${wt}; git worktree add -q --detach $W origin/development && cd $W && git cherry-pick abc || git reset -q --hard`, cwd)[0], 'ask', 'reset --hard in the new worktree asks (real inspector: the worktree does not exist yet)');
+    for (const command of [
+      `git worktree add --detach E:/nature-release-fe-20261014 origin/development`,
+      `git worktree add ${wt} origin/development`,
+      `git worktree add --detach -b side ${wt} origin/development`,
+      `git worktree add --detach --force ${wt} origin/development`,
+      `git worktree add --detach ${base.replace(/\\/g, '/')}/elsewhere/x origin/development`,
+      `W=$(pwd)/x; git worktree add --detach $W origin/development`,
+    ]) assert.equal(decide(command, cwd, dev)[0], 'ask', command);
+    delete process.env.SEABRIDGE_GUARD_WORKTREE_APPROVALS;
+    fs.rmSync(approvals);
+    process.env.SEABRIDGE_GUARD_WORKTREE_APPROVALS = approvals;
+    assert.equal(decide(`git worktree add --detach ${wt} origin/development`, cwd, dev)[0], 'ask', 'no approvals file: ask');
+  } finally {
+    if (previous === undefined) delete process.env.SEABRIDGE_GUARD_WORKTREE_APPROVALS; else process.env.SEABRIDGE_GUARD_WORKTREE_APPROVALS = previous;
+    fs.rmSync(base, { recursive: true, force: true });
+  }
+});
 test('actual stdin runner emits native denial protocol', () => {
   const file = path.resolve(__dirname, '../../scripts/hooks/seabridge-git-guard.js');
   const result = spawnSync(process.execPath, [file], { input: JSON.stringify({ cwd, tool_input: { command: 'git push --force' } }), encoding: 'utf8' });

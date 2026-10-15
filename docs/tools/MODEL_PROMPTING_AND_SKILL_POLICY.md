@@ -53,7 +53,10 @@ running agents or delete their receipts. Reverting this batch affects source onl
 Work directly in the existing primary checkout: backend `seabridge_development`,
 frontend `development`, ECC and OpenSeaBri `main`, autoresearch and `_upstream`
 `master`. Backend `main` and frontend `master` are protected live branches.
-Alejandro must explicitly approve a new worktree or branch by path/name/reason;
+Detached release/integration worktrees under `C:/Users/adelm/SeaBridgeAI/.worktrees/`
+have standing owner approval (backend AGENTS_SYSTEM rule 3): session-owned commits
+only, published by push/merge to the normal branch, then the worktree is removed.
+Alejandro must explicitly approve any new branch or other worktree by path/name/reason;
 general autonomy and commit/push approval do not imply this exception. A dirty
 checkout or occupied file is not permission to create another checkout. Register
 assigned-file ownership, serialize conflicting writes, and keep one release owner.

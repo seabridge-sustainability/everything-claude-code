@@ -51,7 +51,9 @@ is not interception proof, and this guard does not activate direct IDE starts.
   never interpret this skill as blanket approval.
 - Delegate independent required outputs with disjoint ownership, bounded costs,
   closure reserve and available configured models; reuse completed workers.
-  Use primary checkouts; new branches/worktrees require explicit owner approval.
+  Use primary checkouts. Release worktrees under SeaBridgeAI/.worktrees have standing
+  approval (AGENTS_SYSTEM rule 3: land on the normal branch, then remove); new
+  branches and other worktrees require explicit owner approval.
   More agents are not automatically faster or cheaper. Only root integrates/releases.
 - At product checkpoints or suspected drift, use a bounded read-only evaluator;
   retain deterministic ownership/outcome gates. Reject activity-only progress,
