@@ -1,8 +1,7 @@
-name: Scheduled Maintenance
+name: Manual Maintenance
 
 on:
-  schedule:
-    - cron: '0 9 * * 1'  # Weekly Monday 9am UTC
+  # Fork maintenance is owner-invoked only; do not auto-close project work.
   workflow_dispatch:
 
 permissions:
@@ -14,6 +13,7 @@ jobs:
   stale:
     name: Stale Issues/PRs
     runs-on: ubuntu-latest
+    timeout-minutes: 3
     steps:
       - uses: actions/stale@1e223db275d687790206a7acac4d1a11bd6fe629 # v10.4.0
         with:
