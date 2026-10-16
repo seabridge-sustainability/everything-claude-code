@@ -108,7 +108,7 @@ const tests = [
     assert.strictEqual(r.status,0); assert.ok(r.logs.some(x => /Passed:\s+4\s/.test(x)));
   }],
   ['Node spec summary contributes successful cases', () => {
-    const r = run({status:0, stdout:'ℹ tests 3\nℹ pass 3\nℹ fail 0\n'});
+    const r = run({status:0, stdout:'\u2139 tests 3\n\u2139 pass 3\n\u2139 fail 0\n'});
     assert.strictEqual(r.status,0); assert.ok(r.logs.some(x => /Passed:\s+3\s/.test(x)));
   }],
   ['top-level Node summary wins over nested and legacy output', () => {
@@ -120,7 +120,7 @@ const tests = [
     assert.strictEqual(r.status,1); assert.strictEqual(r.annotations.length,1);
   }],
   ['spec failures in stderr fail the gate', () => {
-    const r = run({status:0, stderr:'ℹ pass 1\nℹ fail 2\n'});
+    const r = run({status:0, stderr:'\u2139 pass 1\n\u2139 fail 2\n'});
     assert.strictEqual(r.status,1); assert.ok(r.logs.some(x => /Failed:\s+2\s/.test(x)));
   }],
   ['nonzero child exits still fail a passing TAP summary', () => {

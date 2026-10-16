@@ -278,25 +278,59 @@ test('prepared launch refuses reuse, trust/permission bypass, changed argv and u
 
 test('Codex launch denies failed native trust and rechecks owner, goal and configuration after observation', async () => {
   const helper = require(path.join(testedRoot, 'scripts/lib/codex-hook-readiness.js'));
+  const resources = require(path.join(testedRoot, 'scripts/lib/fresh-launch-reservation.js'));
   const original = helper.inspectCodexHooks;
+  const originalBootstrap = resources.containedBootstrap, originalReservation = resources.createReservation;
+  // Exercise the post-Job entrypoint, not a native Windows launch on Linux.
+  // Only the OS boundary is synthetic; real owner/goal/config validation remains.
+  // A spawn trap proves every negative case stops before any actual process.
+  const file = path.join(testedRoot, 'scripts/fresh-agent-session.js');
+  const nativeRequire = require('node:module').createRequire(file);
+  const childProcess = require('node:child_process');
+  const processFixture = { ...process, env: { ...process.env } };
+  const isolated = { exports: {} };
+  let currentPlan, spawns = 0, discoveries = 0;
+  require('node:vm').runInNewContext(fs.readFileSync(file, 'utf8'), {
+    require: id => id === 'node:child_process' || id === 'child_process'
+      ? { ...childProcess, spawn: () => { spawns++; throw Error('synthetic spawn trap'); } }
+      : nativeRequire(id),
+    module: isolated, exports: isolated.exports, process: processFixture,
+    __dirname: path.dirname(file), __filename: file, console, Buffer,
+  }, { filename: file });
+  const contained = plan => {
+    processFixture.env.ECC_FRESH_LAUNCH_PLAN = JSON.stringify(plan);
+    return isolated.exports.main(['contained']);
+  };
   try {
+    resources.containedBootstrap = plan => { currentPlan = plan; return { claim: {} }; };
+    resources.createReservation = ({ authority }) => ({ recheck: () => authority() });
     const denied = fixture('codex');
-    helper.inspectCodexHooks = async () => { throw Error('Native guard untrusted'); };
-    await assert.rejects(() => launch(denied.plan), /untrusted/);
+    if (process.platform !== 'win32') assert.throws(() => launch(denied.plan), /verified Windows Job lifecycle/);
+    helper.inspectCodexHooks = async () => { discoveries++; throw Error('Native guard untrusted'); };
+    await assert.rejects(() => contained(denied.plan), /untrusted/);
     for (const change of ['owner', 'goal', 'config', 'config-bytes', 'manifest']) {
       const f = fixture('codex');
       // Synthetic successful metadata only; mutation must still prevent spawn.
       helper.inspectCodexHooks = async () => {
+        discoveries++;
         if (change === 'owner') execute('close', { cwd:f.cwd, sessionId:f.session });
         if (change === 'goal') { const goal = JSON.parse(fs.readFileSync(f.selectedGoal)); goal.current_priority = 'Owner changed during probe'; fs.writeFileSync(f.selectedGoal, JSON.stringify(goal)); }
         if (change === 'config') { const b = JSON.parse(fs.readFileSync(f.options.configFile)); fs.writeFileSync(path.join(f.cwd,b.nativeConfig), '{}'); }
         if (change === 'config-bytes') { const b = JSON.parse(fs.readFileSync(f.options.configFile)); fs.appendFileSync(path.join(f.cwd,b.nativeConfig), ' '); }
-        if (change === 'manifest') { f.plan.manifest.args = ['--version']; f.plan.args[f.plan.args.length-1] = '--version'; }
+        if (change === 'manifest') { currentPlan.manifest.args = ['--version']; currentPlan.args[currentPlan.args.length-1] = '--version'; }
         return { ready:true };
       };
-      await assert.rejects(() => launch(f.plan), /closed|goal reference mismatch|hook config changed|binding changed/);
+      await assert.rejects(() => contained(f.plan), /closed|goal reference mismatch|hook config changed|binding changed/);
     }
-  } finally { helper.inspectCodexHooks = original; }
+    assert.equal(discoveries, 6); assert.equal(spawns, 0);
+    // Valid metadata reaches the trapped launch; this is not a deny-everything test.
+    helper.inspectCodexHooks = async () => ({ ready: true });
+    await assert.rejects(() => contained(fixture('codex').plan), /synthetic spawn trap/);
+    assert.equal(spawns, 1);
+  } finally {
+    helper.inspectCodexHooks = original;
+    resources.containedBootstrap = originalBootstrap; resources.createReservation = originalReservation;
+  }
 });
 
 test('managed Codex arguments reject attached config/workspace overrides, alternate profiles and feature changes', () => {
