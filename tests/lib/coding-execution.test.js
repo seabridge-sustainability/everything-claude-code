@@ -168,9 +168,10 @@ function journalFixture(t, leaseMs=5000, successful=false) {
   const config=path.join(trust,'host-config.json');fs.writeFileSync(config,JSON.stringify(spec));c.create(f.file,f.plan);
   const hostFile=path.resolve(__dirname,'../../scripts/lib/coding-execution-host.js');
   const supervisor=path.join(trust,'supervisor.js');
-  fs.writeFileSync(supervisor,`const c=require(${JSON.stringify(path.resolve(__dirname,'../../scripts/lib/coding-execution.js'))}),r=require(${JSON.stringify(path.resolve(__dirname,'../../scripts/lib/coding-execution-runner.js'))});const file=process.argv[2],host=r.pinnedHost(${JSON.stringify(hostFile)},${JSON.stringify(store.sha256File(hostFile))},{stateFile:file,plan:c.load(file).plan});r.run(file,host,{maxIterations:1,maxMilliseconds:20000}).then(v=>console.log(JSON.stringify({pid:process.pid,state:v.state,stopped:v.stopped}))).catch(e=>{console.error(e.message);process.exitCode=2;});`);
+  const supervisorBudget=Math.max(20000,leaseMs*2);
+  fs.writeFileSync(supervisor,`const c=require(${JSON.stringify(path.resolve(__dirname,'../../scripts/lib/coding-execution.js'))}),r=require(${JSON.stringify(path.resolve(__dirname,'../../scripts/lib/coding-execution-runner.js'))});const file=process.argv[2],host=r.pinnedHost(${JSON.stringify(hostFile)},${JSON.stringify(store.sha256File(hostFile))},{stateFile:file,plan:c.load(file).plan});r.run(file,host,{maxIterations:1,maxMilliseconds:${supervisorBudget}}).then(v=>console.log(JSON.stringify({pid:process.pid,state:v.state,stopped:v.stopped}))).catch(e=>{console.error(e.message);process.exitCode=2;});`);
   const env={...process.env,ECC_EXECUTION_HOST_CONFIG:config,ECC_EXECUTION_HOST_CONFIG_SHA256:store.sha256File(config)};
-  return {...f,spec,hostFile,supervisor,env};
+  return {...f,spec,hostFile,supervisor,supervisorBudget,env};
 }
 async function waitFixture(predicate,timeout=15000) {
   const end=Date.now()+timeout;
@@ -586,7 +587,11 @@ test('local critic child survives supervisor death with one review, charge and d
 
 test('local successful child is adopted after supervisor death without relaunch or effects', async t => {
   if(!journalHeadroom(t))return;
-  const f=journalFixture(t,8000,true),worker=f.plan.workers[0],code=path.join(worker.repo,'code.txt');
+  // Successful recovery needs both child closure AND its Git snapshot inside
+  // the lease. Windows process/Git overhead can exceed the old eight seconds;
+  // keep the real expiry/recovery path, with a bounded fixture-only lease.
+  const leaseMs=process.platform==='win32'?30000:8000;
+  const f=journalFixture(t,leaseMs,true),worker=f.plan.workers[0],code=path.join(worker.repo,'code.txt');
   const first=spawn(process.execPath,['--max-old-space-size=64',f.supervisor,f.file],{env:f.env,stdio:'ignore',windowsHide:true});
   const closed=new Promise((resolve,reject)=>{first.once('error',reject);first.once('close',resolve);});
   await waitFixture(()=>fs.readFileSync(code,'utf8').includes('"event":"start"'));
@@ -595,10 +600,13 @@ test('local successful child is adopted after supervisor death without relaunch 
   const receiptFile=path.join(f.spec.receipts,pending.callId+'.json');await waitFixture(()=>fs.existsSync(receiptFile));
   const receipt=JSON.parse(fs.readFileSync(receiptFile,'utf8'));assert.equal(receipt.exit,0);
   assert.ok(receipt.closed_at<=node.lease_until);assert.ok(receipt.closure_snapshot);
-  await waitFixture(()=>Date.now()>node.lease_until);
+  assert.ok(receipt.snapshot_at<=node.lease_until,'closure snapshot must finish within the dispatch lease');
+  await waitFixture(()=>Date.now()>node.lease_until,leaseMs+5000);
   const host=concrete.createBoundHost(f.spec,{stateFile:f.file,plan:f.plan});
-  const observed=host.inspectWorker(worker,node);assert.equal(observed.status,'completed');
-  const next=()=>{const r=spawnSync(process.execPath,['--max-old-space-size=64',f.supervisor,f.file],{env:f.env,encoding:'utf8',windowsHide:true,timeout:20000,maxBuffer:1024*1024});assert.equal(r.status,0,r.stderr);return JSON.parse(r.stdout);};
+  const observed=host.inspectWorker(worker,node);
+  assert.ok(observed,'the in-lease closed worker must be recoverable');
+  assert.equal(observed.status,'completed');
+  const next=()=>{const r=spawnSync(process.execPath,['--max-old-space-size=64',f.supervisor,f.file],{env:f.env,encoding:'utf8',windowsHide:true,timeout:f.supervisorBudget+10000,maxBuffer:1024*1024});assert.equal(r.status,0,r.error?.message||r.stderr);return JSON.parse(r.stdout);};
   const second=next();assert.notEqual(second.pid,first.pid);
   assert.equal(second.state.dispatches,1);assert.equal(second.state.nodes[worker.id].attempts,1);
   assert.equal(second.state.nodes[worker.id].usage.tool_calls,1);assert.equal(second.state.repairs,0);
