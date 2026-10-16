@@ -30,7 +30,7 @@
     ],
     "semanticIndex": "not-run"
   },
-  "sourceFingerprint": "594901dceb71244949f519e8fa54bab3e6203330c4b223d288541b2925d8d338",
+  "sourceFingerprint": "e6902083474ba4b51f39b9098f524b76af7b4efa029f1a6317ad420086a89ec0",
   "sources": [
     {
       "path": "../manageesg-backend/AGENTS.md",
@@ -530,7 +530,7 @@
     },
     {
       "path": "tests/lib/coding-execution.test.js",
-      "sha256": "802b931fd68f48b84b1f1525007b7b59ecfaff3dcce6025471c882097bb5fb2f"
+      "sha256": "c8a85b8cccca127f5385a36c76d9f6496442c9c1bb0fcd5bffa71ecded60a9d7"
     },
     {
       "path": "tests/lib/fresh-session-guard.test.js",
@@ -1366,7 +1366,7 @@
       "id": "file:tests/lib/coding-execution.test.js",
       "type": "source",
       "path": "tests/lib/coding-execution.test.js",
-      "sha256": "802b931fd68f48b84b1f1525007b7b59ecfaff3dcce6025471c882097bb5fb2f"
+      "sha256": "c8a85b8cccca127f5385a36c76d9f6496442c9c1bb0fcd5bffa71ecded60a9d7"
     },
     {
       "id": "file:tests/lib/fresh-session-guard.test.js",
@@ -4876,14 +4876,14 @@
     }
   ],
   "build": {
-    "generatedAt": "2026-10-15T22:02:57-04:00",
-    "sourceCommit": "97f29c3fed508a6928bf10df870d1a4fda250edf",
+    "generatedAt": "2026-10-15T22:30:31-04:00",
+    "sourceCommit": "e73c6c01113bf0939a7c4663eebdb7aadf65bbfe",
     "sourceDirty": false,
-    "policyCommit": "d8722a4e9c0e19df48df94bf49f082ea989b6ed9",
+    "policyCommit": "e88b673282813248da0a569b71528b7c3a8a03d0",
     "policyDirty": false,
     "verificationOnly": true,
     "provenanceMode": "exact-git-object-export",
-    "sourceTree": "1ba68593efd15ac023d54269a157b81683eded0c",
-    "policyTree": "bca194797ee2018a5da18b518b3ad3f0ea829588"
+    "sourceTree": "4267f9b917e42e7be089ee7e7d1e071f67c01f1a",
+    "policyTree": "1414aa3b12a39de8aee90f95ff24251cb8d5d717"
   }
 }
