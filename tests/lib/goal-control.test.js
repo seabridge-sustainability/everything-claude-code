@@ -389,6 +389,19 @@ test('capacity holds survive expiry, ignore cross-goal receipts and honor only t
   assert.doesNotThrow(() => checkAssignmentCapacity(reserved.goal_id, [reserved], [passed, failed, retired], request, telemetry, now));
 });
 
+test('queued assignment metadata does not reserve execution RAM or bind a managed worker', () => {
+  const capacity = { ram_gib: 99, disk_gib: 99, volume: 'c:' };
+  const queued = assignment({ capacity, execution_state: 'queued' });
+  assert.doesNotThrow(() => validateBundle({ goal: goal(), assignments: [queued] }));
+  assert.throws(() => validateBundle({ goal: goal(), assignments: [queued], integrations: [integration()] }), /queued metadata/);
+  assert.equal(require('../../scripts/lib/goal-control').buildParallelStatus([queued], [integration()]).integrated, 0);
+  assert.doesNotThrow(() => validateBundle({ goal: goal(), assignments: [queued], integrations: [integration({ outcome: 'not_adopted', limitations: ['Planning only; execution not admitted'] })] }));
+  const result = checkAssignmentCapacity(queued.goal_id, [queued], [], { ram_gib: 0.1, disk_gib: 0, volume: 'c:' },
+    { freeRamGib: 2.2, freeDiskGib: 6 }, Date.parse('2026-09-30T12:00:00Z'));
+  assert.equal(result.reservedRam, 0); assert.equal(result.reservedDisk, 0);
+  assert.throws(() => validateBundle({ goal: goal(), assignments: [{ ...queued, managed_execution: { repository_root: 'C:/worktree', session_id: 'queued', closure_reserve: 1 } }] }));
+});
+
 test('completion rejects an integration receipt bound to stale repository state', () => {
   const stale = integration({
     repository_fingerprints: [{

@@ -1,5 +1,6 @@
 'use strict';
 const assert = require('node:assert/strict');
+const crypto = require('node:crypto');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
@@ -39,7 +40,7 @@ function fixture(runtime, centralLayout = false, goalFile = null, toolProfile = 
   const commitPolicy=spawnSync('git',['commit','-m','fixture policy baseline'],{cwd,encoding:'utf8',windowsHide:true});assert.equal(commitPolicy.status,0,commitPolicy.stderr);
   const session = 'fresh-' + count;
   execute('register',{cwd,sessionId:session,scopes:['owned','.ecc/fresh-session','.agents/hooks.json',...(goalFile !== null && !centralLayout ? [goalFile] : [])],objective:'Preflight',doneWhen:'Checked',ttl:30});
-  const plan = prepare({runtime,session,cwd,policyRoot,executable:process.execPath,args:['--help'],toolLimit:40,turnLimit:10,toolProfile,
+  const plan = prepare({runtime,session,cwd,policyRoot,executable:process.execPath,args:['--help'],toolLimit:40,turnLimit:10,toolProfile,peakRamGiB:0.1,
     ...(goalFile === null ? {} : {goalFile:selectedGoal})});
   return {cwd,session,policyRoot,plan,selectedGoal,options:{cwd,sessionId:session,policyRoot,configFile:plan.environment.ECC_FRESH_SESSION_CONFIG}};
 }
@@ -69,6 +70,22 @@ function prepareWorker(f) {
   const plan = prepare(f.manifest);
   return {...f,plan,options:{...f.options,sessionId:f.session,configFile:plan.environment.ECC_FRESH_SESSION_CONFIG}};
 }
+test('fresh launch pins its incremental RAM envelope before any native discovery', () => {
+  const f = fixture('claude');
+  const binding = JSON.parse(fs.readFileSync(f.plan.environment.ECC_FRESH_SESSION_CONFIG, 'utf8'));
+  assert.equal(binding.peakRamGiB, 0.1);
+    for (const file of ['workspace-queue', 'workspace-queue-store', 'workspace-live-facts', 'goal-store', 'atomic-write', 'session-coordination']) {
+      assert.equal(binding.implementation['scripts/lib/' + file + '.js'], crypto.createHash('sha256').update(fs.readFileSync(path.join(testedRoot, 'scripts/lib/' + file + '.js'))).digest('hex'));
+    }
+  const changed = structuredClone(f.plan); changed.manifest.peakRamGiB = 0.01;
+  assert.throws(() => launch(changed), /RAM envelope changed/);
+  const removed = structuredClone(f.plan); delete removed.manifest.peakRamGiB;
+  assert.throws(() => launch(removed), /RAM envelope changed/);
+    binding.implementation['scripts/lib/workspace-queue-store.js'] = '0'.repeat(64);
+    fs.writeFileSync(f.plan.environment.ECC_FRESH_SESSION_CONFIG, JSON.stringify(binding));
+    assert.throws(() => launch(f.plan), /implementation changed/);
+});
+
 test('fresh local-no-mcp profile is invocation-local, pinned and preserves hooks',()=>{
   const f=fixture('claude',false,null,'local-no-mcp');
   assert.ok(f.plan.args.includes('--strict-mcp-config'));
@@ -240,8 +257,21 @@ test('prepared launch refuses reuse, trust/permission bypass, changed argv and u
   const f=fixture('claude');
   assert.throws(()=>prepare(f.plan.manifest),/must be absent/);
   assert.throws(()=>prepare({...f.plan.manifest,args:['--dangerously-skip-permissions']}),/bypass/);
+  assert.throws(()=>prepare({...f.plan.manifest,args:['--bare']}),/bypass/);
+  for(const flag of ['--safe-mode','--safe-mode=true']) assert.throws(()=>prepare({...f.plan.manifest,args:[flag]}),/bypass/);
   assert.throws(()=>launch({...f.plan,args:['--dangerously-skip-permissions']}),/arguments changed/);
   assert.throws(()=>launch({...f.plan,environment:{...f.plan.environment,ECC_FRESH_SESSION_REQUIRED:'0'}}),/binding mismatch/);
+  assert.throws(()=>launch({...f.plan,environment:{...f.plan.environment,CLAUDE_CODE_SIMPLE:'1'}}),/binding mismatch/);
+  const simpleBefore=process.env.CLAUDE_CODE_SIMPLE;
+  try { process.env.CLAUDE_CODE_SIMPLE='1';assert.throws(()=>launch(f.plan),/simple mode disables required hooks/); }
+  finally { if(simpleBefore===undefined)delete process.env.CLAUDE_CODE_SIMPLE;else process.env.CLAUDE_CODE_SIMPLE=simpleBefore; }
+  const safeBefore=process.env.CLAUDE_CODE_SAFE_MODE;
+  try {
+    for(const value of ['1','true','unexpected']) {
+      process.env.CLAUDE_CODE_SAFE_MODE=value;
+      assert.throws(()=>launch(f.plan),/safe mode disables required hooks/);
+    }
+  } finally { if(safeBefore===undefined)delete process.env.CLAUDE_CODE_SAFE_MODE;else process.env.CLAUDE_CODE_SAFE_MODE=safeBefore; }
   assert.equal(run('claude','startup',{session_id:'fresh-native',cwd:f.cwd},f.options).exit,0);
   assert.throws(()=>prepare(f.plan.manifest),/existing bindings/);
 });
@@ -358,6 +388,109 @@ test('compacted central workspace declaration keeps the primary checkout fence a
   assert.throws(()=>workspaceBoundary(f.cwd,f.policyRoot),/Malformed central workspace/);
 });
 
+test('current primary grammar and standing detached slots preserve normal-branch and registered-root fences',()=>{
+  const f=fixture('claude',true),system=path.join(f.policyRoot,'AGENTS_SYSTEM.md'),workspace=path.dirname(f.cwd);
+  // Snapshot the reviewed standing rule: hosted CI must not read an owner's home.
+  // Actual installed-policy loading is checked separately by the local audit.
+  const standing="Standing owner approval (2026-10-14): detached release/integration worktrees at `C:/Users/adelm/SeaBridgeAI/.worktrees/<session>-<purpose>-<date>` from the origin normal branch, carrying only session-owned commits; reuse one registered slot/repo, not per worker; no clone/takeover. Once committed and pushed, the work must land in that repo's normal branch above (push/merge, no side branches), then remove the worktree. Remove any unused worktree only when clean, fully published and free of runtime/session bindings. Reuse named commit/push/merge authority; normal release/cost/hooks gates remain. New branches, other worktree locations (E:, home, repo subfolders) and anything else still need Alejandro's explicit path/name/reason; autonomy isn't approval.";
+  fs.writeFileSync(system,`SYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1\nCode ${workspace} only, one primary checkout/repo plus rule 3's slot; E: Docker only;\n${standing}\n`);
+  assert.equal(workspaceBoundary(f.cwd,f.policyRoot).branch,'seabridge_development');
+  const git=args=>{const r=spawnSync('git',args,{cwd:f.cwd,encoding:'utf8',windowsHide:true});assert.equal(r.status,0,r.stderr);return r.stdout;};
+  git(['update-ref','refs/remotes/origin/seabridge_development','HEAD']);
+  const slot=path.join(workspace,'.worktrees','fixture-integration-20261015');
+  git(['worktree','add','--detach',slot,'HEAD']);
+  assert.equal(workspaceBoundary(slot,f.policyRoot).detached,true);
+  const branch=spawnSync('git',['switch','-c','fixture-side-branch'],{cwd:slot,encoding:'utf8',windowsHide:true});assert.equal(branch.status,0,branch.stderr);
+  assert.throws(()=>workspaceBoundary(slot,f.policyRoot),/stay detached/);
+  fs.writeFileSync(system,`SYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1\nCode ${workspace} only, one primary checkout/repo plus rule 3's slot;\n`);
+  assert.throws(()=>workspaceBoundary(slot,f.policyRoot),/approved registered/);
+});
+
+test('fresh artifact-only implementation scope passes positive preflight without broadening writes',()=>{
+  const f=fixture('claude');execute('close',{cwd:f.cwd,sessionId:f.session});
+  const session=f.session+'-artifact',target='artifacts/agent-runs/native-test/allowed.txt';
+  execute('register',{cwd:f.cwd,sessionId:session,scopes:['.ecc/fresh-session/'+session,target],objective:'Exact owned artifact output',doneWhen:'Positive and outside negative',ttl:30});
+  const plan=prepare({...f.plan.manifest,session});
+  const options={...f.options,sessionId:session,configFile:plan.environment.ECC_FRESH_SESSION_CONFIG};
+  const p=payload('claude',f.cwd,target);
+  assert.equal(preflight({...options,runtime:'claude',payload:p}).status,'passed');
+  assert.equal(allowed(run('claude','pre',p,options),'claude'),true);
+  assert.equal(allowed(run('claude','pre',payload('claude',f.cwd,'artifacts/agent-runs/native-test/outside.txt'),options),'claude'),false);
+  assert.equal(fs.existsSync(path.join(f.cwd,target)),false,'preflight itself executes no write');
+});
+
+test('named goal CLI and runtime admission bind sibling ledgers and retain explicit overrides',()=>{
+  const f=fixture('claude',false,'.ecc/goal/named/active-goal.yaml');
+  const directory=path.dirname(f.selectedGoal),outcomes=path.join(directory,'outcomes.jsonl');
+  const bridge=path.join(testedRoot,'scripts/goal-runtime-bridge.js');
+  const admit=()=>spawnSync(process.execPath,[bridge,'admit','--runtime','claude','--mode','controlled',
+    '--goal',f.selectedGoal,'--session',f.session],{cwd:f.cwd,encoding:'utf8',windowsHide:true});
+  fs.writeFileSync(outcomes,'not-json\n');
+  const rejected=admit();
+  assert.equal(rejected.status,2,'must not validate another folder and silently ignore the selected outcomes');
+  assert.equal(JSON.parse(rejected.stdout).admitted,false);
+  assert.ok(JSON.parse(rejected.stdout).validation_error);
+  fs.writeFileSync(outcomes,'');
+  fs.writeFileSync(path.join(f.cwd,'.ecc/goal/outcomes.jsonl'),'unrelated-invalid-json\n');
+  const accepted=admit();
+  assert.equal(accepted.status,0,accepted.stderr+accepted.stdout);
+  assert.equal(JSON.parse(accepted.stdout).admitted,true);
+  fs.writeFileSync(path.join(directory,'resume-receipt.yaml'),'schema: wrong-resume\n');
+  assert.equal(admit().status,2,'selected resume is checked, not omitted');
+  const {pathsFrom}=require(path.join(testedRoot,'scripts/goal-control.js'));
+  assert.equal(pathsFrom(['--goal',f.selectedGoal]).directory,directory);
+  assert.equal(pathsFrom(['--goal',f.selectedGoal]).outcomes,outcomes);
+  assert.equal(pathsFrom(['--goal',f.selectedGoal,'--dir','explicit']).directory,'explicit');
+  assert.equal(pathsFrom([]).directory,path.join('.ecc','goal'));
+});
+
+for (const runtime of ['claude','codex']) test(runtime+': pinned synthetic inputs and schema-only writes denied before any tool side effect',()=>{
+  const f=fixture(runtime);execute('close',{cwd:f.cwd,sessionId:f.session});
+  const fixturePath='tests/fixtures/privacy/synthetic.json',outputPath='artifacts/agent-runs/privacy/result.json';
+  fs.mkdirSync(path.dirname(path.join(f.cwd,fixturePath)),{recursive:true});
+  fs.writeFileSync(path.join(f.cwd,fixturePath),'{"synthetic":true}\n');
+  fs.writeFileSync(path.join(f.cwd,'private-canary.txt'),'FAKE_PRIVATE_CANARY_NEVER_REAL_CLIENT');
+  const sha256=require('node:crypto').createHash('sha256').update(fs.readFileSync(path.join(f.cwd,fixturePath))).digest('hex');
+  const session=f.session+'-privacy';
+  execute('register',{cwd:f.cwd,sessionId:session,scopes:['artifacts/agent-runs/privacy','.ecc/fresh-session/'+session],objective:'Synthetic input fence',doneWhen:'Deny raw reads and writes',ttl:30});
+  const dataPolicy={mode:'synthetic-only',fixture:{path:fixturePath,sha256},outputs:[{path:outputPath,checks:['fixture-check']}]};
+  const plan=prepare({...f.plan.manifest,session,dataPolicy});
+  // No native client or metadata child may see uncontained automatic context,
+  // arbitrary prompt arguments or inherited stdin under a tool-only privacy fence.
+  const readiness=require(path.join(testedRoot,'scripts/lib/codex-hook-readiness'));
+  const original=readiness.inspectCodexHooks;
+  let discoveryCalls=0;
+  try {
+    readiness.inspectCodexHooks=async()=>{discoveryCalls++;return {ready:true};};
+    assert.throws(()=>launch(plan),/Native private-input containment is unverified/);
+    assert.throws(()=>launch({...plan,privacyVerified:true}),/Native private-input containment is unverified/);
+    assert.equal(discoveryCalls,0);
+  } finally {readiness.inspectCodexHooks=original;}
+  assert.throws(()=>execute('guard-bind',{cwd:f.cwd,sessionId:session,guardMode:'audit',dataPolicy}),/requires block mode/);
+  const options={...f.options,sessionId:session,configFile:plan.environment.ECC_FRESH_SESSION_CONFIG};
+  const base={session_id:'privacy-native',cwd:f.cwd};
+  const event=(tool_name,tool_input)=>run(runtime,'pre',{...base,tool_name,tool_input},options);
+  preflight({...options,runtime,payload:{...base,tool_name:'Read',tool_input:{file_path:fixturePath}}});
+  assert.equal(allowed(event('Read',{file_path:fixturePath}),runtime),true);
+  for(const [tool,args] of [
+    ['Read',{file_path:'private-canary.txt'}],['Read',{file_path:fixturePath,path:'private-canary.txt'}],
+    ['Glob',{pattern:'**/*'}],['Grep',{pattern:'CANARY',path:'.'}],
+    ['Write',{file_path:'artifacts/agent-runs/privacy/scratchpad.txt',content:'FAKE_PRIVATE_CANARY'}],
+    ['Write',{file_path:outputPath,content:'FAKE_PRIVATE_CANARY'}],
+    ['Bash',{command:'type private-canary.txt'}],['mcp__filesystem__read_file',{path:'private-canary.txt'}]
+  ]) assert.equal(allowed(event(tool,args),runtime),false,tool+JSON.stringify(Object.keys(args)));
+  const content=require(path.join(testedRoot,'scripts/lib/goal-store')).canonicalJson({schema:'ecc.synthetic-verification.v1',fixture_sha256:sha256,checks:[{id:'fixture-check',passed:true,count:1}]});
+  assert.equal(allowed(event('Write',{file_path:outputPath,content}),runtime),true);
+  const patch='*** Begin Patch\n*** Add File: '+outputPath+'\n'+content.trimEnd().split('\n').map(line=>'+'+line).join('\n')+'\n*** End Patch';
+  assert.equal(allowed(event('apply_patch',runtime==='codex'?{command:patch}:{input:patch}),runtime),true);
+  assert.equal(allowed(event('apply_patch',{patch,input:'*** Begin Patch\n*** Add File: private-canary.txt\n+FAKE_PRIVATE_CANARY\n*** End Patch'}),runtime),false);
+  fs.appendFileSync(path.join(f.cwd,fixturePath),'changed');
+  assert.equal(allowed(event('Read',{file_path:fixturePath}),runtime),false);
+  assert.equal(fs.existsSync(path.join(f.cwd,outputPath)),false);
+  const logs=path.join(f.cwd,'artifacts/agent-runs/scope-guard');
+  for(const file of fs.readdirSync(logs))assert.equal(fs.readFileSync(path.join(logs,file),'utf8').includes('FAKE_PRIVATE_CANARY'),false);
+});
+
 test('selected external artifact goal admits without a repository default and stays write protected',()=>{
   const f=fixture('claude',true,'artifacts/owned-task/active-goal.yaml');
   assert.equal(fs.existsSync(path.join(f.cwd,'.ecc/goal/active-goal.yaml')),false);
@@ -382,6 +515,22 @@ test('selected goal changes invalidate cached startup, pre, turn and final',()=>
     assert.equal(allowed(run('claude','pre',p,f.options),'claude'),false,change);
     for(const event of ['turn','final'])assert.equal(run('claude',event,{...p,turn_id:'fresh-turn'},f.options).output?.decision,'block',change+':'+event);
   }
+});
+
+test('registered same-Git checkout reuses canonical primary goal without accepting another repository or path',()=>{
+  const f=fixture('claude',true),workspace=path.dirname(f.cwd);
+  const slot=path.join(workspace,'.worktrees','canonical-goal-slot');
+  fs.mkdirSync(path.dirname(slot),{recursive:true});
+  const added=spawnSync('git',['worktree','add','--detach',slot,'HEAD'],{cwd:f.cwd,encoding:'utf8',windowsHide:true});
+  assert.equal(added.status,0,added.stderr);
+  const reference=goalReference(repository(slot),f.selectedGoal,workspace);
+  const expected=fs.realpathSync.native(f.selectedGoal);
+  assert.equal(reference.file,process.platform==='win32'?expected.toLowerCase():expected);
+  const other=path.join(f.cwd,'not-canonical-goal.yaml');
+  fs.copyFileSync(f.selectedGoal,other);
+  assert.throws(()=>goalReference(repository(slot),other,workspace));
+  const foreign=fixture('claude');
+  assert.throws(()=>goalReference(repository(slot),foreign.selectedGoal,workspace));
 });
 
 test('goal references reject invalid paths, documents and generic-project external goals',()=>{

@@ -26,7 +26,10 @@ Managed fresh launches may reference an existing task-owned goal using the
 reviewed manifest's `goalFile`; omitted references use the repository default.
 Do not copy goals or overwrite another session's shared goal to satisfy startup.
 Explicit references are immutable and revalidated; outside-repository goals are
-limited to the central approved workspace's artifacts. Version 2 preparation is
+limited to the central approved workspace's artifacts or the same registered Git
+common repository's canonical primary `.ecc/goal/**/active-goal.yaml`. Other
+repositories' private goals remain refused; never copy goals to bypass identity checks.
+Version 2 preparation is
 required for new launches. This closes a path-binding gap, not native interception
 proof or permission to reactivate paused goals.
 
@@ -146,6 +149,50 @@ independent authorized action. Separate waiting, owner-paused, rate-limited,
 approval-required, failed and completed states; never infer them from a spinner.
 
 Use `node scripts/workspace-queue.js status` for current read-only OS/ECC facts.
+Planning-only assignments may use `ecc goal assign --queued true`: they reserve
+no execution RAM/disk, start nothing, cannot bind a managed worker and cannot be
+integrated as executed work. Retire queued metadata with an explicit reason,
+then admit the actual execution separately; do not silently promote it or reset
+spent budgets. Ordinary bounded reads in an existing session need no heavy slot.
+
+New managed native plans declare a reviewed positive `peakRamGiB` incremental
+envelope. `fresh-agent-session` uses the existing shared machine index before
+any native discovery/client startup, and rechecks after asynchronous discovery.
+Native reservations are byte envelopes, not the exclusive browser/test slot;
+concurrent clients may proceed when aggregate headroom permits. Current accounting
+is conservative: no guessed materialization/reclaimed-memory credits. This is
+admission, not a hard resident-memory cap or a claim of reclaimed RAM.
+Prepared profiles pin the enforcing launcher/queue/store/telemetry/lock sources;
+changed implementation requires fresh preparation, not an approval bypass.
+
+The Windows invocation puts its new supervisor, discovery/client and descendants
+in an owned Job before the suspended root runs. Foreground exit/supervisor loss
+closes only that new process tree. A running claim is released only with its
+bound complete-tree closure receipt; missing receipts, expired leases and root
+PID absence are not cessation proof. Unsupported native lifecycle refuses launch;
+never hot-adopt or terminate an existing IDE session to activate it. Invocation-
+local Claude `local-no-mcp` already exists: select it for tasks not needing MCP;
+do not disable required integrations or change global config.
+
+Use `node scripts/fresh-agent-session.js source-search REQUEST.json` for a
+bounded literal metadata-only lookup: `{plan, roots, query}`, with exact relative
+source roots and the existing prepared plan. It excludes generated/private trees,
+links, large/binary files and caps all enumerated entries, input bytes, hits and
+UTF8 output (16 KiB). It prints paths
+and line numbers, not raw matching lines. Its deadline is cooperative between
+bounded filesystem calls, not a hard OS I/O timeout. General lookup is refused
+for a synthetic-only dataPolicy; do not use this route to access private inputs.
+
+For reviewed synthetic work, `fresh-agent-session verify-synthetic PLAN.json`
+performs only deterministic `fixture-integrity` / `output-contract` checks and
+returns canonical receipt metadata. It starts no native client/model/MCP, reads
+no automatic context/stdin/environment input and writes no transcript or scratchpad.
+It cannot attest an unexecuted native/scientific check. Native dataPolicy launch
+remains fail-closed: a Job lifecycle and tool-output checks are not filesystem,
+network or transcript containment. Scope native proof to the exact affected
+runner/harness; unrelated local work needs no universal all-client guarantee.
+This does not waive any explicit current owner publication or acceptance condition.
+
 Admit heavy checks against fresh RAM/disk measurements across current goals;
 per-goal capacity accounting alone does not prove machine-wide headroom. Serialize
 heavy acceptance while constrained. Reuse verified3000/8000 and coordinate any

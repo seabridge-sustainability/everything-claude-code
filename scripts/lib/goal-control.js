@@ -260,6 +260,9 @@ function validateBundle({
     }
     const assignment = assignmentById.get(receipt.assignment_id);
     if (!assignment) throw new Error(`integration receipt ${receipt.receipt_id} references missing assignment ${receipt.assignment_id}`);
+    if (assignment.execution_state === 'queued' && receipt.outcome === 'pass') {
+      throw new Error(`queued metadata cannot be integrated as executed work: ${assignment.assignment_id}`);
+    }
     if (receipt.integrator === assignment.owner_agent) {
       throw new Error(`integration receipt ${receipt.receipt_id} must be recorded by the parent/integrator, not assignment owner ${assignment.owner_agent}`);
     }
@@ -473,7 +476,7 @@ function buildParallelStatus(assignments = [], integrations = [], now = new Date
   }
   const items = assignments.map(assignment => {
     const integration = latestByAssignment.get(assignment.assignment_id) || null;
-    const integrated = integration?.outcome === 'pass';
+    const integrated = assignment.execution_state !== 'queued' && integration?.outcome === 'pass';
     const terminal = ['superseded', 'not_adopted'].includes(integration?.outcome);
     const stale = Boolean(
       correction

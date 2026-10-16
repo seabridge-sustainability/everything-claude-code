@@ -515,7 +515,13 @@ function goalReference(repo, goalFile, workspaceRoot = null) {
   if (!inside(local, file)) {
     if (!workspaceRoot) throw Error('goal reference outside repository');
     boundary = exactPath(workspaceRoot);
-    if (!inside(boundary, local) || !inside(exactPath(path.join(boundary, 'artifacts')), file)) throw Error('goal reference outside reviewed artifacts');
+    // A registered integration checkout shares its repository's canonical goal;
+    // do not require copying that goal into each checkout or a second plan.
+    // Only the same Git common repository's .ecc/goal/**/active-goal.yaml qualifies.
+    const primary = path.basename(repo.common) === '.git' ? exactPath(path.dirname(repo.common)) : null;
+    const canonicalGoal = primary && inside(boundary, primary)
+      && inside(path.join(primary, '.ecc/goal'), file) && path.basename(file) === 'active-goal.yaml';
+    if (!inside(boundary, local) || (!canonicalGoal && !inside(exactPath(path.join(boundary, 'artifacts')), file))) throw Error('goal reference outside reviewed artifacts');
   }
   const original = fs.lstatSync(file, { bigint: true });
   const sameFile = (first, second) => first.isFile() && second.isFile()
@@ -719,7 +725,8 @@ function implementationDigest() {
   const root = path.resolve(__dirname, '../..');
   const files = ['scripts/lib/session-coordination.js', 'scripts/hooks/goal-runtime-gate.js',
     'scripts/goal-runtime-bridge.js', 'schemas/goal-control.schema.json',
-    'scripts/lib/scope-guard-adapters.js', '.opencode/plugins/ecc-scope-guard.ts'];
+    'scripts/lib/scope-guard-adapters.js', '.opencode/plugins/ecc-scope-guard.ts',
+    'scripts/lib/coding-execution.js','schemas/coding-execution.schema.json'];
   return crypto.createHash('sha256').update(files.map(file =>
     crypto.createHash('sha256').update(fs.readFileSync(path.join(root, file))).digest('hex')).join('\n')).digest('hex');
 }
@@ -729,6 +736,7 @@ function validateGuard(guard) {
   if (!guardValidator) {
     const ajv = new Ajv({ strict: false });
     ajv.addSchema(schema);
+    ajv.addSchema(require('../../schemas/coding-execution.schema.json'),'ecc.coding-execution.v1');
     guardValidator = ajv.compile({ $ref: 'ecc.goal-control.v1#/$defs/scopeGuard' });
   }
   if (!guardValidator(guard) || !Number.isFinite(guard.deadline)) throw new Error('invalid scope guard state');
@@ -753,6 +761,7 @@ function bindGuard(repo, session, options, now, state) {
   }
   if (session.preservedForeign?.files.length) preservedForeign(repo, session);
   if (!['audit', 'block'].includes(options.guardMode)) throw new Error('guard-mode must be audit or block');
+  if (options.dataPolicy && options.guardMode!=='block') throw Error('private input policy requires block mode');
   assertNativeVisibleIndex(repo);
   const reference = options.goalReference;
   const goal = goalRevision(repo, reference);
@@ -766,6 +775,7 @@ function bindGuard(repo, session, options, now, state) {
   const guard = { mode: options.guardMode, goalId: goal.id, goalRevision: goal.revision,
     ...(reference ? { goalReference: structuredClone(reference) } : {}),
     ...(worker ? { workerAssignment: worker } : {}),
+    ...(options.dataPolicy ? {dataPolicy:structuredClone(options.dataPolicy)} : {}),
     implementationSha256: implementationDigest(),
     nativeSessionId: options.nativeSessionId || session.id,
     base: session.base, scopes: [...session.scopes], deadline,
@@ -776,6 +786,7 @@ function bindGuard(repo, session, options, now, state) {
   guard.foreignBaselineSha256 = crypto.createHash('sha256')
     .update(JSON.stringify(session.preservedForeign ?? null)).digest('hex');
   validateGuard(guard);
+  if (guard.dataPolicy) require('./coding-execution').verifySyntheticArtifacts({repo:repo.root,scopes:session.scopes,data_policy:guard.dataPolicy});
   if (deadline <= now || deadline > session.expiresAt) throw new Error('guard deadline must be within the active lease');
   session.guard = guard;
   return guard;
@@ -835,6 +846,36 @@ function guardEvent(repo, state, options, now) {
       action = typedAction(options.payload);
       if (!guard.allowedOperations.includes(action.operation)) throw new Error('operation not admitted');
       const toolCwd = options.payload?.tool_input?.workdir || options.payload?.tool_input?.cwd || cwd;
+      if (guard.dataPolicy) {
+        const policy=guard.dataPolicy, input=options.payload.tool_input ?? options.payload.toolInput;
+        const tool=String(options.payload.tool_name || options.payload.toolName || '').replace(/^functions\./,'');
+        require('./coding-execution').verifySyntheticArtifacts({repo:repo.root,scopes:session.scopes,data_policy:policy});
+        if (action.operation==='read') {
+          // Enumerating/searching whole directories is not a reviewed file read.
+          if (!['Read','read_file'].includes(tool) || !input || typeof input!=='object') throw Error('private input policy denied tool');
+          const values=[input.file_path,input.path].filter(value=>value!==undefined);
+          if (!values.length || values.some(value=>value!==values[0]) || Object.hasOwn(input,'paths')
+              || normalizeToolPath(repo,values[0],toolCwd)!==scope(policy.fixture.path)) throw Error('private input policy denied tool');
+        } else {
+          let text;
+          if (tool==='Write' || tool==='write_file') text=input?.content;
+          else if (tool==='apply_patch' || tool==='ApplyPatch') {
+            const aliases=typeof input==='object' && input ? [input.patch,input.input,input.command].filter(value=>value!==undefined) : [];
+            if (aliases.some(value=>value!==aliases[0])) throw Error('private input policy denied tool');
+            const patch=typeof input==='string'?input:input?.patch ?? input?.input;
+            const lines=typeof patch==='string'?patch.replace(/\r\n/g,'\n').trimEnd().split('\n'):[];
+            if (lines[0]!=='*** Begin Patch' || !lines[1]?.startsWith('*** Add File: ') || lines.at(-1)!=='*** End Patch'
+                || lines.slice(2,-1).some(line=>!line.startsWith('+')) || action.paths.length!==1) throw Error('private input policy denied tool');
+            if (fs.existsSync(path.join(repo.root,normalizeToolPath(repo,action.paths[0],toolCwd)))) throw Error('private input policy denied tool');
+            text=lines.slice(2,-1).map(line=>line.slice(1)).join('\n')+'\n';
+          } else throw Error('private input policy denied tool');
+          if (action.paths.length!==1) throw Error('private input policy denied tool');
+          const relative=normalizeToolPath(repo,action.paths[0],toolCwd);
+          const output=policy.outputs.find(item=>scope(item.path)===relative);
+          if (!output) throw Error('private input policy denied tool');
+          require('./coding-execution').verifySyntheticReceipt(policy,output,text);
+        }
+      }
       for (const value of action.paths) {
         const relative = normalizeToolPath(repo, value, toolCwd);
         if (/^(?:\.git|\.ecc|\.codex|\.claude|\.gemini|\.copilot)(?:\/|$)|^\.github\/hooks(?:\/|$)/i.test(relative)
@@ -848,6 +889,7 @@ function guardEvent(repo, state, options, now) {
       'stale owner goal revision', 'scope guard budget exhausted', 'protected guard/check configuration changed',
       'native session identity mismatch', 'missing native turn identity', 'native cwd differs from owned worktree',
       'operation not admitted', 'protected guard/check configuration write', 'unknown guard event',
+      'private input policy denied tool', 'synthetic output policy rejected artifact',
       'invalid event', 'invalid patch', 'empty patch', 'unknown write payload',
       'opaque tool requires a verified restricted execution boundary', 'invalid tool path', 'ambiguous tool path',
       'outside owned write scope', 'linked path is not an owned scope',

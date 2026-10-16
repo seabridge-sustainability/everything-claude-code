@@ -44,6 +44,18 @@ function workerAuthority(worker, now) {
 // Opt-in evidence contract, not a native read sandbox. The immutable plan pins
 // this policy. Reviewed fixture pins cannot prove a hostile adapter read nothing
 // else; native transcript/input containment remains a separately verified layer.
+function verifySyntheticReceipt(policy, output, text) {
+  try {
+    demand(typeof text==='string' && Buffer.byteLength(text)<=16384,'bounded canonical receipt required');
+    const body=text.endsWith('\n')?text.slice(0,-1):text;
+    const receipt=JSON.parse(body);
+    demand(body===canonicalJson(receipt),'canonical receipt required');
+    assert('synthetic_verification',receipt);
+    demand(receipt.fixture_sha256===policy.fixture.sha256 && receipt.checks.length===output.checks.length
+      && new Set(receipt.checks.map(check=>check.id)).size===receipt.checks.length
+      && receipt.checks.every(check=>output.checks.includes(check.id)),'exact reviewed checks required');
+  } catch { throw Error('synthetic output policy rejected artifact'); }
+}
 function verifySyntheticArtifacts(worker, references = null) {
   if (worker.data_policy === undefined) return;
   try {
@@ -81,12 +93,9 @@ function verifySyntheticArtifacts(worker, references = null) {
     for (const ref of references) {
       const relative = inside(worker.repo, ref.path), output = outputs.get(relative);
       demand(output && ref.kind === 'local-check', 'undeclared proof reference');
-      const bytes = read(relative, 16384), text = bytes.toString('utf8'), receipt = JSON.parse(text);
-      demand(sha256Buffer(bytes) === ref.sha256 && text === canonicalJson(receipt), 'canonical pinned proof required');
-      assert('synthetic_verification', receipt);
-      demand(receipt.fixture_sha256 === policy.fixture.sha256 && receipt.checks.length === output.checks.length
-        && new Set(receipt.checks.map(check => check.id)).size === receipt.checks.length
-        && receipt.checks.every(check => output.checks.includes(check.id)), 'exact reviewed checks required');
+      const bytes = read(relative, 16384), text = bytes.toString('utf8');
+      demand(sha256Buffer(bytes) === ref.sha256, 'pinned proof required');
+      verifySyntheticReceipt(policy,output,text);
       seen.add(relative);
     }
     demand(seen.size === outputs.size, 'all declared proof outputs required');
@@ -127,6 +136,7 @@ function checkPlan(plan, now) {
       demand(sha256File(path.join(worker.repo, relative)) === invariant.baseline.sha256, 'preservation baseline changed');
       demand(invariant.category !== 'design' || invariant.baseline.kind === 'browser', 'design preservation needs browser baseline, not private tests');
     }
+    demand(assignment.execution_state !== 'queued', 'queued metadata is not execution admission');
     const proofs = assignment.acceptance_ids.map(id => goal.user_visible_proofs.find(proof => proof.id === id));
     demand(proofs.every(proof => {
       const lane=goal.lanes.find(item=>item.id===proof.lane_id);
@@ -508,4 +518,4 @@ async function dispatchParallel(file, launch, options = {}) {
   }));
   return load(file);
 }
-module.exports = { assert, digest, initialize, apply, create, load, transaction, dispatchParallel, currentEvidence, recoverLock, verifySyntheticArtifacts };
+module.exports = { assert, digest, initialize, apply, create, load, transaction, dispatchParallel, currentEvidence, recoverLock, verifySyntheticArtifacts, verifySyntheticReceipt };

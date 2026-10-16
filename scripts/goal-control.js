@@ -60,7 +60,8 @@ function optionBoolean(args, name, fallback = false) {
 }
 
 function pathsFrom(args) {
-  const directory = optionValue(args, '--dir', DEFAULT_DIR);
+  const selectedGoal = optionValue(args, '--goal');
+  const directory = optionValue(args, '--dir', selectedGoal === null ? DEFAULT_DIR : path.dirname(selectedGoal));
   return {
     directory,
     goal: optionValue(args, '--goal', path.join(directory, 'active-goal.yaml')),
@@ -95,6 +96,7 @@ function loadBundle(args) {
 }
 
 function help() {
+  process.stdout.write('Planning only: assign --queued true records bounded work without reserving/launching it. Queued metadata cannot bind a managed worker, dispatch or count as executed work; retire it before separately admitting execution. Existing bounded reads need no heavy slot.\n');
   process.stdout.write('Fresh managed worker: --managed-session ID --managed-repo DIR --closure-reserve N together. Register first; goal is repository-local. Startup probes count; parent reserve grants no extra worker tools.\n');
   process.stdout.write('Retained artifact verification: --evidence-root DIR (repeatable), --evidence-map SHA256=FILE (repeatable, pinned relocation index/ledger). These do not refresh source fingerprints or authorize acceptance.\n');
   process.stdout.write('New assignments require --work-kind output|blocker, --ram-gib N, --disk-gib N, and --disk-path DIR; blockers also require --defect-evidence FILE.\n');
@@ -237,6 +239,7 @@ function checkAssignmentCapacity(goalId, assignments, integrations, capacity, te
   }
   // Lease expiry proves neither process cessation nor released capacity.
   const active = assignments.filter(item => item.goal_id === goalId && Date.parse(item.issued_at) <= now
+    && item.execution_state !== 'queued'
     && !['pass', 'superseded', 'not_adopted'].includes(latest.get(item.assignment_id)?.outcome));
   if (active.some(item => !item.capacity)) throw new Error('active legacy assignment has unknown capacity; reconcile it before adding parallel work');
   const reservedRam = active.reduce((sum, item) => sum + item.capacity.ram_gib, 0);
@@ -280,6 +283,7 @@ function commandAssignLocked(args) {
   if (ramGib <= 0 || diskGib < 0) throw new Error('assignment peak RAM must be positive and disk cannot be negative');
   const resolvedDiskPath = fs.realpathSync(path.resolve(diskPath));
   const capacity = { ram_gib: ramGib, disk_gib: diskGib, volume: path.parse(resolvedDiskPath).root.toLowerCase() };
+  const queued = optionBoolean(args, '--queued');
   const assignment = {
     schema: 'ecc.assignment.v1',
     assignment_id: optionValue(args, '--assignment-id', makeReceiptId('assignment', issuedAt)),
@@ -289,6 +293,7 @@ function commandAssignLocked(args) {
     work_kind: workKind,
     ...(defectEvidence ? { defect_evidence: defectEvidence, defect_evidence_sha256: sha256File(path.resolve(defectEvidence)) } : {}),
     capacity,
+    ...(queued ? { execution_state: 'queued' } : {}),
     owner_runtime: ownerRuntime,
     owner_agent: ownerAgent,
     scope_paths: scopePaths,
@@ -306,6 +311,7 @@ function commandAssignLocked(args) {
   const managedRepo = optionValue(args,'--managed-repo');
   const reserve = optionValue(args,'--closure-reserve');
   if ([managedSession,managedRepo,reserve].some(value => value !== null)) {
+    if (queued) throw Error('queued metadata cannot bind or launch a managed worker; admit execution separately');
     if (!managedSession || !managedRepo || reserve === null) throw Error('managed assignment requires --managed-session, --managed-repo and --closure-reserve');
     const coordination = require('./lib/session-coordination');
     const repo = coordination.repository(managedRepo), owner = coordination.checkSession({cwd:repo.root,sessionId:managedSession});
@@ -338,10 +344,12 @@ function commandAssignLocked(args) {
     watchdog: fs.existsSync(path.resolve(paths.watchdog)) ? readStructuredFile(paths.watchdog) : null,
     activity: readJsonLines(paths.activity),
   });
-  const stats = fs.statfsSync(resolvedDiskPath), gib = 1024 ** 3;
-  checkAssignmentCapacity(goal.goal_id, assignments, integrations, capacity, {
-    freeRamGib: os.freemem() / gib, freeDiskGib: stats.bavail * stats.bsize / gib,
-  });
+  if (!queued) {
+    const stats = fs.statfsSync(resolvedDiskPath), gib = 1024 ** 3;
+    checkAssignmentCapacity(goal.goal_id, assignments, integrations, capacity, {
+      freeRamGib: os.freemem() / gib, freeDiskGib: stats.bavail * stats.bsize / gib,
+    });
+  }
   if (assignment.managed_execution) {
     const coordination=require('./lib/session-coordination'), repo=coordination.repository(assignment.managed_execution.repository_root);
     coordination.execute('assignment-bind',{cwd:repo.root,sessionId:assignment.managed_execution.session_id,assignment,
@@ -364,6 +372,8 @@ function commandIntegrate(args) {
     throw new Error('integrate requires --assignment, --integrator, --evidence, --tool-calls, --retries, --ci-runs, and --cost-usd');
   }
   const observedAt = optionValue(args, '--observed-at', new Date().toISOString());
+  const pendingAssignment = readJsonLines(paths.assignments).find(item => item.assignment_id === assignmentId);
+  if (pendingAssignment?.execution_state === 'queued' && optionValue(args, '--outcome', 'pass') === 'pass') throw Error('queued metadata cannot be integrated as executed work; retire and admit execution separately');
   const states = captureRepositories(args, paths);
   const receipt = {
     schema: 'ecc.integration-receipt.v1',

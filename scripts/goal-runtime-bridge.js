@@ -76,8 +76,9 @@ function main(args = process.argv.slice(2)) {
   const runtimeId = optionValue(args, '--runtime');
   if (!runtimeId) throw new Error(`${command} requires --runtime`);
   runtimeById(runtimeId, capabilities);
-  const goalDir = optionValue(args, '--dir', path.join('.ecc', 'goal'));
-  const goalPath = optionValue(args, '--goal', path.join(goalDir, 'active-goal.yaml'));
+  // Reuse the goal CLI's resolver so a named goal cannot silently borrow the
+  // default folder's outcomes, assignments or resume receipt.
+  const { directory: goalDir, goal: goalPath } = require('./goal-control').pathsFrom(args);
   const model = optionValue(args, '--model');
   const sessionId = optionValue(args, '--session', process.env.ECC_SESSION_ID);
   const artifactArgs = evidenceArgs(args);

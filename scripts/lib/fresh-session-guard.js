@@ -58,7 +58,7 @@ function policyFiles(policyRoot) {
 function workspaceBoundary(cwd, policyRoot) {
   const system = policyFiles(policyRoot).find(file => path.basename(file) === 'AGENTS_SYSTEM.md');
   const text = fs.readFileSync(system, 'utf8');
-  const declaration = /^Code(?::|\s)\s*(.+?) only(?:;|,) one active checkout\/repo(?:\.|;)/m.exec(text);
+  const declaration = /^Code(?::|\s)\s*(.+?) only(?:;|,) one (?:active checkout\/repo(?:\.|;)|primary checkout\/repo plus rule 3's slot;)/m.exec(text);
   // Non-SeaBridge policy fixtures or other projects have no declared layout.
   // Never invent a workspace policy for them; the scope guard still applies.
   if (!declaration) {
@@ -68,16 +68,35 @@ function workspaceBoundary(cwd, policyRoot) {
   if (!path.isAbsolute(declaration[1])) throw Error('Absolute central code workspace required');
   const workspace = canonical(declaration[1]);
   const repo = repository(cwd);
-  const relative = path.relative(workspace, repo.root).replace(/\\/g, '/');
+  let relative = path.relative(workspace, repo.root).replace(/\\/g, '/');
   const branches = {
     'manageesg-backend': 'seabridge_development', 'manageesg-frontend': 'development',
     'everything-claude-code': 'main', 'autoresearch': 'master', 'openseabri': 'main',
     '_upstream': 'master', 'seabridge-ai-oss': 'master', 'seabri-tidekeepers': 'main',
     '_upstream/climada-stack': 'master',
   };
-  if (!Object.hasOwn(branches, relative)) throw Error('Workspace is not an approved primary checkout; explicit layout approval required');
   const git = args => execFileSync('git', args, { cwd: repo.root, encoding: 'utf8',
     windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] }).trim();
+  if (relative.startsWith('.worktrees/')) {
+    const approved = /Standing owner approval \(\d{4}-\d{2}-\d{2}\):/.test(text)
+      && require('../check-instruction-stack').hasWorktreeApproval(text);
+    const primary = path.dirname(repo.common);
+    relative = path.relative(workspace, primary).replace(/\\/g, '/');
+    const slot = path.relative(path.join(workspace, '.worktrees'), repo.root);
+    if (!approved || slot.includes(path.sep) || !slot || slot.startsWith('.')
+        || !Object.hasOwn(branches, relative) || path.basename(repo.common) !== '.git'
+        || canonical(path.join(primary, '.git')) !== repo.common
+        || !git(['worktree','list','--porcelain','-z']).split('\0').some(row=>row.startsWith('worktree ') && canonical(row.slice(9))===repo.root)) {
+      throw Error('Workspace is not an approved registered integration slot');
+    }
+    let attached = false;
+    try { git(['symbolic-ref','--quiet','--short','HEAD']); attached = true; } catch { /* Detached required. */ }
+    if (attached) throw Error('Standing integration slot must stay detached');
+    try { git(['merge-base','--is-ancestor','refs/remotes/origin/'+branches[relative],'HEAD']); }
+    catch { throw Error('Integration slot must include its published normal branch'); }
+    return { workspace, repository: relative, branch: branches[relative], detached: true };
+  }
+  if (!Object.hasOwn(branches, relative)) throw Error('Workspace is not an approved primary checkout; explicit layout approval required');
   if (canonical(git(['rev-parse', '--absolute-git-dir'])) !== repo.common) throw Error('Secondary worktree refused by central workspace policy');
   const branch = git(['symbolic-ref', '--quiet', '--short', 'HEAD']);
   if (branch !== branches[relative]) throw Error('Branch differs from approved primary branch; no automatic switching or takeover');
@@ -93,6 +112,8 @@ function context({ cwd, runtime, sessionId, payload, policyRoot, configFile }) {
   if (relative.startsWith('../') || path.isAbsolute(relative) || fs.lstatSync(configFile).isSymbolicLink()) throw Error('fresh config must be inside owned worktree');
   const files = policyFiles(policyRoot);
   const binding = JSON.parse(fs.readFileSync(configFile, 'utf8'));
+  if (session.guard && JSON.stringify(session.guard.dataPolicy)!==JSON.stringify(binding.dataPolicy)) throw Error('Prepared input policy changed');
+  if (binding.dataPolicy) require('./coding-execution').verifySyntheticArtifacts({repo:repo.root,scopes:session.scopes,data_policy:binding.dataPolicy});
   if (binding.version !== 2 && !(binding.version === 1 && session.guard
       && !session.guard.goalReference && !binding.goalReference)) throw Error('Unbound legacy or unknown fresh binding refused');
   if (binding.version === 2 && !binding.goalReference) throw Error('reviewed goal reference missing');
@@ -127,7 +148,7 @@ function context({ cwd, runtime, sessionId, payload, policyRoot, configFile }) {
   }
   const fingerprint = sha(JSON.stringify({ runtime, sessionId, cwd: repo.root,
     nativeId: native.session_id, config: hash(configFile),
-    policies: files.map(hash), implementation: [__filename, path.join(root,'scripts/lib/skill-routing.js'),path.join(root,'manifests/task-skill-routing.json'), path.join(root, 'scripts/hooks/fresh-session-guard.js'),
+    policies: files.map(hash), implementation: [__filename, path.join(root,'scripts/check-instruction-stack.js'),path.join(root,'scripts/lib/skill-routing.js'),path.join(root,'manifests/task-skill-routing.json'), path.join(root, 'scripts/hooks/fresh-session-guard.js'),
       path.join(root, '.opencode/plugins/ecc-fresh-session-guard.mjs'),path.join(root,'integrations/software-factory/ui-write-gate.cjs'),path.join(root,'integrations/software-factory/ui-contract.cjs'),path.join(root,'integrations/software-factory/ui-browser.mjs'),path.join(root,'scripts/lib/browser-evidence.js')].map(hash) }));
   const receipt = path.join(repo.directory, 'fresh-preflight', sha(sessionId + ':' + native.session_id) + '.json');
   return { native, repo, session, relative, fingerprint, receipt, binding };
@@ -155,6 +176,7 @@ function preflight(options) {
       toolLimit: config.toolLimit, turnLimit: config.turnLimit,
       ...(config.workerAssignment ? {workerAssignment:config.workerAssignment,runtime:options.runtime} : {}),
       ...(config.goalReference ? { goalReference: config.goalReference } : {}),
+      ...(config.dataPolicy ? { dataPolicy: config.dataPolicy } : {}),
       protectedPaths: [ctx.relative, config.nativeConfig,
         ...(config.goalReference ? (config.goalReference.boundary === ctx.repo.root
           ? [path.relative(ctx.repo.root, config.goalReference.file).replace(/\\/g, '/')] : [])
@@ -162,11 +184,13 @@ function preflight(options) {
     ctx = context(options);
   }
   if (ctx.session.guard.nativeSessionId !== ctx.native.session_id || ctx.session.guard.mode !== 'block') throw Error('fresh guard identity/mode mismatch');
-  const target = ctx.session.scopes.find(scope => !/^(?:\.ecc|\.git|artifacts)(?:\/|$)/i.test(scope));
+  const target = ctx.binding.dataPolicy?.outputs[0].path || ctx.session.scopes.find(scope => !/^(?:\.ecc|\.git)(?:\/|$)/i.test(scope));
   if (!target) throw Error('no implementation scope for allowed-action preflight');
+  const canonicalContent = ctx.binding.dataPolicy ? require('./goal-store').canonicalJson({schema:'ecc.synthetic-verification.v1',fixture_sha256:ctx.binding.dataPolicy.fixture.sha256,
+    checks:ctx.binding.dataPolicy.outputs[0].checks.map(id=>({id,passed:true,count:0}))}) : undefined;
   const base = { session_id: ctx.native.session_id, cwd: ctx.repo.root, tool_name: 'Write' };
   const probes = [
-    ['allowed-owned-write', { ...base, tool_input: { file_path: target } }, true],
+    ['allowed-owned-write', { ...base, tool_input: { file_path: target, ...(canonicalContent?{content:canonicalContent}:{}) } }, true],
     ['blocked-outside-write', { ...base, tool_input: { file_path: '../ecc-preflight-outside' } }, false],
     ['blocked-policy-write', { ...base, tool_input: { file_path: ctx.binding.goalReference?.file ?? '.ecc/goal/active-goal.yaml' } }, false],
     ['blocked-config-write', { ...base, tool_input: { file_path: ctx.relative } }, false],

@@ -4,7 +4,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
-const { planQueues, resourceKey, validateEntries } = require('./workspace-queue');
+const { planQueues, resourceKey, validateEntries, needsMemory } = require('./workspace-queue');
 function demand(value, reason) { if (!value) throw new Error(reason); }
 function synchronous(callback, ...args) {
   const value = callback(...args);
@@ -74,7 +74,7 @@ function createMachineQueueGuard({ file, withFileLock, atomicWrite, assertWrite,
         demand(totalBytes <= 8 * 1024 * 1024, 'aggregate machine queue state too large');
         if (canonical(queue) === canonical(target)) continue;
         const prefix = crypto.createHash('sha256').update(canonical(queue)).digest('hex');
-        for (const entry of state.entries.filter(value => value.kind === 'heavy-check' && value.state === 'running')) {
+        for (const entry of state.entries.filter(value => needsMemory(value) && value.state === 'running')) {
           peers.push({ ...entry, id: 'machine-' + prefix + '-' + entry.id, dependsOn: [] });
           demand(peers.length < 1000, 'machine claim history requires reconciliation');
         }
@@ -90,7 +90,7 @@ function createMachineQueueGuard({ file, withFileLock, atomicWrite, assertWrite,
       const result = synchronous(action, peers);
       // A terminal queue no longer occupies a machine slot. Do not infer this
       // from a lease deadline, PID absence, or deletion of its file.
-      if (initialize && !queueState(target).entries.some(value => value.kind === 'heavy-check' && value.state === 'running')) {
+      if (initialize && !queueState(target).entries.some(value => needsMemory(value) && value.state === 'running')) {
         queues = queues.filter(value => canonical(value) !== canonical(target)); write();
       }
       return result;
@@ -132,9 +132,9 @@ function createQueueStore({ file, withFileLock, atomicWrite, assertWrite, readTe
   function plan(state, targetId = null){
     // Real telemetry callbacks may do ownership/source checks first. Capture
     // planner time after the observation, never before its timestamp exists.
-    const needsMemory=targetId ? state.entries.find(entry=>entry.id===targetId)?.kind==='heavy-check'
-      :state.entries.some(entry=>entry.kind==='heavy-check'&&entry.state==='waiting');
-    const telemetry=needsMemory?synchronous(readTelemetry):undefined,now=synchronous(clock);
+    const sampleMemory=targetId ? needsMemory(state.entries.find(entry=>entry.id===targetId) || {})
+      :state.entries.some(entry=>needsMemory(entry)&&entry.state==='waiting');
+    const telemetry=sampleMemory?synchronous(readTelemetry):undefined,now=synchronous(clock);
     return planQueues([...state.entries, ...peerClaims],{now,telemetry,checkGate:entry=>trustedGate(entry,'acquire')});
   }
   function onMachine(write, action) {
@@ -193,7 +193,7 @@ function createQueueStore({ file, withFileLock, atomicWrite, assertWrite, readTe
             if(recovering)demand(synchronous(confirmStopped,structuredClone(checked))===true,
               'invocation cessation/spend changed before publication');
             const pending={...state,entries:state.entries.map(value=>value.id===entry.id?{...value,state:'waiting'}:value)};
-            const telemetry=entry.kind==='heavy-check'?synchronous(readTelemetry):undefined,now=synchronous(clock);
+            const telemetry=needsMemory(entry)?synchronous(readTelemetry):undefined,now=synchronous(clock);
             const decision=planQueues([...pending.entries, ...peerClaims],{now,telemetry,checkGate:value=>
               value.id===entry.id?trustedGate(checked,operation):trustedGate(value,'acquire')})
               .decisions.find(value=>value.id===entry.id);
@@ -287,7 +287,7 @@ function createQueueStore({ file, withFileLock, atomicWrite, assertWrite, readTe
       // never cessation. Token and original entitlement remain unchanged.
       demand(trustedGate(entry,'recover'),'invocation recovery authority unavailable');
       const ready=()=>{
-        const telemetry=entry.kind==='heavy-check'?synchronous(readTelemetry):undefined,projected=structuredClone(state.entries);
+        const telemetry=needsMemory(entry)?synchronous(readTelemetry):undefined,projected=structuredClone(state.entries);
         projected.find(value=>value.id===id).state='waiting';
         return planQueues([...projected, ...peerClaims],{now:synchronous(clock),telemetry,checkGate:value=>
           value.id===id?trustedGate(entry,'recover'):trustedGate(value,'acquire')})
@@ -302,6 +302,17 @@ function createQueueStore({ file, withFileLock, atomicWrite, assertWrite, readTe
       entry.leaseUntil=new Date(synchronous(clock)+leaseMilliseconds).toISOString();
       return {changed:true,result:{acquired:true,recovered:true,id,owner,token:entry.token,
         leaseUntil:entry.leaseUntil,resource:resourceKey(entry)}};
+    });
+  }
+  function recheck({ id, owner, token }) {
+    return transaction(state => {
+      const entry = state.entries.find(value => value.id === id);
+      demand(entry?.owner === owner && entry.state === 'running' && entry.token === token
+        && Date.parse(entry.leaseUntil) > synchronous(clock), 'current owner-bound launch claim required');
+      const pending = { ...state, entries: state.entries.map(value => value.id === id ? { ...value, state: 'waiting' } : value) };
+      const decision = plan(pending, id).decisions.find(value => value.id === id);
+      demand(decision.state === 'ready-for-atomic-recheck' && trustedGate(entry, 'acquire'), 'launch resources or authority changed');
+      return { changed: false, result: { admitted: true, id, owner } };
     });
   }
   function release({ id, owner, token, outcome, checkpoint }) {
@@ -324,6 +335,6 @@ function createQueueStore({ file, withFileLock, atomicWrite, assertWrite, readTe
       return { changed: true, result: { released: true, id, outcome } };
     });
   }
-  return { enqueue, acquire, recover, release, snapshot };
+  return { enqueue, acquire, recover, release, recheck, snapshot };
 }
 module.exports = { createQueueStore, createMachineQueueGuard };

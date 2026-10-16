@@ -3,7 +3,8 @@
 // ECC queue component. Pure readiness planning, not authorization, launch,
 // an ownership registry, a daemon, or an OS sandbox. Integration must serialize
 // claim/recheck with existing ECC ownership, resource and release gates.
-const KINDS = new Set(['heavy-check', 'backend', 'writer', 'release']);
+const KINDS = new Set(['heavy-check', 'native-client', 'backend', 'writer', 'release']);
+const needsMemory = entry => ['heavy-check', 'native-client'].includes(entry.kind);
 const path = require('node:path');
 const STATES = new Set(['waiting', 'running', 'completed', 'cancelled', 'owner-paused']);
 const terminal = entry => ['completed', 'cancelled'].includes(entry.state);
@@ -39,6 +40,9 @@ function resourceKey(entry) {
   // This controller coordinates one local machine. Task-specific labels must
   // never create separate RAM pools on the same laptop.
   if (entry.kind === 'heavy-check') return 'heavy-check:local-machine';
+  // Native clients reserve bytes, not the exclusive browser/test slot. The
+  // same session cannot accidentally start two clients against one claim.
+  if (entry.kind === 'native-client') return 'native-client:' + identity(entry.resource) + ':' + entry.owner;
   if (entry.kind === 'backend') {
     demand(/^(127\.0\.0\.1|localhost):8000$/i.test(entry.resource), 'verified primary backend resource required');
     return 'backend:127.0.0.1:8000';
@@ -67,7 +71,7 @@ function validateEntries(entries, now, { persisted = false } = {}) {
     if (persisted && entry.state === 'running') demand(typeof entry.token === 'string' && /^[a-f0-9]{48}$/.test(entry.token), 'persisted running owner-bound token required');
     if (persisted && terminal(entry)) demand(Number.isFinite(timestamp(entry.finishedAt)), 'persisted terminal timestamp required');
     if (entry.state === 'owner-paused') demand(entry.explicitOwnerPause === true, 'explicit owner pause required');
-    if (entry.kind === 'heavy-check') demand(Number.isFinite(entry.peakRamGiB) && entry.peakRamGiB > 0, 'positive peak RAM required');
+    if (needsMemory(entry)) demand(Number.isFinite(entry.peakRamGiB) && entry.peakRamGiB > 0, 'positive peak RAM required');
   }
   for (const entry of entries) for (const dependency of entry.dependsOn) {
     demand(ids.has(dependency), 'unknown dependency');
@@ -100,6 +104,9 @@ function planQueues(entries, { now, telemetry, checkGate } = {}) {
     owners.push(entry.owner); occupied.set(key, owners);
   }
   const selected = new Map(), decisions = new Map();
+  const outstandingRam = entries.filter(value => value.state === 'running' && needsMemory(value))
+    .reduce((sum, value) => sum + value.peakRamGiB, 0);
+  let plannedRam = 0;
   for (const entry of [...entries].sort((left, right) => timestamp(left.enqueuedAt) - timestamp(right.enqueuedAt) || left.id.localeCompare(right.id))) {
     const base = { id: entry.id, owner: entry.owner, goalId: entry.goalId,
       resource: resourceKey(entry), waitMilliseconds: now - timestamp(entry.enqueuedAt),
@@ -118,7 +125,7 @@ function planQueues(entries, { now, telemetry, checkGate } = {}) {
     if (dependencies.length) { result('waiting-dependency', dependencies.join(', ')); continue; }
     const holder = occupied.get(base.resource) || selected.get(base.resource);
     if (holder) { result('waiting-owner', 'resource slot held; no takeover', Array.isArray(holder) ? holder.join(', ') : holder); continue; }
-    if (entry.kind === 'heavy-check') {
+    if (needsMemory(entry)) {
       const age = now - timestamp(telemetry?.observedAt);
       if (!Number.isFinite(age) || age < 0 || age > 30000
           || !Number.isFinite(telemetry?.freeRamGiB) || telemetry.freeRamGiB < 0
@@ -142,7 +149,9 @@ function planQueues(entries, { now, telemetry, checkGate } = {}) {
         }
         available = Math.min(available, ...samples.map(sample => sample.freeRamGiB));
       }
-      if (available - entry.peakRamGiB < telemetry.reserveRamGiB) {
+      // Conservative future envelopes. Do not credit guessed materialization
+      // from private commit or summed working sets. Expired live claims count.
+      if (available - outstandingRam - plannedRam - entry.peakRamGiB < telemetry.reserveRamGiB) {
         result('waiting-resource', 'insufficient RAM headroom'); continue;
       }
     }
@@ -153,9 +162,10 @@ function planQueues(entries, { now, telemetry, checkGate } = {}) {
       result('waiting-gate', 'existing authority/ownership/service/release gate not verified'); continue;
     }
     selected.set(base.resource, entry.owner);
+    if (needsMemory(entry)) plannedRam += entry.peakRamGiB;
     result('ready-for-atomic-recheck', 'readiness only; recheck and acquire through canonical gates before execution');
   }
   return { decisions: entries.map(entry => decisions.get(entry.id)), cycles: [...cycles].sort(),
     limitation: 'Pure plan only. All running records retain their slots; no liveness inferred, lease stolen, gate waived, process started, approval issued or side effect executed.' };
 }
-module.exports = { planQueues, resourceKey, validateEntries };
+module.exports = { planQueues, resourceKey, validateEntries, needsMemory };

@@ -441,6 +441,6 @@ function main(argv) {
   return all.some((r) => r.failures.length) ? 1 : 0;
 }
 
-module.exports = { loadAdapterRegistry, expandImports, stripCode, alwaysLoadedRules, legacyEffectiveStacks, effectiveStacks, markerBlock, canonicalBlocks, brokenPathRefs, duplicatedLines, checkRepo, defaultWorkspace, REQUIRED, STALE, CODEX_CAP };
+module.exports = { hasWorktreeApproval, loadAdapterRegistry, expandImports, stripCode, alwaysLoadedRules, legacyEffectiveStacks, effectiveStacks, markerBlock, canonicalBlocks, brokenPathRefs, duplicatedLines, checkRepo, defaultWorkspace, REQUIRED, STALE, CODEX_CAP };
 
 if (require.main === module) process.exit(main(process.argv.slice(2)));
