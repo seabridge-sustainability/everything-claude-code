@@ -7,6 +7,7 @@ function main(args = process.argv.slice(2)) {
     console.log('ecc session <register|status|renew|check-write|check-changes|guard-bind|handoff-file|metadata-only|close|release-acquire|check-release|release-observe|release-renew|release-end|release-watch>');
     console.log('After verified publication: release-observe --session ID --branch NAME --candidate FULL_SHA closes only that owner source reservation, retains the pinned release and forbids further writes/commits/pushes. Old clients see a closed source session; no takeover or CI cancellation.');
     console.log('Ignored task goal scopes register as metadata-only: disjoint source writers continue, no Git commits/releases. A legacy goal-only owner can convert itself with metadata-only; never convert another owner.');
+    console.log('Ownership: one source writer per checkout; overlapping repository-relative paths stay reserved across worktrees; publication serializes per repo/branch. A busy primary is not a whole-repo hold: use your standing-approved detached integration slot for disjoint local work without another approval. Do not message/pause other tasks or take their reservations.');
     console.log('Guard binding: --guard-mode audit|block --native-session ID --deadline ISO_UTC --tool-limit N --turn-limit N --protected-path FILE (repeatable) --allowed-operation read|write|patch (repeatable). New session required for rebinding; opaque execution denied, resource telemetry unverified, provider/CI budget zero.');
     console.log('Options: --session ID --scope relative/path (repeatable) --objective TEXT --done-when TEXT --ttl-minutes 120');
     console.log('Checks: --path relative/path (repeatable), --upstream refs/remotes/origin/BRANCH after integration.');
@@ -53,6 +54,10 @@ function main(args = process.argv.slice(2)) {
   return 0;
 }
 if (require.main === module) {
-  Promise.resolve().then(() => main()).then(code => { process.exitCode = code; }).catch(error => { console.error(`session coordination: ${error.message}`); process.exitCode = 2; });
+  Promise.resolve().then(() => main()).then(code => { process.exitCode = code; }).catch(error => {
+    console.error(`session coordination: ${error.message}`);
+    if (error.recovery) console.error(JSON.stringify({ allowed: false, recovery: error.recovery }));
+    process.exitCode = 2;
+  });
 }
 module.exports = { main };

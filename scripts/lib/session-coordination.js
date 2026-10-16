@@ -208,8 +208,21 @@ function conflicts(state, repo, scopes, sessionId, now, metadataOnly = false) {
     if (other.id === sessionId || other.state !== 'active'
         || (other.expiresAt <= now && state.release?.owner !== other.id)) continue;
     const otherMetadata = other.worktree === repo.root ? metadataSession(repo, other, state) : other.metadataOnly;
-    if (other.worktree === repo.root && !metadataOnly && !otherMetadata) throw new Error(`worktree already owned by ${other.id}; preserve its work and continue independent preparation. Use an existing clean owned integration slot or central rule 3's covered bounded detached slot; only uncovered paths/branches need new approval`);
-    if (scopes.some(a => other.scopes.some(b => overlaps(a, b)))) throw new Error(`write scope overlaps session ${other.id}; no automatic takeover`);
+    const overlap = scopes.flatMap(requested => other.scopes.filter(reserved => overlaps(requested, reserved))
+      .map(reserved => ({ requested, reserved })));
+    const checkoutBusy = other.worktree === repo.root && !metadataOnly && !otherMetadata;
+    if (checkoutBusy || overlap.length) {
+      const reason = checkoutBusy ? `worktree already owned by ${other.id}`
+        : `write scope overlaps session ${other.id}: ${overlap.map(x => `${x.requested} <> ${x.reserved}`).join(', ')}`;
+      const nextAction = checkoutBusy
+        ? 'Preserve this checkout. Reuse your clean task-owned integration slot, or create one detached slot per affected repo within central rule 3; covered isolation needs no new approval. Reserve only needed files there; any overlapping scopes still require a narrow handoff. Do not message or pause another whole task.'
+        : 'Exclude the listed conflicting scopes and continue independent owned work. Isolation does not waive same-file/directory ownership. Only the conflicting paths need a narrow owner handoff; do not request a whole-task pause or release another owner.';
+      const error = new Error(`${reason}; no automatic takeover. ${nextAction}`);
+      error.recovery = { code: checkoutBusy ? 'CHECKOUT_OCCUPIED' : 'WRITE_SCOPE_CONFLICT',
+        owner: other.id, ownerCheckout: other.worktree, conflictingScopes: overlap,
+        nextAction, publicationBlockedOnly: false, permissionGranted: false };
+      throw error;
+    }
   }
 }
 function checkSession({ cwd, sessionId, now = Date.now() }) {

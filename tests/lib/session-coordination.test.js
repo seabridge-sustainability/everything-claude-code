@@ -353,6 +353,51 @@ test('same checkout cannot be shared by two live owners even with disjoint paths
   assert.throws(() => register(root, 'two', ['app/two']), /worktree already owned/);
 });
 
+test('occupied checkout gives a covered-slot remedy, not a whole-goal handoff', () => {
+  const { root, other } = fixture();
+  register(root, 'primary-owner', ['app/primary']);
+  const result = invoke(root, ['register', '--session', 'report', '--scope', 'app/report',
+    '--objective', 'report readability', '--done-when', 'locally verified']);
+  assert.equal(result.status, 2);
+  const recovery = JSON.parse(result.stderr.trim().split(/\r?\n/).at(-1)).recovery;
+  assert.equal(recovery.code, 'CHECKOUT_OCCUPIED');
+  assert.equal(recovery.owner, 'primary-owner');
+  assert.deepEqual(recovery.conflictingScopes, []);
+  assert.match(recovery.nextAction, /covered isolation needs no new approval/);
+  assert.equal(recovery.permissionGranted, false);
+  register(other, 'report', ['app/report']);
+  assert.equal(execute('check-write', { cwd: other, sessionId: 'report', paths: ['app/report/view.js'] }).allowed, true);
+});
+
+test('isolated same-file conflict names exact scopes and does not waive ownership', () => {
+  const { root, other } = fixture();
+  register(root, 'climate', ['app/climate']);
+  assert.throws(() => register(other, 'report', ['app/climate/model.py']), error => {
+    assert.equal(error.recovery.code, 'WRITE_SCOPE_CONFLICT');
+    assert.deepEqual(error.recovery.conflictingScopes,
+      [{ requested: 'app/climate/model.py', reserved: 'app/climate' }]);
+    assert.equal(error.recovery.ownerCheckout, repository(root).root);
+    assert.match(error.recovery.nextAction, /continue independent owned work/);
+    assert.equal(error.recovery.permissionGranted, false);
+    return true;
+  });
+  assert.equal(execute('status', { cwd: other }).sessions.length, 1);
+});
+
+test('foreign publication holds do not block isolated disjoint local work', () => {
+  const { root, other, sha } = fixture();
+  register(root, 'publisher', ['README.md']);
+  execute('release-acquire', { cwd: root, sessionId: 'publisher', branch: 'fixture', candidate: sha, ...budget() });
+  register(other, 'report', ['report.txt']);
+  assert.equal(checkSession({ cwd: other, sessionId: 'report' }).id, 'report');
+  assert.equal(execute('check-write', { cwd: other, sessionId: 'report', paths: ['report.txt'] }).allowed, true);
+  fs.writeFileSync(path.join(other, 'report.txt'), 'local report\n');
+  assert.deepEqual(execute('check-changes', { cwd: other, sessionId: 'report' }).paths, ['report.txt']);
+  assert.throws(() => execute('release-acquire', { cwd: other, sessionId: 'report', branch: 'fixture',
+    candidate: sha, ...budget() }), /release owned by publisher/);
+  assert.equal(execute('status', { cwd: root }).release.owner, 'publisher');
+});
+
 test('ignored goal metadata shares a source checkout without touching its staged index', () => {
   const { root } = fixture(false);
   fs.writeFileSync(path.join(root, '.gitignore'), '.ecc/\n');

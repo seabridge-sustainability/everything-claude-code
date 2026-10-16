@@ -201,6 +201,12 @@ authorized restart. Unknown resources, ownership or spending are not permission.
 Read-only inspection/research and shared-service reuse need no exclusive source/
 backend slot. Hold source slots only for bounded ready changes, then close/handoff
 legitimately. Release waits do not pause another goal or independent local work.
+An occupied primary checkout is not a whole-repository reservation. Reuse your
+clean task-owned integration slot, or create one covered detached slot/repo under
+central rule 3 without re-asking; register only necessary paths. Source writers
+serialize per checkout, actual overlapping paths across linked checkouts, and
+bundled publication per repo/branch. Do not request another task's pause or message
+its owner merely because the primary is busy; continue disjoint owned work.
 Ignored task goal records auto-register metadata-only; a legacy goal-only owner
 can run `ecc session metadata-only --session ID` itself. This cannot commit/release
 or waive overlapping-path checks; never convert another session. Local fetch/rebase

@@ -57,11 +57,15 @@ Detached release/integration worktrees under `C:/Users/adelm/SeaBridgeAI/.worktr
 have standing owner approval (backend AGENTS_SYSTEM rule 3): session-owned commits
 only, published by push/merge to the normal branch, then the worktree is removed.
 Alejandro must explicitly approve any new branch or other worktree by path/name/reason;
-general autonomy and commit/push approval do not imply this exception. A dirty
-checkout or occupied file is not permission to create another checkout. Register
-assigned-file ownership, serialize conflicting writes, and keep one release owner.
-The current native controller permits one writer per checkout; parallel research
-can remain read-only. Do not advertise unsupported concurrent mutation as safe.
+general autonomy and commit/push approval do not extend the standing grant.
+When the primary is busy, reuse your clean owned integration slot, or create one
+covered detached slot per affected repo without asking again. Reserve only needed
+files. One source writer per checkout; overlapping repository-relative files or
+directories stay protected across linked checkouts. A busy checkout is not a hold
+on the whole repository. Parallel disjoint implementation/local verification may
+continue in owned slots while final integration and bundled publication serialize.
+Never take over reservations, copy foreign drafts or ask another task to pause.
+Actual same-file conflicts need a narrow handoff; continue independent work.
 Before owner-approved baseline reconciliation, preserve local-only commits and
 pending edits in private recovery artifacts and verify them; never force-push,
 hard-reset, clean, broadly stage, or discard another session's work. Old worktrees

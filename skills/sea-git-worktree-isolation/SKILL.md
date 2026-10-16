@@ -8,12 +8,14 @@ description: Coordinate safe work on SeaBridgeAI primary branches; inspect dirty
 ## Purpose
 
 Protect existing work on the primary branch. The legacy skill name is retained
-for existing callers; it does not authorize automatic isolation.
+for existing callers; central rule 3, not this skill, grants bounded isolation.
 
 ## When To Call
 
-Use for branch, checkout or ownership decisions. Dirty or parallel work does not
-authorize a new worktree: coordinate disjoint scopes or serialize conflicting edits.
+Use for branch, checkout or ownership decisions. If the primary is occupied, reuse
+your clean owned slot or create one covered detached slot per affected repo under
+central rule 3, without another approval question. Uncovered paths/branches remain
+gated; isolation never waives overlapping-file reservations.
 
 ## Required Inputs
 
