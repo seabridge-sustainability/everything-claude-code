@@ -30,7 +30,7 @@
     ],
     "semanticIndex": "not-run"
   },
-  "sourceFingerprint": "e6902083474ba4b51f39b9098f524b76af7b4efa029f1a6317ad420086a89ec0",
+  "sourceFingerprint": "19e14bc1917dd05d4be68fc29dc0fe9237d988cd5a1b13d015962757b74cad55",
   "sources": [
     {
       "path": "../manageesg-backend/AGENTS.md",
@@ -534,7 +534,7 @@
     },
     {
       "path": "tests/lib/fresh-session-guard.test.js",
-      "sha256": "ca7943c8a8e99c267b1d76137f6f0c8624e88d8c490bd8a30c1b1e519d0675bf"
+      "sha256": "6b6f3c05ddf49c67fa8b62be777903c0f8392a5fa4a80a52e18beebb50faba23"
     },
     {
       "path": "tests/lib/goal-control.test.js",
@@ -1372,7 +1372,7 @@
       "id": "file:tests/lib/fresh-session-guard.test.js",
       "type": "source",
       "path": "tests/lib/fresh-session-guard.test.js",
-      "sha256": "ca7943c8a8e99c267b1d76137f6f0c8624e88d8c490bd8a30c1b1e519d0675bf"
+      "sha256": "6b6f3c05ddf49c67fa8b62be777903c0f8392a5fa4a80a52e18beebb50faba23"
     },
     {
       "id": "file:tests/lib/goal-control.test.js",
@@ -4876,14 +4876,14 @@
     }
   ],
   "build": {
-    "generatedAt": "2026-10-15T22:30:31-04:00",
-    "sourceCommit": "e73c6c01113bf0939a7c4663eebdb7aadf65bbfe",
+    "generatedAt": "2026-10-15T22:56:14-04:00",
+    "sourceCommit": "42a37cb9f454d3954b668278633e57763ff3f8ab",
     "sourceDirty": false,
-    "policyCommit": "e88b673282813248da0a569b71528b7c3a8a03d0",
+    "policyCommit": "aec7fbc9c8aa892f042def46d31ddd6b2f75622a",
     "policyDirty": false,
     "verificationOnly": true,
     "provenanceMode": "exact-git-object-export",
-    "sourceTree": "4267f9b917e42e7be089ee7e7d1e071f67c01f1a",
-    "policyTree": "1414aa3b12a39de8aee90f95ff24251cb8d5d717"
+    "sourceTree": "d23dc167215a4e1fbbc3d38b4f012e8a5b527283",
+    "policyTree": "11f0177b67dd2d37c4a2a688ac32092bc959f4d3"
   }
 }
