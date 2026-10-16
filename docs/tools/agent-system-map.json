@@ -30,7 +30,7 @@
     ],
     "semanticIndex": "not-run"
   },
-  "sourceFingerprint": "004eb76aead39d029f38647ca6b87cc52146e45492af63fc3e011857fff0071a",
+  "sourceFingerprint": "594901dceb71244949f519e8fa54bab3e6203330c4b223d288541b2925d8d338",
   "sources": [
     {
       "path": "../manageesg-backend/AGENTS.md",
@@ -278,7 +278,7 @@
     },
     {
       "path": "schemas/goal-control.schema.json",
-      "sha256": "89e21f902c6f6444044f7548ced96b300a65cb38cda50b9a1cace56f4ea7da04"
+      "sha256": "6749570537c31e6743f16c9f3eff606357a834986807d3eb9bfd70e39e123e5e"
     },
     {
       "path": "schemas/memory.schema.json",
@@ -298,7 +298,7 @@
     },
     {
       "path": "scripts/check-instruction-stack.js",
-      "sha256": "ada206605aceda6a4352cd120785096ae7fd97caf53df435a23865e1584e98f9"
+      "sha256": "53e8ed73a1b210a3c5aec56cb17bb0402eb1a71ad22a55c7ed7e8dba05db66d3"
     },
     {
       "path": "scripts/ci/detect-ci-scope.js",
@@ -334,15 +334,15 @@
     },
     {
       "path": "scripts/fresh-agent-session.js",
-      "sha256": "65b388ea4787eb89cddafce06d384c1ca50323254690db30af8c551217bed575"
+      "sha256": "1c955701a4019f825e9ed09efa2bb0f19313645c582fe6b2d1413ddd57c91d85"
     },
     {
       "path": "scripts/goal-control.js",
-      "sha256": "2c25eff4d0e15076661f31c2605679ce9479d426ee0f8079daf0ef86952d448b"
+      "sha256": "c340f1be3c0d81cc84dc5586429c45cd8f4676704ce1deead30051e1a3c8d650"
     },
     {
       "path": "scripts/goal-runtime-bridge.js",
-      "sha256": "24c0a4f0efe4627b2c7e1dd063e5a9166449d3e1c6bd6ee4861fc8471ab9fa49"
+      "sha256": "07dd6135e1db5c6779679f80e268f67e05ee1fd80680ec416d40303200be159e"
     },
     {
       "path": "scripts/hooks/antigravity-scope-guard.js",
@@ -386,11 +386,11 @@
     },
     {
       "path": "scripts/lib/coding-execution.js",
-      "sha256": "ee870d290a1917a2fd903a3e068c88b0a7ac32be84761ddeffcc123fb731273d"
+      "sha256": "52112cf73b44fef033a9eb8358793c7a37a338a5f85831eca008bee61d6d605a"
     },
     {
       "path": "scripts/lib/fresh-session-guard.js",
-      "sha256": "009980f0767040cf722ca543220bbf794fbd6860f5fd2c16ae9f10afe0168bb8"
+      "sha256": "96c72193da5f8794c3ef00c780ada87cb8eea9b0b297419bebe7cb8742d6aa23"
     },
     {
       "path": "scripts/lib/github-coordination/actions.js",
@@ -402,7 +402,7 @@
     },
     {
       "path": "scripts/lib/goal-control.js",
-      "sha256": "481ec2d31af39ff93f52f2bbd15db83a0d290ef1f8e7732f50d760089e88a69f"
+      "sha256": "a4ae2e28c46e67e4bea83174bca81359c12361218230cdc703d915d0cd62e743"
     },
     {
       "path": "scripts/lib/memory-vault-format.js",
@@ -418,7 +418,7 @@
     },
     {
       "path": "scripts/lib/session-coordination.js",
-      "sha256": "9c0b60f8e14e73d031fe2614d450d6438625da434ecfe6a00b581ab04cfcdfcf"
+      "sha256": "434006c190b97c3623956ed30f9c848a26031f1400bdb5be0b45597357fb854e"
     },
     {
       "path": "scripts/lib/skill-routing.js",
@@ -462,7 +462,7 @@
     },
     {
       "path": "skills/goal-default/SKILL.md",
-      "sha256": "9dae220f35b25423c493bb9e90c7d7afb4f1f711c3f90ae3838eeb655185d537"
+      "sha256": "dc60b53bd9329fdfa068b8210db9adcff343b33e27450db72ebd6b37f302acf7"
     },
     {
       "path": "skills/parallel-execution-optimizer/SKILL.md",
@@ -534,11 +534,11 @@
     },
     {
       "path": "tests/lib/fresh-session-guard.test.js",
-      "sha256": "76360f8c66a174feb7202f5f3de67d4e20706399627669fe112ecc8ae112791f"
+      "sha256": "ca7943c8a8e99c267b1d76137f6f0c8624e88d8c490bd8a30c1b1e519d0675bf"
     },
     {
       "path": "tests/lib/goal-control.test.js",
-      "sha256": "e1852e0b7ac5b9bc45e8e10790fb35a883cfed2f4c889b3d4b7ee70d170427dd"
+      "sha256": "d19a57ce47233f0a00c89fb15297a811a53980ef8dc7f76ad90c576dc0fa8fe5"
     },
     {
       "path": "tests/lib/goal-runtime-hook.test.js",
@@ -988,7 +988,7 @@
       "id": "file:schemas/goal-control.schema.json",
       "type": "source",
       "path": "schemas/goal-control.schema.json",
-      "sha256": "89e21f902c6f6444044f7548ced96b300a65cb38cda50b9a1cace56f4ea7da04"
+      "sha256": "6749570537c31e6743f16c9f3eff606357a834986807d3eb9bfd70e39e123e5e"
     },
     {
       "id": "file:schemas/memory.schema.json",
@@ -1018,7 +1018,7 @@
       "id": "file:scripts/check-instruction-stack.js",
       "type": "source",
       "path": "scripts/check-instruction-stack.js",
-      "sha256": "ada206605aceda6a4352cd120785096ae7fd97caf53df435a23865e1584e98f9"
+      "sha256": "53e8ed73a1b210a3c5aec56cb17bb0402eb1a71ad22a55c7ed7e8dba05db66d3"
     },
     {
       "id": "file:scripts/ci/detect-ci-scope.js",
@@ -1072,19 +1072,19 @@
       "id": "file:scripts/fresh-agent-session.js",
       "type": "source",
       "path": "scripts/fresh-agent-session.js",
-      "sha256": "65b388ea4787eb89cddafce06d384c1ca50323254690db30af8c551217bed575"
+      "sha256": "1c955701a4019f825e9ed09efa2bb0f19313645c582fe6b2d1413ddd57c91d85"
     },
     {
       "id": "file:scripts/goal-control.js",
       "type": "source",
       "path": "scripts/goal-control.js",
-      "sha256": "2c25eff4d0e15076661f31c2605679ce9479d426ee0f8079daf0ef86952d448b"
+      "sha256": "c340f1be3c0d81cc84dc5586429c45cd8f4676704ce1deead30051e1a3c8d650"
     },
     {
       "id": "file:scripts/goal-runtime-bridge.js",
       "type": "source",
       "path": "scripts/goal-runtime-bridge.js",
-      "sha256": "24c0a4f0efe4627b2c7e1dd063e5a9166449d3e1c6bd6ee4861fc8471ab9fa49"
+      "sha256": "07dd6135e1db5c6779679f80e268f67e05ee1fd80680ec416d40303200be159e"
     },
     {
       "id": "file:scripts/hooks/antigravity-scope-guard.js",
@@ -1150,13 +1150,13 @@
       "id": "file:scripts/lib/coding-execution.js",
       "type": "source",
       "path": "scripts/lib/coding-execution.js",
-      "sha256": "ee870d290a1917a2fd903a3e068c88b0a7ac32be84761ddeffcc123fb731273d"
+      "sha256": "52112cf73b44fef033a9eb8358793c7a37a338a5f85831eca008bee61d6d605a"
     },
     {
       "id": "file:scripts/lib/fresh-session-guard.js",
       "type": "source",
       "path": "scripts/lib/fresh-session-guard.js",
-      "sha256": "009980f0767040cf722ca543220bbf794fbd6860f5fd2c16ae9f10afe0168bb8"
+      "sha256": "96c72193da5f8794c3ef00c780ada87cb8eea9b0b297419bebe7cb8742d6aa23"
     },
     {
       "id": "file:scripts/lib/github-coordination/actions.js",
@@ -1174,7 +1174,7 @@
       "id": "file:scripts/lib/goal-control.js",
       "type": "source",
       "path": "scripts/lib/goal-control.js",
-      "sha256": "481ec2d31af39ff93f52f2bbd15db83a0d290ef1f8e7732f50d760089e88a69f"
+      "sha256": "a4ae2e28c46e67e4bea83174bca81359c12361218230cdc703d915d0cd62e743"
     },
     {
       "id": "file:scripts/lib/memory-vault-format.js",
@@ -1198,7 +1198,7 @@
       "id": "file:scripts/lib/session-coordination.js",
       "type": "source",
       "path": "scripts/lib/session-coordination.js",
-      "sha256": "9c0b60f8e14e73d031fe2614d450d6438625da434ecfe6a00b581ab04cfcdfcf"
+      "sha256": "434006c190b97c3623956ed30f9c848a26031f1400bdb5be0b45597357fb854e"
     },
     {
       "id": "file:scripts/lib/skill-routing.js",
@@ -1264,7 +1264,7 @@
       "id": "file:skills/goal-default/SKILL.md",
       "type": "source",
       "path": "skills/goal-default/SKILL.md",
-      "sha256": "9dae220f35b25423c493bb9e90c7d7afb4f1f711c3f90ae3838eeb655185d537"
+      "sha256": "dc60b53bd9329fdfa068b8210db9adcff343b33e27450db72ebd6b37f302acf7"
     },
     {
       "id": "file:skills/parallel-execution-optimizer/SKILL.md",
@@ -1372,13 +1372,13 @@
       "id": "file:tests/lib/fresh-session-guard.test.js",
       "type": "source",
       "path": "tests/lib/fresh-session-guard.test.js",
-      "sha256": "76360f8c66a174feb7202f5f3de67d4e20706399627669fe112ecc8ae112791f"
+      "sha256": "ca7943c8a8e99c267b1d76137f6f0c8624e88d8c490bd8a30c1b1e519d0675bf"
     },
     {
       "id": "file:tests/lib/goal-control.test.js",
       "type": "source",
       "path": "tests/lib/goal-control.test.js",
-      "sha256": "e1852e0b7ac5b9bc45e8e10790fb35a883cfed2f4c889b3d4b7ee70d170427dd"
+      "sha256": "d19a57ce47233f0a00c89fb15297a811a53980ef8dc7f76ad90c576dc0fa8fe5"
     },
     {
       "id": "file:tests/lib/goal-runtime-hook.test.js",
@@ -3411,6 +3411,24 @@
       "evidence": "scripts/fresh-agent-session.js"
     },
     {
+      "from": "file:scripts/fresh-agent-session.js",
+      "to": "file:scripts/lib/coding-execution.js",
+      "type": "mentions-path",
+      "evidence": "scripts/fresh-agent-session.js"
+    },
+    {
+      "from": "file:scripts/fresh-agent-session.js",
+      "to": "file:scripts/lib/fresh-session-guard.js",
+      "type": "mentions-path",
+      "evidence": "scripts/fresh-agent-session.js"
+    },
+    {
+      "from": "file:scripts/fresh-agent-session.js",
+      "to": "file:scripts/lib/session-coordination.js",
+      "type": "mentions-path",
+      "evidence": "scripts/fresh-agent-session.js"
+    },
+    {
       "from": "file:scripts/goal-runtime-bridge.js",
       "to": "file:scripts/lib/session-coordination.js",
       "type": "verified-code-import",
@@ -3532,6 +3550,12 @@
     },
     {
       "from": "file:scripts/lib/fresh-session-guard.js",
+      "to": "file:scripts/check-instruction-stack.js",
+      "type": "mentions-path",
+      "evidence": "scripts/lib/fresh-session-guard.js"
+    },
+    {
+      "from": "file:scripts/lib/fresh-session-guard.js",
       "to": "file:scripts/hooks/antigravity-scope-guard.js",
       "type": "mentions-path",
       "evidence": "scripts/lib/fresh-session-guard.js"
@@ -3574,6 +3598,12 @@
     },
     {
       "from": "file:scripts/lib/session-coordination.js",
+      "to": "file:schemas/coding-execution.schema.json",
+      "type": "mentions-path",
+      "evidence": "scripts/lib/session-coordination.js"
+    },
+    {
+      "from": "file:scripts/lib/session-coordination.js",
       "to": "file:schemas/goal-control.schema.json",
       "type": "mentions-path",
       "evidence": "scripts/lib/session-coordination.js"
@@ -3593,6 +3623,12 @@
     {
       "from": "file:scripts/lib/session-coordination.js",
       "to": "file:scripts/hooks/goal-runtime-gate.js",
+      "type": "mentions-path",
+      "evidence": "scripts/lib/session-coordination.js"
+    },
+    {
+      "from": "file:scripts/lib/session-coordination.js",
+      "to": "file:scripts/lib/coding-execution.js",
       "type": "mentions-path",
       "evidence": "scripts/lib/session-coordination.js"
     },
@@ -3803,6 +3839,12 @@
     {
       "from": "file:skills/goal-default/SKILL.md",
       "to": "file:AGENTS.md",
+      "type": "mentions-path",
+      "evidence": "skills/goal-default/SKILL.md"
+    },
+    {
+      "from": "file:skills/goal-default/SKILL.md",
+      "to": "file:scripts/fresh-agent-session.js",
       "type": "mentions-path",
       "evidence": "skills/goal-default/SKILL.md"
     },
@@ -4187,6 +4229,12 @@
     {
       "from": "file:tests/lib/fresh-session-guard.test.js",
       "to": "file:scripts/goal-control.js",
+      "type": "mentions-path",
+      "evidence": "tests/lib/fresh-session-guard.test.js"
+    },
+    {
+      "from": "file:tests/lib/fresh-session-guard.test.js",
+      "to": "file:scripts/goal-runtime-bridge.js",
       "type": "mentions-path",
       "evidence": "tests/lib/fresh-session-guard.test.js"
     },
@@ -4828,14 +4876,14 @@
     }
   ],
   "build": {
-    "generatedAt": "2026-10-15T14:16:01-04:00",
-    "sourceCommit": "340916c6c5338943bbbc20b3fc69133cb06377bc",
+    "generatedAt": "2026-10-15T22:02:57-04:00",
+    "sourceCommit": "97f29c3fed508a6928bf10df870d1a4fda250edf",
     "sourceDirty": false,
-    "policyCommit": "e799143447b7bc30989156a09cd4c8feeaadf14d",
+    "policyCommit": "d8722a4e9c0e19df48df94bf49f082ea989b6ed9",
     "policyDirty": false,
     "verificationOnly": true,
     "provenanceMode": "exact-git-object-export",
-    "sourceTree": "c7cd934dd6e8215ae87e0fb1533b9369dac56195",
-    "policyTree": "1596cc6fe86c9604cb0bda8c05b22abf18e86df6"
+    "sourceTree": "1ba68593efd15ac023d54269a157b81683eded0c",
+    "policyTree": "bca194797ee2018a5da18b518b3ad3f0ea829588"
   }
 }
