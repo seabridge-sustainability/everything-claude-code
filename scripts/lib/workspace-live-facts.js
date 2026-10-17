@@ -63,18 +63,29 @@ function collectFacts({ repositories = REPOSITORIES, status = cwd => coord.execu
             || (entry.metadataOnly !== undefined && typeof entry.metadataOnly !== 'boolean')) {
           throw new Error('invalid ECC owner record');
         }
+        if (entry.scopes !== undefined) {
+          if (!Array.isArray(entry.scopes) || !entry.scopes.length) throw new Error('invalid ECC owner scopes');
+          entry.scopes.forEach(coord.scope);
+        }
       }
       if (state.release !== null && (!state.release || typeof state.release.owner !== 'string'
           || !Number.isFinite(state.release.expiresAt))) throw new Error('invalid ECC release record');
       facts.repositories.push({ id: repository.id, root: repository.root, known: true,
         activePrimaryOwners: state.sessions.filter(entry => entry.state === 'active' && !entry.metadataOnly
-          && entry.expiresAt > state.now && normal(entry.worktree) === normal(repository.root)).map(entry => entry.id),
+          && (entry.expiresAt > state.now || state.release?.owner === entry.id)
+          && normal(entry.worktree) === normal(repository.root)).map(entry => entry.id),
+        activeSourceOwners: state.sessions.filter(entry => entry.state === 'active' && !entry.metadataOnly
+          && (entry.expiresAt > state.now || state.release?.owner === entry.id)).map(entry => ({ id: entry.id, checkout: entry.worktree,
+          scopes: entry.scopes ? [...entry.scopes] : null, effect: 'source-write' })),
         releaseOwner: state.release?.owner ?? null,
         releaseNeedsReconciliation: state.release !== null && state.release.expiresAt <= state.now,
+        releasePublication: state.release === null ? null : { owner: state.release.owner,
+          effect: 'publication', needsReconciliation: state.release.expiresAt <= state.now },
         statusSource: 'canonical ECC status', statusObservedAt: new Date(state.now).toISOString() });
     } catch {
       facts.repositories.push({ id: repository.id, root: repository.root, known: false,
-        activePrimaryOwners: null, releaseOwner: null, releaseNeedsReconciliation: null,
+        activePrimaryOwners: null, activeSourceOwners: null,
+        releaseOwner: null, releaseNeedsReconciliation: null, releasePublication: null,
         statusSource: 'unavailable; no free-slot or authority inference' });
     }
   }

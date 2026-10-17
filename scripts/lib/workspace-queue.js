@@ -112,7 +112,7 @@ function planQueues(entries, { now, telemetry, checkGate } = {}) {
       resource: resourceKey(entry), waitMilliseconds: now - timestamp(entry.enqueuedAt),
       checkpointDue: timestamp(entry.nextCheckpointAt) <= now,
       independentAction: entry.independentAction, authorizationGranted: false };
-    const result = (state, reason, owner = null) => decisions.set(entry.id, { ...base, state, reason, blockingOwner: owner });
+    const result = (state, reason, owner = null, details = {}) => decisions.set(entry.id, { ...base, state, reason, blockingOwner: owner, ...details });
     if (terminal(entry)) { result(entry.state, 'recorded terminal state'); continue; }
     if (entry.state === 'owner-paused') { result('owner-paused', 'explicit owner pause; never resume automatically'); continue; }
     if (entry.state === 'running') {
@@ -127,12 +127,30 @@ function planQueues(entries, { now, telemetry, checkGate } = {}) {
     if (holder) { result('waiting-owner', 'resource slot held; no takeover', Array.isArray(holder) ? holder.join(', ') : holder); continue; }
     if (needsMemory(entry)) {
       const age = now - timestamp(telemetry?.observedAt);
+      const knownPoint = Number.isFinite(age) && age >= 0 && age <= 30000
+        && Number.isFinite(telemetry?.freeRamGiB) && telemetry.freeRamGiB >= 0;
+      const knownReserve = Number.isFinite(telemetry?.reserveRamGiB) && telemetry.reserveRamGiB >= 2;
+      const capacityDetails = (available = null, recentMinimum = null) => ({ capacityDiagnostic: {
+        operation: entry.kind,
+        telemetryStatus: available === null ? 'unknown' : 'fresh',
+        pointFreeRamGiB: knownPoint ? telemetry.freeRamGiB : null,
+        recentMinimumFreeRamGiB: recentMinimum,
+        effectiveAvailableRamGiB: available,
+        outstandingEnvelopeRamGiB: outstandingRam,
+        plannedPeakRamGiB: plannedRam,
+        requestedPeakRamGiB: entry.peakRamGiB,
+        reserveRamGiB: knownReserve ? telemetry.reserveRamGiB : null,
+        requiredFreeRamGiB: knownReserve ? outstandingRam + plannedRam + entry.peakRamGiB + telemetry.reserveRamGiB : null,
+        deficitRamGiB: available !== null && knownReserve
+          ? Math.max(0, outstandingRam + plannedRam + entry.peakRamGiB + telemetry.reserveRamGiB - available) : null,
+      } });
       if (!Number.isFinite(age) || age < 0 || age > 30000
           || !Number.isFinite(telemetry?.freeRamGiB) || telemetry.freeRamGiB < 0
           || !Number.isFinite(telemetry?.reserveRamGiB) || telemetry.reserveRamGiB < 2) {
-        result('waiting-resource', 'fresh trusted RAM telemetry and existing minimum headroom required'); continue;
+        result('waiting-resource', 'fresh trusted RAM telemetry and existing minimum headroom required', null, capacityDetails()); continue;
       }
       let available = telemetry.freeRamGiB;
+      let recentMinimum = null;
       // Legacy component callers may supply a point observation. The pinned
       // concrete host always supplies this complete recent kernel window.
       if (telemetry.recentSamples !== undefined) {
@@ -145,14 +163,15 @@ function planQueues(entries, { now, telemetry, checkGate } = {}) {
         });
         if (!valid || samples[4].observedAt !== telemetry.observedAt
             || samples[4].freeRamGiB !== telemetry.freeRamGiB) {
-          result('waiting-resource', 'complete fresh recent RAM window required'); continue;
+          result('waiting-resource', 'complete fresh recent RAM window required', null, capacityDetails()); continue;
         }
-        available = Math.min(available, ...samples.map(sample => sample.freeRamGiB));
+        recentMinimum = Math.min(...samples.map(sample => sample.freeRamGiB));
+        available = Math.min(available, recentMinimum);
       }
       // Conservative future envelopes. Do not credit guessed materialization
       // from private commit or summed working sets. Expired live claims count.
       if (available - outstandingRam - plannedRam - entry.peakRamGiB < telemetry.reserveRamGiB) {
-        result('waiting-resource', 'insufficient RAM headroom'); continue;
+        result('waiting-resource', 'insufficient RAM headroom', null, capacityDetails(available, recentMinimum)); continue;
       }
     }
     let gate;

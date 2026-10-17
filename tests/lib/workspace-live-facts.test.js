@@ -62,4 +62,78 @@ test('unknown, impossible and non-monotonic memory sampling fails closed', () =>
   }
   assert.throws(()=>collectMemoryWindow({clock:()=>now,wait:()=>{},freeRamBytes:()=>4,totalRamBytes:()=>32}),/monotonic/);
 });
+test('source scope details cover each checkout and remain separate from publication ownership', () => {
+  const checkout = 'C:/Users/adelm/SeaBridgeAI/.worktrees/owned-integration';
+  const sessions = [
+    { id: 'primary', state: 'active', worktree: root, expiresAt: now + 1000, scopes: ['scripts/one.js'] },
+    { id: 'isolated', state: 'active', worktree: checkout, expiresAt: now + 1000, scopes: ['tests/two.js'] },
+    { id: 'metadata', state: 'active', worktree: root, expiresAt: now + 1000, scopes: ['.ecc/goal/task'], metadataOnly: true },
+    { id: 'expired', state: 'active', worktree: root, expiresAt: now - 1, scopes: ['scripts/old.js'] },
+    { id: 'closed', state: 'closed', worktree: root, expiresAt: now + 1000, scopes: ['scripts/closed.js'] },
+  ];
+  const facts = collectFacts({ ...options, status: () => ({ now, sessions,
+    release: { owner: 'publisher', expiresAt: now + 1000 } }) });
+  const repository = facts.repositories[0];
+  assert.deepEqual(repository.activePrimaryOwners, ['primary']);
+  assert.deepEqual(repository.activeSourceOwners, [
+    { id: 'primary', checkout: root, scopes: ['scripts/one.js'], effect: 'source-write' },
+    { id: 'isolated', checkout, scopes: ['tests/two.js'], effect: 'source-write' },
+  ]);
+  assert.equal(repository.releaseOwner, 'publisher');
+  assert.deepEqual(repository.releasePublication, { owner: 'publisher', effect: 'publication', needsReconciliation: false });
+  assert.equal(facts.authorizationGranted, false);
+  assert.equal(facts.processLivenessVerified, false);
+  repository.activeSourceOwners[0].scopes.push('unowned.js');
+  assert.deepEqual(sessions[0].scopes, ['scripts/one.js']);
+});
+test('missing legacy scopes stay unknown and release expiry does not imply source ownership', () => {
+  const sessions = [{ id: 'legacy', state: 'active', worktree: root, expiresAt: now + 1000 }];
+  const repository = collectFacts({ ...options, status: () => ({ now, sessions,
+    release: { owner: 'publisher', expiresAt: now - 1 } }) }).repositories[0];
+  assert.equal(repository.activeSourceOwners[0].scopes, null);
+  assert.deepEqual(repository.releasePublication, { owner: 'publisher', effect: 'publication', needsReconciliation: true });
+  assert.deepEqual(repository.activePrimaryOwners, ['legacy']);
+});
+test('malformed supplied scopes fail closed instead of displaying an empty ownership list', () => {
+  for (const scopes of [null, 'scripts/one.js', [], ['../outside'], ['scripts/*'], [null]]) {
+    const sessions = [{ id: 'owner', state: 'active', worktree: root, expiresAt: now + 1000, scopes }];
+    const repository = collectFacts({ ...options, status: () => ({ now, sessions, release: null }) }).repositories[0];
+    assert.equal(repository.known, false);
+    assert.equal(repository.activePrimaryOwners, null);
+    assert.equal(repository.activeSourceOwners, null);
+    assert.equal(repository.releasePublication, null);
+  }
+});
+test('expired active source ownership is retained while its release remains recorded', () => {
+  for (const checkout of [root, 'C:/Users/adelm/SeaBridgeAI/.worktrees/owned-integration']) {
+    for (const expiresAt of [now - 1, now + 1000]) {
+      const sessions = [
+        { id: 'publisher', state: 'active', worktree: checkout, expiresAt: now - 1, scopes: ['scripts/held.js'] },
+        { id: 'ordinary-expired', state: 'active', worktree: root, expiresAt: now - 1, scopes: ['scripts/expired.js'] },
+      ];
+      const repository = collectFacts({ ...options, status: () => ({ now, sessions,
+        release: { owner: 'publisher', expiresAt } }) }).repositories[0];
+      assert.equal(repository.known, true);
+      assert.deepEqual(repository.activePrimaryOwners, checkout === root ? ['publisher'] : []);
+      assert.deepEqual(repository.activeSourceOwners, [
+        { id: 'publisher', checkout, scopes: ['scripts/held.js'], effect: 'source-write' },
+      ]);
+      assert.equal(repository.releasePublication.needsReconciliation, expiresAt <= now);
+    }
+  }
+});
+test('closed release observers retain publication ownership without source ownership', () => {
+  for (const expiresAt of [now - 1, now + 1000]) {
+    const sessions = [{ id: 'observer', state: 'closed', worktree: root, expiresAt,
+      scopes: ['scripts/released.js'], releaseObservation: { startedAt: now - 2000 } }];
+    const repository = collectFacts({ ...options, status: () => ({ now, sessions,
+      release: { owner: 'observer', expiresAt } }) }).repositories[0];
+    assert.deepEqual(repository.activePrimaryOwners, []);
+    assert.deepEqual(repository.activeSourceOwners, []);
+    assert.equal(repository.releaseOwner, 'observer');
+    assert.deepEqual(repository.releasePublication, {
+      owner: 'observer', effect: 'publication', needsReconciliation: expiresAt <= now,
+    });
+  }
+});
 console.log(JSON.stringify({ passed, failed: 0, scope: 'canonical read-only collector fixtures', writes: 0, paidCalls: 0 }));

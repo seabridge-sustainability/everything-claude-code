@@ -154,4 +154,75 @@ test('incomplete stale reordered future and mismatched windows never grant admis
   for(const change of variants){const telemetry=windowTelemetry();change(telemetry);
     assert.equal(state(plan([request('a')],{telemetry}),'a'),'waiting-resource');}
 });
+test('capacity diagnostics distinguish point memory from the recent minimum', () => {
+  const result = plan([request('a')], { telemetry: windowTelemetry([5, 2.5, 5, 5, 5]) });
+  const decision = result.decisions[0];
+  assert.equal(decision.state, 'waiting-resource');
+  assert.deepEqual(decision.capacityDiagnostic, {
+    operation: 'heavy-check', telemetryStatus: 'fresh', pointFreeRamGiB: 5,
+    recentMinimumFreeRamGiB: 2.5, effectiveAvailableRamGiB: 2.5,
+    outstandingEnvelopeRamGiB: 0, plannedPeakRamGiB: 0, requestedPeakRamGiB: 1,
+    reserveRamGiB: 2, requiredFreeRamGiB: 3, deficitRamGiB: 0.5,
+  });
+  assert.equal(decision.independentAction, request('a').independentAction);
+  assert.equal(decision.authorizationGranted, false);
+});
+test('capacity diagnostics account for expired running envelopes and selected work without blocking an unrelated writer', () => {
+  const entries = [
+    request('running', { kind: 'native-client', state: 'running', leaseUntil: iso(-1), enqueuedAt: iso(-3000) }),
+    request('planned', { kind: 'native-client', peakRamGiB: 0.5, enqueuedAt: iso(-2000) }),
+    request('blocked', { kind: 'native-client' }),
+    request('writer', { kind: 'writer', resource: 'C:/Repo' }),
+  ];
+  const result = plan(entries, { telemetry: windowTelemetry([6, 4, 6, 6, 6]) });
+  assert.equal(state(result, 'running'), 'reconciliation-required');
+  assert.equal(state(result, 'planned'), 'ready-for-atomic-recheck');
+  assert.equal(state(result, 'blocked'), 'waiting-resource');
+  assert.equal(state(result, 'writer'), 'ready-for-atomic-recheck');
+  const diagnostic = result.decisions.find(entry => entry.id === 'blocked').capacityDiagnostic;
+  assert.equal(diagnostic.operation, 'native-client');
+  assert.equal(diagnostic.pointFreeRamGiB, 6);
+  assert.equal(diagnostic.recentMinimumFreeRamGiB, 4);
+  assert.equal(diagnostic.outstandingEnvelopeRamGiB, 1);
+  assert.equal(diagnostic.plannedPeakRamGiB, 0.5);
+  assert.equal(diagnostic.requiredFreeRamGiB, 4.5);
+  assert.equal(diagnostic.deficitRamGiB, 0.5);
+});
+test('point-only diagnostics preserve a measured zero and the configured reserve', () => {
+  const diagnostic = plan([request('a')], { telemetry: {
+    observedAt: iso(0), freeRamGiB: 0, reserveRamGiB: 2.5,
+  } }).decisions[0].capacityDiagnostic;
+  assert.equal(diagnostic.pointFreeRamGiB, 0);
+  assert.equal(diagnostic.recentMinimumFreeRamGiB, null);
+  assert.equal(diagnostic.effectiveAvailableRamGiB, 0);
+  assert.equal(diagnostic.reserveRamGiB, 2.5);
+  assert.equal(diagnostic.requiredFreeRamGiB, 3.5);
+  assert.equal(diagnostic.deficitRamGiB, 3.5);
+});
+test('unknown and stale telemetry never fabricate available memory or a zero deficit', () => {
+  for (const telemetry of [undefined, {}, { observedAt: iso(-31000), freeRamGiB: 5, reserveRamGiB: 2 },
+    { observedAt: iso(1000), freeRamGiB: 5, reserveRamGiB: 2 },
+    { observedAt: iso(0), freeRamGiB: NaN, reserveRamGiB: 2 }]) {
+    const decision = plan([request('a')], { telemetry }).decisions[0];
+    assert.equal(decision.state, 'waiting-resource');
+    assert.equal(decision.capacityDiagnostic.telemetryStatus, 'unknown');
+    for (const field of ['pointFreeRamGiB', 'recentMinimumFreeRamGiB', 'effectiveAvailableRamGiB', 'deficitRamGiB']) {
+      assert.equal(decision.capacityDiagnostic[field], null);
+    }
+  }
+});
+test('invalid recent windows and reserves retain unknown capacity diagnostics', () => {
+  const invalidWindow = windowTelemetry(); invalidWindow.recentSamples.pop();
+  const invalidReserve = { observedAt: iso(0), freeRamGiB: 5, reserveRamGiB: 1 };
+  for (const telemetry of [invalidWindow, invalidReserve]) {
+    const diagnostic = plan([request('a')], { telemetry }).decisions[0].capacityDiagnostic;
+    assert.equal(diagnostic.pointFreeRamGiB, 5);
+    assert.equal(diagnostic.telemetryStatus, 'unknown');
+    assert.equal(diagnostic.effectiveAvailableRamGiB, null);
+    assert.equal(diagnostic.deficitRamGiB, null);
+  }
+  const diagnostic = plan([request('a')], { telemetry: invalidReserve }).decisions[0].capacityDiagnostic;
+  assert.equal(diagnostic.reserveRamGiB, null);
+  assert.equal(diagnostic.requiredFreeRamGiB, null);
+});
 process.stdout.write(JSON.stringify({ passed, failed: 0, source: 'canonical readiness fixtures', processesLaunched: 0, filesWritten: 0, paidCalls: 0 }) + '\n');
