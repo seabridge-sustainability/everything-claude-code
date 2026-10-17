@@ -4,6 +4,7 @@ import os from 'node:os';
 import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { require, ROOT } from './runtime.mjs';
+import { assertSameMcpLaunch } from './mcp-registration.mjs';
 const home = os.homedir(), bridge = path.resolve('integrations/dev-suite/cli.mjs').replaceAll('\\', '/'), node = process.execPath;
 const stamp = new Date().toISOString().replaceAll(':', '-');
 const backup = path.join(home, '.codex/state/dev-suite-config-backups', stamp);
@@ -27,8 +28,8 @@ for (const [label, rel, key] of [['Claude', '.claude.json', 'mcpServers'], ['Gem
   after[key] ||= {};
   for (const [name, c] of Object.entries(additions)) {
     const next = label === 'OpenCode' ? { type: 'local', command: [c.command, ...c.args], enabled: name !== 'weknora' } : { ...c };
-    if (after[key][name] && !same(after[key][name], next)) throw Error('Existing differing suite server: ' + name);
-    after[key][name] = next;
+    if (after[key][name]) assertSameMcpLaunch(after[key][name], next, name);
+    else after[key][name] = next;
   }
   for (const [k, v] of Object.entries(before)) if (k !== key && !same(v, after[k])) throw Error('Changed unrelated setting ' + k);
   for (const [k, v] of Object.entries(before[key] || {})) if (!additions[k] && !same(v, after[key][k])) throw Error('Changed prior server ' + k);
@@ -41,7 +42,7 @@ const file = path.join(home, '.codex/config.toml'), old = await fs.readFile(file
 let next = old;
 for (const [name, c] of Object.entries(additions)) {
   const config = { ...c, ...(name === 'weknora' ? { enabled: false } : {}) };
-  if (before.mcp_servers?.[name]) { if (!same(before.mcp_servers[name], config)) throw Error('Existing differing Codex server ' + name); continue; }
+  if (before.mcp_servers?.[name]) { assertSameMcpLaunch(before.mcp_servers[name], config, name); continue; }
   next += '\n[mcp_servers.' + name + ']\ncommand = ' + JSON.stringify(c.command) + '\nargs = ' + JSON.stringify(c.args) + '\n' + (name === 'weknora' ? 'enabled = false\n' : '');
 }
 const parsed = toml.parse(next);

@@ -3,6 +3,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { require } from '../dev-suite/runtime.mjs';
 import { ROOT, digest } from '../pstack/runtime.mjs';
+import { assertSameMcpLaunch, registerClaudeSpecialists, codexSpecialistBlock } from '../dev-suite/mcp-registration.mjs';
 const jsonc = require('jsonc-parser');
 const toml = require('@iarna/toml');
 const key = 'seabridge-ponytail';
@@ -12,7 +13,7 @@ const home = os.homedir();
 const clients = [
   { name: 'Claude', file: '.claude.json', section: 'mcpServers' },
   { name: 'Gemini', file: '.gemini/settings.json', section: 'mcpServers' },
-  { name: 'OpenCode', file: '.config/opencode/opencode.json', section: 'mcp', value: { type: 'local', command: [stdio.command, ...stdio.args], enabled: true } },
+  { name: 'OpenCode', file: '.config/opencode/opencode.json', section: 'mcp', value: { type: 'local', command: [stdio.command, ...stdio.args], enabled: false } },
   { name: 'VS Code', file: 'AppData/Roaming/Code/User/mcp.json', section: 'servers', value: { type: 'stdio', ...stdio } },
   { name: 'Cursor', file: '.cursor/mcp.json', section: 'mcpServers' },
   { name: 'Codex', file: '.codex/config.toml', section: 'mcp_servers', toml: true },
@@ -38,14 +39,26 @@ for (const client of clients) {
     raw = client.toml ? '' : '{}\n';
   }
   const before = parse(raw, client.toml), value = client.value || stdio;
-  if (before[client.section]?.[key] && digest(before[client.section][key]) !== digest(value)) throw Error(`Existing different ${client.name} Ponytail entry; preserve it`);
+  if (before[client.section]?.[key]) assertSameMcpLaunch(before[client.section][key], value, `${client.name} Ponytail`);
   let next = raw;
   if (!before[client.section]?.[key]) {
-    if (client.toml) next += `\n[mcp_servers.${key}]\ncommand = ${JSON.stringify(stdio.command)}\nargs = ${JSON.stringify(stdio.args)}\n`;
-    else next = jsonc.applyEdits(raw, jsonc.modify(raw, [client.section, key], value, { formattingOptions: { insertSpaces: true, tabSize: 2 } }));
+    if (client.toml) next += codexSpecialistBlock(key, stdio);
+    else {
+      next = jsonc.applyEdits(raw, jsonc.modify(raw, [client.section, key], value, { formattingOptions: { insertSpaces: true, tabSize: 2 } }));
+      if (client.name === 'Claude') {
+        const planned = structuredClone(before);
+        registerClaudeSpecialists(planned, { [key]: value });
+        for (const [project, settings] of Object.entries(planned.projects || {})) {
+          if (!settings || !Array.isArray(settings.disabledMcpServers)) continue;
+          next = jsonc.applyEdits(next, jsonc.modify(next, ['projects', project, 'disabledMcpServers'], settings.disabledMcpServers, { formattingOptions: { insertSpaces: true, tabSize: 2 } }));
+        }
+      }
+    }
   }
   const after = parse(next, client.toml);
-  if (digest(withoutServer(before, client.section)) !== digest(withoutServer(after, client.section))) throw Error(`Unrelated ${client.name} configuration changed`);
+  const expected = structuredClone(before);
+  if (client.name === 'Claude') registerClaudeSpecialists(expected, { [key]: value });
+  if (digest(withoutServer(expected, client.section)) !== digest(withoutServer(after, client.section))) throw Error(`Unrelated ${client.name} configuration changed`);
   if (client.name === 'Gemini' && after.mcp?.excluded?.includes(key)) throw Error('Ponytail is explicitly excluded in Gemini; preserve owner choice');
   changes.push({ file, raw, next, client, value });
 }

@@ -4,6 +4,7 @@ import os from 'node:os';
 import { createRequire } from 'node:module';
 import { ROOT, REA, config } from './runtime.mjs';
 import { visionConfig } from './opencode-config.mjs';
+import { registerClaudeSpecialists, codexSpecialistBlock } from '../dev-suite/mcp-registration.mjs';
 
 const require = createRequire(path.join(path.dirname(path.dirname(REA)), 'package.json'));
 const { parse: parseToml } = require('smol-toml');
@@ -28,12 +29,7 @@ export async function activateClients(home = os.homedir()) {
     }
   };
   await jsonPlan(path.join(home, '.claude.json'), c => {
-    mergeServers(c, servers);
-    for (const project of Object.values(c.projects || {})) {
-      if (!project || typeof project !== 'object') continue;
-      // Owner-authorized REA servers only; leave every other choice unchanged.
-      for (const key of ['disabledMcpServers', 'rejectedMcpjsonServers']) if (Array.isArray(project[key])) project[key] = project[key].filter(name => !Object.hasOwn(servers, name));
-    }
+    registerClaudeSpecialists(c, servers);
   });
   await jsonPlan(path.join(home, '.gemini/settings.json'), c => mergeServers(c, Object.fromEntries(Object.entries(servers).map(([name, s]) => [name, { ...s, timeout: 600000 }]))));
   // The authorized ECC runtime replaced the old trusted ECC checkout. Trust
@@ -61,7 +57,7 @@ export async function activateClients(home = os.homedir()) {
     if (existing) {
       if (existing.command !== server.command || JSON.stringify(existing.args) !== JSON.stringify(server.args)) throw new Error(`Existing Codex ${name} selects a different command`);
       if (existing.tool_timeout_sec === undefined) output = output.replace(`[mcp_servers.${name}]`, `[mcp_servers.${name}]\ntool_timeout_sec = 600`);
-    } else output += `\n[mcp_servers.${name}]\ncommand = ${JSON.stringify(server.command)}\nargs = ${JSON.stringify(server.args)}\nstartup_timeout_sec = 60\ntool_timeout_sec = 600\n`;
+    } else output += codexSpecialistBlock(name, server) + 'startup_timeout_sec = 60\ntool_timeout_sec = 600\n';
   }
   plans.push({ file, original: original || null, output });
   // Validate all targets before writes and reject concurrent config changes.
