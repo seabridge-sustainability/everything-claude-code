@@ -30,7 +30,7 @@
     ],
     "semanticIndex": "not-run"
   },
-  "sourceFingerprint": "917b117741b8b4577b60d4a5e87c6113e436b0ea6852608ed9431e45fdacf536",
+  "sourceFingerprint": "9546d8868c937305eb45b9a7cb7ed2d3f9b6431a3d4356db1e91db424b28c7f0",
   "sources": [
     {
       "path": "../manageesg-backend/AGENTS.md",
@@ -250,7 +250,7 @@
     },
     {
       "path": "manifests/task-skill-routing.json",
-      "sha256": "6b3fd5d0825e85f69f2e3c29918d8f6ede33af061b8928f026116b3d30b3f68c"
+      "sha256": "a774f8fa5bf26674bc847f163fd4b789441574630ce6f6458eb75143e3187008"
     },
     {
       "path": "package.json",
@@ -338,7 +338,7 @@
     },
     {
       "path": "scripts/goal-control.js",
-      "sha256": "6cb79fc5feb9df42bba20c42c6c3c9c7477225a3f1b0e4f455e6d13c8294ec3d"
+      "sha256": "4e540d5a5123bb8c0a8e275210babf1bbf928974e1ea44683b8693bbcbe402ca"
     },
     {
       "path": "scripts/goal-runtime-bridge.js",
@@ -394,7 +394,7 @@
     },
     {
       "path": "scripts/lib/frontend-review-gate.js",
-      "sha256": "004a36bf603aa1079cf5424d96fd19a826d1ec5d8b4d6131d0c31b17f103a52c"
+      "sha256": "cc67f5e5192b2e4a7499ad428321fa30f0b345724e873b08028ac017feb6eb18"
     },
     {
       "path": "scripts/lib/github-coordination/actions.js",
@@ -542,7 +542,7 @@
     },
     {
       "path": "tests/lib/frontend-review-gate.test.js",
-      "sha256": "e382ca698ae03843b4be37ab254380a70fa0a3884a81d526237e776988531e2d"
+      "sha256": "93c2cbd7494df99c9a47dec7c488facfc716a9687bd83735d1b15c3930c62dd3"
     },
     {
       "path": "tests/lib/goal-control.test.js",
@@ -582,7 +582,7 @@
     },
     {
       "path": "tests/lib/skill-routing.test.js",
-      "sha256": "6f2f9f7492cc9d4b849506a9ea47c52a409b520f6973297bd9caba389fbe6bd3"
+      "sha256": "9ebd0ffdf936894992e33703b722c264cf14cf71cc66f29745dfc64fbd91ce8b"
     },
     {
       "path": "tests/lib/tmux-worktree-orchestrator.test.js",
@@ -948,7 +948,7 @@
       "id": "file:manifests/task-skill-routing.json",
       "type": "source",
       "path": "manifests/task-skill-routing.json",
-      "sha256": "6b3fd5d0825e85f69f2e3c29918d8f6ede33af061b8928f026116b3d30b3f68c"
+      "sha256": "a774f8fa5bf26674bc847f163fd4b789441574630ce6f6458eb75143e3187008"
     },
     {
       "id": "file:OPENCODE.md",
@@ -1086,7 +1086,7 @@
       "id": "file:scripts/goal-control.js",
       "type": "source",
       "path": "scripts/goal-control.js",
-      "sha256": "6cb79fc5feb9df42bba20c42c6c3c9c7477225a3f1b0e4f455e6d13c8294ec3d"
+      "sha256": "4e540d5a5123bb8c0a8e275210babf1bbf928974e1ea44683b8693bbcbe402ca"
     },
     {
       "id": "file:scripts/goal-runtime-bridge.js",
@@ -1170,7 +1170,7 @@
       "id": "file:scripts/lib/frontend-review-gate.js",
       "type": "source",
       "path": "scripts/lib/frontend-review-gate.js",
-      "sha256": "004a36bf603aa1079cf5424d96fd19a826d1ec5d8b4d6131d0c31b17f103a52c"
+      "sha256": "cc67f5e5192b2e4a7499ad428321fa30f0b345724e873b08028ac017feb6eb18"
     },
     {
       "id": "file:scripts/lib/github-coordination/actions.js",
@@ -1392,7 +1392,7 @@
       "id": "file:tests/lib/frontend-review-gate.test.js",
       "type": "source",
       "path": "tests/lib/frontend-review-gate.test.js",
-      "sha256": "e382ca698ae03843b4be37ab254380a70fa0a3884a81d526237e776988531e2d"
+      "sha256": "93c2cbd7494df99c9a47dec7c488facfc716a9687bd83735d1b15c3930c62dd3"
     },
     {
       "id": "file:tests/lib/goal-control.test.js",
@@ -1452,7 +1452,7 @@
       "id": "file:tests/lib/skill-routing.test.js",
       "type": "source",
       "path": "tests/lib/skill-routing.test.js",
-      "sha256": "6f2f9f7492cc9d4b849506a9ea47c52a409b520f6973297bd9caba389fbe6bd3"
+      "sha256": "9ebd0ffdf936894992e33703b722c264cf14cf71cc66f29745dfc64fbd91ce8b"
     },
     {
       "id": "file:tests/lib/tmux-worktree-orchestrator.test.js",
@@ -4902,14 +4902,14 @@
     }
   ],
   "build": {
-    "generatedAt": "2026-10-16T20:23:14-04:00",
-    "sourceCommit": "bf2539937f4bb22b691cf0e86f77ed262e342340",
+    "generatedAt": "2026-10-16T20:41:31-04:00",
+    "sourceCommit": "ccfc2e1a9af6cee08b7bf9c785e1e4d528e24e39",
     "sourceDirty": false,
     "policyCommit": "96b90c8d3903fbf98c735399739a95538bd081f5",
     "policyDirty": false,
     "verificationOnly": true,
     "provenanceMode": "exact-git-object-export",
-    "sourceTree": "7f0f069956f756c33ce37dcb801e384077b5858e",
+    "sourceTree": "101d87a2e7db74439168ce1d592dacb1e92fb79d",
     "policyTree": "b895ba51afff79d5ce142a8b726ef598954ea543"
   }
 }
