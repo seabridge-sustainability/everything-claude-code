@@ -13,10 +13,12 @@ const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 const demand = (ok, reason) => { if (!ok) throw Error('Frontend visual gate: ' + reason); };
 const git = (root, args) => execFileSync('git', args, { cwd: root, encoding: 'utf8', windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] }).trim();
 const normalized = value => process.platform === 'win32' ? path.resolve(value).toLowerCase() : path.resolve(value);
-function isFrontend(root) {
+function productRepository(root) {
   const urls = git(root, ['remote', '-v']);
-  return /(?:[:/])seabridge-sustainability\/manageesg-frontend(?:\.git)?(?:\s|$)/i.test(urls);
+  const match = /(?:[:/])seabridge-sustainability\/manageesg-(frontend|backend)(?:\.git)?(?:\s|$)/i.exec(urls);
+  return match ? match[1].toLowerCase() : null;
 }
+function isFrontend(root) { return productRepository(root) === 'frontend'; }
 function uiPaths(paths) {
   return [...new Set(paths.filter(p => /^(?:src\/|public\/|(?:tailwind|next)\.config\.|package\.json$)/.test(p)
     && !/(?:\.(?:test|spec)\.|(?:^|\/)(?:__tests__|__mocks__)\/)/.test(p)))].sort();
@@ -151,4 +153,22 @@ function requireReview({ root, paths, base, head, file, required = false }) {
   demand(base && head, 'exact baseline and candidate required');
   return readReview(file, { root, head, base, files: sourceFiles(root, affected) });
 }
-module.exports = { isFrontend, uiPaths, sourceFiles, changes, validateRecord, validatePng, readReview, requireReview, hash, crc32 };
+function requireGoalReview(bundle, file) {
+  const states = bundle.resume?.repository_states || (bundle.resume ? [bundle.resume.repository_state] : []);
+  let frontendSeen = false, productSeen = false;
+  for (const state of states) {
+    const kind = productRepository(state.repo_root);
+    if (kind) productSeen = true;
+    if (kind !== 'frontend') continue;
+    frontendSeen = true;
+    const delta = changes(state.repo_root);
+    requireReview({ root: state.repo_root, paths: delta.paths, base: delta.base,
+      head: state.head, file, required: bundle.goal.proof_profile === 'frontend' });
+  }
+  // The central SeaBridge policy does not apply to unrelated ECC consumers or
+  // generic goal fixtures. Real SeaBridge frontend claims cannot omit their repo.
+  if (productSeen && bundle.goal.proof_profile === 'frontend' && !frontendSeen) {
+    throw Error('Frontend visual gate: current frontend repository and rendered review required');
+  }
+}
+module.exports = { isFrontend, uiPaths, sourceFiles, changes, validateRecord, validatePng, readReview, requireReview, requireGoalReview, hash, crc32 };

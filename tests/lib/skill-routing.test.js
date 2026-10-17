@@ -64,6 +64,8 @@ test('frontend visual review remains required for small and non-design primary t
     {query:'security review',impact:{frontend:true}},
     {query:'science repair',changedPaths:['manageesg-frontend/src/components/Risk.tsx']},
     {query:'copy correction',changedPaths:['manageesg-frontend/messages/en.json']},
+    {query:'report wording repair',changedPaths:['src/components/Report.tsx']},
+    {query:'copy correction',changedPaths:['messages/en.json']},
   ]) {
     const out=taskRoute(c,request);
     assert.equal(out.requiredReviews.length,1);

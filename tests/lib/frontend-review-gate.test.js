@@ -69,6 +69,15 @@ test('frontend release refuses absent render evidence while documentation remain
     git('init','--initial-branch=development');git('config','user.name','ECC Fixture');git('config','user.email','fixture@example.invalid');
     fs.writeFileSync(path.join(root,'README.md'),'fixture');git('add','README.md');git('-c','core.hooksPath=','commit','-m','fixture');
     const base=git('rev-parse','HEAD');git('remote','add','origin','https://github.com/seabridge-sustainability/manageesg-frontend.git');git('update-ref','refs/remotes/origin/development',base);
+    const goal={goal:{proof_profile:'frontend'},resume:{repository_state:{repo_root:root,head:base}}};
+    assert.throws(()=>gate.requireGoalReview(goal),/screenshot evidence and UX-review record required/);
+    git('remote','set-url','origin','https://github.com/seabridge-sustainability/manageesg-backend.git');
+    assert.throws(()=>gate.requireGoalReview(goal),/current frontend repository/);
+    git('remote','set-url','origin','https://github.com/example/generic-goal-fixture.git');
+    assert.doesNotThrow(()=>gate.requireGoalReview(goal),'SeaBridge rules must not leak into unrelated ECC goals');
+    git('remote','set-url','origin','https://github.com/SeaBridge-Sustainability/manageesg-Frontend.git');
+    assert.equal(gate.isFrontend(root),true,'URL letter case must not bypass the actual frontend gate');
+    git('remote','set-url','origin','https://github.com/seabridge-sustainability/manageesg-frontend.git');
     execute('register',{cwd:root,sessionId:'visual',scopes:['src','README.md'],objective:'UI proof',doneWhen:'Gate checked'});
     const budget={actionsBudgetStatus:'known',actionsBudgetUsed:10,actionsBudgetLimit:500,actionsBudgetSource:'github-org-budget-ui',actionsBudgetCheckedAt:new Date().toISOString(),actionsStopUsage:'yes',expectedActionsUsd:1,expectedWorkflows:'security-scan'};
     const release=()=>execute('release-acquire',{cwd:root,sessionId:'visual',branch:'development',candidate:git('rev-parse','HEAD'),...budget});
