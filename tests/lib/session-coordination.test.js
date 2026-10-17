@@ -445,6 +445,38 @@ test('legacy ignored goal owners no longer block source writers, with tracked/no
   assert.equal(execute('check-write', { cwd: root, sessionId: 'source', paths: ['README.md'] }).allowed, true);
 });
 
+test('legacy nested ignored task goals share a checkout but retain exact overlap and Git fences', () => {
+  const { root } = fixture(false);
+  fs.writeFileSync(path.join(root, '.gitignore'), '.ecc/\n');
+  git(root, 'add', '.gitignore');
+  git(root, 'commit', '-m', 'ignore local task goals');
+  register(root, 'writer', ['README.md']);
+  const goal = '.ecc/zproperty-wholebuilding-20261011/.ecc/goal/task-a';
+  assert.equal(register(root, 'nested-meta', [goal]).metadataOnly, true);
+  register(root, 'nested-other', ['.ecc/zproperty-wholebuilding-20261011/.ecc/goal/task-b']);
+  assert.equal(execute('check-write', { cwd: root, sessionId: 'nested-meta', paths: [goal + '/active-goal.yaml'] }).allowed, true);
+  assert.throws(() => register(root, 'overlap', [goal + '/child']), /overlaps session/);
+  for (const command of ['check-changes', 'release-acquire', 'guard-bind']) {
+    assert.throws(() => execute(command, { cwd: root, sessionId: 'nested-meta' }), /metadata-only sessions cannot/);
+  }
+  assert.throws(() => register(root, 'not-goal', ['.ecc/zproperty-wholebuilding-20261011/.ecc/config']), /worktree already owned/);
+  assert.equal(checkSession({ cwd: root, sessionId: 'writer' }).id, 'writer');
+});
+
+test('tracked nested goal lookalikes never become metadata-only', () => {
+  const { root } = fixture(false);
+  const goal = '.ecc/legacy-task/.ecc/goal';
+  fs.mkdirSync(path.join(root, goal), { recursive: true });
+  fs.writeFileSync(path.join(root, goal, 'active-goal.yaml'), 'tracked source\n');
+  git(root, 'add', '.ecc');
+  git(root, 'commit', '-m', 'tracked nested lookalike');
+  fs.writeFileSync(path.join(root, '.gitignore'), '.ecc/\n');
+  const record = register(root, 'tracked-nested', [goal]);
+  assert.equal(record.metadataOnly, undefined);
+  assert.throws(() => execute('metadata-only', { cwd: root, sessionId: 'tracked-nested' }), /requires ignored/);
+  assert.throws(() => register(root, 'writer', ['README.md']), /worktree already owned/);
+});
+
 test('tracked goal-looking files and non-goal ignored files cannot gain metadata privileges', () => {
   const { root, other } = fixture();
   fs.mkdirSync(path.join(root, '.ecc/goal'), { recursive: true });

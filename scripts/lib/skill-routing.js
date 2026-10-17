@@ -17,6 +17,10 @@ function policy() {
       || new Set(value.routes.map(x=>x.id)).size !== value.routes.length) throw Error('Invalid task-routing policy');
   for (const row of value.routes) if (!row.id || !row.source || !row.name || !row.skill || !Array.isArray(row.patterns)) throw Error('Incomplete task route');
   for (const row of value.routes) if (row.excludePatterns && (!Array.isArray(row.excludePatterns) || row.excludePatterns.some(p=>typeof p!=='string'))) throw Error('Invalid task route exclusions');
+  const review = value.frontendReview;
+  if (!review || review.skill !== 'sea-frontend-ux-reviewer' || typeof review.queryPattern !== 'string'
+      || typeof review.pathPattern !== 'string' || review.evidenceVolume !== 'D:') throw Error('Invalid frontend review route');
+  new RegExp(review.queryPattern, 'i'); new RegExp(review.pathPattern, 'i');
   return { ...value, sha256: sha(raw) };
 }
 function rankWorkflows(c, { query, limit = 10, kind = 'all', profile = 'auto' }) {
@@ -45,18 +49,23 @@ function rankWorkflows(c, { query, limit = 10, kind = 'all', profile = 'auto' })
 function taskRoute(c, request) {
   if (!request || typeof request.query !== 'string') throw Error('Task query required');
   const impact = request.impact || {};
-  const flags=['presentationOnly','behavior','ambiguous','auth','tenant','secrets','irreversible','scientific','productionData'];
+  const flags=['presentationOnly','behavior','ambiguous','auth','tenant','secrets','irreversible','scientific','productionData','frontend'];
   if (!impact || typeof impact !== 'object' || Array.isArray(impact) || Object.entries(impact).some(([k,v])=>!flags.includes(k)||typeof v!=='boolean')) throw Error('Known boolean impact flags required');
   const high = ['auth','tenant','secrets','irreversible','scientific','productionData'].some(k=>impact[k]);
   const low = impact.presentationOnly===true&&!high&&!impact.behavior&&!impact.ambiguous;
   const matches = rankWorkflows(c,{query:request.query,profile:request.profile||'coding',limit:5});
   const primary = matches.find(x=>x.routingRole==='primary');
-  const p=policy();
+  const p=policy(), changedPaths=request.changedPaths || [];
+  if (!Array.isArray(changedPaths) || changedPaths.some(x=>typeof x!=='string')) throw Error('Changed paths must be strings');
+  const frontend = impact.frontend===true || impact.presentationOnly===true
+    || new RegExp(p.frontendReview.queryPattern,'i').test(request.query)
+    || changedPaths.some(x=>new RegExp(p.frontendReview.pathPattern,'i').test(x.replaceAll('\\','/')));
   return {version:1,query:request.query,profile:request.profile||'coding',impact:{...impact},risk:high?'high':low?'low':'medium',primary:low?null:primary||null,
     status:low?'direct-focused-check':primary?'selected':'needs-task-selection',always:p.always,policySha256:p.sha256,
     checks:low?['focused affected check']:['affected contract/behavior','actual required acceptance evidence',...(high?['protected invariants','independent evidence where required']:[])],
     evaluatorMode:high?'bounded-independent-review-when-authorized':'focused-verification',
     supportingSkills:[...(['auth','tenant','secrets'].some(k=>impact[k])?['sea-security-reviewer']:[]),...(impact.scientific?['sea-sustainability-domain-review']:[])],
+    requiredReviews:frontend?[{...p.frontendReview,reason:'User-facing impact requires final composed-page proof; primary workflow unchanged'}]:[],
     providerCalls:0,permissionGranted:false};
 }
 module.exports={policy,skillFile,rankWorkflows,taskRoute};

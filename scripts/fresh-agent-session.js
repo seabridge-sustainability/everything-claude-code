@@ -14,7 +14,8 @@ function launchImplementation() {
   const files = ['scripts/fresh-agent-session.js', 'scripts/lib/fresh-launch-reservation.js',
     'scripts/lib/workspace-queue.js', 'scripts/lib/workspace-queue-store.js', 'scripts/lib/workspace-live-facts.js',
     'scripts/lib/goal-store.js', 'scripts/lib/atomic-write.js', 'scripts/lib/session-coordination.js',
-    'scripts/lib/fresh-session-guard.js', 'scripts/lib/coding-execution.js'];
+    'scripts/lib/fresh-session-guard.js', 'scripts/lib/coding-execution.js',
+    'scripts/lib/frontend-review-gate.js', 'scripts/lib/browser-evidence.js'];
   return Object.fromEntries(files.map(file => [file, crypto.createHash('sha256').update(fs.readFileSync(path.join(root, file))).digest('hex')]));
 }
 function toml(value) {
@@ -46,6 +47,17 @@ function reviewedArguments(runtime, args) {
 }
 function toolProfileArguments(runtime, profile, args) {
   if (profile === undefined) return [];
+  if (runtime === 'codex' && profile && typeof profile === 'object'
+      && !Array.isArray(profile) && profile.name === 'codex-disable-mcp') {
+    // Native invocation-local overrides, not a global config rewrite or tool
+    // permission change. The reviewed exclusion list must omit required tools.
+    const names = profile.servers;
+    if (Object.keys(profile).some(key => !['name', 'servers'].includes(key))
+        || !Array.isArray(names) || !names.length || names.length > 64
+        || names.some(name => typeof name !== 'string' || !/^[A-Za-z0-9_-]{1,100}$/.test(name))
+        || new Set(names).size !== names.length) throw Error('Exact unique reviewed MCP server names required');
+    return names.flatMap(name => ['-c', `mcp_servers.${name}.enabled=false`]);
+  }
   if (runtime !== 'claude' || profile !== 'local-no-mcp'
       || args.some(arg => /^--(?:mcp-config|strict-mcp-config)(?:=|$)/.test(arg))) {
     throw Error('Reviewed local-no-mcp profile requires Claude and no competing MCP arguments');
@@ -157,7 +169,7 @@ function validateLaunch(plan) {
   if (!Number.isFinite(m.peakRamGiB) || m.peakRamGiB <= 0 || m.peakRamGiB > 1024 || binding.peakRamGiB !== m.peakRamGiB) throw Error('Prepared native RAM envelope changed; prepare a fresh reviewed profile');
   if (JSON.stringify(binding.dataPolicy) !== JSON.stringify(m.dataPolicy)) throw Error('Prepared input policy changed');
   if (binding.dataPolicy) require('./lib/coding-execution').verifySyntheticArtifacts({repo:plan.cwd,scopes:owner.scopes,data_policy:binding.dataPolicy});
-  if (binding.toolProfile !== m.toolProfile) throw Error('Prepared tool profile changed');
+  if (JSON.stringify(binding.toolProfile) !== JSON.stringify(m.toolProfile)) throw Error('Prepared tool profile changed');
   reviewedArguments(plan.runtime, m.args);
   if (binding.runtime !== plan.runtime || binding.session !== plan.session || binding.cwd !== plan.cwd
       || binding.toolLimit !== m.toolLimit || binding.turnLimit !== m.turnLimit
@@ -268,7 +280,7 @@ function main(argv = process.argv.slice(2)) {
   if (command === '--help' || !command) {
     console.log('Worker opt-in: workerAssignment {id, ownerAgent}; exact assignment must already pin this registered repository/session. Cap cannot exceed assignment minus parent closure reserve; native interception is separate proof.');
     console.log('fresh-agent-session prepare <host-manifest.json> | launch <prepared-plan.json> | capabilities');
-    console.log('Manifest: runtime, registered session, owned cwd, central policyRoot, absolute executable, args, toolLimit, turnLimit, optional reviewed absolute goalFile and Claude-only toolProfile: local-no-mcp. Own .ecc/fresh-session and (Antigravity) .agents/hooks.json. No automatic permission grant or provider call.');
+    console.log('Manifest: runtime, registered session, owned cwd, central policyRoot, absolute executable, args, toolLimit, turnLimit, optional reviewed absolute goalFile. toolProfile: Claude local-no-mcp; Codex {name:codex-disable-mcp,servers:[exact-unused-server-names]} supplies invocation-local enabled=false overrides only. Preserve task-required/managed tools; plugin-provided servers and direct IDE starts are not covered. Own .ecc/fresh-session and (Antigravity) .agents/hooks.json. No automatic permission grant or provider call.');
     console.log('dataPolicy synthetic-only prepares tool-policy fixtures but refuses native launch: hooks alone do not contain automatic context, stdin or transcripts.');
     console.log('New native plans require a reviewed positive peakRamGiB. Machine admission precedes native discovery; a Windows Job retains the claim through verified descendant closure. Existing IDE sessions are unchanged.');
     console.log('verify-synthetic <prepared-plan.json>: deterministic fixture-integrity/output-contract only, no native client. source-search <request.json>: {plan,roots,query}, bounded metadata-only literal source lookup.');

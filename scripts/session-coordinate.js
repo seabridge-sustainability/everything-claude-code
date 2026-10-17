@@ -14,6 +14,7 @@ function main(args = process.argv.slice(2)) {
     console.log('Experiment registration: --loop-target exact-file --check-file committed-check (repeatable); exactly one owned target, pinned read-only-to-maker checks.');
     console.log('Release: --branch NAME --candidate FULL_SHA --actions-budget-status known|unknown --actions-budget-used USD --actions-budget-limit USD --actions-budget-checked-at ISO_UTC --actions-budget-source github-org-budget-ui|owner-screenshot|github-org-billing-export --actions-stop-usage yes|no|unknown --expected-actions-usd USD --expected-workflows NAMES [--owner-cost-approval TEXT].');
     console.log('Publication: origin target/destination are pinned automatically. Inherited outgoing commits need --include-owned-commit FULL_SHA (repeatable) and --publication-evidence TEXT. A missing target needs --new-branch-base FULL_SHA and evidence approving that exact baseline history; no-origin leases are local-only. These records grant no authorization.');
+    console.log('User-facing frontend publication also requires --ui-review D:/.../review.json: source-bound ecc.frontend-review.v1, every affected route/state before+after 1280x900/390x844, UX reviewer PASS and actual owner-visible render. Tests alone cannot land UI. Evidence is rechecked by check-release.');
     console.log('Owner watcher: release-watch --session ID --repository OWNER/REPO --branch NAME --candidate FULL_SHA --expected-workflows security-scan[,backend-tests] [--max-polls 20 --poll-ms 15000 --max-requests 200 --deadline-seconds 600 --close-session yes|no]. Finite GET-only observation; existing gh login; missing evidence retains own lease. Invocation grants no push, rerun, deployment or provider authority.');
     console.log('End: --outcome completed|failed|superseded|aborted-before-push --evidence TEXT');
     console.log('Unchanged failed release: --retry-evidence TEXT describing the external change; completed candidates cannot be released again.');
@@ -25,7 +26,7 @@ function main(args = process.argv.slice(2)) {
     '--ttl-minutes': 'ttl', '--branch': 'branch', '--candidate': 'candidate', '--outcome': 'outcome', '--evidence': 'evidence', '--upstream': 'upstream', '--loop-target': 'loopTarget',
     '--repository': 'repository', '--max-polls': 'maxPolls', '--poll-ms': 'pollMs',
     '--max-requests': 'maxRequests', '--deadline-seconds': 'deadlineSeconds', '--close-session': 'closeSession',
-    '--publication-evidence': 'publicationEvidence', '--new-branch-base': 'newBranchBase',
+    '--publication-evidence': 'publicationEvidence', '--new-branch-base': 'newBranchBase', '--ui-review': 'uiReview',
     '--actions-budget-status': 'actionsBudgetStatus', '--actions-budget-used': 'actionsBudgetUsed',
     '--actions-budget-limit': 'actionsBudgetLimit', '--actions-budget-checked-at': 'actionsBudgetCheckedAt',
     '--actions-budget-source': 'actionsBudgetSource', '--actions-stop-usage': 'actionsStopUsage',

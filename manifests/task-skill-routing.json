@@ -3,6 +3,7 @@
   "authority": "Current host and project policy, latest owner request and one active goal",
   "codingSources": ["mattpocock-skills", "addyosmani-agent-skills", "ecc-engineering", "cursor-pstack", "ponytail", "ecc-scroll-craft", "ecc-higgsfield"],
   "always": ["Karpathy assumptions, simplicity, surgical edits and observable success", "Resolve material ambiguity from source before asking", "Preserve protected behavior and concurrent work", "Verify claims with appropriate actual evidence"],
+  "frontendReview": {"skill":"sea-frontend-ux-reviewer","queryPattern":"frontend|\\bui\\b|dashboard|layout|typograph|spacing|responsive|accessibility","pathPattern":"(?:^|/)(?:manageesg-frontend|openseabri)/(?:src|app|components|public|messages|locales|styles)/","gate":"before-done-checklist-or-landing","viewports":[[1280,900],[390,844]],"evidenceVolume":"D:"},
   "routes": [
     {"id":"ponytail-review","patterns":["\\bponytail\\b.*\\breview\\b"],"source":"ponytail","name":"ponytail-review","skill":"sea-ponytail"},
     {"id":"ponytail-audit","patterns":["\\bponytail\\b.*\\baudit\\b"],"source":"ponytail","name":"ponytail-audit","skill":"sea-ponytail"},

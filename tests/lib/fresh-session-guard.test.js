@@ -102,6 +102,24 @@ test('unreviewed or unsupported light profiles refuse before native launch',()=>
   assert.throws(()=>fixture('claude',false,null,'anything-else'),/local-no-mcp/);
   assert.throws(()=>fixture('codex',false,null,'local-no-mcp'),/local-no-mcp/);
 });
+test('Codex reviewed MCP exclusions are invocation-local and retain exact native hook bindings',()=>{
+  const f=fixture('codex',false,null,{name:'codex-disable-mcp',servers:['unused_docs','unused-indexer']});
+  for(const name of ['unused_docs','unused-indexer']) assert.ok(f.plan.args.includes(`mcp_servers.${name}.enabled=false`));
+  assert.ok(f.plan.args.includes('features.hooks=true'));
+  assert.ok(f.plan.args.some(arg=>arg.startsWith('hooks.PreToolUse=')));
+  const binding=JSON.parse(fs.readFileSync(f.plan.environment.ECC_FRESH_SESSION_CONFIG,'utf8'));
+  assert.deepEqual(binding.toolProfile,f.plan.manifest.toolProfile);
+  const changed=structuredClone(f.plan);changed.manifest.toolProfile.servers.push('required_tool');
+  assert.throws(()=>launch(changed),/tool profile changed/);
+  const argv=structuredClone(f.plan);argv.args.push('-c','mcp_servers.required_tool.enabled=false');
+  assert.throws(()=>launch(argv),/launch arguments changed/);
+});
+test('Codex MCP profile rejects duplicates, key injection, empty and unreviewed fields',()=>{
+  for(const servers of [[],['same','same'],['bad.name'],['x=true'],['../server']]) {
+    assert.throws(()=>fixture('codex',false,null,{name:'codex-disable-mcp',servers}),/reviewed MCP server names/);
+  }
+  assert.throws(()=>fixture('codex',false,null,{name:'codex-disable-mcp',servers:['x'],hooks:false}),/reviewed MCP server names/);
+});
 test('managed worker derives exact assignment cap, counts startup and preserves parent reserve', () => {
   const f = prepareWorker(workerFixture());
   assert.equal(f.plan.manifest.toolLimit,21);

@@ -45,7 +45,7 @@ function overlaps(a, b) { return a === b || a.startsWith(`${b}/`) || b.startsWit
 // Ignored, task-specific goal records never own a checkout's Git integration slot.
 // They retain normal path-overlap protection and cannot commit or publish.
 function goalMetadataScopes(repo, scopes) {
-  const goalPath = /^\.ecc\/(?:goal(?:\/|$)|workspace-recovery\/.+\/private\/\.ecc\/goal-[^/]+(?:\/|$))/;
+  const goalPath = /^\.ecc\/(?:goal(?:\/|$)|[a-z0-9][a-z0-9-]*\/\.ecc\/goal(?:\/|$)|workspace-recovery\/.+\/private\/\.ecc\/goal-[^/]+(?:\/|$))/;
   if (!scopes.length || !scopes.every(item => goalPath.test(item))) return false;
   for (const relative of scopes) {
     safePath(repo, relative);
@@ -314,9 +314,12 @@ function publicationReceipt(repo, session, branch, candidate, options) {
   if (inherited.some(commit => !included.includes(commit))) throw new Error('inherited unpublished commits require explicit include-owned-commit and publication-evidence');
   const evidence = included.length || mode === 'origin-new'
     ? requireText(options.publicationEvidence, 'publication-evidence') : null;
+  const uiReview = require('./frontend-review-gate').requireReview({ root: repo.root,
+    paths: outgoing.paths, base, head: candidate, file: options.uiReview });
   return { version: 1, mode, publishable: destinationSha256 !== null, targetRef, targetSha,
     base, destinationSha256, outgoingCommits: outgoing.commits, touchedPaths: outgoing.paths,
     includedInheritedCommits: included, publicationEvidence: evidence,
+    ...(uiReview ? { uiReview } : {}),
     limitation: 'fetched-reference and recorded ownership evidence only; not live remote freshness or owner authorization' };
 }
 function verifyPublication(repo, session, release) {
@@ -331,6 +334,7 @@ function verifyPublication(repo, session, release) {
   const current = publicationReceipt(repo, session, release.branch, release.candidate, {
     newBranchBase: pinned.mode === 'origin-new' ? pinned.base : undefined,
     includeOwnedCommits: pinned.includedInheritedCommits, publicationEvidence: pinned.publicationEvidence,
+    uiReview: pinned.uiReview?.file,
   });
   if (JSON.stringify(current) !== JSON.stringify(pinned)) throw new Error('publication ownership receipt changed after acquisition');
   return current;

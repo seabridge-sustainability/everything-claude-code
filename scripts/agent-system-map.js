@@ -39,6 +39,7 @@ const SOURCES = Object.freeze([
   'scripts/ecc.js', 'package.json', 'scripts/coding-execution.js',
   'scripts/lib/coding-execution.js', 'schemas/coding-execution.schema.json',
   'scripts/lib/goal-control.js',
+  'scripts/lib/frontend-review-gate.js', 'tests/lib/frontend-review-gate.test.js',
   'tests/lib/coding-execution.test.js',
   'scripts/native-adoption-pilot.js', 'tests/lib/native-adoption-pilot.test.js',
   'scripts/coding-execution-run.js', 'scripts/lib/coding-execution-runner.js',

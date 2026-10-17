@@ -25,8 +25,9 @@ Reachable UI; honest loading/empty/error states; responsive behavior; API/state 
 
 Use current SeaBridge brand assets and semantic tokens, existing Radix/Tailwind/
 Recharts components and the [frontend UX standard](../../docs/harness/standards/frontend-ux.md).
-Preserve scientific meaning and essential qualifications beside the metric;
-collapse repeated provenance, technical enums and diagnostic prose. True zero,
+Preserve scientific meaning, units and missing states; apply the central copy
+budget with qualifications/provenance in accessible i/popovers, not repeated
+body text. Record any exact binding visible-attribution conflict for the owner. True zero,
 missing, withheld, pending and failed are different states. No arbitrary risk
 colors, fake scores, API changes or new component packages to improve presentation.
 
@@ -41,7 +42,7 @@ actual reviewed installation approval. Prefer existing components and CSS.
 
 ## Mandatory Verification
 
-Every changed UI component/layout requires the [existing browser workflow](../../agent-tooling/skills/seabridge-browser-autonomy/SKILL.md): source-bound specification before editing, before/after desktop/mobile screenshots and successful video/trace playback on D: only. Missing prerequisites block the affected proof; never substitute a fixture, 401 or screenshot for signed-in behavior/persistence. Check route/menu visibility, API contracts, filter propagation, buttons, text overlap and keyboard flow. Compare approved layout/copy/tokens and call out missing baseline approval; do not redesign adjacent surfaces.
+Every user-facing component/copy/layout/route change requires the central visual gate and the [existing browser workflow](../../agent-tooling/skills/seabridge-browser-autonomy/SKILL.md): source-bound specification before editing, before/after desktop/mobile screenshots and successful video/trace playback on D: only. Missing prerequisites block the affected proof; never substitute a fixture, 401 or screenshot for signed-in behavior/persistence. Check route/menu visibility, API contracts, filter propagation, buttons, text overlap and keyboard flow. Compare approved layout/copy/tokens and call out missing baseline approval; do not redesign adjacent surfaces.
 
 ## Failure Conditions
 

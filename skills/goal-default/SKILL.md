@@ -40,6 +40,16 @@ native hooks and budgets. It edits no global settings or active sessions. Other
 harnesses fail closed for this unverified profile. This is a startup-footprint
 option, not measured RAM savings, native containment or managed-policy override.
 
+For a new Codex invocation, a reviewed `toolProfile` may instead be
+`{name:"codex-disable-mcp",servers:["exact-unused-server-name"]}`. Inventory the
+effective MCP names with the installed client's read-only `mcp list --json` first;
+retain task-required/managed servers. The launcher pins native `enabled=false`
+overrides for these names only. Other and plugin-provided servers are unchanged;
+this is not an all-tools sandbox or measured saving. Re-prepare to change the list.
+Use the verified released ECC checkout for new starts; a published commit does
+not update a dirty primary or existing clients. Never pull over foreign drafts
+or hot-reload agents to manufacture adoption proof.
+
 Managed Codex launches first query the installed client's native hook metadata
 without starting a thread/model turn. Both exact guard definitions must be enabled,
 synchronous and trusted; missing/untrusted/ambiguous metadata refuses that launch.
@@ -211,6 +221,12 @@ Ignored task goal records auto-register metadata-only; a legacy goal-only owner
 can run `ecc session metadata-only --session ID` itself. This cannot commit/release
 or waive overlapping-path checks; never convert another session. Local fetch/rebase
 of a clean owned integration checkout need not wait for another owner's CI.
+Reserve the exact named goal directory, not the shared `.ecc/goal` parent, when
+using a named goal. Ignored legacy `.ecc/<task>/.ecc/goal/<name>` records are also
+metadata-only; tracked lookalikes and other ignored configuration remain writers.
+Keep one durable canonical handoff in the existing project artifacts/goal area;
+Temp scratchpads are disposable, not the master record. Point to it, do not keep
+several independently edited or synchronised handoff copies.
 Bundle necessary contract-preserving CI compatibility repairs before publication;
 keep local logical commits, not a remote push for every small step.
 Do not release a live CI/deploy lease merely to shorten another agent's queue.
@@ -259,6 +275,22 @@ without this policy are not privacy-certified. This is evidence validation, not
 native read/transcript containment; scoped writes alone cannot prove that layer.
 
 ## Completion
+
+Any user-facing UI change, including copy-only/science fixes, requires the central
+frontend gate before done/checklist completion or landing. Record every affected
+route/state's D: before/after1280x900+390x844 images, exact candidate/source hashes,
+UX-reviewer PASS and owner-visible actual render. Recheck the composed page after
+the final patch; old screenshots/reviews cannot approve new text or code. Tests,
+typecheck/lint, login pages and wrong-backend previews cannot substitute.
+Rendering/auth/RAM/port failure means UI acceptance BLOCKED, not done-local;
+notify the owner within the same hour with the exact remedy/approval needed.
+Reuse healthy shared services first; extra ports retain named purpose/owner/
+retirement approval. Continue independent authorized work; never pause a peer.
+Keep one page owner per route, a visible-copy placement budget and REA UX finding
+dispositions in existing plans, progress reports and handoffs. A local preview
+must expose the actual composed view; fixture proof stays labelled and cannot
+replace required signed-in functionality. Owner-visible is not a new blanket
+owner-approval ceremony. Keep existing functional/e2e and accessibility checks.
 
 Use `ecc goal-runtime final` for the actual runtime/session and evidence-based claim.
 Keep local/API/signed-in UI/Save-reopen/attachments/export/science/publication/deploy

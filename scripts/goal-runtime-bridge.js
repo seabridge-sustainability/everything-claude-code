@@ -55,7 +55,7 @@ function runGoal(args, cwd = process.cwd()) {
 function evidenceArgs(args) {
   const result = [];
   for (let index = 0; index < args.length; index += 1) {
-    if (!['--evidence-root', '--evidence-map'].includes(args[index])) continue;
+    if (!['--evidence-root', '--evidence-map', '--ui-review'].includes(args[index])) continue;
     if (!args[index + 1] || args[index + 1].startsWith('--')) throw new Error(`${args[index]} requires a value`);
     result.push(args[index], args[index + 1]);
     index += 1;

@@ -5,6 +5,25 @@ description: "Review SeaBridgeAI frontend changes for UX and implementation guar
 
 # SeaBridgeAI Frontend UX Reviewer
 
+Mandatory for every user-facing component/copy/layout/route change, including
+small presentation, science, peer-review, security and API-driven UI fixes.
+Keep the task's primary workflow; this review is a required acceptance gate.
+One named page owner per route integrates the full page, not isolated snippets.
+Before done/tick/land: inspect every affected view/state before and after at
+1280x900 and390x844 on D:, against the exact final source/candidate; record PASS
+with reviewer, image hashes, route/state/viewport, remaining issues and owner-
+visible preview or signed-in render. Validate the preview's actual API target,
+tenant/auth/data mode and retained-data visibility; ready/login/401 is not proof.
+New visible text invalidates the affected page review. Missing/blocked evidence
+is BLOCKED; notify the owner within the hour, with the precise remedy and any
+extra-port purpose/owner/retirement. Never defer until landing or bypass guards.
+Default page copy: headings, values, controls and accessible i/popover context.
+Place caveats, sources, licences and limitations in keyboard/touch-accessible
+popovers, preserving content and truthful missing states. Record exact binding
+visible-attribution conflicts for owner resolution; no blanket disclaimer blocks.
+Science/peer-review patches must name text placement. Inspect information density,
+primary-action visibility and each REA UX disposition against the final page.
+
 Load:
 
 - `docs/harness/standards/frontend-ux.md`
@@ -21,7 +40,7 @@ Review changed files for:
 - Route regressions and broken navigation.
 - One human-readable metric state, preserved true zeros, units and meaningful precision.
 - Source observations and provisional screens clearly separated from calculated property risk.
-- Essential scientific qualifications adjacent to results; repeated technical detail in accessible disclosures.
+- Truthful values/units/states; qualifications and provenance in accessible i/popovers under the central copy budget.
 - Current brand/semantic tokens and justified severity colors with text labels.
 
 For frontend briefs mentioning API contracts or error states, select the frontend

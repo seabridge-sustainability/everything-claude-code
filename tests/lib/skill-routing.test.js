@@ -56,3 +56,24 @@ test('legacy orchestrators delegate without old file-count, consensus-loop or mi
   assert.match(senior,/canonical routing/);assert.doesNotMatch(senior,/Controlled Auto Mode Policy|Self-Verification Loop|SEABRIDGE_CODING_AGENT_SYSTEM/);
   assert.match(grill,/existing Pstack/);assert.doesNotMatch(grill,/round 5|5 rounds|more than 2|lower.cost execution/);
 });
+
+test('frontend visual review remains required for small and non-design primary tasks',()=>{
+  for(const request of [
+    {query:'change button spacing',impact:{presentationOnly:true}},
+    {query:'debug frontend UI error'},
+    {query:'security review',impact:{frontend:true}},
+    {query:'science repair',changedPaths:['manageesg-frontend/src/components/Risk.tsx']},
+    {query:'copy correction',changedPaths:['manageesg-frontend/messages/en.json']},
+  ]) {
+    const out=taskRoute(c,request);
+    assert.equal(out.requiredReviews.length,1);
+    assert.equal(out.requiredReviews[0].skill,'sea-frontend-ux-reviewer');
+    assert.deepEqual(out.requiredReviews[0].viewports,[[1280,900],[390,844]]);
+  }
+  const debug=taskRoute(c,{query:'debug frontend UI error'});
+  assert.equal(debug.primary.name,'diagnosing-bugs');
+  const exact=c.skills.find(e=>e.name==='api-and-interface-design');
+  assert.equal(taskRoute(c,{query:exact.id,impact:{frontend:true}}).primary.id,exact.id);
+  assert.equal(taskRoute(c,{query:'backend database migration'}).requiredReviews.length,0);
+  assert.throws(()=>taskRoute(c,{query:'review',changedPaths:'not-an-array'}),/paths/);
+});

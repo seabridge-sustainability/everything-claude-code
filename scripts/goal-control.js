@@ -725,6 +725,19 @@ function main(args = process.argv.slice(2)) {
     const claim = args[1];
     if (!claim || claim.startsWith('-')) throw new Error('claim requires complete, blocked, or on-track');
     const result = evaluateClaim(claim, bundle, { now });
+    if (claim === 'complete') {
+      const visual = require('./lib/frontend-review-gate');
+      let frontendSeen = false;
+      const states = bundle.resume?.repository_states || (bundle.resume ? [bundle.resume.repository_state] : []);
+      for (const state of states) {
+        if (!visual.isFrontend(state.repo_root)) continue;
+        frontendSeen = true;
+        const delta = visual.changes(state.repo_root);
+        visual.requireReview({ root: state.repo_root, paths: delta.paths, base: delta.base,
+          head: state.head, file: optionValue(args, '--ui-review'), required: bundle.goal.proof_profile === 'frontend' });
+      }
+      if (bundle.goal.proof_profile === 'frontend' && !frontendSeen) throw Error('Frontend visual gate: current frontend repository and rendered review required');
+    }
     if (args.includes('--json')) {
       process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
     } else {

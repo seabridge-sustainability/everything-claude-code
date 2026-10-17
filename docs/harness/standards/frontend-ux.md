@@ -76,15 +76,51 @@ context/indexes to validated property risk, percentages or financial impact.
 Show one clear state per metric: true zero remains zero; missing/withheld/pending/
 failed/not-applicable remain distinct and neutral. A rounded small nonzero value
 must not look like zero. Severity colors require an existing justified category
-and a text label; absence is not safe. Keep material scientific limitations near
-results, and put repeated provenance/raw diagnostic enums in accessible disclosures.
+and a text label; absence is not safe. Apply the central page-copy budget: truthful
+values/units/states plus accessible i/popover qualifications, sources and licences.
+No repeated disclaimer blocks; exact binding visible-attribution conflicts need
+owner resolution, not deletion or silently hidden mandatory notices.
 
-Verify changed states and expanded panels at 1440x900, 1024x768 and 390x844, plus
+Mandatory before/after changed-state renders:1280x900 and390x844; retain additional
+contract-required viewports (including1440x900/1024x768 where applicable), plus
 200% zoom and keyboard/focus/overflow checks. Reuse existing source-bound UI
 contracts and feature recipes. Before/after screenshots and video/trace playback,
 including profiles/temp/reports, use the existing D-only browser workflow; no
 `lab/shots`, C:/E: fallback or upstream Scroll Craft capture script. Actual signed-in
 runtime proof is separate from anonymous/fixture screenshots and component tests.
+
+### Executable completion/publication receipt
+
+Use the existing D-only capture workflow, not a new collector. After reviewing
+the actual images, retain a D-only `ecc.frontend-review.v1` JSON record and supply
+`--ui-review D:/.../review.json` to `ecc goal-runtime final --claim complete` and
+`ecc session release-acquire`. `check-release` revalidates the pinned record and
+image bytes. Documentation-only publication does not require this UI receipt.
+
+Record fields (no client analyses, credentials or raw tenant identifiers):
+
+- `repository`: exact `root`, full `head`, fetched development `base`, and `files`
+  mapping every affected UI path to its final SHA256 (null for deleted files).
+  `scripts/lib/frontend-review-gate.js` exposes `changes` and `sourceFiles` for
+  deriving these pins; never fill them from memory.
+- `views`: every affected route/state, `requiresAuth`, `before` and `after`.
+  Each phase records `authenticity:"actual-browser"`, `renderedRoute`,
+  `sourceCommit` (base/head), successful HTTP `status`, `authenticated`,
+  `capturedAt`, and two `images:{path,sha256,width,height}` at1280x900/390x844.
+  Each capture's `runtime` records `apiOrigin:"http://localhost:8000"`, the
+  actually observed `backendIdentity`, and `tenantBoundaryVerified:true`.
+  Each view also records `ownerVisible:{origin:"http://localhost:3000",method:
+  "signed-in"|"local-preview",observedAt}`; protected views require signed-in.
+- `review`: `workflow:"sea-frontend-ux-reviewer"`, actual `reviewer`, `verdict:
+  "PASS"`, `inventoryComplete:true`, `reviewedAt`, and `payloadSha256` of
+  `JSON.stringify(recordWithoutReview)`. This binds the reviewed source, captures
+  and owner-visible observation, not just a free-text PASS. Do not auto-sign a
+  review without inspecting the composed views, runtime target and UX findings.
+
+The shared check rejects stale sources, missing phase/viewport/auth/review,
+non-D storage and corrupt PNG data. It validates evidence, not aesthetic quality
+or cryptographic/native authenticity of a caller-supplied capture assertion.
+Keep actual functional/e2e, video/trace, accessibility and reviewer checks.
 
 Scroll Craft is an opt-in supporting reference through exact shared workflow
 `ecc-scroll-craft/ecc/scroll-craft-dashboard-review`. Dashboard use selects brand

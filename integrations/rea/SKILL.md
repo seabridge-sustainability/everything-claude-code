@@ -29,7 +29,17 @@ Follow the workspace's instruction loader and approval boundaries.
    Cite evidence filenames and timestamps. Distinguish observed behavior from
    inferred architecture and unknown implementation. Screenshots/videos cannot
    recover hidden source code, APIs or database schemas.
-5. Save the findings with `reference_blueprint`; `visionConfirmed` is an honest
+5. Keep a **UX findings** section beside method findings in the existing plan.
+   For each captured flow/layout/density/interaction/state, record: finding ID,
+   source image/time, observed/inferred/unknown, affected route, disposition
+   (adopted/adapted/rejected), reason, licence/terms boundary and acceptance check.
+   Missing UI capture is unknown, not permission to invent or silently omit it.
+   Terms can restrict reuse; retain the finding and restriction, never treat
+   capture or owner intent as a new licence. Proprietary data/formulas stay
+   protected; UX similarity is not scientific validation of eligible methods.
+   Carry UX dispositions into progress reports/handoffs; the page owner verifies
+   adopted/adapted items against final renders through the central visual gate.
+   Save the findings with `reference_blueprint`; `visionConfirmed` is an honest
    caller attestation after image inspection. Map the resulting blueprint to the
    persistent frontend/backend repository links. Inspect existing contracts and
    approved UI components before implementing the owner-requested feature.
