@@ -1,0 +1,10 @@
+{
+  "repository": "https://github.com/morluto/rea.git",
+  "revision": "27dc42d10249f0410904a75c0997842eb03b931c",
+  "version": "6.7.0",
+  "license": "MIT",
+  "entryPoint": "vendor/rea-6.7.0/node_modules/rea-agents/scripts/rea.mjs",
+  "releaseIntegrity": "sha512-yhIx2ioJYYT1C/tONfYeitC6LhnKmCh+ZwRUOgYuhSc733lGhkkt73zhug9WmLgxoMdKuqIYGCoBfD4fXkOhFw==",
+  "sourceTag": "rea-agents-6.7.0",
+  "legacyPin": "upstream.json"
+}

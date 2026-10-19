@@ -37,6 +37,9 @@ if ($IsWindows -or $env:OS -eq 'Windows_NT') {
     if ($LASTEXITCODE -ne 0) { throw 'REA Windows helper verification failed' }
 }
 $reaPython = Join-Path $reaRoot '.venv/Scripts/python.exe'
+if (Test-Path -LiteralPath (Join-Path $reaRoot 'active-upstream.json')) {
+    & (Join-Path $reaRoot 'install-release.ps1')
+}
 if (-not (Test-Path -LiteralPath $reaPython)) {
     & $PythonCommand $PythonVersion -m venv (Join-Path $reaRoot '.venv')
     if ($LASTEXITCODE -ne 0) { throw 'Python environment creation failed' }

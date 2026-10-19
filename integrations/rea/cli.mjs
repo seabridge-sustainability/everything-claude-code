@@ -3,18 +3,18 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import readline from 'node:readline';
-import { REA, PYTHON, config, run, providerEnvironment } from './runtime.mjs';
+import { REA, PYTHON, config, run, providerEnvironment, upstreamNode } from './runtime.mjs';
 import { inspectImage, visionStatus } from './vision.mjs';
 import { referenceAnalyze, saveBlueprint } from './reference.mjs';
 import { videoPrepare } from './video.mjs';
-import { nativeInvocation, NATIVE_COMMANDS, linuxPath } from './wsl-native.mjs';
+import { nativeInvocation, NATIVE_COMMANDS, translateWslRequest } from './wsl-native.mjs';
 
 const [command, ...args] = process.argv.slice(2);
 try {
   if (command === 'mcp') { const { startMcp } = await import('./mcp.mjs'); await startMcp(); }
   else if (command === 'upstream' || command === 'native') {
     const useWsl = command === 'native' || ((await config()).native?.runtime === 'wsl' && NATIVE_COMMANDS.has(args[0]));
-    const invocation = useWsl ? await nativeInvocation(args) : { executable: process.execPath, args: [REA, ...args] };
+    const invocation = useWsl ? await nativeInvocation(args) : { executable: await upstreamNode(), args: [REA, ...args] };
     const proxy = useWsl && args.includes('--mcp');
     const child = spawn(invocation.executable, invocation.args, { stdio: proxy ? ['pipe', 'pipe', 'pipe'] : 'inherit', windowsHide: true, shell: false, env: await providerEnvironment() });
     let lines;
@@ -25,10 +25,7 @@ try {
       lines.on('line', line => {
         let request;
         try {
-          request = JSON.parse(line);
-          if (request.method === 'tools/call' && request.params?.name === 'open_binary') {
-            for (const field of ['path', 'snapshot_path']) if (request.params.arguments?.[field]) request.params.arguments[field] = linuxPath(request.params.arguments[field]);
-          }
+          request = translateWslRequest(JSON.parse(line));
           child.stdin.write(JSON.stringify(request) + '\n');
         } catch (error) {
           // Return an explicit protocol error for unsupported path coordinates,
@@ -73,8 +70,9 @@ try {
       }
       catch (error) { checks.native = { available: false, reason: error.message }; }
     }
-    process.stdout.write(JSON.stringify({ checks, modelRequirement: 'Use a vision-capable calling model or reference_inspect_image with the configured local vision model. Local Whisper handles transcription.' }, null, 2) + '\n');
-    if (!checks.rea.available || !checks.compiled.available || !checks.frontend.available || !checks.backend.available || (c.native && !checks.native.available)) process.exitCode = 1;
+    const unavailable = Object.entries(checks).filter(([, check]) => !check.available).map(([name]) => name);
+    process.stdout.write(JSON.stringify({ ready: unavailable.length === 0, unavailable, checks, modelRequirement: 'Use a vision-capable calling model or reference_inspect_image with the configured local vision model. Local Whisper handles transcription. Readiness is not actual inference proof; unavailable lanes do not prevent supported static analysis.' }, null, 2) + '\n');
+    if (unavailable.length) process.exitCode = 1;
   } else {
     process.stdout.write('ECC REA: doctor | mcp | upstream|native <REA arguments> | analyze|video|blueprint|read|inspect-image <request.json or ->\n');
     if (command && command !== '--help') process.exitCode = 1;

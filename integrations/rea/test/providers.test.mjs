@@ -3,8 +3,27 @@ import assert from 'node:assert/strict';
 import path from 'node:path';
 import fs from 'node:fs/promises';
 import { createServer } from 'node:http';
-import { ROOT, STATE, config, providerEnvironment, nativeEnvironment, run } from '../runtime.mjs';
+import { ROOT, STATE, REA, config, newBundle, providerEnvironment, nativeEnvironment, run } from '../runtime.mjs';
 import { spawn } from 'node:child_process';
+import os from 'node:os';
+import { pathToFileURL } from 'node:url';
+
+test('active runtime and evidence provenance match the approved release without replacing legacy files', async () => {
+  const pin = JSON.parse(await fs.readFile(path.join(ROOT, 'active-upstream.json'), 'utf8'));
+  assert.equal(REA, path.resolve(ROOT, pin.entryPoint));
+  const installed = JSON.parse(await fs.readFile(path.join(path.dirname(path.dirname(REA)), 'package.json'), 'utf8'));
+  assert.equal(installed.version, pin.version);
+  const bundle = await newBundle('fixture', 'release-identity');
+  assert.equal(bundle.manifest.rea.version, pin.version);
+  assert.equal(bundle.manifest.rea.revision, pin.revision);
+  const legacy = JSON.parse(await fs.readFile(path.join(ROOT, 'upstream.json'), 'utf8'));
+  assert.equal(legacy.version, '6.4.0');
+  // A fresh release-only install need not contain the optional legacy checkout.
+  // If retained from an earlier install, its entry must remain intact.
+  try { await fs.access(path.join(ROOT, 'vendor/rea')); }
+  catch (error) { if (error.code === 'ENOENT') return; throw error; }
+  assert.ok((await fs.stat(path.join(ROOT, 'vendor/rea/scripts/rea.mjs'))).isFile());
+});
 
 test('Windows provider environment preserves inherited Path without duplicate case variants', () => {
   const native = { provider: 'ghidra', ghidraInstallDir: path.resolve('fixture-ghidra'), javaHome: path.resolve('fixture-java') };
@@ -24,7 +43,9 @@ test('Windows provider environment preserves inherited Path without duplicate ca
 });
 
 test('native proxy exits after child spawn failure even while client stdin stays open', { skip: process.platform !== 'win32', timeout: 8000 }, async () => {
-  const fixtures = path.join(STATE, 'fixtures');
+  // Keep this small process-lifecycle fixture off the bulk evidence drive:
+  // unrelated package installs there must not determine child startup latency.
+  const fixtures = os.tmpdir();
   await fs.mkdir(fixtures, { recursive: true });
   const root = await fs.mkdtemp(path.join(fixtures, 'spawn-exit-'));
   let child;
@@ -33,10 +54,15 @@ test('native proxy exits after child spawn failure even while client stdin stays
       await fs.copyFile(path.join(ROOT, file), path.join(root, file), 1);
     }
     await fs.writeFile(path.join(root, 'workspace.local.json'), JSON.stringify({ repositories: { frontend: root, backend: root }, whisperModel: '.', native: { provider: 'ghidra', ghidraInstallDir: path.join(root, 'absent-ghidra'), javaHome: path.join(root, 'absent-java'), wsl: { distribution: 'fixture', node: '/fixture/node', javaHome: '/fixture/java', ghidraInstallDir: '/fixture/ghidra' } } }));
+    const missingExecutable = path.join(root, 'missing-wsl.exe');
+    const preload = path.join(root, 'spawn-failure.mjs');
+    await fs.writeFile(preload, `import cp from 'node:child_process'; import {syncBuiltinESMExports} from 'node:module'; const realSpawn=cp.spawn; cp.spawn=(file,args,options)=>realSpawn(file==='wsl.exe'?${JSON.stringify(missingExecutable)}:file,args,options); syncBuiltinESMExports();`);
     const env = { ...process.env };
     for (const key of Object.keys(env)) if (key.toLowerCase() === 'path') delete env[key];
-    env.PATH = ''; // No wsl.exe is resolvable; the test never starts WSL.
-    child = spawn(process.execPath, [path.join(root, 'cli.mjs'), 'native', '--mcp'], { env, cwd: root, windowsHide: true, stdio: ['pipe', 'pipe', 'pipe'] });
+    env.PATH = '';
+    // A nonexistent absolute fixture path avoids Windows system search paths.
+    // This still exercises a real OS spawn failure; no WSL process can start.
+    child = spawn(process.execPath, ['--import', pathToFileURL(preload).href, path.join(root, 'cli.mjs'), 'native', '--mcp'], { env, cwd: root, windowsHide: true, stdio: ['pipe', 'pipe', 'pipe'] });
     child.stdout.resume();
     let error = '';
     child.stderr.on('data', data => { error += data; });
@@ -46,7 +72,8 @@ test('native proxy exits after child spawn failure even while client stdin stays
       child.once('close', exit => { clearTimeout(timer); resolve(exit); });
     });
     assert.equal(code, 1);
-    assert.match(error, /spawn wsl\.exe ENOENT/);
+    assert.ok(error.includes(missingExecutable), error);
+    assert.match(error, /spawn .*missing-wsl\.exe ENOENT/);
   } finally {
     if (child && child.exitCode === null) child.kill();
     assert.equal(path.dirname(root), fixtures);

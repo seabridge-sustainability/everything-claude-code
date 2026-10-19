@@ -2,10 +2,22 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { newBundle, finish, addEvidence, rea, writeJson, config, httpUrl, loadBundle, digest } from './runtime.mjs';
 
-export async function referenceAnalyze({ source, kind = 'auto', targetId, cdpEndpoint }, options = {}) {
+export function scopedRequirements(requirements = []) {
+  if (!Array.isArray(requirements) || requirements.length > 100) throw new Error('requirements must be an array of at most 100 scoped items');
+  const ids = new Set();
+  return requirements.map(item => {
+    if (!item || typeof item.id !== 'string' || !/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,63}$/.test(item.id) || typeof item.description !== 'string' || !item.description.trim() || item.description.length > 2000 || ids.has(item.id)) throw new Error('Each requirement needs a unique ID and nonempty description (at most 2000 characters)');
+    ids.add(item.id);
+    return { id: item.id, description: item.description.trim() };
+  });
+}
+
+export async function referenceAnalyze({ source, kind = 'auto', targetId, cdpEndpoint, requirements }, options = {}) {
   if (typeof source !== 'string' || !source.trim()) throw new Error('source is required: path, URL, or active-browser');
+  const scope = scopedRequirements(requirements);
   const c = await config();
   const bundle = await newBundle('reference', source);
+  bundle.manifest.requirements = scope;
   let result;
   if (source === 'active-browser') {
     const endpoint = cdpEndpoint || c.cdpEndpoint;
@@ -79,8 +91,9 @@ async function extractScreenshots(bundle, result) {
 }
 async function addSourceDigest(file) { const { digest } = await import('./runtime.mjs'); return digest(file); }
 
-export async function saveBlueprint({ bundleId, visionConfirmed = false, workflows, architecture, unknowns }) {
+export async function saveBlueprint({ bundleId, visionConfirmed = false, workflows, architecture, unknowns, coverage = [], requireComplete = false }) {
   const bundle = await loadBundle(bundleId);
+  if (typeof requireComplete !== 'boolean') throw new Error('requireComplete must be boolean');
   if (bundle.manifest.evidence.some(item => item.type === 'image') && visionConfirmed !== true) throw new Error('Inspect images with a vision model before saving a blueprint; visionConfirmed is a caller attestation');
   for (const [name, values] of Object.entries({ workflows, architecture })) {
     if (!Array.isArray(values) || !values.length) throw new Error(`${name} must contain at least one evidence-linked finding`);
@@ -94,7 +107,27 @@ export async function saveBlueprint({ bundleId, visionConfirmed = false, workflo
     }
   }
   if (!Array.isArray(unknowns) || unknowns.some(item => typeof item !== 'string')) throw new Error('unknowns must be a string array');
-  const blueprint = { schema: 'ecc.rea.blueprint.v1', bundleId, repositories: bundle.manifest.repositories, visionConfirmed, workflows, architecture, unknowns, implementation: { frontend: 'Map observed UI flows to existing components, hooks and HTTP consumers; preserve approved design tokens.', backend: 'Map supported behavior to existing endpoints, schemas and services; validate contracts and tenant boundaries.', acceptance: 'Compare implementation to cited reference states; test Save/reopen and attachments where applicable.' } };
+  const requirements = scopedRequirements(bundle.manifest.requirements);
+  if (!Array.isArray(coverage) || coverage.length > 100) throw new Error('coverage must be an array of at most 100 items');
+  const findings = { workflows, architecture };
+  const rows = new Map();
+  for (const row of coverage) {
+    if (!row || !requirements.some(item => item.id === row.requirementId) || rows.has(row.requirementId) || !['covered', 'unknown'].includes(row.status)) throw new Error('Coverage must reference unique declared requirement IDs with status covered or unknown');
+    if (row.status === 'covered') {
+      if (!Array.isArray(row.findings) || !row.findings.length) throw new Error('Covered requirements need observed finding references');
+      for (const ref of row.findings) {
+        if (!ref || !['workflows', 'architecture'].includes(ref.section) || !Number.isInteger(ref.index) || ref.index < 0 || !findings[ref.section][ref.index] || findings[ref.section][ref.index].confidence !== 'observed') throw new Error('Covered requirements must reference existing observed findings, not inferences');
+      }
+      rows.set(row.requirementId, { requirementId: row.requirementId, status: 'covered', findings: row.findings.map(({ section, index }) => ({ section, index })) });
+    } else {
+      if (typeof row.reason !== 'string' || !row.reason.trim()) throw new Error('Unknown coverage needs an explicit reason');
+      rows.set(row.requirementId, { requirementId: row.requirementId, status: 'unknown', reason: row.reason.trim() });
+    }
+  }
+  const assessed = requirements.map(item => ({ ...item, ...(rows.get(item.id) || { requirementId: item.id, status: 'unknown', reason: 'No coverage supplied' }) }));
+  const complete = requirements.length > 0 && assessed.every(item => item.status === 'covered') && unknowns.length === 0;
+  if (requireComplete && !complete) throw new Error('Evidence coverage incomplete: declare requirements at capture, cover every requirement with observed findings, and resolve explicit unknowns');
+  const blueprint = { schema: 'ecc.rea.blueprint.v1', bundleId, repositories: bundle.manifest.repositories, visionConfirmed, workflows, architecture, unknowns, coverage: { complete, requirements: assessed, limitation: 'Scoped caller assessment only; validates evidence links, not semantic truth or discovery of undeclared requirements.' }, implementation: { frontend: 'Map observed UI flows to existing components, hooks and HTTP consumers; preserve approved design tokens.', backend: 'Map supported behavior to existing endpoints, schemas and services; validate contracts and tenant boundaries.', acceptance: 'Compare implementation to cited reference states; test Save/reopen and attachments where applicable.' } };
   const filename = `blueprint-${Date.now()}.json`;
   await writeJson(path.join(bundle.directory, filename), blueprint);
   return { file: path.join(bundle.directory, filename), blueprint };

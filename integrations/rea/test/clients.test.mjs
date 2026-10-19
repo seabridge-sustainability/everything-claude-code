@@ -4,12 +4,12 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import os from 'node:os';
 import { pathToFileURL } from 'node:url';
-import { ROOT, STATE, config } from '../runtime.mjs';
+import { ROOT, STATE, REA, config } from '../runtime.mjs';
 import { activateClients } from '../activate-clients.mjs';
 import ReaReferencePlugin from '../opencode-plugin.mjs';
-import { linuxPath, nativeInvocation } from '../wsl-native.mjs';
+import { linuxPath, nativeInvocation, translateWslRequest } from '../wsl-native.mjs';
 
-test('all-client activation preserves unrelated configuration and is idempotent', async () => {
+test('all-client registration preserves opt-in choices, unrelated configuration and idempotence', async () => {
   const home = await fs.mkdtemp(path.join(os.tmpdir(), 'ecc-rea-clients-'));
   await fs.mkdir(path.join(home, '.codex'), { recursive: true });
   await fs.mkdir(path.join(home, '.config/opencode'), { recursive: true });
@@ -22,7 +22,7 @@ test('all-client activation preserves unrelated configuration and is idempotent'
   const claude = JSON.parse(await fs.readFile(path.join(home, '.claude.json'), 'utf8'));
   assert.equal(claude.auth, 'fixture-secret');
   assert.deepEqual(claude.mcpServers.other, { command: 'other' });
-  assert.deepEqual(claude.projects.existing.disabledMcpServers, ['unrelated']);
+  assert.deepEqual(claude.projects.existing.disabledMcpServers, ['unrelated', 'rea-reference', 'rea', 'rea-native']);
   const trusted = JSON.parse(await fs.readFile(path.join(home, '.gemini/trustedFolders.json'), 'utf8'));
   assert.deepEqual(trusted, { [path.dirname(path.dirname(ROOT))]: 'TRUST_FOLDER' });
   const openCode = JSON.parse(await fs.readFile(path.join(home, '.config/opencode/opencode.json'), 'utf8'));
@@ -30,6 +30,8 @@ test('all-client activation preserves unrelated configuration and is idempotent'
   assert.equal(openCode.plugin[0], 'existing-plugin');
   assert.deepEqual(openCode.provider.ollama.whitelist, ['qwen3.5-opencode:32k']);
   assert.ok((await fs.readFile(path.join(home, '.codex/config.toml'), 'utf8')).startsWith(toml));
+  const registeredToml = await fs.readFile(path.join(home, '.codex/config.toml'), 'utf8');
+  for (const name of ['rea', 'rea-reference', 'rea-native']) assert.ok(registeredToml.includes(`[mcp_servers.${name}]\nenabled = false`));
   assert.deepEqual((await activateClients(home)).changed, []);
 });
 
@@ -80,6 +82,24 @@ test('WSL provider maps local paths using argument arrays and rejects UNC', asyn
   const invocation = await nativeInvocation(['decompile', 'C:/Apps with spaces/a.exe', 'rea_answer']);
   assert.equal(invocation.executable, 'wsl.exe');
   assert.equal(invocation.args.includes('sh'), false);
+  assert.equal(invocation.args.includes(linuxPath(REA)), true);
   assert.equal(invocation.args.includes('/mnt/c/Apps with spaces/a.exe'), true);
   assert.equal(invocation.args.at(-1), 'rea_answer');
+  for (const [key, value] of Object.entries((await config()).native.wsl.environment || {})) assert.ok(invocation.args.includes(`${key}=${value}`));
+});
+
+test('WSL free-provider paths translate only declared host coordinates, not queries or device paths', () => {
+  const request = (name, args) => ({ method: 'tools/call', params: { name, arguments: args } });
+  const wasm = translateWslRequest(request('inspect_wasm_artifact', { path: 'D:/samples/a.wasm', glue_paths: ['C:/samples/a.js'], candidate_paths: ['/tmp/b.wasm'] }));
+  assert.equal(wasm.params.arguments.path, '/mnt/d/samples/a.wasm');
+  assert.deepEqual(wasm.params.arguments.glue_paths, ['/mnt/c/samples/a.js']);
+  assert.deepEqual(wasm.params.arguments.candidate_paths, ['/tmp/b.wasm']);
+  const recovery = translateWslRequest(request('recover_javascript_sources', { path: 'D:/a.js', additional_paths: ['D:/b.js'], output_directory: 'D:/new output' }));
+  assert.equal(recovery.params.arguments.output_directory, '/mnt/d/new output');
+  assert.deepEqual(recovery.params.arguments.additional_paths, ['/mnt/d/b.js']);
+  const adb = request('pull_adb_file', { path: 'C:/device-literal' });
+  assert.deepEqual(translateWslRequest(structuredClone(adb)), adb);
+  const packet = translateWslRequest(request('inspect_packet_capture', { path: 'D:/a.pcap', display_filter: 'C:/literal' }));
+  assert.equal(packet.params.arguments.display_filter, 'C:/literal');
+  assert.throws(() => translateWslRequest(request('inspect_sqlite_database', { path: '\\\\server\\db.sqlite' })), /UNC/);
 });

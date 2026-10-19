@@ -11,7 +11,11 @@ In ECC, `ecc rea` invokes the same bridge; its explicit Node entry point works
 from any linked repository even when the ECC command is not on PATH.
 Follow the workspace's instruction loader and approval boundaries.
 
-1. Identify the provided input. Prefer the explicit file path or URL. If the owner
+1. Identify the input and agree the scoped requirements: states, inputs/outputs,
+   navigation, errors, auth/tenant boundaries and relevant contracts. Include
+   `requirements: [{id, description}]` in the initial analysis/video call and
+   repeat it on a selected CDP capture. A declared list cannot prove discovery
+   of everything. Prefer the explicit file path or URL. If the owner
    says “this browser/app”, use the agent's existing browser/desktop capability to
    obtain the selected URL or save the screenshot. Do not guess the foreground tab.
 2. For app files/directories/URLs, call `reference_analyze`. For YouTube/local videos,
@@ -29,7 +33,12 @@ Follow the workspace's instruction loader and approval boundaries.
    Cite evidence filenames and timestamps. Distinguish observed behavior from
    inferred architecture and unknown implementation. Screenshots/videos cannot
    recover hidden source code, APIs or database schemas.
-5. Keep a **UX findings** section beside method findings in the existing plan.
+5. Save findings with `reference_blueprint` and `coverage` rows for the declared
+   requirement IDs. A covered row references observed findings by
+   `{section: "workflows"|"architecture", index}`; an unknown row gives a reason.
+   Use `requireComplete: true` for a final scoped handoff. Missing coverage,
+   inference-only support and unresolved unknowns must remain incomplete.
+   Legacy unscoped bundles are drafts, not complete acceptance.
    For each captured flow/layout/density/interaction/state, record: finding ID,
    source image/time, observed/inferred/unknown, affected route, disposition
    (adopted/adapted/rejected), reason, licence/terms boundary and acceptance check.
@@ -39,7 +48,7 @@ Follow the workspace's instruction loader and approval boundaries.
    protected; UX similarity is not scientific validation of eligible methods.
    Carry UX dispositions into progress reports/handoffs; the page owner verifies
    adopted/adapted items against final renders through the central visual gate.
-   Save the findings with `reference_blueprint`; `visionConfirmed` is an honest
+   `visionConfirmed` is an honest
    caller attestation after image inspection. Map the resulting blueprint to the
    persistent frontend/backend repository links. Inspect existing contracts and
    approved UI components before implementing the owner-requested feature.

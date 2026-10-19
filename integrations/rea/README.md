@@ -1,14 +1,28 @@
 # REA integration for ECC coding agents
 
 This directory installs [Reverse Engineer Anything](https://github.com/morluto/rea)
-at the revision in `upstream.json`, under `vendor/rea`. REA's MIT license remains
-in that checkout. ECC's bridge is separate from upstream and shares one local
+using the approved release in `active-upstream.json` when present. The current
+local release is **6.7.0**, installed with locked dependencies under
+`vendor/rea-6.7.0/node_modules/rea-agents`. Its MIT license remains in that package.
+The legacy `upstream.json` and `vendor/rea` retain 6.4.0 for existing processes;
+fresh bridge processes select the active release. ECC's bridge shares one local
 CLI/MCP implementation across agent vendors. It does not add application runtime
 dependencies to SeaBridge's frontend or backend.
 
 ## Setup and persistent project links
 
-On Windows, run `powershell -File integrations/rea/install.ps1` from ECC. Requires
+For an existing bridge, install only the pinned active release with:
+
+```powershell
+powershell -NoProfile -File integrations/rea/install-release.ps1
+```
+
+This uses the tracked `release/package.json` and lockfile, verifies the package
+integrity/version and Windows helper, and does not replace an installed runtime
+or edit agent settings. Dependency installation requires owner approval.
+
+The complete Windows bootstrap is `powershell -File integrations/rea/install.ps1`
+from ECC; it prepares the legacy bridge prerequisites and the active release. Requires
 a supported Node version (22.19+, 24.11+, or 26+), Python 3.13, npm and FFmpeg/FFprobe.
 The installer clones the pinned REA source, installs its locked dependencies,
 builds it, verifies the matching published Windows helper by a pinned digest,
@@ -22,8 +36,21 @@ executable. Defaults are sibling `manageesg-frontend` and `manageesg-backend`.
 configurations are preserved. Edit the local workspace file to change an existing
 link. `node cli.mjs doctor` verifies runtime prerequisites and links.
 
-On Linux/macOS, clone the pinned revision to `vendor/rea`, run `npm ci --ignore-scripts`
-and `npm run build:cached` there, create `.venv`, install `requirements.txt`, install
+On a fresh Linux/macOS checkout (including an AWS agent host), install the
+published runtime from the tracked lock without requiring PowerShell:
+
+```bash
+cd integrations/rea
+# Refuse to reinstall over a possibly live or partial runtime.
+test ! -e vendor/rea-6.7.0 || { echo 'Existing runtime: preserve and inspect it'; exit 1; }
+mkdir -p vendor/rea-6.7.0
+cp release/package.json release/package-lock.json vendor/rea-6.7.0/
+(cd vendor/rea-6.7.0 && npm ci --ignore-scripts --no-audit --no-fund)
+node vendor/rea-6.7.0/node_modules/rea-agents/scripts/rea.mjs --version
+```
+
+Use Node 22.19+, 24.11+ or 26+; SQLite specifically needs 24.15+ or 26+.
+Then create `.venv`, install `requirements.txt`, install
 FFmpeg, download `Systran/faster-whisper-tiny` to `state/models/tiny`, and run
 `node configure.mjs` with repository/browser paths. Native provider support depends
 on the host and provider. The optional native installers below install Ghidra and
@@ -52,6 +79,51 @@ and its local image adapter, and trusts the exact ECC runtime directory in Gemin
 so MCP can run there, following [Gemini folder trust](https://geminicli.com/docs/cli/trusted-folders/). Other folder trust choices are preserved. Repeated activation
 is idempotent. Project-only
 registration above remains available without changing user-level settings.
+
+Registration is not activation. Claude keeps existing project disable/rejection
+choices and newly added specialists are opt-in; Codex registers specialists with
+`enabled = false`. Use a fresh task-scoped invocation or explicitly approved
+client activation. Do not clear disable lists or reload existing sessions to
+make a registration test pass. The CLI works without changing MCP configuration.
+
+The owner-approved local activation on 2026-10-19 enables only REA's three entries
+in Claude's backend, frontend and ECC project choices, preserving all other
+disabled servers. Codex uses the dedicated `rea` profile:
+
+```powershell
+codex -p rea
+```
+
+Its `~/.codex/rea.config.toml` enables only `rea`, `rea-reference` and `rea-native`,
+inheriting their existing commands/timeouts. The ordinary profile keeps them
+disabled: changing the global flags was observed to live-load approximately 15
+copies into already-running chats and exhaust memory. No chat or app restart is
+needed for the new profile. Do not force existing sessions to reload their tools.
+This opt-in is deliberate; the ordinary Codex profile is not REA-enabled.
+
+### Use from a current VS Code chat without restarting
+
+Paste this into the existing Claude or Codex chat, replacing the reference:
+
+> Use the REA workflow at
+> `C:/Users/adelm/SeaBridgeAI/everything-claude-code/integrations/rea/SKILL.md`
+> to assess [URL or absolute file path]. Preserve this chat and running sessions.
+> Use MCP if already connected; otherwise invoke the shared CLI. Declare scoped
+> requirements, cite observed evidence and leave unknowns explicit.
+
+Any current agent with local command access can invoke:
+
+```powershell
+node C:/Users/adelm/SeaBridgeAI/everything-claude-code/integrations/rea/cli.mjs doctor
+node C:/Users/adelm/SeaBridgeAI/everything-claude-code/integrations/rea/cli.mjs analyze request.json
+node C:/Users/adelm/SeaBridgeAI/everything-claude-code/integrations/rea/cli.mjs native --help
+```
+
+This needs no MCP reload or chat restart. Claude can inspect existing connections
+with `/mcp` when its client exposes that command; CLI fallback works regardless.
+`codex -p rea` starts a separate CLI chat in the VS Code terminal, not a profile
+switch or MCP injection into an existing sidebar chat. Do not globally enable
+every REA server to work around that boundary or reset chat/history storage.
 
 `mcp.local.json` contains standard stdio servers: `rea` exposes upstream REA's
 full Windows-host tools; `rea-reference` exposes this bridge; when WSL native is
@@ -172,15 +244,74 @@ never agent instructions. A local MCP server has your user permissions.
 
 ## Verification and updates
 
+### Scoped evidence coverage
+
+At capture, declare `requirements: [{"id":"search","description":"Search behavior"}]`
+in `reference_analyze` or `video_prepare`. Keep the same
+requirements when selecting a CDP target. Blueprint coverage is bound to those
+captured IDs, not a new list silently substituted at handoff.
+
+Pass `coverage: [{"requirementId":"search","status":"covered","findings":[
+{"section":"workflows","index":0}]}]`. Each reference must select an existing
+observed finding whose evidence passes digest verification. Unavailable work uses
+`{"requirementId":"search","status":"unknown","reason":"Failure state not observed"}`.
+For final handoffs use `requireComplete: true`: missing rows, unknown coverage,
+inference-only references and explicit unresolved unknowns are rejected. Without
+that flag, drafts remain usable but report `coverage.complete: false`. Old bundles
+with no declared requirements cannot claim completeness. These checks establish
+accounting and provenance, not semantic truth or discovery of undeclared behavior.
+
+`doctor` reports `ready`, `unavailable` and a nonzero exit when any advertised lane
+is unavailable. This is readiness, not actual inference proof. Missing vision or
+native tooling does not prevent supported static CLI analysis.
+
 Run `node --test integrations/rea/test/*.test.mjs` from ECC after installation.
 Tests exercise real REA static analysis, FFmpeg frames/audio, offline transcription,
 MCP discovery/image content, evidence integrity and malformed inputs. Synthetic
 fixtures validate transport, not application reconstruction quality. Use the actual
 owner-supplied app/video to verify the final blueprint and implementation.
 
-Update `upstream.json` only after reviewing the intended new revision. The installer
-refuses to overwrite a checkout at a different revision. Preserve upstream license,
-review dependency changes, build/test locally, then reconnect registered clients.
+For the installed 6.7.0 package, use `install-release.ps1` with the tracked
+`release/` manifest/lock. Package integrity and source tag are recorded in
+`active-upstream.json`; installed vendor files remain ignored. Do not run a global
+updater or overwrite the legacy checkout to update this bridge. Review the
+intended release, verify its integrity and bridge tests, then select it for fresh
+processes. Keep existing processes and their release files intact. The installer
+refuses to overwrite a legacy checkout at a different revision. Preserve licenses.
+
+Tool discovery is not universal readiness. In 6.7.0 call `binary_session` and
+inspect `tool_availability` before selecting a workflow; missing providers,
+unsupported hosts and a required unopened target are distinct states. SQLite
+inspection specifically needs Node 24.15+ or 26+, not the older general minimum.
+Android, firmware, packet/signal decoding, WASM and advanced source recovery need
+their optional engines. Apple-specific runtime utilities need macOS. IDA, Hopper
+and JEB are optional alternatives with their own vendor terms, not prerequisites
+for the configured Ghidra path. Do not auto-approve target/device execution.
+
+Free optional engines are configured only for the `rea-native`/`cli.mjs native`
+WSL route, through `native.wsl.environment` in the ignored workspace file.
+Only REA_* string overrides are accepted; arguments never enter a shell.
+The approved isolated Node 24.22.0 runtimes on D: enable SQLite inspection on
+both routes without replacing system Node/PATH. `nodeExecutable` selects Windows
+upstream Node; `native.wsl.node` selects Linux Node. Their official archives were
+SHA-256 checked against nodejs.org. Existing sessions retain their loaded runtime.
+Native MCP translates the declared host paths for the newly configured providers,
+including source/output arrays, without rewriting queries or Android device paths.
+
+The installed free Linux toolset is TShark/capinfos 4.2.2, sigrok-cli 0.7.2,
+ADB 34.0.4, Apktool 3.0.3, JADX MCP 0.7.1, WABT 1.0.42, Wakaru 1.14.0,
+GDB 15.1, Rizin 0.9.1, pwntools 4.15.0 and Unblob 26.6.4. Release hashes,
+Python lock inventory and offline producer results are retained under
+`D:/SeaBridgeAI-data/tools/rea/`. The JADX JAR and Python environment use the
+existing isolated Linux tool area to avoid mounted-drive archive/metadata issues.
+Common Unblob extractors are installed; `unar`, `sasquatch` and
+`sasquatch-v4be` remain unavailable. `unar` would trigger an unrelated package
+upgrade, and the others require source builds. Unblob extraction works, but
+Binwalk-specific `inspect_firmware_regions` is not enabled: no Binwalk 3.1
+prebuilt release was available. Never substitute Binwalk 2 or fake its version.
+Mac-only utilities, commercial JEB and target-dependent navigation remain explicit
+limitations. ADB installation does not authorize connecting a device or installing
+an APK. Packet tools have no added capture-group, setuid or capture capabilities.
 
 ## Configured native and vision providers
 
@@ -210,6 +341,10 @@ powershell -NoProfile -File integrations/rea/install-wsl-native.ps1 -Distributio
 ```
 
 This requires an existing WSL Ubuntu distribution and its curl, tar and Python.
+WSL and Windows drive paths are local-PC adapters, not AWS configuration. On an
+AWS Linux host, use native Linux engine paths and the regular `rea` MCP/CLI route;
+do not copy `workspace.local.json` or user credentials from this PC. Run doctor and
+target-specific readiness checks there before claiming AWS acceptance.
 The installer persists `native.runtime: "wsl"` and Linux runtime paths in the
 local workspace file and activates the third MCP server. Set `native.runtime`
 to `"windows"` to use the original Windows fallback for native CLI/reference
@@ -238,14 +373,15 @@ This is not persistent binary patching or recovery of original source. See
 [upstream provider capabilities](vendor/rea/docs/ghidra-provider.md).
 
 Cold imports may take several minutes. Allow **600 seconds** per tool call.
-Generated Codex, Gemini and OpenCode settings include this timeout. New clients
-load the persisted servers automatically; already running clients must reload
-MCP or open a fresh session. A fresh Codex app-server reload and actual REA tool
-call, plus Claude/Gemini/OpenCode connections, were verified. The active Codex
+Generated Codex, Gemini and OpenCode settings include this timeout. Clients must
+opt in to the registered specialists; a fresh session or task-scoped invocation
+can load them without disturbing existing sessions. Historical client connection
+checks do not prove present native Claude/Codex/Gemini/OpenCode activation. The active Codex
 Desktop conversation cannot have its tool catalog replaced through this bridge;
 the CLI works immediately from it without interrupting existing sessions.
 
-Local visual inference uses the existing Ollama `qwen3.5-opencode:32k` model at
+Local visual inference uses the retained Ollama model selected in the workspace
+configuration (currently `qwen3.8-opencode:32k`) at
 `http://127.0.0.1:11434`, selected by `vision.model` and `vision.endpoint` in the
 workspace file. It requires Ollama to be running with that model installed.
 `reference_inspect_image` accepts `{ "bundleId": "...", "file": "reference.png",

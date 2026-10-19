@@ -5,7 +5,7 @@ import path from 'node:path';
 import { createRequire } from 'node:module';
 import { createServer } from 'node:http';
 import { ROOT, STATE, REA, run, loadBundle, config } from '../runtime.mjs';
-import { referenceAnalyze, saveBlueprint } from '../reference.mjs';
+import { referenceAnalyze, saveBlueprint, scopedRequirements } from '../reference.mjs';
 import { videoPrepare } from '../video.mjs';
 import { readEvidence } from '../mcp.mjs';
 import { register } from '../register.mjs';
@@ -31,7 +31,9 @@ test('real REA static app analysis links evidence to both repositories', async (
 test('real FFmpeg extracts video/audio, image read verifies digest, blueprint requires vision and provenance', async () => {
   const video = path.join(fixture, 'sample.mp4');
   await run('ffmpeg', ['-nostdin', '-y', '-v', 'error', '-f', 'lavfi', '-i', 'testsrc=size=320x240:rate=10', '-f', 'lavfi', '-i', 'sine=frequency=440:sample_rate=16000', '-t', '6', '-pix_fmt', 'yuv420p', video]);
-  const result = await videoPrepare({ source: video, intervalSeconds: 2, durationSeconds: 6, transcribe: true });
+  const requirements = [{ id: 'pattern', description: 'Visible video test pattern' }];
+  const result = await videoPrepare({ source: video, intervalSeconds: 2, durationSeconds: 6, transcribe: true, requirements });
+  assert.deepEqual(result.requirements, requirements);
   assert.equal(result.evidence.filter(item => item.type === 'image').length, 3);
   assert.ok(result.evidence.some(item => item.type === 'audio'));
   assert.equal(result.transcription, 'complete');
@@ -52,11 +54,59 @@ test('real FFmpeg extracts video/audio, image read verifies digest, blueprint re
 
 test('reject unsafe URLs, ambiguous paths, and unbounded media', async () => {
   await assert.rejects(referenceAnalyze({ source: 'relative.exe' }), /absolute/);
-  await assert.rejects(referenceAnalyze({ source: 'https://user:password@example.invalid' }), /credentials/);
+  await assert.rejects(referenceAnalyze({ source: 'https://user:password@example.invalid' }), /credentials/); // pragma: allowlist secret -- synthetic invalid-URL refusal fixture
   await assert.rejects(videoPrepare({ source: 'https://evil.invalid/watch?v=1' }), /YouTube/);
   await assert.rejects(videoPrepare({ source: 'x', durationSeconds: 999999 }), /budget/);
   await assert.rejects(videoPrepare({ source: 'x', intervalSeconds: 0 }), /interval/);
   await assert.rejects(loadBundle('../escape'), /Invalid bundle/);
+});
+
+test('scoped coverage rejects undeclared, duplicate, missing and inference-only completion', async () => {
+  const requirements = [{ id: 'search', description: 'Search trims the query' }, { id: 'export', description: 'CommonJS export exposes search' }];
+  assert.throws(() => scopedRequirements([requirements[0], requirements[0]]), /unique ID/);
+  assert.throws(() => scopedRequirements([{ id: 'x', description: '  ' }]), /nonempty/);
+  const result = await referenceAnalyze({ source: app, requirements });
+  assert.deepEqual(result.requirements, requirements);
+  const observed = { description: 'Search trims the supplied query', confidence: 'observed', evidence: ['rea.json'] };
+  const request = { bundleId: result.id, workflows: [observed, { ...observed, description: 'The CommonJS export exposes search' }], architecture: [{ ...observed, confidence: 'inferred' }], unknowns: [] };
+  const covered = { requirementId: 'search', status: 'covered', findings: [{ section: 'workflows', index: 0 }] };
+  const draft = await saveBlueprint({ ...request, coverage: [covered] });
+  assert.equal(draft.blueprint.coverage.complete, false);
+  assert.equal(draft.blueprint.coverage.requirements[1].status, 'unknown');
+  await assert.rejects(saveBlueprint({ ...request, coverage: [covered], requireComplete: true }), /coverage incomplete/);
+  await assert.rejects(saveBlueprint({ ...request, coverage: [covered, covered] }), /unique declared/);
+  await assert.rejects(saveBlueprint({ ...request, coverage: [{ ...covered, requirementId: 'undeclared' }] }), /declared/);
+  await assert.rejects(saveBlueprint({ ...request, coverage: [{ ...covered, findings: [{ section: 'architecture', index: 0 }] }] }), /not inferences/);
+  await assert.rejects(saveBlueprint({ ...request, coverage: [{ ...covered, findings: [{ section: 'workflows', index: 99 }] }] }), /existing observed/);
+  await assert.rejects(saveBlueprint({ ...request, coverage: [{ requirementId: 'export', status: 'unknown', reason: ' ' }] }), /explicit reason/);
+  await assert.rejects(saveBlueprint({ ...request, coverage: [covered], requireComplete: 'false' }), /boolean/);
+  const allCovered = [covered, { ...covered, requirementId: 'export', findings: [{ section: 'workflows', index: 1 }] }];
+  const complete = await saveBlueprint({ ...request, coverage: allCovered, requireComplete: true });
+  assert.equal(complete.blueprint.coverage.complete, true);
+  await assert.rejects(saveBlueprint({ ...request, coverage: allCovered, unknowns: ['Unresolved scope'], requireComplete: true }), /incomplete/);
+  await fs.appendFile(path.join(result.directory, 'rea.json'), 'tamper');
+  await assert.rejects(saveBlueprint({ ...request, coverage: allCovered, requireComplete: true }), /digest/);
+});
+
+test('legacy unscoped bundles remain drafts and cannot claim complete', async () => {
+  const result = await referenceAnalyze({ source: app });
+  const finding = { description: 'Static fixture', confidence: 'observed', evidence: ['rea.json'] };
+  const request = { bundleId: result.id, workflows: [finding], architecture: [finding], unknowns: [] };
+  assert.equal((await saveBlueprint(request)).blueprint.coverage.complete, false);
+  await assert.rejects(saveBlueprint({ ...request, requireComplete: true }), /declare requirements/);
+});
+
+test('CLI final handoff requires complete observed coverage', async () => {
+  const input = path.join(fixture, 'cli-coverage-input.json');
+  await fs.writeFile(input, JSON.stringify({ source: app, requirements: [{ id: 'search', description: 'Search behavior' }] }));
+  const result = JSON.parse(await run(process.execPath, [path.join(ROOT, 'cli.mjs'), 'analyze', input]));
+  const finding = { description: 'Search trims a query', confidence: 'observed', evidence: ['rea.json'] };
+  const request = { bundleId: result.id, workflows: [finding], architecture: [finding], unknowns: [], requireComplete: true };
+  await fs.writeFile(input, JSON.stringify(request));
+  await assert.rejects(run(process.execPath, [path.join(ROOT, 'cli.mjs'), 'blueprint', input]), /coverage incomplete/);
+  await fs.writeFile(input, JSON.stringify({ ...request, coverage: [{ requirementId: 'search', status: 'covered', findings: [{ section: 'workflows', index: 0 }] }] }));
+  const saved = JSON.parse(await run(process.execPath, [path.join(ROOT, 'cli.mjs'), 'blueprint', input]));
+  assert.equal(saved.blueprint.coverage.complete, true);
 });
 
 test('MCP client discovers tools, rejects malformed requests and reads a real image', async () => {
@@ -72,6 +122,17 @@ test('MCP client discovers tools, rejects malformed requests and reads a real im
     assert.ok(tools.tools.some(tool => tool.name === 'video_prepare'));
     const prompts = await client.listPrompts();
     assert.equal(prompts.prompts[0].name, 'build_from_reference');
+    const blueprintTool = tools.tools.find(tool => tool.name === 'reference_blueprint');
+    assert.ok(blueprintTool.inputSchema.properties.coverage);
+    assert.ok(blueprintTool.inputSchema.properties.requireComplete);
+    const scoped = await client.callTool({ name: 'reference_analyze', arguments: { source: app, requirements: [{ id: 'search', description: 'Search behavior' }] } });
+    assert.equal(scoped.isError, undefined);
+    const scopedCapture = JSON.parse(scoped.content[0].text);
+    assert.equal(scopedCapture.requirements[0].id, 'search');
+    const finding = { description: 'Static search evidence', confidence: 'observed', evidence: ['rea.json'] };
+    const incomplete = await client.callTool({ name: 'reference_blueprint', arguments: { bundleId: scopedCapture.id, workflows: [finding], architecture: [finding], unknowns: [], requireComplete: true } });
+    assert.equal(incomplete.isError, true);
+    assert.match(incomplete.content[0].text, /coverage incomplete/);
     const bad = await client.callTool({ name: 'video_prepare', arguments: { source: 'x', intervalSeconds: -1 } });
     assert.equal(bad.isError, true);
     const result = await client.callTool({ name: 'reference_analyze', arguments: { source: path.join(fixture, 'sample.mp4'), kind: 'image' } });

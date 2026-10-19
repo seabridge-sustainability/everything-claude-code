@@ -1,13 +1,16 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { ROOT, PYTHON, run, newBundle, addEvidence, finish, config, httpUrl, digest } from './runtime.mjs';
+import { scopedRequirements } from './reference.mjs';
 
-export async function videoPrepare({ source, intervalSeconds = 5, startSeconds = 0, durationSeconds = 120, transcribe = true }, options = {}) {
+export async function videoPrepare({ source, intervalSeconds = 5, startSeconds = 0, durationSeconds = 120, transcribe = true, requirements }, options = {}) {
+  const scope = scopedRequirements(requirements);
   const c = await config();
   if (!Number.isFinite(intervalSeconds) || intervalSeconds < 1 || intervalSeconds > 60) throw new Error('intervalSeconds must be between 1 and 60');
   if (!Number.isFinite(startSeconds) || startSeconds < 0) throw new Error('startSeconds must be non-negative');
   if (!Number.isFinite(durationSeconds) || durationSeconds <= 0 || durationSeconds > c.maxVideoSeconds || Math.ceil(durationSeconds / intervalSeconds) > c.maxFrames) throw new Error('Video window exceeds configured duration/frame budget; select a shorter window');
   const bundle = await newBundle('video', source);
+  bundle.manifest.requirements = scope;
   let input = source;
   if (/^https?:\/\//i.test(source)) {
     const url = httpUrl(source);
