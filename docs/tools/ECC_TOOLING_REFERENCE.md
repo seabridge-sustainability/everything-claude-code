@@ -89,20 +89,34 @@ automatically, in the same chat.
   `%USERPROFILE%\.omniroute\limit-failover-proxy.js`. Normal requests pass
   unchanged to the subscription (Claude via the Caveman proxy on 8787).
 - **On HTTP 429:** the same request is replayed, with subscription credentials
-  removed, to the OmniRoute gateway (`127.0.0.1:20128`) combo
-  `coding-failover`, free tiers first: NVIDIA GLM-5.3 / Nemotron 3 Ultra /
-  MiniMax M3.1 Flash / gpt-oss-20b → Kimi K3.1 Pro / K3 / K2.7 Code (prepaid
-  balance) → Z.ai GLM-5.3 (prepaid balance) → local Ollama
-  `qwen3.8-opencode:32k` / `qwen3.5:9b`.
-  The proxy also normalizes tool JSON schemas (`schema-normalize.js`), because
-  Moonshot/Kimi rejects Anthropic/MCP schemas that omit `type` with HTTP 400.
+  removed, to the OmniRoute gateway (`127.0.0.1:20128`). Owner order: Kimi Plus
+  subscription → Antigravity (Google AI Pro subscription) → NVIDIA free →
+  local Ollama. Z.ai and the Kimi pay-per-token balance are not in the chain.
+- **Tier-matched:** `tier-map.js` maps each request's own model, so subagents
+  keep their tier:
+  - Haiku / GPT mini, nano, Luna → `failover-light`: kimi-for-coding →
+    Gemini 3.8 Flash low → Gemini 3.1 Flash Lite → Nemotron 3.5 Lightning →
+    local Qwen 3.5 9B.
+  - Sonnet / GPT Sol / Codex → `failover-standard`: Kimi k3 → kimi-for-coding →
+    Claude Sonnet 5.5 (Antigravity) → Gemini 3.8 Flash high → NVIDIA GLM-5.3 →
+    Nemotron 3 Ultra → local Qwen.
+  - Opus / Fable / Pro → `failover-heavy`: Kimi k3 → Claude Opus 5.5
+    (Antigravity) → Claude Sonnet 5.5 → NVIDIA GLM-5.3 → Nemotron 3 Ultra →
+    local Qwen 3.8 32k.
+- **Schemas:** the proxy normalizes tool JSON schemas (`schema-normalize.js`)
+  because Moonshot/Kimi rejects Anthropic/MCP schemas that omit `type` (HTTP 400).
+- **Account note:** Antigravity runs on a consumer Google login inside OmniRoute;
+  the owner accepted that account risk. Kimi Plus is linked through OmniRoute's
+  Kimi Code CLI sign-in (subscription quota, not API balance).
 - **Switch back:** the proxy re-checks the subscription at the provider's
   reported reset time (5-hour or weekly window) or at most every 60 minutes.
 - **Status/log:** `http://127.0.0.1:20150/status`,
-  `%USERPROFILE%\.omniroute\logs\failover.log`. Both proxy and OmniRoute start
-  from the Windows Startup folder; restart the proxy with
-  `start-failover-proxy.cmd`. Start OmniRoute only from `%USERPROFILE%\.omniroute`
-  (it loads the `.env` of its working directory).
+  `%USERPROFILE%\.omniroute\logs\failover.log`.
+- **Always on:** `omniroute-watchdog.js` (Windows Startup:
+  `start-omniroute-watchdog.cmd`) checks OmniRoute (20128) and the proxy (20150)
+  every 30 s and restarts whichever is down; log `logs\watchdog.log`. OmniRoute
+  must start from `%USERPROFILE%\.omniroute` (it loads the `.env` of its
+  working directory); the watchdog does that.
 - **Undo:** Claude: restore `%USERPROFILE%\.claude\settings.before-failover.json`;
   Codex: `node %USERPROFILE%\.omniroute\enable-codex-failover.js --undo`.
 - **Manual commands:** `claude-fallback.cmd` / `codex-fallback.cmd` (online
@@ -112,9 +126,11 @@ automatically, in the same chat.
   hooks, but follow long rules less reliably: keep diffs small, review
   `git diff` before commits, never send tenant or private data to the NVIDIA
   free tier (development/testing terms). Local models have a 32k context.
-- **Keys:** provider keys live in the backend `.env` (`ZAI_API_KEY`,
-  `KIMI_API_KEY`, `NVIDIA_API_KEY`); OmniRoute stores its copies encrypted.
-  Subscription logins are never stored in OmniRoute.
+- **Keys:** `NVIDIA_API_KEY` and `OMNIROUTE_API_KEY` live in the backend `.env`;
+  OmniRoute stores its copies encrypted. Claude and ChatGPT subscription logins
+  are never stored in OmniRoute (they only pass through the local proxy).
+- **OpenCode:** `~/.config/opencode/opencode.jsonc` uses `omniroute/coding-failover`
+  by default (no subscription in front, so it starts at Kimi Plus).
 - Full guide: `%USERPROFILE%\.omniroute\agents.md`.
 
 ## codeburn — Token Usage Dashboard
