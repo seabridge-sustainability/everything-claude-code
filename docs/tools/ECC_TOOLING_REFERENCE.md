@@ -77,6 +77,46 @@ defaults). Source: [Caveman](https://github.com/JuliusBrussee/caveman).
   `/caveman-review`, `/caveman-compress`. Say `stop caveman` for normal prose.
 - Local reference copy: `references/caveman/` (pre-4.0; may lag upstream).
 
+## OmniRoute — Usage-Limit Failover for Claude Code and Codex
+
+Owner setup (2026-10-24). Subscriptions stay primary; when Claude Max or the
+ChatGPT plan returns a usage limit, requests continue on other models
+automatically, in the same chat.
+
+- **Path:** Claude Code (`ANTHROPIC_BASE_URL=http://127.0.0.1:20150/claude`)
+  and Codex (`model_provider = "failover"`, base URL
+  `http://127.0.0.1:20150/codex`) go through a local failover proxy,
+  `%USERPROFILE%\.omniroute\limit-failover-proxy.js`. Normal requests pass
+  unchanged to the subscription (Claude via the Caveman proxy on 8787).
+- **On HTTP 429:** the same request is replayed, with subscription credentials
+  removed, to the OmniRoute gateway (`127.0.0.1:20128`) combo
+  `coding-failover`, free tiers first: NVIDIA GLM-5.3 / Nemotron 3 Ultra /
+  MiniMax M3.1 Flash / gpt-oss-20b → Kimi K3.1 Pro / K3 / K2.7 Code (prepaid
+  balance) → Z.ai GLM-5.3 (prepaid balance) → local Ollama
+  `qwen3.8-opencode:32k` / `qwen3.5:9b`.
+  The proxy also normalizes tool JSON schemas (`schema-normalize.js`), because
+  Moonshot/Kimi rejects Anthropic/MCP schemas that omit `type` with HTTP 400.
+- **Switch back:** the proxy re-checks the subscription at the provider's
+  reported reset time (5-hour or weekly window) or at most every 60 minutes.
+- **Status/log:** `http://127.0.0.1:20150/status`,
+  `%USERPROFILE%\.omniroute\logs\failover.log`. Both proxy and OmniRoute start
+  from the Windows Startup folder; restart the proxy with
+  `start-failover-proxy.cmd`. Start OmniRoute only from `%USERPROFILE%\.omniroute`
+  (it loads the `.env` of its working directory).
+- **Undo:** Claude: restore `%USERPROFILE%\.claude\settings.before-failover.json`;
+  Codex: `node %USERPROFILE%\.omniroute\enable-codex-failover.js --undo`.
+- **Manual commands:** `claude-fallback.cmd` / `codex-fallback.cmd` (online
+  chain) and `claude-local.cmd` / `codex-local.cmd` (local only) resume the
+  latest conversation on OmniRoute.
+- **Agent guidance:** fallback models receive the same instruction files and
+  hooks, but follow long rules less reliably: keep diffs small, review
+  `git diff` before commits, never send tenant or private data to the NVIDIA
+  free tier (development/testing terms). Local models have a 32k context.
+- **Keys:** provider keys live in the backend `.env` (`ZAI_API_KEY`,
+  `KIMI_API_KEY`, `NVIDIA_API_KEY`); OmniRoute stores its copies encrypted.
+  Subscription logins are never stored in OmniRoute.
+- Full guide: `%USERPROFILE%\.omniroute\agents.md`.
+
 ## codeburn — Token Usage Dashboard
 
 Tracks AI coding token spend across Claude Code, Codex, Cursor, and others by
