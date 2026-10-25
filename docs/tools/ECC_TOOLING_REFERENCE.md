@@ -131,6 +131,18 @@ automatically, in the same chat.
   are never stored in OmniRoute (they only pass through the local proxy).
 - **OpenCode:** `~/.config/opencode/opencode.jsonc` uses `omniroute/coding-failover`
   by default (no subscription in front, so it starts at Kimi Plus).
+- **Kimi limiter:** at most 3 fallback requests use Kimi at once; above 80% of
+  the 25M-token / 5-hour window only the heavy tier still uses Kimi; at 100% or
+  after a Kimi 429 the request goes to a `spill-*` twin (same chain without
+  Kimi) until Kimi recovers. A session keeps its lane for 15 minutes so its
+  prompt cache stays warm. `FAILOVER_KIMI_BUDGET=off` disables the limiter.
+- **Incremental context:** fallback requests reuse append-only checkpoint
+  layers instead of resending the full history (recut after 20 messages or
+  25k tokens). Claude requests mark the newest layer for prompt caching
+  (within the 4-breakpoint limit). The fallback model gets the path to the
+  session transcript (never its contents) so it can recall older detail.
+- **Rollback:** backups in `%USERPROFILE%\.omniroute\backup-pre-limiter-20261024`
+  and `backup-pre-steps3-6-20261025`.
 - Full guide: `%USERPROFILE%\.omniroute\agents.md`.
 
 ## codeburn — Token Usage Dashboard
