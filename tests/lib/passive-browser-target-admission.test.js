@@ -65,7 +65,7 @@ function fixture() {
       readTelemetry: () => ({ observedAt: new Date(state.now).toISOString(), freeRamGiB: state.free, reserveRamGiB: 2 }),
       verifyAdmission: () => state.admission, verifyCustody: () => state.custody, verifyNativeIdentity: () => state.native,
       confirmStopped: () => state.stopped,
-      dispatch: async spec => { state.dispatched++; return { externalWitness: { fixture: true }, operationResult: 'FIXTURE_ONLY' }; }, ...overrides });
+      dispatch: async _spec => { state.dispatched++; return { externalWitness: { fixture: true }, operationResult: 'FIXTURE_ONLY' }; }, ...overrides });
   }
   return { state, packet, adapter };
 }

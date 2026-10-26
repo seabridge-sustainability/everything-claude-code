@@ -60,7 +60,7 @@ test('unsupported versions, conflicting bool/table and duplicate leaves never ge
   assert.equal(savedConfig(config + 'max_concurrent_threads_per_session=99\n', '0.163.0', 25).status, 'UNVERIFIED_TOML_FORM');
 });
 test('table-shaped content in multiline basic and literal strings cannot pass saved configuration', () => {
-  for (const delimiter of ['\"\"\"', "'''"]) {
+  for (const delimiter of ['"""', "'''"]) {
     const embedded = 'description = ' + delimiter + '\n' + config + delimiter + '\n';
     const result = savedConfig(embedded, '0.163.0', 25);
     assert.equal(result.status, 'UNVERIFIED_TOML_FORM');

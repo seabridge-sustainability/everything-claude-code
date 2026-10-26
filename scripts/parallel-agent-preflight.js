@@ -35,14 +35,14 @@ function savedConfig(text, version, minimum) {
   // No evaluation, environment expansion, credential inspection or configuration rewriting.
   // Multiline strings can contain table-shaped text. Unsupported forms must
   // never be treated as real capacity settings by this narrow projection.
-  if (text.includes('\"\"\"') || text.includes("'''")) {
+  if (text.includes('"""') || text.includes("'''")) {
     return { status: 'UNVERIFIED_TOML_FORM', legacyLimit: null, v2Limit: null,
       appliesToLoadedOnceLock: false };
   }
   let table = '', legacy = null, v2 = null, ambiguous = false;
   const tables = new Set();
   for (const line of text.split(/\r?\n/)) {
-    const header = line.match(/^\s*\[([^\[\]]+)\]\s*(?:#.*)?$/);
+    const header = line.match(/^\s*\[([^\][[]+)\]\s*(?:#.*)?$/);
     if (header) {
       table = header[1].trim();
       if (tables.has(table) && ['agents', 'features.multi_agent_v2'].includes(table)) ambiguous = true;
@@ -71,12 +71,12 @@ function nativeProof(proof, root, now, maxAgeSeconds, minimum) {
   for (const a of proof.agents) {
     need(uuid(a.id) && a.id !== root && !ids.has(a.id), 'distinct native child IDs required');
     ids.add(a.id);
-    need(typeof (a.task?.task ?? a.initialTask?.task) === 'string'
-      && (a.task?.task ?? a.initialTask?.task).trim(), 'useful task binding required');
+    const task = a.task?.task ?? a.initialTask?.task;
+    need(typeof task === 'string' && task.trim(), 'useful task binding required');
     const turns = a.turns ?? [a.turn];
     need(Array.isArray(turns) && turns.length > 0 && turns.length <= 1000, 'actual turn intervals required');
     const ranges = turns.map(t => {
-      const start = t?.startedAt * 1000, end = t?.completedAt == null ? at : t.completedAt * 1000;
+      const start = (t?.startedAt ?? NaN) * 1000, end = (t?.completedAt === null || t?.completedAt === undefined) ? at : t.completedAt * 1000;
       need(Number.isFinite(start) && Number.isFinite(end) && start <= end && start <= at, 'valid actual native turn interval required');
       return [start, Math.min(end, at)];
     }).filter(([s, e]) => e > s).sort((a, b) => a[0] - b[0]);
