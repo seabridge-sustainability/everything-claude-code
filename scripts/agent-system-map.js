@@ -11,10 +11,13 @@ const { expandImports } = require('./check-instruction-stack');
 
 const ROOT = path.resolve(__dirname, '..');
 const OUTPUT = 'docs/tools/agent-system-map.json';
+const POLICY_FILES = Object.freeze([
+  'AGENTS_SYSTEM.md', 'AGENTS.md', 'CLAUDE.md',
+  'docs/ai-tools/PARALLEL_CODING_AGENTS.md',
+]);
+const POLICY_SOURCES = Object.freeze(POLICY_FILES.map(name => `../manageesg-backend/${name}`));
 const SOURCES = Object.freeze([
-  '../manageesg-backend/AGENTS_SYSTEM.md',
-  '../manageesg-backend/AGENTS.md',
-  '../manageesg-backend/CLAUDE.md',
+  ...POLICY_SOURCES,
   'AGENTS.md', 'CLAUDE.md', 'GEMINI.md', 'CODEX.md', 'OPENCODE.md',
   '.github/copilot-instructions.md', '.agents/rules/seabridge-agent-baseline.md',
   '.clinerules', '.cursor/rules/common-agents.md',
@@ -202,12 +205,12 @@ function buildMap(root = ROOT, sources = SOURCES) {
   edges.sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b)));
   return {
     schema: 'seabridge.agent-system-map.v1',
-    scope: 'Three backend policy sources and ECC loading adapters, outcome control, evaluation, and CI; no product or tenant data',
+    scope: 'Three backend policy sources, their parallel-agent guide, and ECC loading adapters, outcome control, evaluation, and CI; no product or tenant data',
     extractor: 'scripts/agent-system-map.js (deterministic, no LLM)',
-    generatorVersion: 9,
+    generatorVersion: 10,
     // Generated verification artifact, not a fourth policy source. CI can
-    // reproduce the three reviewed, pinned files without a private-repo token.
-    policySnapshot: rows.filter(row => row.path.startsWith('../manageesg-backend/'))
+    // reproduce the explicitly bounded policy and guide without a private-repo token.
+    policySnapshot: rows.filter(row => POLICY_SOURCES.includes(row.path))
       .map(row => ({ ...row, text: fs.readFileSync(file(root, row.path), 'utf8').replace(/\r\n/g, '\n') })),
     coverage: {
       excludedRoots: ['artifacts/', 'data/', 'graphify-out/', 'logs/', 'vendor/'],
@@ -231,7 +234,7 @@ function buildMetadata(root = ROOT) {
   try {
     const policyRoot = path.resolve(root, '..', 'manageesg-backend');
     policyCommit = execFileSync('git', ['-C', policyRoot, 'rev-parse', 'HEAD'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
-    policyDirty = Boolean(execFileSync('git', ['-C', policyRoot, 'status', '--porcelain=v1', '--', 'AGENTS_SYSTEM.md', 'AGENTS.md', 'CLAUDE.md'],
+    policyDirty = Boolean(execFileSync('git', ['-C', policyRoot, 'status', '--porcelain=v1', '--', ...POLICY_FILES],
       { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim());
   } catch { /* Exported fixtures retain content-bound fingerprints. */ }
   if (policyDirty === true) sourceDirty = true;
@@ -259,22 +262,46 @@ function check(root = ROOT, destination = OUTPUT) {
   }
 }
 
+function lstatIfPresent(target) {
+  try { return fs.lstatSync(target); }
+  catch (error) { if (error.code === 'ENOENT') return null; throw error; }
+}
+
+// Check each component, including dangling links, before writing the snapshot.
+function snapshotParents(destination, target, create = false) {
+  const relative = path.relative(destination, target);
+  if (!relative || relative.startsWith(`..${path.sep}`) || relative === '..' || path.isAbsolute(relative)) {
+    throw new Error('unsafe policy snapshot target');
+  }
+  const parents = [destination];
+  for (const component of relative.split(path.sep).slice(0, -1)) {
+    parents.push(path.join(parents[parents.length - 1], component));
+  }
+  for (const parent of parents) {
+    let stat = lstatIfPresent(parent);
+    if (!stat && create) {
+      try { fs.mkdirSync(parent); }
+      catch (error) { if (error.code !== 'EEXIST') throw error; }
+      stat = fs.lstatSync(parent);
+    }
+    if (stat && (!stat.isDirectory() || stat.isSymbolicLink())) {
+      throw new Error('unsafe policy snapshot parent');
+    }
+  }
+}
+
 function verifyPolicySnapshot(root = ROOT) {
   const stored = JSON.parse(fs.readFileSync(file(root, OUTPUT), 'utf8'));
   if (stored.build?.sourceDirty !== false || stored.build?.policyDirty !== false
       || !/^[a-f0-9]{40}$/.test(stored.build?.policyCommit || '')) {
     throw new Error('policy snapshot requires clean, committed source provenance');
   }
-  const expected = ['AGENTS.md', 'AGENTS_SYSTEM.md', 'CLAUDE.md']
-    .map(name => `../manageesg-backend/${name}`).sort();
+  const expected = [...POLICY_SOURCES].sort();
   const snapshot = stored.policySnapshot;
   if (!Array.isArray(snapshot) || JSON.stringify(snapshot.map(row => row.path).sort()) !== JSON.stringify(expected)) {
-    throw new Error('policy snapshot must contain exactly the three central files');
+    throw new Error('policy snapshot must contain exactly the four allowed policy and guide files');
   }
   const destination = path.resolve(root, '..', 'manageesg-backend');
-  if (fs.existsSync(destination) && (!fs.lstatSync(destination).isDirectory() || fs.lstatSync(destination).isSymbolicLink())) {
-    throw new Error('unsafe policy snapshot destination');
-  }
   // Preflight every row before any write. Never replace a live checkout's policy.
   for (const row of snapshot) {
     const source = stored.sources.find(item => item.path === row.path);
@@ -282,7 +309,9 @@ function verifyPolicySnapshot(root = ROOT) {
       throw new Error('policy snapshot digest mismatch');
     }
     const target = file(root, row.path);
-    if (fs.existsSync(target) && (!fs.lstatSync(target).isFile() || hash(fs.readFileSync(target, 'utf8').replace(/\r\n/g, '\n')) !== row.sha256)) {
+    snapshotParents(destination, target);
+    const stat = lstatIfPresent(target);
+    if (stat && (!stat.isFile() || stat.isSymbolicLink() || hash(fs.readFileSync(target, 'utf8').replace(/\r\n/g, '\n')) !== row.sha256)) {
       throw new Error('refusing to overwrite existing central policy');
     }
   }
@@ -291,10 +320,14 @@ function verifyPolicySnapshot(root = ROOT) {
 
 function materialize(root = ROOT) {
   const { policyCommit, snapshot, destination } = verifyPolicySnapshot(root);
-  fs.mkdirSync(destination, { recursive: true });
   for (const row of snapshot) {
     const target = file(root, row.path);
-    if (!fs.existsSync(target)) fs.writeFileSync(target, row.text, { flag: 'wx' });
+    snapshotParents(destination, target, true);
+    const stat = lstatIfPresent(target);
+    if (!stat) fs.writeFileSync(target, row.text, { flag: 'wx' });
+    else if (!stat.isFile() || stat.isSymbolicLink() || hash(fs.readFileSync(target, 'utf8').replace(/\r\n/g, '\n')) !== row.sha256) {
+      throw new Error('refusing to overwrite existing central policy');
+    }
   }
   return { policyCommit, files: snapshot.length };
 }
@@ -305,7 +338,7 @@ function main(args = process.argv.slice(2), root = ROOT) {
   }
   if (args[0] === 'materialize') {
     const result = materialize(root);
-    process.stdout.write(`Verification snapshot: ${result.files} central files at backend ${result.policyCommit}; not a live freshness or installation claim.\n`);
+    process.stdout.write(`Verification snapshot: ${result.files} policy/guide files at backend ${result.policyCommit}; not a live freshness or installation claim.\n`);
     return 0;
   }
   if (args[0] === 'build') {
@@ -329,4 +362,4 @@ if (require.main === module) {
   try { process.exitCode = main(); }
   catch (error) { process.stderr.write(`${error.message}\n`); process.exitCode = 1; }
 }
-module.exports = { SOURCES, OUTPUT, sourceRows, buildMap, buildMetadata, check, verifyPolicySnapshot, materialize, main };
+module.exports = { POLICY_FILES, SOURCES, OUTPUT, sourceRows, buildMap, buildMetadata, check, verifyPolicySnapshot, materialize, main };

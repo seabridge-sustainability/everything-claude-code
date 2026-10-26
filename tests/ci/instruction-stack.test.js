@@ -471,15 +471,17 @@ test('compatibility adapters carry no copies of central safety or goal policy', 
 
 test('explicit verified policy snapshots report external launcher proof as unverified', () => {
   const crypto = require('crypto');
+  const { POLICY_FILES, materialize } = require('../../scripts/agent-system-map');
   const workspace = fixture({
     'everything-claude-code/AGENTS.md': '@../manageesg-backend/AGENTS.md\n',
-    'manageesg-backend/AGENTS.md': GOOD_AGENTS + '\nUse `scripts/dev/run_backend.ps1`.\n',
+    'manageesg-backend/AGENTS.md': GOOD_AGENTS + '\nUse `scripts/dev/run_backend.ps1`. Read `docs/ai-tools/PARALLEL_CODING_AGENTS.md`.\n',
+    'manageesg-backend/docs/ai-tools/PARALLEL_CODING_AGENTS.md': '# Parallel coding agents\n',
     'manageesg-backend/AGENTS_SYSTEM.md': '# additional policy\n',
     'manageesg-backend/CLAUDE.md': '@AGENTS.md\n',
   });
   try {
     const root = path.join(workspace, 'everything-claude-code');
-    const snapshot = ['AGENTS.md', 'AGENTS_SYSTEM.md', 'CLAUDE.md'].map(name => {
+    const snapshot = POLICY_FILES.map(name => {
       const text = fs.readFileSync(path.join(workspace, 'manageesg-backend', name), 'utf8');
       return { path: `../manageesg-backend/${name}`, text,
         sha256: crypto.createHash('sha256').update(text).digest('hex') };
@@ -491,6 +493,12 @@ test('explicit verified policy snapshots report external launcher proof as unver
     fs.writeFileSync(target, JSON.stringify(map));
     assert(lib.checkRepo(root, workspace, 32768).some(row => row.failures.some(f => f.includes('scripts/dev/run_backend.ps1'))));
     const options = { policySnapshotRoot: root };
+    const guidePath = path.join(workspace, 'manageesg-backend/docs/ai-tools/PARALLEL_CODING_AGENTS.md');
+    fs.unlinkSync(guidePath);
+    const missingGuide = lib.checkRepo(root, workspace, 32768, options);
+    assert(missingGuide.some(row => row.failures.some(f => f.includes('docs/ai-tools/PARALLEL_CODING_AGENTS.md'))));
+    assert(!missingGuide.some(row => (row.unverifiedExternalReferences || []).some(ref => ref.path.includes('PARALLEL_CODING_AGENTS'))));
+    assert.strictEqual(materialize(root).files, 4);
     for (const row of lib.checkRepo(root, workspace, 32768, options)) {
       assert.deepStrictEqual(row.failures, []);
       assert.strictEqual(row.unverifiedExternalReferences[0].path, 'scripts/dev/run_backend.ps1');
@@ -500,7 +508,7 @@ test('explicit verified policy snapshots report external launcher proof as unver
     assert(lib.checkRepo(root, workspace, 32768, options).some(row => row.failures.some(f => f.includes('docs/missing.md'))));
     fs.appendFileSync(path.join(workspace, 'manageesg-backend/AGENTS.md'), '\nchanged policy');
     assert.throws(() => lib.checkRepo(root, workspace, 32768, options), /overwrite existing central policy/);
-    fs.writeFileSync(path.join(workspace, 'manageesg-backend/AGENTS.md'), snapshot[0].text);
+    fs.writeFileSync(path.join(workspace, 'manageesg-backend/AGENTS.md'), snapshot.find(row => row.path === '../manageesg-backend/AGENTS.md').text);
     fs.mkdirSync(path.join(workspace, 'manageesg-backend/.git'));
     assert.throws(() => lib.checkRepo(root, workspace, 32768, options), /cannot replace live backend validation/);
     fs.rmdirSync(path.join(workspace, 'manageesg-backend/.git'));

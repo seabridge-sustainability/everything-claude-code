@@ -4,7 +4,7 @@ const assert = require('assert');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { SOURCES, OUTPUT, buildMap, buildMetadata, check, materialize } = require('../../scripts/agent-system-map');
+const { POLICY_FILES, SOURCES, OUTPUT, buildMap, buildMetadata, check, materialize } = require('../../scripts/agent-system-map');
 const { test, summary } = require('../lib/helpers/mini-test-runner');
 
 let passed = 0;
@@ -189,7 +189,7 @@ run('verification snapshot requires clean provenance and rejects corrupt content
     assert.throws(() => materialize(dir), /clean, committed/);
     data.build = { ...data.build, sourceDirty: false, policyDirty: false, policyCommit: 'a'.repeat(40) };
     fs.writeFileSync(target, JSON.stringify(data));
-    assert.strictEqual(materialize(dir).files, 3);
+    assert.strictEqual(materialize(dir).files, 4);
     data.policySnapshot[0].text += '\ncorruption';
     fs.writeFileSync(target, JSON.stringify(data));
     assert.throws(() => materialize(dir), /digest mismatch/);
@@ -200,17 +200,100 @@ run('verification snapshot requires clean provenance and rejects corrupt content
   } finally { removeFixture(dir); }
 });
 
-run('verification snapshot can create only the three missing central files', () => {
+run('verification snapshot creates the four allowed files and missing nested directories', () => {
   const dir = fixture();
   try {
     const target = writeMap(dir);
     const data = JSON.parse(fs.readFileSync(target, 'utf8'));
     data.build = { ...data.build, sourceDirty: false, policyDirty: false, policyCommit: 'b'.repeat(40) };
     fs.writeFileSync(target, JSON.stringify(data));
-    for (const row of data.policySnapshot) fs.unlinkSync(path.join(dir, row.path));
-    assert.strictEqual(materialize(dir).files, 3);
-    assert.strictEqual(materialize(dir).files, 3);
+    const destination = path.join(dir, '..', 'manageesg-backend');
+    fs.rmSync(destination, { recursive: true, force: true });
+    assert.strictEqual(materialize(dir).files, 4);
+    assert.strictEqual(materialize(dir).files, 4);
     assert.strictEqual(check(dir).fresh, true);
+  } finally { removeFixture(dir); }
+});
+
+
+run('parallel-agent guide is required, hash-bound, and part of map freshness', () => {
+  const dir = fixture();
+  try {
+    assert.deepStrictEqual([...POLICY_FILES].sort(), [
+      'AGENTS.md', 'AGENTS_SYSTEM.md', 'CLAUDE.md', 'docs/ai-tools/PARALLEL_CODING_AGENTS.md',
+    ]);
+    const target = writeMap(dir), data = JSON.parse(fs.readFileSync(target, 'utf8'));
+    data.build = { ...data.build, sourceDirty: false, policyDirty: false, policyCommit: 'c'.repeat(40) };
+    const guide = data.policySnapshot.find(row => row.path.endsWith('/PARALLEL_CODING_AGENTS.md'));
+    assert(guide);
+    guide.text += '\ncorruption';
+    fs.writeFileSync(target, JSON.stringify(data));
+    assert.throws(() => materialize(dir), /digest mismatch/);
+    writeMap(dir);
+    const guidePath = path.join(dir, guide.path);
+    fs.appendFileSync(guidePath, '\nchanged guide');
+    assert.strictEqual(check(dir).fresh, false);
+    fs.unlinkSync(guidePath);
+    assert.throws(() => buildMap(dir), /missing regular source/);
+  } finally { removeFixture(dir); }
+});
+
+run('snapshot rejects extra or absent guide entries before creating any files', () => {
+  const dir = fixture();
+  try {
+    const target = writeMap(dir), data = JSON.parse(fs.readFileSync(target, 'utf8'));
+    data.build = { ...data.build, sourceDirty: false, policyDirty: false, policyCommit: 'd'.repeat(40) };
+    const destination = path.join(dir, '..', 'manageesg-backend');
+    fs.rmSync(destination, { recursive: true, force: true });
+    const original = data.policySnapshot;
+    for (const snapshot of [original.slice(0, -1), [...original, { path: '../manageesg-backend/unapproved.md' }]]) {
+      data.policySnapshot = snapshot;
+      fs.writeFileSync(target, JSON.stringify(data));
+      assert.throws(() => materialize(dir), /exactly the four allowed/);
+      assert.strictEqual(fs.existsSync(destination), false);
+    }
+  } finally { removeFixture(dir); }
+});
+
+run('snapshot refuses existing and dangling symlinks before any policy writes', () => {
+  for (const relative of ['', 'docs', 'docs/ai-tools', 'docs/ai-tools/PARALLEL_CODING_AGENTS.md']) {
+    for (const dangling of [false, true]) {
+      const dir = fixture();
+      try {
+        const target = writeMap(dir), data = JSON.parse(fs.readFileSync(target, 'utf8'));
+        data.build = { ...data.build, sourceDirty: false, policyDirty: false, policyCommit: 'e'.repeat(40) };
+        fs.writeFileSync(target, JSON.stringify(data));
+        const destination = path.join(dir, '..', 'manageesg-backend');
+        fs.rmSync(destination, { recursive: true, force: true });
+        const outside = path.join(path.dirname(dir), 'outside');
+        if (!dangling) fs.mkdirSync(outside);
+        const link = path.join(destination, relative);
+        fs.mkdirSync(path.dirname(link), { recursive: true });
+        fs.symlinkSync(outside, link, process.platform === 'win32' ? 'junction' : 'dir');
+        assert.throws(() => materialize(dir), /unsafe policy snapshot parent|overwrite existing central policy/);
+        for (const name of ['AGENTS.md', 'AGENTS_SYSTEM.md', 'CLAUDE.md']) {
+          assert.strictEqual(fs.existsSync(path.join(destination, name)), false);
+        }
+        if (!dangling) assert.deepStrictEqual(fs.readdirSync(outside), []);
+        else assert.strictEqual(fs.existsSync(outside), false);
+      } finally { removeFixture(dir); }
+    }
+  }
+});
+
+run('snapshot refuses a regular file in a required parent before any policy writes', () => {
+  const dir = fixture();
+  try {
+    const target = writeMap(dir), data = JSON.parse(fs.readFileSync(target, 'utf8'));
+    data.build = { ...data.build, sourceDirty: false, policyDirty: false, policyCommit: 'f'.repeat(40) };
+    fs.writeFileSync(target, JSON.stringify(data));
+    const destination = path.join(dir, '..', 'manageesg-backend');
+    fs.rmSync(destination, { recursive: true, force: true });
+    fs.mkdirSync(destination);
+    fs.writeFileSync(path.join(destination, 'docs'), 'owned sentinel');
+    assert.throws(() => materialize(dir), /unsafe policy snapshot parent/);
+    assert.deepStrictEqual(fs.readdirSync(destination), ['docs']);
+    assert.strictEqual(fs.readFileSync(path.join(destination, 'docs'), 'utf8'), 'owned sentinel');
   } finally { removeFixture(dir); }
 });
 

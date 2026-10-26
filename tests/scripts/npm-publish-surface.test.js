@@ -73,6 +73,7 @@ function buildExpectedPublishPaths(repoRoot) {
     "scripts/memory-mcp.mjs",
     "scripts/nasiko.js",
     "scripts/observability-readiness.js",
+    "scripts/parallel-agent-preflight.js",
     "scripts/plan-canvas.js",
     "scripts/operator-readiness-dashboard.js",
     "scripts/platform-audit.js",
