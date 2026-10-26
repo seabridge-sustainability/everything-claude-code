@@ -35,7 +35,7 @@
     ],
     "semanticIndex": "not-run"
   },
-  "sourceFingerprint": "3046b54d4798e0a45768179b11e785228bf80b377a6a4b1c28260b25e21ce064",
+  "sourceFingerprint": "990b987b233327521627e37af383377a3c37cc2545afadec3b11ae3d0a1c34e5",
   "sources": [
     {
       "path": "../manageesg-backend/AGENTS.md",
@@ -431,7 +431,7 @@
     },
     {
       "path": "scripts/lib/session-coordination.js",
-      "sha256": "31e318e670d7b852df7997fe6ea8fffef27665816f0324885752ac90da43b345"
+      "sha256": "88694e7a24fbe0b0c0f94bf57cd66dcb31e61b28bd8560f1864442b3793c41f1"
     },
     {
       "path": "scripts/lib/skill-routing.js",
@@ -463,7 +463,7 @@
     },
     {
       "path": "scripts/session-coordinate.js",
-      "sha256": "9713f1e17a06e237d1ee2cc871857710e3dcec6465d85d2aeefbde2e6052a116"
+      "sha256": "66701b13affec9505a23c383a95b3aab807be226b9c76469890a508bed5e4a4c"
     },
     {
       "path": "scripts/skill-route.js",
@@ -587,7 +587,7 @@
     },
     {
       "path": "tests/lib/session-coordination.test.js",
-      "sha256": "2571eba088bc97ddd902a190448c16408ac65bb356c434f4c80c1bdca2892cfc"
+      "sha256": "949abda6311b878dd4e49ca1514f1894fb2a8e641bb51656ea88ff32ba7bbd2f"
     },
     {
       "path": "tests/lib/skill-routing.test.js",
@@ -1227,7 +1227,7 @@
       "id": "file:scripts/lib/session-coordination.js",
       "type": "source",
       "path": "scripts/lib/session-coordination.js",
-      "sha256": "31e318e670d7b852df7997fe6ea8fffef27665816f0324885752ac90da43b345"
+      "sha256": "88694e7a24fbe0b0c0f94bf57cd66dcb31e61b28bd8560f1864442b3793c41f1"
     },
     {
       "id": "file:scripts/lib/skill-routing.js",
@@ -1275,7 +1275,7 @@
       "id": "file:scripts/session-coordinate.js",
       "type": "source",
       "path": "scripts/session-coordinate.js",
-      "sha256": "9713f1e17a06e237d1ee2cc871857710e3dcec6465d85d2aeefbde2e6052a116"
+      "sha256": "66701b13affec9505a23c383a95b3aab807be226b9c76469890a508bed5e4a4c"
     },
     {
       "id": "file:scripts/skill-route.js",
@@ -1461,7 +1461,7 @@
       "id": "file:tests/lib/session-coordination.test.js",
       "type": "source",
       "path": "tests/lib/session-coordination.test.js",
-      "sha256": "2571eba088bc97ddd902a190448c16408ac65bb356c434f4c80c1bdca2892cfc"
+      "sha256": "949abda6311b878dd4e49ca1514f1894fb2a8e641bb51656ea88ff32ba7bbd2f"
     },
     {
       "id": "file:tests/lib/skill-routing.test.js",
@@ -4923,8 +4923,8 @@
     }
   ],
   "build": {
-    "generatedAt": "2026-10-26T09:31:59.829Z",
-    "sourceCommit": "c508a19d77a10ce5e76a49a6a3a6c748f563f5ca",
+    "generatedAt": "2026-10-26T18:06:18.234Z",
+    "sourceCommit": "069295da095ca8f21aa783622779e21b722be688",
     "sourceDirty": false,
     "policyCommit": "dafd9bbd8ec2c613fc2d8c9eda0723a8aaddd2c5",
     "policyDirty": false
