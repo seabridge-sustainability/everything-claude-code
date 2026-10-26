@@ -1,0 +1,768 @@
+{
+  "schema": "ecc.parallel-publication-checks.v1",
+  "scope": "Task-owned changes only; no vendor browser execution during publication",
+  "targetedChecksPassed": 96,
+  "instructionStacksPassed": 41,
+  "freshDependencyFixture": "PASS: committed library bytes plus task changes; no .ecc retained state or dirty modules",
+  "npmAudit": "PASS: all dependencies, zero reported vulnerabilities",
+  "secretReview": "No credential-pattern matches in inert fixtures/archive; reviewed source and sanitized proof. No local detect-secrets installation available; configured security checks remain enabled.",
+  "committedMap": {
+    "generatedAt": "2026-10-26T06:41:51.488792Z",
+    "sourceCommit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+    "sourceDirty": false,
+    "policyCommit": "732c4127b0f7f38e50f61a95d16f1cb40f9ee140",
+    "policyDirty": false,
+    "sourceMaterialization": "verified-committed-git-export",
+    "cleanFlagsScope": "Only the exported bytes verified against these exact commits; unrelated dirty live workspaces are neither exported nor attested clean.",
+    "exportedSourceCount": 148
+  },
+  "exportedSources": [
+    {
+      "path": "../manageesg-backend/AGENTS_SYSTEM.md",
+      "commit": "732c4127b0f7f38e50f61a95d16f1cb40f9ee140",
+      "sha256": "6b7712601aad498a0694ccbf9f4a4830aa92f44645828dae989c627a258a9883"
+    },
+    {
+      "path": "../manageesg-backend/AGENTS.md",
+      "commit": "732c4127b0f7f38e50f61a95d16f1cb40f9ee140",
+      "sha256": "eb28c46215f229b3b3db4ad26cdb4e678866d48d6e230fd2ffd05749861d582a"
+    },
+    {
+      "path": "../manageesg-backend/CLAUDE.md",
+      "commit": "732c4127b0f7f38e50f61a95d16f1cb40f9ee140",
+      "sha256": "38676e8f0b6139de56f901814560d883bbfa57da830248b1d3eda1a68c32591a"
+    },
+    {
+      "path": "AGENTS.md",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "8d52556d52eeaae20ab3359dfd3d1b8326b4c42f9a7bcd56af93e1fd51c74f06"
+    },
+    {
+      "path": "CLAUDE.md",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "20587597bc3f1c152951fc879a4e2cb245bc284c0bb15db272a23edddfaf3692"
+    },
+    {
+      "path": "GEMINI.md",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "f677381187bc316e856b117d92acc4adf922125a686056976ca9e3b717f4e43b"
+    },
+    {
+      "path": "CODEX.md",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "ee519b6155e67e0930742c2cb1daa6bf153e9041baa171009b39a13b52580ec3"
+    },
+    {
+      "path": "OPENCODE.md",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "47bee07872d80f9ce73c7e2b254f9f0ad5255a953e2dc52bb9c406e6799b31b4"
+    },
+    {
+      "path": ".github/copilot-instructions.md",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "c6a8b90b87ce9df752e26247515cb4498b36655a5782cec6d4a4ae579a9dc29a"
+    },
+    {
+      "path": ".agents/rules/seabridge-agent-baseline.md",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "213640bd8045f753e421914dc2c3e9bb695642a480d09a2bfd7bec31c8476c1a"
+    },
+    {
+      "path": ".clinerules",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "8149a71b2adf2ed23622df41f13c9b31084117f3c3067df4b29c99532d0f90f3"
+    },
+    {
+      "path": ".cursor/rules/common-agents.md",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "eae29ca8f1b9cf11dacbe69552bf71dcfd514bd6e5e6a9201097355f9df594ae"
+    },
+    {
+      "path": "protocols/SAFETY_AUTHORIZATION_RULE.md",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "93e205eb54064c426f70d16b944192447226cd4e46547f37da3ce5c62454c21b"
+    },
+    {
+      "path": "protocols/GOAL_PROTOCOL.md",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "70b1769552f0a9c13a159dd3934658a6e9874ce190dc9ce01680305d391843a6"
+    },
+    {
+      "path": "protocols/GOAL_PROTOCOL_SHORT.md",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "70b1769552f0a9c13a159dd3934658a6e9874ce190dc9ce01680305d391843a6"
+    },
+    {
+      "path": "commands/goal.md",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "e8c84b3dfaef005b515669604c77a020d509ad65ef6d64d16bdff858b2bf2bcf"
+    },
+    {
+      "path": "skills/goal-default/SKILL.md",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "452716ad48159cc6043afd7cf1da3adf38ca5b39039123aa005724ef4d7f6f90"
+    },
+    {
+      "path": "skills/persistent-goal-execution/SKILL.md",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "c8cc096cbee536289230ea44e73250044918c2c51df431aaa784f655eb8b685f"
+    },
+    {
+      "path": "skills/parallel-execution-optimizer/SKILL.md",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "594b2aba93bfcce48d8292aa35d6cdee2525d8c68894486d8880f90b66ddb748"
+    },
+    {
+      "path": "protocols/CONCURRENT_SESSION_PROTOCOL.md",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "93e205eb54064c426f70d16b944192447226cd4e46547f37da3ce5c62454c21b"
+    },
+    {
+      "path": "scripts/session-coordinate.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "9713f1e17a06e237d1ee2cc871857710e3dcec6465d85d2aeefbde2e6052a116"
+    },
+    {
+      "path": "scripts/lib/session-coordination.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "31e318e670d7b852df7997fe6ea8fffef27665816f0324885752ac90da43b345"
+    },
+    {
+      "path": "scripts/orchestrate-worktrees.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "a510d697ffd52c9588ad5a6739d697df3424f00571c39fd0249a3916d867fc97"
+    },
+    {
+      "path": "scripts/lib/tmux-worktree-orchestrator.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "a1ab4b15faece242ae381d7e0d7e99ee0e796d99298e00d9975613b628dc7305"
+    },
+    {
+      "path": "tests/lib/tmux-worktree-orchestrator.test.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "b3918a2c9335c0f45b5d5f583b66e9e33a19c55acce5b2bd6faf650d82899778"
+    },
+    {
+      "path": "scripts/hooks/goal-runtime-gate.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "d2aad0b117c6bd153692e9838316fc2420dce9f5f6ea0e099fce1ce8f573ee41"
+    },
+    {
+      "path": "schemas/goal-control.schema.json",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "6749570537c31e6743f16c9f3eff606357a834986807d3eb9bfd70e39e123e5e"
+    },
+    {
+      "path": "scripts/lib/scope-guard-adapters.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "cb06408cf07028c54ccc5ae13dc7b43af9cbeb1edb42c00a71c13857b6690803"
+    },
+    {
+      "path": "scripts/scope-guard-adapters.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "c4b41ed0756f39d14d5f1b13e7f439c9ce98f52fb237e2bbec6abe61383a3bfe"
+    },
+    {
+      "path": ".opencode/plugins/ecc-scope-guard.ts",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "576f675174bd801d23d12747107c7199e7aa109d135dda850073419ac93a4167"
+    },
+    {
+      "path": "tests/lib/scope-guard-adapters.test.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "c1d63e5d79c87f925c246609c3d3af7863a6d1306e20e032db4e56aa3ea008f4"
+    },
+    {
+      "path": "tests/lib/goal-runtime-hook.test.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "2dcf75fcb204864f8bbb4be07c5a8c309bb6564b4a3721ad57f23d3b95781b44"
+    },
+    {
+      "path": "tests/lib/goal-runtime.test.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "2ee306a2605464cf3e430044777b8e2b7a990aa56df4e36edae251e690c64f2d"
+    },
+    {
+      "path": "manifests/instruction-adapters.json",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "e3bb2ee039fb12e0992a2da98fef4900c8a82cb1e39481c7b0d5392227cf77cc"
+    },
+    {
+      "path": "manifests/goal-runtime-capabilities.json",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "8770791730ddca7e7c89a4065edb2d095685df96a38b9a06aad4fcfc696736be"
+    },
+    {
+      "path": "manifests/goal-proof-profiles.json",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "af2d25840a53f745fcb95878aee1deda25609186a3039529a841d78bf63e25f7"
+    },
+    {
+      "path": "scripts/check-instruction-stack.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "53e8ed73a1b210a3c5aec56cb17bb0402eb1a71ad22a55c7ed7e8dba05db66d3"
+    },
+    {
+      "path": "scripts/eval-instruction-scenarios.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "e41f14e4f6a79e118b301ff530209b6069167a6f814accd1285830ae930e88f0"
+    },
+    {
+      "path": "scripts/sync-instruction-adapters.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "230960554f2bef1808d25f5d84e5ec6198ec25728dead5e4c02dfbaea3a6d625"
+    },
+    {
+      "path": "scripts/goal-control.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "4e540d5a5123bb8c0a8e275210babf1bbf928974e1ea44683b8693bbcbe402ca"
+    },
+    {
+      "path": "scripts/goal-runtime-bridge.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "d17cafadc1a669dc0bc2f531409c69b186abf119430e69a552baef4e3d46bc2a"
+    },
+    {
+      "path": "scripts/eval-goal-runtime-offline.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "907f5e66b9b3440e39fcf4d77f4172354c8f3bcffd8d46746080281b30e9ec78"
+    },
+    {
+      "path": "scripts/ecc.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "da70bead4bfce7d0901cbd0c6f19449215f1e73ebe333e937a5e467f48bc7e6c"
+    },
+    {
+      "path": "package.json",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "85e093fdf280edd0abfb5873cef1aba6221b43430802019497f3a38fcc00a17d"
+    },
+    {
+      "path": "scripts/coding-execution.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "2190c2a9f7c8010917afa0bb3c91c3fa373b21b507b9acd43b6e9854a58ec2cc"
+    },
+    {
+      "path": "scripts/lib/coding-execution.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "52112cf73b44fef033a9eb8358793c7a37a338a5f85831eca008bee61d6d605a"
+    },
+    {
+      "path": "schemas/coding-execution.schema.json",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "076d52a064d9602c7f9502a544f70c84c2a9d7e8d49b702f1a2f53002d377afa"
+    },
+    {
+      "path": "scripts/lib/goal-control.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "a4ae2e28c46e67e4bea83174bca81359c12361218230cdc703d915d0cd62e743"
+    },
+    {
+      "path": "scripts/lib/frontend-review-gate.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "cc67f5e5192b2e4a7499ad428321fa30f0b345724e873b08028ac017feb6eb18"
+    },
+    {
+      "path": "tests/lib/frontend-review-gate.test.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "93c2cbd7494df99c9a47dec7c488facfc716a9687bd83735d1b15c3930c62dd3"
+    },
+    {
+      "path": "tests/lib/coding-execution.test.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "c8a85b8cccca127f5385a36c76d9f6496442c9c1bb0fcd5bffa71ecded60a9d7"
+    },
+    {
+      "path": "scripts/native-adoption-pilot.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "57ac0a690163cc37053c389edfea2d4648f6aeed5ef28d3d063bd854a8f5f307"
+    },
+    {
+      "path": "tests/lib/native-adoption-pilot.test.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "90899ee27431f6c8e8fab2c33c70831235009fe6493c2b04a20e5cd60dc8d1aa"
+    },
+    {
+      "path": "scripts/coding-execution-run.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "c911b80e6e7cf9e6f6dc9eb64193b995ca6be2e0652818d3d4bdcfa2be058cf3"
+    },
+    {
+      "path": "scripts/lib/coding-execution-runner.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "992ba329ee48ff52ac4378d088381e9155de46b54477df8ef27f6bde9038fc9b"
+    },
+    {
+      "path": "scripts/lib/coding-execution-host.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "467e9c0d40afc61b773fd827d5adba07dace109e8d72fe8d72e9bae5aca95c95"
+    },
+    {
+      "path": "scripts/coding-execution-memory-check.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "a68f3d628624049ec030bc86be9e01a79b7b61b073ab9edb0d52ba2f6bfc17db"
+    },
+    {
+      "path": "scripts/hooks/antigravity-scope-guard.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "397e0c47fc6df927d2dfaec2494d49ef89408fa3470037a57a4f09c26f7d29a5"
+    },
+    {
+      "path": "scripts/hooks/seabridge-git-guard.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "9cb47be8537665656d6f08466a648c841c945e792c8c92892a89acb475d89857"
+    },
+    {
+      "path": "tests/lib/seabridge-git-guard.test.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "6b4975035c0f4ae48b6525d7efeca6c651b0f197d300042340bf78b0aca9795a"
+    },
+    {
+      "path": "scripts/agent-system-map.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "1402af87ba9619fc2db95491013ebfeef6a50fb8ba8687f72e1efb676a32ff7c"
+    },
+    {
+      "path": "scripts/agent-adoption-doctor.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "9e756e5b750a5cdedad9c2c29c6df8f190d75ba5592af6f3127e79b8b27dd035"
+    },
+    {
+      "path": "scripts/agent-behavior-report.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "48139c727a436b111fba37da44a39b68e012bbda975d847f50fbb287fd9c418e"
+    },
+    {
+      "path": "scripts/eval-agent-behavior.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "d7e041676f28796af99916e1823f5ed279c096450f88abc9e6cef6974651c5ff"
+    },
+    {
+      "path": "scripts/ci/detect-ci-scope.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "13db9838821cb515b90ba160725253a1b4852feb57bfd289236f883057e72d78"
+    },
+    {
+      "path": "scripts/knowledge-adoption.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "da178739c10c0f315055dc66a0a62b234ee19167c6fbf3d569943d992ce4d305"
+    },
+    {
+      "path": "scripts/knowledge-retrieval-eval.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "2f24f69e853ffe8077903ef6fcd3b6443a1da73cf46dba830a57df84896d816a"
+    },
+    {
+      "path": "scripts/knowledge-freshness.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "74aa701f2f617cc2fa716f16113be19cc649bedbcbb10ee27d3c985725db8d11"
+    },
+    {
+      "path": "scripts/knowledge-query.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "40c2986a5d283841bfa733563fe2a797e5606789570d4863cfe99b332e8796d3"
+    },
+    {
+      "path": "scripts/memory.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "c5266a07230d5917c84665fff55c4f17a50a6f74bc55bf403d3d4a6b9cc2620c"
+    },
+    {
+      "path": "scripts/memory-mcp.mjs",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "5c549220aa8a6b2d8ed60d99b7f3c688b6ee36f3c76e464f0f8767667c6e2ecc"
+    },
+    {
+      "path": "scripts/lib/memory-vault.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "daa96c9d88d8797bb48c6b78e56683b6e9ffda5d096eaf042c65e4742ce6dae1"
+    },
+    {
+      "path": "scripts/lib/memory-vault-format.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "a5589f0cd0fd8a414436775e74243c39b068c86ddc99a4732d71ee54409a50c2"
+    },
+    {
+      "path": "schemas/memory.schema.json",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "2cdcca95f32fda44a1fffda0137a62857d0e2b8ba8a14d982295f36389a43eb6"
+    },
+    {
+      "path": "docs/design/ecc-memory-vault.md",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "e25fc0e3e7b210174263a56bae169825af0e044e6ba4ca3c735ee05ea73e0053"
+    },
+    {
+      "path": "hooks/hooks.json",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "f3d9ea7173200ab076f68184f8773ff9d1d389709b7ee29307affb62a094fbd7"
+    },
+    {
+      "path": "hooks/codex-hooks.json",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "57edf21eb83d9c8144cfdc19f621700a854b6fd4abc4c368ddaeb5c74488b43c"
+    },
+    {
+      "path": ".cursor/hooks.json",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "73a3f8dac5037208ff94abcfc4d893bac8261363df22bf77c1476fce2453aa48"
+    },
+    {
+      "path": ".cursor/hooks/before-submit-prompt.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "922bef0d9855d77314aef10cec4816ab1485f5bed3ff4ffa33372db66df038c4"
+    },
+    {
+      "path": ".cursor/hooks/stop.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "89ab34070c01f9afeb7d764520fd13a1cd1dbd02d1c8446c129fba80ee6d7fe9"
+    },
+    {
+      "path": ".opencode/plugins/ecc-hooks.ts",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "01ba90da81fe4c89dbd4205225a659092567003f835dcd370fb6a290e0fe555b"
+    },
+    {
+      "path": ".gemini/settings.json",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "7f2a02e5d1999309cbfc836b7e9f0e1b4ea0b387625ff95a0c3fe53e52ab2553"
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "7e610371b35e5453f6ad0c2a678d82b88f68ca69d476b33c31b3415cec5d88ce"
+    },
+    {
+      "path": ".github/workflows/harness.yml",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "a15aa5aec922f10676e5648982338bebad8b7907c41d085181a1a65746cb2065"
+    },
+    {
+      "path": "tests/ci/instruction-stack.test.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "724c5342fbc00837a9cfc6966dacf65bac3341f03629d438a63c07e69fdeedd9"
+    },
+    {
+      "path": "tests/ci/instruction-scenarios.test.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "5d27fc5e9ce0063959a9e8ba5d39832c260124259e520a59db8c1164143d7754"
+    },
+    {
+      "path": "tests/ci/agent-adoption-doctor.test.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "da718d1b006956584b6431805e097deaa2e343a83c09133f2b01e2c30ef6f088"
+    },
+    {
+      "path": "tests/ci/agent-behavior-eval.test.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "df0ec3b47c755400d6acd15245ce4cf3c2cd97ada840014e2b96df34d83ea8a9"
+    },
+    {
+      "path": "tests/ci/agent-behavior-report.test.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "c288a16167c7a5f5b42b51c37e49847b992bc74ae6681694590215ca5a323b68"
+    },
+    {
+      "path": "tests/ci/workflow-cost-contract.test.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "596d7cb633a490d0132838e195a482565db117209c4f87f14cf1d4b7f76b60da"
+    },
+    {
+      "path": "tests/lib/session-coordination.test.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "2571eba088bc97ddd902a190448c16408ac65bb356c434f4c80c1bdca2892cfc"
+    },
+    {
+      "path": "tests/lib/goal-control.test.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "d19a57ce47233f0a00c89fb15297a811a53980ef8dc7f76ad90c576dc0fa8fe5"
+    },
+    {
+      "path": "tests/lib/memory-vault.test.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "087b9100802e46d15754e5ae7d9c785685ee197913f5c59226bce27470603f5a"
+    },
+    {
+      "path": "tests/lib/memory-schema.test.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "40b04f835e81db242b4cf984010d9b417591dd005e290b260a9aa5e2afcc9755"
+    },
+    {
+      "path": "tests/scripts/memory.test.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "243058413f15869af53ad8eca608633608c3178a6aa0b61662cab1e9436246e1"
+    },
+    {
+      "path": "tests/scripts/memory-mcp.test.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "dde3ecf0ebed5df5ce35279ab4e264105958f1952ba9d472afe51a29a9275218"
+    },
+    {
+      "path": "tests/scripts/knowledge-freshness.test.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "87f874e10f8678f15c005274553449d9361d2f06350f6ce9efbac6c442ed57c9"
+    },
+    {
+      "path": "tests/scripts/knowledge-retrieval-eval.test.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "356799d3edc96c3b74602d9750a0db0ce8c7b00adae243a73949e350e04d9f7a"
+    },
+    {
+      "path": "integrations/pstack/cli.mjs",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "0d3812b67644e9e498c21f05ecb5e76dce8d747bf130cb84c7f9ff5e06292f08"
+    },
+    {
+      "path": "integrations/pstack/runtime.mjs",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "7979606782e4ce3aee0ab3d6254393facb41b05a64ad8885277dd80896ec8a81"
+    },
+    {
+      "path": "integrations/pstack/mcp.mjs",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "86dc05af3674603fe26500326b77d9535bcd826d4d093b46d486dec16ef835bc"
+    },
+    {
+      "path": "integrations/dev-suite/runtime.mjs",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "1127297dd5c050e58aa66df2d6021458b6e8a448e8f1f4f576faa429c2c0f6ba"
+    },
+    {
+      "path": "skills/sea-multi-model-planning/SKILL.md",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "636e6d21ec6355cd4f4b4d48a364cb6651adc27404d60df5bc1c377a72ca545c"
+    },
+    {
+      "path": "skills/sea-verify-seabridge/SKILL.md",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "a81d0e11c265db24d552360cc761167cdb15c38f807043064396c1b15da63db9"
+    },
+    {
+      "path": "skills/sea-skill-map/SKILL.md",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "4bf2ba59851ddc8c90145333b768666f434651963e37d28aa9eb310e2f798333"
+    },
+    {
+      "path": "docs/tools/PSTACK_ECC_GUIDE.md",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "f218d3f9637a691268de0a49ffb3a45f9c4ee4492519fd57e0e8a3496d47f2f0"
+    },
+    {
+      "path": "docs/tools/MODEL_PROMPTING_AND_SKILL_POLICY.md",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "3764aa1646f0dc0ee7f99855aa38650dc18484c95f929b777f924bf4a687ab70"
+    },
+    {
+      "path": "tests/scripts/pstack-integration.test.mjs",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "da7d51eff7154a1e0ea3dc06f7b7de15f2721811c8235d90eefa2fa35f963f54"
+    },
+    {
+      "path": "integrations/ponytail/cli.mjs",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "613944a874c395ede60718544f83746db0a55be28d16c7eaada2e01c14f8b420"
+    },
+    {
+      "path": "integrations/ponytail/runtime.mjs",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "6a5bd817e1df5c680354d885e2de87e208d677153bf82cea9e78fcbebeda180e"
+    },
+    {
+      "path": "integrations/ponytail/mcp.mjs",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "51772f1534336e0eeda8b267de9964431a08272a822505e24df6d3231207d49c"
+    },
+    {
+      "path": "skills/sea-ponytail/SKILL.md",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "ac916101f4f71a7edf9c18f57a97dd9d249a1c5128ba3eca2ab8cffdc44fb14d"
+    },
+    {
+      "path": "docs/tools/PONYTAIL_ECC_GUIDE.md",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "89883202b2b2da45a91cc31abac7656b74723044c3b97b8097302c495e3ce759"
+    },
+    {
+      "path": "tests/scripts/ponytail-integration.test.mjs",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "47df98840ad30bae73e0ba39cde7ebbc45b8aaa5f0509eccf5b27e088aff3492"
+    },
+    {
+      "path": "manifests/task-skill-routing.json",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "a774f8fa5bf26674bc847f163fd4b789441574630ce6f6458eb75143e3187008"
+    },
+    {
+      "path": "scripts/lib/skill-routing.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "3a982ff2331b1778c598f16f3fe9b550d90c8c201bfe2e5e4270462583a843d8"
+    },
+    {
+      "path": "scripts/skill-route.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "c511b05f65f7eebc5ebd424e4dbafeecf76f90193510d06cb2d320129a46641b"
+    },
+    {
+      "path": "tests/lib/skill-routing.test.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "9ebd0ffdf936894992e33703b722c264cf14cf71cc66f29745dfc64fbd91ce8b"
+    },
+    {
+      "path": "scripts/fresh-agent-session.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "bb507612a6f8c8072c31341109a34e6393d2da484e513eaf1652b41c81dba731"
+    },
+    {
+      "path": "scripts/lib/fresh-session-guard.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "96c72193da5f8794c3ef00c780ada87cb8eea9b0b297419bebe7cb8742d6aa23"
+    },
+    {
+      "path": "scripts/hooks/fresh-session-guard.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "f715dd2fe830c3339087fe1a09a7035180e7d6b800fae772193246ac31f518fa"
+    },
+    {
+      "path": "tests/lib/fresh-session-guard.test.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "fcd88411d878eec81c4ee7197be0cc460cbf13f9f54ec4d252f2034b703366d6"
+    },
+    {
+      "path": "integrations/engineering-skills/catalog.mjs",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "ea121774c535d7065d57b3eee1139401fb645ecc66b7ebac17b38a29aa11eaee"
+    },
+    {
+      "path": "integrations/engineering-skills/adaptation.json",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "cd5cd913126ad5559a1b65fa36d76687da2482f39e64da14b1ebf2fa91235204"
+    },
+    {
+      "path": "integrations/engineering-skills/configure.mjs",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "d7f04da1ca2185362d4a7b5fa502604692ec252c716a5ce847a56f99df998f10"
+    },
+    {
+      "path": "integrations/engineering-skills/verify-clients.mjs",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "127d27d4f21f52b8e0c6ca247df1026cb7c45dad305362a6ab6a6625f511ffec"
+    },
+    {
+      "path": "skills/sea-requirements-discovery/SKILL.md",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "e008a0dcd388ba911065b8da4f0fdd16fd12b73e3eeca215fee06b7d245421d1"
+    },
+    {
+      "path": "skills/sea-quality-contract/SKILL.md",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "5c647a6e289a0f52987f2b7a3a7388560d89534709a1791c7eefa6663971dbb1"
+    },
+    {
+      "path": "skills/sea-adversarial-review/SKILL.md",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "5b1795e3f0e8d28a88e044e72d6199ed02ac5d926653dd898e54c558627d7a44"
+    },
+    {
+      "path": "skills/sea-verify-seabridge/features/README.md",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "12bbb1817237c2f949eedd56b6fe5534a7f55bd1ddda117eb95db432000350ea"
+    },
+    {
+      "path": "tests/scripts/pstack-feature-recipes.test.mjs",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "475d7443069707b51f0221f4e4236043dda828b00e25c4c78cedb1e99fb1d22c"
+    },
+    {
+      "path": "integrations/software-factory/config.json",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "1b1a16a7e15abc6bce82b4c3dc2935130b88c5a1644eba21137555f8a8b565e6"
+    },
+    {
+      "path": "integrations/software-factory/runtime.mjs",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "95e13360007777550b5029158640ffa44068857c91c1f41140c1a8a4ca711aeb"
+    },
+    {
+      "path": "integrations/software-factory/cli.mjs",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "bb3e64ad4e658881305d98ee1e306bceaeb9e9e6a49d3a93bf13cdd2afd04409"
+    },
+    {
+      "path": "integrations/software-factory/mcp.mjs",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "cc58a072dba2018b1ea959a4b5cbccce7b5cd05129d7f6a56abe29150822c09b"
+    },
+    {
+      "path": "integrations/software-factory/verifier.mjs",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "e725acd012e1c5c0db9d960e46c016d0cabc91f28b3a72915a61f9870c506206"
+    },
+    {
+      "path": "integrations/software-factory/worker.cjs",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "fb02b0d873e7d92c28363993ece435f1a93649302a893e9ffd8401229ad88233"
+    },
+    {
+      "path": "integrations/software-factory/policy.yaml",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "9191defa60515ac303f4318588da5066f65b09dcf2ddf571d820462f2a7a1958"
+    },
+    {
+      "path": "integrations/software-factory/Dockerfile",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "bb38663e714f51be8b8c57a5e9278417e96bee28c038a7b6bf3ec661ea9687d0"
+    },
+    {
+      "path": "integrations/software-factory/contracts.mjs",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "031ddb7eb027bd52014b1307e03c223214e65c97c78f48ed9ff5b3cf70044cae"
+    },
+    {
+      "path": "integrations/software-factory/contract-map.json",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "443404e6d76b1d0e1ad7a46bae430846df92c4401bad1771ad662254723d338c"
+    },
+    {
+      "path": "integrations/software-factory/schema-reader.py",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "226b8402eed5fd139876b1a1f71b2c678a25eb3c8804a043aa9876ae4e6198b4"
+    },
+    {
+      "path": "tests/scripts/software-factory.test.mjs",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "74067637bc77ac3b3dc6a167e66a2b6ee1594d2e24f6d4c2cc7abbc21873b982"
+    },
+    {
+      "path": "integrations/software-factory/journey.mjs",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "b0f3444e52bc2d51e824505dc06c6cc468b572fa3a954f7732c9844c922ee631"
+    },
+    {
+      "path": "tests/scripts/software-factory.test.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "46194226b3d799234c1df7f20097fe98116c961e98dde9cf2f798bf3eca4485e"
+    },
+    {
+      "path": "integrations/dev-suite/mcp.mjs",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "471370cb6031605c87d1427e046f5c5d50593d844224da48bde89f4b1f897cd9"
+    },
+    {
+      "path": "scripts/lib/github-coordination/actions.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "12612d3c7d4dbe32f6e512e4d9bd579edd64b2662bf24a453bfa2387ece99531"
+    },
+    {
+      "path": "scripts/lib/github-coordination/store.js",
+      "commit": "2d7d42fc5fcfc02a38291a08dbbce3b6274920fc",
+      "sha256": "9e482bc5fc4307e7f5df28c745bb21b9154c11bc2fcaff35ac737f3b03219979"
+    }
+  ],
+  "limitations": [
+    "Full remote CI not run yet",
+    "Vendor navigation unverified",
+    "REA exact25 overlap unverified",
+    "Other agents dirty work preserved"
+  ],
+  "revalidatedAfterFreshAdmissionAt": "2026-10-26T06:43:02.861739+00:00"
+}

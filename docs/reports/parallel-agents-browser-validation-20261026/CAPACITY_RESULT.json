@@ -1,0 +1,24 @@
+{
+  "schema": "ecc.historical-agent-capacity.v1",
+  "scope": "Original chats; retained native useful-task and turn-interval receipts, not a current liveness claim",
+  "results": [
+    {
+      "chat": "UIUX",
+      "historicalReceiptSHA256": "a006eedf80bacb6b2ec7e027cbc17e121166111789263977b4285e3b2f65bbf9",
+      "observedAt": "2026-10-26T04:00:26.284848+00:00",
+      "admittedChildren": 25,
+      "overlappingChildrenLowerBound": 25,
+      "strict25OverlapProven": true,
+      "futureCapacityGuaranteed": false
+    },
+    {
+      "chat": "REA",
+      "historicalReceiptSHA256": "9c828b481e43be807fe15f675c59a8205e260e145ba2000bbd7f46c58fc59159",
+      "observedAt": "2026-10-26T04:09:10.871372+00:00",
+      "admittedChildren": 25,
+      "overlappingChildrenLowerBound": 24,
+      "strict25OverlapProven": false,
+      "futureCapacityGuaranteed": false
+    }
+  ]
+}
