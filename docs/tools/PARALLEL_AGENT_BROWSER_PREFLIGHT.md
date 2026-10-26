@@ -93,3 +93,44 @@ Codex proof does not establish Claude, Antigravity, Kimi, OpenCode or Gemini
 capabilities. Use each installed client's supported controls and actual evidence;
 absent clients remain UNVERIFIED. Native capacity and browser admission are
 independent. This checklist supplements existing canonical runbooks, not policy.
+
+## Delivery through acceptance
+
+Use the existing goal and workplan to name one delivery owner for each journey,
+from source integration through actual execution and settlement of its original
+acceptance criterion. Record implementation, receiver integration and product
+acceptance separately. Passing source checks or producing a handoff does not
+establish that the running application loaded the candidate.
+
+Before assigning a probe, identify the exact criterion and the evidence its
+result can establish. A prerequisite observation may support the next step;
+it must not receive credit for an unobserved dataset relationship, persistence
+behavior or complete journey. Preparing a bounded discovery reader does not
+require already knowing the relationship it is intended to discover. Declare
+candidate predicates as exploratory, review their scope and retained outputs,
+and leave unsupported relationships unknown. Source preparation grants no live
+browser permission.
+
+Delegate independent, admitted journeys on distinct targets to their navigation
+owners. ROOT coordinates permissions and integration; it need not perform every
+browser action. Preserve one controller per target, serialize shared focus and
+keep special ROOT-only or single-use grants specific to their operation.
+
+For each blocker, record the affected action, dependency owner, next concrete
+attempt and known onset. An evidence publication date is not the blocker start;
+leave an unknown onset unverified. Keep ready independent work moving, reconcile
+new evidence before repeating a check, and retire superseded next actions rather
+than rebuilding an already reviewed patch.
+
+After reviewed source changes invalidate a resume snapshot, its normal owner
+refreshes it at a safe checkpoint, preserving the complete recorded repository
+set and revalidating changed inputs. Inherited acceptance stays unverified until
+proved. Do not narrow fingerprints, overwrite another writer's goal or repeatedly
+start tasks against an unchanged stale snapshot. A paused monitoring process and
+separately authorized manual recovery are distinct; resuming either requires its
+applicable owner instruction.
+
+For release receipts, unavailable billing stays explicitly unknown. The
+`unavailable` source applies only to that status; a zero incremental workflow
+estimate does not establish account spending. Named owner approval, fresh
+receipts, the 90 percent threshold and the hard spending stop still apply.

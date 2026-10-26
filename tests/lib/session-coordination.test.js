@@ -722,7 +722,7 @@ test('release acquisition records a fresh Actions budget receipt and fails close
   const base = { cwd: root, sessionId: 'release', branch: 'development', candidate: sha, now };
   assert.throws(() => execute('release-acquire', base), /actions-budget-source/);
   assert.throws(() => execute('release-acquire', { ...base, ...budget(now - 3600001) }), /within the last hour/);
-  assert.throws(() => execute('release-acquire', { ...base, ...budget(now), expectedActionsUsd: -1 }), /positive USD/);
+  assert.throws(() => execute('release-acquire', { ...base, ...budget(now), expectedActionsUsd: -1 }), /non-negative USD/);
   assert.throws(() => execute('release-acquire', { ...base, ...budget(now), actionsBudgetUsed: ' ' }), /actions-budget-used required/);
   assert.throws(() => execute('release-acquire', { ...base, ...budget(now), actionsBudgetCheckedAt: '2026-10-01' }), /ISO UTC timestamp/);
   assert.throws(() => execute('release-acquire', { ...base, ...budget(now), actionsBudgetUsed: 89 }), /owner cost approval/);
@@ -733,6 +733,72 @@ test('release acquisition records a fresh Actions budget receipt and fails close
   assert.equal(result.actionsBudget.projectedPercent, 90);
   assert.equal(result.actionsBudget.expectedWorkflows[0], 'security-scan');
   assert.equal(result.actionsBudget.source, 'github-org-budget-ui');
+});
+
+test('unknown billing can be unavailable with zero expected cost only under named approval', () => {
+  const { root, sha } = fixture(false);
+  const now = Date.now();
+  register(root, 'release', ['README.md'], now);
+  const options = { cwd: root, sessionId: 'release', branch: 'development', candidate: sha, now,
+    ...budget(now), actionsBudgetStatus: 'unknown', actionsBudgetSource: 'unavailable',
+    actionsStopUsage: 'unknown', expectedActionsUsd: 0 };
+  assert.throws(() => execute('release-acquire', options), /owner cost approval/);
+  const result = execute('release-acquire', { ...options,
+    ownerCostApproval: 'Owner approved this named public CI batch' });
+  assert.equal(result.actionsBudget.status, 'unknown');
+  assert.equal(result.actionsBudget.source, 'unavailable');
+  assert.equal(result.actionsBudget.usedUsd, null);
+  assert.equal(result.actionsBudget.limitUsd, null);
+  assert.equal(result.actionsBudget.projectedPercent, null);
+  assert.equal(result.actionsBudget.expectedUsd, 0);
+  assert.deepEqual(result.actionsBudget.expectedWorkflows, ['security-scan']);
+  assert.equal(execute('check-release', { ...options, now: now + 1 }).allowed, true);
+  assert.throws(() => execute('check-release', { ...options, now: now + 3600001 }), /within the last hour/);
+});
+
+test('unavailable billing never becomes a known balance or an unchecked estimate', () => {
+  const { root, sha } = fixture(false);
+  const now = Date.now();
+  register(root, 'release', ['README.md'], now);
+  const options = { cwd: root, sessionId: 'release', branch: 'development', candidate: sha, now,
+    ...budget(now), actionsBudgetStatus: 'unknown', actionsBudgetSource: 'unavailable',
+    expectedActionsUsd: 0, ownerCostApproval: 'Owner approved this named CI batch' };
+  assert.throws(() => execute('release-acquire', { ...options, actionsBudgetStatus: 'known' }), /billing observation/);
+  for (const value of [-1, NaN, Infinity, undefined, null, ' ']) {
+    assert.throws(() => execute('release-acquire', { ...options, expectedActionsUsd: value }),
+      /expected-actions-usd (?:required|must be a finite non-negative USD)/);
+  }
+  for (const time of [now - 3600001, now + 120001]) {
+    assert.throws(() => execute('release-acquire', { ...options,
+      actionsBudgetCheckedAt: new Date(time).toISOString() }), /within the last hour/);
+  }
+});
+
+test('zero expected cost preserves the 90 percent approval and hard stop', () => {
+  const { root, sha } = fixture(false);
+  const now = Date.now();
+  register(root, 'release', ['README.md'], now);
+  const options = { cwd: root, sessionId: 'release', branch: 'development', candidate: sha, now,
+    ...budget(now), actionsBudgetUsed: 450, actionsBudgetLimit: 500, expectedActionsUsd: 0 };
+  assert.throws(() => execute('release-acquire', options), /owner cost approval/);
+  const approved = { ...options, ownerCostApproval: 'Owner approved this named zero incremental cost batch' };
+  assert.throws(() => execute('release-acquire', { ...approved, actionsBudgetUsed: 500 }), /hard spending stop/);
+  assert.equal(execute('release-acquire', approved).actionsBudget.projectedPercent, 90);
+});
+
+test('check-release still requires approval when the stored billing status is unknown', () => {
+  const { root, sha } = fixture(false);
+  const now = Date.now();
+  register(root, 'release', ['README.md'], now);
+  const options = { cwd: root, sessionId: 'release', branch: 'development', candidate: sha, now,
+    ...budget(now), actionsBudgetStatus: 'unknown', actionsBudgetSource: 'unavailable',
+    expectedActionsUsd: 0, ownerCostApproval: 'Owner approved this named CI batch' };
+  execute('release-acquire', options);
+  const registry = path.join(repository(root).directory, 'registry.json');
+  const state = JSON.parse(fs.readFileSync(registry, 'utf8'));
+  state.release.actionsBudget.ownerCostApproval = null;
+  fs.writeFileSync(registry, JSON.stringify(state));
+  assert.throws(() => execute('check-release', options), /owner cost approval/);
 });
 
 test('a 90 percent exception cannot override the unchanged hard Actions stop', () => {

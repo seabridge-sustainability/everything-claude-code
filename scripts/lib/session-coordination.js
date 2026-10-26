@@ -119,7 +119,8 @@ function actionsBudgetReceipt(options, now) {
   const status = options.actionsBudgetStatus || 'known';
   if (!['known', 'unknown'].includes(status)) throw new Error('actions-budget-status must be known or unknown');
   const source = requireText(options.actionsBudgetSource, 'actions-budget-source');
-  if (!['github-org-budget-ui', 'owner-screenshot', 'github-org-billing-export'].includes(source)) {
+  const unavailable = status === 'unknown' && source === 'unavailable';
+  if (!unavailable && !['github-org-budget-ui', 'owner-screenshot', 'github-org-billing-export'].includes(source)) {
     throw new Error('actions-budget-source must identify a current GitHub billing observation');
   }
   const checkedAt = requireText(options.actionsBudgetCheckedAt, 'actions-budget-checked-at');
@@ -130,7 +131,7 @@ function actionsBudgetReceipt(options, now) {
   if (!Number.isFinite(observed) || observed > now + 2 * 60000 || now - observed > 60 * 60000) {
     throw new Error('Actions budget observation must be within the last hour (and not in the future)');
   }
-  const expectedUsd = usd(options.expectedActionsUsd, 'expected-actions-usd');
+  const expectedUsd = usd(options.expectedActionsUsd, 'expected-actions-usd', true);
   const expectedWorkflows = requireText(options.expectedWorkflows, 'expected-workflows')
     .split(',').map(item => item.trim()).filter(Boolean);
   if (!expectedWorkflows.length || expectedWorkflows.some(item => !/^[a-zA-Z0-9_. -]{1,80}$/.test(item))) {
