@@ -1,0 +1,11 @@
+{
+  "fixtureOnly": true,
+  "authorityGranted": false,
+  "scope": "PERSEFONI_ONLY_PUBLIC_PURPOSE_STRUCTURE",
+  "producer": {
+    "sha256": "f9ba26ce78e5d02e2cf1ffb3adedb6d0d361d1d6f07dec919cd391f7e53d1afb"
+  },
+  "observer": {
+    "sha256": "aedb09f329a9bcb0ba6117ef521e32003c7a6a0d91fe050c92226d43aeddb596"
+  }
+}

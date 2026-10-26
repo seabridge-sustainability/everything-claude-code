@@ -1,0 +1,11 @@
+# Parallel agents and browser verification — October 26, 2026
+
+The original UI/UX chat admitted and ran 25 useful child workers concurrently. The original REA chat admitted 25; retained native turn intervals prove a conservative peak of 24. Exact 25-way REA overlap remains unverified. Saved settings are separate from a loaded chat tree's latched capacity, and no setting promises unlimited physical resources.
+
+Two independently assigned workers controlled separate new local headless browser sessions. Desktop and mobile each passed six checks. Three measured navigation-call intervals overlapped; no artificial delay was inserted in those measurements. Both complete process trees closed and all three leases were released, preserving the original signed-in browser. ROOT coordinated admission and integration while workers performed navigation.
+
+`LOCAL_NAVIGATION_RESULT.json` retains sanitized actual checks, monotonic navigation intervals, closure facts and the digest of the original result. This establishes local browser infrastructure parallelism only. Vendor-specific REA navigation, product acceptance, and future capacity are unverified. The earlier local run passed desktop but mobile exited 1 without a result; diagnostics were unavailable and its cause remains UNKNOWN. Its closures and releases succeeded. The later source added bounded diagnostics and passed 13 offline checks plus independent review before the passing run.
+
+`historical-source/` preserves the reviewed local test source and HTML as inert `.txt` files, with hashes in `SOURCE_PROVENANCE.json`. They retain historical AWS bindings and are an audit archive, not a portable runnable launcher or current authorization. The original manifest also pinned external dependencies and unrelated dirty shared modules; those are deliberately not included in this publication. No profile directories, cookies, credentials, live leases, capture grants or raw child diagnostics are published.
+
+The portable queue and preflight tests are under `tests/lib/` and `tests/scripts/`. Passive-operation fixtures are explicitly inert and synthetic at dispatch; they prove guard behavior, never live vendor parallelism. The fixed historical operation adapter keeps its original targets and expiry. Current native capacity and browser ownership must be checked for each real task.

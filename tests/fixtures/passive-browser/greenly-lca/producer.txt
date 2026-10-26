@@ -1,0 +1,435 @@
+from pathlib import Path
+import os,sys,json,hashlib,datetime,time,subprocess,selectors,signal,stat,secrets
+
+from types import MappingProxyType
+import re
+BINDING=MappingProxyType(dict(status='UNISSUED',absoluteStop=None,source=None,sourceSHA256=None,sourceBytes=None,sourceReady=None,sourceReadySHA256=None,sourceActor=None,outputParent=None,actor=None,nonce=None,attempt=None,normalAdmissionReceipt=None,normalAdmissionSHA256=None,nativeUnit=None,nativeDescription=None))
+LEASE=MappingProxyType({'clockDomain': 'CLOCK_MONOTONIC', 'ownerDeadlineUTC': '2026-10-28T02:00:00Z', 'releaseUTC': '2026-10-28T01:59:50Z', 'captureUseCeilingUTC': '2026-10-28T01:59:29Z', 'activeEnterMicros': '431801715477', 'execStartMicros': '431801715155', 'runtimeMicros': '389531680391', 'nativeExpiresMonotonicMicros': '821333395868', 'stopGraceMicros': '5000000', 'randomizedExtraMicros': '0'})
+SOURCE_ANCESTOR_SHA='af9ebb31c1d20adf8a7a9bf3c2c1316bbf2c84ec610c59a96745fac6a5479211'
+SCOPE_ACCEPTANCE=None
+SCOPE_ACCEPTANCE_SHA=None
+def absolute_time(value):
+ assert isinstance(value,str) and re.fullmatch(r'\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(?:\.\d{1,6})?Z',value),'BINDING_DEADLINE'
+ return datetime.datetime.fromisoformat(value.replace('Z','+00:00')).timestamp()
+def binding_shape(b,clock=time.time):
+ assert isinstance(b,dict) or isinstance(b,MappingProxyType),'EXECUTION_BINDING'
+ if b.get('status')!='ISSUED':raise RuntimeError('execution_binding_unissued')
+ for key in ['source','sourceReady','outputParent','normalAdmissionReceipt']:
+  value=b.get(key);assert isinstance(value,str) and value.startswith('/home/ubuntu/SeaBridgeAI/everything-claude-code/.ecc/goal/') and str(Path(value))==value and '..' not in Path(value).parts,'BINDING_PATH'
+ for key in ['sourceSHA256','sourceReadySHA256','normalAdmissionSHA256']:
+  assert isinstance(b.get(key),str) and re.fullmatch('[a-f0-9]{64}',b[key]),'BINDING_PIN'
+ assert type(b.get('sourceBytes')) is int and 0<b['sourceBytes']<=65536,'BINDING_SOURCE_SIZE'
+ assert isinstance(b.get('actor'),str) and re.fullmatch('rea-greenly-lca-[a-z0-9-]{1,80}',b['actor']),'BINDING_ACTOR'
+ assert isinstance(b.get('sourceActor'),str) and b['sourceActor']!=b['actor'] and re.fullmatch('[a-z0-9-]{1,120}',b['sourceActor']),'BINDING_SOURCE_ACTOR'
+ assert isinstance(b.get('nonce'),str) and re.fullmatch('[a-f0-9]{32,64}',b['nonce']) and type(b.get('attempt')) is int and b['attempt']==1,'BINDING_NONCE_ATTEMPT'
+ deadline=absolute_time(b.get('absoluteStop'));assert deadline<=absolute_time(LEASE['captureUseCeilingUTC']) and deadline-clock()>22,'ABSOLUTE_CUTOFF_RESERVE'
+ return deadline
+def duration_micros(value):
+ assert isinstance(value,str) and 0<len(value)<=80,'NATIVE_TIME_SHAPE'
+ if re.fullmatch(r'\d+',value):
+  result=int(value);assert result<=9007199254740991,'NATIVE_TIME_SHAPE';return result
+ units={'d':86400000000,'h':3600000000,'min':60000000,'s':1000000,'ms':1000,'us':1,'µs':1};total=0;end=0;previous=86400000001;count=0
+ for m in re.finditer(r'(\d+)(?:\.(\d{1,6}))?(us|µs|ms|min|s|h|d)',value):
+  unit=units[m[3]];assert not value[end:m.start()].strip() and unit<previous,'NATIVE_TIME_SHAPE'
+  fraction=m[2] or '';number=int(m[1]+fraction)*unit;scale=10**len(fraction);assert number%scale==0,'NATIVE_TIME_PRECISION'
+  total+=number//scale;previous=unit;end=m.end();count+=1
+ assert count and not value[end:].strip() and total<=9007199254740991,'NATIVE_TIME_SHAPE'
+ return total
+def validate_native_lease(p,wall,mono):
+ for k in ['ActiveEnterTimestampMonotonic','ExecMainStartTimestampMonotonic']:
+  assert re.fullmatch(r'\d+',p.get(k,'')),'NATIVE_TIME_SHAPE'
+ active=int(p['ActiveEnterTimestampMonotonic']);execution=int(p['ExecMainStartTimestampMonotonic']);runtime=duration_micros(p.get('RuntimeMaxUSec',''));extra=duration_micros(p.get('RuntimeRandomizedExtraUSec',''));stop=duration_micros(p.get('TimeoutStopUSec',''))
+ assert active==int(LEASE['activeEnterMicros']) and execution==int(LEASE['execStartMicros']) and runtime==int(LEASE['runtimeMicros']) and extra==0 and stop==int(LEASE['stopGraceMicros']),'NATIVE_LEASE_BINDING'
+ expiry=active+runtime;assert expiry==int(LEASE['nativeExpiresMonotonicMicros']) and expiry-mono>60000000 and absolute_time(LEASE['captureUseCeilingUTC'])-wall>60,'NATIVE_LEASE_MARGIN'
+ return {'activeEnterMicros':str(active),'execStartMicros':str(execution),'runtimeMicros':str(runtime),'nativeExpiresMonotonicMicros':str(expiry),'remainingMicros':str(expiry-mono),'wallCeilingUTC':LEASE['captureUseCeilingUTC']}
+def validate_admission_record(record,b,clock=time.time):
+ assert isinstance(record,dict) and record.get('schema')=='rea.exact-passive-normal-admission.v1','NORMAL_ADMISSION_RECORD'
+ for key in ['normalRegister','normalControlledOriginalGoalAdmit','exactCheckWrite','sourceActorClosedFreshReadback']:
+  assert isinstance(record.get(key),dict),'HISTORICAL_BOOLEAN_NOT_ADMISSION'
+ reg=record['normalRegister'];admit=record['normalControlledOriginalGoalAdmit'];write=record['exactCheckWrite'];closed=record['sourceActorClosedFreshReadback']
+ assert reg.get('id')==b['actor'] and reg.get('state')=='active','NORMAL_SESSION'
+ assert admit.get('admitted') is True and admit.get('runtime')=='codex' and admit.get('mode')=='controlled' and admit.get('session')==b['actor'],'NORMAL_GOAL_ADMISSION'
+ assert write.get('allowed') is True and write.get('session')==b['actor'] and isinstance(write.get('paths'),list) and any(isinstance(p,str) and '..' not in Path(p).parts and str(Path('/home/ubuntu/SeaBridgeAI/everything-claude-code')/p)==b['outputParent'] for p in write['paths']),'NORMAL_OUTPUT_ADMISSION'
+ assert closed.get('id')==b['sourceActor'] and closed.get('state')=='closed','SOURCE_WRITER_NOT_CLOSED'
+ assert record.get('session')==b['actor'] and record.get('sourceSHA256')==b['sourceSHA256'] and record.get('sourceREADYsha256')==b['sourceReadySHA256'] and record.get('nonce')==b['nonce'] and record.get('cutoff')==b['absoluteStop'],'ADMISSION_BINDING_MISMATCH'
+ age=clock()-absolute_time(record.get('at'));assert 0<=age<=120,'ADMISSION_STALE'
+ return record
+def validate_observer_binding(code,b):
+ text=code.decode('utf-8');m=re.search(r'const EXEC=Object\.freeze\((\{[^\n]+\})\);',text);assert m,'OBSERVER_BINDING_MISSING'
+ try:x=json.loads(m[1])
+ except Exception:raise AssertionError('OBSERVER_BINDING_NOT_CANONICAL_JSON')
+ expected={'status':'ISSUED','absoluteStop':b['absoluteStop'],'output':str(Path(b['outputParent'])/'run1'),'session':b['actor'],'nonce':b['nonce'],'attempt':b['attempt'],'nativeUnit':b['nativeUnit'],'nativeDescription':b['nativeDescription']}
+ assert all(x.get(k)==v for k,v in expected.items()),'OBSERVER_NONCE_BINDING'
+ return expected
+DEADLINE=binding_shape(BINDING)
+
+E=Path('/home/ubuntu/SeaBridgeAI/everything-claude-code');PARENT=Path(BINDING['outputParent']);P=PARENT/'run1';SOURCE=Path(BINDING['source']);S=SOURCE.parent;SHA=BINDING['sourceSHA256'];ACTOR=BINDING['actor'];UNIT='seabridge-rea-browser-startup-diagnostic-20261022-2.service';INV='9a0f784944ed4e2984df6932e23f7056';BPID=2101247;BTICKS='43180170';NODE='/usr/local/bin/node';ARGV=[NODE,'--max-old-space-size=64','/control/OBSERVER.cjs'];uid=os.getuid();assert uid==1000
+now=lambda:datetime.datetime.now(datetime.timezone.utc).isoformat().replace('+00:00','Z')
+def digest(b):return hashlib.sha256(b).hexdigest()
+def boundread(path,cap):
+ f=os.open(path,os.O_RDONLY|os.O_NOFOLLOW|os.O_NONBLOCK)
+ try:
+  a=os.fstat(f);assert stat.S_ISREG(a.st_mode);b=bytearray()
+  while len(b)<=cap:
+   x=os.read(f,min(65536,cap+1-len(b)))
+   if not x:break
+   b.extend(x)
+  z=os.fstat(f);assert len(b)<=cap and (a.st_dev,a.st_ino,a.st_size,a.st_mtime_ns,a.st_ctime_ns)==(z.st_dev,z.st_ino,z.st_size,z.st_mtime_ns,z.st_ctime_ns)
+  return bytes(b)
+ finally:os.close(f)
+def fsyncdir():
+ d=os.open(P,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW)
+ try:os.fsync(d)
+ finally:os.close(d)
+def save(name,v):
+ b=(json.dumps(v,indent=2)+'\n').encode();assert len(b)<=65536;f=os.open(P/name,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600)
+ try:
+  offset=0
+  while offset<len(b):offset+=os.write(f,b[offset:offset+65536])
+  os.fsync(f)
+ finally:os.close(f)
+ fsyncdir();return {'path':str(P/name),'bytes':len(b),'sha256':digest(b)}
+def proc(pid):
+ b=boundread('/proc/'+str(pid)+'/stat',8192).decode();a=b[b.rfind(')')+2:].split();u=boundread('/proc/'+str(pid)+'/status',16384).decode();line=next(x for x in u.splitlines() if x.startswith('Uid:'));return {'pid':pid,'ppid':int(a[1]),'pgid':int(a[2]),'session':int(a[3]),'startTicks':a[19],'uid':int(line.split()[1])}
+def properties(unit,names):
+ x=subprocess.run(['/usr/bin/systemctl','show',unit,'--property='+','.join(names)],capture_output=True,timeout=2,env={'PATH':'/usr/bin:/bin','LC_ALL':'C'});assert x.returncode==0 and len(x.stdout)<=8192,'NATIVE_OBSERVATION';return dict(y.split('=',1) for y in x.stdout.decode().strip().splitlines() if '=' in y)
+def members(pgid,deadline=None):
+ result=[];count=0
+ for entry in os.scandir('/proc'):
+  if deadline is not None and time.monotonic()>=deadline:raise RuntimeError('RECONCILIATION_DEADLINE')
+  if not entry.name.isdigit():continue
+  count+=1
+  if count>65536:raise RuntimeError('PROC_SCAN_BOUND')
+  try:
+   b=boundread('/proc/'+entry.name+'/stat',8192).decode();a=b[b.rfind(')')+2:].split()
+   if int(a[2])==pgid:result.append(proc(int(entry.name)))
+  except FileNotFoundError:continue
+  except ProcessLookupError:continue
+ return result
+
+
+NATIVE_LIMITS=MappingProxyType({'memory':134217728,'swap':0,'tasks':32,'heapMiB':64,'startSeconds':1,'runtimeSeconds':9,'stopSeconds':1,'outerSeconds':22,'stdout':32768,'stderr':8192})
+NATIVE_SLICE='seabridge-browser-viewer-20261018.slice'
+NATIVE_FIELDS=['Id','LoadState','ActiveState','SubState','MainPID','InvocationID','Description','ControlGroup','ExecMainStartTimestampMonotonic','MemoryMax','MemorySwapMax','CPUQuotaPerSecUSec','TasksMax','RuntimeMaxUSec','TimeoutStartUSec','TimeoutStopUSec','KillMode','NoNewPrivileges','ProtectProc','ProcSubset','ReadWritePaths','Delegate']
+def budget(deadline,maximum=0.5):
+ left=deadline-time.monotonic();assert left>0,'NATIVE_BUDGET_EXHAUSTED';return min(maximum,left)
+def require_native_containment():
+ unit=BINDING.get('nativeUnit');nonce=BINDING.get('nonce')
+ assert isinstance(nonce,str) and re.fullmatch('[a-f0-9]{32}',nonce),'NATIVE_NONCE'
+ assert unit=='rea-greenly-lca-'+nonce+'.service','NATIVE_UNIT_BINDING'
+ assert BINDING.get('nativeDescription')=='rea-greenly-noncapture:'+nonce,'NATIVE_DESCRIPTION'
+ assert BINDING.get('attempt')==1,'NATIVE_NO_REPLAY'
+ return unit
+NATIVE_ASSERTION_CODES={'NATIVE_OBSERVATION','NATIVE_PROPERTIES','NATIVE_PROCESS_IDENTITY','NATIVE_PROCESS_CGROUP','NATIVE_PROCESS_DRIFT','NATIVE_CHILD_LIMITS','NATIVE_CHILD_TIMING','NATIVE_EPOCH','NATIVE_CGROUP','NATIVE_COMMAND_IDENTITY'}
+NATIVE_DIAGNOSTIC_STEPS={'PROPERTY_READ','PROPERTY_PARSE','PROCESS_READ','PROCESS_IDENTITY','PROCESS_CGROUP','COMMAND_SNAPSHOT','CHILD_LIMITS','CHILD_TIMING','UNIT_IDENTITY','INVOCATION_IDENTITY','START_EPOCH','COMMAND_IDENTITY','UNKNOWN'}
+NATIVE_DIAGNOSTIC_FLAGS={'propertyStatusZero','stdoutBounded','stderrBounded','lineHasEquals','knownUniqueProperty','requiredPropertiesPresent','pidWellFormed','uidUbuntu','ppidInit','noNewPrivileges','cgroupMatched','commandMatchesNode','commandStartsEnv','unitMatched','descriptionMatched','active','activating','invocationWellFormed','startWellFormed','startAfterIntent','memoryMaxMatched','swapMaxMatched','tasksMaxMatched','killModeMatched','noNewPrivilegesMatched','protectProcMatched','procSubsetMatched','writePathMatched','delegateMatched'}
+NATIVE_DIAGNOSTIC_PHASES={'NORMAL_ADMISSION','NATIVE_LAUNCH','NATIVE_BIND','NONCAPTURE_GATE','STREAM_READ'}
+NATIVE_DIAGNOSTIC_CONTEXT={'step':'UNKNOWN','checks':{}}
+def note_native_check(step,checks=None):
+ global NATIVE_DIAGNOSTIC_CONTEXT
+ state={k:None if step=='PROPERTY_READ' and checks is None else NATIVE_DIAGNOSTIC_CONTEXT['checks'].get(k) for k in ('active','activating')}
+ NATIVE_DIAGNOSTIC_CONTEXT={'step':step if step in NATIVE_DIAGNOSTIC_STEPS else 'UNKNOWN','checks':{**state,**{k:v for k,v in (checks or {}).items() if k in NATIVE_DIAGNOSTIC_FLAGS and (type(v) is bool or v is None)}}}
+def fixed_native_failure(error,phase):
+ legacy={'NATIVE_COMMAND_AUTHORITY_REFUSED','FOREIGN_REPLACEMENT_NO_STOP','NORMAL_ADMISSION_REFUSED','NATIVE_LAUNCH_REFUSED','NATIVE_EPOCH_UNKNOWN','STREAM_BOUND','STREAM_OR_TRANSPORT_UNKNOWN','NATIVE_BUDGET_EXHAUSTED'}
+ code=error.args[0] if len(error.args)==1 and type(error.args[0]) is str else None
+ actualAssertion=isinstance(error,AssertionError) and code in NATIVE_ASSERTION_CODES
+ reason=code if code in legacy or actualAssertion else {'NORMAL_ADMISSION':'NORMAL_ADMISSION_UNKNOWN','NATIVE_LAUNCH':'NATIVE_LAUNCH_UNKNOWN','NATIVE_BIND':'NATIVE_IDENTITY_UNKNOWN','NONCAPTURE_GATE':'NONCAPTURE_GATE_REFUSED','STREAM_READ':'STREAM_UNKNOWN'}.get(phase,'NATIVE_UNKNOWN')
+ return {'reason':reason,'stage':phase if phase in NATIVE_DIAGNOSTIC_PHASES else 'UNKNOWN','lastNativeStep':NATIVE_DIAGNOSTIC_CONTEXT['step'],'failedPredicate':code if actualAssertion or code=='NATIVE_BUDGET_EXHAUSTED' else 'UNKNOWN','checks':dict(NATIVE_DIAGNOSTIC_CONTEXT['checks'])}
+
+def startup_metadata(p,unit,context):
+ # Pending means only an exact owned startup observation, never process admission.
+ intent,expected,prior=context['intent'],context['expected'],context['observed']
+ budget(context['deadline'])
+ assert context['transport'].poll() is None,'NATIVE_LAUNCH_REFUSED'
+ active=p.get('ActiveState')=='active';activating=p.get('ActiveState')=='activating'
+ note_native_check('UNIT_IDENTITY',{'active':active,'activating':activating,'unitMatched':p.get('Id')==unit==BINDING['nativeUnit'],'descriptionMatched':p.get('Description')==BINDING['nativeDescription'],'cgroupMatched':p.get('ControlGroup')==expected})
+ assert unit==BINDING['nativeUnit'],'NATIVE_EPOCH'
+ if native_absent(p,expected):
+  assert prior is None and p.get('ActiveState')=='inactive' and p.get('SubState')=='dead' and not p.get('InvocationID','') and p.get('ExecMainStartTimestampMonotonic','0') in ('','0'),'NATIVE_EPOCH'
+  return True
+ assert p.get('Id')==unit and p.get('Description')==BINDING['nativeDescription'] and p.get('LoadState')=='loaded' and (active or activating),'NATIVE_EPOCH'
+ inv=p.get('InvocationID','');start=p.get('ExecMainStartTimestampMonotonic','');pid=p.get('MainPID','');cg=p.get('ControlGroup','')
+ assert (inv=='' or re.fullmatch('[a-f0-9]{32}',inv)) and re.fullmatch('0|[1-9][0-9]*',start) and re.fullmatch('0|[1-9][0-9]*',pid),'NATIVE_EPOCH'
+ assert cg==expected or cg=='' and cgroup_absent(expected),'NATIVE_EPOCH'
+ if start!='0':assert intent<=int(start)<=time.clock_gettime_ns(time.CLOCK_MONOTONIC)//1000 and inv!='','NATIVE_EPOCH'
+ if pid!='0':assert start!='0' and inv!='' and cg==expected,'NATIVE_EPOCH'
+ if active:assert inv!='' and start!='0' and pid!='0' and cg==expected,'NATIVE_EPOCH'
+ if prior is not None:
+  assert (not prior['invocation'] or inv==prior['invocation']) and (prior['started']=='0' or start==prior['started']) and (prior['pid']=='0' or pid==prior['pid']) and (not prior['cgroup'] or cg==prior['cgroup']),'NATIVE_EPOCH'
+ child_limits(p)
+ context['observed']={'invocation':inv,'started':start,'pid':pid,'cgroup':cg}
+ return activating
+
+def native_properties(unit,deadline,*,startup=None):
+ note_native_check('PROPERTY_READ')
+ r=subprocess.run(['/usr/bin/systemctl','show',unit,'--property='+','.join(NATIVE_FIELDS)],capture_output=True,timeout=budget(deadline),env={'PATH':'/usr/bin:/bin','LC_ALL':'C'})
+ note_native_check('PROPERTY_READ',{'propertyStatusZero':r.returncode==0,'stdoutBounded':len(r.stdout)<=16384,'stderrBounded':len(r.stderr)<=8192})
+ assert r.returncode==0 and len(r.stdout)<=16384 and len(r.stderr)<=8192,'NATIVE_OBSERVATION'
+ out={}
+ for line in r.stdout.decode().splitlines():
+  note_native_check('PROPERTY_PARSE',{'lineHasEquals':'=' in line})
+  assert '=' in line,'NATIVE_PROPERTIES';k,v=line.split('=',1);note_native_check('PROPERTY_PARSE',{'knownUniqueProperty':k in NATIVE_FIELDS and k not in out});assert k in NATIVE_FIELDS and k not in out,'NATIVE_PROPERTIES';out[k]=v
+ note_native_check('PROPERTY_PARSE',{'requiredPropertiesPresent':all(k in out for k in ['LoadState','MainPID','ControlGroup'])})
+ assert all(k in out for k in ['LoadState','MainPID','ControlGroup']),'NATIVE_PROPERTIES'
+ note_native_check('UNIT_IDENTITY',{'active':out.get('ActiveState')=='active','activating':out.get('ActiveState')=='activating'})
+ if startup is not None and startup_metadata(out,unit,startup):return out
+ if out.get('MainPID','0')!='0':
+  note_native_check('PROCESS_READ',{'pidWellFormed':bool(re.fullmatch('[1-9][0-9]*',out['MainPID']))})
+  assert re.fullmatch('[1-9][0-9]*',out['MainPID']),'NATIVE_PROCESS_IDENTITY'
+  pid=int(out['MainPID']);a=proc(pid);status=boundread('/proc/'+str(pid)+'/status',16384).decode()
+  note_native_check('PROCESS_IDENTITY',{'uidUbuntu':a['uid']==1000,'noNewPrivileges':bool(re.search(r'^NoNewPrivs:\s+1$',status,re.M))})
+  assert a['uid']==1000 and re.search(r'^NoNewPrivs:\s+1$',status,re.M),'NATIVE_PROCESS_IDENTITY'
+  note_native_check('PROCESS_CGROUP')
+  assert boundread('/proc/'+str(pid)+'/cgroup',8192).decode().strip()=='0::'+out.get('ControlGroup',''),'NATIVE_PROCESS_CGROUP'
+  note_native_check('COMMAND_SNAPSHOT')
+  commandBytes=boundread('/proc/'+str(pid)+'/cmdline',65536);command=digest(commandBytes);note_native_check('COMMAND_SNAPSHOT',{'commandMatchesNode':commandBytes==b'/usr/local/bin/node\x00--max-old-space-size=64\x00/control/OBSERVER.cjs\x00','commandStartsEnv':commandBytes.startswith(b'/usr/bin/env\x00-i\x00')});assert proc(pid)==a,'NATIVE_PROCESS_DRIFT'
+  out['startTicks']=a['startTicks'];out['procUID']=str(a['uid']);out['procCommandSHA256']=command
+ return out
+def cgroup_absent(cgroup):
+ assert isinstance(cgroup,str) and cgroup.startswith('/') and '..' not in cgroup.split('/') and not re.search(r'[\s\x00-\x1f]',cgroup),'NATIVE_CGROUP'
+ try:os.lstat('/sys/fs/cgroup'+cgroup);return False
+ except FileNotFoundError:return True
+def native_absent(p,expected):
+ return p.get('LoadState')=='not-found' and p.get('MainPID')=='0' and p.get('ControlGroup')=='' and cgroup_absent(expected)
+def native_same(p,b):
+ if native_absent(p,b['cgroup']):return True
+ return p.get('InvocationID')==b['invocation'] and p.get('Description')==b['description'] and p.get('ControlGroup') in ['',b['cgroup']] and (p.get('MainPID')=='0' or p.get('MainPID')==str(b['pid']) and p.get('ExecMainStartTimestampMonotonic')==b['started'] and p.get('startTicks')==b['startTicks'] and p.get('procUID')=='1000' and p.get('procCommandSHA256')==b['commandSHA256'])
+def original_epoch_gone(b):
+ try:return proc(b['pid'])['startTicks']!=b['startTicks']
+ except (FileNotFoundError,ProcessLookupError):return True
+def native_ceased(p,b):
+ return native_same(p,b) and (native_absent(p,b['cgroup']) or p.get('ActiveState') in ['inactive','failed'] and p.get('MainPID')=='0' and cgroup_absent(b['cgroup'])) and original_epoch_gone(b)
+def child_limits(p):
+ expected={'MemoryMax':'134217728','MemorySwapMax':'0','TasksMax':'32','KillMode':'control-group','NoNewPrivileges':'yes','ProtectProc':'invisible','ProcSubset':'pid','ReadWritePaths':str(P),'Delegate':'no'}
+ note_native_check('CHILD_LIMITS',dict(zip(['memoryMaxMatched','swapMaxMatched','tasksMaxMatched','killModeMatched','noNewPrivilegesMatched','protectProcMatched','procSubsetMatched','writePathMatched','delegateMatched'],[p.get(k)==v for k,v in expected.items()])))
+ assert all(p.get(k)==v for k,v in expected.items()),'NATIVE_CHILD_LIMITS'
+ note_native_check('CHILD_TIMING')
+ assert duration_micros(p.get('CPUQuotaPerSecUSec',''))==1000000 and duration_micros(p.get('RuntimeMaxUSec',''))==9000000 and duration_micros(p.get('TimeoutStartUSec',''))==1000000 and duration_micros(p.get('TimeoutStopUSec',''))==1000000,'NATIVE_CHILD_TIMING'
+ return True
+def bind_native_epoch(p,intent,expected):
+ note_native_check('UNIT_IDENTITY',{'unitMatched':p.get('Id')==BINDING['nativeUnit'],'descriptionMatched':p.get('Description')==BINDING['nativeDescription'],'cgroupMatched':p.get('ControlGroup')==expected,'active':p.get('ActiveState')=='active'})
+ assert p.get('Id')==BINDING['nativeUnit'] and p.get('Description')==BINDING['nativeDescription'] and p.get('ControlGroup')==expected and p.get('ActiveState')=='active','NATIVE_EPOCH'
+ note_native_check('INVOCATION_IDENTITY',{'invocationWellFormed':bool(re.fullmatch('[a-f0-9]{32}',p.get('InvocationID',''))),'pidWellFormed':bool(re.fullmatch('[1-9][0-9]*',p.get('MainPID','')))})
+ assert re.fullmatch('[a-f0-9]{32}',p.get('InvocationID','')) and re.fullmatch('[1-9][0-9]*',p.get('MainPID','')),'NATIVE_EPOCH'
+ start=p.get('ExecMainStartTimestampMonotonic','');note_native_check('START_EPOCH',{'startWellFormed':bool(re.fullmatch('[1-9][0-9]*',start)),'startAfterIntent':bool(re.fullmatch('[1-9][0-9]*',start)) and intent<=int(start)});assert re.fullmatch('[1-9][0-9]*',start) and intent<=int(start)<=time.clock_gettime_ns(time.CLOCK_MONOTONIC)//1000,'NATIVE_EPOCH'
+ child_limits(p);note_native_check('PROCESS_READ');pid=int(p['MainPID']);before=proc(pid);status=boundread('/proc/'+str(pid)+'/status',16384).decode()
+ note_native_check('PROCESS_IDENTITY',{'uidUbuntu':before['uid']==1000,'ppidInit':before['ppid']==1,'noNewPrivileges':bool(re.search(r'^NoNewPrivs:\s+1$',status,re.M))})
+ assert before['uid']==1000 and before['ppid']==1 and re.search(r'^NoNewPrivs:\s+1$',status,re.M),'NATIVE_PROCESS_IDENTITY'
+ note_native_check('PROCESS_CGROUP')
+ assert boundread('/proc/'+str(pid)+'/cgroup',8192).decode().strip()=='0::'+expected,'NATIVE_CGROUP'
+ expectedCmd=digest(b'\0'.join(os.fsencode(x) for x in ['/usr/local/bin/node','--max-old-space-size=64','/control/OBSERVER.cjs'])+b'\0')
+ note_native_check('COMMAND_IDENTITY')
+ commandBytes=boundread('/proc/'+str(pid)+'/cmdline',65536);note_native_check('COMMAND_IDENTITY',{'commandMatchesNode':digest(commandBytes)==expectedCmd,'commandStartsEnv':commandBytes.startswith(b'/usr/bin/env\x00-i\x00')})
+ assert digest(commandBytes)==expectedCmd and proc(pid)==before,'NATIVE_COMMAND_IDENTITY'
+ return MappingProxyType({'pid':pid,'startTicks':before['startTicks'],'invocation':p['InvocationID'],'description':p['Description'],'cgroup':expected,'started':start,'commandSHA256':expectedCmd})
+def native_argv():
+ unit=require_native_containment()
+ props=['Description='+BINDING['nativeDescription'],'Slice='+NATIVE_SLICE,'User=ubuntu','Group=ubuntu','MemoryMax=134217728','MemorySwapMax=0','CPUQuota=100%','TasksMax=32','RuntimeMaxSec=9','TimeoutStartSec=1','TimeoutStopSec=1','KillMode=control-group','OOMPolicy=stop','Delegate=no','NoNewPrivileges=yes','PrivateNetwork=no','RestrictAddressFamilies=AF_INET AF_UNIX','IPAddressDeny=any','IPAddressAllow=127.0.0.1','ProtectSystem=strict','ProtectHome=read-only','PrivateTmp=yes','ProtectProc=invisible','ProcSubset=pid','BindReadOnlyPaths=/proc/meminfo:/control/HOST_MEMINFO '+str(SOURCE)+':/control/OBSERVER.cjs','ReadOnlyPaths=/tmp /var/tmp /dev/shm '+str(S),'ReadWritePaths='+str(P),'LimitNOFILE=1024','LimitCORE=0','LimitFSIZE=65536','UMask=0077','WorkingDirectory='+str(P)]
+ return ['-n','/usr/bin/systemd-run','--unit='+unit,'--service-type=exec','--wait','--pipe','--expand-environment=no',*['--property='+x for x in props],'/usr/bin/env','-i','HOME=/nonexistent','PATH=/usr/local/bin:/usr/bin:/bin','LANG=C.UTF-8','LC_ALL=C.UTF-8','TZ=UTC','NODE_OPTIONS=--v8-pool-size=1','UV_THREADPOOL_SIZE=1','NODE_PATH=','/usr/local/bin/node','--max-old-space-size=64','/control/OBSERVER.cjs']
+def check_command_authority(args,deadline):
+ assert args[0]=='-n','NONINTERACTIVE_AUTHORITY'
+ r=subprocess.run(['/usr/bin/sudo','-n','-l','--',*args[1:]],capture_output=True,timeout=budget(deadline,0.75),env={'PATH':'/usr/bin:/bin','LC_ALL':'C'})
+ assert r.returncode==0 and len(r.stdout)<=32768 and len(r.stderr)<=8192,'NATIVE_COMMAND_AUTHORITY_REFUSED'
+ return True
+def fresh_normal_admission(deadline):
+ env={'PATH':'/usr/local/bin:/usr/bin:/bin','LC_ALL':'C','NODE_PATH':'/home/ubuntu/SeaBridgeAI/previews/rea/manageesg-frontend/node_modules','NODE_OPTIONS':'--v8-pool-size=1','UV_THREADPOOL_SIZE':'1','GIT_OPTIONAL_LOCKS':'0','GIT_CONFIG_COUNT':'2','GIT_CONFIG_KEY_0':'index.threads','GIT_CONFIG_VALUE_0':'1','GIT_CONFIG_KEY_1':'core.preloadIndex','GIT_CONFIG_VALUE_1':'false'}
+ args=[['session','check-write','--session',ACTOR,'--path',str(PARENT.relative_to(E))],['goal-runtime','admit','--runtime','codex','--mode','controlled','--session',ACTOR,'--dir','/home/ubuntu/.codex/worktrees/49f3/manageesg-backend/.ecc/rea-aws-01a14c24/.ecc/goal','--goal','/home/ubuntu/.codex/worktrees/49f3/manageesg-backend/.ecc/rea-aws-01a14c24/.ecc/goal/active-goal.yaml','--evidence-root',str(E)]]
+ for i,cmd in enumerate(args):
+  r=subprocess.run([NODE,'/home/ubuntu/SeaBridgeAI/pilot-ecc.cjs',*cmd],cwd=str(E),env=env,capture_output=True,timeout=budget(deadline,1.5));assert r.returncode==0 and len(r.stdout)<=32768 and len(r.stderr)<=8192,'NORMAL_ADMISSION_REFUSED'
+  result=json.loads(r.stdout);assert result.get('session')==ACTOR and result.get('allowed' if i==0 else 'admitted') is True,'NORMAL_ADMISSION_REFUSED'
+ return True
+def validate_meminfo_mounts(text,dev):
+ assert len(text.encode())<=131072,'MEMINFO_MOUNT_BOUND';lines=text.strip().splitlines();assert 0<len(lines)<=512,'MEMINFO_MOUNT_BOUND';alias=None;procmount=None
+ for line in lines:
+  assert len(line)<=2048 and line.count(' - ')==1,'MEMINFO_MOUNT_SHAPE';a,b=line.split(' - ');a=a.split(' ');b=b.split(' ');assert len(a)>=6 and len(b)>=3,'MEMINFO_MOUNT_SHAPE'
+  if a[4]=='/control/HOST_MEMINFO':assert alias is None,'MEMINFO_DUPLICATE';alias=(a,b)
+  if a[4]=='/proc':assert procmount is None,'MEMINFO_DUPLICATE';procmount=(a,b)
+ device=str(os.major(dev))+':'+str(os.minor(dev));assert alias and alias[0][2]==device and alias[0][3]=='/meminfo' and alias[1][:2]==['proc','proc'] and 'ro' in alias[0][5].split(',') and 'rw' not in alias[0][5].split(','),'MEMINFO_READONLY_ALIAS'
+ assert procmount and procmount[1][:2]==['proc','proc'] and 'subset=pid' in procmount[1][2].split(',') and any(x in procmount[1][2].split(',') for x in ['hidepid=invisible','hidepid=2']),'MEMINFO_PRIVATE_PROC'
+ return True
+def proc_filesystem(fd):
+ # Linux libc fstatfs writes into a conservatively sized buffer; only the first
+ # native-long f_type is inspected. Refuse other ABIs; never invent a Python API.
+ import ctypes
+ assert sys.platform=='linux' and os.uname().machine=='x86_64' and ctypes.sizeof(ctypes.c_long)==8,'STATFS_ABI_UNVERIFIED'
+ library=ctypes.CDLL(None,use_errno=True);fn=library.fstatfs;fn.argtypes=[ctypes.c_int,ctypes.c_void_p];fn.restype=ctypes.c_int;buf=ctypes.create_string_buffer(4096)
+ assert fn(fd,ctypes.byref(buf))==0,'STATFS_REFUSED';assert ctypes.c_long.from_buffer(buf).value==0x9fa0,'HOST_PROC_FILESYSTEM'
+ return True
+def prove_host_meminfo(binding,deadline):
+ end=min(deadline,time.monotonic()+0.5);held=[]
+ def check():budget(end)
+ def op(path,flags):
+  check();f=os.open(path,flags);held.append(f);return f
+ def rel(fd,name,directory=False):
+  assert re.fullmatch('[A-Za-z0-9_.-]+',name),'MEMINFO_FIXED_LEAF'
+  return op('/proc/self/fd/'+str(fd)+'/'+name,os.O_RDONLY|os.O_NOFOLLOW|os.O_NONBLOCK|(os.O_DIRECTORY if directory else 0))
+ def meta(fd):
+  x=os.fstat(fd);return (x.st_dev,x.st_ino,x.st_mode,x.st_uid,x.st_gid,x.st_nlink)
+ def read(fd,cap):
+  check();before=meta(fd);assert stat.S_ISREG(before[2]),'MEMINFO_TYPE';b=bytearray()
+  while len(b)<=cap:
+   check();x=os.pread(fd,min(8192,cap+1-len(b)),len(b))
+   if not x:break
+   b.extend(x)
+  assert len(b)<=cap and before==meta(fd),'MEMINFO_DRIFT';return bytes(b).decode()
+ def live():
+  check();p=native_properties(BINDING['nativeUnit'],end);assert native_same(p,binding) and p['MainPID']==str(binding['pid']) and p['ActiveState']=='active','MEMINFO_EPOCH';child_limits(p);return p
+ try:
+  live();root=op('/',os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW);procfd=rel(root,'proc',True);proc_filesystem(procfd);host=rel(procfd,'meminfo');hostmeta=meta(host);assert stat.S_ISREG(hostmeta[2]) and hostmeta[3]==0 and hostmeta[5]==1,'HOST_MEMINFO_META';proc_filesystem(host)
+  pidfd=rel(procfd,str(binding['pid']),True);pidmeta=meta(pidfd);assert stat.S_ISDIR(pidmeta[2]) and pidmeta[3]==1000,'MEMINFO_PID_DIRECTORY'
+  def epoch():
+   ps=read(rel(pidfd,'stat'),8192);xs=ps[ps.rfind(')')+2:].split();st=read(rel(pidfd,'status'),16384);cg=read(rel(pidfd,'cgroup'),8192)
+   assert xs[19]==binding['startTicks'] and re.search(r'^Uid:\s+1000\s+1000\s+1000\s+1000$',st,re.M) and cg.strip()=='0::'+binding['cgroup'],'MEMINFO_KERNEL_EPOCH'
+   ns=os.readlink('/proc/self/fd/'+str(pidfd)+'/ns/mnt');assert re.fullmatch(r'mnt:\[[1-9][0-9]*\]',ns),'MEMINFO_NAMESPACE';assert os.readlink('/proc/self/fd/'+str(pidfd)+'/ns/pid')==os.readlink('/proc/self/ns/pid'),'PID_NAMESPACE_CHANGED';return ns
+  ns=epoch();assert ns!=os.readlink('/proc/self/ns/mnt'),'MEMINFO_NAMESPACE_NOT_ISOLATED'
+  rootpath='/proc/self/fd/'+str(pidfd)+'/root';assert stat.S_ISLNK(os.lstat(rootpath).st_mode),'MEMINFO_ROOT_LINK';childroot=op(rootpath,os.O_RDONLY|os.O_DIRECTORY);rootmeta=meta(childroot);control=rel(childroot,'control',True);alias=rel(control,'HOST_MEMINFO');assert meta(alias)==hostmeta,'MEMINFO_ALIAS_IDENTITY';proc_filesystem(alias)
+  def mounts():validate_meminfo_mounts(read(rel(pidfd,'mountinfo'),131072),hostmeta[0])
+  mounts()
+  for text in [read(host,65536),read(alias,65536)]:
+   m=re.search(r'^MemAvailable:\s+(\d+)\s+kB$',text,re.M);assert m and int(m[1])*1024>=4*1073741824,'MEMINFO_RAM'
+  assert epoch()==ns and meta(pidfd)==pidmeta and meta(childroot)==rootmeta and meta(host)==hostmeta and meta(alias)==hostmeta,'MEMINFO_AFTER_EPOCH';live();mounts();freshroot=op(rootpath,os.O_RDONLY|os.O_DIRECTORY);assert meta(freshroot)==rootmeta,'MEMINFO_ROOT_DRIFT';freshalias=rel(rel(freshroot,'control',True),'HOST_MEMINFO');assert meta(freshalias)==hostmeta,'MEMINFO_ALIAS_DRIFT';proc_filesystem(freshalias);assert epoch()==ns,'MEMINFO_FINAL_EPOCH';live();check()
+ finally:
+  failed=False
+  for fd in reversed(held):
+   try:os.close(fd)
+   except OSError:failed=True
+  assert not failed,'MEMINFO_CLOSE_UNKNOWN'
+ # No failing descriptor cleanup may occur after the release.
+ live();check();return {'hostMeminfoReadOnlyBound':True,'namespaceEpochBound':True}
+
+def stop_native(binding,deadline):
+ def exact_owned_state(p):
+  return native_same(p,binding) and p.get('Id')==BINDING['nativeUnit'] and p.get('InvocationID')==binding['invocation'] and p.get('Description')==binding['description'] and p.get('ControlGroup')==binding['cgroup'] and (p.get('MainPID')==str(binding['pid']) or p.get('MainPID')=='0' and original_epoch_gone(binding))
+ p=native_properties(BINDING['nativeUnit'],deadline)
+ if native_ceased(p,binding):return False
+ assert exact_owned_state(p),'FOREIGN_REPLACEMENT_NO_STOP'
+ command=['-n','/usr/bin/systemctl','stop','--no-block',BINDING['nativeUnit']];check_command_authority(command,deadline)
+ p=native_properties(BINDING['nativeUnit'],deadline);assert exact_owned_state(p) and not native_ceased(p,binding),'FOREIGN_REPLACEMENT_NO_STOP'
+ r=subprocess.run(['/usr/bin/sudo',*command],capture_output=True,timeout=budget(deadline,0.5),env={'PATH':'/usr/bin:/bin','LC_ALL':'C'});assert r.returncode==0 and len(r.stdout)<=32768 and len(r.stderr)<=8192,'NATIVE_STOP_REFUSED';return True
+
+def reconcile_native(transport,binding,expected,deadline,eof):
+ # Fresh native cessation, original PID epoch, transport exit AND stream EOF.
+ out={'nativeChildClosed':False,'transportExited':False,'stdoutEOF':'stdout' in eof,'stderrEOF':'stderr' in eof,'externalProducerClosureRequired':True,'wholeProcessTreeProven':False,'custodyDisposition':'UNRESOLVED_NATIVE_CUSTODY'}
+ try:
+  p=native_properties(BINDING['nativeUnit'],deadline);out['transportExited']=transport is not None and transport.poll() is not None
+  if binding is not None:out['nativeChildClosed']=native_ceased(p,binding)
+  elif native_absent(p,expected):out['nativeChildAbsentNoEpochBound']=True
+  out['wholeOwnedChildClosed']=binding is not None and out['nativeChildClosed'] and out['transportExited'] and out['stdoutEOF'] and out['stderrEOF']
+  if out['wholeOwnedChildClosed']:out['custodyDisposition']='CHILD_CLOSED_EXTERNAL_PRODUCER_WITNESS_REQUIRED'
+ except Exception:out['failedGate']='NATIVE_CLOSURE_UNKNOWN';out['wholeOwnedChildClosed']=False
+ return out
+
+def execute_child():
+ started=time.monotonic();end=started+22;p=None;binding=None;sel=None;signals=[];eof=set();counts={'stdout':0,'stderr':0};hashes={k:hashlib.sha256() for k in counts};violation=None;stage='NORMAL_ADMISSION';failureDiagnostic=None;gate=False;stopRequested=False;expected=None;rc=None;closure=None;outcome=None;afterSHA=None;unchanged=False;terminal=None;validated=False;kind='UNKNOWN';reconciliation={'custodyDisposition':'UNRESOLVED_NATIVE_CUSTODY','wholeOwnedChildClosed':False};durable=False
+ try:
+  fresh_normal_admission(min(end-18,started+3));unit=require_native_containment();sliceprops=properties(NATIVE_SLICE,['ControlGroup']);base=sliceprops.get('ControlGroup','');assert base.startswith('/') and base.endswith('/'+NATIVE_SLICE),'NATIVE_SLICE';expected=base+'/'+unit
+  assert native_absent(native_properties(unit,end-17),expected),'NATIVE_UNIT_PREEXISTS';args=native_argv();check_command_authority(args,end-17)
+  claim=save('UNIT_CUSTODY.json',{'schema':'rea.noncapture-unit-exclusive-custody.v1','unit':unit,'description':BINDING['nativeDescription'],'nonce':BINDING['nonce'],'actor':ACTOR,'attempt':1,'neverReuse':True,'exactArgvSHA256':digest(b'\0'.join(os.fsencode(x) for x in ['/usr/bin/sudo',*args])),'sourceSHA256':SHA})
+  assert digest(boundread(SOURCE,65536))==SHA and native_absent(native_properties(unit,end-17),expected),'NATIVE_PREDISPATCH_CHANGED'
+  intentBoot=time.clock_gettime_ns(time.CLOCK_MONOTONIC)//1000;save('NATIVE_DISPATCH_INTENT.json',{'at':now(),'unit':unit,'nonce':BINDING['nonce'],'sourceSHA256':SHA,'bootMicros':str(intentBoot),'attempt':1,'retry':False,'actualNativeCreation':'NOT_YET_OBSERVED'})
+  stage='NATIVE_LAUNCH';p=subprocess.Popen(['/usr/bin/sudo',*args],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,cwd=str(E),env={'PATH':'/usr/local/bin:/usr/bin:/bin','LC_ALL':'C'},start_new_session=True)
+  sel=selectors.DefaultSelector()
+  for name,pipe in [('stdout',p.stdout),('stderr',p.stderr)]:os.set_blocking(pipe.fileno(),False);sel.register(pipe,selectors.EVENT_READ,name)
+  stage='NATIVE_BIND';startup={'intent':intentBoot,'expected':expected,'observed':None,'deadline':min(started+6,end-15),'transport':p}
+  while time.monotonic()<min(started+6,end-15):
+   state=native_properties(unit,end-15,startup=startup)
+   if state.get('ActiveState')=='active':binding=bind_native_epoch(state,intentBoot,expected);break
+   if p.poll() is not None:raise RuntimeError('NATIVE_LAUNCH_REFUSED')
+   time.sleep(0.01)
+  assert binding is not None,'NATIVE_EPOCH_UNKNOWN';stage='NONCAPTURE_GATE';proof=prove_host_meminfo(binding,end-14)
+  assert native_same(native_properties(unit,end-14),binding) and digest(boundread(SOURCE,65536))==SHA,'NATIVE_GATE_EPOCH_CHANGED'
+  save('NONCAPTURE_GATE_PROOF.json',{'at':now(),'unit':unit,'epoch':dict(binding),'nonce':BINDING['nonce'],'proof':proof,'protocol':'REA_NONCAPTURE_START_V1','sourceSHA256':SHA})
+  p.stdin.write(('REA_NONCAPTURE_START_V1:'+BINDING['nonce']+'\n').encode());p.stdin.flush();p.stdin.close();gate=True;stage='STREAM_READ'
+  while time.monotonic()<end-3 and (sel.get_map() or p.poll() is None):
+   for key,_ in sel.select(min(0.02,budget(end-3))):
+    try:data=os.read(key.fileobj.fileno(),8192)
+    except BlockingIOError:continue
+    name=key.data
+    if not data:eof.add(name);sel.unregister(key.fileobj);key.fileobj.close();continue
+    counts[name]+=len(data);hashes[name].update(data);assert counts[name]<=NATIVE_LIMITS[name],'STREAM_BOUND'
+   if time.monotonic()>=started+16 and p.poll() is None and not stopRequested:stopRequested=stop_native(binding,end-3)
+  assert p.poll() is not None and eof=={'stdout','stderr'},'STREAM_OR_TRANSPORT_UNKNOWN'
+ except Exception as e:
+  failureDiagnostic=fixed_native_failure(e,stage);violation=failureDiagnostic['reason']
+ finally:
+  # Encompasses all post-spawn setup, proof, pipe operations and terminal work.
+  if p is not None:
+   try:
+    if p.stdin and not p.stdin.closed:p.stdin.close()
+   except Exception:violation=violation or 'GATE_PIPE_UNKNOWN'
+   if binding is not None:
+    try:
+     current=native_properties(BINDING['nativeUnit'],end-2)
+     if not native_ceased(current,binding):stop_native(binding,end-2)
+    except Exception:violation=violation or 'OWNED_STOP_UNKNOWN'
+   try:
+    while sel is not None and time.monotonic()<end-2 and (sel.get_map() or p.poll() is None):
+     for key,_ in sel.select(min(0.02,budget(end-2))):
+      try:data=os.read(key.fileobj.fileno(),8192)
+      except BlockingIOError:continue
+      name=key.data
+      if not data:eof.add(name);sel.unregister(key.fileobj);key.fileobj.close();continue
+      counts[name]+=len(data);hashes[name].update(data)
+      if counts[name]>NATIVE_LIMITS[name]:violation=violation or 'STREAM_BOUND'
+    rc=p.poll()
+   except Exception:violation=violation or 'STREAM_RECONCILIATION_UNKNOWN'
+  try:reconciliation=reconcile_native(p,binding,expected,end-1.5,eof) if expected else reconciliation
+  except Exception:violation=violation or 'NATIVE_CLOSURE_UNKNOWN'
+  if sel is not None:
+   try:sel.close()
+   except Exception:violation=violation or 'STREAM_CLOSE_UNKNOWN'
+  if p is not None:
+   for pipe in [p.stdout,p.stderr]:
+    try:
+     if pipe and not pipe.closed:pipe.close()
+    except Exception:violation=violation or 'STREAM_CLOSE_UNKNOWN'
+  try:afterSHA=digest(boundread(SOURCE,65536));unchanged=afterSHA==SHA
+  except Exception:violation=violation or 'SOURCE_REHASH_UNKNOWN'
+  try:
+   result=P/'RESULT.json';refusal=P/'REFUSAL.json';assert result.exists()!=refusal.exists(),'TERMINAL_UNIQUE';f=result if result.exists() else refusal;b=boundread(f,16384);v=json.loads(b)
+   assert v.get('scope')=='GREENLY_ONLY_FIXED_LCA_OVERVIEW_ELIGIBILITY' and v.get('globalInputSafety')=='NOT_ASSESSED' and all(v.get(k)==0 for k in ['navigationCommands','DOMClickCommands','captureCommands']),'TERMINAL_SCOPE'
+   if f==result:assert v.get('schema')=='rea.greenly-lca-passive-eligibility.v1' and v.get('passiveOnly') is True and v.get('publicEligibilityReads')==2,'TERMINAL_RESULT';validated=True
+   else:assert v.get('schema')=='rea.greenly-lca-passive-eligibility-refusal.v1' and v.get('retryPermitted') is False and v.get('result')!='LCA_PASSIVE_ELIGIBILITY_OBSERVATION_COMPLETE','TERMINAL_REFUSAL'
+   terminal={'path':str(f),'bytes':len(b),'sha256':digest(b)};kind=v.get('result','UNKNOWN')
+  except Exception:violation=violation or 'TERMINAL_VALIDATION_UNKNOWN';validated=False
+  closed=reconciliation.get('wholeOwnedChildClosed') is True
+  qualified=gate and validated and kind=='LCA_PASSIVE_ELIGIBILITY_OBSERVATION_COMPLETE' and rc==0 and closed and unchanged and violation is None
+  try:
+   assert time.monotonic()<=end-2,'PERSISTENCE_RESERVE_REFUSED'
+   closure=save('PROCESS_CLOSURE.json',{'schema':'rea.native-noncapture-reconciliation.v1','at':now(),'nativeEpoch':dict(binding) if binding else None,'nativeServiceCreation':'BOUND' if binding else 'UNKNOWN','transportPID':p.pid if p else None,'transportExit':rc,'reconciliation':reconciliation,'wholeOwnedChildClosed':closed,'wholeProcessTreeProven':False,'externalProducerClosureRequired':True,'sourceSHA256Before':SHA,'sourceSHA256After':afterSHA,'sourceUnchanged':unchanged,'elapsedSeconds':time.monotonic()-started,'stdoutBytes':counts['stdout'],'stderrBytes':counts['stderr'],'signals':[],'failedGate':violation,'fixedNativeDiagnostic':failureDiagnostic,'retry':False})
+   assert time.monotonic()<end,'PERSISTENCE_AFTER_CLOSURE_BOUND'
+   outcome=save('OUTCOME.json',{'schema':'rea.passive-terminal-outcome.v2','at':now(),'result':'NONPASS','qualificationReason':'EXTERNAL_TIMING_AND_PRODUCER_CLOSURE_NOT_YET_ATTESTED','qualifiedChildPublicMarkerObservation':False,'childMarkerCandidateBeforePersistence':qualified,'terminal':terminal,'closure':closure,'fixedNativeDiagnostic':failureDiagnostic,'nativeGateReleased':gate,'wholeOwnedChildClosed':closed,'wholeProcessTreeProven':False,'externalProducerClosureRequired':True,'wholeSequenceWithin22Seconds':'UNKNOWN_EXTERNAL_WITNESS_REQUIRED','qualificationIsProvisional':True,'sourceUnchanged':unchanged,'accepted':18,'open':50,'retry':False,'authentication':'UNKNOWN','company':'UNKNOWN','reportingYear':'UNKNOWN','population':'UNKNOWN'})
+   durable=True
+  except Exception as error:
+   fixed={'PERSISTENCE_RESERVE_REFUSED','PERSISTENCE_AFTER_CLOSURE_BOUND'};violation=violation or (str(error) if str(error) in fixed else 'TERMINAL_PERSISTENCE_UNKNOWN')
+ finishedWithinBudget=time.monotonic()<end
+ if not finishedWithinBudget:qualified=False;violation='PERSISTENCE_BOUND_EXCEEDED'
+ return {'postPersistenceWithinBudget':finishedWithinBudget,'wholeSequenceWithin22Seconds':'UNKNOWN_EXTERNAL_WITNESS_REQUIRED','result':'OBSERVATION_PENDING_EXTERNAL_PRODUCER_CLOSURE' if outcome and qualified else 'NONPASS','closure':closure,'outcome':outcome,'durableTerminalProven':durable,'failedGate':violation,'fixedNativeDiagnostic':failureDiagnostic,'wholeOwnedChildClosed':reconciliation.get('wholeOwnedChildClosed') is True,'wholeProcessTreeProven':False,'externalProducerClosureRequired':True}
+
+assert DEADLINE-time.time()>22,'ABSOLUTE_CUTOFF_RESERVE';assert not PARENT.exists(),'OUTPUT_PREEXISTS'
+heldSource=boundread(SOURCE,65536);assert len(heldSource)==BINDING['sourceBytes'] and digest(heldSource)==SHA,'SOURCE_PIN'
+assert digest(boundread(BINDING['sourceReady'],16384))==BINDING['sourceReadySHA256'],'READY_PIN'
+assert digest(boundread(SCOPE_ACCEPTANCE,16384))==SCOPE_ACCEPTANCE_SHA,'SOURCE_SCOPE_PIN'
+observerBinding=validate_observer_binding(heldSource,BINDING)
+admissionBytes=boundread(BINDING['normalAdmissionReceipt'],65536);assert digest(admissionBytes)==BINDING['normalAdmissionSHA256'],'NORMAL_ADMISSION_PIN'
+normalAdmission=validate_admission_record(json.loads(admissionBytes),BINDING)
+PARENT.mkdir(mode=0o700);P.mkdir(mode=0o700)
+mem=int(next(x.split()[1] for x in Path('/proc/meminfo').read_text().splitlines() if x.startswith('MemAvailable:')))*1024;df=os.statvfs(E);disk=df.f_bavail*df.f_frsize
+admission=save('NORMAL_ADMISSION.json',normalAdmission)
+preflight={};failed=None
+try:
+ require_native_containment()
+ assert mem>=4*1073741824,'RAM_GUARD';assert disk>=20*1073741824,'DISK_GUARD'
+ expected={'Id':UNIT,'ActiveState':'active','SubState':'running','MainPID':str(BPID),'InvocationID':INV,'MemoryMax':'1879048192','MemorySwapMax':'0','CPUQuotaPerSecUSec':'1s','TasksMax':'384','NoNewPrivileges':'yes','AppArmorProfile':'chrome','RuntimeDirectoryPreserve':'yes','ExecMainStartTimestampMonotonic':'431801715155'}
+ actual=properties(UNIT,list(expected)+['ControlGroup','RuntimeMaxUSec','ActiveEnterTimestampMonotonic','RuntimeRandomizedExtraUSec','TimeoutStopUSec']);assert all(actual.get(k)==v for k,v in expected.items()),'NATIVE_BINDING';nativeLease=validate_native_lease(actual,time.time(),time.clock_gettime_ns(time.CLOCK_MONOTONIC)//1000);assert actual['ControlGroup'].endswith('/'+UNIT),'CGROUP_BINDING';bp=proc(BPID);assert bp['startTicks']==BTICKS and bp['uid']==1000,'BROWSER_EPOCH';assert digest(boundread('/proc/'+str(BPID)+'/cmdline',65536))=='e209ed9d0c338d82d1bdfce0637b09d5a684580879890eff4f2a055c68155474','BROWSER_COMMAND'
+ pf=os.lstat('/run/seabridge-rea-reference-browser-20261020/profile');assert stat.S_ISDIR(pf.st_mode) and (pf.st_dev,pf.st_ino,pf.st_uid,pf.st_mode&511)==(29,90468,1000,448),'PROFILE_BINDING'
+ sl=properties('seabridge-browser-viewer-20261018.slice',['ActiveState','MemoryMax','MemorySwapMax','CPUQuotaPerSecUSec','TasksMax','ControlGroup']);assert all(sl.get(k)==v for k,v in {'ActiveState':'active','MemoryMax':'2147483648','MemorySwapMax':'0','CPUQuotaPerSecUSec':'1s','TasksMax':'512'}.items()),'AGGREGATE_BINDING';current=int(boundread('/sys/fs/cgroup'+sl['ControlGroup']+'/memory.current',128));assert current<=2147483648-268435456,'AGGREGATE_HEADROOM';assert DEADLINE-time.time()>22,'ABSOLUTE_CUTOFF_RESERVE'
+ preflight={'at':now(),'pass':True,'browser':actual,'nativeLease':nativeLease,'browserStartTicks':bp['startTicks'],'profile':{'dev':pf.st_dev,'inode':pf.st_ino,'uid':pf.st_uid,'mode':oct(pf.st_mode&511)},'aggregate':sl,'aggregateMemoryCurrentBytes':current,'sourceSHA256':SHA,'availableMemoryBytes':mem,'availableDiskBytes':disk,'DOMReads':0}
+except Exception as e:
+ allow={'NATIVE_CONTAINMENT_CONTRACT_UNIMPLEMENTED','RAM_GUARD','DISK_GUARD','NATIVE_BINDING','CGROUP_BINDING','BROWSER_EPOCH','BROWSER_COMMAND','PROFILE_BINDING','AGGREGATE_BINDING','AGGREGATE_HEADROOM','ABSOLUTE_CUTOFF_RESERVE','NATIVE_OBSERVATION','NATIVE_TIME_SHAPE','NATIVE_TIME_PRECISION','NATIVE_LEASE_BINDING','NATIVE_LEASE_MARGIN'};failed=str(e) if str(e) in allow else 'NATIVE_PREFLIGHT_UNKNOWN';preflight={'at':now(),'pass':False,'failedGate':failed,'DOMReads':0}
+save('NATIVE_PREFLIGHT.json',preflight)
+if failed:
+ refusal=save('OUTER_REFUSAL.json',{'schema':'rea.passive-external-refusal.v1','at':now(),'stage':'BEFORE_DISPATCH','failedGate':failed,'dispatchAttempted':False,'retryPermitted':False});closure=save('PROCESS_CLOSURE.json',{'schema':'rea.owned-pgid-closure.v2','at':now(),'processCreated':False,'dispatchAttempted':False,'wholeOwnedPGIDClosed':True,'sourceUnchanged':digest(boundread(SOURCE,65536))==SHA,'signals':[]});out=save('OUTCOME.json',{'result':'PREFLIGHT_REFUSED','failedGate':failed,'refusal':refusal,'closure':closure,'accepted':18,'open':50});print(json.dumps({'result':'PREFLIGHT_REFUSED','failedGate':failed,'outcome':out,'closure':closure}));sys.exit(0)
+intent=save('DISPATCH_INTENT.json',{'schema':'rea.passive-owned-dispatch-intent.v1','at':now(),'nonce':BINDING['nonce'],'sourceSHA256':SHA,'literalArgv':ARGV,'ownerActor':ACTOR,'scope':'GREENLY_ONLY_FIXED_LCA_OVERVIEW_ELIGIBILITY','targetId':'D4DFC16D0BBBD72010B4F93F74F3CCB3','deadline':BINDING['absoluteStop'],'attempt':1,'retry':False})
+assert DEADLINE-time.time()>22,'ABSOLUTE_CUTOFF_RESERVE';assert digest(boundread(SOURCE,65536))==SHA,'SOURCE_DRIFT'
+print(json.dumps(execute_child()))

@@ -3,8 +3,8 @@
 // ECC queue component. Pure readiness planning, not authorization, launch,
 // an ownership registry, a daemon, or an OS sandbox. Integration must serialize
 // claim/recheck with existing ECC ownership, resource and release gates.
-const KINDS = new Set(['heavy-check', 'native-client', 'backend', 'writer', 'release']);
-const needsMemory = entry => ['heavy-check', 'native-client'].includes(entry.kind);
+const KINDS = new Set(['heavy-check', 'native-client', 'browser-target', 'backend', 'writer', 'release']);
+const needsMemory = entry => ['heavy-check', 'native-client', 'browser-target'].includes(entry.kind);
 const path = require('node:path');
 const STATES = new Set(['waiting', 'running', 'completed', 'cancelled', 'owner-paused']);
 const terminal = entry => ['completed', 'cancelled'].includes(entry.state);
@@ -40,6 +40,27 @@ function resourceKey(entry) {
   // This controller coordinates one local machine. Task-specific labels must
   // never create separate RAM pools on the same laptop.
   if (entry.kind === 'heavy-check') return 'heavy-check:local-machine';
+  if (entry.kind === 'browser-target') {
+    // The reviewed parent must verify these native identities and target custody
+    // in checkGate. A worker label, owner, deadline or changing observation hash
+    // must never create a second slot for the same live target.
+    const browser = entry.browser;
+    demand(entry.backgroundOnly === true, 'browser-target requires background-only operation');
+    demand(browser && typeof browser === 'object' && !Array.isArray(browser)
+      && Object.keys(browser).sort().join(',') === 'bootId,hostId,pid,profileDevice,profileInode,startTicks',
+    'exact native browser identity required');
+    demand(typeof browser.hostId === 'string' && /^[a-z0-9][a-z0-9._-]{0,127}$/.test(browser.hostId)
+      && typeof browser.bootId === 'string' && /^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/.test(browser.bootId)
+      && Number.isSafeInteger(browser.pid) && browser.pid > 0,
+    'canonical browser host boot and PID required');
+    for (const field of ['startTicks', 'profileDevice', 'profileInode']) {
+      demand(typeof browser[field] === 'string' && /^[1-9][0-9]{0,19}$/.test(browser[field]),
+        'canonical native browser ' + field + ' required');
+    }
+    demand(/^[a-fA-F0-9]{32}$/.test(entry.resource), 'exact CDP target ID required');
+    return ['browser-target', browser.hostId, browser.bootId, browser.pid, browser.startTicks,
+      browser.profileDevice, browser.profileInode, entry.resource.toLowerCase()].join(':');
+  }
   // Native clients reserve bytes, not the exclusive browser/test slot. The
   // same session cannot accidentally start two clients against one claim.
   if (entry.kind === 'native-client') return 'native-client:' + identity(entry.resource) + ':' + entry.owner;

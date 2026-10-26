@@ -1,0 +1,38 @@
+'use strict';
+const c=require('./common.cjs');
+async function main(){const [mode,file,digest,manifest]=process.argv.slice(2),i=c.input(file,digest);c.pins(manifest);c.shared();
+ if(mode==='prepare'){
+  c.fresh(i);c.need(!c.fs.existsSync(i.controlDirectory+'/PREPARED.json'),'single attempt only');
+  c.need(c.covers(c.session(i.sourceActor,'closed'),__dirname),'source must be closed');
+  const admissions=[];for(const [actor,dir] of [[i.coordinatorActor,i.controlDirectory],...i.workers.map(w=>[w.actor,w.directory])]){c.need(c.covers(c.session(actor),dir),'actual actor scope');admissions.push(c.admit(actor));c.ensure(actor,dir);}
+  c.write(i.coordinatorActor,i.controlDirectory+'/PREPARED.json',{inputNonce:i.nonce,inputSHA256:digest,manifest,goalFingerprint:c.goal(),admissions,shared:c.shared(),scope:'LOCAL_SYNTHETIC_NAVIGATION_ONLY'});
+  const q=c.queue(i,manifest);q.enqueue([c.entry(i,'launch-envelope',i.coordinatorActor,'heavy-check','local-machine',{peakRamGiB:2})]);
+  const claim=q.acquire({id:'launch-envelope',owner:i.coordinatorActor,leaseMilliseconds:Math.min(240000,Date.parse(i.expiresAt)-Date.now())});c.need(claim.acquired,'canonical heavy-check admission refused');
+  c.write(i.coordinatorActor,i.controlDirectory+'/LAUNCH.json',{nonce:i.nonce,claim,expiresAt:i.expiresAt});return {state:'ADMITTED_DISPATCH_TWO_ACTUAL_WORKERS',scope:'local infrastructure only'};
+ }
+ c.runtime(i,manifest,{release:mode==='finish'});
+ if(mode==='start'){
+  c.need(!c.fs.existsSync(i.controlDirectory+'/START.json'),'start already consumed');const until=Math.min(Date.now()+120000,Date.parse(i.expiresAt)-30000);
+  while(!i.workers.every(w=>c.fs.existsSync(w.directory+'/READY.json'))){c.need(Date.now()<until,'two-worker READY deadline');await c.wait(50);}
+  const ready=i.workers.map(w=>c.nativeReady(i,w));c.need(ready[0].browser.pid!==ready[1].browser.pid&&ready[0].browser.profileInode!==ready[1].browser.profileInode,'distinct native profiles required');
+  const q=c.queue(i,manifest),heavy=c.json(i.controlDirectory+'/LAUNCH.json').claim;c.need(q.recheck(heavy).admitted,'launch envelope invalid');
+  q.enqueue(i.workers.map((w,k)=>c.entry(i,w.role,w.actor,'browser-target',ready[k].targetId,{peakRamGiB:0.125,backgroundOnly:true,browser:ready[k].browser})));
+  const claims=i.workers.map(w=>{const r=q.acquire({id:w.role,owner:w.actor,leaseMilliseconds:Math.min(120000,Date.parse(i.expiresAt)-Date.now())});c.need(r.acquired,'target admission refused');return r;});
+  for(const claim of [heavy,...claims])c.need(q.recheck(claim).admitted,'pre-start claim invalid');
+  c.write(i.coordinatorActor,i.controlDirectory+'/START.json',{nonce:i.nonce,claims,ready,atNs:String(process.hrtime.bigint()),deadline:i.expiresAt});return {state:'BOTH_READY_TARGETS_ADMITTED_START_PUBLISHED'};
+ }
+ if(mode==='finish'){
+  const until=Math.min(Date.now()+120000,Date.parse(i.expiresAt)+30000);while(!i.workers.every(w=>c.fs.existsSync(w.directory+'/CLOSURE.json'))){c.need(Date.now()<until,'closure unavailable; claims retained');await c.wait(100);}
+  const results=i.workers.map(w=>{try{const r=c.json(w.directory+'/RESULT.json');c.need(Array.isArray(r.steps)&&Array.isArray(r.events),'valid result arrays');return r;}catch{return {role:w.role,actor:w.actor,threadId:w.threadId,nonce:i.nonce,passed:false,reason:'RESULT_MISSING_OR_MALFORMED',steps:[],events:[]};}}),closures=i.workers.map(w=>c.json(w.directory+'/CLOSURE.json'));
+  c.need(closures.every((x,k)=>x.nonce===i.nonce&&x.actor===i.workers[k].actor&&x.completeTreeClosed&&c.stopped(x.worker)&&c.stopped(x.browser)),'external complete-tree closure unavailable; claims retained');c.shared();
+  const q=c.queue(i,manifest),started=c.fs.existsSync(i.controlDirectory+'/START.json');
+  // Read actual retained canonical claims, including a partial pre-START acquire.
+  // release() revalidates each exact owner/token under the canonical ledger lock.
+  const claims=c.reconciliationClaims(i,c.json(i.controlDirectory+'/queue.json').entries),released=claims.map(claim=>q.release({...claim,outcome:'completed'}));
+  const byRole=Object.fromEntries(results.map(r=>[r.role,r])),intervals=c.overlap(byRole.desktop.steps,byRole.mobile.steps);
+  const result={scope:'LOCAL_SYNTHETIC_NAVIGATION_ONLY',nonce:i.nonce,localInfrastructureParallelNavigationProven:started&&results.every((r,k)=>r.passed===true&&r.nonce===i.nonce&&r.actor===i.workers[k].actor&&r.threadId===i.workers[k].threadId&&r.steps.length===6&&r.steps.every(s=>s.passed===true)&&r.events.some(e=>e.kind==='request')&&r.events.some(e=>e.kind==='framenavigated'))&&closures.every(x=>x.error===null&&x.exitCode===0&&x.streamsClosed===true)&&released.length===3&&released.every(r=>r.released===true)&&intervals.length>0,preStartFailureReconciled:!started,navigationOverlap:intervals,results,closures,released,sharedChromeEpochPreserved:true,vendorParallelismProven:false,productUIAcceptance:false,limitation:'Cooperating genuine ECC workers; soft RAM envelope, not a kernel sandbox or vendor validation.'};
+  c.write(i.coordinatorActor,i.controlDirectory+'/RESULT.json',result);return result;
+ }
+ throw Error('mode must be prepare, start or finish');
+}
+main().then(r=>console.log(JSON.stringify(r))).catch(e=>{console.error(JSON.stringify({state:'REFUSED_OR_RECONCILIATION_REQUIRED',reason:e.message}));process.exitCode=1;});

@@ -1,0 +1,64 @@
+{
+  "schema": "ecc.historical-source-archive.v1",
+  "authorityGranted": false,
+  "runnableFromCheckout": false,
+  "historicalManifestSHA256": "4e0ee4b5f428cb76b4f87489b76385685e099f06a7085afc4de71f44bcad8047",
+  "limitation": "Historical AWS bindings and closed actors remain in inert source text. External dependencies and unrelated dirty shared helpers from the original manifest are not distributed or claimed portable. New execution requires new current binding and review.",
+  "files": [
+    {
+      "path": "historical-source/common.cjs.txt",
+      "sha256": "002b795b5417b93860b95a4bd64b92855762abc95752e3e31b57bebcda4194a4",
+      "inertHistoricalSource": true
+    },
+    {
+      "path": "historical-source/controller.cjs.txt",
+      "sha256": "0cefc97015893450d73515f3c4ae8cfc98d883aa5aeaadd47fa79a0a9ce66977",
+      "inertHistoricalSource": true
+    },
+    {
+      "path": "historical-source/diagnostics.cjs.txt",
+      "sha256": "85f589ced8933fcae27f9128a97cd6edafaf30377679d3bd277ced3e723142c4",
+      "inertHistoricalSource": true
+    },
+    {
+      "path": "historical-source/diagnostics.test.cjs.txt",
+      "sha256": "7d247012c9032e2bf4ef0e698b7147a2de042ad10d3b06639bc0c76d7fa829a1",
+      "inertHistoricalSource": true
+    },
+    {
+      "path": "historical-source/launch.cjs.txt",
+      "sha256": "86f8698e399c8d03899e4d0c5fc38b391d760175f86f4471c186b6eb08a253c7",
+      "inertHistoricalSource": true
+    },
+    {
+      "path": "historical-source/source.test.cjs.txt",
+      "sha256": "f9f12bd69828feb8d346b34a5bade83c4cca9fb098e34a0ac2640ead3470a80a",
+      "inertHistoricalSource": true
+    },
+    {
+      "path": "historical-source/worker-launch.cjs.txt",
+      "sha256": "ea2f5c8f5043f073c2deefd04961baf7ece8729edec171b07eaaea28eb4e834c",
+      "inertHistoricalSource": true
+    },
+    {
+      "path": "historical-source/worker.cjs.txt",
+      "sha256": "3a955b4b2ab8a68b6fc4c28cf47378b2bf2c90dca19cf893f3fbe32210d4d003",
+      "inertHistoricalSource": true
+    },
+    {
+      "path": "historical-source/details.html.txt",
+      "sha256": "c4a93a331e60ae343d436cc6ffb67aecd38f4c0ec7f45db2ab0725f9befc60ca",
+      "inertHistoricalSource": true
+    },
+    {
+      "path": "historical-source/form.html.txt",
+      "sha256": "8483d6442708d8a00fa84ab283f8196fe1b5078eeeeeeda531a1108df6ab3666",
+      "inertHistoricalSource": true
+    },
+    {
+      "path": "historical-source/index.html.txt",
+      "sha256": "af3f254a53ac2cac552d361e6c29d84c36862b051a8a399d2981e81a43956390",
+      "inertHistoricalSource": true
+    }
+  ]
+}

@@ -1,0 +1,177 @@
+{
+  "schema": "ecc.parallel-browser-validation.v1",
+  "observedDateUTC": "2026-10-26",
+  "scope": "LOCAL_SYNTHETIC_NAVIGATION_ONLY",
+  "historicalResultSHA256": "7d823205e027bdf3147ef63626d50062365741c9024012c0344018c4214aa458",
+  "localInfrastructureParallelNavigationProven": true,
+  "vendorParallelismProven": false,
+  "productAcceptanceGranted": false,
+  "navigationOverlap": [
+    {
+      "desktop": "desktop-goto-index",
+      "mobile": "mobile-goto-index",
+      "startNs": "662674880337127",
+      "endNs": "662674921866272",
+      "durationNs": "41529145"
+    },
+    {
+      "desktop": "desktop-click-details",
+      "mobile": "mobile-fragment-navigation",
+      "startNs": "662674977611141",
+      "endNs": "662675035643062",
+      "durationNs": "58031921"
+    },
+    {
+      "desktop": "desktop-history-back",
+      "mobile": "mobile-form-validation",
+      "startNs": "662675061728835",
+      "endNs": "662675081233647",
+      "durationNs": "19504812"
+    }
+  ],
+  "workers": [
+    {
+      "role": "desktop",
+      "passed": true,
+      "steps": [
+        {
+          "name": "desktop-goto-index",
+          "navigation": true,
+          "startNs": "662674880216733",
+          "passed": true,
+          "navigationStartNs": "662674880337127",
+          "navigationEndNs": "662674921866272",
+          "endNs": "662674977497447"
+        },
+        {
+          "name": "desktop-click-details",
+          "navigation": true,
+          "startNs": "662674977527048",
+          "passed": true,
+          "navigationStartNs": "662674977611141",
+          "navigationEndNs": "662675035643062",
+          "endNs": "662675061594570"
+        },
+        {
+          "name": "desktop-history-back",
+          "navigation": true,
+          "startNs": "662675061617691",
+          "passed": true,
+          "navigationStartNs": "662675061728835",
+          "navigationEndNs": "662675085772702",
+          "endNs": "662675085834064"
+        },
+        {
+          "name": "desktop-history-forward",
+          "navigation": true,
+          "startNs": "662675085855974",
+          "passed": true,
+          "navigationStartNs": "662675085927257",
+          "navigationEndNs": "662675109862240",
+          "endNs": "662675109876431"
+        },
+        {
+          "name": "desktop-reload-persistence",
+          "navigation": true,
+          "startNs": "662675109905972",
+          "passed": true,
+          "navigationStartNs": "662675110057096",
+          "navigationEndNs": "662675130491818",
+          "endNs": "662675137901225"
+        },
+        {
+          "name": "desktop-profile-isolation",
+          "navigation": false,
+          "startNs": "662675137923856",
+          "passed": true,
+          "endNs": "662675140193508"
+        }
+      ]
+    },
+    {
+      "role": "mobile",
+      "passed": true,
+      "steps": [
+        {
+          "name": "mobile-goto-index",
+          "navigation": true,
+          "startNs": "662674878657414",
+          "passed": true,
+          "navigationStartNs": "662674878761207",
+          "navigationEndNs": "662674924316470",
+          "endNs": "662674942981026"
+        },
+        {
+          "name": "mobile-fragment-navigation",
+          "navigation": true,
+          "startNs": "662674943057098",
+          "passed": true,
+          "navigationStartNs": "662674943129731",
+          "navigationEndNs": "662675040374753",
+          "endNs": "662675040421855"
+        },
+        {
+          "name": "mobile-history-back",
+          "navigation": true,
+          "startNs": "662675040443395",
+          "passed": true,
+          "navigationStartNs": "662675040495287",
+          "navigationEndNs": "662675049232256",
+          "endNs": "662675049242206"
+        },
+        {
+          "name": "mobile-history-forward",
+          "navigation": true,
+          "startNs": "662675049261797",
+          "passed": true,
+          "navigationStartNs": "662675049337509",
+          "navigationEndNs": "662675055886388",
+          "endNs": "662675055894888"
+        },
+        {
+          "name": "mobile-form-validation",
+          "navigation": true,
+          "startNs": "662675055916069",
+          "passed": true,
+          "navigationStartNs": "662675056079014",
+          "navigationEndNs": "662675081233647",
+          "endNs": "662675182438626"
+        },
+        {
+          "name": "mobile-profile-isolation",
+          "navigation": false,
+          "startNs": "662675182465047",
+          "passed": true,
+          "endNs": "662675187568249"
+        }
+      ]
+    }
+  ],
+  "closures": [
+    {
+      "role": "desktop",
+      "exitCode": 0,
+      "signal": null,
+      "streamsClosed": true,
+      "allGroupsKnown": true,
+      "allObservedGone": true,
+      "completeTreeClosed": true,
+      "sharedChromeEpochPreserved": true
+    },
+    {
+      "role": "mobile",
+      "exitCode": 0,
+      "signal": null,
+      "streamsClosed": true,
+      "allGroupsKnown": true,
+      "allObservedGone": true,
+      "completeTreeClosed": true,
+      "sharedChromeEpochPreserved": true
+    }
+  ],
+  "preStartFailureReconciled": false,
+  "sharedChromeEpochPreserved": true,
+  "productUIAcceptance": false,
+  "releasedLeaseCount": 3,
+  "allLeasesReleased": true
+}

@@ -1,0 +1,10 @@
+'use strict';
+// This tiny launcher validates the complete reviewed closure before loading it.
+const fs=require('node:fs'),crypto=require('node:crypto'),path=require('node:path');
+const [manifest,component,...args]=process.argv.slice(2),sha=b=>crypto.createHash('sha256').update(b).digest('hex');
+if(!/^[a-f0-9]{64}$/.test(manifest)||!['controller','worker-launch','worker'].includes(component))throw Error('reviewed digest and exact component required');
+const file=__dirname+'/SOURCE_PINS.json',raw=fs.readFileSync(file);if(raw.length>131072||sha(raw)!==manifest)throw Error('source manifest mismatch');
+for(const pin of JSON.parse(raw).files){const s=fs.lstatSync(pin.path);if(!s.isFile()||s.isSymbolicLink()||s.size>1048576||fs.realpathSync(pin.path)!==pin.path||sha(fs.readFileSync(pin.path))!==pin.sha256)throw Error('reviewed closure mismatch');}
+if(component==='controller')process.argv=[process.argv[0],path.join(__dirname,'controller.cjs'),...args,manifest];
+else process.argv=[process.argv[0],path.join(__dirname,component+'.cjs'),args[0],args[1],manifest,args[2]];
+require('./'+component+'.cjs');

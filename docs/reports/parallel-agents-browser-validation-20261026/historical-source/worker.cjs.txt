@@ -1,0 +1,49 @@
+'use strict';
+const c=require('./common.cjs'),{pathToFileURL}=require('node:url'),d=require('./diagnostics.cjs');
+const fixtureBase=pathToFileURL(__dirname+'/fixtures/').href;let diagnosticPhase='input-and-runtime-preflight';
+function emitFailure(error){const value=error.fixtureDiagnostic||d.diagnostic(error,diagnosticPhase,fixtureBase);console.error(JSON.stringify(value));return value;}
+async function main(){const [file,digest,manifest,role]=process.argv.slice(2),i=c.input(file,digest),w=i.workers.find(w=>w.role===role);c.need(w,'assigned role required');c.runtime(i,manifest);
+ const launch=c.json(i.controlDirectory+'/LAUNCH.json'),state=c.json(i.controlDirectory+'/queue.json');c.need(launch.nonce===i.nonce&&state.entries.some(e=>e.id==='launch-envelope'&&e.token===launch.claim.token&&e.owner===i.coordinatorActor&&e.state==='running'&&Date.parse(e.leaseUntil)>Date.now()),'live launch envelope required');
+ const profile=w.directory+'/profile';c.need(!c.fs.existsSync(profile),'fresh synthetic profile required');c.writable(w.actor,[profile]);
+ const {chromium}=require(c.PW);let context,browserNative,result;const steps=[],events=[];const clock=()=>String(process.hrtime.bigint()),recorder=d.eventRecorder({base:fixtureBase,clock,events});
+ try{
+  diagnosticPhase='isolated-browser-launch';context=await chromium.launchPersistentContext(profile,{executablePath:c.EXE,headless:true,timeout:15000,viewport:role==='desktop'?{width:1280,height:900}:{width:390,height:844},isMobile:role==='mobile',serviceWorkers:'block',acceptDownloads:false,args:['--disable-background-networking','--host-resolver-rules=MAP * ~NOTFOUND','--no-proxy-server']});
+  context.setDefaultTimeout(4000);context.setDefaultNavigationTimeout(5000);
+  const base=fixtureBase,allowed=new Set(['index.html','details.html','form.html'].map(n=>base+n));
+  await context.route('**/*',route=>{const u=new URL(route.request().url());u.hash='';return allowed.has(u.href)?route.continue():route.abort('blockedbyclient');});
+  const page=context.pages()[0]||await context.newPage();c.need(context.pages().length===1,'single owned page only');
+  const ownCookie=role+'_owner';await context.addCookies([{name:ownCookie,value:i.nonce,domain:'fixture.invalid',path:'/',sameSite:'Strict'}]);
+  const own=c.proc(process.pid),tree=c.roster(),desc=new Set([own.pid]);for(let k=0;k<8;k++)for(const p of tree)if(desc.has(p.ppid))desc.add(p.pid);
+  const matches=tree.filter(p=>desc.has(p.pid)&&p.pid!==process.pid).filter(p=>{try{const a=c.fs.readFileSync('/proc/'+p.pid+'/cmdline','utf8').split('\0');return a.includes('--user-data-dir='+profile)&&a.includes('--remote-debugging-pipe')&&c.fs.realpathSync('/proc/'+p.pid+'/exe')===c.EXE;}catch{return false;}});c.need(matches.length===1,'one verified own native browser');const native=matches[0],s=c.fs.lstatSync(profile,{bigint:true});c.need(native.pgid===native.pid,'own Chrome process group required');
+  browserNative={pid:native.pid,pgid:native.pgid,startTicks:native.startTicks};
+  // Persist epoch BEFORE any further setup so external supervisor can reconcile failures.
+  c.write(w.actor,w.directory+'/BROWSER.json',{nonce:i.nonce,actor:w.actor,browser:browserNative});
+  const cdps=await context.newCDPSession(page),target=(await cdps.send('Target.getTargetInfo')).targetInfo.targetId;await cdps.detach();
+  const browser={hostId:'seabridge-pilot',bootId:c.fs.readFileSync('/proc/sys/kernel/random/boot_id','utf8').trim(),pid:native.pid,startTicks:native.startTicks,profileDevice:String(s.dev),profileInode:String(s.ino)};
+  diagnosticPhase='ready-publication';c.write(w.actor,w.directory+'/READY.json',{nonce:i.nonce,actor:w.actor,threadId:w.threadId,role,worker:own,profile,browser,targetId:target});
+  diagnosticPhase='start-barrier';const deadline=Math.min(Date.now()+120000,Date.parse(i.expiresAt)-15000);while(!c.fs.existsSync(i.controlDirectory+'/START.json')){c.need(Date.now()<deadline,'START barrier deadline');await c.wait(20);}
+  c.runtime(i,manifest);const start=c.json(i.controlDirectory+'/START.json'),claim=start.claims.find(x=>x.owner===w.actor),qs=c.json(i.controlDirectory+'/queue.json');c.need(start.nonce===i.nonce&&claim&&qs.entries.some(e=>e.token===claim.token&&e.owner===w.actor&&e.resource===target&&e.state==='running'&&Date.parse(e.leaseUntil)>Date.now()+10000),'actual target lease required before navigation');
+  page.on('request',r=>recorder.record('request',r.url()));page.on('requestfinished',r=>recorder.record('requestfinished',r.url()));page.on('framenavigated',f=>{if(f===page.mainFrame())recorder.record('framenavigated',f.url());});
+  let activeStep;async function navigate(fn){c.need(activeStep?.navigation,'measured navigation step');activeStep.navigationStartNs=clock();try{return await fn();}finally{activeStep.navigationEndNs=clock();}}
+  async function step(name,navigation,fn){diagnosticPhase=name;recorder.assertClean();c.need(Date.now()<Date.parse(i.expiresAt)-6000,'finite navigation deadline');const record={name,navigation,startNs:clock(),passed:false};activeStep=record;try{await fn();recorder.assertClean();record.passed=true;}finally{record.endNs=clock();steps.push(record);activeStep=null;}}
+  diagnosticPhase='navigation';recorder.enable();
+  if(role==='desktop'){
+   await step('desktop-goto-index',true,async()=>{await navigate(()=>page.goto(base+'index.html'));c.need(await page.locator('h1').textContent()==='Local navigation fixture','index heading');c.need(await page.evaluate(()=>innerWidth)===1280,'desktop viewport');});
+   await step('desktop-click-details',true,async()=>{await navigate(async()=>{await page.locator('#details').click();await page.waitForURL(base+'details.html');});c.need(await page.locator('h1').textContent()==='Details fixture','details route');await page.evaluate(n=>sessionStorage.setItem('owner',n),i.nonce);});
+   await step('desktop-history-back',true,async()=>{await navigate(()=>page.goBack());c.need(page.url()===base+'index.html','back route');});
+   await step('desktop-history-forward',true,async()=>{await navigate(()=>page.goForward());c.need(page.url()===base+'details.html','forward route');});
+   await step('desktop-reload-persistence',true,async()=>{await navigate(()=>page.reload());c.need(await page.evaluate(()=>sessionStorage.getItem('owner'))===i.nonce,'reload session persistence');});
+  }else{
+   await step('mobile-goto-index',true,async()=>{await navigate(()=>page.goto(base+'index.html'));c.need(await page.evaluate(()=>matchMedia('(max-width: 500px)').matches),'mobile viewport');});
+   await step('mobile-fragment-navigation',true,async()=>{await navigate(async()=>{await page.locator('#mobile-link').click();await page.waitForURL(base+'index.html#mobile-section');});c.need(page.url()===base+'index.html#mobile-section','fragment navigation');});
+   await step('mobile-history-back',true,async()=>{await navigate(()=>page.goBack());c.need(page.url()===base+'index.html','mobile back');});
+   await step('mobile-history-forward',true,async()=>{await navigate(()=>page.goForward());c.need(page.url()===base+'index.html#mobile-section','mobile forward');});
+   await step('mobile-form-validation',true,async()=>{await navigate(()=>page.goto(base+'form.html'));await page.locator('#submit').click();c.need(await page.locator('#email').evaluate(e=>e.validity.valueMissing),'required input validation');c.need(page.url()===base+'form.html','invalid form must not navigate');});
+  }
+  await step(role+'-profile-isolation',false,async()=>{const cookies=await context.cookies('https://fixture.invalid/');c.need(cookies.length===1&&cookies[0].name===ownCookie&&cookies[0].value===i.nonce,'independent profile cookie isolation');if(role==='mobile')c.need(await page.evaluate(()=>sessionStorage.getItem('owner'))===null,'independent session storage');});
+  recorder.assertClean();recorder.disable();result={role,actor:w.actor,threadId:w.threadId,nonce:i.nonce,passed:steps.length===6&&steps.every(x=>x.passed),steps,events,browser:browserNative};
+ }catch(e){recorder.disable();const failureDiagnostic=emitFailure(e);result={role,actor:w.actor,threadId:w.threadId,nonce:i.nonce,passed:false,reason:failureDiagnostic.message,failureDiagnostic,steps,events,browser:browserNative||null};}
+ finally{recorder.disable();diagnosticPhase='owned-browser-close';if(context)try{await context.close();}catch(e){if(result){result.passed=false;result.closeFailed=true;result.closeDiagnostic=emitFailure(e);}}}
+ diagnosticPhase='final-native-epoch-check';c.shared();diagnosticPhase='result-publication';c.write(w.actor,w.directory+'/RESULT.json',result);if(!result.passed)process.exitCode=1;
+}
+main().catch(e=>{emitFailure(e);process.exitCode=1;});

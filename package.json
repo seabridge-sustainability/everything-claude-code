@@ -146,6 +146,7 @@
     "scripts/ito.js",
     "scripts/nasiko.js",
     "scripts/lib/",
+    "scripts/parallel-agent-preflight.js",
     "scripts/list-installed.js",
     "scripts/loop-status.js",
     "scripts/plan-canvas.js",

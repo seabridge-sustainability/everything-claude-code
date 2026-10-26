@@ -1,0 +1,40 @@
+'use strict';
+// External supervisor; only starts and, on timeout, terminates its own fresh child/group.
+const c=require('./common.cjs'),d=require('./diagnostics.cjs'),{pathToFileURL}=require('node:url');
+async function main(){const [file,digest,manifest,role]=process.argv.slice(2),i=c.input(file,digest),w=i.workers.find(w=>w.role===role);c.need(w,'assigned worker role');c.runtime(i,manifest);c.need(!c.fs.existsSync(w.directory+'/LAUNCHER.json'),'single-use worker dispatch');
+ const taskConfig=w.directory+'/config';c.ensure(w.actor,taskConfig);c.write(w.actor,w.directory+'/LAUNCHER.json',{actor:w.actor,threadId:w.threadId,nonce:i.nonce,role,at:new Date().toISOString()});
+ const env={PATH:'/usr/local/bin:/usr/bin:/bin',XDG_CONFIG_HOME:taskConfig,XDG_CACHE_HOME:taskConfig,LANG:'C.UTF-8',TZ:'UTC',NODE_PATH:'/home/ubuntu/SeaBridgeAI/previews/rea/manageesg-frontend/node_modules',NODE_OPTIONS:'--v8-pool-size=1',UV_THREADPOOL_SIZE:'1'};
+ const child=c.cp.spawn('/usr/local/bin/node',['--max-old-space-size=128',__dirname+'/launch.cjs',manifest,'worker',file,digest,role],{cwd:__dirname,env,detached:true,stdio:['ignore','pipe','pipe']});let closed=false,exitCode=null,signal=null,bytes=0,error=null,browser=null;const collector=d.createCollector(pathToFileURL(__dirname+'/fixtures/').href);
+ child.once('error',()=>{error='CHILD_SPAWN_FAILED';});child.once('close',(code,sig)=>{closed=true;exitCode=code;signal=sig;});
+ for(const name of ['stdout','stderr'])child[name].on('data',b=>{bytes=collector.push(name,b);if(bytes>16384)error='OUTPUT_LIMIT';});
+ const epoch=c.proc(child.pid);c.need(epoch&&epoch.pgid===epoch.pid&&epoch.pid!==2101271,'exact task-owned worker epoch');const started=process.hrtime.bigint(),until=Math.min(Date.now()+180000,Date.parse(i.expiresAt));let peakRSS=0;const seen=new Map();
+ function observe(){if(c.fs.existsSync(w.directory+'/BROWSER.json')){const b=c.json(w.directory+'/BROWSER.json');c.need(b.nonce===i.nonce&&b.actor===w.actor,'own browser metadata');browser=b.browser;}
+  const all=c.roster(),desc=new Set([epoch.pid]);if(browser)desc.add(browser.pid);for(let k=0;k<8;k++)for(const p of all)if(desc.has(p.ppid))desc.add(p.pid);
+  let rss=0;for(const p of all.filter(p=>desc.has(p.pid))){seen.set(p.pid+':'+p.startTicks,p);try{const m=/^VmRSS:\s+(\d+) kB$/m.exec(c.fs.readFileSync('/proc/'+p.pid+'/status','utf8'));if(m)rss+=Number(m[1])*1024;}catch(e){if(!['ENOENT','ESRCH'].includes(e.code))throw e;}}
+  peakRSS=Math.max(peakRSS,rss);if(rss>1073741824)error='OWN_GROUP_SOFT_RAM_CEILING';
+ }
+ while(!closed&&Date.now()<until&&!error){try{observe();}catch{error='EXTERNAL_OBSERVATION_FAILED';}await c.wait(50);}
+ if(!closed){error||='OWN_WORKER_DEADLINE';if(c.proc(epoch.pid)?.startTicks===epoch.startTicks)process.kill(-epoch.pgid,'SIGTERM');const grace=Date.now()+2000;while(!closed&&Date.now()<grace)await c.wait(50);
+  // A bounded kill can only target independently verified task-created epochs.
+  if(c.proc(epoch.pid)?.startTicks===epoch.startTicks)process.kill(-epoch.pgid,'SIGKILL');
+  if(browser&&c.proc(browser.pid)?.startTicks===browser.startTicks){const a=c.fs.readFileSync('/proc/'+browser.pid+'/cmdline','utf8').split('\0');c.need(a.includes('--user-data-dir='+w.directory+'/profile')&&c.fs.realpathSync('/proc/'+browser.pid+'/exe')===c.EXE&&browser.pgid===browser.pid&&browser.pid!==2101271,'own browser kill guard');process.kill(-browser.pgid,'SIGKILL');}
+  const end=Date.now()+2000;while(!closed&&Date.now()<end)await c.wait(50);
+ }
+ try{observe();}catch{error||='EXTERNAL_OBSERVATION_FAILED';}
+ // Worker exit is not detached-browser cessation. Close only an exact retained
+ // task-created browser epoch; unknown/reused epochs remain unreconciled.
+ if(browser&&c.proc(browser.pid)?.startTicks===browser.startTicks){
+  error||='BROWSER_OUTLIVED_WORKER';const a=c.fs.readFileSync('/proc/'+browser.pid+'/cmdline','utf8').split('\0');
+  c.need(browser.pid!==2101271&&browser.pgid===browser.pid&&a.includes('--user-data-dir='+w.directory+'/profile')&&c.fs.realpathSync('/proc/'+browser.pid+'/exe')===c.EXE,'own detached-browser cleanup guard');
+  process.kill(-browser.pgid,'SIGTERM');const grace=Date.now()+1500;while(c.proc(browser.pid)?.startTicks===browser.startTicks&&Date.now()<grace)await c.wait(50);
+  if(c.proc(browser.pid)?.startTicks===browser.startTicks)process.kill(-browser.pgid,'SIGKILL');
+  const end=Date.now()+1500;while(!c.stopped(browser)&&Date.now()<end)await c.wait(50);
+ }
+ c.pins(manifest);c.shared();const allGroupsKnown=[...seen.values()].every(p=>p.pgid===epoch.pgid||p.pgid===browser?.pgid),allObservedGone=[...seen.values()].every(p=>c.proc(p.pid)?.startTicks!==p.startTicks);
+ const childDiagnostics=collector.finish(),lastDiagnostic=childDiagnostics.structured.at(-1)||null;
+ const childFailure=exitCode===0&&signal===null?null:{classification:lastDiagnostic?.classification||'UNSTRUCTURED_CHILD_FAILURE',phase:lastDiagnostic?.phase||'unknown',exitCode,signal};
+ const closure={childFailure,childDiagnostics,nonce:i.nonce,actor:w.actor,role,worker:epoch,browser,streamsClosed:closed,exitCode,signal,error,peakRSSBytes:peakRSS,observedProcessCount:seen.size,allGroupsKnown,allObservedGone,completeTreeClosed:closed&&!!browser&&allGroupsKnown&&allObservedGone&&c.stopped(epoch)&&c.stopped(browser),sharedChromeEpochPreserved:true,startNs:String(started),endNs:String(process.hrtime.bigint())};
+ c.write(w.actor,w.directory+'/CLOSURE.json',closure);console.log(JSON.stringify(closure));if(error||exitCode!==0||!closure.completeTreeClosed)process.exitCode=1;
+ if(!closed){child.unref();child.stdout.unref();child.stderr.unref();}
+}
+main().catch(e=>{console.error(JSON.stringify({state:'SUPERVISOR_REFUSED_CLAIMS_RETAINED',reason:e.message}));process.exitCode=1;});

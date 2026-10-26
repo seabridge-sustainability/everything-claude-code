@@ -1,0 +1,43 @@
+{
+  "schema": "ecc.inert-source-fixtures.v1",
+  "authorityGranted": false,
+  "nativeLaunchesPermitted": false,
+  "files": [
+    {
+      "path": "greenly-lca/producer.txt",
+      "sha256": "3cbf037bccca5f32f6e8ce2861a7a95d7a93684956a0c63a795ad7fcec351498",
+      "historicalSourceSHA256": "3cbf037bccca5f32f6e8ce2861a7a95d7a93684956a0c63a795ad7fcec351498",
+      "exactHistoricalBytes": true
+    },
+    {
+      "path": "greenly-lca/observer.txt",
+      "sha256": "6c775ce672fc24ed049925042e48c686ab6c50e719eb7a0d3ea522150ad3723b",
+      "historicalSourceSHA256": "6c775ce672fc24ed049925042e48c686ab6c50e719eb7a0d3ea522150ad3723b",
+      "exactHistoricalBytes": true
+    },
+    {
+      "path": "greenly-lca/review.json",
+      "sha256": "9a95f1fdb542cd3de45d2df34a9fc919c9f00b9840990eb8431c58c7fa3be3fd",
+      "historicalSourceSHA256": "09329366c8307a393362db5f9cb0de62cde79bd9c2084fb88b8c059199a284f3",
+      "exactHistoricalBytes": false
+    },
+    {
+      "path": "persefoni-purpose/producer.txt",
+      "sha256": "f9ba26ce78e5d02e2cf1ffb3adedb6d0d361d1d6f07dec919cd391f7e53d1afb",
+      "historicalSourceSHA256": "f9ba26ce78e5d02e2cf1ffb3adedb6d0d361d1d6f07dec919cd391f7e53d1afb",
+      "exactHistoricalBytes": true
+    },
+    {
+      "path": "persefoni-purpose/observer.txt",
+      "sha256": "aedb09f329a9bcb0ba6117ef521e32003c7a6a0d91fe050c92226d43aeddb596",
+      "historicalSourceSHA256": "aedb09f329a9bcb0ba6117ef521e32003c7a6a0d91fe050c92226d43aeddb596",
+      "exactHistoricalBytes": true
+    },
+    {
+      "path": "persefoni-purpose/review.json",
+      "sha256": "aa169951aea4240707ccc86c9ad1a094b124684a24d280e8d18479673ea58052",
+      "historicalSourceSHA256": "7d22bda1eed92c7f36906910b9c636c68e7e4c1fd423c3e9948faa25b416aaf3",
+      "exactHistoricalBytes": false
+    }
+  ]
+}

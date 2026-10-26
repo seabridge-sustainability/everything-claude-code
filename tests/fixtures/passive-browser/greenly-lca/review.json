@@ -1,0 +1,11 @@
+{
+  "fixtureOnly": true,
+  "authorityGranted": false,
+  "scope": "GREENLY_ONLY_FIXED_LCA_OVERVIEW_ELIGIBILITY",
+  "producer": {
+    "sha256": "3cbf037bccca5f32f6e8ce2861a7a95d7a93684956a0c63a795ad7fcec351498"
+  },
+  "observer": {
+    "sha256": "6c775ce672fc24ed049925042e48c686ab6c50e719eb7a0d3ea522150ad3723b"
+  }
+}
