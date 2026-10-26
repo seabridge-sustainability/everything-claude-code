@@ -1,0 +1,58 @@
+{
+  "schema": "ecc.parallel-ci-repair-checks.v1",
+  "observedAt": "2026-10-26T09:31:59.855570+00:00",
+  "publishedCandidate": "15bb1c403ec835d9eefbb29e5a687b1a0abdeb9f",
+  "initialCi": {
+    "runId": 40286504334,
+    "terminal": "failure",
+    "reportedTests": 5399,
+    "passedTests": 5397,
+    "failedTests": 2,
+    "rootCauses": [
+      "Missing parallel-agent guide in central snapshot (validation and instruction tests)",
+      "Published preflight missing from expected package allowlist",
+      "Upstream Zod4.6.7 manifest upgrade not reflected in Yarn lock"
+    ]
+  },
+  "sourceRepairCommit": "c508a19d77a10ce5e76a49a6a3a6c748f563f5ca",
+  "localChecks": {
+    "mapRegressionCasesPassed": 18,
+    "instructionStackCasesPassed": 30,
+    "npmPublishCasesPassed": 2,
+    "isolatedCiSnapshotInstructionStacksPassed": 19,
+    "lint": "PASS available ESLint9/repository configuration",
+    "diffCheck": "PASS",
+    "checkerWeakening": false
+  },
+  "isolatedSnapshotFixtureCorrections": "Initial proof fixtures lacked declared installer/config/reference inputs; final fixture derives native entries/config from manifest and includes referenced ECC documents. Final exact materialize+checker commands PASS. No source exemption added.",
+  "map": {
+    "sourceCommit": "c508a19d77a10ce5e76a49a6a3a6c748f563f5ca",
+    "policyCommit": "dafd9bbd8ec2c613fc2d8c9eda0723a8aaddd2c5",
+    "sourceDirty": false,
+    "policyDirty": false,
+    "snapshotFiles": 4,
+    "freshness": "PASS actual clean release sources"
+  },
+  "yarn": {
+    "status": "SOURCE_REVIEWED_RESOLUTION_CORRECTION_APPLIED_LOCAL",
+    "proposal": "YARN_LOCK_PROPOSAL.patch.txt",
+    "applied": true,
+    "review": "YARN_RESOLUTION_REVIEW.json",
+    "semanticCheck": "PASS exact manifest/rootdescriptor/newentry; all other lock values/checksums unchanged",
+    "lockSHA256": "fc0049cd6a1193b6f528810f1cf6b94b641ff863e6a632dd397794ee70138ff9",
+    "remaining": "Fetch, checksum population, full install and CI UNVERIFIED; no Yarn runtime installed or executed.",
+    "sourceFinding": "Pinned4.9.2 immutable check precedes fetch; optional checksum is valid at resolution. Prior blanket checksum-absence blocker retired for this scoped source correction only.",
+    "sourceCommit": "c508a19d77a10ce5e76a49a6a3a6c748f563f5ca"
+  },
+  "correctivePushPerformed": false,
+  "ciRerunOrDispatchPerformed": false,
+  "foreignChangesPreserved": true,
+  "tenantBrowserActions": 0,
+  "limitation": "Local source/map/package repairs are not a successful full CI run or authenticated vendor proof.",
+  "priorLocalOwnedCommits": [
+    "c7aea433f25e14d3fb818e8524e3cf0f31d387f6",
+    "e33d611eca208920513d27b665e4e955db165170",
+    "5a09184a56ab3b830b019dff660a2b781a7bf2f5"
+  ],
+  "checkReuseQualification": "Source/test bytes match the reviewed local5a candidate; commit metadata/history consolidated only. Reused targeted source/behavior/package evidence remains qualified to those identical bytes. Fresh map check and exact lock semantic verification PASS; no full Yarn install or new CI PASS claimed."
+}

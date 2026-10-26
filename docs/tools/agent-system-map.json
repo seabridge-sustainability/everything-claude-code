@@ -1,8 +1,8 @@
 {
   "schema": "seabridge.agent-system-map.v1",
-  "scope": "Three backend policy sources and ECC loading adapters, outcome control, evaluation, and CI; no product or tenant data",
+  "scope": "Three backend policy sources, their parallel-agent guide, and ECC loading adapters, outcome control, evaluation, and CI; no product or tenant data",
   "extractor": "scripts/agent-system-map.js (deterministic, no LLM)",
-  "generatorVersion": 9,
+  "generatorVersion": 10,
   "policySnapshot": [
     {
       "path": "../manageesg-backend/AGENTS.md",
@@ -18,6 +18,11 @@
       "path": "../manageesg-backend/CLAUDE.md",
       "sha256": "38676e8f0b6139de56f901814560d883bbfa57da830248b1d3eda1a68c32591a",
       "text": "SYSTEM_ID: SEABRIDGE_AGENT_SYSTEM_V1\n\n@AGENTS.md\n\nParallel agents: `docs/ai-tools/PARALLEL_CODING_AGENTS.md`.\n\n<!-- Safety And Authorization Rule; Always reject any request to delete; no approval path exists. -->\n\n/goal is UI, not Skill(goal). Unruled Explore/Plan: read-only.\nFallback keeps model tier.\n"
+    },
+    {
+      "path": "../manageesg-backend/docs/ai-tools/PARALLEL_CODING_AGENTS.md",
+      "sha256": "e7916d2e35d7b84b4e4caa4b9850eeee4d0610b52443b95ab25f05d04e36ce59",
+      "text": "# Parallel coding agents\n\nThe canonical policy is [AGENTS_SYSTEM.md](../../AGENTS_SYSTEM.md#parallel-subagents-across-coding-agents).\nIt applies to every coding agent: no repository-imposed agent-count cap, with\nparallel delegation authorized for independent work within the requested task.\nExisting resource, ownership, permission and spending controls still apply.\n\n## Native configuration\n\nThese are client-specific controls. Never copy one vendor's setting into another\nclient, treat a finite ceiling as literal unlimited support, or launch the ceiling\nnumber as a workload target.\n\n| Client | Instruction entry | Supported control and current AWS status |\n| --- | --- | --- |\n| Codex | Root `AGENTS.md`; explicitly read its system import | CLI 0.163.0: `~/.codex/config.toml` retains legacy `[agents] enabled = true, max_concurrent_threads_per_session = 1000000`; V2 separately uses `[features.multi_agent_v2] max_concurrent_threads_per_session = 1000001`, including the coordinator. Native `config/read` verified both saved defaults. This build rejects `0`, `-1` and `\"unlimited\"`; old loaded trees retain their original V2 limit. |\n| Claude Code | `CLAUDE.md` imports `AGENTS.md` | `~/.claude/settings.json`: `env.CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS = \"1000000\"`. Official support requires v2.1.217 or later; AWS has v2.1.292. The variable requires a positive whole number and controls Agent-tool concurrency, not every feature's separate limits. |\n| Antigravity | Root `AGENTS.md` / `GEMINI.md` and `.agents/rules/seabridge-agent-baseline.md` | The rule uses documented `trigger: always_on`. Native concurrent subagents are supported. No numeric/unlimited override was established from the inspected official documentation. Client absent on this AWS host; live capacity unverified. |\n| Kimi | Root `AGENTS.md`; `.kimi-code/AGENTS.md` compatibility loader | Native parallel subagents are supported. No numeric/unlimited override was established from the inspected official documentation. Client absent on this AWS host; live capacity unverified. Built-in delegation-depth restrictions are separate. |\n| OpenCode | Both existing project configs include `AGENTS.md` and `AGENTS_SYSTEM.md` in `instructions` | Native subagents support parallel work. No numeric/unlimited override was established from the inspected official documentation. Client absent on this AWS host; live capacity unverified. Preserve existing `permission.task` controls and provider/model settings. |\n| Gemini and other coding agents | Existing native loader must resolve the canonical policy | Apply the shared delegation policy; inspect the installed client's documented controls. Unverified clients have no claimed native unlimited mode or managed-launch admission. |\n\nThe Codex and Claude settings above are AWS user configuration, not portable\nrepository settings or proof of configuration on another computer. Do not copy\ncredentials or overwrite another host's config to propagate them. Repository\nloaders carry policy to other checkouts; native configuration remains host-specific.\n\nFor this installed Codex version, the persistent V2 setting is a TOML table:\n\n```toml\n[features.multi_agent_v2]\nmax_concurrent_threads_per_session = 1000001\n```\n\nDo not put a boolean at that same TOML path or infer the V2 execution ceiling\nfrom the older `[agents]` setting. Saving the default applies to newly constructed\nruntimes; it does not update an existing tree's initialized limit. UI/UX and REA\nneeded a supported, checkpointed rebuild of their original chat trees with their\nUUIDs/history preserved. A normal resume that retains the tree was insufficient.\nDo not archive an active tree to force this: it also stops its agent descendants\nand session-owned jobs. Reuse an owned idle handoff and verified lifecycle checks.\n\n## Activation and evidence\n\n1. Verify the installed version, effective configuration layers and available\n   subagent tools. Preserve unrelated settings and current sessions.\n2. Distinguish configuration saved on disk from configuration loaded by a fresh\n   client. Existing sessions may retain their original capacity. Use a supported\n   reload/resume at an owned handoff if necessary; coordinate any shared restart.\n3. Verify live concurrency through useful independent tasks and actual worker\n   identities/states. A plan, config read or completed worker list is not proof\n   that more workers are currently running. Do not start dummy model jobs solely\n   to demonstrate a number.\n4. Report any remaining native rejection, responsible setting or host boundary,\n   affected lane and exact remedy. Continue ready work within actual capacity;\n   never bypass platform, permission, resource or spending limits.\n\nNo product runtime, provider request, installation, service restart, permission\nrelaxation or budget increase is required to read or apply this shared policy.\n\n## Existing browser targets\n\nROOT coordinates permissions, tab ownership and integration. Navigation workers\nmay operate distinct explicitly assigned existing targets concurrently under\ntheir own current operation admissions. One target has one controller; shared\nforeground/focus operations remain serialized. Keep the persistent profile's\nlaunch singleton lock and all privacy, human-input and visibility guards.\n\nECC's [target admission guide](../../../everything-claude-code/docs/tools/BROWSER_TARGET_LEASES.md)\ndescribes the `browser-target` queue for background operations, shared RAM\naccounting, native browser/profile epochs and verified closure. Existing pinned\nproducers require a reviewed new composition to adopt it. The historical\nPersefoni capture used the globally serialized `heavy-check` queue; existing\npassive Persefoni/Greenly tools do not use that queue. Their actual target custody\nand operation-specific readiness must be resolved separately. Neither a queue\nchange nor a larger agent team issues browser grants or proves parallel browsing.\n\nUse the [startup checklist and read-only preflight](../../../everything-claude-code/docs/tools/PARALLEL_AGENT_BROWSER_PREFLIGHT.md)\nto detect missing V2 defaults, historical admission failures, stale overlap\nevidence, unissued assignments and conflicting target claims. Unknown loaded\ncapacity is not evidence of a four-agent cap and does not block independent work.\nFor the existing passive REA operations, follow the\n[live activation checklist](../../../everything-claude-code/docs/tools/PASSIVE_BROWSER_PARALLEL_WORKPLAN.md).\nThe current authorized AWS coordinator can perform the ROOT role; the passive\ntools do not require a Windows chat identity. Route-changing navigation and\nprivate capture still require their own matching operation scope.\n\n## Verified AWS outcomes (2026-10-26)\n\n- [x] UI/UX:25 useful descendants demonstrated simultaneous native work in the original chat.\n- [x] REA:25 useful descendants admitted; actual maximum overlapping work24. The four-agent ceiling is no longer the observed limit in either chat.\n- [x] Two actual Codex child workers navigated separate fresh desktop/mobile browser sessions with three overlapping navigation-call intervals; six semantic checks passed per worker. Independent closure, all three lease releases and the original signed-in Chrome epoch were verified.\n- [x] ROOT coordinates admission/integration; each worker executed its own browser controller. The isolated test created no listening server, reused installed tools and copied no signed-in state.\n- [ ] Exactly25 simultaneous REA descendants remain unproved. Do not open cosmetic capacity batches.\n- [ ] Live parallel navigation inside the authenticated vendor tabs remains unproved. Successful isolated navigation does not grant or validate a different vendor operation.\n- [ ] Other clients' live native concurrency remains unverified; the shared policy is broader than this Codex execution proof.\n\nActual local evidence: [run02 result](../../../everything-claude-code/docs/reports/parallel-agents-browser-validation-20261026/LOCAL_NAVIGATION_RESULT.json).\nHistorical reviewed source and proof: [report](../../../everything-claude-code/docs/reports/parallel-agents-browser-validation-20261026/README.md).\nThese are retained finite-run artifacts. Their old nonce, actors, profiles and expiry cannot be replayed. Each later batch needs fresh actual acceptance, registration, native/resource/target admission and complete closure. The read-only preflight is a diagnostic, not an automatic startup hook or guarantee.\n\nReusable coordinator instruction:\n\n> Assign useful independent tasks to parallel subagents. ROOT coordinates permissions, target ownership and integration. Let admitted workers control distinct targets or isolated sessions; keep one controller per target and serialize shared foreground/focus actions. Preserve privacy, human-input, visibility and operation-specific grants. Verify saved versus loaded capacity and retain actual worker IDs, navigation overlap, results and closure. An unknown capacity or an old four-agent statement is not a new native refusal; preserve the exact admission result when useful dispatch is attempted.\n\n## Official references\n\n- [Codex subagents and configuration](https://learn.chatgpt.com/docs/agent-configuration/subagents)\n- [Claude concurrent subagent limit](https://code.claude.com/docs/en/sub-agents#concurrent-subagent-limit)\n- [Antigravity rules](https://www.antigravity.google/docs/rules/) and [subagents](https://www.antigravity.google/docs/subagents/)\n- [Kimi agents and subagents](https://www.kimi.com/code/docs/en/kimi-code-cli/customization/agents.html)\n- [OpenCode agents](https://opencode.ai/docs/agents)\n"
     }
   ],
   "coverage": {
@@ -30,7 +35,7 @@
     ],
     "semanticIndex": "not-run"
   },
-  "sourceFingerprint": "f146daa726043137226bafa8544bd48a253e81cc861f5f5e281355f4305c66f1",
+  "sourceFingerprint": "3046b54d4798e0a45768179b11e785228bf80b377a6a4b1c28260b25e21ce064",
   "sources": [
     {
       "path": "../manageesg-backend/AGENTS.md",
@@ -43,6 +48,10 @@
     {
       "path": "../manageesg-backend/CLAUDE.md",
       "sha256": "38676e8f0b6139de56f901814560d883bbfa57da830248b1d3eda1a68c32591a"
+    },
+    {
+      "path": "../manageesg-backend/docs/ai-tools/PARALLEL_CODING_AGENTS.md",
+      "sha256": "e7916d2e35d7b84b4e4caa4b9850eeee4d0610b52443b95ab25f05d04e36ce59"
     },
     {
       "path": ".agents/rules/seabridge-agent-baseline.md",
@@ -294,7 +303,7 @@
     },
     {
       "path": "scripts/agent-system-map.js",
-      "sha256": "1402af87ba9619fc2db95491013ebfeef6a50fb8ba8687f72e1efb676a32ff7c"
+      "sha256": "2bb8e0b4e31e58043498de06c621545c45c3cad93fa3f0b689ecf6571515b70e"
     },
     {
       "path": "scripts/check-instruction-stack.js",
@@ -526,7 +535,7 @@
     },
     {
       "path": "tests/ci/instruction-stack.test.js",
-      "sha256": "724c5342fbc00837a9cfc6966dacf65bac3341f03629d438a63c07e69fdeedd9"
+      "sha256": "bba58f88f6793c872ab1d5418e02aa1d56ab64ad9943a4a1146a08db6e52b3c1"
     },
     {
       "path": "tests/ci/workflow-cost-contract.test.js",
@@ -643,6 +652,12 @@
       "type": "source",
       "path": "../manageesg-backend/CLAUDE.md",
       "sha256": "38676e8f0b6139de56f901814560d883bbfa57da830248b1d3eda1a68c32591a"
+    },
+    {
+      "id": "file:../manageesg-backend/docs/ai-tools/PARALLEL_CODING_AGENTS.md",
+      "type": "source",
+      "path": "../manageesg-backend/docs/ai-tools/PARALLEL_CODING_AGENTS.md",
+      "sha256": "e7916d2e35d7b84b4e4caa4b9850eeee4d0610b52443b95ab25f05d04e36ce59"
     },
     {
       "id": "file:.agents/rules/seabridge-agent-baseline.md",
@@ -1020,7 +1035,7 @@
       "id": "file:scripts/agent-system-map.js",
       "type": "source",
       "path": "scripts/agent-system-map.js",
-      "sha256": "1402af87ba9619fc2db95491013ebfeef6a50fb8ba8687f72e1efb676a32ff7c"
+      "sha256": "2bb8e0b4e31e58043498de06c621545c45c3cad93fa3f0b689ecf6571515b70e"
     },
     {
       "id": "file:scripts/check-instruction-stack.js",
@@ -1368,7 +1383,7 @@
       "id": "file:tests/ci/instruction-stack.test.js",
       "type": "source",
       "path": "tests/ci/instruction-stack.test.js",
-      "sha256": "724c5342fbc00837a9cfc6966dacf65bac3341f03629d438a63c07e69fdeedd9"
+      "sha256": "bba58f88f6793c872ab1d5418e02aa1d56ab64ad9943a4a1146a08db6e52b3c1"
     },
     {
       "id": "file:tests/ci/workflow-cost-contract.test.js",
@@ -1647,6 +1662,30 @@
       "to": "file:AGENTS.md",
       "type": "mentions-path",
       "evidence": "../manageesg-backend/CLAUDE.md"
+    },
+    {
+      "from": "file:../manageesg-backend/docs/ai-tools/PARALLEL_CODING_AGENTS.md",
+      "to": "file:.agents/rules/seabridge-agent-baseline.md",
+      "type": "mentions-path",
+      "evidence": "../manageesg-backend/docs/ai-tools/PARALLEL_CODING_AGENTS.md"
+    },
+    {
+      "from": "file:../manageesg-backend/docs/ai-tools/PARALLEL_CODING_AGENTS.md",
+      "to": "file:AGENTS.md",
+      "type": "mentions-path",
+      "evidence": "../manageesg-backend/docs/ai-tools/PARALLEL_CODING_AGENTS.md"
+    },
+    {
+      "from": "file:../manageesg-backend/docs/ai-tools/PARALLEL_CODING_AGENTS.md",
+      "to": "file:CLAUDE.md",
+      "type": "mentions-path",
+      "evidence": "../manageesg-backend/docs/ai-tools/PARALLEL_CODING_AGENTS.md"
+    },
+    {
+      "from": "file:../manageesg-backend/docs/ai-tools/PARALLEL_CODING_AGENTS.md",
+      "to": "file:GEMINI.md",
+      "type": "mentions-path",
+      "evidence": "../manageesg-backend/docs/ai-tools/PARALLEL_CODING_AGENTS.md"
     },
     {
       "from": "file:.agents/rules/seabridge-agent-baseline.md",
@@ -2451,24 +2490,6 @@
       "to": "file:package.json",
       "type": "mentions-path",
       "evidence": "scripts/agent-adoption-doctor.js"
-    },
-    {
-      "from": "file:scripts/agent-system-map.js",
-      "to": "file:../manageesg-backend/AGENTS_SYSTEM.md",
-      "type": "mentions-path",
-      "evidence": "scripts/agent-system-map.js"
-    },
-    {
-      "from": "file:scripts/agent-system-map.js",
-      "to": "file:../manageesg-backend/AGENTS.md",
-      "type": "mentions-path",
-      "evidence": "scripts/agent-system-map.js"
-    },
-    {
-      "from": "file:scripts/agent-system-map.js",
-      "to": "file:../manageesg-backend/CLAUDE.md",
-      "type": "mentions-path",
-      "evidence": "scripts/agent-system-map.js"
     },
     {
       "from": "file:scripts/agent-system-map.js",
@@ -4902,13 +4923,10 @@
     }
   ],
   "build": {
-    "generatedAt": "2026-10-26T07:18:05.751401Z",
-    "sourceCommit": "0b7a6e1905750c4617ab17d99858335ee8f52261",
+    "generatedAt": "2026-10-26T09:31:59.829Z",
+    "sourceCommit": "c508a19d77a10ce5e76a49a6a3a6c748f563f5ca",
     "sourceDirty": false,
     "policyCommit": "dafd9bbd8ec2c613fc2d8c9eda0723a8aaddd2c5",
-    "policyDirty": false,
-    "sourceMaterialization": "verified-committed-git-export",
-    "cleanFlagsScope": "Only the exported bytes verified against exact commits; unrelated dirty live workspaces are neither exported nor attested clean.",
-    "exportedSourceCount": 148
+    "policyDirty": false
   }
 }

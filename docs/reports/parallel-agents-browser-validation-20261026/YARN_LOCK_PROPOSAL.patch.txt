@@ -1,0 +1,16 @@
+APPLIED LOCALLY / SOURCE REVIEWED: exact resolution delta from CI YN0028 output.
+Yarn fetch, checksum population, full install and CI remain UNVERIFIED.
+No executable Yarn/runtime/dependency installation was performed.
+
+--- a/yarn.lock
++++ b/yarn.lock
+@@ -1111 +1111 @@
+-    zod: "npm:4.1.8"
++    zod: "npm:4.6.7"
+@@ -3509,0 +3510,6 @@
++"zod@npm:4.6.7":
++  version: 4.6.7
++  resolution: "zod@npm:4.6.7"
++  languageName: node
++  linkType: hard
++

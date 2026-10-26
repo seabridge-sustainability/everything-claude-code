@@ -1,0 +1,31 @@
+{
+  "schema": "ecc.yarn-resolution-correction.v1",
+  "at": "2026-10-26T09:15:13.428453+00:00",
+  "sourceReview": "GO exact local resolution-only correction; /root/astra_runtime_capacity independent review",
+  "packageManager": "yarn@4.9.2+sha512.1fc009bc09d13cfd0e19efa44cbfc2b9cf6ca61482725eb35bbc5e257e093ebf4130db6dfe15d604ff4b79efd8e1e8e99b25fa7d0a6197c9f9826358d4d65c3c",
+  "manifestVersion": "4.6.7",
+  "lockSHA256Before": "f3194149df1b02b76c80819eb0a0d2cf2a87f61900364dc6cd22790f5497e96f",
+  "lockSHA256After": "fc0049cd6a1193b6f528810f1cf6b94b641ff863e6a632dd397794ee70138ff9",
+  "semanticDelta": "Only root Zod descriptor and new matching4.6.7 package block; all other parsed values unchanged",
+  "existingChecksumsPreserved": true,
+  "transitive418Preserved": true,
+  "lockVersionAndCacheKeyPreserved": true,
+  "inventedChecksum": false,
+  "primarySources": [
+    {
+      "url": "https://raw.githubusercontent.com/yarnpkg/berry/@yarnpkg%2Fcli%2F4.9.2/packages/yarnpkg-core/sources/Project.ts",
+      "basis": "Optional checksum accepted/generated; immutable compares resolution before fetch; fetch populates checksums"
+    },
+    {
+      "url": "https://yarnpkg.com/cli/install",
+      "basis": "update-lockfile fetches packages lacking checksums"
+    }
+  ],
+  "appliedLocally": true,
+  "yarnRuntimeExecuted": false,
+  "fetchChecksumPopulationFullInstallCI": "UNVERIFIED",
+  "dependencyOrToolInstall": false,
+  "correctivePush": false,
+  "sourceCommit": "c508a19d77a10ce5e76a49a6a3a6c748f563f5ca",
+  "boundAt": "2026-10-26T09:31:59.855969+00:00"
+}
