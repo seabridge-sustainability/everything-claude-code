@@ -628,6 +628,202 @@
         "source_harness": { "$ref": "#/$defs/nonEmptyString" }
       }
     },
+    "goalAdmission": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "goal_id",
+        "contract_sha256",
+        "mode",
+        "assignments"
+      ],
+      "properties": {
+        "goal_id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "contract_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "mode": {
+          "enum": [
+            "supervised",
+            "single-agent"
+          ]
+        },
+        "assignments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "assignment_id",
+              "sha256",
+              "worker_id"
+            ],
+            "properties": {
+              "assignment_id": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "worker_id": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              }
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "mode": {
+                "const": "supervised"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "assignments": {
+                "minItems": 1
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "assignments": {
+                "maxItems": 0
+              }
+            }
+          }
+        }
+      ]
+    },
+    "alternativesReview": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract_sha256",
+        "snapshot_sha256",
+        "observed_at",
+        "expires_at",
+        "lanes"
+      ],
+      "properties": {
+        "contract_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "snapshot_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "observed_at": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "expires_at": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "lanes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "lane_id",
+              "dependency",
+              "owner",
+              "remedy",
+              "next_checkpoint_at",
+              "alternatives"
+            ],
+            "properties": {
+              "lane_id": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "dependency": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "owner": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "remedy": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "next_checkpoint_at": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "alternatives": {
+                "type": "array",
+                "minItems": 3,
+                "maxItems": 3,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "kind",
+                    "disposition",
+                    "reason",
+                    "evidence"
+                  ],
+                  "properties": {
+                    "kind": {
+                      "enum": [
+                        "retained_inputs",
+                        "owned_patch",
+                        "integration_seam"
+                      ]
+                    },
+                    "disposition": {
+                      "enum": [
+                        "ready",
+                        "blocked",
+                        "unavailable",
+                        "not_applicable"
+                      ]
+                    },
+                    "reason": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    "evidence": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "resumeReceipt": {
       "type": "object",
       "additionalProperties": false,
@@ -647,6 +843,7 @@
         "source_harness"
       ],
       "properties": {
+        "alternatives_review": { "$ref": "#/$defs/alternativesReview" },
         "schema": { "const": "ecc.resume-receipt.v1" },
         "receipt_id": { "$ref": "#/$defs/nonEmptyString" },
         "goal_id": { "$ref": "#/$defs/nonEmptyString" },

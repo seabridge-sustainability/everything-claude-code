@@ -49,6 +49,7 @@ function options(host) {
   // Optional capability: legacy hosts cannot adopt successful expired calls.
   // A Promise (including Promise.resolve(true)) never authorizes recovery.
   if(typeof host.verifyRecoveredResult==='function')result.verifyRecoveredResult=(...args)=>host.verifyRecoveredResult(...args)===true;
+  if(typeof host.verifyWorkerAdmission==='function')result.verifyWorkerAdmission=(...args)=>host.verifyWorkerAdmission(...args)===true;
   return result;
 }
 async function run(file, host, { maxIterations = 50, maxMilliseconds = 300000, invocation = null } = {}) {
@@ -130,21 +131,25 @@ async function run(file, host, { maxIterations = 50, maxMilliseconds = 300000, i
     } finally { clearTimeout(timer); }
   };
   const recoverWorkers = async state => {
+    let reconciled = true;
     for (const worker of state.plan.workers) {
       const node = state.nodes[worker.id];
-      if (node.status !== 'running' || node.lease_until > Date.now()) continue;
+      if (node.status !== 'running' || (node.lease_until > Date.now() && !node.reconciliation)) continue;
       const observed = await call('inspectWorker', structuredClone(worker), structuredClone(node));
       // Expiry does NOT prove the process stopped or that failed spending was zero.
       if(observed?.status==='completed'){
-        if(!observed.result||observed.receipt==null||typeof gates.verifyRecoveredResult!=='function')return false;
+        if(!observed.result || (node.lease_until <= Date.now()
+          && (observed.receipt==null||typeof gates.verifyRecoveredResult!=='function'))) {reconciled=false;continue;}
         demand(observed.result.worker===worker.id&&observed.result.token===node.token,'inspected completion belongs to another worker attempt');
         // Adopt the original running token; never dispatch a replacement for
         // an already completed adapter. Engine rechecks every current gate.
-        state=transition({type:'recover-result',actor:state.plan.parent,result:observed.result,receipt:observed.receipt});
+        state=transition(node.lease_until > Date.now()
+          ? {type:'result',actor:worker.agent,result:observed.result}
+          : {type:'recover-result',actor:state.plan.parent,result:observed.result,receipt:observed.receipt});
         if(state.phase==='budget-exhausted')return true;
         continue;
       }
-      if (observed?.status !== 'failed' || !observed.usage) return false;
+      if (observed?.status !== 'failed' || !observed.usage) {reconciled=false;continue;}
       // inspectWorker is trusted, token-bound completion/closure evidence.
       // Bind its failed observation to this exact persisted attempt in apply().
       const key = `${worker.id}:${node.token}`;
@@ -155,23 +160,42 @@ async function run(file, host, { maxIterations = 50, maxMilliseconds = 300000, i
       } finally { verifiedStoppedAttempts.delete(key); }
       if(state.phase==='budget-exhausted')return true;
     }
-    return true;
+    return reconciled;
   };
   try {
     let state = engine.load(file);
     if(invocation)demand(engine.digest(state)===invocation.checkpoint_sha256,
       'invocation checkpoint changed before execution');
-    if (!await recoverWorkers(state)) return { state:engine.load(file), stopped: 'worker-reconciliation-required', transitions: steps };
-    state = transition({ type: 'recover', actor: plan.parent });
+    await recoverWorkers(state);
+    state=engine.load(file);
+    // Raw recovery cannot clear expired attempts. Inspect them independently,
+    // retaining every token; only dispatch's trusted peer admission can proceed.
+    if (!Object.values(state.nodes).some(node=>node.status==='running' && node.lease_until<=Date.now()))
+      state = transition({ type: 'recover', actor: plan.parent });
     while (steps++ < maxIterations && Date.now() < deadline) {
       const parent = state.plan.parent;
       if (['completed','budget-exhausted'].includes(state.phase)) return { state, stopped: state.phase, transitions: steps };
-      if (['planned','repair'].includes(state.phase)) {
-        state = await engine.dispatchParallel(file, worker => call('launchWorker', worker), gates);
-      } else if (state.phase === 'workers') {
-        if (!await recoverWorkers(state)) return { state: engine.load(file), stopped: 'worker-reconciliation-required', transitions: steps };
-        state = transition({ type: 'recover', actor: parent });
-        if (state.phase === 'workers') return { state, stopped: 'awaiting-live-worker-leases', transitions: steps };
+      if (['planned','repair','workers'].includes(state.phase)) {
+        await recoverWorkers(state);
+        state=engine.load(file);
+        if (state.phase==='budget-exhausted' || state.phase==='critic') continue;
+        const pending=state.plan.workers.filter(worker=>state.nodes[worker.id].status==='pending');
+        const unresolved=state.plan.workers.filter(worker=>state.nodes[worker.id].status==='running');
+        if (!pending.length) return {state,stopped:unresolved.some(worker=>state.nodes[worker.id].reconciliation
+          ||state.nodes[worker.id].lease_until<=Date.now())?'worker-reconciliation-required':'awaiting-live-worker-leases',transitions:steps};
+        const ready=pending.filter(worker=>!unresolved.length || (typeof gates.verifyWorkerAdmission==='function'
+          && gates.verifyWorkerAdmission({worker,state,unresolved},state.plan)===true));
+        if (!ready.length) return {state,stopped:'worker-budget-unverified',transitions:steps};
+        if(typeof host.readWorkerCapacity!=='function') return {state,stopped:'worker-capacity-unverified',transitions:steps,
+          capacity:{status:'unverified',limitation:'No trusted current child-slot observation; no workers launched'}};
+        const capacity=await call('readWorkerCapacity',structuredClone(state));
+        if(capacity==null)return {state,stopped:'worker-capacity-unverified',transitions:steps,
+          capacity:{status:'unverified',limitation:'Trusted host has no current child-slot observation; no workers launched'}};
+        engine.assert('capacity',capacity);
+        if(capacity.available_child_slots===0)return {state,stopped:'worker-capacity-queued',transitions:steps,capacity};
+        const before=state.dispatches;
+        state = await engine.dispatchParallel(file, worker => call('launchWorker', worker), {...gates,capacity});
+        if(state.dispatches===before && state.phase!=='budget-exhausted')return {state,stopped:'worker-budget-unverified',transitions:steps,capacity};
       } else if (state.phase === 'critic') {
         const reviewed = await call('review', structuredClone(state));
         if(reviewed?.journal_review===true){

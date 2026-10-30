@@ -7,6 +7,7 @@ const path = require('path');
 const os = require('os');
 const {
   assertDocument,
+  admissionForGoal,
   goalContractDigest,
   assignmentContractDigest,
   buildParallelStatus,
@@ -103,6 +104,7 @@ function help() {
   process.stdout.write('Retained artifact verification: --evidence-root DIR (repeatable), --evidence-map SHA256=FILE (repeatable, pinned relocation index/ledger). These do not refresh source fingerprints or authorize acceptance.\n');
   process.stdout.write('New assignments require --work-kind output|blocker, --ram-gib N, --disk-gib N, and --disk-path DIR; blockers also require --defect-evidence FILE.\n');
   process.stdout.write('Terminal integration outcomes superseded/not_adopted require --limitation REASON; failed or over-budget receipts remain history, never passing proof.\n');
+  process.stdout.write('Completion requires parent-pinned goal_admission; explicit single-agent and supervised modes never infer authority from an empty ledger. Blocked resume requires --alternatives-review FILE with finite checkpoints and exact contract/dependency snapshot.\n');
   process.stdout.write('New receipts pin exact acceptance contracts; legacy receipts remain readable but do not establish current acceptance. Managed passing integration requires --acceptance-receipt FILE from the trusted parent adapter. Watchdog retry/CI/cost caps are cumulative across tactic and policy windows.\n');
   process.stdout.write('Controlled execution v3: assign --change-contract FILE (requested_delta and hash-bound preserved_invariants). Historical records are not silently upgraded.\n');
   process.stdout.write(`ECC outcome control\n\nUsage:\n  ecc goal profiles\n  ecc goal init --from FILE [--dir DIR]\n  ecc goal checkpoint --proof ID --at ISO --started-at ISO --basis TEXT --hours N [--confidence LEVEL]\n  ecc goal correct --instruction TEXT --priority TEXT --proof ID --next-action TEXT --at ISO --started-at ISO --basis TEXT --hours N\n  ecc goal record --acceptance ID --stage STAGE --environment NAME --evidence KIND=FILE [options]\n    options: --result-class CLASS --authenticity CLASS --user-visible true|false --subject-scope SCOPE\n  ecc goal assign --description TEXT --acceptance ID --owner-runtime NAME --owner-agent ID --scope PATH --lease-until ISO [budgets]\n  ecc goal integrate --assignment ID --integrator ID --evidence KIND=FILE --repo ID=DIR --tool-calls N --retries N --ci-runs N --cost-usd N\n  ecc goal watch-config --window-hours N --max-activity N --max-retries N --max-ci-runs N --max-cost-usd N\n  ecc goal activity --kind KIND --tactic ID [--count N] [--cost-usd N]\n  ecc goal watch [--json] [--now ISO]\n  ecc goal resume --next-action TEXT [--repo DIR ...] [--last-result TEXT] [options]\n  ecc goal handoff --next-action TEXT [resume options]\n  ecc goal validate [--goal FILE] [--outcomes FILE] [--resume FILE]\n  ecc goal status [--goal FILE] [--outcomes FILE] [--json] [--now ISO]\n  ecc goal claim <complete|blocked|on-track> [--goal FILE] [--outcomes FILE] [--resume FILE] [--json] [--now ISO]\n\nDefaults:\n  directory:    .ecc/goal\n  goal:         active-goal.yaml\n  outcomes:     outcomes.jsonl\n  assignments:  assignments.jsonl\n  integrations: integrations.jsonl\n  resume:       resume-receipt.yaml (loaded when present)\n\nWrites are local, atomic, and lock-protected. The command never calls a model, provider, CI service, or deployment API.\n`);
@@ -236,7 +238,11 @@ function commandActivity(args) {
 function checkAssignmentCapacity(goalId, assignments, integrations, capacity, telemetry, now = Date.now()) {
   if (![telemetry.freeRamGib, telemetry.freeDiskGib].every(value => Number.isFinite(value) && value >= 0)) throw new Error('capacity telemetry must be known and non-negative');
   const latest = new Map();
-  for (const receipt of integrations.filter(item => item.goal_id === goalId && Date.parse(item.observed_at) <= now)) {
+  const eligible = integrations.filter(item => item.goal_id === goalId && Date.parse(item.observed_at) <= now);
+  const current = eligible.filter(receipt => assignments.some(assignment => assignment.assignment_id === receipt.assignment_id
+    && assignment.contract_sha256 && receipt.contract_sha256 === assignment.contract_sha256
+    && assignment.assignment_contract_sha256 && receipt.assignment_contract_sha256 === assignment.assignment_contract_sha256));
+  for (const receipt of eligible.filter(receipt => !current.some(item => item.assignment_id === receipt.assignment_id) || current.includes(receipt))) {
     const previous = latest.get(receipt.assignment_id);
     if (!previous || Date.parse(receipt.observed_at) > Date.parse(previous.observed_at)) latest.set(receipt.assignment_id, receipt);
   }
@@ -408,7 +414,8 @@ function commandIntegrate(args) {
   }
   if (pendingAssignment.contract_sha256) receipt.contract_sha256 = pendingAssignment.contract_sha256;
   if (pendingAssignment.assignment_contract_sha256) receipt.assignment_contract_sha256 = pendingAssignment.assignment_contract_sha256;
-  if (receipt.outcome === 'pass' && pendingAssignment.managed_execution) {
+  if (receipt.outcome === 'pass' && (pendingAssignment.managed_execution
+      || admissionForGoal(goal, readJsonLines(paths.assignments))?.mode === 'supervised')) {
     const acceptancePath = optionValue(args, '--acceptance-receipt');
     if (!acceptancePath) throw new Error('managed passing integration requires --acceptance-receipt');
     const receiptPath = fs.realpathSync(path.resolve(acceptancePath));
@@ -614,6 +621,8 @@ function commandResume(args, handoff = false) {
     },
     source_harness: optionValue(args, '--source-harness', process.env.ECC_SOURCE_HARNESS || 'unknown'),
   };
+  const reviewFile = optionValue(args, '--alternatives-review');
+  if (reviewFile) receipt.alternatives_review = readStructuredFile(reviewFile);
   assertDocument('resume', receipt, 'resume receipt');
   validateBundle({
     goal,

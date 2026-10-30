@@ -17,6 +17,7 @@ const DEFINITIONS = {
   integration: 'integrationReceipt',
   watchdog: 'watchdogPolicy',
   activity: 'activityEvent',
+  admission: 'goalAdmission',
 };
 
 let schema;
@@ -185,7 +186,7 @@ function contractBinding(goal, record) {
 function assignmentBinding(goal, assignment, receipt = null) {
   const binding = contractBinding(goal, assignment);
   if (binding !== 'current') return binding;
-  if (!assignment.assignment_contract_sha256) return 'legacy';
+  if (!assignment?.assignment_contract_sha256) return 'legacy';
   if (assignment.assignment_contract_sha256 !== assignmentContractDigest(goal, assignment)) return 'stale';
   if (!receipt) return 'current';
   const receiptBinding = contractBinding(goal, receipt);
@@ -194,16 +195,117 @@ function assignmentBinding(goal, assignment, receipt = null) {
   return receipt.assignment_contract_sha256 === assignment.assignment_contract_sha256 ? 'current' : 'stale';
 }
 
-function verifyManagedAcceptance(goal, assignment, receipt) {
+
+// Admission is parent-owned launch input, not a flag in an editable goal/receipt.
+// The existing pinned config is the trust root; unrestricted same-user writes
+// remain outside this boundary (as in orca-acceptance).
+function admissionForGoal(goal, assignments = [], required = false) {
+  const configured = process.env.ECC_ORCA_ACCEPTANCE_CONFIG || process.env.ECC_ORCA_ACCEPTANCE_CONFIG_SHA256;
+  if (!configured && !required) return null;
+  const config = require('./orca-acceptance').loadTrust();
+  const admission = config.goal_admission;
+  assertDocument('admission', admission, 'parent goal admission');
+  if (admission.goal_id !== goal.goal_id || admission.contract_sha256 !== goalContractDigest(goal)) {
+    throw new Error('parent admission is missing or stale for current goal contract');
+  }
+  const current = assignments.filter(item => contractBinding(goal, item) === 'current');
+  if (admission.mode === 'single-agent') {
+    if (current.length || assignments.some(item => item.managed_execution)) throw new Error('single-agent admission cannot downgrade delegated work');
+    return admission;
+  }
+  ensureUniqueIds(admission.assignments.map(item => item.assignment_id), 'admitted assignment');
+  ensureUniqueIds(admission.assignments.map(item => item.worker_id), 'admitted worker');
+  for (const expected of admission.assignments) {
+    const assignment = assignments.find(item => item.assignment_id === expected.assignment_id);
+    if (!assignment || assignmentBinding(goal, assignment) !== 'current'
+        || contractDigest(assignment) !== expected.sha256) throw new Error('admitted assignment missing, stripped or changed');
+    const bindings = (config.bindings || []).filter(item => item.worker_id === expected.worker_id);
+    if (bindings.length !== 1 || ['task_id', 'dispatch_id', 'process_incarnation', 'host_id']
+      .some(key => typeof bindings[0][key] !== 'string' || !bindings[0][key].trim())) {
+      throw new Error('admitted assignment requires exact native Dispatch binding');
+    }
+  }
+  if (current.some(item => !admission.assignments.some(expected => expected.assignment_id === item.assignment_id))) {
+    throw new Error('current assignment is outside parent admission');
+  }
+  return admission;
+}
+
+
+function supervisedProofReasons(goal, outcomes, assignments, integrations, status, admission) {
+  if (admission.mode !== 'supervised') return [];
+  const reasons = [], verified = new Map();
+  for (const item of status.parallel.assignments.filter(item => item.integrated)) {
+    const assignment = assignments.find(row => row.assignment_id === item.assignment_id);
+    const receipt = integrations.find(row => row.receipt_id === item.integration_receipt_id);
+    verified.set(assignment.assignment_id, {assignment, accepted:verifyManagedAcceptance(goal, assignment, receipt, admission)});
+  }
+  for (const proof of status.proofs.filter(item => item.required && item.stage_met)) {
+    const outcome = outcomes.find(item => item.receipt_id === proof.receipt_id);
+    const candidates = [...verified.values()].filter(item => item.assignment.acceptance_ids.includes(proof.id));
+    if (!candidates.length) {
+      reasons.push(`required proof ${proof.id} lacks current authenticated admitted parent integration coverage`);
+      continue;
+    }
+    const roots = outcome.repository_fingerprints.map(item => item.repo_root);
+    const covered = candidates.some(({accepted}) => outcome.evidence.every(evidence => {
+      try {
+        const resolved = require('./goal-evidence').verifyEvidenceItem(evidence, {roots}).resolved;
+        return accepted.payload.artifacts.some(artifact => artifact.kind === evidence.kind
+          && artifact.sha256 === evidence.sha256 && fs.realpathSync(artifact.path) === fs.realpathSync(resolved));
+      } catch { return false; }
+    }));
+    if (!covered) reasons.push(`required proof ${proof.id} outcome evidence does not match authenticated accepted artifacts`);
+  }
+  return reasons;
+}
+
+function alternativesSnapshot(goal, outcomes = [], assignments = [], integrations = []) {
+  return contractDigest({ lanes: goal.lanes, outcomes, assignments, integrations });
+}
+
+function alternativesReviewReasons(goal, outcomes, assignments, integrations, resume, now) {
+  const review = resume?.alternatives_review;
+  if (!review) return ['a current contract-bound alternatives review is required for a blocked claim'];
+  const reasons = [];
+  const observed = Date.parse(review.observed_at), expires = Date.parse(review.expires_at);
+  const latest = Math.max(Date.parse(goal.updated_at), ...outcomes.map(item => Date.parse(item.observed_at)),
+    ...integrations.map(item => Date.parse(item.observed_at)), ...assignments.map(item => Date.parse(item.issued_at)));
+  if (review.contract_sha256 !== goalContractDigest(goal)
+      || review.snapshot_sha256 !== alternativesSnapshot(goal, outcomes, assignments, integrations)
+      || !Number.isFinite(observed) || !Number.isFinite(expires) || observed < latest
+      || observed > Date.parse(resume.observed_at) || observed > now.getTime() || expires <= now.getTime()
+      || expires <= observed) reasons.push('alternatives review is stale, expired or not bound to current contract/dependencies');
+  const reviewed = new Set(review.lanes.map(item => item.lane_id));
+  if (reviewed.size !== review.lanes.length || reviewed.size !== goal.lanes.length
+      || goal.lanes.some(lane => !reviewed.has(lane.id))) reasons.push('alternatives review must cover every current lane exactly once');
+  for (const lane of review.lanes) {
+    const checkpoint = Date.parse(lane.next_checkpoint_at);
+    if (!Number.isFinite(checkpoint) || checkpoint <= now.getTime() || checkpoint > expires) {
+      reasons.push(`alternatives review ${lane.lane_id} needs a bounded future owner/remedy checkpoint`);
+    }
+    const kinds = new Set(lane.alternatives.map(item => item.kind));
+    if (kinds.size !== 3 || lane.alternatives.length !== 3) reasons.push(`alternatives review ${lane.lane_id} must review retained inputs, owned patches and integration seams`);
+    for (const alternative of lane.alternatives) {
+      if (alternative.disposition === 'ready') reasons.push(`independent ready work remains: ${lane.lane_id}/${alternative.kind}`);
+    }
+  }
+  return reasons;
+}
+
+function verifyManagedAcceptance(goal, assignment, receipt, admission = null) {
   const provenance = receipt.acceptance_provenance;
   if (!provenance || !path.isAbsolute(provenance.receipt_path)) {
     throw new Error('bound managed passing integration requires absolute acceptance provenance');
   }
   const digest = crypto.createHash('sha256').update(fs.readFileSync(provenance.receipt_path)).digest('hex');
   if (digest !== provenance.sha256) throw new Error('acceptance provenance hash mismatch');
-  require('./orca-acceptance').verifyIntegrationAcceptance(provenance.receipt_path, {
+  const accepted = require('./orca-acceptance').verifyIntegrationAcceptance(provenance.receipt_path, {
     goal, assignment, integrator: receipt.integrator, evidence: receipt.evidence, usage: receipt.usage,
   });
+  const expected = admission?.assignments.find(item => item.assignment_id === assignment.assignment_id);
+  if (expected && accepted.payload.worker_id !== expected.worker_id) throw new Error('acceptance uses a foreign admitted worker Dispatch');
+  return accepted;
 }
 
 function latestExecutableCorrection(goal) {
@@ -320,6 +422,7 @@ function validateBundle({
     const expiresAt = parseIso(assignment.lease_expires_at, `assignment ${assignment.assignment_id}.lease_expires_at`);
     if (expiresAt <= issuedAt) throw new Error(`assignment ${assignment.assignment_id} lease must expire after it is issued`);
   }
+  const admission = admissionForGoal(goal, assignments);
   ensureUniqueIds(integrations.map(item => item.receipt_id), 'integration receipt');
   const integrationsByAssignmentAndTime = new Map();
   const currentCorrection = latestExecutableCorrection(goal);
@@ -345,9 +448,9 @@ function validateBundle({
         && observedAt > Date.parse(currentCorrection.recorded_at)) {
       throw new Error(`integration receipt ${receipt.receipt_id} uses assignment ${assignment.assignment_id} from a superseded owner plan`);
     }
-    if (receipt.outcome === 'pass' && assignment.managed_execution
+    if (receipt.outcome === 'pass' && (assignment.managed_execution || admission?.mode === 'supervised')
         && assignmentBinding(goal, assignment, receipt) === 'current') {
-      verifyManagedAcceptance(goal, assignment, receipt);
+      verifyManagedAcceptance(goal, assignment, receipt, admission);
     }
     ensureUniqueIds(receipt.repository_fingerprints.map(item => item.repo_id), `repository fingerprint in ${receipt.receipt_id}`);
     const limits = assignment.budget;
@@ -363,7 +466,7 @@ function validateBundle({
       }
     }
     if (['superseded', 'not_adopted'].includes(receipt.outcome) && !receipt.limitations.length) throw new Error(`terminal assignment receipt ${receipt.receipt_id} requires a reason`);
-    const key = `${receipt.assignment_id}\u0000${receipt.observed_at}`;
+    const key = `${receipt.contract_sha256 || 'legacy'}\u0000${receipt.assignment_id}\u0000${receipt.observed_at}`;
     const prior = integrationsByAssignmentAndTime.get(key);
     if (prior && prior.outcome !== receipt.outcome) {
       throw new Error(`contradictory integration receipts ${prior.receipt_id} and ${receipt.receipt_id}`);
@@ -494,7 +597,7 @@ function validateBundle({
 function evaluateWatchdog(goal, outcomes = [], policy = null, activity = [], now = new Date()) {
   if (!policy) return { configured: false, healthy: true, breaches: [], metrics: null };
   const latestProofAt = [...latestOutcomeByProof(outcomes.filter(receipt => contractBinding(goal, receipt) === 'current')).values()]
-    .filter(receipt => receipt.outcome === 'pass')
+    .filter(receipt => receipt.outcome === 'pass' && receipt.status === 'accepted')
     .map(receipt => Date.parse(receipt.observed_at))
     .sort((left, right) => left - right)
     .at(-1) || Date.parse(goal.updated_at);
@@ -558,7 +661,10 @@ function evaluateWatchdog(goal, outcomes = [], policy = null, activity = [], now
 
 function buildParallelStatus(assignments = [], integrations = [], now = new Date(), correction = null, goal = null) {
   const latestByAssignment = new Map();
-  for (const receipt of integrations) {
+  const currentAssignments = new Map(assignments.map(item => [item.assignment_id, item]));
+  const current = integrations.filter(receipt => assignmentBinding(goal, currentAssignments.get(receipt.assignment_id), receipt) === 'current');
+  const eligible = goal ? integrations.filter(receipt => !current.some(item => item.assignment_id === receipt.assignment_id) || current.includes(receipt)) : integrations;
+  for (const receipt of eligible.filter(item => Date.parse(item.observed_at) <= now.getTime())) {
     const existing = latestByAssignment.get(receipt.assignment_id);
     if (!existing || Date.parse(receipt.observed_at) > Date.parse(existing.observed_at)) {
       latestByAssignment.set(receipt.assignment_id, receipt);
@@ -607,9 +713,11 @@ function buildParallelStatus(assignments = [], integrations = [], now = new Date
 function latestOutcomeByProof(outcomes) {
   const result = new Map();
   const superseded = new Set(outcomes.flatMap(receipt => receipt.supersedes));
-  for (const receipt of outcomes.filter(item => item.status === 'accepted' && !superseded.has(item.receipt_id))) {
+  for (const receipt of outcomes.filter(item => !superseded.has(item.receipt_id))) {
     const existing = result.get(receipt.acceptance_id);
-    if (!existing || Date.parse(receipt.observed_at) > Date.parse(existing.observed_at)) {
+    if (!existing || Date.parse(receipt.observed_at) > Date.parse(existing.observed_at)
+        || (Date.parse(receipt.observed_at) === Date.parse(existing.observed_at)
+          && (receipt.status === 'retracted' || receipt.outcome === 'fail'))) {
       result.set(receipt.acceptance_id, receipt);
     }
   }
@@ -617,7 +725,10 @@ function latestOutcomeByProof(outcomes) {
 }
 
 function buildStatus(goal, outcomes = [], now = new Date()) {
-  const latest = latestOutcomeByProof(outcomes);
+  const observed = outcomes.filter(receipt => Date.parse(receipt.observed_at) <= now.getTime());
+  const current = observed.filter(receipt => contractBinding(goal, receipt) === 'current');
+  const currentIds = new Set(current.map(receipt => receipt.acceptance_id));
+  const latest = latestOutcomeByProof(observed.filter(receipt => !currentIds.has(receipt.acceptance_id) || current.includes(receipt)));
   const proofs = goal.user_visible_proofs.map(proof => {
     const receipt = latest.get(proof.id) || null;
     const binding = contractBinding(goal, receipt);
@@ -628,6 +739,7 @@ function buildStatus(goal, outcomes = [], now = new Date()) {
       receipt
       && binding === 'current'
       && receipt.outcome === 'pass'
+      && receipt.status === 'accepted'
       && receipt.stage === proof.required_stage
       && evidenceMet
     );
@@ -740,6 +852,10 @@ function evaluateClaim(claim, bundle, options = {}) {
   }
 
   if (claim === 'complete') {
+    try {
+      const admission = admissionForGoal(goal, assignments, true);
+      reasons.push(...supervisedProofReasons(goal, outcomes, assignments, integrations, status, admission));
+    } catch (error) { reasons.push(`completion admission unverified: ${error.message}`); }
     if (!status.complete) reasons.push(`${unmet.length} required user-visible proof(s) remain unmet`);
     if (goal.status !== 'complete') reasons.push(`goal status is ${goal.status}, not complete`);
     if (!resume) reasons.push('a current resume receipt is required for a complete claim');
@@ -764,6 +880,7 @@ function evaluateClaim(claim, bundle, options = {}) {
     }
     reasons.push(...parallelBindingReasons());
   } else if (claim === 'blocked') {
+    reasons.push(...alternativesReviewReasons(goal, outcomes, assignments, integrations, resume, now));
     if (status.complete) reasons.push('all required proofs are met; use complete rather than blocked');
     if (!resume) reasons.push('a current resume receipt is required for a blocked claim');
     if (goal.status !== 'blocked') reasons.push(`goal status is ${goal.status}, not blocked`);
@@ -842,6 +959,8 @@ function evaluateClaim(claim, bundle, options = {}) {
 }
 
 module.exports = {
+  admissionForGoal,
+  alternativesSnapshot,
   goalContractDigest,
   assignmentContractDigest,
   assertDocument,

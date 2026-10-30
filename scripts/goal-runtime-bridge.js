@@ -10,6 +10,7 @@ const {
   classifyTaskText,
   inferClaim,
   completionIntent,
+  requireSupervisedIntent,
   loadCapabilities,
   runtimeById,
   validateCapabilities,
@@ -119,6 +120,12 @@ function main(args = process.argv.slice(2)) {
     let payload = {};
     try { payload = JSON.parse(raw || '{}'); } catch { /* Legacy text is advisory only. */ }
     const intent = completionIntent(payload);
+    if (fs.existsSync(path.resolve(goalPath))) {
+      const goals = require('./lib/goal-control');
+      const goal = goals.readStructuredFile(path.resolve(goalPath));
+      const assignments = goals.readJsonLines(path.resolve(goalDir, 'assignments.jsonl'));
+      requireSupervisedIntent(goals.admissionForGoal(goal, assignments), intent);
+    }
     if (intent) {
       const goal = require('./lib/goal-control').readStructuredFile(path.resolve(goalPath));
       const { goalContractDigest } = require('./lib/goal-control');

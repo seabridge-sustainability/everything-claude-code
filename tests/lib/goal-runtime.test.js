@@ -8,6 +8,7 @@ const {
   classifyTaskText,
   inferClaim,
   completionIntent,
+  requireSupervisedIntent,
   loadCapabilities,
   validateCapabilities,
 } = require('../../scripts/lib/goal-runtime');
@@ -77,6 +78,15 @@ test('final claim inference avoids explicit negative claims', () => {
   assert.strictEqual(inferClaim('The goal is not blocked as a whole.'), null);
   assert.strictEqual(inferClaim('The old prototype is not complete; the goal is complete.'), 'complete');
   assert.strictEqual(inferClaim('Done.'), 'complete');
+});
+
+test('supervised final turns require intent while progress remains unaccepted', () => {
+  assert.throws(() => requireSupervisedIntent({mode:'supervised'}, null), /explicit structured completion intent/);
+  for (const intent of ['progress','incomplete','complete']) {
+    assert.doesNotThrow(() => requireSupervisedIntent({mode:'supervised'}, {intent}));
+  }
+  assert.doesNotThrow(() => requireSupervisedIntent({mode:'single-agent'}, null));
+  assert.doesNotThrow(() => requireSupervisedIntent(null, null));
 });
 
 test('structured lifecycle intent is explicit and bound, independently of prose', () => {

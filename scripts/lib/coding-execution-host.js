@@ -26,6 +26,29 @@ function json(output){
   demand(Buffer.byteLength(output)<1024*1024,'host output too large');
   try{return JSON.parse(output);}catch{throw Error('invalid reviewed host JSON');}
 }
+// A host observes its own capacity and reserves independent authority. Neither
+// a worker count in a prompt nor an agent's own report supplies that authority.
+function reviewedWorkerGate(entry,plan,state,operation,workerId=null){
+  if(entry==null)return null;
+  demand(['capacity','independent-worker-admission'].includes(operation),'unknown worker admission operation');
+  demand(engine.digest(state.plan)===engine.digest(plan),'worker admission plan changed');
+  if(workerId!==null)demand(plan.workers.some(worker=>worker.id===workerId),'unknown admission worker');
+  const script=pin(entry);outsideWorkers(script,plan);
+  const request={version:1,operation,nonce:crypto.randomBytes(32).toString('hex'),
+    plan_sha256:engine.digest(plan),state_sha256:engine.digest(state),worker_id:workerId,state};
+  const child=spawnSync(process.execPath,[script],{cwd:plan.repo,input:JSON.stringify(request),
+    encoding:'utf8',windowsHide:true,timeout:1000,maxBuffer:16384});
+  demand(!child.error&&child.status===0,'reviewed worker admission unavailable');
+  const response=json(child.stdout);
+  demand(['version','operation','nonce','plan_sha256','state_sha256','worker_id']
+    .every(key=>response[key]===request[key]),'worker admission identity mismatch');
+  if(operation==='capacity'){
+    demand(Number.isSafeInteger(response.available_child_slots)&&response.available_child_slots>=0
+      &&typeof response.source==='string'&&response.source.trim().length>0,'invalid observed worker capacity');
+    return {available_child_slots:response.available_child_slots,source:response.source};
+  }
+  return response.allowed===true&&response.budget_independent===true;
+}
 // Opt-in cooperative journal for reviewed adapters that have no descendants.
 // This is not a sandbox or a claim that killing a PID stops a process tree.
 const JOURNAL='direct-child-v1';
@@ -222,7 +245,8 @@ function createBoundHost(spec,{stateFile,plan}){
   spec=structuredClone(spec);plan=structuredClone(plan);
   demand(spec?.version===1&&spec.plan_sha256===engine.digest(plan),'host config not bound to plan');
   demand(spec.timeout_ms>0&&spec.timeout_ms<=300000,'bounded process timeout required');
-  const protectedEntries=[spec.critic,...Object.values(spec.workers).flatMap(w=>[w.launch,w.check]),spec.approval_key];
+  const protectedEntries=[spec.critic,...Object.values(spec.workers).flatMap(w=>[w.launch,w.check]),spec.approval_key,
+    ...[spec.worker_capacity,spec.independent_worker_admission].filter(entry=>entry!==undefined)];
   for(const entry of protectedEntries){pin(entry);outsideWorkers(entry.path,plan);}
   regular(spec.approval_file);outsideWorkers(spec.approval_file,plan);
   demand(path.resolve(spec.receipts).startsWith(path.resolve(plan.repo)+path.sep),'receipt directory outside parent');
@@ -589,6 +613,12 @@ function createBoundHost(spec,{stateFile,plan}){
       budget:found.request.entry.budget}};
   }
   return {
+    readWorkerCapacity(state){
+      return reviewedWorkerGate(spec.worker_capacity,plan,state,'capacity');
+    },
+    verifyWorkerAdmission({worker,state}){
+      return reviewedWorkerGate(spec.independent_worker_admission,plan,state,'independent-worker-admission',worker.id)===true;
+    },
     async launchWorker(worker,control){
       const binding=spec.workers[worker.id];demand(binding,'worker adapter absent');
       const launched=await processCall(binding.launch,worker,worker.repo,control);
@@ -724,7 +754,7 @@ function createHost(context){
     'production workers require durable journal');
   return createBoundHost(spec,context);
 }
-module.exports={createHost,createBoundHost,pin};
+module.exports={createHost,createBoundHost,pin,reviewedWorkerGate};
 if(require.main===module){
   if(process.argv.length!==4||process.argv[2]!=='--failure-journal-child')process.exitCode=2;
   else runJournalChild(process.argv[3]).catch(()=>{process.exitCode=2;});

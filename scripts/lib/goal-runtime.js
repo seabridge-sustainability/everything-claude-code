@@ -158,6 +158,12 @@ function completionIntent(payload) {
   return value;
 }
 
+function requireSupervisedIntent(admission, intent) {
+  if (admission?.mode === 'supervised' && !intent) {
+    throw new Error('supervised final turn requires explicit structured completion intent; no acceptance granted');
+  }
+}
+
 module.exports = {
   ADAPTER_PATH,
   CAPABILITY_PATH,
@@ -166,6 +172,7 @@ module.exports = {
   classifyTaskText,
   inferClaim,
   completionIntent,
+  requireSupervisedIntent,
   loadCapabilities,
   runtimeById,
   validateCapabilities,

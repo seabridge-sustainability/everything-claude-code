@@ -249,6 +249,16 @@ function accountUsage(state, node, worker, usage) {
   const budget = assignmentFor(state.plan, worker).budget;
   if (state.spent_usd > state.plan.limits.usd || Object.entries(node.usage).some(([key,value]) => value > budget[`max_${key}`])) state.phase = 'budget-exhausted';
 }
+// Reconciliation usage is cumulative for the original token, not another bill.
+function accountAttemptUsage(state, node, worker, usage) {
+  assert('usage', usage);
+  const previous = node.reconciliation?.usage;
+  const delta = Object.fromEntries(Object.entries(usage).map(([key,value]) => {
+    demand(!previous || value >= previous[key], 'attempt usage regressed during reconciliation');
+    return [key,value-(previous?.[key] ?? 0)];
+  }));
+  accountUsage(state,node,worker,delta);
+}
 function apply(state, event, options = {}) {
   validateState(state);
   const now = options.now ?? Date.now();
@@ -260,9 +270,19 @@ function apply(state, event, options = {}) {
   const evidence = (requireReview = next.critique?.accepted === true) => currentEvidence(next, options.authorizeCitation, options.verifyPreservation, requireReview);
   switch (event.type) {
     case 'dispatch': {
-      parent(); demand(['planned','repair'].includes(next.phase), 'dispatch requires planned/repair phase');
-      const pending = plan.workers.filter(worker => next.nodes[worker.id].status === 'pending');
-      demand(pending.length > 0, 'no pending nodes'); pending.forEach(live);
+      parent(); demand(['planned','repair','workers'].includes(next.phase), 'dispatch requires planned/repair/workers phase');
+      const unresolved = plan.workers.filter(worker => next.nodes[worker.id].status === 'running');
+      let pending = plan.workers.filter(worker => next.nodes[worker.id].status === 'pending');
+      demand(pending.length > 0, 'no pending nodes');
+      if (event.capacity !== undefined) assert('capacity',event.capacity);
+      // No unknown shared spend may buy another launch. Only a trusted parent
+      // can establish a separate reservation and authority for this worker.
+      if (unresolved.length) pending = pending.filter(worker => typeof options.verifyWorkerAdmission === 'function'
+        && options.verifyWorkerAdmission({worker:structuredClone(worker),state:structuredClone(next),
+          unresolved:structuredClone(unresolved)},structuredClone(plan)) === true);
+      if (event.capacity !== undefined) pending = pending.slice(0,event.capacity.available_child_slots);
+      if (!pending.length) break;
+      pending.forEach(live);
       if (next.spent_usd > plan.limits.usd || next.dispatches + pending.length > plan.limits.dispatches || pending.some(w => {
         const node=next.nodes[w.id],budget=assignmentFor(plan,w).budget;
         return node.attempts >= w.max_attempts || node.usage.tool_calls >= budget.max_tool_calls
@@ -283,7 +303,7 @@ function apply(state, event, options = {}) {
       const recovering=event.type==='recover-result';
       if(recovering){
         parent();
-        demand(['workers','repair'].includes(next.phase),'result recovery requires active worker reconciliation');
+        demand(['workers','repair','budget-exhausted'].includes(next.phase),'result recovery requires active worker reconciliation');
       }
       assert('result', event.result);
       const result = event.result, worker = plan.workers.find(w => w.id === result.worker);
@@ -326,7 +346,8 @@ function apply(state, event, options = {}) {
         // healthy result. Retaining verified output grants no new dispatch.
         node.result=result;node.status='done';evidence();
       }
-      accountUsage(next,node,worker,result.usage);
+      accountAttemptUsage(next,node,worker,result.usage);
+      delete node.reconciliation;
       if (next.phase === 'budget-exhausted') break;
       maybeJoin(next);break;
     }
@@ -336,7 +357,13 @@ function apply(state, event, options = {}) {
       const node = next.nodes[worker.id]; demand(node.status === 'running' && node.token === event.token, 'stale worker error');
       next.history.push({ error: 'worker-launch-or-execution-failed', worker: worker.id, attempt: node.attempts });
       // A reported failure is not proof this exact attempt stopped.
-      if (!event.cessation) { next.phase = 'budget-exhausted'; break; }
+      if (!event.cessation) {
+        if (event.usage) accountAttemptUsage(next,node,worker,event.usage);
+        node.reconciliation = { reason:'cessation-unverified', usage:event.usage ?? node.reconciliation?.usage ?? null };
+        // The original token remains live. Uncertainty is not measured global
+        // exhaustion; dispatch separately enforces independent admission.
+        break;
+      }
       const cessation = event.cessation;
       demand(cessation.worker === worker.id && cessation.token === node.token
         && cessation.status === 'failed' && Number.isSafeInteger(cessation.confirmed_at)
@@ -346,9 +373,13 @@ function apply(state, event, options = {}) {
           cessation: structuredClone(cessation), revision: plan.revision, environment: plan.environment }, structuredClone(plan)) === true,
       'trusted exact-attempt cessation evidence required');
       // Unknown failed-attempt spending must not buy another attempt.
-      if (!event.usage) { next.phase = 'budget-exhausted'; break; }
+      if (!event.usage) {
+        node.reconciliation = {reason:'spend-unverified',usage:node.reconciliation?.usage ?? null};
+        break;
+      }
+      accountAttemptUsage(next,node,worker,event.usage);
+      delete node.reconciliation;
       node.status = 'pending'; node.token = null;
-      accountUsage(next,node,worker,event.usage);
       if (next.phase !== 'budget-exhausted') next.phase = 'repair'; break;
     }
     case 'critic-usage': {
@@ -511,7 +542,7 @@ function create(file, plan) {
 async function dispatchParallel(file, launch, options = {}) {
   demand(typeof launch === 'function', 'explicit admitted worker launcher required');
   const before = load(file);
-  const state = transaction(file, current => apply(current, { type: 'dispatch', actor: current.plan.parent }, options));
+  const state = transaction(file, current => apply(current, { type: 'dispatch', actor: current.plan.parent, ...(options.capacity ? {capacity:options.capacity} : {}) }, options));
   if (state.phase === 'budget-exhausted') return state;
   const running = state.plan.workers.filter(w => state.nodes[w.id].status === 'running' && state.nodes[w.id].token !== before.nodes[w.id].token);
   // Launchers must provide their own native sandbox/tool restrictions. Persist
@@ -529,6 +560,8 @@ async function dispatchParallel(file, launch, options = {}) {
     }
     transaction(file, current => apply(current, { type: 'result', actor: worker.agent, result }, options));
   }));
+  // Direct engine callers retain caller-managed capacity for compatibility.
+  // Only the runner requires a trusted slot observation before dispatch.
   return load(file);
 }
 module.exports = { assert, digest, initialize, apply, create, load, transaction, dispatchParallel, currentEvidence, recoverLock, verifySyntheticArtifacts, verifySyntheticReceipt };

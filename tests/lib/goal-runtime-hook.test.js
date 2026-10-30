@@ -48,10 +48,10 @@ const tests = [
       const bound = { version: 1, intent: 'incomplete', goal_id: goal.goal_id, session_id: 'bound-final',
         contract_sha256: require('../../scripts/lib/goal-control').goalContractDigest(goal) };
       const bridge = path.resolve(__dirname, '../../scripts/goal-runtime-bridge.js');
-      const call = intent => spawnSync(process.execPath, [bridge, 'final-hook', '--runtime', 'codex', '--dir', folder,
+      const call = (intent, env = process.env) => spawnSync(process.execPath, [bridge, 'final-hook', '--runtime', 'codex', '--dir', folder,
         '--session', 'bound-final'], { cwd: dir, input: JSON.stringify({ ecc_completion: intent,
-        response: intent.intent === 'complete' ? 'All requested deliverables are implemented and verified.'
-          : 'Still verifying the required output.' }), encoding: 'utf8', windowsHide: true });
+        response: intent?.intent === 'complete' ? 'All requested deliverables are implemented and verified.'
+          : 'Still verifying the required output.' }), env, encoding: 'utf8', windowsHide: true });
       const progress = call(bound);
       assert.strictEqual(progress.status, 0, progress.stderr);
       assert.strictEqual(JSON.parse(progress.stdout).acceptance, 'not_accepted');
@@ -60,6 +60,34 @@ const tests = [
       assert.match(complete.stdout, /required.*proof|not complete|not verified|remain unmet/i);
       assert.strictEqual(call({ ...bound, contract_sha256: 'b'.repeat(64) }).status, 1);
       assert.strictEqual(call({ ...bound, session_id: 'other' }).status, 1);
+      // Exercise the actual bridge with pinned synthetic admission. This is a
+      // subprocess contract check, not proof of installed Orca interception.
+      const goals = require('../../scripts/lib/goal-control');
+      const store = require('../../scripts/lib/goal-store');
+      const digest = value => store.sha256Buffer(store.canonicalJson(value));
+      const assignment = {schema:'ecc.assignment.v1',assignment_id:'worker',goal_id:goal.goal_id,
+        description:'Verify output',acceptance_ids:['required'],owner_runtime:'codex',owner_agent:'worker',
+        scope_paths:['README.md'],issued_at:now,lease_expires_at:new Date(Date.now()+3600000).toISOString(),
+        budget:{max_tool_calls:5,max_retries:0,max_ci_runs:0,max_cost_usd:0},source_harness:'fixture',
+        contract_sha256:goals.goalContractDigest(goal)};
+      assignment.assignment_contract_sha256 = goals.assignmentContractDigest(goal,assignment);
+      fs.writeFileSync(path.join(folder,'assignments.jsonl'),JSON.stringify(assignment)+'\n');
+      const key = path.join(folder,'public.pem');
+      fs.writeFileSync(key,require('crypto').generateKeyPairSync('ed25519').publicKey.export({type:'spki',format:'pem'}));
+      const config = {version:1,run_id:'fixture-run',parent_orca_session_id:'fixture-parent',runtime_id:'fixture-host',
+        cli:{path:bridge,sha256:store.sha256File(bridge)},public_key:{path:key,sha256:store.sha256File(key)},
+        bindings:[{worker_id:'worker',task_id:'task',dispatch_id:'dispatch',process_incarnation:'incarnation',host_id:'local'}],
+        goal_admission:{goal_id:goal.goal_id,contract_sha256:bound.contract_sha256,mode:'supervised',
+          assignments:[{assignment_id:'worker',worker_id:'worker',sha256:digest(assignment)}]}};
+      const configFile = path.join(folder,'parent.json');fs.writeFileSync(configFile,JSON.stringify(config));
+      const env = {...process.env,ECC_ORCA_ACCEPTANCE_CONFIG:configFile,
+        ECC_ORCA_ACCEPTANCE_CONFIG_SHA256:store.sha256File(configFile)};
+      const missing = call(undefined,env);
+      assert.strictEqual(missing.status,1,missing.stdout+missing.stderr);
+      assert.match(missing.stderr,/explicit structured completion intent/);
+      const supervisedProgress = call(bound,env);
+      assert.strictEqual(supervisedProgress.status,0,supervisedProgress.stderr);
+      assert.strictEqual(JSON.parse(supervisedProgress.stdout).acceptance,'not_accepted');
     } finally { fs.rmSync(dir, { recursive: true, force: true }); }
   }],
   ['neutral completed handoff is not a product completion claim', () => {

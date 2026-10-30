@@ -8,6 +8,8 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 
 const {
+  alternativesSnapshot,
+  admissionForGoal,
   buildStatus,
   buildParallelStatus,
   goalContractDigest,
@@ -263,7 +265,24 @@ function activityEvent(id, kind, observedAt, overrides = {}) {
 }
 
 function run(script, args, cwd) {
-  return spawnSync('node', [script, ...args], { cwd, encoding: 'utf8' });
+  // Explicit parent-controlled single-agent admission for legacy CLI fixtures.
+  // Delegated fixtures deliberately get no admission and remain non-accepting.
+  const directory=path.join(cwd,'.ecc','goal'), goalFile=path.join(directory,'active-goal.yaml');
+  let env=process.env;
+  if(args[0]==='claim' && args[1]==='complete' && fs.existsSync(goalFile)) {
+    const ledger=path.join(directory,'assignments.jsonl');
+    if(!fs.existsSync(ledger) || !fs.readFileSync(ledger,'utf8').trim()) {
+      const store=require('../../scripts/lib/goal-store'), selected=yaml.load(fs.readFileSync(goalFile,'utf8'));
+      const configFile=path.join(directory,'fixture-parent-trust.json'), key=path.join(directory,'fixture-parent.pub');
+      const publicKey=crypto.generateKeyPairSync('ed25519').publicKey;
+      fs.writeFileSync(key,publicKey.export({format:'pem',type:'spki'}));
+      fs.writeFileSync(configFile,JSON.stringify({version:1,run_id:'fixture',runtime_id:'fixture',parent_orca_session_id:'fixture',
+        cli:{path:process.execPath,sha256:store.sha256File(process.execPath)},public_key:{path:key,sha256:store.sha256File(key)},
+        goal_admission:{goal_id:selected.goal_id,contract_sha256:goalContractDigest(selected),mode:'single-agent',assignments:[]}}));
+      env={...process.env,ECC_ORCA_ACCEPTANCE_CONFIG:configFile,ECC_ORCA_ACCEPTANCE_CONFIG_SHA256:store.sha256File(configFile)};
+    }
+  }
+  return spawnSync('node', [script, ...args], { cwd, encoding: 'utf8', env });
 }
 
 function runGit(args, cwd) {
@@ -284,6 +303,39 @@ function materializeEvidence(receipt, dir) {
     };
   });
   return receipt;
+}
+
+
+function reviewAlternatives(bundle) {
+  const observed = bundle.resume.observed_at;
+  bundle.resume.alternatives_review = {
+    contract_sha256: goalContractDigest(bundle.goal),
+    snapshot_sha256: alternativesSnapshot(bundle.goal, bundle.outcomes || [], bundle.assignments || [], bundle.integrations || []),
+    observed_at: observed, expires_at: '2099-01-01T00:00:00Z',
+    lanes: bundle.goal.lanes.map(lane => ({lane_id:lane.id, dependency:lane.blocker || 'No unmet dependency',
+      owner:'source-owner', remedy:lane.next_action || 'Obtain eligible source or method', next_checkpoint_at:'2099-01-01T00:00:00Z',
+      alternatives:['retained_inputs','owned_patch','integration_seam'].map(kind => ({kind,disposition:'unavailable',
+        reason:'Reviewed exact retained source and owned implementation; no admitted independent action.',evidence:'fixture://bounded-independent-review'}))})),
+  };
+  return bundle;
+}
+function withParentConfig(config, fn) {
+  const adapter = require('../../scripts/lib/orca-acceptance'), previous = adapter.loadTrust;
+  const old = process.env.ECC_ORCA_ACCEPTANCE_CONFIG, oldHash = process.env.ECC_ORCA_ACCEPTANCE_CONFIG_SHA256;
+  process.env.ECC_ORCA_ACCEPTANCE_CONFIG = 'unit-test-parent-config';
+  adapter.loadTrust = () => config;
+  if (config.public_key) {
+    const store = require('../../scripts/lib/goal-store');
+    config.version = 1; config.cli = {path:process.execPath,sha256:store.sha256File(process.execPath)};
+    const file = path.join(path.dirname(config.public_key.path),'trust.json');fs.writeFileSync(file,JSON.stringify(config));
+    process.env.ECC_ORCA_ACCEPTANCE_CONFIG=file;process.env.ECC_ORCA_ACCEPTANCE_CONFIG_SHA256=store.sha256File(file);
+    adapter.loadTrust=previous;
+  }
+  try { return fn(); } finally { adapter.loadTrust = previous; if (old === undefined) delete process.env.ECC_ORCA_ACCEPTANCE_CONFIG; else process.env.ECC_ORCA_ACCEPTANCE_CONFIG = old; if(oldHash===undefined)delete process.env.ECC_ORCA_ACCEPTANCE_CONFIG_SHA256;else process.env.ECC_ORCA_ACCEPTANCE_CONFIG_SHA256=oldHash; }
+}
+function singleAgentClaim(claim, bundle, options) {
+  return withParentConfig({goal_admission:{goal_id:bundle.goal.goal_id,contract_sha256:goalContractDigest(bundle.goal),mode:'single-agent',assignments:[]}},
+    () => evaluateClaim(claim,bundle,options));
 }
 
 const tests = [];
@@ -311,7 +363,7 @@ test('denies complete when required user-visible proof is missing', () => {
 });
 
 test('allows complete only when every required proof has sufficient evidence', () => {
-  const result = evaluateClaim('complete', {
+  const result = singleAgentClaim('complete', {
     goal: goal({ status: 'complete' }),
     outcomes: [
       outcome('r1', 'heat-browser', 'ui_displayed'),
@@ -340,7 +392,8 @@ test('parent cannot count delegated work complete without a passing integration 
     ...base,
     integrations: [integration()],
   }, { now: '2026-09-29T15:00:00Z' });
-  assert.strictEqual(integrated.allowed, true);
+  assert.strictEqual(integrated.allowed, false);
+  assert.match(integrated.reasons.join(' '), /completion admission unverified/);
 });
 
 test('assignment integration enforces owner separation, lease, and budgets', () => {
@@ -575,11 +628,12 @@ test('allows blocked only when every unmet lane is blocked and no independent wo
     outcomes: [],
     resume: resume({ blocked_lanes: ['product', 'science'] }),
   });
-  assert.strictEqual(result.allowed, true);
+  assert.strictEqual(result.allowed, false);
+  assert.match(result.reasons.join(' '), /alternatives review is required/);
 });
 
 function blockedBundle(overrides = {}) {
-  return {
+  return reviewAlternatives({
     goal: goal({
       status: 'blocked',
       lanes: [
@@ -590,7 +644,7 @@ function blockedBundle(overrides = {}) {
     outcomes: [],
     resume: resume({ blocked_lanes: ['product', 'science'] }),
     ...overrides,
-  };
+  });
 }
 
 for (const mapping of ['unmapped', 'optional', 'already-met']) {
@@ -621,7 +675,7 @@ test('blocked claim preserves complete/deferred lanes and dependency remedies', 
     bundle.goal.lanes.push({ id: status, description: status, status, blocker: null, next_action: 'Historical or deferred task.' });
   }
   bundle.goal.lanes[0].next_action = 'Obtain missing eligible source inputs from their owner.';
-  assert.strictEqual(evaluateClaim('blocked', bundle).allowed, true);
+  assert.strictEqual(evaluateClaim('blocked', reviewAlternatives(bundle)).allowed, true);
 });
 
 for (const harness of ['codex', 'claude', 'gemini', 'opencode', 'copilot-local', 'copilot-cli']) {
@@ -633,7 +687,7 @@ for (const harness of ['codex', 'claude', 'gemini', 'opencode', 'copilot-local',
     assert.strictEqual(result.allowed, false);
     assert.match(result.reasons.join(' '), /resume receipt predates the active goal update/);
     bundle.resume.observed_at = '2026-09-29T15:30:00Z';
-    assert.strictEqual(evaluateClaim('blocked', bundle).allowed, true);
+    assert.strictEqual(evaluateClaim('blocked', reviewAlternatives(bundle)).allowed, true);
   });
 
   test(`blocked freshness denies stale outcome snapshot for ${harness}`, () => {
@@ -644,7 +698,7 @@ for (const harness of ['codex', 'claude', 'gemini', 'opencode', 'copilot-local',
     assert.strictEqual(result.allowed, false);
     assert.match(result.reasons.join(' '), /resume receipt predates the latest outcome evidence/);
     bundle.resume.observed_at = '2026-09-29T15:30:00Z';
-    assert.strictEqual(evaluateClaim('blocked', bundle).allowed, true);
+    assert.strictEqual(evaluateClaim('blocked', reviewAlternatives(bundle)).allowed, true);
   });
 
   test(`blocked freshness denies unexplained blockers for ${harness}`, () => {
@@ -669,7 +723,7 @@ for (const harness of ['codex', 'claude', 'gemini', 'opencode', 'copilot-local',
       limitations: ['Worker result was not adopted; eligible scientific inputs remain unavailable.'],
     })];
     bundle.resume.observed_at = '2026-09-29T15:30:00Z';
-    const retired = evaluateClaim('blocked', bundle, { now: '2026-09-29T16:00:00Z' });
+    const retired = evaluateClaim('blocked', reviewAlternatives(bundle), { now: '2026-09-29T16:00:00Z' });
     assert.strictEqual(retired.allowed, true);
     assert.strictEqual(retired.status.complete, false);
   });
@@ -689,7 +743,7 @@ for (const claim of ['blocked', 'complete']) {
     assert.strictEqual(stale.allowed, false);
     assert.match(stale.reasons.join(' '), /resume receipt predates the latest outcome evidence/);
     bundle.resume.observed_at = '2026-09-29T18:30:00Z';
-    assert.strictEqual(evaluateClaim(claim, bundle, { now: '2026-09-29T19:00:00Z' }).allowed, true);
+    assert.strictEqual((claim === 'complete' ? singleAgentClaim : evaluateClaim)(claim, reviewAlternatives(bundle), { now: '2026-09-29T19:00:00Z' }).allowed, true);
   });
 }
 
@@ -791,7 +845,8 @@ test('a create-only retraction removes a superseded successful outcome', () => {
   };
   const status = buildStatus(goal(), [accepted, retracted], new Date('2026-09-29T15:00:00Z'));
   assert.strictEqual(status.proofs[0].met, false);
-  assert.strictEqual(status.proofs[0].achieved_stage, null);
+  assert.strictEqual(status.proofs[0].receipt_id, 'r2');
+  assert.strictEqual(status.proofs[0].stage_met, false);
 });
 
 test('a later failing observation invalidates stale success without preferring the old high point', () => {
@@ -1230,7 +1285,8 @@ test('real CLI assigns bounded work and requires parent integration before compl
       '--observed-at', '2026-09-29T15:30:00Z',
     ], dir).status, 0);
     claim = run(CLI, ['claim', 'complete', '--json', '--now', '2026-09-29T15:30:00Z'], dir);
-    assert.strictEqual(claim.status, 0, claim.stderr || claim.stdout);
+    assert.strictEqual(claim.status, 2, claim.stderr || claim.stdout);
+    assert.match(claim.stdout, /completion admission unverified/);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }
@@ -1720,6 +1776,111 @@ test('cumulative watchdog accounting survives tactic, policy and proof windows',
   assert.deepStrictEqual(result.breaches.sort(), ['ci_budget', 'cost_budget', 'retry_budget']);
   assert.strictEqual(result.metrics.cost_usd, 0);
   assert.strictEqual(result.metrics.retries, 0);
+});
+
+
+test('parent admission rejects empty ledgers, stripped bindings and missing trusted mode', () => {
+  const work = assignment({managed_execution:{repository_root:'C:/worktree',session_id:'worker',closure_reserve:1}});
+  const adapter = require('../../scripts/lib/orca-acceptance');
+  const config = {goal_admission:{goal_id:goal().goal_id,contract_sha256:goalContractDigest(goal()),mode:'supervised',
+    assignments:[{assignment_id:work.assignment_id,sha256:adapter.hash(work),worker_id:'native-worker'}]},
+    bindings:[{worker_id:'native-worker',task_id:'task',dispatch_id:'dispatch',process_incarnation:'native:1',host_id:'host'}]};
+  withParentConfig(config, () => {
+    for (const assignments of [[], undefined]) assert.throws(() => validateBundle({goal:goal(),assignments}), /admitted assignment missing/);
+    const stripped = {...work}; delete stripped.managed_execution;
+    assert.throws(() => validateBundle({goal:goal(),assignments:[stripped]}), /stripped or changed/);
+    config.goal_admission.assignments[0].sha256 = adapter.hash(stripped);
+    assert.throws(() => validateBundle({goal:goal(),assignments:[stripped],integrations:[integration()]}), /absolute acceptance provenance/);
+    config.goal_admission.assignments = [];
+    assert.throws(() => admissionForGoal(goal(),[]), /parent goal admission/);
+  });
+  withParentConfig({}, () => assert.throws(() => admissionForGoal(goal(),[]), /parent goal admission/));
+  const result = evaluateClaim('complete',{goal:goal({status:'complete'}),outcomes:[outcome('heat','heat-browser','ui_displayed'),outcome('flood','flood-validation','independently_validated')],resume:resume()});
+  assert.strictEqual(result.allowed,false);
+  assert.match(result.reasons.join(' '),/completion admission unverified/);
+  assert.strictEqual(singleAgentClaim('complete',{goal:goal({status:'complete'}),outcomes:[outcome('heat','heat-browser','ui_displayed'),outcome('flood','flood-validation','independently_validated')],resume:resume()}).allowed,true);
+  assert.throws(() => withParentConfig({goal_admission:{goal_id:goal().goal_id,contract_sha256:goalContractDigest(goal()),mode:'single-agent',assignments:[]}},
+    () => validateBundle({goal:goal(),assignments:[assignment()]})), /cannot downgrade delegated work/);
+});
+
+test('supervised acceptance verifies signatures and exact native Dispatch even without managed_execution', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(),'ecc-goal-signed-'));
+  try {
+    const adapter = require('../../scripts/lib/orca-acceptance'), store = require('../../scripts/lib/goal-store');
+    const keys = crypto.generateKeyPairSync('ed25519');
+    const key = path.join(dir,'parent.pub'), state = path.join(dir,'state.json'), artifact = path.join(dir,'result.json'), receiptPath=path.join(dir,'accepted.json');
+    fs.writeFileSync(key, keys.publicKey.export({format:'pem',type:'spki'}));fs.writeFileSync(state,'{}');fs.writeFileSync(artifact,'{"actual":true}');
+    const work=assignment(), receipt=integration({evidence:[{kind:'browser',ref:artifact,sha256:store.sha256File(artifact)},{kind:'independent_validation',ref:artifact,sha256:store.sha256File(artifact)}]});
+    const binding={worker_id:'worker',dispatch_id:'dispatch',task_id:'task',process_incarnation:'native:1',host_id:'host'};
+    const config={run_id:'run',parent_orca_session_id:'parent',runtime_id:'runtime',public_key:{path:key,sha256:store.sha256File(key)},bindings:[binding],
+      goal_admission:{goal_id:goal().goal_id,contract_sha256:goalContractDigest(goal()),mode:'supervised',assignments:[{assignment_id:work.assignment_id,sha256:adapter.hash(work),worker_id:'worker'}]}};
+    const payload={version:1,verdict:'accepted',goal_id:goal().goal_id,contract_sha256:goalContractDigest(goal()),assignment_id:work.assignment_id,
+      assignment_sha256:adapter.hash(work),integrator:receipt.integrator,worker_agent:work.owner_agent,critic:'critic',parent_orca_session_id:'parent',run_id:'run',...binding,
+      accepted_at:receipt.observed_at,expires_at:work.lease_expires_at,evidence_sha256:adapter.evidenceDigest(receipt.evidence),usage:receipt.usage,
+      artifacts:receipt.evidence.map(item => ({kind:item.kind,path:artifact,sha256:item.sha256})),execution_state:state,execution_sha256:store.sha256File(state)};
+    function write(p) { fs.writeFileSync(receiptPath,JSON.stringify({payload:p,signature:crypto.sign(null,Buffer.from(store.canonicalJson(p)),keys.privateKey).toString('base64')}));receipt.acceptance_provenance={receipt_path:receiptPath,sha256:store.sha256File(receiptPath)}; }
+    withParentConfig(config, () => {
+      write(payload);assert.doesNotThrow(() => validateBundle({goal:goal(),assignments:[work],integrations:[receipt]}));
+      const completion={goal:goal({status:'complete'}),assignments:[work],integrations:[receipt],outcomes:[outcome('heat','heat-browser','ui_displayed'),outcome('flood','flood-validation','independently_validated')],resume:resume({observed_at:'2026-09-29T15:00:00Z'})};
+      completion.outcomes.forEach(row => {row.evidence=[{kind:row.evidence[0].kind,ref:artifact,sha256:store.sha256File(artifact)}];});
+      const uncovered=evaluateClaim('complete',completion);
+      assert.strictEqual(uncovered.allowed,false);assert.match(uncovered.reasons.join(' '),/flood-validation lacks current authenticated/);
+      work.acceptance_ids.push('flood-validation');work.assignment_contract_sha256=assignmentContractDigest(goal(),work);
+      receipt.assignment_contract_sha256=work.assignment_contract_sha256;
+      payload.assignment_sha256=adapter.hash(work);config.goal_admission.assignments[0].sha256=adapter.hash(work);
+      const trustFile=process.env.ECC_ORCA_ACCEPTANCE_CONFIG;
+      fs.writeFileSync(trustFile,JSON.stringify(config));process.env.ECC_ORCA_ACCEPTANCE_CONFIG_SHA256=store.sha256File(trustFile);
+      write(payload);assert.strictEqual(evaluateClaim('complete',completion).allowed,true);
+      completion.outcomes[1].evidence[0].sha256='f'.repeat(64);
+      const mismatched=evaluateClaim('complete',completion);
+      assert.strictEqual(mismatched.allowed,false);assert.match(mismatched.reasons.join(' '),/outcome evidence does not match authenticated accepted artifacts/);
+      completion.outcomes[1].evidence[0].sha256=store.sha256File(artifact);
+      write({...payload,dispatch_id:'foreign-dispatch'});
+      assert.throws(() => validateBundle({goal:goal(),assignments:[work],integrations:[receipt]}), /native attempt binding changed/);
+      write(payload);const forged=JSON.parse(fs.readFileSync(receiptPath));forged.payload.integrator='attacker';fs.writeFileSync(receiptPath,JSON.stringify(forged));receipt.acceptance_provenance.sha256=store.sha256File(receiptPath);
+      assert.throws(() => validateBundle({goal:goal(),assignments:[work],integrations:[receipt]}), /signature invalid/);
+    });
+  } finally { fs.rmSync(dir,{recursive:true,force:true}); }
+});
+
+test('current contract is selected before history timestamps and retains failures/retractions', () => {
+  const current=outcome('current','heat-browser','ui_displayed');
+  const historical={...outcome('foreign','heat-browser','ui_displayed','2026-09-29T15:00:00Z'),contract_sha256:'f'.repeat(64),outcome:'fail',supersedes:['current']};
+  assert.strictEqual(buildStatus(goal(),[current,historical],new Date('2026-09-29T16:00:00Z')).proofs[0].met,true);
+  for (const delta of [{outcome:'fail'},{status:'retracted'}]) {
+    const rejected={...outcome('rejected','heat-browser','ui_displayed','2026-09-29T14:00:00Z'),...delta};
+    const result=buildStatus(goal(),[current,historical,rejected],new Date('2026-09-29T16:00:00Z'));
+    assert.strictEqual(result.proofs[0].met,false);assert.strictEqual(result.proofs[0].receipt_id,'rejected');
+  }
+  const future={...current,receipt_id:'future',observed_at:'2026-09-30T12:00:00Z'};
+  assert.strictEqual(buildStatus(goal(),[future],new Date('2026-09-29T16:00:00Z')).proofs[0].met,false);
+  const tied={...current,receipt_id:'tied',status:'retracted'};
+  assert.strictEqual(buildStatus(goal(),[current,tied],new Date('2026-09-29T16:00:00Z')).proofs[0].met,false);
+  const accepted=integration(), stale={...integration({receipt_id:'stale',observed_at:'2026-09-29T16:00:00Z',outcome:'fail'}),contract_sha256:'f'.repeat(64)};
+  const now=new Date('2026-09-29T17:00:00Z');
+  assert.strictEqual(buildParallelStatus([assignment()],[accepted,stale],now,null,goal()).integrated,1);
+  const failure=integration({receipt_id:'current-failure',observed_at:'2026-09-29T15:00:00Z',outcome:'fail'});
+  assert.strictEqual(buildParallelStatus([assignment()],[accepted,stale,failure],now,null,goal()).integrated,0);
+});
+
+test('blocked alternatives review rejects missing, stale, ready and unbounded dependency dispositions', () => {
+  const now={now:'2026-09-29T14:00:00Z'}, bundle=blockedBundle();
+  bundle.resume.alternatives_review.expires_at='2026-09-29T16:00:00Z';
+  bundle.resume.alternatives_review.lanes.forEach(lane => {lane.next_checkpoint_at='2026-09-29T16:00:00Z';});
+  assert.strictEqual(evaluateClaim('blocked',bundle,now).allowed,true);
+  const missing=structuredClone(bundle);delete missing.resume.alternatives_review;
+  assert.strictEqual(evaluateClaim('blocked',missing,now).allowed,false);
+  for (const mutate of [
+    b=>{b.resume.alternatives_review.contract_sha256='f'.repeat(64);},
+    b=>{b.goal.lanes[0].blocker='Changed dependency';},
+    b=>{b.integrations=[integration({outcome:'fail'})];b.assignments=[assignment()];},
+    b=>{b.resume.alternatives_review.lanes[0].alternatives[0].disposition='ready';},
+    b=>{b.resume.alternatives_review.lanes[0].next_checkpoint_at='invalid';},
+    b=>{b.resume.alternatives_review.expires_at='2026-09-29T13:45:00Z';},
+    b=>{b.resume.alternatives_review.lanes.pop();},
+  ]) {const changed=structuredClone(bundle);mutate(changed);assert.strictEqual(evaluateClaim('blocked',changed,now).allowed,false);}
+  const ownerless=structuredClone(bundle);delete ownerless.resume.alternatives_review.lanes[0].owner;
+  assert.throws(() => evaluateClaim('blocked',ownerless,now), /invalid resume receipt/);
 });
 
 (async () => {
