@@ -321,10 +321,13 @@ function apply(state, event, options = {}) {
         // ownership and independent semantic preservation before charging it.
         // Mark this token consumed even if its usage exhausts the budget.
         node.result=result;node.status='done';evidence(true);
+      } else {
+        // A peer's budget/cessation stop must not discard an already-returned
+        // healthy result. Retaining verified output grants no new dispatch.
+        node.result=result;node.status='done';evidence();
       }
       accountUsage(next,node,worker,result.usage);
       if (next.phase === 'budget-exhausted') break;
-      if(!recovering){node.result=result;node.status='done';evidence();}
       maybeJoin(next);break;
     }
     case 'worker-error': {
@@ -332,9 +335,19 @@ function apply(state, event, options = {}) {
       demand(event.actor === worker.agent, 'worker identity mismatch');
       const node = next.nodes[worker.id]; demand(node.status === 'running' && node.token === event.token, 'stale worker error');
       next.history.push({ error: 'worker-launch-or-execution-failed', worker: worker.id, attempt: node.attempts });
-      node.status = 'pending'; node.token = null;
+      // A reported failure is not proof this exact attempt stopped.
+      if (!event.cessation) { next.phase = 'budget-exhausted'; break; }
+      const cessation = event.cessation;
+      demand(cessation.worker === worker.id && cessation.token === node.token
+        && cessation.status === 'failed' && Number.isSafeInteger(cessation.confirmed_at)
+        && cessation.confirmed_at <= now
+        && typeof options.verifyStoppedAttempt === 'function'
+        && options.verifyStoppedAttempt({ worker: structuredClone(worker), node: structuredClone(node),
+          cessation: structuredClone(cessation), revision: plan.revision, environment: plan.environment }, structuredClone(plan)) === true,
+      'trusted exact-attempt cessation evidence required');
       // Unknown failed-attempt spending must not buy another attempt.
       if (!event.usage) { next.phase = 'budget-exhausted'; break; }
+      node.status = 'pending'; node.token = null;
       accountUsage(next,node,worker,event.usage);
       if (next.phase !== 'budget-exhausted') next.phase = 'repair'; break;
     }
@@ -424,11 +437,10 @@ function apply(state, event, options = {}) {
       parent();
       if (['budget-exhausted','completed'].includes(next.phase)) break;
       if (Object.values(next.effects).some(effect => effect.status === 'running')) { next.phase = 'reconciliation'; break; }
-      let interrupted = false;
-      for (const node of Object.values(next.nodes)) {
-        if (node.status === 'running' && node.lease_until <= now) { node.status = 'pending'; node.token = null; interrupted = true; }
-      }
-      if (interrupted) next.phase = 'repair'; break;
+      // Expiry is only a deadline; it cannot prove an attempt stopped.
+      demand(!Object.values(next.nodes).some(node => node.status === 'running' && node.lease_until <= now),
+        'expired worker token requires trusted exact-attempt recovery');
+      break;
     }
     case 'reconcile-effect': {
       parent(); demand(next.phase === 'reconciliation', 'effect not ambiguous'); const effect = next.effects[event.id];
@@ -512,6 +524,7 @@ async function dispatchParallel(file, launch, options = {}) {
       result = await launch({ ...worker, assignment, remaining_budget, goal_sha256:state.plan.goal_sha256, token: state.nodes[worker.id].token, revision: state.plan.revision, environment: state.plan.environment });
     }
     catch (_error) {
+      // Preserve the token until a later supervisor proves exact cessation.
       transaction(file, current => apply(current, { type: 'worker-error', actor: worker.agent, worker: worker.id, token: state.nodes[worker.id].token, usage:_error?.usage }, options)); return;
     }
     transaction(file, current => apply(current, { type: 'result', actor: worker.agent, result }, options));

@@ -7,6 +7,8 @@ const path = require('path');
 const os = require('os');
 const {
   assertDocument,
+  goalContractDigest,
+  assignmentContractDigest,
   buildParallelStatus,
   buildStatus,
   evaluateClaim,
@@ -101,6 +103,7 @@ function help() {
   process.stdout.write('Retained artifact verification: --evidence-root DIR (repeatable), --evidence-map SHA256=FILE (repeatable, pinned relocation index/ledger). These do not refresh source fingerprints or authorize acceptance.\n');
   process.stdout.write('New assignments require --work-kind output|blocker, --ram-gib N, --disk-gib N, and --disk-path DIR; blockers also require --defect-evidence FILE.\n');
   process.stdout.write('Terminal integration outcomes superseded/not_adopted require --limitation REASON; failed or over-budget receipts remain history, never passing proof.\n');
+  process.stdout.write('New receipts pin exact acceptance contracts; legacy receipts remain readable but do not establish current acceptance. Managed passing integration requires --acceptance-receipt FILE from the trusted parent adapter. Watchdog retry/CI/cost caps are cumulative across tactic and policy windows.\n');
   process.stdout.write('Controlled execution v3: assign --change-contract FILE (requested_delta and hash-bound preserved_invariants). Historical records are not silently upgraded.\n');
   process.stdout.write(`ECC outcome control\n\nUsage:\n  ecc goal profiles\n  ecc goal init --from FILE [--dir DIR]\n  ecc goal checkpoint --proof ID --at ISO --started-at ISO --basis TEXT --hours N [--confidence LEVEL]\n  ecc goal correct --instruction TEXT --priority TEXT --proof ID --next-action TEXT --at ISO --started-at ISO --basis TEXT --hours N\n  ecc goal record --acceptance ID --stage STAGE --environment NAME --evidence KIND=FILE [options]\n    options: --result-class CLASS --authenticity CLASS --user-visible true|false --subject-scope SCOPE\n  ecc goal assign --description TEXT --acceptance ID --owner-runtime NAME --owner-agent ID --scope PATH --lease-until ISO [budgets]\n  ecc goal integrate --assignment ID --integrator ID --evidence KIND=FILE --repo ID=DIR --tool-calls N --retries N --ci-runs N --cost-usd N\n  ecc goal watch-config --window-hours N --max-activity N --max-retries N --max-ci-runs N --max-cost-usd N\n  ecc goal activity --kind KIND --tactic ID [--count N] [--cost-usd N]\n  ecc goal watch [--json] [--now ISO]\n  ecc goal resume --next-action TEXT [--repo DIR ...] [--last-result TEXT] [options]\n  ecc goal handoff --next-action TEXT [resume options]\n  ecc goal validate [--goal FILE] [--outcomes FILE] [--resume FILE]\n  ecc goal status [--goal FILE] [--outcomes FILE] [--json] [--now ISO]\n  ecc goal claim <complete|blocked|on-track> [--goal FILE] [--outcomes FILE] [--resume FILE] [--json] [--now ISO]\n\nDefaults:\n  directory:    .ecc/goal\n  goal:         active-goal.yaml\n  outcomes:     outcomes.jsonl\n  assignments:  assignments.jsonl\n  integrations: integrations.jsonl\n  resume:       resume-receipt.yaml (loaded when present)\n\nWrites are local, atomic, and lock-protected. The command never calls a model, provider, CI service, or deployment API.\n`);
 }
@@ -331,6 +334,8 @@ function commandAssignLocked(args) {
   if (assignment.change_contract && assignment.change_contract.requested_delta !== description) {
     throw new Error('requested delta differs from goal assignment');
   }
+  assignment.contract_sha256 = goalContractDigest(goal);
+  assignment.assignment_contract_sha256 = assignmentContractDigest(goal, assignment);
   assertDocument('assignment', assignment, `assignment ${assignment.assignment_id}`);
   const assignments = readJsonLines(paths.assignments);
   const integrations = readJsonLines(paths.integrations);
@@ -394,6 +399,24 @@ function commandIntegrate(args) {
     limitations: optionValues(args, '--limitation'),
     source_harness: optionValue(args, '--source-harness', process.env.ECC_SOURCE_HARNESS || 'unknown'),
   };
+  if (!pendingAssignment) throw new Error('integration references missing assignment');
+  // Never stamp a historical assignment with a stronger current contract.
+  if (receipt.outcome === 'pass' && (!pendingAssignment.contract_sha256
+      || pendingAssignment.contract_sha256 !== goalContractDigest(goal)
+      || pendingAssignment.assignment_contract_sha256 !== assignmentContractDigest(goal, pendingAssignment))) {
+    throw new Error('passing integration requires a current bound assignment; reissue legacy or stale work');
+  }
+  if (pendingAssignment.contract_sha256) receipt.contract_sha256 = pendingAssignment.contract_sha256;
+  if (pendingAssignment.assignment_contract_sha256) receipt.assignment_contract_sha256 = pendingAssignment.assignment_contract_sha256;
+  if (receipt.outcome === 'pass' && pendingAssignment.managed_execution) {
+    const acceptancePath = optionValue(args, '--acceptance-receipt');
+    if (!acceptancePath) throw new Error('managed passing integration requires --acceptance-receipt');
+    const receiptPath = fs.realpathSync(path.resolve(acceptancePath));
+    require('./lib/orca-acceptance').verifyIntegrationAcceptance(receiptPath, {
+      goal, assignment: pendingAssignment, integrator, evidence: receipt.evidence, usage: receipt.usage,
+    });
+    receipt.acceptance_provenance = { receipt_path: receiptPath, sha256: sha256File(receiptPath) };
+  }
   assertDocument('integration', receipt, `integration receipt ${receipt.receipt_id}`);
   if (['superseded', 'not_adopted'].includes(receipt.outcome) && !receipt.limitations.length) throw new Error('terminal assignment outcome requires --limitation REASON');
   const integrations = readJsonLines(paths.integrations);
@@ -529,6 +552,7 @@ function commandRecord(args) {
     receipt_id: optionValue(args, '--receipt-id', makeReceiptId(acceptanceId, observedAt)),
     goal_id: goal.goal_id,
     acceptance_id: acceptanceId,
+    contract_sha256: goalContractDigest(goal),
     stage,
     result_class: resultClass,
     authenticity: optionValue(args, '--authenticity', 'unknown'),
@@ -710,6 +734,7 @@ function main(args = process.argv.slice(2)) {
       bundle.integrations,
       now,
       latestExecutableCorrection(bundle.goal),
+      bundle.goal,
     );
     process.stdout.write(args.includes('--json') ? `${JSON.stringify(status, null, 2)}\n` : renderStatus(status));
     return status.complete ? 0 : 2;

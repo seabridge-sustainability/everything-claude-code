@@ -9,6 +9,7 @@ const {
   admissionDecision,
   classifyTaskText,
   inferClaim,
+  completionIntent,
   loadCapabilities,
   runtimeById,
   validateCapabilities,
@@ -113,10 +114,33 @@ function main(args = process.argv.slice(2)) {
   }
 
   if (command === 'final' || command === 'final-hook') {
-    const text = optionValue(args, '--text', hookText(readStdin()));
-    const claim = optionValue(args, '--claim', inferClaim(text));
+    const raw = readStdin();
+    const text = optionValue(args, '--text', hookText(raw));
+    let payload = {};
+    try { payload = JSON.parse(raw || '{}'); } catch { /* Legacy text is advisory only. */ }
+    const intent = completionIntent(payload);
+    if (intent) {
+      const goal = require('./lib/goal-control').readStructuredFile(path.resolve(goalPath));
+      const { goalContractDigest } = require('./lib/goal-control');
+      if (typeof goalContractDigest !== 'function' || intent.goal_id !== goal.goal_id
+          || intent.session_id !== sessionId || intent.contract_sha256 !== goalContractDigest(goal)) {
+        throw new Error('structured completion goal/session/contract binding mismatch');
+      }
+      const session = checkSession({ sessionId });
+      if (session.guard?.goalReference?.file
+          && path.resolve(session.guard.goalReference.file) !== path.resolve(goalPath)) {
+        throw new Error('structured completion selected a different bound goal');
+      }
+    }
+    const inferred = inferClaim(text);
+    // Structured completion is always checked, including unfamiliar wording.
+    // Ending a progress turn never promotes acceptance or a completed badge.
+    const claim = intent?.intent === 'complete' ? 'complete'
+      : optionValue(args, '--claim', inferred);
     if (!claim) {
-      process.stdout.write(`${JSON.stringify({ checked: false, runtime: runtimeId, model, reason: 'no status claim detected' })}\n`);
+      process.stdout.write(`${JSON.stringify({ checked: !!intent, runtime: runtimeId, model,
+        acceptance: 'not_accepted', turn_intent: intent?.intent || 'unclassified',
+        reason: intent ? 'non-completion turn; goal acceptance unchanged' : 'no structured completion; no acceptance granted' })}\n`);
       return 0;
     }
     if (!fs.existsSync(path.resolve(goalPath))) {

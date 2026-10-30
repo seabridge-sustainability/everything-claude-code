@@ -7,6 +7,7 @@ const {
   admissionDecision,
   classifyTaskText,
   inferClaim,
+  completionIntent,
   loadCapabilities,
   validateCapabilities,
 } = require('../../scripts/lib/goal-runtime');
@@ -62,6 +63,7 @@ test('task classification is risk-scaled and deterministic', () => {
 });
 
 test('final claim inference avoids explicit negative claims', () => {
+  assert.strictEqual(inferClaim('Do not claim "goal achieved" until the proof passes.'), null);
   assert.strictEqual(inferClaim('Everything is complete and verified.'), 'complete');
   assert.strictEqual(inferClaim('The goal is blocked as a whole.'), 'blocked');
   assert.strictEqual(inferClaim('The work remains on track.'), 'on-track');
@@ -75,6 +77,16 @@ test('final claim inference avoids explicit negative claims', () => {
   assert.strictEqual(inferClaim('The goal is not blocked as a whole.'), null);
   assert.strictEqual(inferClaim('The old prototype is not complete; the goal is complete.'), 'complete');
   assert.strictEqual(inferClaim('Done.'), 'complete');
+});
+
+test('structured lifecycle intent is explicit and bound, independently of prose', () => {
+  const bound = { version: 1, intent: 'complete', goal_id: 'g', session_id: 'parent', contract_sha256: 'a'.repeat(64) };
+  assert.deepStrictEqual(completionIntent({ ecc_completion: bound, text: 'All requested deliverables are implemented.' }), bound);
+  assert.strictEqual(completionIntent({ text: 'The full integration is complete.' }), null);
+  for (const intent of ['progress', 'incomplete']) assert.strictEqual(completionIntent({ ecc_completion: { ...bound, intent } }).intent, intent);
+  for (const invalid of [{}, { ...bound, intent: 'accepted' }, { ...bound, session_id: '' }, { ...bound, contract_sha256: 'changed' }]) {
+    assert.throws(() => completionIntent({ ecc_completion: invalid }), /invalid structured completion intent/);
+  }
 });
 
 (async () => {

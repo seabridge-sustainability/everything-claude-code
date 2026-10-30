@@ -305,6 +305,7 @@
         "supersedes"
       ],
       "properties": {
+        "contract_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$", "description": "Canonical acceptance contract revision. Absent on legacy records, which cannot establish current acceptance." },
         "schema": { "const": "ecc.outcome-receipt.v1" },
         "receipt_id": { "$ref": "#/$defs/nonEmptyString" },
         "goal_id": { "$ref": "#/$defs/nonEmptyString" },
@@ -549,6 +550,8 @@
         "lease_expires_at", "budget", "source_harness"
       ],
       "properties": {
+        "assignment_contract_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "contract_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$", "description": "Canonical acceptance contract revision. Absent on legacy records, which cannot establish current acceptance." },
         "schema": { "const": "ecc.assignment.v1" },
         "assignment_id": { "$ref": "#/$defs/nonEmptyString" },
         "goal_id": { "$ref": "#/$defs/nonEmptyString" },
@@ -593,6 +596,15 @@
         "outcome", "limitations", "source_harness"
       ],
       "properties": {
+        "acceptance_provenance": {
+          "type": "object", "additionalProperties": false, "required": ["receipt_path", "sha256"],
+          "properties": {
+            "receipt_path": { "$ref": "#/$defs/nonEmptyString" },
+            "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+          }
+        },
+        "assignment_contract_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "contract_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$", "description": "Canonical acceptance contract revision. Absent on legacy records, which cannot establish current acceptance." },
         "schema": { "const": "ecc.integration-receipt.v1" },
         "receipt_id": { "$ref": "#/$defs/nonEmptyString" },
         "goal_id": { "$ref": "#/$defs/nonEmptyString" },

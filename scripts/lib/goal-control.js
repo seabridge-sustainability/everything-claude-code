@@ -1,6 +1,7 @@
 'use strict';
 
 const fs = require('fs');
+const crypto = require('crypto');
 const path = require('path');
 const Ajv = require('ajv');
 const yaml = require('js-yaml');
@@ -137,6 +138,74 @@ function parseIso(value, label) {
   return timestamp;
 }
 
+// Object key order is irrelevant; array order and exact strings remain contractual.
+function canonicalJson(value) {
+  if (Array.isArray(value)) return '[' + value.map(canonicalJson).join(',') + ']';
+  if (value && typeof value === 'object') return '{' + Object.keys(value).sort()
+    .filter(key => value[key] !== undefined)
+    .map(key => JSON.stringify(key) + ':' + canonicalJson(value[key])).join(',') + '}';
+  return JSON.stringify(value);
+}
+
+function contractDigest(value) {
+  return crypto.createHash('sha256').update(canonicalJson(value), 'utf8').digest('hex');
+}
+
+// Deliberate projection: checkpoints, forecasts and lane execution metadata
+// cannot invalidate evidence. Exact outputs, invariants and owner corrections can.
+function goalContractDigest(goal) {
+  return contractDigest({
+    version: 1,
+    goal_id: goal.goal_id,
+    objective: goal.objective,
+    proof_profile: goal.proof_profile,
+    non_goals: goal.non_goals,
+    user_visible_proofs: goal.user_visible_proofs,
+    owner_corrections: goal.owner_corrections,
+  });
+}
+
+function assignmentContractDigest(goal, assignment) {
+  return contractDigest({
+    version: 1,
+    contract_sha256: goalContractDigest(goal),
+    description: assignment.description,
+    acceptance_ids: assignment.acceptance_ids,
+    scope_paths: assignment.scope_paths,
+    change_contract: assignment.change_contract || null,
+  });
+}
+
+function contractBinding(goal, record) {
+  if (!record?.contract_sha256) return 'legacy';
+  if (!goal) return 'unverified';
+  return record.contract_sha256 === goalContractDigest(goal) ? 'current' : 'stale';
+}
+
+function assignmentBinding(goal, assignment, receipt = null) {
+  const binding = contractBinding(goal, assignment);
+  if (binding !== 'current') return binding;
+  if (!assignment.assignment_contract_sha256) return 'legacy';
+  if (assignment.assignment_contract_sha256 !== assignmentContractDigest(goal, assignment)) return 'stale';
+  if (!receipt) return 'current';
+  const receiptBinding = contractBinding(goal, receipt);
+  if (receiptBinding !== 'current') return receiptBinding;
+  if (!receipt.assignment_contract_sha256) return 'legacy';
+  return receipt.assignment_contract_sha256 === assignment.assignment_contract_sha256 ? 'current' : 'stale';
+}
+
+function verifyManagedAcceptance(goal, assignment, receipt) {
+  const provenance = receipt.acceptance_provenance;
+  if (!provenance || !path.isAbsolute(provenance.receipt_path)) {
+    throw new Error('bound managed passing integration requires absolute acceptance provenance');
+  }
+  const digest = crypto.createHash('sha256').update(fs.readFileSync(provenance.receipt_path)).digest('hex');
+  if (digest !== provenance.sha256) throw new Error('acceptance provenance hash mismatch');
+  require('./orca-acceptance').verifyIntegrationAcceptance(provenance.receipt_path, {
+    goal, assignment, integrator: receipt.integrator, evidence: receipt.evidence, usage: receipt.usage,
+  });
+}
+
 function latestExecutableCorrection(goal) {
   return goal.owner_corrections
     .filter(correction => correction.priority && correction.checkpoint_proof_id && correction.next_action)
@@ -240,11 +309,12 @@ function validateBundle({
     if (assignment.goal_id !== goal.goal_id) {
       throw new Error(`assignment ${assignment.assignment_id} belongs to goal ${assignment.goal_id}, not ${goal.goal_id}`);
     }
+    const currentAssignment = assignmentBinding(goal, assignment) === 'current';
     const missingProofs = assignment.acceptance_ids.filter(id => !proofById.has(id));
-    if (missingProofs.length) {
+    if (currentAssignment && missingProofs.length) {
       throw new Error(`assignment ${assignment.assignment_id} references missing proofs: ${missingProofs.join(', ')}`);
     }
-    if (assignment.work_kind && assignment.acceptance_ids.some(id => !proofById.get(id).required)) throw new Error(`assignment ${assignment.assignment_id} cannot use optional-only proofs`);
+    if (currentAssignment && assignment.work_kind && assignment.acceptance_ids.some(id => !proofById.get(id).required)) throw new Error(`assignment ${assignment.assignment_id} cannot use optional-only proofs`);
     if (assignment.work_kind === 'blocker' && (!assignment.defect_evidence || !assignment.defect_evidence_sha256)) throw new Error(`assignment ${assignment.assignment_id} needs observed defect evidence`);
     const issuedAt = parseIso(assignment.issued_at, `assignment ${assignment.assignment_id}.issued_at`);
     const expiresAt = parseIso(assignment.lease_expires_at, `assignment ${assignment.assignment_id}.lease_expires_at`);
@@ -270,10 +340,14 @@ function validateBundle({
     if (observedAt < Date.parse(assignment.issued_at) || (receipt.outcome === 'pass' && observedAt > Date.parse(assignment.lease_expires_at))) {
       throw new Error(`integration receipt ${receipt.receipt_id} falls outside assignment ${assignment.assignment_id} lease`);
     }
-    if (receipt.outcome === 'pass' && currentCorrection
+    if (receipt.outcome === 'pass' && assignmentBinding(goal, assignment, receipt) === 'current' && currentCorrection
         && Date.parse(assignment.issued_at) < Date.parse(currentCorrection.recorded_at)
         && observedAt > Date.parse(currentCorrection.recorded_at)) {
       throw new Error(`integration receipt ${receipt.receipt_id} uses assignment ${assignment.assignment_id} from a superseded owner plan`);
+    }
+    if (receipt.outcome === 'pass' && assignment.managed_execution
+        && assignmentBinding(goal, assignment, receipt) === 'current') {
+      verifyManagedAcceptance(goal, assignment, receipt);
     }
     ensureUniqueIds(receipt.repository_fingerprints.map(item => item.repo_id), `repository fingerprint in ${receipt.receipt_id}`);
     const limits = assignment.budget;
@@ -301,17 +375,19 @@ function validateBundle({
     if (receipt.goal_id !== goal.goal_id) {
       throw new Error(`outcome receipt ${receipt.receipt_id} belongs to goal ${receipt.goal_id}, not ${goal.goal_id}`);
     }
-    if (!proofById.has(receipt.acceptance_id)) {
+    const currentContract = contractBinding(goal, receipt) === 'current';
+    if (currentContract && !proofById.has(receipt.acceptance_id)) {
       throw new Error(`outcome receipt ${receipt.receipt_id} references missing proof ${receipt.acceptance_id}`);
     }
     const proof = proofById.get(receipt.acceptance_id);
-    if (receipt.stage !== proof.required_stage) {
+    if (currentContract && receipt.stage !== proof.required_stage) {
       throw new Error(`outcome receipt ${receipt.receipt_id} uses ${receipt.stage}; proof ${proof.id} requires its own ${proof.required_stage} receipt`);
     }
     ensureUniqueIds(receipt.repository_fingerprints.map(item => item.repo_id), `repository fingerprint in ${receipt.receipt_id}`);
     if (receipt.commit !== receipt.repository_fingerprints[0].head) {
       throw new Error(`outcome receipt ${receipt.receipt_id} commit does not match its primary repository fingerprint`);
     }
+    if (currentContract) {
     const fingerprintIds = new Set(receipt.repository_fingerprints.map(item => item.repo_id));
     const missingRepositories = proof.required_repositories.filter(repoId => !fingerprintIds.has(repoId));
     if (missingRepositories.length) {
@@ -333,6 +409,7 @@ function validateBundle({
     }
     if (proof.subject_scope && receipt.subject_scope !== proof.subject_scope) {
       throw new Error(`outcome receipt ${receipt.receipt_id} has subject scope ${receipt.subject_scope || '<none>'}; proof ${proof.id} requires ${proof.subject_scope}`);
+    }
     }
     if (receipt.result_class === 'engineering_activity' && receipt.outcome === 'pass') {
       throw new Error(`outcome receipt ${receipt.receipt_id} cannot use engineering activity as a passing product outcome`);
@@ -373,7 +450,7 @@ function validateBundle({
   const activeReceiptIds = new Set(outcomes.flatMap(receipt => receipt.supersedes));
   const currentByProofAndTime = new Map();
   for (const receipt of outcomes.filter(item => item.status === 'accepted' && !activeReceiptIds.has(item.receipt_id))) {
-    const key = `${receipt.acceptance_id}\u0000${receipt.observed_at}`;
+    const key = `${receipt.contract_sha256 || 'legacy'}\u0000${receipt.acceptance_id}\u0000${receipt.observed_at}`;
     const existing = currentByProofAndTime.get(key);
     if (existing && (existing.outcome !== receipt.outcome || existing.commit !== receipt.commit)) {
       throw new Error(`unresolved contradictory receipts ${existing.receipt_id} and ${receipt.receipt_id}`);
@@ -416,7 +493,7 @@ function validateBundle({
 
 function evaluateWatchdog(goal, outcomes = [], policy = null, activity = [], now = new Date()) {
   if (!policy) return { configured: false, healthy: true, breaches: [], metrics: null };
-  const latestProofAt = [...latestOutcomeByProof(outcomes).values()]
+  const latestProofAt = [...latestOutcomeByProof(outcomes.filter(receipt => contractBinding(goal, receipt) === 'current')).values()]
     .filter(receipt => receipt.outcome === 'pass')
     .map(receipt => Date.parse(receipt.observed_at))
     .sort((left, right) => left - right)
@@ -441,16 +518,29 @@ function evaluateWatchdog(goal, outcomes = [], policy = null, activity = [], now
   const ciRuns = sum('ci_run');
   const costUsd = currentEvents.reduce((total, event) => total + event.cost_usd, 0);
   const hoursWithoutProof = Math.max(0, (now.getTime() - windowStart) / 3600000);
+  // Cumulative accounting is goal-wide, including events before policy refresh.
+  // This is recorded usage, not an assertion of native/provider metering.
+  const cumulativeEvents = activity.filter(event => event.goal_id === goal.goal_id
+    && Date.parse(event.observed_at) <= now.getTime());
+  const cumulativeSum = kind => cumulativeEvents.filter(event => event.kind === kind)
+    .reduce((total, event) => total + event.count, 0);
+  const cumulative = {
+    tool_calls: cumulativeSum('tool_call'),
+    retries: cumulativeSum('retry'),
+    ci_runs: cumulativeSum('ci_run'),
+    cost_usd: cumulativeEvents.reduce((total, event) => total + event.cost_usd, 0),
+  };
   const breaches = [];
   if (activityCount > policy.max_activity_without_proof) breaches.push('activity_without_proof');
   if (hoursWithoutProof > policy.window_hours) breaches.push('proof_window_elapsed');
-  if (retries > policy.max_retries) breaches.push('retry_budget');
-  if (ciRuns > policy.max_ci_runs) breaches.push('ci_budget');
-  if (costUsd > policy.max_cost_usd) breaches.push('cost_budget');
+  if (cumulative.retries > policy.max_retries) breaches.push('retry_budget');
+  if (cumulative.ci_runs > policy.max_ci_runs) breaches.push('ci_budget');
+  if (cumulative.cost_usd > policy.max_cost_usd) breaches.push('cost_budget');
   return {
     configured: true,
     healthy: breaches.length === 0,
     breaches,
+    cumulative,
     window_started_at: new Date(windowStart).toISOString(),
     tactic_id: currentEvents.at(-1)?.tactic_id || activity
       .filter(event => event.kind === 'tactic_change')
@@ -466,7 +556,7 @@ function evaluateWatchdog(goal, outcomes = [], policy = null, activity = [], now
   };
 }
 
-function buildParallelStatus(assignments = [], integrations = [], now = new Date(), correction = null) {
+function buildParallelStatus(assignments = [], integrations = [], now = new Date(), correction = null, goal = null) {
   const latestByAssignment = new Map();
   for (const receipt of integrations) {
     const existing = latestByAssignment.get(receipt.assignment_id);
@@ -476,7 +566,9 @@ function buildParallelStatus(assignments = [], integrations = [], now = new Date
   }
   const items = assignments.map(assignment => {
     const integration = latestByAssignment.get(assignment.assignment_id) || null;
-    const integrated = assignment.execution_state !== 'queued' && integration?.outcome === 'pass';
+    const binding = assignmentBinding(goal, assignment, integration);
+    const integrated = assignment.execution_state !== 'queued' && integration?.outcome === 'pass'
+      && binding === 'current';
     const terminal = ['superseded', 'not_adopted'].includes(integration?.outcome);
     const stale = Boolean(
       correction
@@ -491,6 +583,8 @@ function buildParallelStatus(assignments = [], integrations = [], now = new Date
       lease_expires_at: assignment.lease_expires_at,
       lease_expired: !integrated && !terminal && now.getTime() > Date.parse(assignment.lease_expires_at),
       stale_owner_plan: stale,
+      contract_binding: binding,
+      stale_contract: binding === 'stale',
       integrated,
       terminal,
       integration_receipt_id: integration?.receipt_id || null,
@@ -505,7 +599,8 @@ function buildParallelStatus(assignments = [], integrations = [], now = new Date
     pending: items.filter(item => !item.integrated && !item.terminal).length,
     retired: items.filter(item => item.terminal).length,
     expired: items.filter(item => item.lease_expired).length,
-    stale: items.filter(item => item.stale_owner_plan).length,
+    stale: items.filter(item => item.stale_owner_plan || item.stale_contract).length,
+    legacy: items.filter(item => item.contract_binding === 'legacy').length,
   };
 }
 
@@ -525,11 +620,13 @@ function buildStatus(goal, outcomes = [], now = new Date()) {
   const latest = latestOutcomeByProof(outcomes);
   const proofs = goal.user_visible_proofs.map(proof => {
     const receipt = latest.get(proof.id) || null;
+    const binding = contractBinding(goal, receipt);
     const achievedStage = receipt ? receipt.stage : null;
     const evidenceKinds = new Set(receipt?.evidence.map(item => item.kind) || []);
     const evidenceMet = proof.required_evidence_kinds.every(kind => evidenceKinds.has(kind));
     const stageMet = Boolean(
       receipt
+      && binding === 'current'
       && receipt.outcome === 'pass'
       && receipt.stage === proof.required_stage
       && evidenceMet
@@ -537,6 +634,7 @@ function buildStatus(goal, outcomes = [], now = new Date()) {
     const met = !proof.required || stageMet;
     return {
       ...proof,
+      contract_binding: receipt ? binding : 'missing',
       achieved_stage: achievedStage,
       stage_met: stageMet,
       met: Boolean(met),
@@ -593,7 +691,7 @@ function evaluateClaim(claim, bundle, options = {}) {
   if (!Number.isFinite(now.getTime())) throw new Error('claim evaluation time must be valid');
   const { goal, outcomes, resume, assignments, integrations, watchdog, activity } = validateBundle(bundle);
   const status = buildStatus(goal, outcomes, now);
-  status.parallel = buildParallelStatus(assignments, integrations, now, latestExecutableCorrection(goal));
+  status.parallel = buildParallelStatus(assignments, integrations, now, latestExecutableCorrection(goal), goal);
   status.watchdog = evaluateWatchdog(goal, outcomes, watchdog, activity, now);
   const unmet = status.proofs.filter(proof => proof.required && !proof.met);
   const laneById = new Map(goal.lanes.map(lane => [lane.id, lane]));
@@ -637,6 +735,9 @@ function evaluateClaim(claim, bundle, options = {}) {
     .sort((left, right) => Date.parse(left) - Date.parse(right))
     .at(-1);
   let reasons = [];
+  if (claim !== 'blocked' && status.watchdog.breaches.some(reason => ['retry_budget', 'ci_budget', 'cost_budget'].includes(reason))) {
+    reasons.push(`cumulative watchdog budget exceeded: ${status.watchdog.breaches.filter(reason => reason.endsWith('_budget')).join(', ')}`);
+  }
 
   if (claim === 'complete') {
     if (!status.complete) reasons.push(`${unmet.length} required user-visible proof(s) remain unmet`);
@@ -741,6 +842,8 @@ function evaluateClaim(claim, bundle, options = {}) {
 }
 
 module.exports = {
+  goalContractDigest,
+  assignmentContractDigest,
   assertDocument,
   buildStatus,
   buildParallelStatus,

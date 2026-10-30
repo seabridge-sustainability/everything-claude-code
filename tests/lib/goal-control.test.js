@@ -9,6 +9,9 @@ const { spawnSync } = require('child_process');
 
 const {
   buildStatus,
+  buildParallelStatus,
+  goalContractDigest,
+  assignmentContractDigest,
   evaluateClaim,
   evaluateWatchdog,
   loadProofProfiles,
@@ -129,6 +132,7 @@ function outcome(id, acceptanceId, stage, observedAt = '2026-09-29T13:00:00Z') {
     receipt_id: id,
     goal_id: 'openaccess-product',
     acceptance_id: acceptanceId,
+    contract_sha256: goalContractDigest(goal()),
     stage,
     result_class: resultClass,
     authenticity: 'authentic',
@@ -179,7 +183,7 @@ function resume(overrides = {}) {
 }
 
 function assignment(overrides = {}) {
-  return {
+  const record = {
     schema: 'ecc.assignment.v1',
     assignment_id: 'assign-heat',
     goal_id: 'openaccess-product',
@@ -199,6 +203,9 @@ function assignment(overrides = {}) {
     source_harness: 'codex',
     ...overrides,
   };
+  record.contract_sha256 = goalContractDigest(goal());
+  record.assignment_contract_sha256 = assignmentContractDigest(goal(), record);
+  return record;
 }
 
 function integration(overrides = {}) {
@@ -207,6 +214,8 @@ function integration(overrides = {}) {
     receipt_id: 'integration-heat',
     goal_id: 'openaccess-product',
     assignment_id: 'assign-heat',
+    contract_sha256: goalContractDigest(goal()),
+    assignment_contract_sha256: assignmentContractDigest(goal(), assignment()),
     observed_at: '2026-09-29T14:00:00Z',
     integrator: 'parent-agent',
     repository_fingerprints: [{
@@ -349,8 +358,11 @@ test('assignment integration enforces owner separation, lease, and budgets', () 
 test('new assignments need required outputs and observed blocker evidence', () => {
   const optionalGoal = goal({ user_visible_proofs: goal().user_visible_proofs.map(proof =>
     proof.id === 'flood-validation' ? { ...proof, required: false } : proof) });
+  const optionalAssignment = assignment({ acceptance_ids: ['flood-validation'], work_kind: 'output' });
+  optionalAssignment.contract_sha256 = goalContractDigest(optionalGoal);
+  optionalAssignment.assignment_contract_sha256 = assignmentContractDigest(optionalGoal, optionalAssignment);
   assert.throws(() => validateBundle({ goal: optionalGoal,
-    assignments: [assignment({ acceptance_ids: ['flood-validation'], work_kind: 'output' })] }), /optional-only proofs/);
+    assignments: [optionalAssignment] }), /optional-only proofs/);
   assert.throws(() => validateBundle({ goal: goal(),
     assignments: [assignment({ work_kind: 'blocker' })] }), /observed defect evidence/);
 });
@@ -461,11 +473,11 @@ test('latest owner correction controls priority, checkpoint, and next action', (
     goal: correctedGoal,
     resume: resume({ observed_at: '2026-09-29T14:30:00Z', next_action: corrected.next_action }),
   }));
-  assert.throws(() => validateBundle({
+  assert.doesNotThrow(() => validateBundle({
     goal: correctedGoal,
     assignments: [assignment()],
     integrations: [integration({ observed_at: '2026-09-29T15:00:00Z' })],
-  }), /superseded owner plan/);
+  }));
   const stalePlan = evaluateClaim('on-track', {
     goal: correctedGoal,
     outcomes: [outcome('r1', 'heat-browser', 'ui_displayed')],
@@ -476,7 +488,7 @@ test('latest owner correction controls priority, checkpoint, and next action', (
   assert.match(stalePlan.reasons.join(' '), /superseded owner plan/);
 });
 
-test('watchdog detects activity plateau and budget overruns until tactic changes', () => {
+test('watchdog resets diagnostics while retaining cumulative budget overruns', () => {
   const events = [
     activityEvent('a1', 'tool_call', '2026-09-29T13:00:00Z'),
     activityEvent('a2', 'retry', '2026-09-29T13:10:00Z'),
@@ -492,7 +504,10 @@ test('watchdog detects activity plateau and budget overruns until tactic changes
     ...events,
     activityEvent('change-1', 'tactic_change', '2026-09-29T14:05:00Z', { tactic_id: 'tactic-b' }),
   ], new Date('2026-09-29T14:10:00Z'));
-  assert.strictEqual(changed.healthy, true);
+  assert.strictEqual(changed.healthy, false);
+  assert.deepStrictEqual(changed.breaches.sort(), ['ci_budget', 'cost_budget']);
+  assert.strictEqual(changed.metrics.activity_without_proof, 0);
+  assert.strictEqual(changed.cumulative.cost_usd, 1);
   assert.strictEqual(changed.tactic_id, 'tactic-b');
 });
 
@@ -1133,7 +1148,7 @@ test('proof requiring multiple repositories rejects a one-repository receipt', (
   assert.throws(
     () => validateBundle({
       goal: crossRepoGoal,
-      outcomes: [outcome('backend-only', 'heat-browser', 'ui_displayed')],
+      outcomes: [{ ...outcome('backend-only', 'heat-browser', 'ui_displayed'), contract_sha256: goalContractDigest(crossRepoGoal) }],
     }),
     /lacks required repositories: frontend/,
   );
@@ -1603,6 +1618,108 @@ test('real CLI validate lists historical receipts after an explicit superseded i
     fs.rmSync(dir, { recursive: true, force: true });
     fs.rmSync(evidenceDir, { recursive: true, force: true });
   }
+});
+
+
+test('contract revision changes same-ID predicates without discarding historical receipts', () => {
+  const original = goal();
+  const changed = structuredClone(original);
+  changed.user_visible_proofs[0].acceptance_predicate += ' Save and reopen must preserve exact values.';
+  const receipt = outcome('prior-contract', 'heat-browser', 'ui_displayed');
+  assert.notStrictEqual(goalContractDigest(original), goalContractDigest(changed));
+  assert.doesNotThrow(() => validateBundle({ goal: changed, outcomes: [receipt] }));
+  const status = buildStatus(changed, [receipt]);
+  assert.strictEqual(status.proofs[0].stage_met, false);
+  assert.strictEqual(status.proofs[0].contract_binding, 'stale');
+  assert.strictEqual(receipt.contract_sha256, goalContractDigest(original));
+});
+
+test('contract revision binds required outputs and owner corrections', () => {
+  for (const mutate of [
+    value => { value.user_visible_proofs[0].required = false; },
+    value => { value.user_visible_proofs[0].required_stage = 'api_served'; },
+    value => { value.user_visible_proofs[0].required_evidence_kinds.push('export'); },
+    value => { value.user_visible_proofs[0].subject_scope = 'other_property'; },
+    value => { value.user_visible_proofs.push({ ...value.user_visible_proofs[0], id: 'required-export' }); },
+    value => { value.owner_corrections[0].instruction += ' Preserve all hazards.'; },
+    value => { value.non_goals.push('No changes to calculations.'); },
+  ]) {
+    const changed = goal();
+    mutate(changed);
+    assert.notStrictEqual(goalContractDigest(changed), goalContractDigest(goal()));
+    assert.strictEqual(buildStatus(changed, [outcome('prior', 'heat-browser', 'ui_displayed')]).proofs[0].stage_met, false);
+  }
+});
+
+test('contract revision ignores volatile checkpoint and execution metadata', () => {
+  const changed = goal();
+  changed.updated_at = '2026-09-30T12:00:00Z';
+  changed.forecast = { ...changed.forecast, state: 'at_risk', likely_hours: 24,
+    checkpoint_started_at: '2026-09-30T12:00:00Z', next_checkpoint_at: '2026-09-30T18:00:00Z' };
+  changed.lanes[0].status = 'blocked';
+  changed.lanes[0].blocker = 'Temporary local dependency';
+  changed.current_priority = 'Refresh the next checkpoint';
+  changed.status = 'blocked';
+  assert.strictEqual(goalContractDigest(changed), goalContractDigest(goal()));
+  assert.strictEqual(buildStatus(changed, [outcome('r', 'heat-browser', 'ui_displayed')]).proofs[0].stage_met, true);
+  const reordered = Object.fromEntries(Object.entries(changed).reverse());
+  reordered.user_visible_proofs = reordered.user_visible_proofs.map(value => Object.fromEntries(Object.entries(value).reverse()));
+  assert.strictEqual(goalContractDigest(reordered), goalContractDigest(changed));
+});
+
+test('contract revision keeps legacy outcome and integration receipts explicitly non-accepting', () => {
+  const receipt = outcome('legacy', 'heat-browser', 'ui_displayed');
+  delete receipt.contract_sha256;
+  const work = assignment();
+  delete work.contract_sha256;
+  delete work.assignment_contract_sha256;
+  const accepted = integration();
+  delete accepted.contract_sha256;
+  delete accepted.assignment_contract_sha256;
+  assert.doesNotThrow(() => validateBundle({ goal: goal(), outcomes: [receipt], assignments: [work], integrations: [accepted] }));
+  assert.strictEqual(buildStatus(goal(), [receipt]).proofs[0].contract_binding, 'legacy');
+  assert.strictEqual(buildStatus(goal(), [receipt]).proofs[0].stage_met, false);
+  const status = buildParallelStatus([work], [accepted], new Date('2026-09-29T15:00:00Z'), null, goal());
+  assert.strictEqual(status.integrated, 0);
+  assert.strictEqual(status.legacy, 1);
+});
+
+test('contract revision binds assignment output and preserved invariants', () => {
+  const work = assignment({ change_contract: { version: 1, requested_delta: 'Implement and verify the heat result.',
+    preserved_invariants: [{ id: 'values', description: 'Preserve source values', category: 'data',
+      baseline: { path: 'baseline.json', sha256: 'a'.repeat(64), kind: 'local-check' } }] } });
+  const accepted = integration({ assignment_contract_sha256: work.assignment_contract_sha256 });
+  assert.strictEqual(buildParallelStatus([work], [accepted], new Date(), null, goal()).integrated, 1);
+  const changed = structuredClone(work);
+  changed.change_contract.preserved_invariants[0].description = 'Permit substituted source values';
+  assert.notStrictEqual(assignmentContractDigest(goal(), changed), work.assignment_contract_sha256);
+  assert.strictEqual(buildParallelStatus([changed], [accepted], new Date(), null, goal()).integrated, 0);
+  changed.description += ' Plus export';
+  assert.notStrictEqual(assignmentContractDigest(goal(), changed), work.assignment_contract_sha256);
+});
+
+test('contract revision denies managed pass without trusted parent provenance', () => {
+  const work = assignment({ managed_execution: { repository_root: 'C:/worktree', session_id: 'worker', closure_reserve: 1 } });
+  assert.throws(() => validateBundle({ goal: goal(), assignments: [work], integrations: [integration()] }),
+    /requires absolute acceptance provenance/);
+});
+
+test('cumulative watchdog accounting survives tactic, policy and proof windows', () => {
+  const events = [
+    activityEvent('old-retries', 'retry', '2026-09-29T12:15:00Z', { count: 2 }),
+    activityEvent('old-cost', 'cost', '2026-09-29T12:30:00Z', { cost_usd: 4 }),
+    activityEvent('old-ci', 'ci_run', '2026-09-29T12:35:00Z'),
+    activityEvent('new-tactic', 'tactic_change', '2026-09-29T14:00:00Z', { tactic_id: 'new' }),
+    activityEvent('future-cost', 'cost', '2026-09-30T12:30:00Z', { cost_usd: 99 }),
+    activityEvent('foreign-cost', 'cost', '2026-09-29T12:30:00Z', { goal_id: 'foreign', cost_usd: 99 }),
+  ];
+  const policy = watchdogPolicy({ updated_at: '2026-09-29T14:05:00Z', max_cost_usd: 3 });
+  const result = evaluateWatchdog(goal(), [outcome('proof', 'heat-browser', 'ui_displayed', '2026-09-29T14:06:00Z')],
+    policy, events, new Date('2026-09-29T14:10:00Z'));
+  assert.deepStrictEqual(result.cumulative, { tool_calls: 0, retries: 2, ci_runs: 1, cost_usd: 4 });
+  assert.deepStrictEqual(result.breaches.sort(), ['ci_budget', 'cost_budget', 'retry_budget']);
+  assert.strictEqual(result.metrics.cost_usd, 0);
+  assert.strictEqual(result.metrics.retries, 0);
 });
 
 (async () => {

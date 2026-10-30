@@ -47,6 +47,15 @@ function main(args = process.argv.slice(2), raw = readInput()) {
     } catch { /* The bridge will reject controlled work without a session. */ }
   }
   if (typeof sessionId === 'string') bridgeArgs.push('--session', sessionId);
+  // A managed fresh launch binds its exact named goal. Never borrow cwd's
+  // default goal merely because it exists on the same host.
+  let boundGoal;
+  if (typeof sessionId === 'string') {
+    try { boundGoal = require('../lib/session-coordination').checkSession({ sessionId }).guard?.goalReference?.file; }
+    catch { /* Explicit admission/final checks report unavailable ownership. */ }
+  }
+  if (boundGoal) bridgeArgs.push('--goal', boundGoal);
+  else if (process.env.ECC_GOAL_FILE) bridgeArgs.push('--goal', process.env.ECC_GOAL_FILE);
   if (phase === 'admit') bridgeArgs.push('--mode', 'auto');
   const model = payloadModel(raw);
   if (model) bridgeArgs.push('--model', model);

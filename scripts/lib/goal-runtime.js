@@ -129,7 +129,10 @@ function admissionDecision({ runtimeId, mode, goalExists, goalValid = false, mod
 }
 
 function inferClaim(text) {
-  const source = String(text || '');
+  // Prohibitions/quoted examples are diagnostics, not an affirmative claim.
+  const source = String(text || '').split(/(?<=[.!?])\s+|\n/)
+    .filter(clause => !/^\s*(?:do not|don't|never|avoid)\b/i.test(clause))
+    .join('\n');
   // Activity completion is not goal completion. A negated clause must not hide
   // a separate affirmative goal claim elsewhere in the same response.
   if (/\b(?:everything|(?:the|this|our|my)\s+(?:whole[- ]building\s+)?(?:goal|task|mvp|product|project|implementation|requested work|work))\s+(?:is|was|has been|is now)\s+(?:fully\s+)?(?:complete|completed|done|finished|functional)\b|\b(?:i(?:'m| am)|we(?:'re| are))\s+(?:now\s+)?(?:done|finished)\b|\b(?:i|we)\s+have\s+(?:fully\s+)?(?:completed|finished)\s+(?:the|this|our)\s+(?:goal|task|work|mvp|project)\b|\bgoal achieved\b/i.test(source)
@@ -140,6 +143,21 @@ function inferClaim(text) {
   return null;
 }
 
+// A native adapter supplies this object from its lifecycle, never by parsing
+// assistant prose. It is a completion *candidate*, not an acceptance receipt.
+function completionIntent(payload) {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)
+      || payload.ecc_completion === undefined) return null;
+  const value = payload.ecc_completion;
+  if (!value || value.version !== 1 || !['progress', 'incomplete', 'complete'].includes(value.intent)
+      || typeof value.goal_id !== 'string' || !value.goal_id
+      || typeof value.session_id !== 'string' || !value.session_id
+      || !/^[a-f0-9]{64}$/.test(value.contract_sha256 || '')) {
+    throw new Error('invalid structured completion intent');
+  }
+  return value;
+}
+
 module.exports = {
   ADAPTER_PATH,
   CAPABILITY_PATH,
@@ -147,6 +165,7 @@ module.exports = {
   admissionDecision,
   classifyTaskText,
   inferClaim,
+  completionIntent,
   loadCapabilities,
   runtimeById,
   validateCapabilities,

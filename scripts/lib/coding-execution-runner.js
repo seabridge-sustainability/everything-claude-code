@@ -96,7 +96,11 @@ async function run(file, host, { maxIterations = 50, maxMilliseconds = 300000, i
     fs.closeSync(reclaimFd);
     if (JSON.parse(fs.readFileSync(recovery,'utf8')).nonce===marker.nonce) fs.unlinkSync(recovery);
   }
-  const gates = options(host), started = Date.now();
+  const verifiedStoppedAttempts = new Set();
+  const gates = options(host);
+  gates.verifyStoppedAttempt = ({worker,node,cessation}) => cessation?.worker===worker.id
+    && cessation.token===node.token && verifiedStoppedAttempts.has(`${worker.id}:${node.token}`);
+  const started = Date.now();
   const deadline=Math.min(started+maxMilliseconds,queueDeadline);
   let steps = 0;
   const transition = event => engine.transaction(file, state => engine.apply(state, event, gates));
@@ -141,7 +145,14 @@ async function run(file, host, { maxIterations = 50, maxMilliseconds = 300000, i
         continue;
       }
       if (observed?.status !== 'failed' || !observed.usage) return false;
-      state = transition({ type: 'worker-error', actor: worker.agent, worker: worker.id, token: node.token, usage: observed.usage });
+      // inspectWorker is trusted, token-bound completion/closure evidence.
+      // Bind its failed observation to this exact persisted attempt in apply().
+      const key = `${worker.id}:${node.token}`;
+      verifiedStoppedAttempts.add(key);
+      try {
+        state = transition({ type: 'worker-error', actor: worker.agent, worker: worker.id, token: node.token,
+          usage: observed.usage, cessation:{worker:worker.id,token:node.token,status:'failed',confirmed_at:Date.now()} });
+      } finally { verifiedStoppedAttempts.delete(key); }
       if(state.phase==='budget-exhausted')return true;
     }
     return true;

@@ -22,6 +22,46 @@ function invoke(runtime, phase, payload, cwd) {
 
 const workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-goal-hook-'));
 const tests = [
+  ['bound structured completion checks unfamiliar prose while incomplete turns remain unaccepted', () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-structured-final-'));
+    const git = argv => {
+      const result = spawnSync('git', argv, { cwd: dir, encoding: 'utf8', windowsHide: true });
+      assert.strictEqual(result.status, 0, result.stderr);
+    };
+    try {
+      git(['init', '--initial-branch=main']);
+      fs.writeFileSync(path.join(dir, 'README.md'), 'fixture\n'); git(['add', 'README.md']);
+      git(['-c', 'user.name=ECC Fixture', '-c', 'user.email=fixture@example.invalid', 'commit', '-m', 'fixture']);
+      const now = new Date().toISOString();
+      const goal = { schema: 'ecc.active-goal.v1', goal_id: 'structured-final', mode: 'controlled', proof_profile: 'docs',
+        objective: 'Verify required live output', current_priority: 'Verify', non_goals: [], owner_corrections: [],
+        user_visible_proofs: [{ id: 'required', description: 'Required output', lane_id: 'main', required_stage: 'source_identified',
+          required_evidence_kinds: ['runtime'], required_repositories: ['fixture'], allowed_result_classes: ['other'],
+          acceptance_predicate: 'The exact required output is verified', subject_scope: null, requires_authentic: false, requires_user_visible: false, required: true }],
+        lanes: [{ id: 'main', description: 'verification', status: 'active', blocker: null, next_action: 'Verify' }],
+        forecast: { state: 'not_set', confidence: 'none', basis: 'not measured', critical_path: ['main'], likely_hours: null,
+          next_checkpoint_at: null, checkpoint_started_at: null, checkpoint_proof_id: null, updated_at: now }, status: 'active', updated_at: now };
+      const folder = path.join(dir, '.ecc', 'goal'); fs.mkdirSync(folder, { recursive: true });
+      fs.writeFileSync(path.join(folder, 'active-goal.yaml'), JSON.stringify(goal));
+      require('../../scripts/lib/session-coordination').execute('register', { cwd: dir, sessionId: 'bound-final',
+        scopes: ['.ecc/goal'], objective: 'fixture', doneWhen: 'checked', ttl: 30 });
+      const bound = { version: 1, intent: 'incomplete', goal_id: goal.goal_id, session_id: 'bound-final',
+        contract_sha256: require('../../scripts/lib/goal-control').goalContractDigest(goal) };
+      const bridge = path.resolve(__dirname, '../../scripts/goal-runtime-bridge.js');
+      const call = intent => spawnSync(process.execPath, [bridge, 'final-hook', '--runtime', 'codex', '--dir', folder,
+        '--session', 'bound-final'], { cwd: dir, input: JSON.stringify({ ecc_completion: intent,
+        response: intent.intent === 'complete' ? 'All requested deliverables are implemented and verified.'
+          : 'Still verifying the required output.' }), encoding: 'utf8', windowsHide: true });
+      const progress = call(bound);
+      assert.strictEqual(progress.status, 0, progress.stderr);
+      assert.strictEqual(JSON.parse(progress.stdout).acceptance, 'not_accepted');
+      const complete = call({ ...bound, intent: 'complete' });
+      assert.strictEqual(complete.status, 2, complete.stderr);
+      assert.match(complete.stdout, /required.*proof|not complete|not verified|remain unmet/i);
+      assert.strictEqual(call({ ...bound, contract_sha256: 'b'.repeat(64) }).status, 1);
+      assert.strictEqual(call({ ...bound, session_id: 'other' }).status, 1);
+    } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+  }],
   ['neutral completed handoff is not a product completion claim', () => {
     const result = invoke('cursor', 'final', { response: 'Handoff complete; whole-building MVP remains incomplete. Two source-only reviews completed, not product acceptance.' }, workspace);
     assert.strictEqual(result.status, 0, result.stderr);

@@ -689,9 +689,9 @@ test('actual CLI resumes interrupted nodes from a new process and rejects early 
   }
   const plan={...f.plan,limits:{...f.plan.limits,lease_ms:1}};
   run('create',plan); const first=run('event',{type:'dispatch',actor:'parent'});
-  run('event',{type:'recover',actor:'parent'}); assert.equal(run('status').phase,'repair');
-  run('event',{type:'dispatch',actor:'parent'}); const resumed=run('status');
-  assert.notEqual(first.nodes['worker-0'].token,resumed.nodes['worker-0'].token); assert.equal(resumed.nodes['worker-0'].attempts,2);
+  assert.match(run('event',{type:'recover',actor:'parent'},false),/expired worker token requires trusted exact-attempt recovery/);
+  const retained=run('status'); assert.equal(retained.phase,'workers');
+  assert.equal(retained.nodes['worker-0'].status,'running'); assert.equal(retained.nodes['worker-0'].token,first.nodes['worker-0'].token);
   assert.match(run('event',{type:'synthesis',actor:'parent',output:{}},false),/accepted critic/);
 });
 test('outside and unowned checkpoint creation causes no ancillary writes', t => {
@@ -704,7 +704,9 @@ test('partial recovery does not dispatch a healthy running worker twice', async 
   const f=fixture(t,['claude','gemini']); c.create(f.file,f.plan);
   c.transaction(f.file,s=>c.apply(s,{type:'dispatch',actor:'parent'}));
   const previous=c.load(f.file), later=previous.nodes['worker-0'].lease_until+1;
-  c.transaction(f.file,s=>{ s.nodes['worker-1'].lease_until=later+60000; return c.apply(s,{type:'recover',actor:'parent'},{now:later}); });
+  c.transaction(f.file,s=>{ s.nodes['worker-1'].lease_until=later+60000; return c.apply(s,{type:'worker-error',actor:'worker-0',worker:'worker-0',token:s.nodes['worker-0'].token,
+    usage:{tool_calls:0,retries:0,ci_runs:0,cost_usd:0},cessation:{worker:'worker-0',token:s.nodes['worker-0'].token,status:'failed',confirmed_at:later}},
+    {now:later,verifyStoppedAttempt:({worker,node,cessation})=>worker.id===cessation.worker&&node.token===cessation.token}); });
   const launched=[];
   const next=await c.dispatchParallel(f.file,async w=>{ launched.push(w.id); return f.result(c.load(f.file),w.id); },{now:later});
   assert.deepEqual(launched,['worker-0']); assert.equal(next.nodes['worker-1'].token,previous.nodes['worker-1'].token);
@@ -735,10 +737,12 @@ test('actual process death leaves recoverable own lock; live locks are never sto
   assert.equal(c.recoverLock(f.file).recovered,true); assert.equal(c.load(f.file).phase,'planned');
   c.transaction(f.file,s=>{ assert.throws(()=>c.recoverLock(f.file),/still alive/); return s; });
 });
-test('worker errors become bounded retry state immediately without relaunching healthy workers', async t => {
+test('unverified worker errors retain the original attempt and halt replacement dispatch', async t => {
   const f=fixture(t,['claude','gemini']); c.create(f.file,f.plan);
   const state=await c.dispatchParallel(f.file,async w=>{ if(w.id==='worker-0') throw Object.assign(new Error('fixture worker error'),{usage:{tool_calls:1,retries:1,ci_runs:0,cost_usd:0}}); return f.result(c.load(f.file),w.id); });
-  assert.equal(state.phase,'repair'); assert.equal(state.nodes['worker-0'].status,'pending'); assert.equal(state.nodes['worker-1'].status,'done');
+  assert.equal(state.phase,'budget-exhausted'); assert.equal(state.nodes['worker-0'].status,'running'); assert.equal(state.nodes['worker-1'].status,'done');
+  assert.ok(state.nodes['worker-0'].token);
+  assert.throws(()=>c.apply(state,{type:'dispatch',actor:'parent'}),/dispatch requires/);
   assert.equal(state.history[0].error,'worker-launch-or-execution-failed');
 });
 test('Windows mixed-case declared scopes accept legitimate mutations', {skip:process.platform!=='win32'}, t => {
@@ -793,8 +797,13 @@ test('failed-attempt spending accumulates and absent error telemetry stops furth
   assert.equal(s.phase,'budget-exhausted');
   assert.throws(()=>c.apply(s,{type:'dispatch',actor:'parent'}),/dispatch requires/);
   const g=fixture(t,['gemini']);let p=c.apply(c.initialize(g.plan),{type:'dispatch',actor:'parent'});
-  p=c.apply(p,{type:'worker-error',actor:'worker-0',worker:'worker-0',token:p.nodes['worker-0'].token,
-    usage:{tool_calls:11,retries:1,ci_runs:0,cost_usd:0}});
+  const token=p.nodes['worker-0'].token, lease=p.nodes['worker-0'].lease_until;
+  assert.throws(()=>c.apply(p,{type:'worker-error',actor:'worker-0',worker:'worker-0',token,
+    usage:{tool_calls:11,retries:1,ci_runs:0,cost_usd:0},cessation:{worker:'worker-0',token,status:'failed',confirmed_at:lease+1}},
+    {now:lease+1}),/trusted exact-attempt cessation evidence/);
+  p=c.apply(p,{type:'worker-error',actor:'worker-0',worker:'worker-0',token,
+    usage:{tool_calls:11,retries:1,ci_runs:0,cost_usd:0},cessation:{worker:'worker-0',token,status:'failed',confirmed_at:lease+1}},
+    {now:lease+1,verifyStoppedAttempt:({worker,node,cessation})=>worker.id===cessation.worker&&node.token===cessation.token});
   assert.equal(p.phase,'budget-exhausted');assert.equal(p.nodes['worker-0'].usage.tool_calls,11);
 });
 
@@ -909,14 +918,37 @@ test('operational runner joins, rejects once, repairs, pauses and resumes exact 
   await operational.run(f.file,host); assert.equal(executed,1);
 });
 
+test('expired tokens survive raw recover and worker errors need shared exact-attempt proof', t => {
+  const f=fixture(t,['claude']); let s=c.apply(c.initialize(f.plan),{type:'dispatch',actor:'parent'});
+  const node=s.nodes['worker-0'], token=node.token, now=node.lease_until+1;
+  assert.throws(()=>c.apply(s,{type:'recover',actor:'parent'},{now}),/expired worker token requires trusted exact-attempt recovery/);
+  assert.equal(s.nodes['worker-0'].status,'running'); assert.equal(s.nodes['worker-0'].token,token);
+  const event={type:'worker-error',actor:'worker-0',worker:'worker-0',token,usage:{tool_calls:1,retries:0,ci_runs:0,cost_usd:0},
+    cessation:{worker:'worker-0',token,status:'failed',confirmed_at:now}};
+  assert.throws(()=>c.apply(s,event,{now}),/trusted exact-attempt cessation evidence/);
+  assert.equal(s.nodes['worker-0'].token,token);
+  const recovered=c.apply(s,event,{now,verifyStoppedAttempt:({worker,node,cessation})=>worker.id===cessation.worker&&node.token===cessation.token});
+  assert.equal(recovered.nodes['worker-0'].status,'pending'); assert.equal(recovered.nodes['worker-0'].token,null);
+  assert.equal(recovered.nodes['worker-0'].usage.tool_calls,1); assert.equal(recovered.phase,'repair');
+  let early=c.apply(c.initialize(f.plan),{type:'dispatch',actor:'parent'});
+  const earlyNode=early.nodes['worker-0'], stoppedAt=earlyNode.lease_until-1;
+  const earlyEvent={type:'worker-error',actor:'worker-0',worker:'worker-0',token:earlyNode.token,
+    usage:{tool_calls:1,retries:0,ci_runs:0,cost_usd:0},cessation:{worker:'worker-0',token:earlyNode.token,status:'failed',confirmed_at:stoppedAt}};
+  early=c.apply(early,earlyEvent,{now:stoppedAt,verifyStoppedAttempt:({worker,node,cessation})=>worker.id===cessation.worker&&node.token===cessation.token});
+  assert.equal(early.nodes['worker-0'].status,'pending'); assert.equal(early.nodes['worker-0'].token,null);
+});
+
 test('operational recovery never duplicates a live or unmetered expired worker', async t => {
   const f=fixture(t,['claude']); c.create(f.file,f.plan);
   c.transaction(f.file,s=>{s=c.apply(s,{type:'dispatch',actor:'parent'});s.nodes['worker-0'].lease_until=Date.now()-1;return s;});
+  const token=c.load(f.file).nodes['worker-0'].token;
   let launches=0;
   const host=Object.fromEntries(operational.REQUIRED.map(key=>[key,()=>false]));
   host.launchWorker=()=>{launches++;throw Error('must not launch');};host.inspectWorker=()=>({status:'running'});
   const held=await operational.run(f.file,host); assert.equal(held.stopped,'worker-reconciliation-required'); assert.equal(launches,0);
-  host.inspectWorker=()=>({status:'failed'});assert.equal((await operational.run(f.file,host)).stopped,'worker-reconciliation-required');assert.equal(launches,0);
+  host.inspectWorker=()=>({status:'failed'});
+  assert.equal((await operational.run(f.file,host)).stopped,'worker-reconciliation-required');assert.equal(launches,0);
+  assert.equal(c.load(f.file).nodes['worker-0'].status,'running'); assert.equal(c.load(f.file).nodes['worker-0'].token,token);
 });
 
 test('controller accepts unchanged preserved drafts but rejects foreign edits and new unowned files', t => {
