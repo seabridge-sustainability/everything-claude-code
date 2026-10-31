@@ -100,6 +100,7 @@ function loadBundle(args) {
 
 function help() {
   process.stdout.write('Planning only: assign --queued true records bounded work without reserving/launching it. Queued metadata cannot bind a managed worker, dispatch or count as executed work; retire it before separately admitting execution. Existing bounded reads need no heavy slot.\n');
+  process.stdout.write('Existing same-goal metadata: resume --refresh-metadata --next-action TEXT preserves unspecified receipt metadata and every repository ID/root while recapturing live fingerprints. Requires a valid existing receipt; --repo may only name existing bindings.\n');
   process.stdout.write('Fresh managed worker: --managed-session ID --managed-repo DIR --closure-reserve N together. Register first; goal is repository-local. Startup probes count; parent reserve grants no extra worker tools.\n');
   process.stdout.write('Retained artifact verification: --evidence-root DIR (repeatable), --evidence-map SHA256=FILE (repeatable, pinned relocation index/ledger). These do not refresh source fingerprints or authorize acceptance.\n');
   process.stdout.write('New assignments require --work-kind output|blocker, --ram-gib N, --disk-gib N, and --disk-path DIR; blockers also require --defect-evidence FILE.\n');
@@ -152,6 +153,33 @@ function captureRepositories(args, paths) {
       repoId: spec.repoId || undefined,
       excludePaths: [paths.directory],
     });
+  });
+}
+
+function refreshRepositories(args, paths, previous) {
+  const states = previous.repository_states;
+  const primary = states.find(state => state.repo_id === previous.repository_state.repo_id);
+  if (!primary || primary.repo_root !== previous.repository_state.repo_root
+      || primary.tree_fingerprint !== previous.repository_state.tree_fingerprint) {
+    throw new Error('--refresh-metadata requires a consistent previous primary repository state');
+  }
+  for (const value of optionValues(args, '--repo')) {
+    const spec = parseRepoSpec(value);
+    const existing = states.find(state => spec.repoId
+      ? state.repo_id === spec.repoId : path.resolve(state.repo_root) === path.resolve(spec.repoPath));
+    if (!existing || path.resolve(existing.repo_root) !== path.resolve(spec.repoPath)) {
+      throw new Error('--refresh-metadata cannot change repository IDs or root bindings');
+    }
+  }
+  return states.map(state => {
+    const current = captureRepositoryState(state.repo_root, {
+      repoId: state.repo_id, excludePaths: [paths.directory],
+    });
+    if (path.resolve(current.repo_root) !== path.resolve(state.repo_root)
+        || path.resolve(current.worktree) !== path.resolve(state.worktree)) {
+      throw new Error('--refresh-metadata repository root/worktree binding changed');
+    }
+    return { ...current, repo_root: state.repo_root, worktree: state.worktree };
   });
 }
 
@@ -590,36 +618,59 @@ function commandRecord(args) {
   return { recorded: true, ...write, receipt, paths };
 }
 
-function commandResume(args, handoff = false) {
+function commandResume(args, handoff = false, locked = false) {
   const paths = pathsFrom(args);
+  const refreshMetadata = args.includes('--refresh-metadata');
+  if (refreshMetadata && handoff) throw new Error('--refresh-metadata is supported only by resume');
+  if (refreshMetadata && !locked) {
+    return withFileLock(`${paths.resume}.lock`, () => commandResume(args, handoff, true));
+  }
   const goal = readStructuredFile(paths.goal);
   const nextAction = optionValue(args, '--next-action');
   if (!nextAction) throw new Error(`${handoff ? 'handoff' : 'resume'} requires --next-action`);
   const observedAt = optionValue(args, '--observed-at', new Date().toISOString());
-  const states = captureRepositories(args, paths);
+  let previous = null;
+  if (refreshMetadata) {
+    if (!fs.existsSync(path.resolve(paths.resume))) throw new Error('--refresh-metadata requires an existing resume receipt');
+    previous = readStructuredFile(paths.resume);
+    assertDocument('resume', previous, 'previous resume receipt');
+    if (previous.goal_id !== goal.goal_id) throw new Error('--refresh-metadata previous receipt belongs to another goal');
+  }
+  const states = previous ? refreshRepositories(args, paths, previous) : captureRepositories(args, paths);
+  const preservedValue = (name, value) => optionValue(args, name, previous ? value : null);
+  const preservedList = (name, value) => args.includes(name) ? optionValues(args, name) : previous ? value : [];
+  const spendingNumber = (name, field) => {
+    const value = optionValue(args, name);
+    return value === null ? previous?.spending[field] ?? null : parseNumber(value, name);
+  };
+  const inheritedClaims = previous ? previous.inherited_claims.map((claim, index) => index ? claim : {
+    claim: optionValue(args, '--inherited-claim', claim.claim),
+    status: optionValue(args, '--claim-status', claim.status),
+    evidence: optionValue(args, '--claim-evidence', claim.evidence),
+  }) : [{
+    claim: optionValue(args, '--inherited-claim', 'No predecessor progress claim was supplied.'),
+    status: optionValue(args, '--claim-status', 'unverified'),
+    evidence: optionValue(args, '--claim-evidence'),
+  }];
   const receipt = {
     schema: 'ecc.resume-receipt.v1',
     receipt_id: optionValue(args, '--receipt-id', makeReceiptId(handoff ? 'handoff' : 'resume', observedAt)),
     goal_id: goal.goal_id,
     observed_at: observedAt,
-    repository_state: states[0],
+    repository_state: previous ? states.find(state => state.repo_id === previous.repository_state.repo_id) : states[0],
     repository_states: states,
-    inherited_claims: [{
-      claim: optionValue(args, '--inherited-claim', 'No predecessor progress claim was supplied.'),
-      status: optionValue(args, '--claim-status', 'unverified'),
-      evidence: optionValue(args, '--claim-evidence'),
-    }],
-    last_user_visible_result: optionValue(args, '--last-result'),
+    inherited_claims: inheritedClaims,
+    last_user_visible_result: preservedValue('--last-result', previous?.last_user_visible_result),
     next_action: nextAction,
-    blocked_lanes: optionValues(args, '--blocked-lane'),
-    independent_work_remaining: optionValues(args, '--independent-work'),
+    blocked_lanes: preservedList('--blocked-lane', previous?.blocked_lanes),
+    independent_work_remaining: preservedList('--independent-work', previous?.independent_work_remaining),
     spending: {
-      observed_usd: optionValue(args, '--observed-usd') === null ? null : parseNumber(optionValue(args, '--observed-usd'), '--observed-usd'),
-      approved_ceiling_usd: optionValue(args, '--budget-usd') === null ? null : parseNumber(optionValue(args, '--budget-usd'), '--budget-usd'),
-      ci_runs: optionValue(args, '--ci-runs') === null ? null : parseNumber(optionValue(args, '--ci-runs'), '--ci-runs'),
-      verified_at: optionValue(args, '--spending-verified-at'),
+      observed_usd: spendingNumber('--observed-usd', 'observed_usd'),
+      approved_ceiling_usd: spendingNumber('--budget-usd', 'approved_ceiling_usd'),
+      ci_runs: spendingNumber('--ci-runs', 'ci_runs'),
+      verified_at: preservedValue('--spending-verified-at', previous?.spending.verified_at),
     },
-    source_harness: optionValue(args, '--source-harness', process.env.ECC_SOURCE_HARNESS || 'unknown'),
+    source_harness: optionValue(args, '--source-harness', previous?.source_harness || process.env.ECC_SOURCE_HARNESS || 'unknown'),
   };
   const reviewFile = optionValue(args, '--alternatives-review');
   if (reviewFile) receipt.alternatives_review = readStructuredFile(reviewFile);
@@ -633,8 +684,16 @@ function commandResume(args, handoff = false) {
     watchdog: fs.existsSync(path.resolve(paths.watchdog)) ? readStructuredFile(paths.watchdog) : null,
     activity: readJsonLines(paths.activity),
   });
-  withFileLock(`${paths.resume}.lock`, () => writeYaml(paths.resume, receipt));
-  appendJsonLine(paths.resumeHistory, receipt);
+  if (locked) {
+    // Retain the predecessor even when an older caller never wrote history.
+    // History errors must not replace the current receipt.
+    appendJsonLine(paths.resumeHistory, previous);
+    appendJsonLine(paths.resumeHistory, receipt);
+    writeYaml(paths.resume, receipt);
+  } else {
+    withFileLock(`${paths.resume}.lock`, () => writeYaml(paths.resume, receipt));
+    appendJsonLine(paths.resumeHistory, receipt);
+  }
   return { [handoff ? 'handoff_created' : 'resumed']: true, receipt, paths };
 }
 

@@ -82,7 +82,7 @@ function main(args = process.argv.slice(2), raw = readInput()) {
     process.stdout.write(`${JSON.stringify({
       hookSpecificOutput: {
         hookEventName: 'UserPromptSubmit',
-        additionalContext: `ECC controlled-goal setup pending: ${reason}. Before implementation, register an isolated scoped session with ecc session register, initialize or repair .ecc/goal with ecc goal init and ecc goal validate, then run ecc goal-runtime admit --runtime ${runtime} --mode controlled --session <registered-id>. Do not treat this advisory prompt hook as admission or claim completion from it.`,
+        additionalContext: `ECC controlled-goal setup pending: ${reason}. Before implementation, use ecc session register and ecc session check-write for the exact owned goal metadata paths. Use ecc goal init only when the goal is absent. For an existing goal with an absent resume receipt, use plain ecc goal resume with explicit reconciled repository bindings and metadata. For a valid existing same-goal receipt, use ecc goal resume --refresh-metadata --next-action <latest-owner-next-action> to preserve receipt metadata and repository bindings while refreshing live fingerprints. A malformed existing receipt remains fail-closed; never overwrite it with blank defaults. Preserve goal identity, dependencies, spending, inherited evidence, results and history. Require successful ecc goal validate, then ecc goal-runtime admit --runtime ${runtime} --mode controlled --session <registered-id> before source edits or implementation dispatch. A denied registration/check-write remains fail-closed. Do not treat this advisory prompt hook as admission or claim completion from it.`,
       },
     })}\n`);
     return 0;

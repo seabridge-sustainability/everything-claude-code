@@ -135,6 +135,13 @@ const tests = [
     assert.strictEqual(output.hookSpecificOutput.hookEventName, 'UserPromptSubmit');
     assert.match(output.hookSpecificOutput.additionalContext, /ecc session register/);
     assert.match(output.hookSpecificOutput.additionalContext, /ecc goal init/);
+    assert.match(output.hookSpecificOutput.additionalContext, /ecc session check-write/);
+    assert.match(output.hookSpecificOutput.additionalContext, /ecc goal init only when the goal is absent/);
+    assert.match(output.hookSpecificOutput.additionalContext, /ecc goal resume --refresh-metadata/);
+    assert.match(output.hookSpecificOutput.additionalContext, /absent resume receipt, use plain ecc goal resume with explicit reconciled repository bindings and metadata/);
+    assert.match(output.hookSpecificOutput.additionalContext, /malformed existing receipt remains fail-closed; never overwrite it with blank defaults/);
+    assert.match(output.hookSpecificOutput.additionalContext, /Require successful ecc goal validate/);
+    assert.match(output.hookSpecificOutput.additionalContext, /denied registration\/check-write remains fail-closed/);
     assert.match(output.hookSpecificOutput.additionalContext, /goal-runtime admit/);
     assert.doesNotMatch(result.stdout, /Continue this long-running/);
   }],
