@@ -22,6 +22,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { execFileSync } = require('child_process');
 
 const CODEX_CAP = 32 * 1024;
 const MAX_IMPORT_DEPTH = 4;
@@ -83,6 +84,31 @@ function stripCode(text) {
 }
 
 /** Expand Claude Code `@path` imports (outside code) recursively. Returns {text, files, missing}. */
+// A linked worktree lives under .worktrees/, outside the main checkout, so a
+// sibling policy import such as ../manageesg-backend/AGENTS.md cannot resolve
+// from it and every worktree-based agent saw a phantom "missing policy imports"
+// failure. Fall back to the same relative position under the main worktree,
+// which is where the sibling repository actually sits.
+function gitDir(from, flag) {
+  try {
+    const out = execFileSync('git', ['-C', from, 'rev-parse', flag], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+    return out.trim() || null;
+  } catch { return null; }
+}
+
+function resolveImport(abs, spec) {
+  const here = path.dirname(abs);
+  const direct = path.resolve(here, spec);
+  if (fs.existsSync(direct)) return direct;
+  const common = gitDir(here, '--git-common-dir');
+  const top = gitDir(here, '--show-toplevel');
+  if (!common || !top) return null;
+  const mainRoot = path.dirname(path.resolve(here, common));
+  if (path.resolve(mainRoot) === path.resolve(top)) return null;
+  const fallback = path.resolve(mainRoot, path.relative(top, here), spec);
+  return fs.existsSync(fallback) ? fallback : null;
+}
+
 function expandImports(file, depth = 0, seen = new Set()) {
   const abs = path.resolve(file);
   const out = { text: '', files: [abs], missing: [] };
@@ -95,8 +121,8 @@ function expandImports(file, depth = 0, seen = new Set()) {
   const re = /(^|\s)@([^\s`]+\.md)\b|<!--\s*SEABRIDGE_CORE_ENTRY:\s*([^\s]+\.md)\s*-->/g;
   let m;
   while ((m = re.exec(scan)) !== null) {
-    const target = path.resolve(path.dirname(abs), (m[2] || m[3]).replace(/^~(?=[\\/])/, process.env.USERPROFILE || '~'));
-    if (!fs.existsSync(target)) { out.missing.push(m[2] || m[3]); continue; }
+    const target = resolveImport(abs, (m[2] || m[3]).replace(/^~(?=[\\/])/, process.env.USERPROFILE || '~'));
+    if (!target) { out.missing.push(m[2] || m[3]); continue; }
     const sub = expandImports(target, depth + 1, seen);
     out.text += '\n' + sub.text;
     out.files.push(...sub.files);

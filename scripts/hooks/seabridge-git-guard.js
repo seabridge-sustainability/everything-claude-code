@@ -248,11 +248,96 @@ function inspect(dir) {
   return { product, ecc, branch, remote: Boolean(remote) };
 }
 
+// Hook bypass and force-push are decided on tokenized git invocations, never on the
+// raw command text. Raw matching denied read-only `git config --get core.hooksPath`,
+// commit messages and heredoc bodies that merely named these strings, blocking
+// unrelated work. Tokenizing alone is not enough: hook-disabling environment can be
+// exported in an EARLIER shell segment, and GIT_CONFIG_* injects config with no -c
+// token, so the whole preceding text is inspected for both of those forms.
+const BYPASS_OPS = new Set(['commit', 'push', 'merge', 'am', 'rebase']);
+// -n means --no-verify only for commit; it is --dry-run for push and --no-stat for merge.
+const bypassFlag = (op, arg) => arg === '--no-verify'
+  || (op === 'commit' && /^-[^-]*n/.test(arg));
+const FORCE_PUSH = /^(?:--force(?:-with-lease|-if-includes)?(?:=|$)|-[a-z]*f[a-z]*$|\+)/;
+
+const HOOK_ENV = /(?:^|[\s;&|(]|\$env:)(?:HUSKY\s*=\s*0|SKIP\s*=)/i;
+// GIT_CONFIG_PARAMETERS/COUNT/KEY_n inject config without any -c token.
+const CONFIG_ENV = /(?:^|[\s;&|(]|\$env:)GIT_CONFIG_(?:PARAMETERS|COUNT|KEY_\d+)\s*=/i;
+const HOOKS_PATH = /core\.hooksPath/i;
+
+// Concurrent sessions edit these working trees, so discarding or deleting work
+// is judged by blast radius, not by whether the command names a ref. `reset
+// --hard` was already denied while `checkout -- .` and `restore .` — identical
+// in effect on unstaged peer work — returned no opinion at all.
+const WIPES_WORKTREE = new Set(['checkout', 'restore']);
+const WHOLE_TREE = new Set(['.', ':/', '*', './']);
+// Deleting a remote branch, moving a ref, or editing user-level config are all
+// outside a single session's scope; they are asked, not silently allowed.
+const DELETE_REF = /^(?:--delete|-d)$/;
+
+function peerWork(op, args) {
+  const paths = args.slice(args.indexOf('--') + 1).filter(a => !a.startsWith('-'));
+  if (WIPES_WORKTREE.has(op) && args.includes('--')) {
+    // No pathspec, or a whole-tree pathspec, discards every peer's unstaged work.
+    if (!paths.length || paths.some(a => WHOLE_TREE.has(a))) {
+      return ['deny', 'Never discard other sessions\' uncommitted work.'];
+    }
+    return ['ask', 'Discards uncommitted changes; confirm the paths are yours.'];
+  }
+  if (op === 'stash' && args.some(a => a === 'clear' || a === 'drop')) {
+    return ['deny', 'Never discard other sessions\' uncommitted work.'];
+  }
+  if (op === 'push' && args.some(a => DELETE_REF.test(a))) {
+    return ['deny', 'Never delete a remote branch.'];
+  }
+  if (op === 'update-ref' && args.includes('-d')) {
+    return ['deny', 'Never delete a ref directly.'];
+  }
+  if (op === 'branch' && args.includes('-D')) {
+    return ['ask', 'Force-deletes an unmerged branch; confirm it is yours.'];
+  }
+  if (op === 'config' && args.includes('--global')) {
+    return ['ask', 'Edits user-level Git config outside this task.'];
+  }
+  return null;
+}
+
+function bypassOrForce(command) {
+  const text = stripDataBodies(command);
+  for (const match of text.matchAll(INVOCATION)) {
+    // An export or $env: assignment survives into later segments, so the whole
+    // preceding text counts, not only the segment that runs git.
+    const lead = text.slice(0, match.index);
+    if (HOOK_ENV.test(lead)) return ['deny', 'Never bypass Git hooks.'];
+    if (CONFIG_ENV.test(lead) && HOOKS_PATH.test(lead)) return ['deny', 'Never bypass Git hooks.'];
+    const tokens = gitArgs(match[1]);
+    // `git -c core.hooksPath=...` relocates hooks for this invocation only.
+    if (tokens.some((t, k) => t === '-c' && /^core\.hooksPath=/i.test(tokens[k + 1] || ''))) {
+      return ['deny', 'Never bypass Git hooks.'];
+    }
+    const flags = {};
+    let i = subcommand(tokens, 0, flags);
+    while (tokens[i] === '-C') i = subcommand(tokens, i + 2, flags);
+    const op = tokens[i];
+    if (!op || op.startsWith('-')) continue;
+    const args = tokens.slice(i + 1);
+    if (BYPASS_OPS.has(op) && args.some(a => bypassFlag(op, a))) return ['deny', 'Never bypass Git hooks.'];
+    // Writing core.hooksPath moves hooks away from the repository; reading it is safe.
+    if (op === 'config' && !readOnly(op, args) && args.some(a => /^core\.hooksPath(?:=|$)/i.test(a))) {
+      return ['deny', 'Never bypass Git hooks.'];
+    }
+    if (op === 'push' && args.some(a => FORCE_PUSH.test(a))) return ['deny', 'Never force-push.'];
+    const peer = peerWork(op, args);
+    if (peer) return peer;
+  }
+  return null;
+}
+
 function decide(command, cwd, inspector = inspect) {
   if (typeof command !== 'string' || !command.trim() || typeof cwd !== 'string') return ['deny', 'Git guard: malformed tool payload; no execution authorized.'];
   if (!/\bgit(?:\.exe)?\b/i.test(command)) return null;
-  if (/--no-verify\b|(?:core\.hooksPath|HUSKY\s*=\s*0|SKIP\s*=)/i.test(command)) return ['deny', 'Never bypass Git hooks.'];
-  if (/\bpush\b[^\n;&|]*(?:\s--force\S*|\s-[a-z]*f\b|\s\+\S)/i.test(command)) return ['deny', 'Never force-push.'];
+  const bypass = bypassOrForce(command);
+  if (bypass) return bypass;
   // Scripts, aliases and opaque shell expansion are never interpreted; see decideCompound.
   if (!/^\s*git(?:\.exe)?\s/i.test(command) || /[;&|\r\n`$><]/.test(command)) return decideCompound(command, cwd, inspector);
   const tokens = tokenize(command), flags = {};
@@ -301,4 +386,4 @@ if (require.main === module) {
   process.stdin.on('data', chunk => { raw += chunk; });
   process.stdin.on('end', () => { const result = run(raw); if (result) process.stdout.write(JSON.stringify(result)); });
 }
-module.exports = { decide, run, inspect };
+module.exports = { decide, run, inspect, bypassOrForce };
