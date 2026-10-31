@@ -1540,6 +1540,70 @@ test('goal CLI and runtime bridge forward pinned maps and explicit historical ro
   }
 });
 
+test('runtime bridge final claim rejects a cited commit absent from the bound repository', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-cited-commit-'));
+  try {
+    runGit(['init', '-q'], dir);
+    fs.writeFileSync(path.join(dir, 'README.md'), '# Cited commit\n');
+    runGit(['add', 'README.md'], dir);
+    runGit(['-c', 'user.name=Test', '-c', 'user.email=test@example.invalid', 'commit', '-qm', 'initial'], dir);
+    const head = runGit(['rev-parse', 'HEAD'], dir);
+    const goalDir = path.join(dir, '.ecc', 'goal');
+    fs.mkdirSync(goalDir, { recursive: true });
+    fs.writeFileSync(path.join(goalDir, 'active-goal.yaml'), JSON.stringify(goal()));
+    require('../../scripts/lib/session-coordination').execute('register', { cwd: dir, sessionId: 'cited-commit',
+      scopes: ['README.md'], objective: 'offline commit citation check', doneWhen: 'claim remains gated', ttl: 120 });
+    const bridge = path.join(__dirname, '..', '..', 'scripts', 'goal-runtime-bridge.js');
+    const final = text => run(bridge, ['final', '--runtime', 'codex', '--claim', 'complete',
+      '--session', 'cited-commit', '--text', text], dir);
+    runGit(['branch', 'e6126e2a6'], dir);
+    const fabricated = final('Committed e6126e2a6 and verified it.');
+    assert.strictEqual(fabricated.status, 2, fabricated.stderr);
+    assert.match(fabricated.stderr, /missing or ambiguous commit\(s\).*e6126e2a6/);
+    // A real SHA passes this gate and still meets every existing claim gate.
+    const real = final(`Committed ${head} and verified it.`);
+    assert.strictEqual(real.status, 2, real.stderr);
+    assert.doesNotMatch(real.stderr, /missing or ambiguous commit/);
+    assert.strictEqual(JSON.parse(real.stdout).allowed, false);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('runtime bridge validates the selected resume before citation roots and forwards it for uncited claims', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-cited-resume-'));
+  try {
+    runGit(['init', '-q'], dir);
+    fs.writeFileSync(path.join(dir, 'README.md'), '# Before\n');
+    runGit(['add', 'README.md'], dir);
+    runGit(['-c', 'user.name=Test', '-c', 'user.email=test@example.invalid', 'commit', '-qm', 'initial'], dir);
+    const goalDir = path.join(dir, '.ecc', 'goal'); fs.mkdirSync(goalDir, { recursive: true });
+    fs.writeFileSync(path.join(goalDir, 'active-goal.yaml'), JSON.stringify(goal()));
+    require('../../scripts/lib/session-coordination').execute('register', { cwd: dir, sessionId: 'cited-resume',
+      scopes: ['README.md'], objective: 'offline selected receipt check', doneWhen: 'stale claims refused', ttl: 120 });
+    const selected = path.join(goalDir, 'selected.json');
+    fs.writeFileSync(selected, JSON.stringify({ repository_states: [{ repo_root: dir }] }));
+    const bridge = path.join(__dirname, '..', '..', 'scripts', 'goal-runtime-bridge.js');
+    const args = ['--runtime', 'codex', '--session', 'cited-resume', '--resume', selected];
+    const malformed = run(bridge, ['final', ...args, '--claim', 'complete', '--text', 'Committed e6126e2a6'], dir);
+    assert.strictEqual(malformed.status, 1);
+    assert.match(malformed.stderr, /invalid resume receipt/);
+    const state = captureRepositoryState(dir, { repoId: 'backend', excludePaths: [goalDir] });
+    fs.writeFileSync(selected, JSON.stringify(resume({ repository_state: state, repository_states: [state] })));
+    fs.writeFileSync(path.join(dir, 'README.md'), '# Changed\n');
+    const admission = run(bridge, ['admit', ...args, '--mode', 'controlled'], dir);
+    assert.strictEqual(admission.status, 2);
+    assert.match(JSON.parse(admission.stdout).validation_error, /is stale.*tree fingerprint/);
+    const uncited = run(bridge, ['final', ...args, '--claim', 'on-track', '--text', 'Progress report'], dir);
+    assert.strictEqual(uncited.status, 1);
+    assert.match(uncited.stderr, /is stale.*tree fingerprint/);
+    const cited = run(bridge, ['final', ...args, '--claim', 'complete', '--text', 'Committed e6126e2a6'], dir);
+    assert.strictEqual(cited.status, 1);
+    assert.match(cited.stderr, /is stale.*tree fingerprint/);
+    assert.doesNotMatch(cited.stderr, /missing or ambiguous/);
+  } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+});
+
 test('a later terminal receipt retires stale pinned history without weakening current evidence checks', () => {
   const { classifyHistoricalIntegrations, verifyBundleEvidence } = require('../../scripts/lib/goal-evidence');
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-historical-receipts-'));
@@ -1881,6 +1945,27 @@ test('blocked alternatives review rejects missing, stale, ready and unbounded de
   ]) {const changed=structuredClone(bundle);mutate(changed);assert.strictEqual(evaluateClaim('blocked',changed,now).allowed,false);}
   const ownerless=structuredClone(bundle);delete ownerless.resume.alternatives_review.lanes[0].owner;
   assert.throws(() => evaluateClaim('blocked',ownerless,now), /invalid resume receipt/);
+});
+
+test('stale-contract worker settlement leaves a fully proven goal incomplete', () => {
+  const previousGoal = goal();
+  previousGoal.user_visible_proofs[0].acceptance_predicate = 'Any heat value rendered anywhere.';
+  const stale = assignment();
+  stale.contract_sha256 = goalContractDigest(previousGoal);
+  stale.assignment_contract_sha256 = assignmentContractDigest(previousGoal, stale);
+  const settled = integration({ contract_sha256: stale.contract_sha256, assignment_contract_sha256: stale.assignment_contract_sha256 });
+  const bundle = { goal: goal({ status: 'complete' }),
+    outcomes: [outcome('r1', 'heat-browser', 'ui_displayed'), outcome('r2', 'flood-validation', 'independently_validated')],
+    resume: resume({ observed_at: '2026-09-29T15:00:00Z' }), assignments: [stale], integrations: [settled] };
+  const result = singleAgentClaim('complete', bundle, { now: '2026-09-29T15:00:00Z' });
+  assert.strictEqual(result.allowed, false);
+  assert.strictEqual(result.status.complete, true);
+  assert.strictEqual(result.status.parallel.integrated, 0);
+  assert.strictEqual(result.status.parallel.stale, 1);
+  assert.match(result.reasons.join(' '), /1 delegated assignment\(s\) lack a passing parent integration receipt/);
+  const unconfigured = evaluateClaim('complete', bundle, { now: '2026-09-29T15:00:00Z' });
+  assert.strictEqual(unconfigured.allowed, false);
+  assert.match(unconfigured.reasons.join(' '), /completion admission unverified/);
 });
 
 (async () => {

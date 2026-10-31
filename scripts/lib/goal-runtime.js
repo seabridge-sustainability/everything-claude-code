@@ -143,6 +143,26 @@ function inferClaim(text) {
   return null;
 }
 
+// Commit-like tokens cited in claim prose. Prose can only deny, never prove:
+// each explicit citation must resolve in a bound repository. UUID/ID fragments,
+// colors, data digests, ordinary words and dates are not commit citations.
+function citedCommits(text) {
+  const source = String(text || '');
+  const citations = new Set();
+  let previousEnd = null;
+  for (const match of source.matchAll(/(?<![\w#.-])[0-9a-f]{7,40}(?![\w-])/gi)) {
+    const prefix = source.slice(Math.max(0, match.index - 80), match.index);
+    const explicit = /\b(?:commit(?:ted|s)?(?:\s+(?:id|sha|hash))?|sha(?:-?1)?s?|revision|head|pushed)\s*[:=]?\s*[`*"'([{]*$/i.test(prefix)
+      || /\/(?:commits?|revision)\/$/i.test(prefix);
+    const continued = previousEnd !== null && /^[\s,`*"'\])]*(?:(?:and|or)\s+)?[`*"'([{]*$/i.test(source.slice(previousEnd, match.index));
+    if (explicit || continued) {
+      citations.add(match[0].toLowerCase());
+      previousEnd = match.index + match[0].length;
+    } else previousEnd = null;
+  }
+  return [...citations];
+}
+
 // A native adapter supplies this object from its lifecycle, never by parsing
 // assistant prose. It is a completion *candidate*, not an acceptance receipt.
 function completionIntent(payload) {
@@ -169,6 +189,7 @@ module.exports = {
   CAPABILITY_PATH,
   ROOT,
   admissionDecision,
+  citedCommits,
   classifyTaskText,
   inferClaim,
   completionIntent,

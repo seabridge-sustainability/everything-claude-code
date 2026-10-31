@@ -3,8 +3,10 @@
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 const {
   admissionDecision,
+  citedCommits,
   classifyTaskText,
   inferClaim,
   completionIntent,
@@ -97,6 +99,54 @@ test('structured lifecycle intent is explicit and bound, independently of prose'
   for (const invalid of [{}, { ...bound, intent: 'accepted' }, { ...bound, session_id: '' }, { ...bound, contract_sha256: 'changed' }]) {
     assert.throws(() => completionIntent({ ecc_completion: invalid }), /invalid structured completion intent/);
   }
+});
+
+test('cited commit extraction finds SHA-like tokens and skips IDs, colors and digests', () => {
+  // Deterministic synthetic SHA-shaped input, not a credential.
+  const syntheticCommit = '0123456789abcdef'.repeat(2) + '01234567';
+  assert.deepStrictEqual(citedCommits(`Committed e6126e2a6; pushed e6126e2a6 and ${syntheticCommit}.`),
+    ['e6126e2a6', syntheticCommit]);
+  assert.deepStrictEqual(citedCommits('Thread 01a18a4b-37a9-7852-a1da-39d6f6e264a4, run_83af29cecbbe, #0f2757aa, '
+    + `sha256 ${'ab12'.repeat(16)}, build 20261030, word deadbeef.`), []);
+  assert.deepStrictEqual(citedCommits(''), []);
+  assert.deepStrictEqual(citedCommits('Committed deadbeef; commit 12345678; SHA ABCDEF12; commit ID `DEADBEEF`.'),
+    ['deadbeef', '12345678', 'abcdef12']);
+  assert.deepStrictEqual(citedCommits('Commits `DEADBEEF`, ABCDEF12 and 12345678.'), ['deadbeef', 'abcdef12', '12345678']);
+  assert.deepStrictEqual(citedCommits('Company ID 507f1f77bcf86cd799439011; MD5 d41d8cd98f00b204e9800998ecf8427e.'), []);
+  assert.deepStrictEqual(citedCommits('https://example.invalid/repo/commit/ABCDEF12'), ['abcdef12']);
+});
+
+test('commit observation is offline, bounded and unambiguous across repositories', () => {
+  const { missingCommits } = require('../../scripts/goal-runtime-bridge');
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-commit-observation-'));
+  try {
+    const other = path.join(dir, 'other'); fs.mkdirSync(other);
+    const prefix = 'abc1234', full = prefix + '0'.repeat(33);
+    let calls = 0;
+    const observe = (command, args, options) => {
+      calls++;
+      assert.strictEqual(command, 'git');
+      assert.deepStrictEqual(args.slice(-2), ['cat-file', '--batch-check']);
+      assert.strictEqual(options.input, prefix + '^{commit}\n');
+      assert.ok(options.timeout > 0 && options.timeout <= 1000);
+      assert.strictEqual(options.shell, false);
+      assert.strictEqual(options.env.GIT_NO_LAZY_FETCH, '1');
+      assert.strictEqual(options.env.GIT_TERMINAL_PROMPT, '0');
+      return { status: 0, stdout: `${full} commit 100\n` };
+    };
+    assert.deepStrictEqual(missingCommits(`Commit ${prefix}`, [dir, dir, other], observe), []);
+    assert.strictEqual(calls, 2);
+    assert.deepStrictEqual(missingCommits(`Commit ${prefix}`, [dir, other], (command, args) =>
+      ({ status: 0, stdout: `${args[1] === fs.realpathSync(dir) ? full : prefix + '1'.repeat(33)} commit 100\n` })), [prefix]);
+    // A branch bearing the claimed prefix is not that commit object.
+    assert.deepStrictEqual(missingCommits(`Commit ${prefix}`, [dir], () =>
+      ({ status: 0, stdout: `${'f'.repeat(40)} commit 100\n` })), [prefix]);
+    assert.deepStrictEqual(missingCommits(`Commit ${prefix}`, [dir], () =>
+      ({ status: 0, stdout: `${prefix}^{commit} missing\n` })), [prefix]);
+    assert.throws(() => missingCommits(`Commit ${prefix}`, [dir], () => ({ status: null, error: Error('timeout') })), /unavailable/);
+    assert.throws(() => missingCommits(`Commit ${prefix}`, [dir], () => ({ status: 0, stdout: '' })), /invalid|incomplete/);
+    assert.throws(() => missingCommits(Array.from({length:33}, (_, i) => `commit a${i.toString(16).padStart(6,'0')}`).join('; '), [dir], observe), /bounded scope/);
+  } finally { fs.rmSync(dir, { recursive: true, force: true }); }
 });
 
 (async () => {

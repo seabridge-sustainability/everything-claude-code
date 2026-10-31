@@ -4,6 +4,14 @@
 `pre_tool_call` shell hook to ECC's existing registered scope guard. It is not a
 new coordinator or a claim that installed/running agents are protected.
 
+The installed Hermes 0.22.5 chat client executes its turns in the gateway
+(`hermes_cli.main.cmd_chat`, `gateway_chat_startup` and `gateway_agent`). A fresh
+client's ECC environment is not a binding of that execution process. Do not add
+Hermes to protected fresh launches merely because the client inherits these
+variables. First verify the exact execution gateway/profile, native session and
+parent binding at the actual hook invocation. Preserve the existing healthy
+gateway; client launch, hook consent and gateway activation are separate steps.
+
 The parent must register a fresh owned session, bind the exact current goal and
 observed **Hermes session ID**, choose a deadline within that lease and finite
 tool/turn limits, and protect controller/configuration paths. Reuse the exported

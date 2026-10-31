@@ -1314,3 +1314,43 @@ test('reviewed worker gates reject forged identity and invalid capacity but acce
   assert.throws(()=>invoke('available_child_slots:-1'));
   assert.throws(()=>invoke('available_child_slots:1.5'));
 });
+test('uncertain worker late exact-token result is recorded once and charges only the dollar delta', t => {
+  const f=fixture(t,['claude']);f.assignments[0].budget.max_cost_usd=1;f.writeAssignments();f.plan.limits.usd=1;
+  let s=c.apply(c.initialize(f.plan),{type:'dispatch',actor:'parent'});
+  const token=s.nodes['worker-0'].token,lease=s.nodes['worker-0'].lease_until;
+  s=c.apply(s,{type:'worker-error',actor:'worker-0',worker:'worker-0',token,usage:{tool_calls:1,retries:0,ci_runs:0,cost_usd:0.25}});
+  assert.equal(s.nodes['worker-0'].status,'running');assert.equal(s.nodes['worker-0'].token,token);assert.equal(s.spent_usd,0.25);
+  assert.throws(()=>c.apply(s,{type:'dispatch',actor:'parent'}),/no pending nodes/);
+  const late={...f.result(s),usd:0.4,usage:{tool_calls:2,retries:0,ci_runs:0,cost_usd:0.4}};
+  assert.throws(()=>c.apply(s,{type:'result',actor:'worker-0',result:{...late,token:'0'.repeat(64)}}),/stale or duplicate/);
+  assert.throws(()=>c.apply(s,{type:'result',actor:'worker-0',result:late},{now:lease+1}),/stale or duplicate/);
+  const settled=c.apply(s,{type:'result',actor:'worker-0',result:late});
+  assert.ok(Math.abs(settled.spent_usd-0.4)<1e-9,`spent_usd must be 0.40 (delta only), got ${settled.spent_usd}`);
+  assert.ok(Math.abs(settled.nodes['worker-0'].usage.cost_usd-0.4)<1e-9);assert.equal(settled.nodes['worker-0'].usage.tool_calls,2);
+  assert.equal(settled.dispatches,1);assert.equal(settled.nodes['worker-0'].attempts,1);assert.equal(settled.phase,'critic');
+  const digest=c.digest(settled);
+  assert.throws(()=>c.apply(settled,{type:'result',actor:'worker-0',result:late}),/stale or duplicate/);
+  assert.equal(c.digest(settled),digest);
+});
+const countNodes=(state,status)=>Object.values(state.nodes).filter(node=>node.status===status).length;
+test('twelve ready tasks follow observed capacity 3 and 12 with no hidden cap', t => {
+  const f=fixture(t,Array(12).fill('synthetic'));
+  const three=c.apply(c.initialize(f.plan),{type:'dispatch',actor:'parent',capacity:{available_child_slots:3,source:'synthetic observed slots'}});
+  assert.equal(countNodes(three,'running'),3);assert.equal(countNodes(three,'pending'),9);assert.equal(three.dispatches,3);
+  const twelve=c.apply(c.initialize(f.plan),{type:'dispatch',actor:'parent',capacity:{available_child_slots:12,source:'synthetic observed slots'}});
+  assert.equal(countNodes(twelve,'running'),12,'observed capacity above 10 must not be clipped by a hidden cap');
+  assert.equal(twelve.dispatches,12);assert.equal(new Set(Object.values(twelve.nodes).map(node=>node.token)).size,12);
+});
+test('runner queues capacity overflow with an explicit reason instead of launching', async t => {
+  const f=fixture(t,Array(12).fill('synthetic'));c.create(f.file,f.plan);
+  c.transaction(f.file,s=>c.apply(s,{type:'dispatch',actor:'parent',capacity:{available_child_slots:3,source:'synthetic observed slots'}}));
+  const host=recoveryHost(f);let launches=0;host.verifyWorkerAdmission=()=>true;
+  host.readWorkerCapacity=state=>{const used=countNodes(state,'running');
+    return {available_child_slots:Math.max(0,3-used),source:`synthetic: 3 observed, ${used} in use`};};
+  host.launchWorker=async worker=>{launches++;return f.result(c.load(f.file),worker.id);};
+  const queued=await operational.run(f.file,host);
+  assert.equal(queued.stopped,'worker-capacity-queued');
+  assert.deepEqual(queued.capacity,{available_child_slots:0,source:'synthetic: 3 observed, 3 in use'});
+  assert.equal(launches,0);assert.equal(queued.state.dispatches,3);
+  assert.equal(countNodes(queued.state,'running'),3);assert.equal(countNodes(queued.state,'pending'),9);
+});

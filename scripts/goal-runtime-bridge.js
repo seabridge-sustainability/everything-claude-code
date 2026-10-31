@@ -7,6 +7,7 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 const {
   admissionDecision,
+  citedCommits,
   classifyTaskText,
   inferClaim,
   completionIntent,
@@ -65,6 +66,39 @@ function evidenceArgs(args) {
   return result;
 }
 
+// The caller validates the exact selected receipt and its live repository
+// fingerprints first. Git observation is finite, noninteractive and offline;
+// a branch named like a SHA, ambiguous prefix or failed read cannot prove it.
+function missingCommits(text, roots, observe = spawnSync) {
+  const citations = citedCommits(text);
+  if (!citations.length) return [];
+  const unique = [...new Set(roots.map(root => fs.realpathSync(root)))];
+  if (citations.length > 32 || unique.length > 16 || !unique.length) throw Error('commit citation verification exceeds bounded scope');
+  const resolved = citations.map(() => new Set());
+  const deadline = Date.now() + 5000;
+  for (const root of unique) {
+    const remaining = deadline - Date.now();
+    if (remaining <= 0) throw Error('commit citation observation timed out; acceptance withheld');
+    const result = observe('git', ['-C', root, 'cat-file', '--batch-check'], {
+      input: citations.map(sha => `${sha}^{commit}`).join('\n') + '\n',
+      encoding: 'utf8', shell: false, windowsHide: true,
+      timeout: Math.min(1000, remaining), maxBuffer: 64 * 1024,
+      env: { ...process.env, GIT_NO_LAZY_FETCH: '1', GIT_TERMINAL_PROMPT: '0', GIT_OPTIONAL_LOCKS: '0', GCM_INTERACTIVE: 'Never' },
+    });
+    if (result.error || result.status !== 0 || Date.now() > deadline) throw Error('commit citation observation unavailable; acceptance withheld');
+    const rows = String(result.stdout).trimEnd().split('\n');
+    if (rows.length !== citations.length) throw Error('incomplete commit citation observation');
+    rows.forEach((row, index) => {
+      const found = /^([a-f0-9]{40}) commit \d+\r?$/.exec(row);
+      if (found && found[1].startsWith(citations[index])) resolved[index].add(found[1]);
+      else if (row !== `${citations[index]}^{commit} missing` && row !== `${citations[index]}^{commit} missing\r` && !found) {
+        throw Error('invalid commit citation observation');
+      }
+    });
+  }
+  return citations.filter((sha, index) => resolved[index].size !== 1);
+}
+
 function main(args = process.argv.slice(2)) {
   const command = args[0] || 'capabilities';
   const capabilities = loadCapabilities();
@@ -80,7 +114,11 @@ function main(args = process.argv.slice(2)) {
   runtimeById(runtimeId, capabilities);
   // Reuse the goal CLI's resolver so a named goal cannot silently borrow the
   // default folder's outcomes, assignments or resume receipt.
-  const { directory: goalDir, goal: goalPath } = require('./goal-control').pathsFrom(args);
+  const selected = require('./goal-control').pathsFrom(args);
+  const { goal: goalPath, resume: resumePath } = selected;
+  // Validation, commit lookup and final claim must consume the same bundle.
+  const selectedArgs = Object.entries(selected).filter(([key]) => key !== 'resumeHistory')
+    .flatMap(([key, value]) => [key === 'directory' ? '--dir' : `--${key}`, value]);
   const model = optionValue(args, '--model');
   const sessionId = optionValue(args, '--session', process.env.ECC_SESSION_ID);
   const artifactArgs = evidenceArgs(args);
@@ -95,7 +133,7 @@ function main(args = process.argv.slice(2)) {
     let goalValid = false;
     let validationError = null;
     if (goalExists) {
-      const result = runGoal(['validate', '--goal', goalPath, '--dir', goalDir, ...artifactArgs]);
+      const result = runGoal(['validate', ...selectedArgs, ...artifactArgs]);
       goalValid = result.status === 0;
       validationError = goalValid ? null : (result.stderr || result.stdout).trim();
     }
@@ -123,7 +161,7 @@ function main(args = process.argv.slice(2)) {
     if (fs.existsSync(path.resolve(goalPath))) {
       const goals = require('./lib/goal-control');
       const goal = goals.readStructuredFile(path.resolve(goalPath));
-      const assignments = goals.readJsonLines(path.resolve(goalDir, 'assignments.jsonl'));
+      const assignments = goals.readJsonLines(path.resolve(selected.assignments));
       requireSupervisedIntent(goals.admissionForGoal(goal, assignments), intent);
     }
     if (intent) {
@@ -162,7 +200,26 @@ function main(args = process.argv.slice(2)) {
       process.stderr.write(`session coordination: ${error.message}\n`);
       return 2;
     }
-    const result = runGoal(['claim', claim, '--goal', goalPath, '--dir', goalDir, '--json', ...artifactArgs]);
+    if (citedCommits(text).length) {
+      const snapshot = () => fs.existsSync(path.resolve(resumePath)) ? fs.readFileSync(path.resolve(resumePath), 'utf8') : null;
+      const before = snapshot();
+      const validation = runGoal(['validate', ...selectedArgs, ...artifactArgs]);
+      if (validation.status !== 0) {
+        if (validation.stderr) process.stderr.write(validation.stderr);
+        return validation.status === null ? 1 : validation.status;
+      }
+      if (snapshot() !== before) throw Error('selected resume receipt changed during citation validation');
+      const receipt = before === null ? null : require('js-yaml').load(before);
+      const roots = [process.cwd(), ...(receipt?.repository_states || (receipt ? [receipt.repository_state] : []))
+        .map(state => state.repo_root)];
+      const missing = missingCommits(text, roots);
+      if (missing.length) {
+        process.stderr.write(`goal runtime: ${claim} claim cites missing or ambiguous commit(s) in the bound repositories: ${missing.join(', ')}; cite a full SHA read from git or remove it\n`);
+        return 2;
+      }
+      if (snapshot() !== before) throw Error('selected resume receipt changed during citation observation');
+    }
+    const result = runGoal(['claim', claim, ...selectedArgs, '--json', ...artifactArgs]);
     if (result.stdout) process.stdout.write(result.stdout);
     if (result.stderr) process.stderr.write(result.stderr);
     return result.status === null ? 1 : result.status;
@@ -180,4 +237,4 @@ if (require.main === module) {
   }
 }
 
-module.exports = { evidenceArgs, hookText, main, optionValue, readStdin, runGoal };
+module.exports = { evidenceArgs, hookText, main, missingCommits, optionValue, readStdin, runGoal };
