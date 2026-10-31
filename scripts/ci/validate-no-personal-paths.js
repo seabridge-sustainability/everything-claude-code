@@ -31,6 +31,8 @@ const EXEMPT_PREFIXES = [
 
 const PLACEHOLDER_USERNAMES = new Set([
   'example',
+  // Generic "home directory" wording in central policy ("No loose C:/Users/home code").
+  'home',
   'me',
   'user',
   'username',

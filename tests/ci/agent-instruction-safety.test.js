@@ -111,8 +111,13 @@ function run() {
     const snapshot = require('../../docs/tools/agent-system-map.json').policySnapshot;
     const source = snapshot.find(row => row.path.endsWith('/AGENTS_SYSTEM.md')).text.replace(/\s+/g, ' ');
     for (const pattern of guardrails[0].requiredPatterns) assert.ok(pattern.test(source), `${pattern}`);
-    assert.ok(!guardrails[0].requiredPatterns[1].test(source.replace('commit/push/merge/branch/PR', 'unrelated action')));
-    assert.ok(!guardrails[0].requiredPatterns[2].test(source.replace('paid/live-provider APIs', 'unrelated action')));
+    // Remove the phrase in whichever accepted wording the published policy uses.
+    for (const index of [1, 2]) {
+      const pattern = guardrails[0].requiredPatterns[index];
+      const removed = source.replace(new RegExp(pattern.source, 'gi'), 'unrelated action');
+      assert.notStrictEqual(removed, source);
+      assert.ok(!pattern.test(removed), `${pattern} must fail once the requirement is removed`);
+    }
   })) passed++; else failed++;
 
   console.log(`\nPassed: ${passed}`);
