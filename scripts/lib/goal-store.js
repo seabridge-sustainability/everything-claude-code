@@ -113,9 +113,10 @@ function gitBuffer(repo, args) {
   try {
     return execFileSync('git', ['-C', repo, ...args], {
       stdio: ['ignore', 'pipe', 'pipe'],
+      maxBuffer: 16 * 1024 * 1024,
     });
   } catch (error) {
-    const detail = error.stderr ? String(error.stderr).trim() : error.message;
+    const detail = String(error.stderr || '').trim() || error.message;
     throw new Error(`git ${args.join(' ')} failed for ${repo}: ${detail}`);
   }
 }
@@ -151,7 +152,8 @@ function captureRepositoryState(repoPath = process.cwd(), options = {}) {
     const absolute = path.join(root, file);
     return {
       path: file.split(path.sep).join('/'),
-      sha256: sha256File(absolute),
+      // Empty source files still have an identity; nonempty evidence is checked separately.
+      sha256: sha256Buffer(fs.readFileSync(absolute)),
       size_bytes: fs.statSync(absolute).size,
     };
   }).sort((left, right) => left.path.localeCompare(right.path));
