@@ -90,28 +90,56 @@ is not interception proof, and this guard does not activate direct IDE starts.
 
 ## Dependency-local continuation and fail-fast gates
 
-- Reconcile resolved approvals, ownership handoffs, commits and current evidence
-  before repeating a blocker. A copied historical status is not a current audit.
-  For each required lane name the actual dependency, remedy/owner and next safe
-  action. Continue ready implementation, bounded review or worker integration;
-  missing scientific inputs never justify invented values or waived admission.
+- At the first blocked lane, record its dependency, owner, remedy, evidence and
+  next safe action; escalate through the authorized assigned-manager route with
+  a bounded response checkpoint. Record delivery, confirmed consumption and the
+  manager's next action separately; queued delivery is not acknowledgement.
+  Reconcile resolved approvals, handoffs, commits and changed evidence before
+  repeating a blocker. A copied historical status is not a current audit.
+  Continue independent authorized work; a lane wait does not pause the goal.
+  Missing scientific inputs never justify invented values or waived admission.
 - Treat register/admit/check commands as dependencies: require exit 0 AND the
-  expected successful structured result before dispatch, writes or claims.
-  A failed gate permits only safe independent reads or an owned unapplied patch,
-  not a source edit. Never chain a failed gate into implementation or report a
-  denied reservation as registered. Refresh legitimate snapshots once after
-  changed source; never bypass guards or repeat unchanged checks indefinitely.
+  expected successful structured result before dependent dispatch, source edits
+  or claims. A failed gate permits safe independent reads or an owned unapplied
+  patch, not source implementation. For missing or stale same-goal metadata,
+  use the supported bootstrap only: register/check-write the exact owned goal
+  metadata paths, then initialize only an absent goal. For an existing goal with
+  an absent receipt, use plain `ecc goal resume` with explicit reconciled repository
+  bindings and metadata. Refresh a valid existing same-goal receipt with
+  `ecc goal resume --refresh-metadata --next-action <latest-owner-next-action>`;
+  a malformed existing receipt remains fail-closed, never overwritten with defaults.
+  Reconcile the observed source change first;
+  preserve goal identity, repository IDs/roots, dependencies, spending, inherited
+  evidence, results and history. Match the latest owner correction's next action
+  exactly. Require `ecc goal validate` success, then controlled runtime admission
+  before any source edit or implementation-worker dispatch. Independent read-only
+  delegation remains subject to all applicable native/harness launch, ownership
+  and budget gates. Metadata repair grants no source,
+  status, budget or ownership override; failed registration/check-write remains
+  fail-closed. Never replace an existing goal, erase evidence, bypass guards,
+  report a denied reservation as registered or repeat unchanged checks indefinitely.
 - A blocked claim needs a fresh goal/outcome snapshot, a concrete reason for
   every unmet lane, no ready independent work and no unreviewed worker result.
   Pending assignments need integration or explicit non-passing retirement;
   labeling all lanes blocked cannot replace those obligations.
+  For a verified live worker, record its assignment, expected output, remaining
+  budget and bounded checkpoint, and use supported waiting while independent
+  work continues. Do not call its pending result an empty backlog. At the
+  checkpoint reconcile the result, legitimate handoff or explicit non-passing
+  retirement; do not retire useful work merely to permit a blocked claim.
   Reconcile the actual next work items, not only unmet acceptance proofs: active
   next actions in optional, already-proved or unmapped lanes still contradict a
   whole-goal blocked claim. Before yielding after suspected drift, use one bounded
-  independent backlog review to look for retained-input calculations, owned patches
-  and integration seams. A self-reported empty backlog is not proof of exhaustion;
+  independent diagnosis/backlog review, parallel where useful and admitted, to look
+  for retained-input calculations, owned patches and integration seams.
+  A self-reported empty backlog is not proof of exhaustion;
   ECC cannot discover work omitted from its records. Do not repeat this review on
   unchanged ticks or turn missing scientific/legal admission into fabricated data.
+  Do not spend three turns repeating unchanged status checks. A missing manager
+  response at the bounded checkpoint is an external dependency, not authority
+  to wait forever or invent progress. Whole-goal blocking still requires a true
+  impasse after authorized work is exhausted and must respect any applicable
+  native recurrence threshold.
 - Worker budgets need execution-time enforcement, not only terminal rejection.
   Bind the exact assignment cap to the actual intercepted tools, count startup
   probes/retries/closure explicitly and never silently substitute the launcher's
@@ -135,7 +163,11 @@ is not interception proof, and this guard does not activate direct IDE starts.
   Cross-repository/legacy workers and unmetered earlier work are not retroactively
   admitted; live native interception and provider/token metering remain separate.
 - On an explicit owner resumption/correction, refresh the ECC plan and resume
-  receipt, then pursue the authorized next action. A stale native UI label is
+  receipt, then pursue the authorized next action. Use supported continuation of
+  the same goal only when a changed/resolved blocker or ready admitted work provides
+  a concrete next action; refresh the audit after explicit resumption. Do not force-resume,
+  create new timers or busywork, or override owner pauses, native status control
+  or safety/usage stops. A stale native UI label is
   not proof of a current blocker. Respect actual owner pauses and host safety,
   permission, resource and budget stops; agents cannot change host-controlled
   goal status or promise automatic vendor continuation without runtime proof.
