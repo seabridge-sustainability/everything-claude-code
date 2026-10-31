@@ -74,13 +74,69 @@ function run(payload, options = {}) {
   }
 }
 
+// Gateway hooks do not inherit a client's ECC environment, and their cwd is
+// the gateway's process cwd. A parent pins one exact native session before any
+// prompt and passes its immutable binding through the consented hook command.
+function runBound(payload, bindingFile, bindingSha256, environment = process.env) {
+  const blocked = () => ({ output: { action: 'block', message: 'ECC Hermes guard: parent-pinned gateway binding unavailable' }, exit: 2 });
+  const previousNodePath = process.env.NODE_PATH;
+  let changedNodePath = false;
+  try {
+    demand(path.isAbsolute(bindingFile || '') && /^[a-f0-9]{64}$/.test(bindingSha256 || ''), 'pinned absolute binding required');
+    demand(!fs.lstatSync(bindingFile).isSymbolicLink() && fs.statSync(bindingFile).isFile() && fs.statSync(bindingFile).size <= 16384
+      && canonical(bindingFile) === (process.platform === 'win32' ? path.resolve(bindingFile).toLowerCase() : path.resolve(bindingFile)), 'regular binding required');
+    const bytes = fs.readFileSync(bindingFile);
+    demand(bytes.length <= 16384 && crypto.createHash('sha256').update(bytes).digest('hex') === bindingSha256, 'binding changed');
+    const binding = JSON.parse(bytes.toString('utf8'));
+    const fields = ['version','nativeSessionId','profileName','profileHome','cwd','sessionId','goalFile','sourceSha256','nodePath'];
+    demand(Object.keys(binding).length === fields.length && fields.every(key => Object.hasOwn(binding,key))
+      && binding.version === 1 && fields.slice(1).every(key => typeof binding[key] === 'string' && binding[key].trim()), 'exact binding required');
+    demand(binding.nativeSessionId.length <= 200 && binding.sourceSha256 === sourceHash(), 'native/source pin required');
+    const native = normalize(payload);
+    // This exact-session hook grants no protection or approval to other native
+    // sessions. They may have their own separately pinned hook definitions.
+    if (native.session_id !== binding.nativeSessionId) return { output: {}, exit: 0 };
+    demand(payload.profile === binding.profileName && path.isAbsolute(binding.profileHome)
+      && environment.HERMES_HOME && canonical(environment.HERMES_HOME) === canonical(binding.profileHome), 'native profile mismatch');
+    demand(path.isAbsolute(binding.nodePath) && path.basename(binding.nodePath) === 'node_modules'
+      && fs.statSync(binding.nodePath).isDirectory() && !fs.lstatSync(binding.nodePath).isSymbolicLink()
+      && canonical(binding.nodePath) === (process.platform === 'win32' ? path.resolve(binding.nodePath).toLowerCase() : path.resolve(binding.nodePath)), 'reviewed existing dependencies required');
+    // Process-local resolution only; never install, junction or edit the gateway
+    // environment. The immutable parent pin includes this existing dependency path.
+    process.env.NODE_PATH = binding.nodePath;
+    changedNodePath = true;
+    require('node:module').Module._initPaths();
+    const coordination = require('../lib/session-coordination');
+    const session = coordination.checkSession({ cwd: binding.cwd, sessionId: binding.sessionId });
+    for (const authority of [bindingFile,binding.nodePath,__filename]) {
+      const relative = path.relative(binding.cwd, authority).replace(/\\/g, '/');
+      demand(relative.startsWith('../') || path.isAbsolute(relative)
+        || !session.scopes.some(scope => coordination.overlaps(relative,scope)), 'authority overlaps worker write scope');
+    }
+    demand(session.guard?.nativeSessionId === binding.nativeSessionId, 'parent native binding mismatch');
+    // The workspace comes from the parent/controller, never from Path.cwd() in
+    // the shared gateway, nor from model-supplied tool arguments.
+    return run({ ...payload, cwd: binding.cwd }, { cwd: binding.cwd, sessionId: binding.sessionId,
+      goalFile: binding.goalFile, sourceSha256: binding.sourceSha256 });
+  } catch { return blocked(); }
+  finally {
+    if (changedNodePath) {
+      if (previousNodePath === undefined) delete process.env.NODE_PATH;
+      else process.env.NODE_PATH = previousNodePath;
+      require('node:module').Module._initPaths();
+    }
+  }
+}
+
 function main(args = process.argv.slice(2)) {
   let result;
   try {
-    demand(args.length === 1 && args[0] === 'pre', 'pre-tool adapter only');
+    const bound = args.length === 5 && args[0] === 'pre' && args[1] === '--binding-file' && args[3] === '--binding-sha256';
+    demand(bound || (args.length === 1 && args[0] === 'pre'), 'pre-tool adapter only');
     const raw = fs.readFileSync(0);
     demand(raw.length <= 1024 * 1024, 'bounded hook input required');
-    result = run(JSON.parse(raw.toString('utf8')));
+    const payload = JSON.parse(raw.toString('utf8'));
+    result = bound ? runBound(payload, args[2], args[4]) : run(payload);
   } catch {
     result = { output: { action: 'block', message: 'ECC Hermes guard: malformed or unsupported hook input' }, exit: 2 };
   }
@@ -88,4 +144,4 @@ function main(args = process.argv.slice(2)) {
   return result.exit;
 }
 if (require.main === module) process.exitCode = main();
-module.exports = { normalize, run, main, sourceHash };
+module.exports = { normalize, run, runBound, main, sourceHash };

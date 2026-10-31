@@ -66,3 +66,35 @@ consented Hermes session, changed goal/identity/deadline negatives, owner stop a
 restart without rebinding/replay, then the normal signed parent acceptance path.
 Native shell-hook parsing/dispatch with synthetic input is integration evidence
 for this boundary only; it is not live model or whole-goal completion proof.
+
+For gateway execution, use the exact-session binding mode instead of assuming
+client ECC environment reaches the hook. The parent creates the native session
+without a prompt, records its returned ID, registers/binds the ECC guard, and
+creates an immutable JSON file outside that worker's write scopes containing:
+`version: 1`, `nativeSessionId`, `profileName`, `profileHome`, `cwd`, `sessionId`,
+`goalFile`, `sourceSha256`, and `nodePath` (the existing reviewed `node_modules`
+directory). Pin that file's SHA-256 in the normally reviewed/consented command:
+
+```text
+node "<reviewed-ECC-root>/scripts/hooks/hermes-scope-guard.js" pre --binding-file "<absolute-parent-binding.json>" --binding-sha256 <SHA256>
+```
+
+Keep `matcher: '.*'`, `timeout: 10`, `fail_closed: true`. For that exact native
+session, the adapter checks the current profile/home, source/file pins, existing
+dependencies, controller identity, goal, lease and budgets. It resolves tools
+relative to the parent-bound workspace; native `cwd` is the gateway process cwd.
+Other well-formed native sessions receive no veto from this hook and are
+**unmanaged by it**, not protected or approved. A bad binding can veto calls for
+the whole configured hook, so validate it before requesting profile activation.
+Never silently remove an old binding or reuse its native identity to escape a
+stop. New assignments need fresh reviewed bindings; existing instances do not
+become protected merely because this source was committed.
+
+`discover_gateway_endpoint(home)` is read-only. Pass its already-ready endpoint
+explicitly to `connect_gateway(endpoint=...)`; the default can start a daemon.
+`runtime.describe` advertises the supported create fields. A fresh
+`session.create` without a title returns `stored_session_id` before
+`prompt.submit`. Record unique request/input identities before submission and
+reconcile uncertain receipts without replay. Profile-hook consent/registration,
+exact native interception, final acceptance and trustworthy billing still need
+separate live proof. Do not use `accept_hooks`, `safe_mode` or bypass flags.

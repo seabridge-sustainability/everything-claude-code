@@ -4,6 +4,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
+const crypto = require('node:crypto');
 const { spawnSync } = require('node:child_process');
 const adapter = require('../../scripts/hooks/hermes-scope-guard');
 const coordination = require('../../scripts/lib/session-coordination');
@@ -97,4 +98,45 @@ test('a closed parent session never becomes an implicitly rebound native worker'
   const f=fixture(t);
   coordination.execute('close',{cwd:f.cwd,sessionId:'hermes-owner'});
   assert.equal(adapter.run(f.payload,f.options).exit,2);
+});
+
+function gatewayBinding(f, changes = {}, file = path.join(f.cwd,'.ecc/goal/native-binding.json')) {
+  const binding = {version:1,nativeSessionId:f.payload.session_id,profileName:'fixture',profileHome:f.cwd,
+    cwd:f.cwd,sessionId:f.options.sessionId,goalFile:f.goalFile,sourceSha256:adapter.sourceHash(),
+    nodePath:process.env.NODE_PATH?.split(path.delimiter)[0] || path.resolve(__dirname,'../../node_modules'),...changes};
+  fs.mkdirSync(path.dirname(file),{recursive:true});fs.writeFileSync(file,JSON.stringify(binding),{flag:'wx'});
+  return {file,pin:crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex'),
+    payload:{...f.payload,cwd:os.tmpdir(),profile:'fixture'},env:{HERMES_HOME:f.cwd}};
+}
+
+test('gateway binding routes the exact native session to parent cwd without client ECC environment', t => {
+  const f=fixture(t),b=gatewayBinding(f);
+  assert.deepEqual(adapter.runBound(b.payload,b.file,b.pin,b.env),{output:{},exit:0});
+  assert.equal(f.tools(),1);
+  const env={...process.env,HERMES_HOME:f.cwd};
+  for(const key of ['ECC_SESSION_ID','ECC_OWNED_WORKTREE','ECC_HERMES_GOAL_FILE','ECC_HERMES_GUARD_SHA256','NODE_PATH'])delete env[key];
+  const child=spawnSync(process.execPath,[entry,'pre','--binding-file',b.file,'--binding-sha256',b.pin],
+    {env,input:JSON.stringify(b.payload),encoding:'utf8',windowsHide:true,timeout:10000});
+  assert.equal(child.status,0,child.stderr);assert.deepEqual(JSON.parse(child.stdout),{});assert.equal(f.tools(),2);
+});
+
+test('an exact-session gateway hook leaves other native sessions unmanaged without charging this guard', t => {
+  const f=fixture(t),b=gatewayBinding(f);
+  assert.deepEqual(adapter.runBound({...b.payload,session_id:'another-native-session'},b.file,b.pin,b.env),{output:{},exit:0});
+  assert.equal(f.tools(),0);
+  assert.equal(adapter.runBound({...b.payload,session_id:''},b.file,b.pin,b.env).exit,2);
+});
+
+test('gateway binding refuses wrong profile, changed pin, closed session and worker-writable binding', t => {
+  const f=fixture(t),b=gatewayBinding(f);
+  assert.equal(adapter.runBound({...b.payload,profile:'other'},b.file,b.pin,b.env).exit,2);
+  assert.equal(adapter.runBound(b.payload,b.file,b.pin,{}).exit,2);
+  assert.equal(adapter.runBound(b.payload,b.file,'0'.repeat(64),b.env).exit,2);
+  const writable=gatewayBinding(f,{},path.join(f.cwd,'owned/native-binding.json'));
+  assert.equal(adapter.runBound(writable.payload,writable.file,writable.pin,writable.env).exit,2);
+  const nodePath=path.join(f.cwd,'owned/node_modules');fs.mkdirSync(nodePath,{recursive:true});
+  const dependencies=gatewayBinding(f,{nodePath},path.join(f.cwd,'.ecc/goal/writable-dependencies.json'));
+  assert.equal(adapter.runBound(dependencies.payload,dependencies.file,dependencies.pin,dependencies.env).exit,2);
+  coordination.execute('close',{cwd:f.cwd,sessionId:f.options.sessionId});
+  assert.equal(adapter.runBound(b.payload,b.file,b.pin,b.env).exit,2);
 });
