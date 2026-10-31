@@ -46,11 +46,31 @@ test('native observation binds parent, Run, Task, Dispatch, incarnation and exec
   const status = { caller: { live: true, orcaSessionId: 'parent' } };
   const show = { dispatch: { id: 'dispatch', runId: 'run', taskId: 'task', processIncarnation: 'native:one', status: 'completed' },
     projection: { host: { id: 'local' }, outcome: 'succeeded' } };
-  const output = { source: 'transcript', sourceIdentity: 'native-output', transcript: { messages: [] } };
+  const output = { source: 'transcript', sourceIdentity: 'native-output', transcript: {
+    messages: [{ role: 'assistant', blocks: [{ type: 'text', text: 'Synthetic worker output' }] }],
+    limited: false, returnedMessageCount: 1 }, warnings: [] };
   const call = argv => argv[0] === 'status' ? status : argv.includes('worker-show') ? show : output;
   assert.strictEqual(adapter.observeDispatch(config, binding, call).dispatch_id, 'dispatch');
   for (const field of ['dispatch_id', 'task_id', 'process_incarnation', 'host_id']) {
     assert.throws(() => adapter.observeDispatch(config, { ...binding, [field]: 'wrong' }, call), /binding mismatch/);
+  }
+  const complete = structuredClone(output);
+  for (const delta of [
+    { transcript: { ...complete.transcript, messages: [] } },
+    { transcript: { ...complete.transcript, messages: [{ role: 'user' }] } },
+    { transcript: { ...complete.transcript, messages: [{ role: 'assistant' }] } },
+    { transcript: { ...complete.transcript, messages: [{ role: 'assistant', blocks: [] }] } },
+    { transcript: { ...complete.transcript, messages: [{ role: 'assistant', blocks: [{ type: 'text', text: ' ' }] }] } },
+    { transcript: { ...complete.transcript, limited: true } },
+    { transcript: { ...complete.transcript, returnedMessageCount: 2 } },
+    { transcript: { messages: complete.transcript.messages } },
+    { contentComplete: false }, { clipping: { text: true } },
+    { warnings: ['Oversized transcript text was clipped.'] }, { warnings: {} }, { warnings: undefined },
+  ]) {
+    Object.assign(output, complete, delta);
+    assert.throws(() => adapter.observeDispatch(config, binding, call), /worker output required/);
+    for (const key of Object.keys(output)) delete output[key];
+    Object.assign(output, structuredClone(complete));
   }
   status.caller.orcaSessionId = 'worker';
   assert.throws(() => adapter.observeDispatch(config, binding, call), /authenticated native parent/);

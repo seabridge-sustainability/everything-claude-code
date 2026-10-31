@@ -76,6 +76,15 @@ function observeDispatch(config, binding, call = createClient(config)) {
   const output = call(['orchestration', 'worker-read', '--dispatch', binding.dispatch_id, '--limit', '100']);
   demand(output.source === 'transcript' && output.sourceIdentity && output.transcript,
     'authoritative worker output unavailable');
+  demand(Array.isArray(output.transcript.messages) && output.transcript.messages.length > 0
+    && output.transcript.messages.some(message => message.role === 'assistant' && Array.isArray(message.blocks)
+      && message.blocks.some(block => (block.type === 'text' && typeof block.text === 'string' && block.text.trim())
+        || (block.type === 'tool-result' && !block.isError && typeof block.output === 'string' && block.output.trim()))),
+  'concrete authoritative worker output required');
+  demand(output.transcript.limited === false && output.contentComplete !== false
+    && output.transcript.returnedMessageCount === output.transcript.messages.length
+    && output.clipping == null && Array.isArray(output.warnings) && output.warnings.length === 0,
+  'complete unclipped authoritative worker output required');
   return { run_id: config.run_id, task_id: dispatch.taskId, dispatch_id: dispatch.id,
     process_incarnation: dispatch.processIncarnation, host_id: binding.host_id,
     parent_orca_session_id: status.caller.orcaSessionId,

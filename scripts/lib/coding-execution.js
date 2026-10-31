@@ -138,6 +138,7 @@ function checkPlan(plan, now) {
     }
     demand(assignment.execution_state !== 'queued', 'queued metadata is not execution admission');
     const proofs = assignment.acceptance_ids.map(id => goal.user_visible_proofs.find(proof => proof.id === id));
+    demand(proofs.every(Boolean), 'assignment references missing proofs');
     demand(proofs.every(proof => {
       const lane=goal.lanes.find(item=>item.id===proof.lane_id);
       return proof.required && (lane?.status==='active' || (lane?.status==='blocked' && lane.blocker && lane.next_action));

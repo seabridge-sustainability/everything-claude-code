@@ -248,7 +248,9 @@ test('recovered results require stopped timely evidence and parent identity, the
   const exhausted=c.apply(s,{...event,result:{...result,usage:{...result.usage,tool_calls:11}}},verified);
   assert.equal(exhausted.phase,'budget-exhausted');assert.equal(exhausted.nodes['worker-0'].status,'done');
   assert.equal(exhausted.nodes['worker-0'].usage.tool_calls,11);
-  assert.throws(()=>c.apply(exhausted,event,verified),/active worker reconciliation/);
+  const consumed=c.digest(exhausted);
+  assert.throws(()=>c.apply(exhausted,event,verified),/stale or duplicate worker result/);
+  assert.equal(c.digest(exhausted),consumed); // Duplicate recovery cannot mutate or charge the settled token.
 });
 
 test('recovered results still reject expired assignments, ownership and changed source', t => {
@@ -404,6 +406,29 @@ test('concrete critic journal reuses metered receipt and denies changed or unkno
   const failed=await host.review(charged,control);assert.equal(failed.report,null);assert.deepEqual(failed.usage,usage);
   fs.writeFileSync(receiptFile,JSON.stringify(receipt));
   assert.equal(host.verifyCriticUsage({...observed,receipt:{...observed.receipt,journal_sha256:'f'.repeat(64)}},f.plan),false);
+  assert.equal(host.verifyCritic({actor:f.plan.critic,report},f.plan),false); // Original decision requires its receipt.
+  engine.transaction(f.file,s=>c.apply(s,{type:'critic',actor:f.plan.critic,...observed},{verifyCritic:host.verifyCritic}));
+  engine.transaction(f.file,s=>c.apply(s,{type:'synthesis',actor:f.plan.parent,output:{
+    version:1,join_sha256:s.join_sha256,claim:'locally-verified',outputs:f.plan.workers.map(w=>w.id)}}));
+  const restarted=concrete.createBoundHost(f.spec,{stateFile:f.file,plan:f.plan}),approved=engine.load(f.file);
+  assert.equal(restarted.verifyCritic({actor:f.plan.critic,report},f.plan),true);
+  assert.equal(restarted.verifyCritic({actor:f.plan.parent,report},f.plan),false);
+  assert.equal(restarted.verifyCritic({actor:f.plan.critic,report:{...report,accepted:false}},f.plan),false);
+  for(const mutate of [s=>{s.phase='critic';},s=>{s.critique.accepted=false;},
+    s=>{delete s.critic_usage[attempt_sha256];},s=>{s.critic_usage[attempt_sha256].receipt_sha256='0'.repeat(64);},
+    s=>{s.critic_usage[attempt_sha256].usage.cost_usd=0;},s=>{s.join_sha256='0'.repeat(64);},
+    s=>{s.plan.revision=c.digest('changed owner revision');}]){
+    const changed=structuredClone(approved);mutate(changed);
+    fs.writeFileSync(f.file,JSON.stringify({state:changed,sha256:c.digest(changed)}));
+    assert.equal(restarted.verifyCritic({actor:f.plan.critic,report},f.plan),false);
+  }
+  fs.writeFileSync(f.file,JSON.stringify({state:approved,sha256:c.digest(approved)}));
+  assert.equal(restarted.verifyCritic({actor:f.plan.critic,report},f.plan),true);
+  const missing=receiptFile+'.held';fs.renameSync(receiptFile,missing);
+  try{assert.equal(restarted.verifyCritic({actor:f.plan.critic,report},f.plan),false);}
+  finally{fs.renameSync(missing,receiptFile);}
+  assert.equal(fs.existsSync(path.join(f.plan.repo,'.ecc/goal/critic-launches')),false);
+  engine.transaction(f.file,()=>charged); // Restore this synthetic fixture's earlier spend-only branch.
   fs.appendFileSync(path.join(f.plan.workers[0].repo,'code.txt'),'changed');
   assert.equal(host.verifyCriticUsage(observed,f.plan),true); // Spend must remain reconciled despite stale acceptance.
   assert.throws(()=>c.apply(charged,{type:'critic',actor:f.plan.critic,...observed},{verifyCritic:host.verifyCritic}),/stale/);

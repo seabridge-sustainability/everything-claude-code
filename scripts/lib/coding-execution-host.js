@@ -598,8 +598,9 @@ function createBoundHost(spec,{stateFile,plan}){
   }
   const criticKey=state=>engine.digest({plan_sha256:engine.digest(plan),critic:plan.critic,join_sha256:state.join_sha256});
   const criticClaim=state=>path.join(plan.repo,'.ecc/goal','journal-attempt-'+criticKey(state)+'.claim');
-  function readCritic(state){
-    demand(state.phase==='critic'&&engine.digest(state.plan)===engine.digest(plan),'current critic state required');
+  function readCritic(state,accepted=false){
+    demand((state.phase==='critic'||(accepted&&['approval','effect','completed'].includes(state.phase)
+      &&state.critique?.accepted===true))&&engine.digest(state.plan)===engine.digest(plan),'current critic state required');
     const claim=journalJson(criticClaim(state));
     demand(claim.critic===plan.critic&&claim.join_sha256===state.join_sha256
       &&claim.plan_sha256===engine.digest(plan)&&/^[a-f0-9-]{36}$/.test(claim.call_id),'critic winning claim mismatch');
@@ -700,9 +701,17 @@ function createBoundHost(spec,{stateFile,plan}){
     },
     verifyCritic({report,actor,receipt},currentPlan){
       if(spec.critic.failure_journal===JOURNAL){try{
-        const found=readCritic(engine.load(stateFile));
-        return actor===plan.critic&&engine.digest(currentPlan)===engine.digest(plan)&&!!found?.report
-          &&engine.digest(found.report)===engine.digest(report)&&receipt!=null&&engine.digest(found.receipt)===engine.digest(receipt);
+        const state=engine.load(stateFile),found=readCritic(state,receipt===undefined);
+        if(actor!==plan.critic||engine.digest(currentPlan)!==engine.digest(plan)||!found?.report
+          ||engine.digest(found.report)!==engine.digest(report))return false;
+        if(receipt!==undefined)return receipt!==null&&engine.digest(found.receipt)===engine.digest(receipt);
+        // Revalidation after synthesis reuses the exact already-consumed journal;
+        // it cannot supply an unmetered original critic decision or rerun a model.
+        const consumed=state.critic_usage?.[criticKey(state)];
+        return ['approval','effect','completed'].includes(state.phase)&&state.critique?.accepted===true
+          &&engine.digest(state.critique)===engine.digest(report)&&!!consumed
+          &&consumed.receipt_sha256===engine.digest(found.receipt)
+          &&engine.digest(consumed.usage)===engine.digest(found.usage);
       }catch{return false;}}
       return actor===currentPlan.critic&&reviews.get(engine.digest(report))===report.join_sha256;
     },
