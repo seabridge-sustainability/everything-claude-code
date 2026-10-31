@@ -22,7 +22,6 @@ A scenario does not run on its own. It runs as the baseline and comparison trial
 
 Authoring/export is not execution. Report the backend's passed, failed, or incomplete assessment and actual run/resource references. Compare the same scenario version and recipe across distinct revisions. Synthetic task execution, local fixture proof, and certified hosted execution are different evidence. A cancelled, missing, or incomplete result cannot pass.
 
-
 ## HTTP simulation suites
 
 HTTP simulation suites (conversation tests against a sandbox endpoint) have no

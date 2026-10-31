@@ -11,9 +11,10 @@ const GOAL = path.join(__dirname, 'goal-control.js');
 const BRIDGE = path.join(__dirname, 'goal-runtime-bridge.js');
 const SESSION = path.join(__dirname, 'session-coordinate.js');
 
-function runNode(script, args, cwd, expected) {
+function runNode(script, args, cwd, expected, env) {
   const result = spawnSync(process.execPath, [script, ...args], {
     cwd,
+    env: env ? { ...process.env, ...env } : process.env,
     encoding: 'utf8',
     timeout: 30000,
     windowsHide: true,
@@ -99,6 +100,27 @@ function createFixture(root, complete) {
   return goalDir;
 }
 
+// A completion claim needs parent-pinned admission. The valid fixture is an explicit
+// single-agent goal, so pin that admission outside the fixture repository.
+function singleAgentAdmission(temp, goalDir) {
+  const { goalContractDigest, readStructuredFile } = require('./lib/goal-control');
+  const { sha256File } = require('./lib/goal-store');
+  const goal = readStructuredFile(path.join(goalDir, 'active-goal.yaml'));
+  const key = path.join(temp, 'offline-parent.pub');
+  fs.writeFileSync(key, 'offline-eval synthetic parent key\n');
+  const config = path.join(temp, 'offline-parent-trust.json');
+  fs.writeFileSync(config, `${JSON.stringify({
+    version: 1,
+    run_id: 'offline-eval',
+    parent_orca_session_id: 'offline-eval-parent',
+    runtime_id: 'offline-eval',
+    cli: { path: process.execPath, sha256: sha256File(process.execPath) },
+    public_key: { path: key, sha256: sha256File(key) },
+    goal_admission: { goal_id: goal.goal_id, contract_sha256: goalContractDigest(goal), mode: 'single-agent', assignments: [] },
+  }, null, 2)}\n`);
+  return { ECC_ORCA_ACCEPTANCE_CONFIG: config, ECC_ORCA_ACCEPTANCE_CONFIG_SHA256: sha256File(config) };
+}
+
 function evaluate() {
   const capabilities = loadCapabilities();
   const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'ecc-runtime-eval-'));
@@ -107,6 +129,7 @@ function evaluate() {
     const invalidRoot = path.join(temp, 'all-null');
     const validGoalDir = createFixture(validRoot, true);
     const invalidGoalDir = createFixture(invalidRoot, false);
+    const admission = singleAgentAdmission(temp, validGoalDir);
     const models = capabilities.model_families.map(item => item.id);
     const results = capabilities.runtimes.map((runtime, index) => {
       const model = `${models[index % models.length]}/offline-eval`;
@@ -118,7 +141,7 @@ function evaluate() {
       ], validRoot, [2]);
       const valid = runNode(BRIDGE, [
         'final', '--runtime', runtime.id, '--model', model, '--claim', 'complete', '--dir', validGoalDir, '--session', 'offline-eval',
-      ], validRoot, [0]);
+      ], validRoot, [0], admission);
       const allNull = runNode(BRIDGE, [
         'final', '--runtime', runtime.id, '--model', model, '--claim', 'complete', '--dir', invalidGoalDir, '--session', 'offline-eval',
       ], invalidRoot, [2]);
