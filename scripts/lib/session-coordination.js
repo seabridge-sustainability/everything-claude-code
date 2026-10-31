@@ -22,7 +22,10 @@ function repository(cwd = process.cwd()) {
   return { root, common, directory: path.join(common, 'ecc-coordination') };
 }
 function scope(value) {
-  if (typeof value !== 'string' || !value || /[\\:*?[\]{}]/.test(value)
+  // Next.js parameter directories are exact names, never wildcard reservations.
+  const syntax = typeof value === 'string'
+    ? value.replace(/(^|\/)(?:\[(?:\.\.\.)?[A-Za-z_][A-Za-z0-9_]*\]|\[\[\.\.\.[A-Za-z_][A-Za-z0-9_]*\]\])(?=\/|$)/g, '$1route') : value;
+  if (typeof value !== 'string' || !value || /[\\:*?[\]{}]/.test(syntax)
       || [...value].some(character => character.charCodeAt(0) < 32)
       || value.startsWith('/') || value.split('/').some(p => !p || p === '.' || p === '..' || /[. ]$/.test(p))) {
     throw new Error('scope must be an explicit repository-relative file or directory (no globs/traversal)');
@@ -49,7 +52,7 @@ function goalMetadataScopes(repo, scopes) {
   if (!scopes.length || !scopes.every(item => goalPath.test(item))) return false;
   for (const relative of scopes) {
     safePath(repo, relative);
-    if (git(repo.root, ['ls-files', '--', relative])) return false;
+    if (git(repo.root, ['ls-files', '--', `:(literal)${relative}`])) return false;
     try { git(repo.root, ['check-ignore', '-q', '--', relative]); }
     catch { return false; }
   }
@@ -75,8 +78,8 @@ function pinLoop(repo, options, scopes) {
   if (scopes.length !== 1 || scopes[0] !== target) throw new Error('loop scope must be exactly its single target file');
   const checks = [...new Set(options.checkFiles.map(file => safePath(repo, file)))].map(file => {
     if (overlaps(target, file)) throw new Error('loop maker cannot own its protected checks');
-    git(repo.root, ['ls-files', '--error-unmatch', '--', file]);
-    if (git(repo.root, ['diff', '--name-only', 'HEAD', '--', file])) throw new Error('protected checks must match committed baseline');
+    git(repo.root, ['ls-files', '--error-unmatch', '--', `:(literal)${file}`]);
+    if (git(repo.root, ['diff', '--name-only', 'HEAD', '--', `:(literal)${file}`])) throw new Error('protected checks must match committed baseline');
     return { path: file, sha256: checkDigest(repo, file) };
   });
   return { target, checks, baseline: git(repo.root, ['rev-parse', 'HEAD']),
@@ -209,6 +212,14 @@ function conflicts(state, repo, scopes, sessionId, now, metadataOnly = false) {
     if (other.id === sessionId || other.state !== 'active'
         || (other.expiresAt <= now && state.release?.owner !== other.id)) continue;
     const otherMetadata = other.worktree === repo.root ? metadataSession(repo, other, state) : other.metadataOnly;
+    // Ignored goal records are physically private to distinct worktrees. Recheck
+    // the peer's real checkout and metadata classification, not its cached flag.
+    if (metadataOnly && otherMetadata && other.worktree !== repo.root
+        && state.release?.owner !== other.id) {
+      const peer = repository(other.worktree);
+      if (peer.root !== other.worktree || peer.common !== repo.common) throw new Error('peer metadata worktree identity changed');
+      if (metadataSession(peer, other, state)) continue;
+    }
     const overlap = scopes.flatMap(requested => other.scopes.filter(reserved => overlaps(requested, reserved))
       .map(reserved => ({ requested, reserved })));
     const checkoutBusy = other.worktree === repo.root && !metadataOnly && !otherMetadata;

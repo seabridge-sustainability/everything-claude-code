@@ -46,6 +46,68 @@ function budgetArgs(now = Date.now()) {
 
 after(() => fs.rmSync(workspace, { recursive: true, force: true }));
 
+test('literal Next route directories admit exact scopes without matching neighboring names', () => {
+  const { root } = fixture(false);
+  const scopes = ['src/app/[token]', 'src/app/[...slug]', 'src/app/[[...slug]]'];
+  for (const relative of scopes) fs.mkdirSync(path.join(root, relative), { recursive: true });
+  register(root, 'literal-routes', scopes);
+  for (const relative of scopes) {
+    const file = `${relative}/page.tsx`;
+    assert.equal(execute('check-write', { cwd: root, sessionId: 'literal-routes', paths: [file] }).allowed, true);
+    fs.writeFileSync(path.join(root, file), 'owned route\n');
+  }
+  assert.throws(() => execute('check-write', { cwd: root, sessionId: 'literal-routes', paths: ['src/app/t/page.tsx'] }), /outside owned/);
+  assert.deepEqual(execute('check-changes', { cwd: root, sessionId: 'literal-routes' }).paths.sort(), scopes.map(relative => `${relative}/page.tsx`).sort());
+});
+
+test('literal Next route foreign drafts retain exact Git metadata and immutable preservation', () => {
+  const { root } = fixture(false);
+  const file = 'src/app/[token]/viewer.tsx', neighbor = 'src/app/t/viewer.tsx';
+  for (const relative of [file, neighbor]) {
+    fs.mkdirSync(path.dirname(path.join(root, relative)), { recursive: true });
+    fs.writeFileSync(path.join(root, relative), `${relative}\n`);
+  }
+  git(root, 'add', 'src');
+  git(root, '-c', 'core.hooksPath=', 'commit', '-m', 'literal route fixture');
+  fs.appendFileSync(path.join(root, file), 'retained draft\n');
+  const session = register(root, 'literal-preservation', ['README.md']);
+  const retained = session.preservedForeign.files.find(item => item.path === file);
+  const exactIndex = spawnSync('git', ['--literal-pathspecs', 'ls-files', '--stage', '-z', '--', file], { cwd: root, encoding: 'utf8', windowsHide: true });
+  assert.equal(exactIndex.status, 0, exactIndex.stderr);
+  assert.equal(retained.index, exactIndex.stdout);
+  assert.ok(retained.index.includes(file));
+  assert.ok(!retained.index.includes(neighbor));
+  fs.appendFileSync(path.join(root, 'README.md'), 'owned change\n');
+  const checked = execute('check-changes', { cwd: root, sessionId: 'literal-preservation' });
+  assert.equal(checked.allowed, true);
+  assert.deepEqual(checked.paths, ['README.md']);
+  assert.ok(checked.preservedForeign.includes(file));
+  fs.appendFileSync(path.join(root, file), 'unapproved mutation\n');
+  assert.throws(() => execute('check-changes', { cwd: root, sessionId: 'literal-preservation' }), /foreign baseline changed/);
+});
+
+test('literal Next route support still rejects wildcard, malformed and traversal scopes', () => {
+  const { root } = fixture(false);
+  const invalid = ['src/*', 'src/?', 'src/{a,b}', 'src/[a-z]', 'src/[]', 'src/[!id]', 'src/[id]suffix', 'src/[id]/../outside', 'src/[id]/file:stream'];
+  invalid.forEach((relative, index) => assert.throws(() => register(root, `invalid-literal-${index}`, [relative]), /scope must/));
+});
+
+test('literal Next route drafts coexist with ignored goal metadata registration and writes', () => {
+  const { root } = fixture(false);
+  fs.writeFileSync(path.join(root, '.gitignore'), '.ecc/\n');
+  git(root, 'add', '.gitignore');
+  git(root, '-c', 'core.hooksPath=', 'commit', '-m', 'ignored metadata fixture');
+  const file = 'src/app/[token]/viewer.tsx';
+  fs.mkdirSync(path.dirname(path.join(root, file)), { recursive: true });
+  fs.writeFileSync(path.join(root, file), 'retained literal route draft\n');
+  register(root, 'literal-source', ['README.md']);
+  const indexBefore = git(root, 'diff', '--cached', '--binary');
+  assert.equal(register(root, 'literal-meta', ['.ecc/goal/frontend']).metadataOnly, true);
+  assert.equal(execute('check-write', { cwd: root, sessionId: 'literal-meta', paths: ['.ecc/goal/frontend/resume-receipt.yaml'] }).allowed, true);
+  assert.equal(execute('check-changes', { cwd: root, sessionId: 'literal-source' }).allowed, true);
+  assert.equal(git(root, 'diff', '--cached', '--binary'), indexBefore);
+});
+
 function guardFixture(mode = 'block', overrides = {}, prepare = null) {
   const f = fixture(false);
   const now = Date.now();
@@ -492,6 +554,72 @@ test('tracked goal-looking files and non-goal ignored files cannot gain metadata
   assert.equal(plain.metadataOnly, undefined);
   assert.throws(() => execute('metadata-only', { cwd: root, sessionId: 'plain' }), /requires ignored/);
   assert.throws(() => register(other, 'same-goal', ['.ecc/other-state']), /overlaps session/);
+});
+
+function privateMetadataPair() {
+  const f = fixture();
+  for (const checkout of [f.root, f.other]) {
+    fs.writeFileSync(path.join(checkout, '.gitignore'), '.ecc/\n');
+    fs.mkdirSync(path.join(checkout, '.ecc/goal'), { recursive: true });
+    fs.writeFileSync(path.join(checkout, '.ecc/goal/active-goal.yaml'), `private ${path.basename(checkout)}\n`);
+  }
+  return f;
+}
+
+test('private metadata in separate worktrees admits identical scopes without changing either goal or index', () => {
+  const { root, other } = privateMetadataPair();
+  const originals = [root, other].map(checkout => ({
+    goal: fs.readFileSync(path.join(checkout, '.ecc/goal/active-goal.yaml')),
+    index: fs.readFileSync(path.resolve(checkout, git(checkout, 'rev-parse', '--git-path', 'index')))
+  }));
+  register(root, 'private-first', ['.ecc/goal']);
+  assert.equal(register(other, 'private-second', ['.ecc/goal']).metadataOnly, true);
+  for (const [i, checkout] of [root, other].entries()) {
+    const id = i === 0 ? 'private-first' : 'private-second';
+    assert.equal(execute('check-write', { cwd: checkout, sessionId: id, paths: ['.ecc/goal/active-goal.yaml'] }).allowed, true);
+    assert.deepEqual(fs.readFileSync(path.join(checkout, '.ecc/goal/active-goal.yaml')), originals[i].goal);
+    assert.deepEqual(fs.readFileSync(path.resolve(checkout, git(checkout, 'rev-parse', '--git-path', 'index'))), originals[i].index);
+  }
+  assert.throws(() => register(root, 'private-same-checkout', ['.ecc/goal']), /overlaps session/);
+});
+
+test('private metadata exemption never admits mixed or source scopes across worktrees', () => {
+  const { root, other } = privateMetadataPair();
+  register(root, 'private-first', ['.ecc/goal']);
+  assert.throws(() => register(other, 'mixed', ['.ecc/goal', 'README.md']), /overlaps session/);
+});
+
+test('private metadata exemption revalidates peer ignore status after reservation', () => {
+  const { root, other } = privateMetadataPair();
+  register(root, 'private-first', ['.ecc/goal']);
+  fs.writeFileSync(path.join(root, '.gitignore'), '');
+  assert.throws(() => register(other, 'private-second', ['.ecc/goal']), /invalid goal metadata scope/);
+});
+
+test('private metadata exemption revalidates peer tracked state after reservation', () => {
+  const { root, other } = privateMetadataPair();
+  register(root, 'private-first', ['.ecc/goal']);
+  git(root, 'add', '-f', '.ecc/goal/active-goal.yaml');
+  assert.throws(() => register(other, 'private-second', ['.ecc/goal']), /invalid goal metadata scope/);
+});
+
+test('private metadata exemption refuses peer links added after reservation', () => {
+  const { root, other } = privateMetadataPair();
+  register(root, 'private-first', ['.ecc/goal']);
+  fs.renameSync(path.join(root, '.ecc'), path.join(root, '.ecc-retained'));
+  fs.symlinkSync(path.join(root, '.ecc-retained'), path.join(root, '.ecc'), process.platform === 'win32' ? 'junction' : 'dir');
+  assert.throws(() => register(other, 'private-second', ['.ecc/goal']), /linked path/);
+});
+
+test('private metadata exemption cannot bypass a held peer release after its session expires', () => {
+  const { root, other } = privateMetadataPair();
+  const peer = register(root, 'private-first', ['.ecc/goal']);
+  const registry = path.join(repository(root).directory, 'registry.json');
+  const state = JSON.parse(fs.readFileSync(registry, 'utf8'));
+  delete state.sessions.find(s => s.id === peer.id).metadataOnly;
+  state.release = { owner: peer.id, candidate: peer.base, branch: 'fixture', acquiredAt: Date.now(), expiresAt: peer.expiresAt };
+  fs.writeFileSync(registry, JSON.stringify(state));
+  assert.throws(() => register(other, 'private-second', ['.ecc/goal'], peer.expiresAt + 1), /overlaps session/);
 });
 
 test('links added after reservation cannot redirect an owned edit outside the worktree', () => {
