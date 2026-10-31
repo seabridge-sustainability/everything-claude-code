@@ -8,10 +8,18 @@ const { writeFileAtomic } = require('./atomic-write');
 const crypto = require('node:crypto');
 
 function git(cwd, args) {
-  const output = execFileSync('git', args, { cwd, encoding: 'utf8', windowsHide: true,
-    stdio: ['ignore', 'pipe', 'pipe'] });
-  return args.includes('-z') ? output : output.trim();
+  try {
+    const output = execFileSync('git', args, { cwd, encoding: 'utf8', windowsHide: true,
+      stdio: ['ignore', 'pipe', 'pipe'], maxBuffer: 8 * 1024 * 1024 });
+    return args.includes('-z') ? output : output.trim();
+  } catch (error) {
+    if (error.code !== 'ENOBUFS') throw error;
+    const refused = new Error('Git observation exceeded the 8 MiB output bound; repository state remains unverified');
+    refused.code = 'ENOBUFS';
+    throw refused;
+  }
 }
+
 function canonical(file) {
   const result = fs.realpathSync(file);
   return process.platform === 'win32' ? result.toLowerCase() : result;

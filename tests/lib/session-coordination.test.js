@@ -253,6 +253,23 @@ test('native index visibility refuses hidden clean, dirty and owned tracked file
   }
 });
 
+test('native index visibility reads indexes beyond 1 MiB and still checks late flags', () => {
+  const bulk=root=>{
+    fs.mkdirSync(path.join(root,'bulk'));
+    for(let i=0;i<17000;i++)fs.writeFileSync(path.join(root,'bulk',`${String(i).padStart(5,'0')}-${'x'.repeat(56)}.txt`),'');
+    fs.writeFileSync(path.join(root,'zz-late.txt'),'late\n');
+    git(root,'add','bulk','zz-late.txt');git(root,'-c','core.hooksPath=','commit','-q','-m','bulk index fixture');
+  };
+  const f=guardFixture('block',{},bulk);
+  const listing=spawnSync('git',['ls-files','-v','-z','--'],{cwd:f.root,encoding:'utf8',windowsHide:true,maxBuffer:8*1024*1024});
+  assert.equal(listing.status,0,listing.stderr);
+  assert.ok(Buffer.byteLength(listing.stdout)>1024*1024,'fixture index listing must exceed the old 1 MiB default');
+  assert.equal(f.event('Read',{}).allowed,true);
+  // The flagged entry sorts after every bulk path, so it is read only beyond the first MiB.
+  assert.throws(()=>guardFixture('block',{},root=>{bulk(root);git(root,'update-index','--skip-worktree','zz-late.txt');}),
+    /native index hides tracked paths/);
+});
+
 test('legacy standard foreign ledgers remain readable but require fresh registration for native binding', () => {
   const f=guardFixture('block',{},root=>fs.writeFileSync(path.join(root,'foreign.txt'),'draft\n'));
   const file=path.join(repository(f.root).directory,'registry.json'),state=JSON.parse(fs.readFileSync(file,'utf8'));
