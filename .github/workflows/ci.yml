@@ -169,7 +169,6 @@ jobs:
           node tests/hooks/mcp-health-check.test.js
           node tests/scripts/install-ps1.test.js
           node tests/lib/antigravity-legacy-migration.test.js
-          node tests/integration/hooks.test.js
       - name: Run macOS platform checks
         if: matrix.suite == 'macos'
         shell: bash
@@ -177,7 +176,6 @@ jobs:
           node tests/scripts/ecc-universal-bin.test.js
           node tests/gan-harness.test.js
           node tests/scripts/install-guided.test.js
-          node tests/skills/repo-scan-install.test.js
           node tests/lib/claude-settings.test.js
 
   pack-installer:

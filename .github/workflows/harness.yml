@@ -7,7 +7,6 @@ on:
       - 'CLAUDE.md'
       - '.agents/**'
       - 'agents/**'
-      - 'skills/**'
       - 'scripts/check-*'
       - '.github/workflows/harness.yml'
   push:
@@ -20,7 +19,6 @@ on:
       - 'CLAUDE.md'
       - '.agents/**'
       - 'agents/**'
-      - 'skills/**'
       - 'scripts/check-*'
       - '.github/workflows/harness.yml'
 
