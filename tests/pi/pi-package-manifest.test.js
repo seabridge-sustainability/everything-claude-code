@@ -239,35 +239,13 @@ function main() {
       )
     }],
 
-    ["canonical skills/ is Pi-compatible without transformation (Agent Skills standard)", () => {
-      const skillsDir = path.join(repoRoot, "skills")
-      const skillDirNames = fs.readdirSync(skillsDir, { withFileTypes: true })
-        .filter((entry) => entry.isDirectory())
-        .map((entry) => entry.name)
-      const skillDirsWithManifest = skillDirNames.filter((name) =>
-        fs.existsSync(path.join(skillsDir, name, "SKILL.md"))
-      )
-      assert.ok(
-        skillDirsWithManifest.length >= 100,
-        `skills/ must contain at least 100 subdirectories with a SKILL.md for Pi's Agent Skills implementation — found ${skillDirsWithManifest.length}`
-      )
-
-      const sampleSkillPath = path.join(skillsDir, "frontend-patterns", "SKILL.md")
-      const sampleSkill = fs.readFileSync(sampleSkillPath, "utf8")
-      const sampleFrontmatter = extractFrontmatter(sampleSkill)
-      assert.ok(
-        sampleFrontmatter !== null,
-        `${sampleSkillPath} must start with a --- YAML frontmatter block for Pi to parse it as an Agent Skill`
-      )
-      assert.ok(
-        /^name:/m.test(sampleFrontmatter),
-        `${sampleSkillPath} frontmatter must contain a name: field — the Agent Skills standard Pi implements requires it`
-      )
-      assert.ok(
-        /^description:/m.test(sampleFrontmatter),
-        `${sampleSkillPath} frontmatter must contain a description: field — the Agent Skills standard Pi implements requires it`
-      )
-    }],
+    // The canonical skills/ catalog was removed from the repository (the
+    // plugin no longer ships a skill catalog). The on-disk Pi-compatibility
+    // scan of skills/ subdirectories went with it; pi.skills still points at
+    // the canonical "./skills" path declared in package.json.
+    // NOTE: package.json's `files` array still lists skills/... entries that
+    // no longer exist on disk — that manifest edit is outside this test's
+    // scope and must be resolved separately.
 
     [".pi/README.md documents the single-source-of-truth principle without instructing copies into .pi/", () => {
       const readmePath = path.join(repoRoot, ".pi", "README.md")

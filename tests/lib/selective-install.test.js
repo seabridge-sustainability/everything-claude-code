@@ -236,27 +236,24 @@ function runTests() {
 
   if (test('component catalog includes lang: family entries', () => {
     const components = listInstallComponents({ family: 'language' });
-    assert.ok(components.some(c => c.id === 'lang:typescript'), 'Should have lang:typescript');
-    assert.ok(components.some(c => c.id === 'lang:python'), 'Should have lang:python');
-    assert.ok(components.some(c => c.id === 'lang:go'), 'Should have lang:go');
-    assert.ok(components.some(c => c.id === 'lang:java'), 'Should have lang:java');
+    assert.ok(components.length > 0, 'Should have at least one language component');
+    assert.ok(components.some(c => c.id === 'lang:perl'), 'Should have lang:perl');
     assert.ok(components.some(c => c.id === 'lang:ruby'), 'Should have lang:ruby');
   })) passed++; else failed++;
 
   if (test('component catalog includes framework: family entries', () => {
     const components = listInstallComponents({ family: 'framework' });
-    assert.ok(components.some(c => c.id === 'framework:react'), 'Should have framework:react');
-    assert.ok(components.some(c => c.id === 'framework:nextjs'), 'Should have framework:nextjs');
-    assert.ok(components.some(c => c.id === 'framework:django'), 'Should have framework:django');
-    assert.ok(components.some(c => c.id === 'framework:springboot'), 'Should have framework:springboot');
+    assert.ok(components.length > 0, 'Should have at least one framework component');
+    assert.ok(components.some(c => c.id === 'framework:quarkus'), 'Should have framework:quarkus');
     assert.ok(components.some(c => c.id === 'framework:rails'), 'Should have framework:rails');
+    assert.ok(components.some(c => c.id === 'framework:laravel'), 'Should have framework:laravel');
   })) passed++; else failed++;
 
   if (test('component catalog includes capability: family entries', () => {
     const components = listInstallComponents({ family: 'capability' });
-    assert.ok(components.some(c => c.id === 'capability:database'), 'Should have capability:database');
     assert.ok(components.some(c => c.id === 'capability:security'), 'Should have capability:security');
     assert.ok(components.some(c => c.id === 'capability:orchestration'), 'Should have capability:orchestration');
+    assert.ok(components.some(c => c.id === 'capability:agentic'), 'Should have capability:agentic');
   })) passed++; else failed++;
 
   if (test('component catalog includes agent: family entries', () => {
@@ -268,23 +265,22 @@ function runTests() {
   if (test('component catalog includes skill: family entries', () => {
     const components = listInstallComponents({ family: 'skill' });
     assert.ok(components.length > 0, 'Should have at least one skill component');
-    assert.ok(components.some(c => c.id === 'skill:continuous-learning'), 'Should have skill:continuous-learning');
-    assert.ok(components.some(c => c.id === 'skill:continuous-learning-v2'), 'Should have skill:continuous-learning-v2');
+    assert.ok(components.some(c => c.id === 'skill:security-review'), 'Should have skill:security-review');
   })) passed++; else failed++;
 
   // ─── Install Plan Resolution with --with ───
 
   if (test('--with alone resolves component modules and their dependencies', () => {
     const plan = resolveInstallPlan({
-      includeComponentIds: ['lang:typescript'],
+      includeComponentIds: ['capability:orchestration'],
       target: 'claude',
     });
-    assert.ok(plan.selectedModuleIds.includes('framework-language'),
-      'Should include the module behind lang:typescript');
-    assert.ok(plan.selectedModuleIds.includes('rules-core'),
-      'Should include framework-language dependency rules-core');
+    assert.ok(plan.selectedModuleIds.includes('orchestration'),
+      'Should include the module behind capability:orchestration');
+    assert.ok(plan.selectedModuleIds.includes('commands-core'),
+      'Should include orchestration dependency commands-core');
     assert.ok(plan.selectedModuleIds.includes('platform-configs'),
-      'Should include framework-language dependency platform-configs');
+      'Should include orchestration dependency platform-configs');
   })) passed++; else failed++;
 
   if (test('--with adds modules on top of a profile', () => {
@@ -295,7 +291,7 @@ function runTests() {
     });
     // core profile modules
     assert.ok(plan.selectedModuleIds.includes('rules-core'));
-    assert.ok(plan.selectedModuleIds.includes('workflow-quality'));
+    assert.ok(plan.selectedModuleIds.includes('agents-core'));
     // added by --with
     assert.ok(plan.selectedModuleIds.includes('security'),
       'Should include security module from --with');
@@ -303,13 +299,13 @@ function runTests() {
 
   if (test('multiple --with flags union their modules', () => {
     const plan = resolveInstallPlan({
-      includeComponentIds: ['lang:typescript', 'capability:database'],
+      includeComponentIds: ['lang:perl', 'agent:security-reviewer'],
       target: 'claude',
     });
-    assert.ok(plan.selectedModuleIds.includes('framework-language'),
-      'Should include framework-language from lang:typescript');
-    assert.ok(plan.selectedModuleIds.includes('database'),
-      'Should include database from capability:database');
+    assert.ok(plan.selectedModuleIds.includes('security'),
+      'Should include security from lang:perl');
+    assert.ok(plan.selectedModuleIds.includes('agents-core'),
+      'Should include agents-core from agent:security-reviewer');
   })) passed++; else failed++;
 
   // ─── Install Plan Resolution with --without ───
@@ -326,22 +322,21 @@ function runTests() {
       'Should report orchestration as excluded');
     // rest of developer profile should remain
     assert.ok(plan.selectedModuleIds.includes('rules-core'));
-    assert.ok(plan.selectedModuleIds.includes('framework-language'));
-    assert.ok(plan.selectedModuleIds.includes('database'));
+    assert.ok(plan.selectedModuleIds.includes('agents-core'));
   })) passed++; else failed++;
 
   if (test('multiple --without flags exclude multiple modules', () => {
     const plan = resolveInstallPlan({
       profileId: 'full',
-      excludeComponentIds: ['capability:media', 'capability:social', 'capability:supply-chain'],
+      excludeComponentIds: ['capability:security', 'capability:orchestration', 'capability:agentic'],
       target: 'claude',
     });
-    assert.ok(!plan.selectedModuleIds.includes('media-generation'));
-    assert.ok(!plan.selectedModuleIds.includes('social-distribution'));
-    assert.ok(!plan.selectedModuleIds.includes('supply-chain-domain'));
-    assert.ok(plan.excludedModuleIds.includes('media-generation'));
-    assert.ok(plan.excludedModuleIds.includes('social-distribution'));
-    assert.ok(plan.excludedModuleIds.includes('supply-chain-domain'));
+    assert.ok(!plan.selectedModuleIds.includes('security'));
+    assert.ok(!plan.selectedModuleIds.includes('orchestration'));
+    assert.ok(!plan.selectedModuleIds.includes('agentic-patterns'));
+    assert.ok(plan.excludedModuleIds.includes('security'));
+    assert.ok(plan.excludedModuleIds.includes('orchestration'));
+    assert.ok(plan.excludedModuleIds.includes('agentic-patterns'));
   })) passed++; else failed++;
 
   // ─── Combined --with + --without ───
@@ -364,8 +359,8 @@ function runTests() {
   if (test('--without on a dependency of --with raises an error', () => {
     assert.throws(
       () => resolveInstallPlan({
-        includeComponentIds: ['capability:social'],
-        excludeComponentIds: ['capability:content'],
+        includeComponentIds: ['capability:orchestration'],
+        excludeComponentIds: ['baseline:commands'],
       }),
       /depends on excluded module/
     );
@@ -402,7 +397,6 @@ function runTests() {
           'baseline:commands',
           'baseline:hooks',
           'baseline:platform',
-          'baseline:workflow',
         ],
         target: 'claude',
       }),
@@ -449,26 +443,23 @@ function runTests() {
 
   if (test('--with skill: component includes the parent skill module', () => {
     const plan = resolveInstallPlan({
-      includeComponentIds: ['skill:continuous-learning'],
+      includeComponentIds: ['skill:security-review'],
       target: 'claude',
     });
-    assert.ok(plan.selectedModuleIds.includes('workflow-quality'),
-      'Should include workflow-quality module from skill:continuous-learning');
+    assert.ok(plan.selectedModuleIds.includes('security'),
+      'Should include security module from skill:security-review');
   })) passed++; else failed++;
 
-  if (test('--with skill:continuous-learning-v2 installs only that skill module', () => {
+  if (test('--with skill:security-review installs only the security module', () => {
     const plan = resolveInstallPlan({
-      includeComponentIds: ['skill:continuous-learning-v2'],
+      includeComponentIds: ['skill:security-review'],
       target: 'claude',
     });
-    assert.deepStrictEqual(plan.selectedModuleIds, ['skill-continuous-learning-v2']);
-    assert.ok(
-      plan.operations.some(operation => operation.sourceRelativePath === 'skills/continuous-learning-v2'),
-      'Should install the continuous-learning-v2 skill directory'
-    );
-    assert.ok(
-      !plan.operations.some(operation => operation.sourceRelativePath === 'skills/tdd-workflow'),
-      'Should not install the whole workflow-quality skill module'
+    assert.deepStrictEqual(plan.selectedModuleIds, ['security']);
+    assert.deepStrictEqual(
+      plan.operations.map(operation => operation.sourceRelativePath),
+      ['the-security-guide.md'],
+      'Should install exactly the security guide file'
     );
   })) passed++; else failed++;
 
@@ -561,7 +552,7 @@ function runTests() {
     }
   })) passed++; else failed++;
 
-  if (test('end-to-end: --with lang:python --with agent:security-reviewer --dry-run', () => {
+  if (test('end-to-end: --with lang:perl --with agent:security-reviewer --dry-run', () => {
     const { execFileSync } = require('child_process');
     const scriptPath = path.join(__dirname, '..', '..', 'scripts', 'install-apply.js');
     const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'selective-e2e-'));
@@ -570,7 +561,7 @@ function runTests() {
     try {
       const result = execFileSync('node', [
         scriptPath,
-        '--with', 'lang:python',
+        '--with', 'lang:perl',
         '--with', 'agent:security-reviewer',
         '--dry-run',
       ], {
@@ -581,7 +572,7 @@ function runTests() {
       });
 
       assert.ok(result.includes('Mode: manifest'), 'Should be manifest mode');
-      assert.ok(result.includes('lang:python'), 'Should show lang:python as included');
+      assert.ok(result.includes('lang:perl'), 'Should show lang:perl as included');
       assert.ok(result.includes('agent:security-reviewer'), 'Should show agent:security-reviewer as included');
     } finally {
       fs.rmSync(homeDir, { recursive: true, force: true });
@@ -660,9 +651,9 @@ function runTests() {
       });
 
       const claudeRoot = path.join(homeDir, '.claude');
-      // Security skill should be installed (from --with)
-      assert.ok(fs.existsSync(path.join(claudeRoot, 'skills', 'security-review', 'SKILL.md')),
-        'Should install security-review skill from --with');
+      // Security module should be installed (from --with)
+      assert.ok(fs.existsSync(path.join(claudeRoot, 'the-security-guide.md')),
+        'Should install the security guide from --with');
       // Core profile modules should be installed
       assert.ok(fs.existsSync(path.join(claudeRoot, 'rules', 'ecc', 'common', 'coding-style.md')),
         'Should install core rules');
@@ -701,14 +692,11 @@ function runTests() {
       });
 
       const claudeRoot = path.join(homeDir, '.claude');
-      // Orchestration skills should NOT be installed (from --without)
-      assert.ok(!fs.existsSync(path.join(claudeRoot, 'skills', 'dmux-workflows', 'SKILL.md')),
-        'Should not install orchestration skills');
       // Developer profile base modules should be installed
       assert.ok(fs.existsSync(path.join(claudeRoot, 'rules', 'ecc', 'common', 'coding-style.md')),
         'Should install core rules');
-      assert.ok(fs.existsSync(path.join(claudeRoot, 'skills', 'tdd-workflow', 'SKILL.md')),
-        'Should install workflow skills');
+      assert.ok(fs.existsSync(path.join(claudeRoot, 'agents', 'ai-agent.md')),
+        'Should install developer agents');
 
       const statePath = path.join(claudeRoot, 'ecc', 'install-state.json');
       const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
@@ -731,7 +719,7 @@ function runTests() {
     try {
       execFileSync('node', [
         scriptPath,
-        '--with', 'lang:typescript',
+        '--with', 'lang:perl',
       ], {
         cwd: projectDir,
         env: { ...process.env, HOME: homeDir },
@@ -740,25 +728,25 @@ function runTests() {
       });
 
       const claudeRoot = path.join(homeDir, '.claude');
-      // framework-language skill (from lang:typescript) should be installed
-      assert.ok(fs.existsSync(path.join(claudeRoot, 'skills', 'coding-standards', 'SKILL.md')),
-        'Should install framework-language skills');
-      // Its dependencies should be installed
-      assert.ok(fs.existsSync(path.join(claudeRoot, 'rules', 'ecc', 'common', 'coding-style.md')),
-        'Should install dependency rules-core');
+      // security module (behind lang:perl) should be installed
+      assert.ok(fs.existsSync(path.join(claudeRoot, 'the-security-guide.md')),
+        'Should install the security module file');
+      // No profile modules should leak in
+      assert.ok(!fs.existsSync(path.join(claudeRoot, 'rules', 'ecc', 'common', 'coding-style.md')),
+        'Should not install profile rules without a profile');
 
       const statePath = path.join(claudeRoot, 'ecc', 'install-state.json');
       const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
       assert.strictEqual(state.request.profile, null);
-      assert.deepStrictEqual(state.request.includeComponents, ['lang:typescript']);
-      assert.ok(state.resolution.selectedModules.includes('framework-language'));
+      assert.deepStrictEqual(state.request.includeComponents, ['lang:perl']);
+      assert.ok(state.resolution.selectedModules.includes('security'));
     } finally {
       fs.rmSync(homeDir, { recursive: true, force: true });
       fs.rmSync(projectDir, { recursive: true, force: true });
     }
   })) passed++; else failed++;
 
-  if (test('end-to-end: --skills continuous-learning-v2 installs only that skill', () => {
+  if (test('end-to-end: --skills security-review installs only that skill', () => {
     const { execFileSync } = require('child_process');
     const scriptPath = path.join(__dirname, '..', '..', 'scripts', 'install-apply.js');
     const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'selective-skill-install-'));
@@ -767,7 +755,7 @@ function runTests() {
     try {
       execFileSync('node', [
         scriptPath,
-        '--skills', 'continuous-learning-v2',
+        '--skills', 'security-review',
       ], {
         cwd: projectDir,
         env: { ...process.env, HOME: homeDir },
@@ -777,18 +765,18 @@ function runTests() {
 
       const claudeRoot = path.join(homeDir, '.claude');
       assert.ok(
-        fs.existsSync(path.join(claudeRoot, 'skills', 'continuous-learning-v2', 'SKILL.md')),
-        'Should install continuous-learning-v2'
+        fs.existsSync(path.join(claudeRoot, 'the-security-guide.md')),
+        'Should install the security-review skill file'
       );
       assert.ok(
-        !fs.existsSync(path.join(claudeRoot, 'skills', 'tdd-workflow', 'SKILL.md')),
-        'Should not install unrelated workflow-quality skills'
+        !fs.existsSync(path.join(claudeRoot, 'agents', 'ai-agent.md')),
+        'Should not install unrelated agents-core files'
       );
 
       const statePath = path.join(claudeRoot, 'ecc', 'install-state.json');
       const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
-      assert.deepStrictEqual(state.request.includeComponents, ['skill:continuous-learning-v2']);
-      assert.deepStrictEqual(state.resolution.selectedModules, ['skill-continuous-learning-v2']);
+      assert.deepStrictEqual(state.request.includeComponents, ['skill:security-review']);
+      assert.deepStrictEqual(state.resolution.selectedModules, ['security']);
     } finally {
       fs.rmSync(homeDir, { recursive: true, force: true });
       fs.rmSync(projectDir, { recursive: true, force: true });
@@ -807,7 +795,7 @@ function runTests() {
       const output = execFileSync('node', [
         scriptPath,
         '--profile', 'core',
-        '--with', 'capability:database',
+        '--with', 'capability:security',
         '--without', 'baseline:hooks',
         '--dry-run',
         '--json',
@@ -822,12 +810,20 @@ function runTests() {
       assert.strictEqual(json.dryRun, true);
       assert.ok(json.plan, 'Should include plan object');
       assert.ok(
-        json.plan.includedComponentIds.includes('capability:database'),
-        'JSON output should include capability:database in included components'
+        json.plan.includedComponentIds.includes('capability:security'),
+        'JSON output should include capability:security in included components'
       );
       assert.ok(
         json.plan.excludedComponentIds.includes('baseline:hooks'),
         'JSON output should include baseline:hooks in excluded components'
+      );
+      assert.ok(
+        json.plan.selectedModuleIds.includes('security'),
+        'JSON output should show the security module selected'
+      );
+      assert.ok(
+        !json.plan.selectedModuleIds.includes('hooks-runtime'),
+        'JSON output should show hooks-runtime excluded'
       );
     } finally {
       fs.rmSync(homeDir, { recursive: true, force: true });

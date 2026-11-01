@@ -26,6 +26,17 @@ function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, 'utf8'));
 }
 
+function stateOperationsIncludeSkills(homeDir) {
+  const statePath = path.join(homeDir, '.claude', 'ecc', 'install-state.json');
+  if (!fs.existsSync(statePath)) {
+    return false;
+  }
+  const state = readJson(statePath);
+  return state.operations.some(operation => (
+    String(operation.sourceRelativePath || '').replace(/\\/g, '/').startsWith('skills/')
+  ));
+}
+
 function readMarkdownFrontmatter(filePath) {
   const source = fs.readFileSync(filePath, 'utf8');
   const match = source.match(/^---\n([\s\S]*?)\n---\n/);
@@ -48,7 +59,7 @@ function run(args = [], options = {}) {
       env,
       encoding: 'utf8',
       stdio: ['pipe', 'pipe', 'pipe'],
-      maxBuffer: 4 * 1024 * 1024,
+      maxBuffer: 64 * 1024 * 1024,
       timeout: options.timeout || DEFAULT_INSTALL_APPLY_TIMEOUT_MS,
     });
 
@@ -116,7 +127,7 @@ function runTests() {
     assert.ok(result.stdout.includes('--modules <id,id,...>'));
   })) passed++; else failed++;
 
-  if (test('Claude hook dry-run validates settings without mutating malformed input', () => {
+  if (test('Claude dry-run preserves malformed settings without mutating them', () => {
     const homeDir = createTempDir('install-apply-home-');
     const projectDir = createTempDir('install-apply-project-');
     const claudeRoot = path.join(homeDir, '.claude');
@@ -131,8 +142,7 @@ function runTests() {
         { cwd: projectDir, homeDir }
       );
 
-      assert.notStrictEqual(result.code, 0);
-      assert.match(result.stderr, /Failed to parse Claude settings/);
+      assert.strictEqual(result.code, 0, result.stderr);
       assert.strictEqual(fs.readFileSync(settingsPath, 'utf8'), '{ malformed\n');
       assert.deepStrictEqual(fs.readdirSync(claudeRoot), ['settings.json']);
     } finally {
@@ -168,11 +178,12 @@ function runTests() {
       assert.ok(fs.existsSync(path.join(claudeRoot, 'rules', 'ecc', 'common', 'coding-style.md')));
       assert.ok(fs.existsSync(path.join(claudeRoot, 'rules', 'ecc', 'typescript', 'testing.md')));
       assert.ok(fs.existsSync(path.join(claudeRoot, 'commands', 'plan.md')));
-      assert.ok(fs.existsSync(path.join(claudeRoot, 'scripts', 'hooks', 'session-end.js')));
-      assert.ok(fs.existsSync(path.join(claudeRoot, 'scripts', 'lib', 'utils.js')));
-      assert.ok(fs.existsSync(path.join(claudeRoot, 'skills', 'tdd-workflow', 'SKILL.md')));
-      assert.ok(fs.existsSync(path.join(claudeRoot, 'skills', 'coding-standards', 'SKILL.md')));
+      assert.ok(!fs.existsSync(path.join(claudeRoot, 'skills', 'tdd-workflow', 'SKILL.md')), 'skill catalog was removed');
+      assert.ok(!fs.existsSync(path.join(claudeRoot, 'skills', 'coding-standards', 'SKILL.md')), 'skill catalog was removed');
       assert.ok(fs.existsSync(path.join(claudeRoot, 'plugin.json')));
+      const homeSettings = readJson(path.join(claudeRoot, 'settings.json'));
+      assert.strictEqual(homeSettings.includeCoAuthoredBy, false);
+      assert.ok(!homeSettings.hooks, 'no hooks are registered for Claude targets');
 
       const statePath = path.join(homeDir, '.claude', 'ecc', 'install-state.json');
       const state = readJson(statePath);
@@ -181,47 +192,12 @@ function runTests() {
       assert.strictEqual(state.request.legacyMode, true);
       assert.deepStrictEqual(state.request.modules, []);
       assert.ok(state.resolution.selectedModules.includes('rules-core'));
-      assert.ok(state.resolution.selectedModules.includes('framework-language'));
       assert.ok(
         state.operations.some(operation => (
           operation.destinationPath === path.join(claudeRoot, 'rules', 'ecc', 'common', 'coding-style.md')
         )),
         'Should record common rule file operation'
       );
-    } finally {
-      cleanup(homeDir);
-      cleanup(projectDir);
-    }
-  })) passed++; else failed++;
-
-  if (test('rewrites namespaced skill links to the ecc/ rules path (#2340)', () => {
-    const homeDir = createTempDir('install-apply-home-');
-    const projectDir = createTempDir('install-apply-project-');
-
-    try {
-      const result = run(['typescript', '--enable-hooks'], { cwd: projectDir, homeDir });
-      assert.strictEqual(result.code, 0, result.stderr);
-
-      const claudeRoot = path.join(homeDir, '.claude');
-      const skillPath = path.join(claudeRoot, 'skills', 'react-patterns', 'SKILL.md');
-      assert.ok(fs.existsSync(skillPath), 'react-patterns SKILL.md should be installed');
-
-      const content = fs.readFileSync(skillPath, 'utf8');
-      assert.ok(
-        content.includes('../../rules/ecc/react/'),
-        'source-relative rules link should be rewritten for the ecc/ namespace'
-      );
-      assert.ok(
-        !content.includes('](../../rules/react/'),
-        'no un-namespaced ](../../rules/react/ links should remain'
-      );
-
-      // The rewritten link must resolve to a file that actually exists on disk.
-      const linkTarget = path.join(
-        path.dirname(skillPath),
-        '../../rules/ecc/react/hooks.md'
-      );
-      assert.ok(fs.existsSync(linkTarget), 'rewritten link target should exist');
     } finally {
       cleanup(homeDir);
       cleanup(projectDir);
@@ -244,17 +220,10 @@ function runTests() {
       assert.ok(fs.existsSync(path.join(projectDir, '.cursor', 'agents', 'ecc-architect.md')));
       assert.ok(!fs.existsSync(path.join(projectDir, '.cursor', 'agents', 'architect.md')));
       assert.ok(fs.existsSync(path.join(projectDir, '.cursor', 'commands', 'plan.md')));
-      assert.ok(fs.existsSync(path.join(projectDir, '.cursor', 'hooks.json')));
-      assert.ok(fs.existsSync(path.join(projectDir, '.cursor', 'mcp.json')));
-      assert.ok(fs.existsSync(path.join(projectDir, '.cursor', 'hooks', 'session-start.js')));
-      assert.ok(fs.existsSync(path.join(projectDir, '.cursor', 'scripts', 'lib', 'utils.js')));
-      assert.ok(fs.existsSync(path.join(projectDir, '.cursor', 'skills', 'tdd-workflow', 'SKILL.md')));
-      assert.ok(fs.existsSync(path.join(projectDir, '.cursor', 'skills', 'coding-standards', 'SKILL.md')));
+      assert.ok(!fs.existsSync(path.join(projectDir, '.cursor', 'skills', 'tdd-workflow', 'SKILL.md')), 'skill catalog was removed');
+      assert.ok(!fs.existsSync(path.join(projectDir, '.cursor', 'skills', 'coding-standards', 'SKILL.md')), 'skill catalog was removed');
 
-      const hooksConfig = readJson(path.join(projectDir, '.cursor', 'hooks.json'));
       const mcpConfig = readJson(path.join(projectDir, '.cursor', 'mcp.json'));
-      assert.strictEqual(hooksConfig.version, 1);
-      assert.ok(hooksConfig.hooks.sessionStart, 'Should keep Cursor sessionStart hooks');
       assert.ok(mcpConfig.mcpServers['chrome-devtools'], 'Should install shared MCP servers into Cursor');
 
       const statePath = path.join(projectDir, '.cursor', 'ecc-install-state.json');
@@ -264,7 +233,6 @@ function runTests() {
       assert.strictEqual(state.target.root, path.join(normalizedProjectDir, '.cursor'));
       assert.deepStrictEqual(state.request.legacyLanguages, ['typescript']);
       assert.strictEqual(state.request.legacyMode, true);
-      assert.ok(state.resolution.selectedModules.includes('framework-language'));
       assert.ok(
         state.operations.some(operation => (
           operation.destinationPath === path.join(normalizedProjectDir, '.cursor', 'commands', 'plan.md')
@@ -317,7 +285,7 @@ function runTests() {
       assert.ok(fs.existsSync(path.join(projectDir, '.agents', 'rules', 'typescript-testing.md')));
       assert.ok(!fs.existsSync(path.join(projectDir, '.agents', 'rules', 'python-testing.md')));
       assert.ok(fs.existsSync(path.join(projectDir, '.agents', 'workflows', 'plan.md')));
-      assert.ok(fs.existsSync(path.join(projectDir, '.agents', 'skills', 'tdd-workflow', 'SKILL.md')));
+      assert.ok(!fs.existsSync(path.join(projectDir, '.agents', 'skills')), 'skill catalog was removed');
       assert.ok(fs.existsSync(path.join(projectDir, '.agents', 'agents', 'architect.md')));
       const tddGuide = readMarkdownFrontmatter(
         path.join(projectDir, '.agents', 'agents', 'tdd-guide.md')
@@ -347,9 +315,6 @@ function runTests() {
           'rules-core',
           'agents-core',
           'commands-core',
-          'platform-configs',
-          'skill-unified-memory',
-          'workflow-quality',
         ]
       );
       assert.ok(
@@ -405,7 +370,7 @@ function runTests() {
       assert.ok(!fs.existsSync(path.join(projectDir, '.joycode', 'rules', 'common', 'coding-style.md')));
       assert.ok(fs.existsSync(path.join(projectDir, '.joycode', 'agents', 'architect.md')));
       assert.ok(fs.existsSync(path.join(projectDir, '.joycode', 'commands', 'plan.md')));
-      assert.ok(fs.existsSync(path.join(projectDir, '.joycode', 'skills', 'tdd-workflow', 'SKILL.md')));
+      assert.ok(!fs.existsSync(path.join(projectDir, '.joycode', 'skills')), 'skill catalog was removed');
       assert.ok(fs.existsSync(path.join(projectDir, '.joycode', 'mcp-configs', 'mcp-servers.json')));
       assert.ok(!fs.existsSync(path.join(projectDir, '.joycode', 'hooks')));
 
@@ -414,12 +379,12 @@ function runTests() {
       assert.strictEqual(state.target.id, 'joycode-project');
       assert.deepStrictEqual(state.request.modules, []);
       assert.strictEqual(state.request.profile, 'minimal');
-      assert.ok(state.resolution.selectedModules.includes('workflow-quality'));
+      assert.ok(!state.resolution.selectedModules.includes('workflow-quality'));
       assert.ok(
-        state.operations.some(operation => (
-          operation.destinationPath.endsWith(path.join('.joycode', 'skills', 'tdd-workflow', 'SKILL.md'))
+        !state.operations.some(operation => (
+          String(operation.sourceRelativePath || '').replace(/\\/g, '/').startsWith('skills/')
         )),
-        'Should record JoyCode skill file operation'
+        'Skill catalog was removed: no top-level skills/ operations may appear in the plan'
       );
     } finally {
       cleanup(homeDir);
@@ -439,7 +404,14 @@ function runTests() {
       assert.ok(fs.existsSync(path.join(homeDir, '.qwen', 'rules', 'common', 'coding-style.md')));
       assert.ok(fs.existsSync(path.join(homeDir, '.qwen', 'agents', 'architect.md')));
       assert.ok(fs.existsSync(path.join(homeDir, '.qwen', 'commands', 'plan.md')));
-      assert.ok(fs.existsSync(path.join(homeDir, '.qwen', 'skills', 'tdd-workflow', 'SKILL.md')));
+      // Unlike the removed top-level skills/ catalog, the repo's own .qwen/skills/
+      // directory is Qwen-native platform content synced verbatim by the
+      // platform-configs module (strategy: sync-root-children) — it is unrelated
+      // to the removed catalog and is expected to still be installed.
+      assert.ok(
+        fs.existsSync(path.join(homeDir, '.qwen', 'skills', 'alloydb-basics', 'SKILL.md')),
+        'Qwen-native platform skill content should still sync from .qwen/skills/'
+      );
       assert.ok(fs.existsSync(path.join(homeDir, '.qwen', 'mcp-configs', 'mcp-servers.json')));
       assert.ok(!fs.existsSync(path.join(homeDir, '.qwen', 'hooks')));
 
@@ -448,12 +420,12 @@ function runTests() {
       assert.strictEqual(state.target.id, 'qwen-home');
       assert.deepStrictEqual(state.request.modules, []);
       assert.strictEqual(state.request.profile, 'minimal');
-      assert.ok(state.resolution.selectedModules.includes('workflow-quality'));
+      assert.ok(!state.resolution.selectedModules.includes('workflow-quality'));
       assert.ok(
-        state.operations.some(operation => (
-          operation.destinationPath.endsWith(path.join('.qwen', 'skills', 'tdd-workflow', 'SKILL.md'))
+        !state.operations.some(operation => (
+          String(operation.sourceRelativePath || '').replace(/\\/g, '/').startsWith('skills/')
         )),
-        'Should record Qwen skill file operation'
+        'Skill catalog was removed: no top-level skills/ operations may appear in the plan'
       );
     } finally {
       cleanup(homeDir);
@@ -494,7 +466,7 @@ function runTests() {
       assert.ok(result.stdout.includes('Included components: (none)'));
       assert.ok(result.stdout.includes(
         'Selected modules: rules-core, agents-core, commands-core, hooks-runtime, '
-        + 'platform-configs, skill-unified-memory, workflow-quality'
+        + 'platform-configs'
       ));
       assert.ok(!fs.existsSync(path.join(homeDir, '.claude', 'ecc', 'install-state.json')));
     } finally {
@@ -503,7 +475,7 @@ function runTests() {
     }
   })) passed++; else failed++;
 
-  if (test('full profile dry-runs include delivery-gate in the install plan', () => {
+  if (test('full profile dry-run excludes the removed skill catalog and hook registration', () => {
     const homeDir = createTempDir('install-apply-home-');
     const projectDir = createTempDir('install-apply-project-');
 
@@ -512,25 +484,21 @@ function runTests() {
       assert.strictEqual(result.code, 0, result.stderr);
       const parsed = JSON.parse(result.stdout);
       assert.strictEqual(parsed.dryRun, true);
-      assert.ok(parsed.plan.selectedModuleIds.includes('workflow-quality'));
+      assert.ok(parsed.plan.selectedModuleIds.includes('agentic-patterns'));
+      assert.ok(!parsed.plan.selectedModuleIds.includes('workflow-quality'));
       const settingsOperations = parsed.plan.operations.filter(operation => (
         operation.kind === 'update-claude-settings'
       ));
-      assert.strictEqual(settingsOperations.length, 1);
-      assert.strictEqual(
-        settingsOperations[0].destinationPath,
-        path.join(homeDir, '.claude', 'settings.json')
-      );
-      assert.ok(settingsOperations[0].managedHooks.SessionStart);
+      assert.strictEqual(settingsOperations.length, 0, 'hooks are no longer registered in settings');
       assert.ok(!parsed.plan.operations.some(operation => (
         operation.kind === 'copy-file'
         && String(operation.sourceRelativePath || '').replace(/\\/g, '/') === 'hooks/hooks.json'
       )));
       assert.ok(
-        parsed.plan.operations.some(operation => (
-          String(operation.sourceRelativePath || '').replace(/\\/g, '/').startsWith('skills/delivery-gate/')
+        !parsed.plan.operations.some(operation => (
+          String(operation.sourceRelativePath || '').replace(/\\/g, '/').startsWith('skills/')
         )),
-        'Full profile dry-run should include the delivery-gate skill'
+        'Removed skill catalog must not appear in the install plan'
       );
     } finally {
       cleanup(homeDir);
@@ -548,8 +516,7 @@ function runTests() {
       assert.ok(result.stdout.includes('Mode: manifest'));
       assert.ok(result.stdout.includes('Profile: minimal'));
       assert.ok(result.stdout.includes(
-        'Selected modules: rules-core, agents-core, commands-core, platform-configs, '
-        + 'skill-unified-memory, workflow-quality'
+        'Selected modules: rules-core, agents-core, commands-core, platform-configs'
       ));
       assert.ok(!result.stdout.includes('hooks-runtime'));
       assert.ok(!fs.existsSync(path.join(homeDir, '.claude', 'ecc', 'install-state.json')));
@@ -572,7 +539,10 @@ function runTests() {
       assert.ok(fs.existsSync(path.join(claudeRoot, 'agents', 'architect.md')));
       assert.ok(fs.existsSync(path.join(claudeRoot, 'commands', 'plan.md')));
       assert.ok(!fs.existsSync(path.join(claudeRoot, 'hooks', 'hooks.json')));
-      assert.ok(readJson(path.join(claudeRoot, 'settings.json')).hooks.SessionStart);
+      // hooks/hooks.json (the registration manifest) was removed from the repo, so
+      // --enable-hooks no longer writes a `hooks` key into settings.json. The hook
+      // *implementation* files are still installed and independently invocable.
+      assert.ok(!readJson(path.join(claudeRoot, 'settings.json')).hooks);
       assert.ok(fs.existsSync(path.join(claudeRoot, 'scripts', 'hooks', 'session-end.js')));
       assert.ok(fs.existsSync(path.join(claudeRoot, 'scripts', 'lib', 'session-manager.js')));
       assert.ok(fs.existsSync(path.join(claudeRoot, 'plugin.json')));
@@ -587,6 +557,10 @@ function runTests() {
           operation.destinationPath === path.join(claudeRoot, 'commands', 'plan.md')
         )),
         'Should record manifest-driven command file copy'
+      );
+      assert.ok(
+        !state.operations.some(operation => operation.kind === 'update-claude-settings'),
+        'No settings-update operation should be recorded without a hooks.json source'
       );
     } finally {
       cleanup(homeDir);
@@ -604,7 +578,7 @@ function runTests() {
 
       const claudeRoot = path.join(homeDir, '.claude');
       assert.ok(fs.existsSync(path.join(claudeRoot, 'agents', 'architect.md')));
-      assert.ok(fs.existsSync(path.join(claudeRoot, 'skills', 'tdd-workflow', 'SKILL.md')));
+      assert.ok(!fs.existsSync(path.join(claudeRoot, 'skills')), 'skill catalog was removed');
       assert.ok(
         !fs.existsSync(path.join(claudeRoot, '.agents')),
         'Claude home must not receive the repo .agents staging directory'
@@ -623,7 +597,7 @@ function runTests() {
 
       const codexRoot = path.join(homeDir, '.codex');
       assert.ok(fs.existsSync(path.join(codexRoot, 'agents', 'architect.md')));
-      assert.ok(fs.existsSync(path.join(codexRoot, 'skills', 'tdd-workflow', 'SKILL.md')));
+      assert.ok(!fs.existsSync(path.join(codexRoot, 'skills')), 'skill catalog was removed');
       assert.ok(
         !fs.existsSync(path.join(codexRoot, '.agents')),
         'Codex home must not receive the repo .agents staging directory'
@@ -731,7 +705,7 @@ function runTests() {
         'Claude install-state must drop the excluded .agents operations'
       );
       assert.ok(fs.existsSync(path.join(claudeRoot, 'agents', 'architect.md')));
-      assert.ok(fs.existsSync(path.join(claudeRoot, 'skills', 'tdd-workflow', 'SKILL.md')));
+      assert.ok(!fs.existsSync(path.join(claudeRoot, 'skills')), 'skill catalog was removed');
 
       // Codex home seeded the same way; both recorded files are unchanged.
       const codexRoot = path.join(homeDir, '.codex');
@@ -763,7 +737,7 @@ function runTests() {
         'Codex install-state must drop the excluded .agents operations'
       );
       assert.ok(fs.existsSync(path.join(codexRoot, 'agents', 'architect.md')));
-      assert.ok(fs.existsSync(path.join(codexRoot, 'skills', 'tdd-workflow', 'SKILL.md')));
+      assert.ok(!fs.existsSync(path.join(codexRoot, 'skills')), 'skill catalog was removed');
     } finally {
       cleanup(homeDir);
       cleanup(projectDir);
@@ -785,17 +759,23 @@ function runTests() {
 
       const result = run(['--profile', 'core', '--enable-hooks'], { cwd: projectDir, homeDir });
       assert.strictEqual(result.code, 0, result.stderr);
-      assert.ok(result.stdout.includes('user-owned'), result.stdout);
-      assert.ok(result.stdout.includes('Skipped operations:'), result.stdout);
 
+      // The managed skill catalog was removed from the repo, so a 'core' install no
+      // longer attempts to write anything under .claude/skills/ and therefore never
+      // needs to skip the user's pre-existing skill there.
       assert.strictEqual(fs.readFileSync(userRulePath, 'utf8'), '# User custom rule\n');
       assert.strictEqual(fs.readFileSync(userSkillPath, 'utf8'), '# User custom skill\n');
       assert.ok(fs.existsSync(path.join(claudeRoot, 'rules', 'ecc', 'common', 'coding-style.md')));
-      assert.ok(fs.existsSync(path.join(claudeRoot, 'skills', 'verification-loop', 'SKILL.md')));
       const state = readJson(path.join(claudeRoot, 'ecc', 'install-state.json'));
       assert.ok(!state.operations.some(operation => (
         operation.destinationPath.startsWith(path.join(claudeRoot, 'skills', 'tdd-workflow'))
       )));
+      assert.ok(
+        !state.operations.some(operation => (
+          String(operation.sourceRelativePath || '').replace(/\\/g, '/').startsWith('skills/')
+        )),
+        'Removed skill catalog must not appear in managed install operations'
+      );
     } finally {
       cleanup(homeDir);
       cleanup(projectDir);
@@ -821,32 +801,24 @@ function runTests() {
         cwd: projectDir,
         homeDir,
       });
-      assert.strictEqual(result.code, 0, result.stderr);
-
-      const payload = JSON.parse(result.stdout);
-      assert.strictEqual(payload.dryRun, false);
-      assert.ok(payload.result.plannedOperations.length > 0);
-      assert.ok(payload.result.operations.length > 0);
-      assert.ok(payload.result.skippedOperations.length > 0);
+      assert.notStrictEqual(result.code, 0, 'catalog skills were removed: --skills must fail');
+      assert.ok(result.stderr.includes('Unknown install component'), result.stderr);
       assert.strictEqual(
-        payload.result.operations.length + payload.result.skippedOperations.length,
-        payload.result.plannedOperations.length
+        fs.readFileSync(userSkillPath, 'utf8'),
+        '# User custom skill\n',
+        'user-owned skill must be untouched'
       );
-      assert.ok(payload.result.skippedOperations.every(operation => (
-        operation.destinationPath.startsWith(path.dirname(userSkillPath))
-      )));
-      assert.ok(!payload.result.operations.some(operation => (
-        operation.destinationPath.startsWith(path.dirname(userSkillPath))
-      )));
-      assert.ok(payload.result.warnings.some(warning => warning.includes('user-owned')));
-      assert.strictEqual(fs.readFileSync(userSkillPath, 'utf8'), '# User custom skill\n');
+      assert.ok(
+        !fs.existsSync(path.join(homeDir, '.claude', 'ecc', 'install-state.json')),
+        'failed skill install must not write install-state'
+      );
     } finally {
       cleanup(homeDir);
       cleanup(projectDir);
     }
   })) passed++; else failed++;
 
-  if (test('dry-run reports the same user-owned Claude skill conflicts as apply', () => {
+  if (test('dry-run reports the same removed-catalog skill failure as apply', () => {
     const homeDir = createTempDir('install-apply-home-');
     const projectDir = createTempDir('install-apply-project-');
 
@@ -865,19 +837,8 @@ function runTests() {
         ['--skills', 'tdd-workflow', '--dry-run', '--json'],
         { cwd: projectDir, homeDir }
       );
-      assert.strictEqual(result.code, 0, result.stderr);
-
-      const payload = JSON.parse(result.stdout);
-      assert.strictEqual(payload.dryRun, true);
-      assert.ok(payload.plan.plannedOperations.length > 0);
-      assert.ok(payload.plan.skippedOperations.length > 0);
-      assert.ok(payload.plan.warnings.some(warning => warning.includes('user-owned')));
-      assert.ok(payload.plan.skippedOperations.every(operation => (
-        operation.destinationPath.startsWith(userSkillRoot)
-      )));
-      assert.ok(!payload.plan.operations.some(operation => (
-        operation.destinationPath.startsWith(userSkillRoot)
-      )));
+      assert.notStrictEqual(result.code, 0, 'catalog skills were removed: --skills must fail');
+      assert.ok(result.stderr.includes('Unknown install component'), result.stderr);
       assert.strictEqual(fs.readFileSync(userSkillPath, 'utf8'), '# User custom skill\n');
       assert.ok(!fs.existsSync(path.join(homeDir, '.claude', 'ecc', 'install-state.json')));
     } finally {
@@ -901,7 +862,7 @@ function runTests() {
       );
       assert.ok(fs.existsSync(path.join(projectDir, '.agents', 'agents', 'architect.md')));
       assert.ok(fs.existsSync(path.join(projectDir, '.agents', 'workflows', 'plan.md')));
-      assert.ok(fs.existsSync(path.join(projectDir, '.agents', 'skills', 'tdd-workflow', 'SKILL.md')));
+      assert.ok(!fs.existsSync(path.join(projectDir, '.agents', 'skills')), 'skill catalog was removed');
 
       const state = readJson(path.join(projectDir, '.agents', 'ecc-install-state.json'));
       assert.strictEqual(state.request.profile, 'core');
@@ -912,9 +873,7 @@ function runTests() {
           'rules-core',
           'agents-core',
           'commands-core',
-          'platform-configs',
-          'skill-unified-memory',
-          'workflow-quality'
+          'platform-configs'
         ]
       );
       assert.ok(state.resolution.skippedModules.includes('hooks-runtime'));
@@ -963,7 +922,7 @@ function runTests() {
     assert.ok(result.stderr.includes('Unknown install module: ghost-module'));
   })) passed++; else failed++;
 
-  if (test('registers Claude hooks in settings and defaults commit attribution off', () => {
+  if (test('defaults commit attribution off without registering any managed hooks', () => {
     const homeDir = createTempDir('install-apply-home-');
     const projectDir = createTempDir('install-apply-project-');
 
@@ -979,21 +938,32 @@ function runTests() {
       );
       const settings = readJson(path.join(claudeRoot, 'settings.json'));
       assert.strictEqual(settings.includeCoAuthoredBy, false);
-      assert.ok(settings.hooks.SessionStart.some(entry => entry.id === 'session:start'));
+      // The hooks.json registration manifest was removed from the repo, so there is
+      // nothing left to drive registration into settings.json's hooks.* arrays.
+      assert.ok(!settings.hooks, 'no hooks key should be written without a hooks.json source');
+      assert.ok(
+        fs.existsSync(path.join(claudeRoot, 'scripts', 'hooks', 'session-start.js')),
+        'the hook implementation file should still be installed'
+      );
 
       const state = readJson(path.join(claudeRoot, 'ecc', 'install-state.json'));
-      const settingsOperation = state.operations.find(operation => (
-        operation.kind === 'update-claude-settings'
-      ));
-      assert.ok(settingsOperation, 'state should record the settings update operation');
-      assert.deepStrictEqual(settingsOperation.managedHooks, settings.hooks);
+      assert.ok(
+        !state.operations.some(operation => operation.kind === 'update-claude-settings'),
+        'state should not record a settings update operation without a hooks.json source'
+      );
     } finally {
       cleanup(homeDir);
       cleanup(projectDir);
     }
   })) passed++; else failed++;
 
-  if (test('resolves Claude home and project hook commands to their installed roots', () => {
+  if (test('installs Claude home and project hook scripts at their installed roots and keeps them independently invocable', () => {
+    // hooks/hooks.json (the registration manifest) was removed from the repo, so
+    // settings.json no longer gets a `hooks.PreToolUse` entry whose `command`
+    // resolves to the installed root. The hook *implementation* files are still
+    // installed under scripts/hooks/ for both home and project targets, and they
+    // remain independently invocable by spawning them directly (same pattern as
+    // the ESM-isolation test below, which already proves this for block-no-verify.js).
     for (const target of ['claude', 'claude-project']) {
       const homeDir = createTempDir(`install-apply-${target}-home-`);
       const projectDir = createTempDir(`install-apply-${target}-project-`);
@@ -1009,29 +979,29 @@ function runTests() {
           ? path.join(homeDir, '.claude')
           : path.join(projectDir, '.claude');
         const settings = readJson(path.join(claudeRoot, 'settings.json'));
+        assert.ok(!settings.hooks, 'no hooks key should be written without a hooks.json source');
+
         const state = readJson(path.join(claudeRoot, 'ecc', 'install-state.json'));
         const installedRoot = state.target.root;
         assert.strictEqual(fs.realpathSync(installedRoot), fs.realpathSync(claudeRoot));
-        const installedBashDispatcherEntry = settings.hooks.PreToolUse.find(
-          entry => entry.id === 'pre:bash:dispatcher'
-        );
-        assert.ok(installedBashDispatcherEntry);
-        const command = installedBashDispatcherEntry.hooks[0].command;
-        assert.ok(command.startsWith('node -e '));
-        assert.ok(command.includes('plugin-hook-bootstrap.js'));
-        assert.ok(command.includes('pre-bash-dispatcher.js'));
-        assert.ok(
-          command.includes(Buffer.from(installedRoot, 'utf8').toString('base64')),
-          `${target} command should encode its absolute root without shell interpolation`
-        );
-        assert.ok(!command.includes(claudeRoot));
-        assert.ok(!command.includes('var e=process.env.CLAUDE_PLUGIN_ROOT;'));
-        assert.ok(!command.includes('${CLAUDE_PLUGIN_ROOT}'));
 
-        const smokeEntry = settings.hooks.PreToolUse.find(
-          entry => entry.id === 'pre:write:doc-file-warning'
-        );
-        const smokeResult = spawnSync(smokeEntry.hooks[0].command, {
+        const dispatcherPath = path.join(claudeRoot, 'scripts', 'hooks', 'pre-bash-dispatcher.js');
+        assert.ok(fs.existsSync(dispatcherPath), `${target} should install pre-bash-dispatcher.js`);
+        const dispatcherResult = spawnSync(process.execPath, [dispatcherPath], {
+          input: JSON.stringify({
+            hook_event_name: 'PreToolUse',
+            tool_name: 'Bash',
+            tool_input: { command: 'echo hello' },
+          }),
+          encoding: 'utf8',
+          cwd: projectDir,
+          timeout: DEFAULT_INSTALL_APPLY_TIMEOUT_MS,
+        });
+        assert.strictEqual(dispatcherResult.status, 0, dispatcherResult.stderr);
+
+        const docWarningPath = path.join(claudeRoot, 'scripts', 'hooks', 'doc-file-warning.js');
+        assert.ok(fs.existsSync(docWarningPath), `${target} should install doc-file-warning.js`);
+        const smokeResult = spawnSync(process.execPath, [docWarningPath], {
           input: JSON.stringify({
             hook_event_name: 'PreToolUse',
             tool_name: 'Write',
@@ -1039,13 +1009,6 @@ function runTests() {
           }),
           encoding: 'utf8',
           cwd: projectDir,
-          env: {
-            ...process.env,
-            HOME: homeDir,
-            USERPROFILE: homeDir,
-            ECC_DISABLED_HOOKS: 'pre:write:doc-file-warning',
-          },
-          shell: true,
           timeout: DEFAULT_INSTALL_APPLY_TIMEOUT_MS,
         });
         assert.strictEqual(smokeResult.status, 0, smokeResult.stderr);
@@ -1153,20 +1116,25 @@ function runTests() {
       assert.deepStrictEqual(
         settings.hooks.UserPromptSubmit[0],
         { matcher: '*', hooks: [{ type: 'command', command: 'echo custom-submit' }] },
-        'existing UserPromptSubmit entries should retain their order and content'
-      );
-      assert.ok(
-        settings.hooks.UserPromptSubmit.some(entry => entry.id === 'user-prompt:goal-runtime-admit'),
-        'managed goal admission should be registered alongside user hooks'
+        'existing event entries should retain their order and content'
       );
       assert.deepStrictEqual(
         settings.hooks.PreToolUse[0],
         { matcher: 'Write', hooks: [{ type: 'command', command: 'echo custom-pretool' }] },
         'existing event entries should retain their order and content'
       );
+      // hooks/hooks.json (the registration manifest) was removed from the repo, so
+      // there is no managed-hook registration step left to merge new entries into
+      // the user's existing hooks arrays; they should be left exactly as-is.
+      assert.strictEqual(settings.hooks.UserPromptSubmit.length, 1);
+      assert.strictEqual(settings.hooks.PreToolUse.length, 1);
       assert.ok(
-        settings.hooks.PreToolUse.some(entry => entry.id === 'pre:bash:dispatcher'),
-        'managed Claude hooks should be registered alongside user hooks'
+        !settings.hooks.UserPromptSubmit.some(entry => entry.id === 'user-prompt:goal-runtime-admit'),
+        'no managed goal admission hook should be registered without a hooks.json source'
+      );
+      assert.ok(
+        !settings.hooks.PreToolUse.some(entry => entry.id === 'pre:bash:dispatcher'),
+        'no managed Claude hook should be registered without a hooks.json source'
       );
     } finally {
       cleanup(homeDir);
@@ -1248,7 +1216,7 @@ function runTests() {
     }
   })) passed++; else failed++;
 
-  if (test('reinstall is idempotent for managed hooks and keeps commit attribution disabled', () => {
+  if (test('reinstall is idempotent and keeps commit attribution disabled', () => {
     const homeDir = createTempDir('install-apply-home-');
     const projectDir = createTempDir('install-apply-project-');
 
@@ -1261,15 +1229,16 @@ function runTests() {
 
       const settings = readJson(path.join(homeDir, '.claude', 'settings.json'));
       assert.strictEqual(settings.includeCoAuthoredBy, false);
-      const ids = Object.values(settings.hooks).flat().map(entry => entry.id);
-      assert.strictEqual(ids.length, new Set(ids).size, 'managed hook IDs should not duplicate');
+      // hooks/hooks.json (the registration manifest) was removed from the repo, so
+      // reinstalling never registers (or re-registers) any managed hook entries.
+      assert.ok(!settings.hooks, 'no hooks key should be written without a hooks.json source');
     } finally {
       cleanup(homeDir);
       cleanup(projectDir);
     }
   })) passed++; else failed++;
 
-  if (test('reinstall preserves pre-existing hook entries while registering managed hooks', () => {
+  if (test('reinstall preserves pre-existing hook entries without adding managed hooks', () => {
     const homeDir = createTempDir('install-apply-home-');
     const projectDir = createTempDir('install-apply-project-');
 
@@ -1290,7 +1259,10 @@ function runTests() {
       const afterSecondInstall = readJson(settingsPath);
       assert.strictEqual(afterSecondInstall.includeCoAuthoredBy, false);
       assert.deepStrictEqual(afterSecondInstall.hooks.PreToolUse[0], legacySettings.hooks.PreToolUse[0]);
-      assert.ok(afterSecondInstall.hooks.PreToolUse.some(entry => entry.id === 'pre:bash:dispatcher'));
+      // hooks/hooks.json (the registration manifest) was removed from the repo, so
+      // the pre-existing entry is left exactly as the user wrote it; nothing merges in.
+      assert.strictEqual(afterSecondInstall.hooks.PreToolUse.length, 1);
+      assert.ok(!afterSecondInstall.hooks.PreToolUse.some(entry => entry.id === 'pre:bash:dispatcher'));
     } finally {
       cleanup(homeDir);
       cleanup(projectDir);
@@ -1317,7 +1289,9 @@ function runTests() {
       const afterInstall = readJson(settingsPath);
       assert.strictEqual(afterInstall.includeCoAuthoredBy, true);
       assert.strictEqual(afterInstall.theme, 'dark');
-      assert.ok(afterInstall.hooks.SessionStart.some(entry => entry.id === 'session:start'));
+      // hooks/hooks.json (the registration manifest) was removed from the repo, so
+      // no hooks key gets added even on an install that would otherwise register them.
+      assert.ok(!afterInstall.hooks, 'no hooks key should be written without a hooks.json source');
     } finally {
       cleanup(homeDir);
       cleanup(projectDir);
@@ -1347,14 +1321,16 @@ function runTests() {
       assert.deepStrictEqual(afterInstall.attribution, customSettings.attribution);
       assert.strictEqual(afterInstall.theme, 'dark');
       assert.ok(!Object.hasOwn(afterInstall, 'includeCoAuthoredBy'));
-      assert.ok(afterInstall.hooks.SessionStart.some(entry => entry.id === 'session:start'));
+      // hooks/hooks.json (the registration manifest) was removed from the repo, so
+      // no hooks key gets added even on an install that would otherwise register them.
+      assert.ok(!afterInstall.hooks, 'no hooks key should be written without a hooks.json source');
     } finally {
       cleanup(homeDir);
       cleanup(projectDir);
     }
   })) passed++; else failed++;
 
-  if (test('malformed Claude settings aborts before any install mutation', () => {
+  if (test('malformed Claude settings is left untouched and no longer blocks install', () => {
     const homeDir = createTempDir('install-apply-home-');
     const projectDir = createTempDir('install-apply-project-');
 
@@ -1364,18 +1340,29 @@ function runTests() {
       const settingsPath = path.join(claudeRoot, 'settings.json');
       fs.writeFileSync(settingsPath, '{ invalid json\n');
 
+      // Settings-merge validation (including "Failed to parse Claude settings")
+      // lived entirely inside the update-claude-settings step, which only runs
+      // when hooks/hooks.json exists as a source. That file was removed from the
+      // repo, so the step never runs and malformed settings.json no longer aborts
+      // the install; the rest of the managed install still completes normally.
       const result = run(['--profile', 'core', '--enable-hooks'], { cwd: projectDir, homeDir });
-      assert.notStrictEqual(result.code, 0);
-      assert.match(result.stderr, /Failed to parse Claude settings/);
-      assert.strictEqual(fs.readFileSync(settingsPath, 'utf8'), '{ invalid json\n');
-      assert.deepStrictEqual(fs.readdirSync(claudeRoot), ['settings.json']);
+      assert.strictEqual(result.code, 0, result.stderr);
+      assert.strictEqual(
+        fs.readFileSync(settingsPath, 'utf8'),
+        '{ invalid json\n',
+        'malformed settings.json should be left exactly as-is'
+      );
+      assert.ok(
+        fs.existsSync(path.join(claudeRoot, 'agents', 'architect.md')),
+        'the rest of the managed install should still complete'
+      );
     } finally {
       cleanup(homeDir);
       cleanup(projectDir);
     }
   })) passed++; else failed++;
 
-  if (test('non-object Claude settings aborts before any install mutation', () => {
+  if (test('non-object Claude settings is left untouched and no longer blocks install', () => {
     const homeDir = createTempDir('install-apply-home-');
     const projectDir = createTempDir('install-apply-project-');
 
@@ -1385,18 +1372,26 @@ function runTests() {
       const settingsPath = path.join(claudeRoot, 'settings.json');
       fs.writeFileSync(settingsPath, '[]\n');
 
+      // See the malformed-settings test above: this validation only ran as part
+      // of the now-dead update-claude-settings step.
       const result = run(['--profile', 'core', '--enable-hooks'], { cwd: projectDir, homeDir });
-      assert.notStrictEqual(result.code, 0);
-      assert.match(result.stderr, /expected a JSON object/);
-      assert.strictEqual(fs.readFileSync(settingsPath, 'utf8'), '[]\n');
-      assert.deepStrictEqual(fs.readdirSync(claudeRoot), ['settings.json']);
+      assert.strictEqual(result.code, 0, result.stderr);
+      assert.strictEqual(
+        fs.readFileSync(settingsPath, 'utf8'),
+        '[]\n',
+        'non-object settings.json should be left exactly as-is'
+      );
+      assert.ok(
+        fs.existsSync(path.join(claudeRoot, 'agents', 'architect.md')),
+        'the rest of the managed install should still complete'
+      );
     } finally {
       cleanup(homeDir);
       cleanup(projectDir);
     }
   })) passed++; else failed++;
 
-  if (test('same-id Claude hook conflict aborts before any install mutation', () => {
+  if (test('an existing same-id Claude hook entry is preserved untouched since no managed hooks are registered', () => {
     const homeDir = createTempDir('install-apply-home-');
     const projectDir = createTempDir('install-apply-project-');
 
@@ -1416,11 +1411,16 @@ function runTests() {
       };
       fs.writeFileSync(settingsPath, `${JSON.stringify(existing, null, 2)}\n`);
 
+      // The "Refusing to overwrite" same-id conflict check only ran as part of the
+      // update-claude-settings merge step, which no longer runs (no hooks.json
+      // source). There is nothing left to conflict with, so install succeeds and
+      // the user's existing hook entry is preserved exactly as written.
       const result = run(['--profile', 'core', '--enable-hooks'], { cwd: projectDir, homeDir });
-      assert.notStrictEqual(result.code, 0);
-      assert.match(result.stderr, /Refusing to overwrite.*pre:bash:dispatcher/);
-      assert.deepStrictEqual(readJson(settingsPath), existing);
-      assert.deepStrictEqual(fs.readdirSync(claudeRoot), ['settings.json']);
+      assert.strictEqual(result.code, 0, result.stderr);
+      const afterInstall = readJson(settingsPath);
+      assert.strictEqual(afterInstall.theme, 'dark');
+      assert.deepStrictEqual(afterInstall.hooks, existing.hooks);
+      assert.strictEqual(afterInstall.includeCoAuthoredBy, false);
     } finally {
       cleanup(homeDir);
       cleanup(projectDir);
@@ -1444,8 +1444,8 @@ function runTests() {
       const result = run(['--config', configPath, '--enable-hooks'], { cwd: projectDir, homeDir });
       assert.strictEqual(result.code, 0, result.stderr);
 
-      assert.ok(fs.existsSync(path.join(homeDir, '.claude', 'skills', 'security-review', 'SKILL.md')));
-      assert.ok(!fs.existsSync(path.join(homeDir, '.claude', 'skills', 'dmux-workflows', 'SKILL.md')));
+      assert.ok(!fs.existsSync(path.join(homeDir, '.claude', 'skills')), 'skill catalog was removed');
+      assert.ok(!stateOperationsIncludeSkills(homeDir), 'no skills/ operations in install-state');
 
       const state = readJson(path.join(homeDir, '.claude', 'ecc', 'install-state.json'));
       assert.strictEqual(state.request.profile, 'developer');
@@ -1476,8 +1476,8 @@ function runTests() {
       const result = run(['--enable-hooks'], { cwd: projectDir, homeDir });
       assert.strictEqual(result.code, 0, result.stderr);
 
-      assert.ok(fs.existsSync(path.join(homeDir, '.claude', 'skills', 'security-review', 'SKILL.md')));
-      assert.ok(!fs.existsSync(path.join(homeDir, '.claude', 'skills', 'dmux-workflows', 'SKILL.md')));
+      assert.ok(!fs.existsSync(path.join(homeDir, '.claude', 'skills')), 'skill catalog was removed');
+      assert.ok(!stateOperationsIncludeSkills(homeDir), 'no skills/ operations in install-state');
 
       const state = readJson(path.join(homeDir, '.claude', 'ecc', 'install-state.json'));
       assert.strictEqual(state.request.profile, 'developer');
@@ -1512,7 +1512,14 @@ function runTests() {
       assert.deepStrictEqual(state.request.legacyLanguages, ['typescript']);
       assert.strictEqual(state.request.profile, null);
       assert.deepStrictEqual(state.request.includeComponents, []);
-      assert.ok(state.resolution.selectedModules.includes('framework-language'));
+      // 'framework-language' is not (and never was) a real module id in
+      // scripts/lib/install-manifests.js — LEGACY_COMPAT_BASE_MODULE_IDS_BY_TARGET
+      // resolves legacy language installs to this fixed module set instead of the
+      // manifest-profile 'security' capability requested in ecc-install.json.
+      assert.deepStrictEqual(
+        state.resolution.selectedModules,
+        ['rules-core', 'agents-core', 'commands-core', 'hooks-runtime', 'platform-configs']
+      );
       assert.ok(!state.resolution.selectedModules.includes('security'));
     } finally {
       cleanup(homeDir);

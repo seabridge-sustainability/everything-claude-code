@@ -233,7 +233,8 @@ function runTests() {
       assert.strictEqual(json.plan.mode, 'legacy-compat');
       assert.deepStrictEqual(json.plan.legacyLanguages, ['typescript']);
       assert.ok(json.plan.includedComponentIds.includes('locale:ja'));
-      assert.ok(json.plan.selectedModuleIds.includes('framework-language'));
+      assert.ok(!json.plan.selectedModuleIds.includes('framework-language'),
+        'framework-language module was removed from the catalog');
       assert.ok(json.plan.selectedModuleIds.includes('docs-ja-jp'));
     } finally {
       fs.rmSync(homeDir, { recursive: true, force: true });

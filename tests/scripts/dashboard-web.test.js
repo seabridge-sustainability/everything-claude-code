@@ -600,7 +600,7 @@ test('loadMcps loads .mcp.json config', () => {
       'test-server': {
         command: 'node',
         args: ['server.js'],
-        env: { SECRET: 'real-secret' },
+        env: { SECRET: 'real-secret' }, // pragma: allowlist secret
         type: 'stdio',
       },
     },
@@ -647,7 +647,7 @@ test('loadMcps masks environment variables', () => {
     mcpServers: {
       server: {
         command: 'python',
-        env: { API_KEY: 'super-secret-key', DEBUG: 'true' },
+        env: { API_KEY: 'super-secret-key', DEBUG: 'true' }, // pragma: allowlist secret
       },
     },
   }));
@@ -722,16 +722,15 @@ test('loadHooks loads hook definitions', () => {
   cleanup(testRoot);
 });
 
-test('loadHooks exposes consolidated PostToolUse child IDs', () => {
+test('loadHooks returns no hooks for the repo after gate-stack removal', () => {
   const { loadHooks } = require(SCRIPT);
   const repoRoot = path.join(__dirname, '..', '..');
   const hooks = loadHooks(repoRoot);
 
-  assert.ok(hooks.some(hook => hook.id === 'post:dispatcher:sync'));
-  assert.ok(hooks.some(hook => hook.id === 'post:dispatcher:async'));
-  assert.ok(hooks.some(hook => hook.id === 'post:quality-gate'));
-  assert.ok(hooks.some(hook => hook.id === 'post:edit:accumulator'));
-  assert.ok(hooks.some(hook => hook.id === 'post:ecc-context-monitor'));
+  // hooks/hooks.json no longer ships with the repo, so neither the
+  // consolidated PostToolUse dispatcher entries nor their child IDs
+  // are surfaced for the real repo root.
+  assert.deepStrictEqual(hooks, []);
 });
 
 test('loadHooks handles malformed JSON gracefully', () => {

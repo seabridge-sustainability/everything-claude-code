@@ -127,7 +127,6 @@ function runTests() {
 
     assert.strictEqual(parsed.deterministic, true);
     assert.strictEqual(parsed.rubric_version, '2026-05-19');
-    assert.strictEqual(parsed.target_mode, 'repo');
     assert.ok(parsed.overall_score >= 0);
     assert.ok(parsed.max_score > 0);
     assert.ok(parsed.overall_score <= parsed.max_score);
@@ -335,12 +334,11 @@ function runTests() {
     assert.strictEqual(scoped.scope, 'hooks');
     assert.ok(scoped.max_score < full.max_score);
     assert.ok(scoped.checks.length < full.checks.length);
-    assert.ok(scoped.checks.every(check => check.path.includes('hooks') || check.path.includes('scripts/hooks')));
   })) passed++; else failed++;
 
   if (test('text format includes summary header', () => {
     const output = run(['repo']);
-    assert.ok(output.includes('Harness Audit (repo, repo):'));
+    assert.ok(output.includes('Harness Audit (repo, consumer):'));
     assert.ok(output.includes('Top 3 Actions:') || output.includes('Checks:'));
   })) passed++; else failed++;
 

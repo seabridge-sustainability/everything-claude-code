@@ -91,7 +91,7 @@ function main() {
         assert.strictEqual(payload.dryRun, true);
         assert.strictEqual(payload.plan.mode, 'legacy-compat');
         assert.deepStrictEqual(payload.plan.legacyLanguages, ['typescript']);
-        assert.ok(payload.plan.selectedModuleIds.includes('framework-language'));
+        assert.ok(payload.plan.selectedModuleIds.includes('rules-core'));
       } finally {
         fs.rmSync(homeDir, { force: true, recursive: true });
       }
@@ -110,7 +110,7 @@ function main() {
         assert.strictEqual(payload.dryRun, true);
         assert.strictEqual(payload.plan.mode, 'legacy-compat');
         assert.deepStrictEqual(payload.plan.legacyLanguages, ['typescript']);
-        assert.ok(payload.plan.selectedModuleIds.includes('framework-language'));
+        assert.ok(payload.plan.selectedModuleIds.includes('rules-core'));
       } finally {
         fs.rmSync(homeDir, { force: true, recursive: true });
       }
@@ -123,11 +123,11 @@ function main() {
       assert.ok(payload.profiles.length > 0);
     }],
     ['delegates catalog command', () => {
-      const result = runCli(['catalog', 'show', 'framework:nextjs', '--json']);
+      const result = runCli(['catalog', 'show', 'capability:security', '--json']);
       assert.strictEqual(result.status, 0, result.stderr);
       const payload = parseJson(result.stdout);
-      assert.strictEqual(payload.id, 'framework:nextjs');
-      assert.deepStrictEqual(payload.moduleIds, ['framework-language']);
+      assert.strictEqual(payload.id, 'capability:security');
+      assert.deepStrictEqual(payload.moduleIds, ['security']);
     }],
     ['delegates consult command', () => {
       const result = runCli(['consult', 'security', 'reviews', '--json']);

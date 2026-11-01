@@ -33,7 +33,7 @@ function runTests() {
       'scripts/install-apply.js',
       '--target', 'cursor',
       '--profile', 'developer',
-      '--modules', 'platform-configs, workflow-quality ,platform-configs',
+      '--modules', 'platform-configs, orchestration ,platform-configs',
       '--with', 'lang:typescript',
       '--without', 'capability:media',
       '--config', 'ecc-install.json',
@@ -44,7 +44,7 @@ function runTests() {
     assert.strictEqual(parsed.target, 'cursor');
     assert.strictEqual(parsed.profileId, 'developer');
     assert.strictEqual(parsed.configPath, 'ecc-install.json');
-    assert.deepStrictEqual(parsed.moduleIds, ['platform-configs', 'workflow-quality']);
+    assert.deepStrictEqual(parsed.moduleIds, ['platform-configs', 'orchestration']);
     assert.deepStrictEqual(parsed.includeComponentIds, ['lang:typescript']);
     assert.deepStrictEqual(parsed.excludeComponentIds, ['capability:media']);
     assert.strictEqual(parsed.dryRun, true);
@@ -206,7 +206,7 @@ function runTests() {
         path: '/workspace/app/ecc-install.json',
         target: 'claude',
         profileId: 'developer',
-        moduleIds: ['workflow-quality'],
+        moduleIds: ['orchestration'],
         includeComponentIds: ['lang:typescript'],
         excludeComponentIds: ['capability:orchestration'],
       },
@@ -215,7 +215,7 @@ function runTests() {
     assert.strictEqual(request.mode, 'manifest');
     assert.strictEqual(request.target, 'cursor');
     assert.strictEqual(request.profileId, 'developer');
-    assert.deepStrictEqual(request.moduleIds, ['workflow-quality', 'platform-configs']);
+    assert.deepStrictEqual(request.moduleIds, ['orchestration', 'platform-configs']);
     assert.deepStrictEqual(request.includeComponentIds, ['lang:typescript', 'framework:nextjs']);
     assert.deepStrictEqual(request.excludeComponentIds, ['capability:orchestration', 'capability:media']);
     assert.strictEqual(request.configPath, '/workspace/app/ecc-install.json');

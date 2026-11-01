@@ -65,7 +65,7 @@ smoke receipt is still required for activation claims.
 | Runtime | Outcome gate tier | Instruction entry |
 | --- | --- | --- |
 | codex | hybrid | `AGENTS.md` |
-| claude | native | `CLAUDE.md` |
+| claude | hybrid | `CLAUDE.md` |
 | gemini | wrapper | `GEMINI.md` |
 | opencode | hybrid | `AGENTS.md` |
 | copilot | instruction | `.github/copilot-instructions.md` |

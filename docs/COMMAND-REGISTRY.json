@@ -66,9 +66,7 @@
       "allAgents": [
         "cpp-build-resolver"
       ],
-      "skills": [
-        "cpp-coding-standards"
-      ],
+      "skills": [],
       "path": "commands/cpp-build.md"
     },
     {
@@ -81,10 +79,7 @@
       "allAgents": [
         "cpp-reviewer"
       ],
-      "skills": [
-        "cpp-coding-standards",
-        "cpp-testing"
-      ],
+      "skills": [],
       "path": "commands/cpp-review.md"
     },
     {
@@ -93,10 +88,7 @@
       "type": "testing",
       "primaryAgents": [],
       "allAgents": [],
-      "skills": [
-        "cpp-testing",
-        "tdd-workflow"
-      ],
+      "skills": [],
       "path": "commands/cpp-test.md"
     },
     {
@@ -105,10 +97,7 @@
       "type": "review",
       "primaryAgents": [],
       "allAgents": [],
-      "skills": [
-        "ecc-guide",
-        "security-scan"
-      ],
+      "skills": [],
       "path": "commands/ecc-guide.md"
     },
     {
@@ -117,10 +106,7 @@
       "type": "review",
       "primaryAgents": [],
       "allAgents": [],
-      "skills": [
-        "orch-add-feature",
-        "orch-change-feature"
-      ],
+      "skills": [],
       "path": "commands/epic-claim.md"
     },
     {
@@ -183,9 +169,7 @@
       "type": "testing",
       "primaryAgents": [],
       "allAgents": [],
-      "skills": [
-        "continuous-learning-v2"
-      ],
+      "skills": [],
       "path": "commands/evolve.md"
     },
     {
@@ -216,9 +200,7 @@
       "allAgents": [
         "dart-build-resolver"
       ],
-      "skills": [
-        "flutter-dart-code-review"
-      ],
+      "skills": [],
       "path": "commands/flutter-build.md"
     },
     {
@@ -231,9 +213,7 @@
       "allAgents": [
         "flutter-reviewer"
       ],
-      "skills": [
-        "flutter-dart-code-review"
-      ],
+      "skills": [],
       "path": "commands/flutter-review.md"
     },
     {
@@ -248,9 +228,7 @@
         "dart-build-resolver",
         "flutter-reviewer"
       ],
-      "skills": [
-        "flutter-dart-code-review"
-      ],
+      "skills": [],
       "path": "commands/flutter-test.md"
     },
     {
@@ -281,9 +259,7 @@
       "allAgents": [
         "go-build-resolver"
       ],
-      "skills": [
-        "golang-patterns"
-      ],
+      "skills": [],
       "path": "commands/go-build.md"
     },
     {
@@ -296,10 +272,7 @@
       "allAgents": [
         "go-reviewer"
       ],
-      "skills": [
-        "golang-patterns",
-        "golang-testing"
-      ],
+      "skills": [],
       "path": "commands/go-review.md"
     },
     {
@@ -308,10 +281,7 @@
       "type": "testing",
       "primaryAgents": [],
       "allAgents": [],
-      "skills": [
-        "golang-testing",
-        "tdd-workflow"
-      ],
+      "skills": [],
       "path": "commands/go-test.md"
     },
     {
@@ -338,9 +308,7 @@
       "type": "testing",
       "primaryAgents": [],
       "allAgents": [],
-      "skills": [
-        "sea-grill-me-codex"
-      ],
+      "skills": [],
       "path": "commands/grill-me-codex.md"
     },
     {
@@ -403,9 +371,7 @@
       "type": "testing",
       "primaryAgents": [],
       "allAgents": [],
-      "skills": [
-        "continuous-learning-v2"
-      ],
+      "skills": [],
       "path": "commands/instinct-import.md"
     },
     {
@@ -414,9 +380,7 @@
       "type": "testing",
       "primaryAgents": [],
       "allAgents": [],
-      "skills": [
-        "continuous-learning-v2"
-      ],
+      "skills": [],
       "path": "commands/instinct-status.md"
     },
     {
@@ -425,9 +389,7 @@
       "type": "testing",
       "primaryAgents": [],
       "allAgents": [],
-      "skills": [
-        "jira-integration"
-      ],
+      "skills": [],
       "path": "commands/jira.md"
     },
     {
@@ -440,9 +402,7 @@
       "allAgents": [
         "kotlin-build-resolver"
       ],
-      "skills": [
-        "kotlin-patterns"
-      ],
+      "skills": [],
       "path": "commands/kotlin-build.md"
     },
     {
@@ -455,10 +415,7 @@
       "allAgents": [
         "kotlin-reviewer"
       ],
-      "skills": [
-        "kotlin-patterns",
-        "kotlin-testing"
-      ],
+      "skills": [],
       "path": "commands/kotlin-review.md"
     },
     {
@@ -467,10 +424,7 @@
       "type": "testing",
       "primaryAgents": [],
       "allAgents": [],
-      "skills": [
-        "kotlin-testing",
-        "tdd-workflow"
-      ],
+      "skills": [],
       "path": "commands/kotlin-test.md"
     },
     {
@@ -515,9 +469,7 @@
       "type": "testing",
       "primaryAgents": [],
       "allAgents": [],
-      "skills": [
-        "marketing-campaign"
-      ],
+      "skills": [],
       "path": "commands/marketing-campaign.md"
     },
     {
@@ -526,9 +478,7 @@
       "type": "testing",
       "primaryAgents": [],
       "allAgents": [],
-      "skills": [
-        "sea-local-llm-training"
-      ],
+      "skills": [],
       "path": "commands/model-route.md"
     },
     {
@@ -564,9 +514,7 @@
       "type": "orchestration",
       "primaryAgents": [],
       "allAgents": [],
-      "skills": [
-        "accessibility"
-      ],
+      "skills": [],
       "path": "commands/multi-plan.md"
     },
     {
@@ -584,9 +532,7 @@
       "type": "orchestration",
       "primaryAgents": [],
       "allAgents": [],
-      "skills": [
-        "orch-add-feature"
-      ],
+      "skills": [],
       "path": "commands/orch-add-feature.md"
     },
     {
@@ -595,9 +541,7 @@
       "type": "orchestration",
       "primaryAgents": [],
       "allAgents": [],
-      "skills": [
-        "orch-build-mvp"
-      ],
+      "skills": [],
       "path": "commands/orch-build-mvp.md"
     },
     {
@@ -606,11 +550,7 @@
       "type": "orchestration",
       "primaryAgents": [],
       "allAgents": [],
-      "skills": [
-        "orch-add-feature",
-        "orch-change-feature",
-        "orch-fix-defect"
-      ],
+      "skills": [],
       "path": "commands/orch-change-feature.md"
     },
     {
@@ -619,11 +559,7 @@
       "type": "orchestration",
       "primaryAgents": [],
       "allAgents": [],
-      "skills": [
-        "orch-add-feature",
-        "orch-change-feature",
-        "orch-fix-defect"
-      ],
+      "skills": [],
       "path": "commands/orch-fix-defect.md"
     },
     {
@@ -632,11 +568,7 @@
       "type": "orchestration",
       "primaryAgents": [],
       "allAgents": [],
-      "skills": [
-        "orch-change-feature",
-        "orch-fix-defect",
-        "orch-refine-code"
-      ],
+      "skills": [],
       "path": "commands/orch-refine-code.md"
     },
     {
@@ -654,9 +586,7 @@
       "type": "review",
       "primaryAgents": [],
       "allAgents": [],
-      "skills": [
-        "plan-canvas"
-      ],
+      "skills": [],
       "path": "commands/plan-canvas.md"
     },
     {
@@ -678,9 +608,7 @@
       "allAgents": [
         "planner"
       ],
-      "skills": [
-        "plan-canvas"
-      ],
+      "skills": [],
       "path": "commands/plan.md"
     },
     {
@@ -707,9 +635,7 @@
       "type": "testing",
       "primaryAgents": [],
       "allAgents": [],
-      "skills": [
-        "ecc-guide"
-      ],
+      "skills": [],
       "path": "commands/project-init.md"
     },
     {
@@ -718,9 +644,7 @@
       "type": "testing",
       "primaryAgents": [],
       "allAgents": [],
-      "skills": [
-        "continuous-learning-v2"
-      ],
+      "skills": [],
       "path": "commands/projects.md"
     },
     {
@@ -729,9 +653,7 @@
       "type": "testing",
       "primaryAgents": [],
       "allAgents": [],
-      "skills": [
-        "continuous-learning-v2"
-      ],
+      "skills": [],
       "path": "commands/promote.md"
     },
     {
@@ -785,9 +707,7 @@
       "type": "testing",
       "primaryAgents": [],
       "allAgents": [],
-      "skills": [
-        "continuous-learning-v2"
-      ],
+      "skills": [],
       "path": "commands/prune.md"
     },
     {
@@ -800,10 +720,7 @@
       "allAgents": [
         "python-reviewer"
       ],
-      "skills": [
-        "python-patterns",
-        "python-testing"
-      ],
+      "skills": [],
       "path": "commands/python-review.md"
     },
     {
@@ -825,10 +742,7 @@
       "allAgents": [
         "react-build-resolver"
       ],
-      "skills": [
-        "frontend-patterns",
-        "react-patterns"
-      ],
+      "skills": [],
       "path": "commands/react-build.md"
     },
     {
@@ -843,11 +757,7 @@
         "react-reviewer",
         "typescript-reviewer"
       ],
-      "skills": [
-        "accessibility",
-        "react-patterns",
-        "react-testing"
-      ],
+      "skills": [],
       "path": "commands/react-review.md"
     },
     {
@@ -856,12 +766,7 @@
       "type": "testing",
       "primaryAgents": [],
       "allAgents": [],
-      "skills": [
-        "accessibility",
-        "e2e-testing",
-        "react-testing",
-        "tdd-workflow"
-      ],
+      "skills": [],
       "path": "commands/react-test.md"
     },
     {
@@ -901,9 +806,7 @@
       "allAgents": [
         "rust-build-resolver"
       ],
-      "skills": [
-        "rust-patterns"
-      ],
+      "skills": [],
       "path": "commands/rust-build.md"
     },
     {
@@ -916,10 +819,7 @@
       "allAgents": [
         "rust-reviewer"
       ],
-      "skills": [
-        "rust-patterns",
-        "rust-testing"
-      ],
+      "skills": [],
       "path": "commands/rust-review.md"
     },
     {
@@ -928,10 +828,7 @@
       "type": "testing",
       "primaryAgents": [],
       "allAgents": [],
-      "skills": [
-        "rust-patterns",
-        "rust-testing"
-      ],
+      "skills": [],
       "path": "commands/rust-test.md"
     },
     {
@@ -962,9 +859,7 @@
       "allAgents": [
         "security-reviewer"
       ],
-      "skills": [
-        "security-scan"
-      ],
+      "skills": [],
       "path": "commands/security-scan.md"
     },
     {
@@ -1042,9 +937,7 @@
         "typescript-reviewer",
         "vue-reviewer"
       ],
-      "skills": [
-        "vue-patterns"
-      ],
+      "skills": [],
       "path": "commands/vue-review.md"
     }
   ],
@@ -1098,47 +991,6 @@
         "count": 1
       }
     ],
-    "topSkills": [
-      {
-        "skill": "continuous-learning-v2",
-        "count": 6
-      },
-      {
-        "skill": "orch-add-feature",
-        "count": 4
-      },
-      {
-        "skill": "orch-change-feature",
-        "count": 4
-      },
-      {
-        "skill": "tdd-workflow",
-        "count": 4
-      },
-      {
-        "skill": "accessibility",
-        "count": 3
-      },
-      {
-        "skill": "flutter-dart-code-review",
-        "count": 3
-      },
-      {
-        "skill": "orch-fix-defect",
-        "count": 3
-      },
-      {
-        "skill": "rust-patterns",
-        "count": 3
-      },
-      {
-        "skill": "cpp-coding-standards",
-        "count": 2
-      },
-      {
-        "skill": "cpp-testing",
-        "count": 2
-      }
-    ]
+    "topSkills": []
   }
 }

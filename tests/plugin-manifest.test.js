@@ -17,7 +17,6 @@
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
-const { readHooksConfig } = require('../scripts/lib/hooks-config');
 const { expandImports } = require('../scripts/check-instruction-stack');
 
 const repoRoot = path.resolve(__dirname, '..');
@@ -36,7 +35,6 @@ const selectiveInstallArchitecturePath = path.join(repoRoot, 'docs', 'SELECTIVE-
 const opencodePackageJsonPath = path.join(repoRoot, '.opencode', 'package.json');
 const opencodePackageLockPath = path.join(repoRoot, '.opencode', 'package-lock.json');
 const opencodeHooksPluginPath = path.join(repoRoot, '.opencode', 'plugins', 'ecc-hooks.ts');
-const hooksReadmePath = path.join(repoRoot, 'hooks', 'README.md');
 const semverPattern = '[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?';
 const installPrPublishedBaseline = '2.1.0';
 
@@ -230,8 +228,8 @@ test('claude plugin.json does NOT have agents field (unsupported by Claude Code 
   assert.ok(!('agents' in claudePlugin), 'agents field must NOT be declared — Claude Code plugin validator rejects it');
 });
 
-test('claude plugin.json skills is an array', () => {
-  assert.ok(Array.isArray(claudePlugin.skills), 'Expected skills to be an array');
+test('claude plugin.json does NOT have skills field (catalog removed)', () => {
+  assert.ok(!('skills' in claudePlugin), 'skills field must NOT be declared — the skill catalog was removed and a dangling path would break plugin install');
 });
 
 test('claude plugin.json commands is an array', () => {
@@ -335,8 +333,12 @@ test('codex plugin.json version matches package.json', () => {
   assert.strictEqual(codexPlugin.version, expectedVersion);
 });
 
-test('codex plugin.json skills is a string (not array) per official spec', () => {
-  assert.strictEqual(typeof codexPlugin.skills, 'string', 'skills must be a string path per Codex official docs, not an array');
+test('codex plugin.json does NOT have skills field (catalog removed)', () => {
+  assert.ok(!('skills' in codexPlugin), 'skills field must NOT be declared — the skill catalog was removed and a dangling path would break Codex plugin install');
+});
+
+test('codex plugin.json does NOT have hooks field (gate stack removed)', () => {
+  assert.ok(!('hooks' in codexPlugin), 'hooks field must NOT be declared — the hooks/ gate stack was removed and a dangling path would break Codex plugin install');
 });
 
 test('codex plugin.json mcpServers is a string path (not array) per official spec', () => {
@@ -349,81 +351,9 @@ test('codex plugin.json mcpServers exactly matches "./.mcp.json"', () => {
   assert.ok(fs.existsSync(mcpPath), `mcpServers file missing at plugin root: ${codexPlugin.mcpServers}`);
 });
 
-test('codex plugin.json explicitly declares the supported lifecycle hook bundle', () => {
-  assert.strictEqual(
-    codexPlugin.hooks,
-    './hooks/codex-hooks.json',
-    'Codex supports a top-level hooks path; keep the ECC hook bundle explicit instead of inventing provider-specific settings'
-  );
-  const hooksPath = path.join(repoRoot, codexPlugin.hooks.replace(/^\.\//, ''));
-  assert.ok(fs.existsSync(hooksPath), `Codex hooks file missing at plugin root: ${codexPlugin.hooks}`);
-});
-
-test('codex lifecycle hook bundle contains only Codex 0.146-supported schema', () => {
-  const hooksPath = path.join(repoRoot, 'hooks', 'codex-hooks.json');
-  const config = loadJsonObject(hooksPath, 'hooks/codex-hooks.json');
-  assert.deepStrictEqual(Object.keys(config).sort(), ['description', 'hooks'], 'Codex rejects Claude\'s top-level $schema field');
-
-  const supportedEvents = new Set([
-    'PreToolUse', 'PermissionRequest', 'PostToolUse', 'PreCompact', 'PostCompact',
-    'SessionStart', 'SessionEnd', 'SubagentStart', 'SubagentStop',
-    'UserPromptSubmit', 'Stop'
-  ]);
-  assert.deepStrictEqual(
-    Object.keys(config.hooks || {}),
-    ['SessionStart'],
-    'Only the verified, non-blocking SessionStart hook ships natively; Claude hook profiles are not Codex hook profiles'
-  );
-  assert.deepStrictEqual(
-    config.hooks.SessionStart.map(group => group.id),
-    ['session:start'],
-    'Do not ship Claude handlers that surface hook failures in Codex'
-  );
-
-  for (const [event, groups] of Object.entries(config.hooks || {})) {
-    assert.ok(supportedEvents.has(event), `Unsupported Codex hook event: ${event}`);
-    assert.ok(Array.isArray(groups) && groups.length > 0, `Expected non-empty matcher groups for ${event}`);
-    for (const group of groups) {
-      assert.ok(Array.isArray(group.hooks) && group.hooks.length > 0, `Expected non-empty handlers for ${event}`);
-      for (const handler of group.hooks) {
-        assert.strictEqual(handler.type, 'command', `Codex 0.146 only executes command handlers (${event})`);
-        assert.ok(!Object.prototype.hasOwnProperty.call(handler, 'async'), `Codex 0.146 skips async handlers (${event})`);
-        assert.ok(
-          handler.command.includes('process.env.CLAUDE_PLUGIN_ROOT=process.env.PLUGIN_ROOT'),
-          `Codex plugin hooks must pin Claude-compatible bootstrap resolution to Codex PLUGIN_ROOT (${event})`
-        );
-        if (event === 'SessionEnd' && Number.isFinite(handler.timeout)) {
-          assert.ok(handler.timeout <= 3, 'Codex clamps SessionEnd timeouts to 3 seconds');
-        }
-      }
-    }
-  }
-
-  const claudeConfig = readHooksConfig(path.join(repoRoot, 'hooks', 'hooks.json'), 'hooks/hooks.json');
-  const sourceSessionStart = claudeConfig.hooks.SessionStart.find(group => group.id === 'session:start');
-  const expectedSessionStart = {
-    ...sourceSessionStart,
-    hooks: sourceSessionStart.hooks.map(handler => ({
-      ...handler,
-      command: handler.command.replace(
-        'node -e "',
-        'node -e "if(!process.env.PLUGIN_ROOT)throw new Error(\'Missing Codex PLUGIN_ROOT\');process.env.CLAUDE_PLUGIN_ROOT=process.env.PLUGIN_ROOT;'
-      )
-    }))
-  };
-  assert.deepStrictEqual(config.hooks.SessionStart[0], expectedSessionStart, 'Codex SessionStart hook must track its canonical implementation with a Codex-root bootstrap');
-});
-
-test('hook documentation distinguishes the Claude off setting from runtime profiles', () => {
-  const source = fs.readFileSync(hooksReadmePath, 'utf8');
-  assert.ok(source.includes('Claude setup-only value:'), 'Expected hooks README to label off as a Claude setup-only value');
-  const runtimeProfiles = source.match(/Runtime hook profiles:\n((?:- `[^`]+`[^\n]*\n)+)/);
-  assert.ok(runtimeProfiles, 'Expected hooks README to identify runtime hook profiles separately');
-  assert.ok(!runtimeProfiles[1].includes('`off`'), 'off is a Claude setup value, not a runtime hook profile');
-  for (const profile of ['minimal', 'standard', 'strict']) {
-    assert.ok(runtimeProfiles[1].includes(`\`${profile}\``), `Expected documented runtime hook profile: ${profile}`);
-  }
-});
+// The hooks/ gate stack (hooks/codex-hooks.json, hooks/hooks.json, hooks/README.md)
+// was removed alongside the skill catalog; the lifecycle hook bundle tests were
+// removed with it.
 
 test('Chinese capability matrix documents the native Codex SessionStart hook', () => {
   const source = fs.readFileSync(zhCnReadmePath, 'utf8');
@@ -555,7 +485,7 @@ test('marketplace local plugin source is a self-contained native Codex bundle', 
     assert.strictEqual(sourceRoot, repoRoot, `ECC's native Codex bundle must use the self-contained repository root, got: ${plugin.source.path}`);
 
     const manifest = loadJsonObject(path.join(sourceRoot, '.codex-plugin', 'plugin.json'), 'marketplace Codex plugin manifest');
-    for (const field of ['skills', 'mcpServers', 'hooks']) {
+    for (const field of ['mcpServers']) {
       assert.strictEqual(typeof manifest[field], 'string', `Expected Codex manifest ${field} path`);
       const target = path.resolve(sourceRoot, manifest[field]);
       assert.ok(target === sourceRoot || target.startsWith(sourceRoot + path.sep), `${field} escapes the installed source root: ${manifest[field]}`);
@@ -563,7 +493,6 @@ test('marketplace local plugin source is a self-contained native Codex bundle', 
     }
 
     assert.ok(fs.existsSync(path.join(sourceRoot, 'scripts', 'hooks', 'plugin-hook-bootstrap.js')), 'Codex hook runtime must ship inside the installed source root');
-    assert.ok(fs.existsSync(path.join(sourceRoot, 'skills', 'configure-ecc', 'SKILL.md')), 'Codex configure-ecc skill must ship inside the installed source root');
   }
 });
 
@@ -589,18 +518,15 @@ test('plugins/ecc manifest version matches the root Codex manifest', () => {
   assert.strictEqual(marketplacePluginManifest.version, rootCodexManifest.version);
 });
 
-test('plugins/ecc manifest reuses root skills and MCP config without vendoring', () => {
+test('plugins/ecc manifest reuses root MCP config without vendoring', () => {
   const pluginDir = path.dirname(path.dirname(marketplacePluginManifestPath));
 
-  const skillsTarget = path.resolve(pluginDir, marketplacePluginManifest.skills);
-  assert.strictEqual(skillsTarget, path.join(repoRoot, 'skills'), `skills ref must resolve to the root skills/ directory, got: ${marketplacePluginManifest.skills}`);
-  assert.ok(fs.existsSync(skillsTarget), 'Root skills/ directory missing');
+  assert.ok(!('skills' in marketplacePluginManifest), 'skills ref must not be declared — the skill catalog was removed');
 
   const mcpTarget = path.resolve(pluginDir, marketplacePluginManifest.mcpServers);
   assert.strictEqual(mcpTarget, path.join(repoRoot, '.mcp.json'), `mcpServers ref must resolve to the root .mcp.json, got: ${marketplacePluginManifest.mcpServers}`);
   assert.ok(fs.existsSync(mcpTarget), 'Root .mcp.json missing');
 
-  assert.ok(!fs.existsSync(path.join(pluginDir, 'skills')), 'plugins/ecc must not vendor a second skills/ copy (see #2097 review)');
   assert.ok(!fs.existsSync(path.join(pluginDir, '.mcp.json')), 'plugins/ecc must not vendor a second .mcp.json (see #2097 review)');
 });
 
@@ -638,7 +564,6 @@ test('user-facing docs do not use overlong legacy marketplace install commands',
   const markdownFiles = [
     path.join(repoRoot, 'README.md'),
     path.join(repoRoot, 'README.zh-CN.md'),
-    path.join(repoRoot, 'skills', 'configure-ecc', 'SKILL.md'),
     ...collectMarkdownFiles(path.join(repoRoot, 'docs'))
   ].filter(filePath => !path.relative(repoRoot, filePath).startsWith(`docs${path.sep}drafts${path.sep}`));
 

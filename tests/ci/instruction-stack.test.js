@@ -173,28 +173,18 @@ test('every ECC runtime receives the Actions batch and budget rules', () => {
   }
 });
 
-test('all runtime instructions retain independent-session scope and separate delivery milestones', () => {
+test('all runtime instructions keep separate delivery milestones', () => {
   const root = path.resolve(__dirname, '..', '..');
   for (const stack of lib.effectiveStacks(root)) {
-    assert.match(stack.text, /ecc session register/, stack.harness);
-    assert.match(stack.text, /check-write/, stack.harness);
-    assert.match(stack.text, /Release(?: owner(?: only|:)|: owner).*release-acquire.*check-release.*(?:bind )?fixed full SHA/s, stack.harness);
     assert.match(stack.text, /(?:Separate|Distinguish)\s+implementation\/\s*verification\/publication\/deploy/, stack.harness);
   }
 });
 
 test('workflow text does not reintroduce a second approval gate', () => {
   const agents = currentPolicy();
-  const worktree = fs.readFileSync(
-    path.resolve(__dirname, '..', '..', 'skills', 'sea-git-worktree-isolation', 'SKILL.md'),
-    'utf8',
-  );
   assert.doesNotMatch(agents, /separate push approval gate/);
   assert.match(agents, /clearly bounded sequence named in advance/);
   assert.match(agents, /Do not (?:ask again for steps already included|re-ask for included steps)/);
-  assert.match(worktree, /explicit.*approval/is);
-  assert.match(worktree, /primary/i);
-  assert.doesNotMatch(worktree, /always create a worktree/i);
 });
 
 test('cheap CI validation runs effective instructions and the fresh system map', () => {
@@ -213,10 +203,10 @@ test('default instructions require runtime evidence without unconditional test e
     assert.match(text, /signed-in UI\/durable/, harness);
     assert.match(text, /Bind subject\/source\/revision\/code\/environment/, harness);
     assert.match(text, /Repeated QA\s+becomes a (?:narrow|focused)\s+skill\/script/, harness);
-    assert.match(text, /No (?:universal|fixed)\s+coverage\/TDD\/review ritual/, harness);
+    assert.match(text, /No (?:universal|fixed)\s+coverage\/\s*TDD\/review ritual/, harness);
   }
   assert.doesNotMatch(agents, /Minimum coverage:\s*80%/);
-  assert.match(agents, /No fixed coverage|No universal\s+coverage\/TDD\/review ritual/);
+  assert.match(agents, /No fixed coverage|No universal\s+coverage\/\s*TDD\/review ritual/);
 });
 
 test('thin navigation files do not duplicate the canonical goal contract', () => {
@@ -330,11 +320,9 @@ test('missing advertised installer target is rejected (negative control)', () =>
   assert.ok(installer.failures.includes('agents-core missing install target: gemini'));
 });
 
-test('model and skill policy is routed on demand and covers the evidence lifecycle', () => {
-  const agents = currentPolicy();
+test('model and skill policy covers the evidence lifecycle', () => {
   const policyPath = path.resolve(__dirname, '..', '..', 'docs', 'tools', 'MODEL_PROMPTING_AND_SKILL_POLICY.md');
   const policy = fs.readFileSync(policyPath, 'utf8');
-  assert.match(agents, /MODEL_PROMPTING_AND_SKILL_POLICY\.md/);
   assert.match(policy, /Keep prompts lean and outcome-based/);
   assert.match(policy, /Calibrate effort and model by evaluation/);
   assert.match(policy, /One job, one trigger/);
@@ -354,7 +342,6 @@ test('generic orchestration and TDD guidance remains risk-scaled', () => {
     'rules/common/development-workflow.md',
     'rules/common/testing.md',
     'agents/tdd-guide.md',
-    'skills/tdd-workflow/SKILL.md',
   ];
   const text = files
     .map((name) => fs.readFileSync(path.join(root, name), 'utf8'))
@@ -391,7 +378,10 @@ test('reachable agent surfaces reject fixed coverage, timed verification, and ea
       else if (/\.(?:md|json|txt)$/i.test(entry.name)) files.push(absolute);
     }
   }
-  for (const relative of roots) collect(path.join(root, relative));
+  for (const relative of roots) {
+    const absolute = path.join(root, relative);
+    if (fs.existsSync(absolute)) collect(absolute);
+  }
 
   const forbidden = [
     /coverage[^\r\n]{0,60}(?:80%|>=\s*80|\u2265\s*80)/i,

@@ -20,7 +20,6 @@
     "workflow",
     "automation"
   ],
-  "skills": "../../skills/",
   "mcpServers": "../../.mcp.json",
   "interface": {
     "displayName": "ECC",

@@ -20,9 +20,7 @@
     "workflow",
     "automation"
   ],
-  "skills": "./skills/",
   "mcpServers": "./.mcp.json",
-  "hooks": "./hooks/codex-hooks.json",
   "interface": {
     "displayName": "ECC",
     "shortDescription": "Selective ECC engineering skills, guarded workflows, and an opt-out browser connector.",

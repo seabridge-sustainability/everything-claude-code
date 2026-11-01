@@ -41,7 +41,7 @@ function cleanupTempDir(dirPath) {
 }
 
 function runNode(scriptPath, args = [], options = {}) {
-  return spawnSync('node', [scriptPath, ...args], {
+  return spawnSync(process.execPath, [scriptPath, ...args], {
     encoding: 'utf8',
     cwd: options.cwd || process.cwd(),
     env: {

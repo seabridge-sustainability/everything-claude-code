@@ -16,13 +16,13 @@ const sources = {
     producer: 'greenly-lca/producer.txt',
     observer: 'greenly-lca/observer.txt',
     review: 'greenly-lca/review.json',
-    target: 'D4DFC16D0BBBD72010B4F93F74F3CCB3', prefix: 'rea-greenly-lca-',
+    target: 'D4DFC16D0BBBD72010B4F93F74F3CCB3', prefix: 'rea-greenly-lca-', // pragma: allowlist secret
   },
   'persefoni-purpose': {
     producer: 'persefoni-purpose/producer.txt',
     observer: 'persefoni-purpose/observer.txt',
     review: 'persefoni-purpose/review.json',
-    target: 'DE72303F6AF6B76A701094512FA4C4FD', prefix: 'rea-persefoni-scope3-',
+    target: 'DE72303F6AF6B76A701094512FA4C4FD', prefix: 'rea-persefoni-scope3-', // pragma: allowlist secret
   },
 };
 let passed = 0, id = 0;
@@ -60,8 +60,9 @@ function fixture() {
   }
   function adapter(p, overrides = {}) {
     const assignmentBytes = Buffer.from(JSON.stringify(p.a));
+    const canonicalDir = (process.platform === 'win32' ? dir.toLowerCase() : dir) + path.sep;
     return createPassiveTargetAdmission({ repositoryPath: dir, assignmentBytes, assignmentSHA256: sha(assignmentBytes),
-      assertWrite: paths => paths.every(p => p.startsWith(dir + path.sep)), clock: () => state.now,
+      assertWrite: paths => paths.every(p => (process.platform === 'win32' ? p.toLowerCase() : p).startsWith(canonicalDir)), clock: () => state.now,
       readTelemetry: () => ({ observedAt: new Date(state.now).toISOString(), freeRamGiB: state.free, reserveRamGiB: 2 }),
       verifyAdmission: () => state.admission, verifyCustody: () => state.custody, verifyNativeIdentity: () => state.native,
       confirmStopped: () => state.stopped,

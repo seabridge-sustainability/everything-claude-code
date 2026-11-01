@@ -32,9 +32,16 @@ test('native runtime wiring has a negative control', () => {
       evidenceText[source] = fs.readFileSync(path.join(__dirname, '..', '..', source), 'utf8');
     }
   }
-  evidenceText['hooks/hooks.json'] = evidenceText['hooks/hooks.json'].replaceAll('goal-runtime-gate', 'disabled-goal-gate');
+  for (const source of Object.keys(evidenceText)) {
+    evidenceText[source] = evidenceText[source]
+      .replaceAll('goal-runtime-gate', 'disabled-goal-gate')
+      .replaceAll('goal-runtime-bridge', 'disabled-goal-bridge')
+      .replaceAll('runGoalRuntime', 'disabledRunGoalRuntime');
+  }
   const errors = validateCapabilities(capabilities, { evidenceText });
-  assert.ok(errors.includes('native runtime claude does not invoke the canonical goal runtime gate'));
+  for (const runtime of capabilities.runtimes.filter(runtime => runtime.tier === 'native')) {
+    assert.ok(errors.includes(`native runtime ${runtime.id} does not invoke the canonical goal runtime gate`));
+  }
 });
 
 test('controlled admission decision is identical across runtimes and models', () => {

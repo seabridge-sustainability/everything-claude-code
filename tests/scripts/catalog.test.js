@@ -70,19 +70,19 @@ function runTests() {
     assert.ok(Array.isArray(parsed.components));
     assert.ok(parsed.components.length > 0);
     assert.ok(parsed.components.every(component => component.family === 'language'));
-    assert.ok(parsed.components.some(component => component.id === 'lang:typescript'));
-    assert.ok(parsed.components.every(component => component.id !== 'framework:nextjs'));
+    assert.ok(parsed.components.some(component => component.id === 'lang:perl'));
+    assert.ok(parsed.components.every(component => component.id !== 'framework:quarkus'));
   })) passed++; else failed++;
 
   if (test('shows a resolved component payload', () => {
-    const result = run(['show', 'framework:nextjs', '--json']);
+    const result = run(['show', 'framework:quarkus', '--json']);
     assert.strictEqual(result.code, 0, result.stderr);
     const parsed = JSON.parse(result.stdout);
-    assert.strictEqual(parsed.id, 'framework:nextjs');
+    assert.strictEqual(parsed.id, 'framework:quarkus');
     assert.strictEqual(parsed.family, 'framework');
-    assert.deepStrictEqual(parsed.moduleIds, ['framework-language']);
+    assert.deepStrictEqual(parsed.moduleIds, ['security']);
     assert.ok(Array.isArray(parsed.modules));
-    assert.strictEqual(parsed.modules[0].id, 'framework-language');
+    assert.strictEqual(parsed.modules[0].id, 'security');
   })) passed++; else failed++;
 
   if (test('fails on unknown subcommands', () => {

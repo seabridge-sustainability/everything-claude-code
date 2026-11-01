@@ -18,9 +18,9 @@
   },
   {
    "id": "claude",
-   "tier": "native",
-   "admission": "native",
-   "final_claim": "native",
+   "tier": "hybrid",
+   "admission": "wrapper",
+   "final_claim": "wrapper",
    "native_events": [
     "UserPromptSubmit",
     "Stop"

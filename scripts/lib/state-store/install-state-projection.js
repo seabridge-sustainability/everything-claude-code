@@ -271,29 +271,28 @@ function summarizeProjectedInstallHealth(installHealth, reconciliation) {
   const installations = installHealth.installations.map(installation => {
     const key = identityKey(installation);
     const canonicalHealth = healthByIdentity.get(key);
+    // Status output is consumed by tools with default buffers (spawnSync caps
+    // at 1 MB) — keep the per-operation log out of it; expose counts only.
+    const summarized = {
+      ...installation,
+      operations: Array.isArray(installation.operations)
+        ? { total: installation.operations.length }
+        : installation.operations,
+    };
     if (canonicalHealth) {
-      return {
-        ...installation,
-        status: canonicalHealth.status === 'ok' ? installation.status : 'warning',
-        canonicalStatus: canonicalHealth.status,
-        issues: canonicalHealth.issues.map(issue => cloneJsonValue(issue)),
-      };
+      summarized.status = canonicalHealth.status === 'ok' ? installation.status : 'warning';
+      summarized.canonicalStatus = canonicalHealth.status;
+      summarized.issues = canonicalHealth.issues.map(issue => cloneJsonValue(issue));
+    } else if (healthCheckFailed && scopedIdentities.has(key)) {
+      summarized.status = 'warning';
+      summarized.canonicalStatus = 'unverified';
+      summarized.issues = [{
+        severity: 'warning',
+        code: 'install-health-check-failed',
+        message: 'Canonical managed-file health could not be verified',
+      }];
     }
-
-    if (healthCheckFailed && scopedIdentities.has(key)) {
-      return {
-        ...installation,
-        status: 'warning',
-        canonicalStatus: 'unverified',
-        issues: [{
-          severity: 'warning',
-          code: 'install-health-check-failed',
-          message: 'Canonical managed-file health could not be verified',
-        }],
-      };
-    }
-
-    return installation;
+    return summarized;
   });
   const healthyCount = installations.filter(installation => installation.status === 'healthy').length;
   const warningCount = installations.length - healthyCount;
