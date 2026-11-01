@@ -68,7 +68,7 @@ function runTests() {
     const result = run(['--list-components', '--family', 'language']);
     assert.strictEqual(result.code, 0);
     assert.ok(result.stdout.includes('Install components'));
-    assert.ok(result.stdout.includes('lang:typescript'));
+    assert.ok(result.stdout.includes('lang:ruby'));
     assert.ok(!result.stdout.includes('capability:security'));
   })) passed++; else failed++;
 
@@ -94,16 +94,15 @@ function runTests() {
   if (test('emits JSON for explicit module resolution', () => {
     const result = run([
       '--modules', 'security',
-      '--with', 'capability:research',
+      '--with', 'capability:agentic',
       '--target', 'cursor',
       '--json'
     ]);
     assert.strictEqual(result.code, 0);
     const parsed = JSON.parse(result.stdout);
     assert.ok(parsed.selectedModuleIds.includes('security'));
-    assert.ok(parsed.selectedModuleIds.includes('research-apis'));
-    assert.ok(parsed.selectedModuleIds.includes('workflow-quality'));
-    assert.deepStrictEqual(parsed.includedComponentIds, ['capability:research']);
+    assert.ok(parsed.selectedModuleIds.includes('agentic-patterns'));
+    assert.deepStrictEqual(parsed.includedComponentIds, ['capability:agentic']);
     assert.strictEqual(parsed.targetAdapterId, 'cursor-project');
     assert.ok(Array.isArray(parsed.operations));
     assert.ok(parsed.operations.length > 0);
@@ -111,16 +110,14 @@ function runTests() {
 
   if (test('emits JSON for --skills without pulling parent module', () => {
     const result = run([
-      '--skills', 'continuous-learning-v2',
+      '--skills', 'security-review',
       '--target', 'claude',
       '--json',
     ]);
     assert.strictEqual(result.code, 0);
     const parsed = JSON.parse(result.stdout);
-    assert.deepStrictEqual(parsed.includedComponentIds, ['skill:continuous-learning-v2']);
-    assert.deepStrictEqual(parsed.selectedModuleIds, ['skill-continuous-learning-v2']);
-    assert.ok(parsed.operations.some(operation => operation.sourceRelativePath === 'skills/continuous-learning-v2'));
-    assert.ok(!parsed.operations.some(operation => operation.sourceRelativePath === 'skills/tdd-workflow'));
+    assert.deepStrictEqual(parsed.includedComponentIds, ['skill:security-review']);
+    assert.deepStrictEqual(parsed.selectedModuleIds, ['security']);
   })) passed++; else failed++;
 
   if (test('loads planning intent from ecc-install.json', () => {

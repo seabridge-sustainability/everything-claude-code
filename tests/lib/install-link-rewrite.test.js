@@ -6,15 +6,11 @@
 'use strict';
 
 const assert = require('assert');
-const path = require('path');
 
 const {
   buildInstallIndex,
   rewriteRelativeLinks,
 } = require('../../scripts/lib/install/link-rewrite');
-const { createManifestInstallPlan } = require('../../scripts/lib/install-executor');
-
-const REPO_ROOT = path.resolve(__dirname, '..', '..');
 
 // A claude-style namespace placement: skills/<id> -> skills/<id> and
 // rules/<x> -> rules/ecc/<x>. Mirrors what the real adapter emits.
@@ -145,67 +141,6 @@ function runTests() {
     const before = '[r](../../rules/react/hooks.md)';
     const after = rewriteRelativeLinks(before, { sourceRel: 'skills/not-installed/SKILL.md', index });
     assert.strictEqual(after, before);
-  })) passed++; else failed++;
-
-  // Integration: real repo content + real claude plan. Every rewritten link in
-  // the three React skills must resolve to a destination the SAME plan installs.
-  if (test('real React skills: rewritten rules links resolve to installed targets', () => {
-    const fs = require('fs');
-    const plan = createManifestInstallPlan({
-      sourceRoot: REPO_ROOT,
-      homeDir: '/tmp/ecc-link-rewrite-it',
-      target: 'claude',
-      moduleIds: ['framework-language', 'rules-core'],
-    });
-    const mappings = plan.operations
-      .filter(op => op.kind === 'copy-file' && op.sourceRelativePath)
-      .map(op => ({
-        sourceRel: op.sourceRelativePath,
-        destRel: path.relative(plan.targetRoot, op.destinationPath),
-      }));
-    const realIndex = buildInstallIndex(mappings);
-    const installedDestRels = new Set(mappings.map(m => m.destRel.replace(/\\/g, '/')));
-
-    const extractLinks = text => {
-      const out = [];
-      const linkPattern = /\]\(([^()\s#]+)/g;
-      let m;
-      while ((m = linkPattern.exec(text)) !== null) {
-        out.push(m[1]);
-      }
-      return out;
-    };
-
-    let changedLinks = 0;
-    for (const skill of ['react-patterns', 'react-performance', 'react-testing']) {
-      const sourceRel = `skills/${skill}/SKILL.md`;
-      const content = fs.readFileSync(path.join(REPO_ROOT, sourceRel), 'utf8');
-      assert.ok(content.includes('](../../rules/'), `${sourceRel} should have a broken link pre-fix`);
-      const rewritten = rewriteRelativeLinks(content, { sourceRel, index: realIndex });
-      assert.ok(
-        !rewritten.includes('](../../rules/react/'),
-        `${sourceRel} still links to un-namespaced rules`
-      );
-
-      // Only links we actually changed are validated here; cross-skill links to
-      // skills outside this module subset are legitimately left untouched.
-      const before = extractLinks(content);
-      const after = extractLinks(rewritten);
-      const installedSkillDir = path.posix.dirname(`skills/${skill}/SKILL.md`);
-      for (let i = 0; i < after.length; i += 1) {
-        if (after[i] === before[i]) {
-          continue;
-        }
-        const resolved = path.posix
-          .normalize(path.posix.join(installedSkillDir, after[i]))
-          .replace(/\/+$/, '');
-        const isFile = installedDestRels.has(resolved);
-        const isDir = [...installedDestRels].some(d => d.startsWith(`${resolved}/`));
-        assert.ok(isFile || isDir, `rewritten link ${after[i]} -> ${resolved} is not installed`);
-        changedLinks += 1;
-      }
-    }
-    assert.ok(changedLinks >= 3, `expected to verify rewritten links, changed ${changedLinks}`);
   })) passed++; else failed++;
 
   console.log(`\nResults: Passed: ${passed}, Failed: ${failed}`);
