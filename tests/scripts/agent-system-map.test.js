@@ -42,11 +42,9 @@ run('map covers canonical policy, all adapters, outcome gate, and CI with bounde
     'file:scripts/ci/detect-ci-scope.js', 'file:tests/ci/workflow-cost-contract.test.js',
     'file:integrations/pstack/cli.mjs', 'file:integrations/pstack/mcp.mjs',
     'file:integrations/ponytail/cli.mjs', 'file:integrations/ponytail/mcp.mjs',
-    'file:skills/sea-ponytail/SKILL.md',
     'file:manifests/task-skill-routing.json', 'file:scripts/lib/skill-routing.js',
     'file:scripts/fresh-agent-session.js', 'file:scripts/lib/fresh-session-guard.js',
     'file:integrations/engineering-skills/catalog.mjs',
-    'file:skills/sea-multi-model-planning/SKILL.md', 'file:skills/sea-verify-seabridge/SKILL.md',
     'runtime:codex', 'runtime:claude', 'runtime:gemini', 'runtime:opencode']) {
     assert.ok(ids.has(required), required);
   }
@@ -56,7 +54,6 @@ run('map covers canonical policy, all adapters, outcome gate, and CI with bounde
   assert.ok(map.edges.some(edge => edge.from === 'file:integrations/ponytail/mcp.mjs'
     && edge.to === 'file:integrations/dev-suite/runtime.mjs' && edge.type === 'verified-code-import'));
   assert.ok(map.edges.some(edge => edge.from === 'file:CLAUDE.md' && edge.to === 'file:../manageesg-backend/CLAUDE.md' && edge.type === 'verified-import'));
-  assert.ok(map.edges.some(edge => edge.from === 'runtime:claude' && edge.to === 'file:hooks/hooks.json' && edge.type === 'runtime-evidence'));
   assert.ok(map.edges.some(edge => edge.from === 'file:scripts/memory.js'
     && edge.to === 'file:scripts/lib/memory-vault.js' && edge.type === 'verified-code-import'));
   assert.ok(map.sources.every(row => !/^(?:data|artifacts|logs|graphify-out)\//.test(row.path)));

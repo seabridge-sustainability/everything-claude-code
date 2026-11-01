@@ -54,14 +54,5 @@
       "Agent"
     ]
   },
-  "enabledMcpjsonServers": [
-    "berry",
-    "github",
-    "context7",
-    "exa",
-    "playwright",
-    "sequential-thinking",
-    "gitnexus",
-    "falkordb"
-  ]
+  "enabledMcpjsonServers": []
 }
