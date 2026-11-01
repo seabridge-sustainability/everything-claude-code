@@ -1,12 +1,11 @@
 /**
  * Surface test for #2573: every GATEGUARD_* environment variable the hook
- * reads must be documented in the GateGuard skill doc.
+ * reads must be reachable through a documented, literal access form.
  *
- * `GATEGUARD_BASH_ROUTINE_DISABLED` shipped with no documentation at all and
- * `GATEGUARD_EXEMPT_GLOBS` was mentioned only in a release note, so operators
- * had no discoverable way to narrow the gate short of disabling it outright.
- * This pins the surface: adding a knob to the hook without documenting it
- * fails here.
+ * The GateGuard skill doc (skills/gateguard/SKILL.md) was removed with the
+ * ECC catalog removal, so the doc-existence and documentation-coverage
+ * assertions were pruned; what remains pins the env-read surface in the hook
+ * source itself.
  *
  * The env reads are extracted from *code only* — comments, string literals,
  * template-literal text and regex literals are blanked out first, so a knob
@@ -31,6 +30,8 @@ const path = require('path');
 
 const repoRoot = path.join(__dirname, '..', '..');
 const hookPath = path.join(repoRoot, 'scripts', 'hooks', 'gateguard-fact-force.js');
+// Removed with the ECC catalog; kept only so the reverse-drift check below
+// stays armed if a skill doc is ever reintroduced (reads as '' until then).
 const skillPath = path.join(repoRoot, 'skills', 'gateguard', 'SKILL.md');
 
 let passed = 0;
@@ -226,10 +227,9 @@ function findUnsupportedAccess(source) {
 
 console.log('\nGateGuard env-var documentation surface\n');
 
-if (test('hook and skill doc both exist', () => {
-  assert.ok(fs.existsSync(hookPath), `missing ${hookPath}`);
-  assert.ok(fs.existsSync(skillPath), `missing ${skillPath}`);
-})) passed++; else failed++;
+// 'hook and skill doc both exist' and 'every GATEGUARD_* variable the hook
+// reads is documented' were pruned with the removal of skills/gateguard; the
+// hook itself still ships from scripts/hooks/gateguard-fact-force.js.
 
 const hookSource = fs.existsSync(hookPath) ? fs.readFileSync(hookPath, 'utf8') : '';
 const skillDoc = fs.existsSync(skillPath) ? fs.readFileSync(skillPath, 'utf8') : '';
@@ -239,19 +239,12 @@ if (test('hook reads at least one GATEGUARD_* variable', () => {
   assert.ok(envNames.size > 0, 'no GATEGUARD_* env reads found - has the hook moved?');
 })) passed++; else failed++;
 
-if (test('every GATEGUARD_* variable the hook reads is documented', () => {
-  const undocumented = [...envNames].filter(name => !skillDoc.includes(name)).sort();
-  assert.deepStrictEqual(
-    undocumented,
-    [],
-    `undocumented in skills/gateguard/SKILL.md: ${undocumented.join(', ')}`
-  );
-})) passed++; else failed++;
-
 if (test('the documented knobs are the ones the hook actually reads', () => {
   // Guards the reverse drift: a doc naming a knob the hook no longer reads.
   // Compared against the parsed env reads, not raw source — a name surviving
   // only in a comment or error string must not satisfy this.
+  // Vacuous while the skill doc is absent (skills/ removed): an empty doc
+  // names no knobs, so it can never be stale.
   const documented = [...new Set(skillDoc.match(/GATEGUARD_[A-Z0-9_]+/g) || [])];
   const stale = documented.filter(name => !envNames.has(name)).sort();
   assert.deepStrictEqual(stale, [], `documented but unread by the hook: ${stale.join(', ')}`);

@@ -96,11 +96,28 @@ for (const testFile of testFiles) {
   for (const key of ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE', 'GIT_COMMON_DIR', 'GIT_PREFIX']) {
     delete childEnv[key];
   }
+  // Headless hygiene: nothing a test spawns may open a GUI prompt or pager and
+  // block forever. Credential helpers must fail fast instead of popping GCM,
+  // pagers must not start, and an unresponsive child will be killed by the
+  // timeout below (spawnSync kills the direct child only, so belt and braces).
+  childEnv.GIT_TERMINAL_PROMPT = '0';
+  childEnv.GCM_INTERACTIVE = 'Never';
+  childEnv.GIT_ASKPASS = 'echo';
+  childEnv.SSH_ASKPASS = 'echo';
+  childEnv.SSH_ASKPASS_REQUIRE = 'force';
+  childEnv.PAGER = 'cat';
+  childEnv.GIT_PAGER = 'cat';
 
+  // Per-file timeout. Gate tests spawn git children; a GUI prompt or orphaned
+  // pager wedged one file for 5 hours with no way to notice. 120s is ~3x the
+  // p95 file runtime; on expiry the child is SIGKILLed and counted as failed.
+  const FILE_TIMEOUT_MS = 120000;
   const result = spawnSync('node', [testPath], {
     encoding: 'utf8',
     stdio: ['pipe', 'pipe', 'pipe'],
-    env: childEnv
+    env: childEnv,
+    timeout: FILE_TIMEOUT_MS,
+    killSignal: 'SIGKILL'
   });
 
   const stdout = result.stdout || '';
@@ -132,8 +149,10 @@ for (const testFile of testFiles) {
   totalFailed += processFailed ? Math.max(reportedFailures, 1) : reportedFailures;
 
   let failureReason;
-  if (result.error) {
-    failureReason = `failed to start: ${result.error.message}`;
+  if (result.error && result.error.code === 'ETIMEDOUT') {
+    failureReason = `timed out after ${FILE_TIMEOUT_MS / 1000}s (likely blocked on a prompt, pager, or hung git child)`;
+  } else if (result.error) {
+    failureReason = `failed to start or was killed with partial output: ${result.error.message}`;
   } else if (result.status !== 0) {
     failureReason = result.signal
       ? `terminated by signal ${result.signal}`
